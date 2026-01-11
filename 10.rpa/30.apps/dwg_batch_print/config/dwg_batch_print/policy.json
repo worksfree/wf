@@ -1,0 +1,14 @@
+{
+  "identity": {
+    "app_name": "dwg_batch_print",
+    "short_name": "dbp",
+    "display_name": "DWG Batch Print"
+  },
+  "policy": {
+    "icon_text": "DBP",
+    "description": "도면 일괄 출력 앱",
+    "trial_credits": 50000,
+    "credit_per_work": 100,
+    "credit_type": "per_file"
+  }
+}

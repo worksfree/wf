@@ -1,0 +1,90 @@
+2026-01-08 06:16:49,256 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:16:49,257 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2026-01-08 06:16:49,322 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:16:49,323 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:16:49,324 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2026-01-08 06:16:49,324 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:16:50,742 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:16:50,742 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2026-01-08 06:16:50,742 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:16:50,742 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:92 - [CONFIG] run_mode=release, settings_file=D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-08 06:16:50,742 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:225 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-08 06:16:50,743 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:16:50,743 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:109 - App: DWG_Batch_Print
+2026-01-08 06:16:50,743 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:16:50,743 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:87 - [CONFIG] run_mode=demo, settings_file=D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2026-01-08 06:16:50,744 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:223 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2026-01-08 06:16:50,745 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:16:50,745 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
+2026-01-08 06:16:50,745 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:16:50,745 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:66 - [CONFIG] run_mode=demo, settings_file=d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-08 06:16:50,746 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:212 - 사용자 설정 로드 완료: d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-08 06:16:50,746 - DEBUG - [wf_rpa.Dwg_Classifier] app_setting_data:253 - [새로 로드] 크레딧 정책 로드: {'icon_text': 'DWG', 'description': '도면 분류 앱', 'trial_credits': 50000, 'credit_per_work': 50, 'credit_type': 'per_file'}
+2026-01-08 06:16:50,746 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:224 - 크레딧 정책 설정 적용: ['icon_text', 'description', 'trial_credits', 'credit_per_work', 'credit_type']
+2026-01-08 06:16:50,747 - INFO - [wf_rpa.conversion_verifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:16:50,747 - INFO - [wf_rpa.conversion_verifier] wf_log:109 - App: conversion_verifier
+2026-01-08 06:16:50,747 - INFO - [wf_rpa.conversion_verifier] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:16:50,749 - INFO - [wf_rpa.Korean_Filename_Normalizer] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:16:50,749 - INFO - [wf_rpa.Korean_Filename_Normalizer] wf_log:109 - App: Korean_Filename_Normalizer
+2026-01-08 06:16:50,749 - INFO - [wf_rpa.Korean_Filename_Normalizer] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:16:50,749 - INFO - [wf_rpa.Korean_Filename_Normalizer] app_setting_data:78 - [CONFIG] run_mode=demo, settings_file=D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\config\korean_filename_normalizer\settings.json
+2026-01-08 06:17:05,676 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:17:05,676 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2026-01-08 06:17:05,738 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:17:05,740 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:17:05,740 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2026-01-08 06:17:05,740 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:17:07,167 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:17:07,167 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2026-01-08 06:17:07,167 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:17:07,167 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:92 - [CONFIG] run_mode=release, settings_file=D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-08 06:17:07,167 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:225 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-08 06:17:07,169 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:17:07,169 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:109 - App: DWG_Batch_Print
+2026-01-08 06:17:07,169 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:17:07,169 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:87 - [CONFIG] run_mode=demo, settings_file=D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2026-01-08 06:17:07,169 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:223 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2026-01-08 06:17:07,170 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:17:07,170 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
+2026-01-08 06:17:07,170 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:17:07,171 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:66 - [CONFIG] run_mode=demo, settings_file=d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-08 06:17:07,171 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:212 - 사용자 설정 로드 완료: d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-08 06:17:07,171 - DEBUG - [wf_rpa.Dwg_Classifier] app_setting_data:253 - [새로 로드] 크레딧 정책 로드: {'icon_text': 'DWG', 'description': '도면 분류 앱', 'trial_credits': 50000, 'credit_per_work': 50, 'credit_type': 'per_file'}
+2026-01-08 06:17:07,171 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:224 - 크레딧 정책 설정 적용: ['icon_text', 'description', 'trial_credits', 'credit_per_work', 'credit_type']
+2026-01-08 06:17:07,173 - INFO - [wf_rpa.conversion_verifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:17:07,173 - INFO - [wf_rpa.conversion_verifier] wf_log:109 - App: conversion_verifier
+2026-01-08 06:17:07,173 - INFO - [wf_rpa.conversion_verifier] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:17:07,175 - INFO - [wf_rpa.Korean_Filename_Normalizer] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:17:07,175 - INFO - [wf_rpa.Korean_Filename_Normalizer] wf_log:109 - App: Korean_Filename_Normalizer
+2026-01-08 06:17:07,175 - INFO - [wf_rpa.Korean_Filename_Normalizer] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:17:07,175 - INFO - [wf_rpa.Korean_Filename_Normalizer] app_setting_data:78 - [CONFIG] run_mode=demo, settings_file=D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\config\korean_filename_normalizer\settings.json
+2026-01-08 06:27:56,573 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:27:56,573 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2026-01-08 06:27:56,638 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:27:56,640 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:27:56,640 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2026-01-08 06:27:56,640 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:27:58,073 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:27:58,073 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2026-01-08 06:27:58,073 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:27:58,073 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:92 - [CONFIG] run_mode=release, settings_file=D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-08 06:27:58,074 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:225 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-08 06:27:58,075 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:27:58,075 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:109 - App: DWG_Batch_Print
+2026-01-08 06:27:58,075 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:27:58,075 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:87 - [CONFIG] run_mode=demo, settings_file=D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2026-01-08 06:27:58,076 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:223 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2026-01-08 06:27:58,077 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:27:58,077 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
+2026-01-08 06:27:58,077 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:27:58,077 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:66 - [CONFIG] run_mode=demo, settings_file=d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-08 06:27:58,077 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:212 - 사용자 설정 로드 완료: d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-08 06:27:58,077 - DEBUG - [wf_rpa.Dwg_Classifier] app_setting_data:253 - [새로 로드] 크레딧 정책 로드: {'icon_text': 'DWG', 'description': '도면 분류 앱', 'trial_credits': 50000, 'credit_per_work': 50, 'credit_type': 'per_file'}
+2026-01-08 06:27:58,077 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:224 - 크레딧 정책 설정 적용: ['icon_text', 'description', 'trial_credits', 'credit_per_work', 'credit_type']
+2026-01-08 06:27:58,079 - INFO - [wf_rpa.conversion_verifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:27:58,079 - INFO - [wf_rpa.conversion_verifier] wf_log:109 - App: conversion_verifier
+2026-01-08 06:27:58,079 - INFO - [wf_rpa.conversion_verifier] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:27:58,081 - INFO - [wf_rpa.Korean_Filename_Normalizer] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 06:27:58,081 - INFO - [wf_rpa.Korean_Filename_Normalizer] wf_log:109 - App: Korean_Filename_Normalizer
+2026-01-08 06:27:58,081 - INFO - [wf_rpa.Korean_Filename_Normalizer] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 06:27:58,081 - INFO - [wf_rpa.Korean_Filename_Normalizer] app_setting_data:78 - [CONFIG] run_mode=demo, settings_file=D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\config\korean_filename_normalizer\settings.json

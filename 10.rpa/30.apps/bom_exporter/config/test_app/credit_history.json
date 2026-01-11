@@ -1,0 +1,15 @@
+{
+  "app_policy": {
+    "description": "test_app - 정책 미설정",
+    "trial_credits": 0,
+    "credit_per_work": 1,
+    "credit_type": "per_item"
+  },
+  "credit_changed": false,
+  "trial_credits": 0,
+  "purchased_credits": 0,
+  "created_at": "2026-01-08T06:41:50.588",
+  "last_updated": "2026-01-08T06:41:50.588",
+  "purchase_history": [],
+  "usage_history": []
+}

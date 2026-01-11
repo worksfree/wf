@@ -1,0 +1,686 @@
+2025-12-28 09:57:16,527 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:16,527 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:16,648 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:16,650 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:16,650 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:16,650 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:20,189 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:20,189 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:20,322 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:20,324 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:20,324 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:20,324 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:25,628 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:25,628 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:25,770 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:25,772 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:25,772 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:25,772 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:30,165 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:30,166 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:30,289 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:30,291 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:30,291 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:30,291 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:33,453 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:33,453 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:33,585 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:33,587 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:33,587 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:33,587 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:36,970 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:36,970 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:37,092 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:37,094 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:37,094 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:37,095 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:41,395 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:41,395 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:41,517 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:41,519 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:41,519 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:41,519 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:44,973 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:44,973 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:45,102 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:45,104 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:45,104 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:45,104 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:49,533 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:49,533 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:49,674 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:49,676 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:49,676 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:49,676 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:55,027 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:55,028 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:57:55,159 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:57:55,161 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:57:55,161 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:57:55,161 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:01,991 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:01,991 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:58:02,116 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:02,118 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:02,118 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:58:02,118 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:08,457 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:08,457 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:58:08,577 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:08,579 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:08,579 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:58:08,579 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:15,117 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:15,118 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:58:15,244 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:15,246 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:15,246 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:58:15,246 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:21,991 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:21,991 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:58:22,130 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:22,132 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:22,132 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:58:22,132 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:25,337 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:25,337 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:58:25,473 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:25,475 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:25,475 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:58:25,475 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:30,173 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:30,173 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 09:58:30,328 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:58:30,330 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:58:30,331 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 09:58:30,331 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:00:17,351 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:00:17,351 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:00:17,470 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:00:17,472 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:00:17,472 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:00:17,472 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:03:11,541 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:03:11,541 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:03:11,695 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:03:11,697 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:03:11,697 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:03:11,697 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:05:41,447 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:05:41,447 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:05:41,598 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:05:41,600 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:05:41,600 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:05:41,601 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:07,313 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:07,313 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:15:07,431 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:07,432 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:07,432 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:15:07,432 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:10,999 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:11,000 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:15:11,109 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:11,111 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:11,111 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:15:11,111 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:15,630 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:15,631 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:15:15,745 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:15,747 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:15,747 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:15:15,747 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:35,348 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:35,348 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:15:35,484 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:35,485 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:35,485 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:15:35,486 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:59,593 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:59,593 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:15:59,731 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:15:59,733 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:15:59,733 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:15:59,733 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:16:12,029 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:16:12,029 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:16:12,160 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:16:12,162 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:16:12,162 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:16:12,162 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:16:21,443 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:16:21,443 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:16:21,589 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:16:21,590 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:16:21,590 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:16:21,591 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:16:27,728 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:16:27,728 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:16:27,853 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:16:27,856 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:16:27,856 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:16:27,856 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:21:08,980 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:21:08,980 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 10:21:09,104 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 10:21:09,106 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 10:21:09,106 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 10:21:09,106 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:06:24,266 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:06:24,266 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:06:24,415 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:06:24,417 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:06:24,417 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:06:24,417 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:08:36,141 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:08:36,141 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:08:36,249 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:08:36,252 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:08:36,252 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:08:36,252 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:32:46,924 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:32:46,924 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:32:47,037 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:32:47,038 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:32:47,039 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:32:47,039 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:32:57,268 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:32:57,268 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:32:57,372 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:32:57,374 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:32:57,374 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:32:57,374 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:33:06,291 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:33:06,291 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:33:06,391 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:33:06,392 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:33:06,393 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:33:06,393 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:33:25,457 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:33:25,457 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:33:25,569 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:33:25,570 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:33:25,571 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:33:25,571 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:35:41,170 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:35:41,170 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:35:41,291 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:35:41,293 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:35:41,293 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:35:41,293 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:36:23,973 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:36:23,974 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:36:24,075 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:36:24,078 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:36:24,079 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:36:24,079 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:40:50,014 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:40:50,014 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:40:50,134 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:40:50,136 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:40:50,136 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:40:50,136 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:40:59,316 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:40:59,316 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:40:59,423 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:40:59,425 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:40:59,426 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:40:59,426 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:49:05,837 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:49:05,837 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:49:05,957 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:49:05,959 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:49:05,959 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:49:05,959 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:49:18,162 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:49:18,163 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:49:18,269 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:49:18,271 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:49:18,271 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:49:18,271 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:49:37,171 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:49:37,171 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:49:37,306 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:49:37,308 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:49:37,308 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:49:37,308 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:50:52,201 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:50:52,201 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:50:52,309 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:50:52,311 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:50:52,311 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:50:52,311 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:55:42,154 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:55:42,155 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:55:42,261 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:55:42,263 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:55:42,263 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:55:42,263 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:55:45,559 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:55:45,559 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:55:45,655 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:55:45,657 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:55:45,657 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:55:45,657 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:55:49,784 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:55:49,784 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 11:55:49,898 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 11:55:49,900 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 11:55:49,901 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 11:55:49,901 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:02:22,280 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:02:22,281 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:02:22,402 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:02:22,404 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:02:22,404 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:02:22,405 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:03:03,324 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:03:03,324 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:03:03,428 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:03:03,433 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:03:03,433 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:03:03,433 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:03:03,964 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:03:03,964 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2025-12-28 12:03:03,964 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:03:03,964 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:188 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2025-12-28 12:03:04,427 - INFO - [wf_rpa.Bom2Excel_test] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:03:04,428 - INFO - [wf_rpa.Bom2Excel_test] wf_log:109 - App: Bom2Excel_test
+2025-12-28 12:03:04,428 - INFO - [wf_rpa.Bom2Excel_test] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:03:04,428 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:26 - === Bom2Excel 크레딧 사용량 로깅 통합 테스트 시작 ===
+2025-12-28 12:03:04,436 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:32 - 현재 크레딧 상태: {'success': False, 'error': 'not_registered', 'remaining_credits': 0, 'credit_type': 'unregistered', 'message': '사용자 등록이 필요합니다.'}
+2025-12-28 12:03:04,436 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:35 - 정책 기반 크레딧 차감 테스트 (도면 파일 2개 - 200크레딧)
+2025-12-28 12:03:04,436 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:39 - 차감 결과: {'success': False, 'error': 'not_registered', 'message': '사용자 등록 필요'}
+2025-12-28 12:03:04,436 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:42 - 수동 크레딧 차감 테스트 (추가 도면 1개 - 100크레딧)
+2025-12-28 12:03:04,436 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:46 - 수동 차감 결과: {'success': False, 'error': 'not_registered', 'message': '사용자 등록 필요'}
+2025-12-28 12:03:04,437 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:50 - 차감 후 크레딧 상태: {'success': False, 'error': 'not_registered', 'remaining_credits': 0, 'credit_type': 'unregistered', 'message': '사용자 등록이 필요합니다.'}
+2025-12-28 12:03:04,437 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:53 - 구글 시트 동기화 및 사용량 로깅 테스트
+2025-12-28 12:03:04,437 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:57 - 앱 정책 정보: {'app_name': 'bom2excel', 'policy': {'description': 'bom2excel - 정책 미설정', 'trial_credits': 0, 'credit_per_work': 1, 'credit_type': 'per_item', 'full_description': 'bom2excel - JSON 파일 필요'}, 'per_item_cost': 1}
+2025-12-28 12:03:04,437 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:60 - 동기화 결과: {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-12-28 12:03:04,437 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:64 - 동기화 후 최종 상태: {'success': False, 'error': 'not_registered', 'remaining_credits': 0, 'credit_type': 'unregistered', 'message': '사용자 등록이 필요합니다.'}
+2025-12-28 12:03:04,437 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:66 - === 통합 테스트 완료 ===
+2025-12-28 12:03:04,441 - INFO - [wf_rpa.policy_verification] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:03:04,441 - INFO - [wf_rpa.policy_verification] wf_log:109 - App: policy_verification
+2025-12-28 12:03:04,441 - INFO - [wf_rpa.policy_verification] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:03:04,441 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:28 - === 실제 앱 정책 검증 테스트 ===
+2025-12-28 12:03:04,441 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:38 - 
+--- bom2excel 정책 확인 ---
+2025-12-28 12:03:04,468 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:47 - 예상 비용: 100크레딧/파일
+2025-12-28 12:03:04,468 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:48 - 실제 비용: 1크레딧/파일
+2025-12-28 12:03:04,468 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:49 - 정책 일치: ❌
+2025-12-28 12:03:04,468 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:38 - 
+--- DWG_Classifier 정책 확인 ---
+2025-12-28 12:03:04,509 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:47 - 예상 비용: 50크레딧/파일
+2025-12-28 12:03:04,509 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:48 - 실제 비용: 1크레딧/파일
+2025-12-28 12:03:04,509 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:49 - 정책 일치: ❌
+2025-12-28 12:03:04,509 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:38 - 
+--- file_list_check 정책 확인 ---
+2025-12-28 12:03:04,552 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:47 - 예상 비용: 10크레딧/파일
+2025-12-28 12:03:04,552 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:48 - 실제 비용: 1크레딧/파일
+2025-12-28 12:03:04,552 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:49 - 정책 일치: ❌
+2025-12-28 12:03:04,552 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:82 - 
+=== 정책 검증 테스트 완료 ===
+2025-12-28 12:03:04,680 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:30 - ============================================================
+2025-12-28 12:03:04,680 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:31 - 이메일 설정 로컬 저장 테스트
+2025-12-28 12:03:04,680 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:32 - ============================================================
+2025-12-28 12:03:04,680 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:37 - 
+1. 설정 파일 위치: C:\Users\HP\.wf_rpa\.wf_rpa_config.json
+2025-12-28 12:03:04,680 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:44 -    설정 파일 없음 (새로 생성됨)
+2025-12-28 12:03:04,680 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:48 - 
+2. 로컬 이메일 설정 초기화...
+2025-12-28 12:03:04,680 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:65 - 
+3. wfm.init() 실행 (구글 시트 → 로컬 저장)...
+2025-12-28 12:03:04,680 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:68 -    ✅ wfm.init() 완료
+2025-12-28 12:03:04,680 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:74 - 
+4. 저장된 설정 확인...
+2025-12-28 12:03:04,680 - ERROR - [wf_rpa.test_email_config] test_wf_email_config_save:107 -    ❌ 설정 파일이 생성되지 않았습니다.
+2025-12-28 12:03:04,683 - INFO - [wf_rpa.test_email_success] test_wf_email_success:29 - ============================================================
+2025-12-28 12:03:04,683 - INFO - [wf_rpa.test_email_success] test_wf_email_success:30 - 성공 메일 전송 테스트 시작
+2025-12-28 12:03:04,683 - INFO - [wf_rpa.test_email_success] test_wf_email_success:31 - ============================================================
+2025-12-28 12:03:04,683 - INFO - [wf_rpa.test_email_success] test_wf_email_success:46 - Step 1: wfm.init() 호출
+2025-12-28 12:03:04,684 - INFO - [wf_rpa.test_email_success] test_wf_email_success:48 - ✅ wfm.init() 완료
+2025-12-28 12:03:04,684 - INFO - [wf_rpa.test_email_success] test_wf_email_success:50 - 
+Step 2: 메일 전송 파라미터 확인
+2025-12-28 12:03:04,684 - INFO - [wf_rpa.test_email_success] test_wf_email_success:51 -   제목: [B2E] [TEST] Success First Try - 테스트 메일
+2025-12-28 12:03:04,684 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.co.kr
+2025-12-28 12:03:04,684 - INFO - [wf_rpa.test_email_success] test_wf_email_success:53 -   첨부파일: None
+2025-12-28 12:03:04,684 - INFO - [wf_rpa.test_email_success] test_wf_email_success:55 - 
+Step 3: wfm.mail_send_attach() 호출
+2025-12-28 12:03:07,957 - INFO - [wf_rpa.test_email_success] test_wf_email_success:58 - 
+============================================================
+2025-12-28 12:03:07,958 - INFO - [wf_rpa.test_email_success] test_wf_email_success:59 - ✅✅✅ 성공 메일 전송 테스트 성공! ✅✅✅
+2025-12-28 12:03:07,958 - INFO - [wf_rpa.test_email_success] test_wf_email_success:60 - ============================================================
+2025-12-28 12:03:07,958 - INFO - [wf_rpa.test_email_success] test_wf_email_success:61 - 수신 메일함 확인: insung.lee@worksfree.co.kr
+2025-12-28 12:03:07,963 - INFO - [wf_rpa.test_hidden] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:03:07,963 - INFO - [wf_rpa.test_hidden] wf_log:109 - App: test_hidden
+2025-12-28 12:03:07,963 - INFO - [wf_rpa.test_hidden] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:03:07,963 - INFO - [wf_rpa.default] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:03:07,963 - INFO - [wf_rpa.default] wf_log:109 - App: default
+2025-12-28 12:03:07,963 - INFO - [wf_rpa.default] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:03:21,431 - INFO - [wf_rpa.bom_exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:03:21,431 - INFO - [wf_rpa.bom_exporter] wf_log:109 - App: bom_exporter
+2025-12-28 12:03:21,431 - INFO - [wf_rpa.bom_exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:07:01,009 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:07:01,009 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:07:01,117 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:07:01,119 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:07:01,119 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:07:01,119 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:07:04,715 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:07:04,716 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:07:04,813 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:07:04,815 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:07:04,815 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:07:04,815 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:15:08,993 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:15:08,993 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:15:09,111 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:15:09,113 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:15:09,113 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:15:09,113 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:15:23,657 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:15:23,657 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:15:23,779 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:15:23,781 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:15:23,781 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:15:23,781 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:15:37,410 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:15:37,410 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:15:37,528 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:15:37,530 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:15:37,530 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:15:37,530 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:15:41,119 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:15:41,119 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:15:41,217 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:15:41,219 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:15:41,219 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:15:41,219 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:04,774 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:04,774 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:16:04,868 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:04,870 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:04,870 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:16:04,870 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:11,675 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:11,675 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:16:11,779 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:11,780 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:11,781 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:16:11,781 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:15,486 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:15,487 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:16:15,602 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:15,604 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:15,604 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:16:15,604 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:18,968 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:18,969 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:16:19,069 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:19,071 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:19,071 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:16:19,071 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:26,390 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:26,390 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:16:26,488 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:26,489 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:26,489 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:16:26,489 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:44,567 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:44,567 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:16:44,679 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:16:44,681 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:16:44,681 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:16:44,681 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:17:09,523 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:17:09,524 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:17:09,630 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:17:09,632 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:17:09,632 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:17:09,632 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:17:49,101 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:17:49,102 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:17:49,223 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:17:49,225 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:17:49,226 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:17:49,226 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:18:21,278 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:18:21,278 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:18:21,371 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:18:21,373 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:18:21,373 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:18:21,373 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:18:27,778 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:18:27,778 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:18:27,897 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:18:27,900 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:18:27,900 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:18:27,900 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:18:47,130 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:18:47,130 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:18:47,258 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:18:47,262 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:18:47,262 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:18:47,262 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:18:52,418 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:18:52,418 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:18:52,530 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:18:52,536 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:18:52,536 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:18:52,536 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:24:41,139 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:24:41,139 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:24:41,260 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:24:41,267 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:24:41,267 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:24:41,267 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:26:20,472 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:26:20,472 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:26:20,579 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:26:20,589 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:26:20,589 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:26:20,590 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:26:23,601 - INFO - [wf_rpa.Bom2Excel_test] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:26:23,601 - INFO - [wf_rpa.Bom2Excel_test] wf_log:109 - App: Bom2Excel_test
+2025-12-28 12:26:23,601 - INFO - [wf_rpa.Bom2Excel_test] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:26:23,601 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:26 - === Bom2Excel 크레딧 사용량 로깅 통합 테스트 시작 ===
+2025-12-28 12:26:23,608 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:32 - 현재 크레딧 상태: {'success': True, 'app_name': 'Bom2Excel', 'credit_type': 'free', 'remaining_credits': -1, 'trial_credits': -1, 'purchased_credits': 0, 'created_at': '2025-11-13T18:39:16.425', 'last_updated': '2025-12-28T12:26:23.030', 'usage_count': 5, 'message': '무료 배포판'}
+2025-12-28 12:26:23,609 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:35 - 정책 기반 크레딧 차감 테스트 (도면 파일 2개 - 200크레딧)
+2025-12-28 12:26:23,614 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:39 - 차감 결과: {'success': True, 'message': '무료 앱 또는 영구 라이선스 사용', 'deducted_amount': 0, 'remaining_credits': -1}
+2025-12-28 12:26:23,614 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:42 - 수동 크레딧 차감 테스트 (추가 도면 1개 - 100크레딧)
+2025-12-28 12:26:23,642 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:46 - 수동 차감 결과: {'success': True, 'message': '무료 앱 또는 영구 라이선스 사용', 'deducted_amount': 0, 'remaining_credits': -1}
+2025-12-28 12:26:23,662 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:50 - 차감 후 크레딧 상태: {'success': True, 'app_name': 'Bom2Excel', 'credit_type': 'free', 'remaining_credits': -1, 'trial_credits': -1, 'purchased_credits': 0, 'created_at': '2025-11-13T18:39:16.425', 'last_updated': '2025-12-28T12:26:23.636', 'usage_count': 7, 'message': '무료 배포판'}
+2025-12-28 12:26:23,662 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:53 - 구글 시트 동기화 및 사용량 로깅 테스트
+2025-12-28 12:26:23,662 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:57 - 앱 정책 정보: {'app_name': 'Bom2Excel', 'policy': {'description': 'Bom2Excel - 정책 미설정', 'trial_credits': 0, 'credit_per_work': 1, 'credit_type': 'per_item', 'full_description': 'Bom2Excel - JSON 파일 필요'}, 'per_item_cost': 1}
+2025-12-28 12:26:23,663 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:60 - 동기화 결과: {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-12-28 12:26:23,664 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:64 - 동기화 후 최종 상태: {'success': True, 'app_name': 'Bom2Excel', 'credit_type': 'free', 'remaining_credits': -1, 'trial_credits': -1, 'purchased_credits': 0, 'created_at': '2025-11-13T18:39:16.425', 'last_updated': '2025-12-28T12:26:23.636', 'usage_count': 7, 'message': '무료 배포판'}
+2025-12-28 12:26:23,664 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:66 - === 통합 테스트 완료 ===
+2025-12-28 12:26:23,671 - INFO - [wf_rpa.policy_verification] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:26:23,671 - INFO - [wf_rpa.policy_verification] wf_log:109 - App: policy_verification
+2025-12-28 12:26:23,671 - INFO - [wf_rpa.policy_verification] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:26:23,690 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:28 - === 실제 앱 정책 검증 테스트 ===
+2025-12-28 12:26:23,690 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:38 - 
+--- bom2excel 정책 확인 ---
+2025-12-28 12:26:23,715 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:47 - 예상 비용: 100크레딧/파일
+2025-12-28 12:26:23,715 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:48 - 실제 비용: 1크레딧/파일
+2025-12-28 12:26:23,715 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:49 - 정책 일치: ❌
+2025-12-28 12:26:23,715 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:38 - 
+--- DWG_Classifier 정책 확인 ---
+2025-12-28 12:26:23,771 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:47 - 예상 비용: 50크레딧/파일
+2025-12-28 12:26:23,771 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:48 - 실제 비용: 1크레딧/파일
+2025-12-28 12:26:23,771 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:49 - 정책 일치: ❌
+2025-12-28 12:26:23,771 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:38 - 
+--- file_list_check 정책 확인 ---
+2025-12-28 12:26:23,805 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:47 - 예상 비용: 10크레딧/파일
+2025-12-28 12:26:23,805 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:48 - 실제 비용: 1크레딧/파일
+2025-12-28 12:26:23,805 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:49 - 정책 일치: ❌
+2025-12-28 12:26:23,805 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:82 - 
+=== 정책 검증 테스트 완료 ===
+2025-12-28 12:26:23,882 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:30 - ============================================================
+2025-12-28 12:26:23,883 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:31 - 이메일 설정 로컬 저장 테스트
+2025-12-28 12:26:23,883 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:32 - ============================================================
+2025-12-28 12:26:23,883 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:37 - 
+1. 설정 파일 위치: C:\Users\HP\.wf_rpa\.wf_rpa_config.json
+2025-12-28 12:26:23,883 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:44 -    설정 파일 없음 (새로 생성됨)
+2025-12-28 12:26:23,883 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:48 - 
+2. 로컬 이메일 설정 초기화...
+2025-12-28 12:26:23,883 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:65 - 
+3. wfm.init() 실행 (구글 시트 → 로컬 저장)...
+2025-12-28 12:26:23,884 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:68 -    ✅ wfm.init() 완료
+2025-12-28 12:26:23,884 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:74 - 
+4. 저장된 설정 확인...
+2025-12-28 12:26:23,884 - ERROR - [wf_rpa.test_email_config] test_wf_email_config_save:107 -    ❌ 설정 파일이 생성되지 않았습니다.
+2025-12-28 12:26:23,888 - INFO - [wf_rpa.test_email_success] test_wf_email_success:29 - ============================================================
+2025-12-28 12:26:23,888 - INFO - [wf_rpa.test_email_success] test_wf_email_success:30 - 성공 메일 전송 테스트 시작
+2025-12-28 12:26:23,888 - INFO - [wf_rpa.test_email_success] test_wf_email_success:31 - ============================================================
+2025-12-28 12:26:23,888 - INFO - [wf_rpa.test_email_success] test_wf_email_success:46 - Step 1: wfm.init() 호출
+2025-12-28 12:26:23,889 - INFO - [wf_rpa.test_email_success] test_wf_email_success:48 - ✅ wfm.init() 완료
+2025-12-28 12:26:23,889 - INFO - [wf_rpa.test_email_success] test_wf_email_success:50 - 
+Step 2: 메일 전송 파라미터 확인
+2025-12-28 12:26:23,889 - INFO - [wf_rpa.test_email_success] test_wf_email_success:51 -   제목: [B2E] [TEST] Success First Try - 테스트 메일
+2025-12-28 12:26:23,889 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.co.kr
+2025-12-28 12:26:23,889 - INFO - [wf_rpa.test_email_success] test_wf_email_success:53 -   첨부파일: None
+2025-12-28 12:26:23,889 - INFO - [wf_rpa.test_email_success] test_wf_email_success:55 - 
+Step 3: wfm.mail_send_attach() 호출
+2025-12-28 12:26:23,889 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:66 - 
+============================================================
+2025-12-28 12:26:23,889 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:67 - ❌❌❌ 성공 메일 전송 테스트 실패! ❌❌❌
+2025-12-28 12:26:23,889 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:68 - ============================================================
+2025-12-28 12:26:23,889 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:69 - 오류: 잘못된 보내는 사람 이메일 주소: 
+2025-12-28 12:26:23,891 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:73 - 
+상세 오류:
+Traceback (most recent call last):
+  File "D:\drive_files\10.worksfree\10.rpa\90.tests\10.common\test_wf_email_success.py", line 56, in test_success_email
+    wfm.mail_send_attach(title, test_email, content, None)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\drive_files\10.worksfree\10.rpa\10.common\wf_email.py", line 338, in mail_send_attach
+    raise ValueError(f"잘못된 보내는 사람 이메일 주소: {email_from}")
+ValueError: 잘못된 보내는 사람 이메일 주소: 
+
+2025-12-28 12:26:23,895 - INFO - [wf_rpa.test_hidden] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:26:23,895 - INFO - [wf_rpa.test_hidden] wf_log:109 - App: test_hidden
+2025-12-28 12:26:23,895 - INFO - [wf_rpa.test_hidden] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:26:23,896 - INFO - [wf_rpa.default] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:26:23,896 - INFO - [wf_rpa.default] wf_log:109 - App: default
+2025-12-28 12:26:23,896 - INFO - [wf_rpa.default] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:26:26,174 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:26:26,174 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2025-12-28 12:26:26,175 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:26:26,175 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:188 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2025-12-28 12:26:28,520 - INFO - [wf_rpa.bom_exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:26:28,520 - INFO - [wf_rpa.bom_exporter] wf_log:109 - App: bom_exporter
+2025-12-28 12:26:28,520 - INFO - [wf_rpa.bom_exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:29:34,000 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:29:34,001 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:29:34,130 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:29:34,132 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:29:34,132 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:29:34,133 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:11,825 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:11,825 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:41:11,938 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:11,947 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:11,947 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:41:11,947 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:29,284 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:29,284 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 12:41:29,399 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:29,401 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:29,401 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 12:41:29,401 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:31,856 - INFO - [wf_rpa.Bom2Excel_test] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:31,856 - INFO - [wf_rpa.Bom2Excel_test] wf_log:109 - App: Bom2Excel_test
+2025-12-28 12:41:31,857 - INFO - [wf_rpa.Bom2Excel_test] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:31,857 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:26 - === Bom2Excel 크레딧 사용량 로깅 통합 테스트 시작 ===
+2025-12-28 12:41:31,865 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:32 - 현재 크레딧 상태: {'success': True, 'app_name': 'Bom2Excel', 'credit_type': 'free', 'remaining_credits': -1, 'trial_credits': -1, 'purchased_credits': 0, 'created_at': '2025-11-13T18:39:16.425', 'last_updated': '2025-12-28T12:41:31.295', 'usage_count': 8, 'message': '무료 배포판'}
+2025-12-28 12:41:31,865 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:35 - 정책 기반 크레딧 차감 테스트 (도면 파일 2개 - 200크레딧)
+2025-12-28 12:41:31,872 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:39 - 차감 결과: {'success': True, 'message': '무료 앱 또는 영구 라이선스 사용', 'deducted_amount': 0, 'remaining_credits': -1}
+2025-12-28 12:41:31,872 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:42 - 수동 크레딧 차감 테스트 (추가 도면 1개 - 100크레딧)
+2025-12-28 12:41:31,899 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:46 - 수동 차감 결과: {'success': True, 'message': '무료 앱 또는 영구 라이선스 사용', 'deducted_amount': 0, 'remaining_credits': -1}
+2025-12-28 12:41:31,914 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:50 - 차감 후 크레딧 상태: {'success': True, 'app_name': 'Bom2Excel', 'credit_type': 'free', 'remaining_credits': -1, 'trial_credits': -1, 'purchased_credits': 0, 'created_at': '2025-11-13T18:39:16.425', 'last_updated': '2025-12-28T12:41:31.894', 'usage_count': 10, 'message': '무료 배포판'}
+2025-12-28 12:41:31,914 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:53 - 구글 시트 동기화 및 사용량 로깅 테스트
+2025-12-28 12:41:31,914 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:57 - 앱 정책 정보: {'app_name': 'Bom2Excel', 'policy': {'description': 'Bom2Excel - 정책 미설정', 'trial_credits': 0, 'credit_per_work': 1, 'credit_type': 'per_item', 'full_description': 'Bom2Excel - JSON 파일 필요'}, 'per_item_cost': 1}
+2025-12-28 12:41:31,915 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:60 - 동기화 결과: {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-12-28 12:41:31,915 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:64 - 동기화 후 최종 상태: {'success': True, 'app_name': 'Bom2Excel', 'credit_type': 'free', 'remaining_credits': -1, 'trial_credits': -1, 'purchased_credits': 0, 'created_at': '2025-11-13T18:39:16.425', 'last_updated': '2025-12-28T12:41:31.894', 'usage_count': 10, 'message': '무료 배포판'}
+2025-12-28 12:41:31,915 - INFO - [wf_rpa.Bom2Excel_test] test_wf_credit_logging_integration:66 - === 통합 테스트 완료 ===
+2025-12-28 12:41:31,921 - INFO - [wf_rpa.policy_verification] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:31,921 - INFO - [wf_rpa.policy_verification] wf_log:109 - App: policy_verification
+2025-12-28 12:41:31,921 - INFO - [wf_rpa.policy_verification] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:31,921 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:28 - === 실제 앱 정책 검증 테스트 ===
+2025-12-28 12:41:31,921 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:38 - 
+--- bom2excel 정책 확인 ---
+2025-12-28 12:41:31,941 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:47 - 예상 비용: 100크레딧/파일
+2025-12-28 12:41:31,941 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:48 - 실제 비용: 1크레딧/파일
+2025-12-28 12:41:31,941 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:49 - 정책 일치: ❌
+2025-12-28 12:41:31,941 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:38 - 
+--- DWG_Classifier 정책 확인 ---
+2025-12-28 12:41:31,950 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:47 - 예상 비용: 50크레딧/파일
+2025-12-28 12:41:31,951 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:48 - 실제 비용: 1크레딧/파일
+2025-12-28 12:41:31,951 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:49 - 정책 일치: ❌
+2025-12-28 12:41:31,951 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:38 - 
+--- file_list_check 정책 확인 ---
+2025-12-28 12:41:31,977 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:47 - 예상 비용: 10크레딧/파일
+2025-12-28 12:41:31,977 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:48 - 실제 비용: 1크레딧/파일
+2025-12-28 12:41:31,977 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:49 - 정책 일치: ❌
+2025-12-28 12:41:31,977 - INFO - [wf_rpa.policy_verification] test_wf_credit_manager_policies:82 - 
+=== 정책 검증 테스트 완료 ===
+2025-12-28 12:41:32,065 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:30 - ============================================================
+2025-12-28 12:41:32,065 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:31 - 이메일 설정 로컬 저장 테스트
+2025-12-28 12:41:32,065 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:32 - ============================================================
+2025-12-28 12:41:32,065 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:37 - 
+1. 설정 파일 위치: C:\Users\HP\.wf_rpa\.wf_rpa_config.json
+2025-12-28 12:41:32,066 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:44 -    설정 파일 없음 (새로 생성됨)
+2025-12-28 12:41:32,066 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:48 - 
+2. 로컬 이메일 설정 초기화...
+2025-12-28 12:41:32,066 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:65 - 
+3. wfm.init() 실행 (구글 시트 → 로컬 저장)...
+2025-12-28 12:41:32,067 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:68 -    ✅ wfm.init() 완료
+2025-12-28 12:41:32,067 - INFO - [wf_rpa.test_email_config] test_wf_email_config_save:74 - 
+4. 저장된 설정 확인...
+2025-12-28 12:41:32,067 - ERROR - [wf_rpa.test_email_config] test_wf_email_config_save:107 -    ❌ 설정 파일이 생성되지 않았습니다.
+2025-12-28 12:41:32,070 - INFO - [wf_rpa.test_email_success] test_wf_email_success:29 - ============================================================
+2025-12-28 12:41:32,070 - INFO - [wf_rpa.test_email_success] test_wf_email_success:30 - 성공 메일 전송 테스트 시작
+2025-12-28 12:41:32,071 - INFO - [wf_rpa.test_email_success] test_wf_email_success:31 - ============================================================
+2025-12-28 12:41:32,071 - INFO - [wf_rpa.test_email_success] test_wf_email_success:46 - Step 1: wfm.init() 호출
+2025-12-28 12:41:32,072 - INFO - [wf_rpa.test_email_success] test_wf_email_success:48 - ✅ wfm.init() 완료
+2025-12-28 12:41:32,072 - INFO - [wf_rpa.test_email_success] test_wf_email_success:50 - 
+Step 2: 메일 전송 파라미터 확인
+2025-12-28 12:41:32,072 - INFO - [wf_rpa.test_email_success] test_wf_email_success:51 -   제목: [B2E] [TEST] Success First Try - 테스트 메일
+2025-12-28 12:41:32,072 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.co.kr
+2025-12-28 12:41:32,072 - INFO - [wf_rpa.test_email_success] test_wf_email_success:53 -   첨부파일: None
+2025-12-28 12:41:32,072 - INFO - [wf_rpa.test_email_success] test_wf_email_success:55 - 
+Step 3: wfm.mail_send_attach() 호출
+2025-12-28 12:41:32,073 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:66 - 
+============================================================
+2025-12-28 12:41:32,073 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:67 - ❌❌❌ 성공 메일 전송 테스트 실패! ❌❌❌
+2025-12-28 12:41:32,073 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:68 - ============================================================
+2025-12-28 12:41:32,073 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:69 - 오류: 잘못된 보내는 사람 이메일 주소: 
+2025-12-28 12:41:32,074 - ERROR - [wf_rpa.test_email_success] test_wf_email_success:73 - 
+상세 오류:
+Traceback (most recent call last):
+  File "D:\drive_files\10.worksfree\10.rpa\90.tests\10.common\test_wf_email_success.py", line 56, in test_success_email
+    wfm.mail_send_attach(title, test_email, content, None)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\drive_files\10.worksfree\10.rpa\10.common\wf_email.py", line 338, in mail_send_attach
+    raise ValueError(f"잘못된 보내는 사람 이메일 주소: {email_from}")
+ValueError: 잘못된 보내는 사람 이메일 주소: 
+
+2025-12-28 12:41:32,078 - INFO - [wf_rpa.test_hidden] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:32,078 - INFO - [wf_rpa.test_hidden] wf_log:109 - App: test_hidden
+2025-12-28 12:41:32,078 - INFO - [wf_rpa.test_hidden] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:32,079 - INFO - [wf_rpa.default] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:32,079 - INFO - [wf_rpa.default] wf_log:109 - App: default
+2025-12-28 12:41:32,079 - INFO - [wf_rpa.default] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:33,896 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:33,896 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2025-12-28 12:41:33,896 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 12:41:33,896 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:188 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2025-12-28 12:41:36,189 - INFO - [wf_rpa.bom_exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 12:41:36,189 - INFO - [wf_rpa.bom_exporter] wf_log:109 - App: bom_exporter
+2025-12-28 12:41:36,189 - INFO - [wf_rpa.bom_exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 13:18:07,238 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 13:18:07,238 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
+2025-12-28 13:18:07,337 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 13:18:07,338 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
+2025-12-28 13:18:07,339 - INFO - [wf_rpa.test_email_success] wf_log:109 - App: test_email_success
+2025-12-28 13:18:07,339 - INFO - [wf_rpa.test_email_success] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W

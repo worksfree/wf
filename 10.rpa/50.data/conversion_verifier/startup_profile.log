@@ -1,0 +1,36 @@
+============================================================
+STARTUP PROFILING REPORT
+============================================================
+[    0.0ms] Script start
+[  186.6ms] multiprocessing.freeze_support()
+[  188.2ms] sys.path setup complete
+[  249.0ms] import tkinter
+[  262.4ms] import tkinter.ttk, messagebox
+[  268.4ms] import datetime
+[  270.3ms] pyautogui deferred (lazy import)
+[  282.9ms] import filedialog, Path
+[  324.4ms] import logging, threading
+[  336.8ms] import app_setting_data
+[  338.1ms] automation.BomAutomation deferred (lazy import)
+[ 2227.2ms] import ui_setting
+[ 2265.4ms] import wf_log
+[ 4319.2ms] main() entry
+[ 4345.8ms] single instance check complete
+[ 4480.2ms] Creating Tk root window
+[ 4860.6ms] Tk root created
+[ 5127.6ms] __init__ started
+[ 5174.6ms] Master and directory initialized
+[ 5930.7ms] Adaptive UI settings loaded
+[ 5967.3ms] Logger initialized
+[ 5978.5ms] WFM availability checked
+[ 6019.4ms] Config loaded
+[ 6063.3ms] Custom settings applied
+[ 6091.9ms] Basic variables initialized
+[ 6113.9ms] UI-related variables initialized
+[ 6150.9ms] About to set WM_DELETE_WINDOW protocol
+[ 6160.4ms] About to call init_ui()
+[ 6595.9ms] BomGUIApplication initialized - UI ready
+[ 6715.3ms] BomGUIApplication initialized - UI ready
+
+Total startup time: 6715.3ms
+============================================================

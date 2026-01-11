@@ -1,0 +1,12 @@
+2025-11-22 07:49:12,236 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-11-22 07:49:12,237 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:107 - App: korean_filename_normalizer
+2025-11-22 07:49:12,435 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-11-22 07:49:13,931 - DEBUG - [wf_rpa.korean_filename_normalizer] ui_main:1552 - 기존 지문: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658
+2025-11-22 07:49:13,937 - DEBUG - [wf_rpa.korean_filename_normalizer] ui_main:1553 - 현재 지문: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5
+2025-11-22 07:49:13,940 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1514 - 🔄 백그라운드 정책 동기화 실행...
+2025-11-22 07:49:13,942 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1516 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-22 07:49:14,359 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:405 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-11-22 07:49:57,396 - DEBUG - [wf_rpa.korean_filename_normalizer] ui_main:1552 - 기존 지문: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658
+2025-11-22 07:49:57,396 - DEBUG - [wf_rpa.korean_filename_normalizer] ui_main:1553 - 현재 지문: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5
+2025-11-22 07:50:06,316 - INFO - [wf_rpa.korean_filename_normalizer] wf_settings_common:212 - ✅ korean_filename_normalizer 앱 정책 업데이트: D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\config\korean_filename_normalizer\credit_policy.json
+2025-11-22 07:50:06,326 - INFO - [wf_rpa.korean_filename_normalizer] wf_settings_common:264 - ✅ 관리자 설정 업데이트: D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\config\wf_rpa_config.json

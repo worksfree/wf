@@ -1,0 +1,577 @@
+2025-11-07 05:39:19 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 05:39:19 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 05:39:19 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 05:39:23 - wf_bom2excel - INFO - _worker:178 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 05:39:23 - wf_bom2excel - INFO - _worker:180 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 05:39:27 - wf_bom2excel - INFO - worker:400 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 05:40:03 - wf_bom2excel - INFO - _enter_admin_mode:1008 - 관리자 모드가 활성화되었습니다.
+2025-11-07 05:40:03 - wf_bom2excel - WARNING - _enter_admin_mode:1010 - 경고 레벨 로그 테스트
+2025-11-07 05:40:03 - wf_bom2excel - INFO - on_progress_label_click:976 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 05:40:11 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 설정 파일 로드됨
+2025-11-07 05:40:15 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 백그라운드 작업 실행 중
+2025-11-07 05:40:22 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 시스템 상태 확인 중...
+2025-11-07 05:40:30 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 파일 처리 작업 진행 중
+2025-11-07 05:40:35 - wf_bom2excel - INFO - worker:1399 - 🚀 백그라운드 작업 시작...
+2025-11-07 05:40:37 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 시스템 상태 확인 중...
+2025-11-07 05:40:53 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 네트워크 연결 상태 양호
+2025-11-07 05:41:10 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 크레딧 동기화 완료
+2025-11-07 05:41:16 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 백그라운드 작업 실행 중
+2025-11-07 05:41:25 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 설정 파일 로드됨
+2025-11-07 05:41:51 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 파일 처리 작업 진행 중
+2025-11-07 05:42:00 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 백그라운드 작업 실행 중
+2025-11-07 05:42:07 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] UI 업데이트 완료
+2025-11-07 05:42:14 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 크레딧 동기화 완료
+2025-11-07 05:42:28 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 백그라운드 작업 실행 중
+2025-11-07 05:42:38 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 크레딧 동기화 완료
+2025-11-07 05:42:43 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 메모리 사용량 모니터링
+2025-11-07 05:42:49 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 네트워크 연결 상태 양호
+2025-11-07 05:42:55 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 시스템 상태 확인 중...
+2025-11-07 05:43:01 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 크레딧 동기화 완료
+2025-11-07 05:43:06 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 시스템 상태 확인 중...
+2025-11-07 05:43:14 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 시스템 상태 확인 중...
+2025-11-07 05:43:19 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] UI 업데이트 완료
+2025-11-07 05:43:22 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 백그라운드 작업 실행 중
+2025-11-07 05:43:30 - wf_bom2excel - INFO - _generate_test_log:906 - [테스트] 크레딧 동기화 완료
+2025-11-07 05:43:37 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] 백그라운드 작업 실행 중
+2025-11-07 05:43:48 - wf_bom2excel - WARNING - _generate_test_log:906 - [테스트] UI 업데이트 완료
+2025-11-07 05:43:54 - wf_bom2excel - INFO - _exit_admin_mode:1046 - 관리자 모드가 비활성화되었습니다.
+2025-11-07 05:43:54 - wf_bom2excel - INFO - on_progress_label_click:957 - 관리자 모드가 비활성화되었습니다.
+2025-11-07 05:44:14 - wf_bom2excel - INFO - on_closing:613 - 🔄 앱 종료 시 크레딧 동기화 시도...
+2025-11-07 05:44:24 - wf_bom2excel - INFO - on_closing:615 - [SYNC-EXIT] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-07T05:44:24.526'}
+2025-11-07 06:13:51 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:13:51 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:13:51 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:13:53 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:13:53 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 06:13:57 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:14:08 - wf_bom2excel - INFO - _enter_admin_mode:988 - 관리자 모드가 활성화되었습니다.
+2025-11-07 06:14:08 - wf_bom2excel - WARNING - _enter_admin_mode:990 - 경고 레벨 로그 테스트
+2025-11-07 06:14:08 - wf_bom2excel - INFO - on_progress_label_click:956 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 06:14:44 - wf_bom2excel - INFO - worker:1371 - 🚀 백그라운드 작업 시작...
+2025-11-07 06:18:43 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:18:43 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:18:43 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:18:46 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:18:46 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 06:18:49 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:19:31 - wf_bom2excel - INFO - _enter_admin_mode:988 - 관리자 모드가 활성화되었습니다.
+2025-11-07 06:19:31 - wf_bom2excel - WARNING - _enter_admin_mode:990 - 경고 레벨 로그 테스트
+2025-11-07 06:19:31 - wf_bom2excel - INFO - on_progress_label_click:956 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 06:19:37 - wf_bom2excel - INFO - worker:1371 - 🚀 백그라운드 작업 시작...
+2025-11-07 06:23:02 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:23:02 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:23:02 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:23:05 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:23:05 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 06:23:08 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:23:33 - wf_bom2excel - INFO - worker:1371 - 🚀 백그라운드 작업 시작...
+2025-11-07 06:27:39 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:27:39 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:27:39 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:27:42 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:27:45 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:27:53 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-07T06:27:53.312'}
+2025-11-07 06:28:05 - wf_bom2excel - INFO - _enter_admin_mode:988 - 관리자 모드가 활성화되었습니다.
+2025-11-07 06:28:05 - wf_bom2excel - WARNING - _enter_admin_mode:990 - 경고 레벨 로그 테스트
+2025-11-07 06:28:05 - wf_bom2excel - INFO - on_progress_label_click:956 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 06:28:09 - wf_bom2excel - INFO - worker:1371 - 🚀 백그라운드 작업 시작...
+2025-11-07 06:30:10 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:30:10 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:30:10 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:30:12 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:30:12 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 06:30:16 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:30:28 - wf_bom2excel - INFO - _enter_admin_mode:988 - 관리자 모드가 활성화되었습니다.
+2025-11-07 06:30:28 - wf_bom2excel - WARNING - _enter_admin_mode:990 - 경고 레벨 로그 테스트
+2025-11-07 06:30:29 - wf_bom2excel - INFO - on_progress_label_click:956 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 06:30:45 - wf_bom2excel - INFO - worker:1371 - 🚀 백그라운드 작업 시작...
+2025-11-07 06:35:36 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:35:36 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:35:36 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:35:39 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:35:39 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 06:35:44 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:36:05 - wf_bom2excel - INFO - worker:1372 - 🚀 백그라운드 작업 시작...
+2025-11-07 06:38:59 - wf_bom2excel - INFO - worker:1374 - ✅ 백그라운드 작업 완료
+2025-11-07 06:38:59 - wf_bom2excel - INFO - _on_extraction_complete:1413 - ✅ 모든 파일이 성공적으로 처리되었습니다.
+2025-11-07 06:38:59 - wf_bom2excel - INFO - _on_extraction_complete:1422 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-07 06:39:08 - wf_bom2excel - INFO - _on_extraction_complete:1424 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-07T06:39:08.101'}
+2025-11-07 06:39:08 - wf_bom2excel - INFO - _on_extraction_complete:1435 - 🏁 작업 완료 처리 종료
+2025-11-07 06:39:26 - wf_bom2excel - INFO - _enter_admin_mode:976 - 관리자 모드가 활성화되었습니다.
+2025-11-07 06:39:26 - wf_bom2excel - INFO - _enter_admin_mode:983 - 현재 프로세스 관리자 권한: 0
+2025-11-07 06:39:26 - wf_bom2excel - WARNING - _enter_admin_mode:991 - 경고 레벨 로그 테스트
+2025-11-07 06:39:26 - wf_bom2excel - INFO - on_progress_label_click:944 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 06:39:30 - wf_bom2excel - INFO - worker:1372 - 🚀 백그라운드 작업 시작...
+2025-11-07 06:42:16 - wf_bom2excel - INFO - worker:1374 - ✅ 백그라운드 작업 완료
+2025-11-07 06:42:16 - wf_bom2excel - INFO - _on_extraction_complete:1413 - ✅ 모든 파일이 성공적으로 처리되었습니다.
+2025-11-07 06:42:16 - wf_bom2excel - INFO - _on_extraction_complete:1422 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-07 06:42:24 - wf_bom2excel - INFO - _on_extraction_complete:1424 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-07T06:42:24.951'}
+2025-11-07 06:42:24 - wf_bom2excel - INFO - _on_extraction_complete:1435 - 🏁 작업 완료 처리 종료
+2025-11-07 06:42:58 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:42:58 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:42:58 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:43:01 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:43:01 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 06:43:04 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:43:10 - wf_bom2excel - INFO - _enter_admin_mode:976 - 관리자 모드가 활성화되었습니다.
+2025-11-07 06:43:10 - wf_bom2excel - INFO - _enter_admin_mode:983 - 현재 프로세스 관리자 권한: 0
+2025-11-07 06:43:10 - wf_bom2excel - WARNING - _enter_admin_mode:991 - 경고 레벨 로그 테스트
+2025-11-07 06:43:10 - wf_bom2excel - INFO - on_progress_label_click:944 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 06:43:26 - wf_bom2excel - INFO - worker:1372 - 🚀 백그라운드 작업 시작...
+2025-11-07 06:46:15 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:46:15 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:46:15 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:46:18 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:46:18 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 06:46:21 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:46:24 - wf_bom2excel - INFO - _enter_admin_mode:995 - 관리자 모드가 활성화되었습니다.
+2025-11-07 06:46:24 - wf_bom2excel - INFO - _enter_admin_mode:1002 - 현재 프로세스 관리자 권한: 0
+2025-11-07 06:46:24 - wf_bom2excel - WARNING - _enter_admin_mode:1010 - 경고 레벨 로그 테스트
+2025-11-07 06:46:24 - wf_bom2excel - INFO - on_progress_label_click:963 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 06:46:39 - wf_bom2excel - INFO - worker:1391 - 🚀 백그라운드 작업 시작...
+2025-11-07 06:57:17 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:57:17 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:57:17 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:57:20 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:57:20 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 06:57:24 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:57:48 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 06:57:48 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 06:57:48 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 06:57:51 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 06:57:51 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 06:57:55 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 06:58:00 - wf_bom2excel - INFO - on_progress_label_click:887 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 07:01:08 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 07:01:08 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 07:01:08 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 07:01:11 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 07:01:11 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 07:01:15 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 07:01:20 - wf_bom2excel - INFO - on_progress_label_click:953 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 07:04:57 - wf_bom2excel - INFO - _on_extraction_complete:1447 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-07 07:05:06 - wf_bom2excel - INFO - _on_extraction_complete:1449 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-07T07:05:06.961'}
+2025-11-07 07:05:06 - wf_bom2excel - INFO - _on_extraction_complete:1460 - 🏁 작업 완료 처리 종료
+2025-11-07 07:17:50 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 07:17:50 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 07:17:50 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 07:17:53 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 07:17:53 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 07:17:57 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 07:18:00 - wf_bom2excel - INFO - on_progress_label_click:953 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 07:22:26 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 07:22:26 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 07:22:26 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 07:22:29 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 07:22:29 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 07:22:33 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 07:22:42 - wf_bom2excel - INFO - on_progress_label_click:954 - 관리자 모드가 활성화되었습니다. (30분 후 자동 해제)
+2025-11-07 10:30:49 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 10:30:49 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 10:30:49 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 10:30:52 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 10:30:52 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 10:30:56 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 11:27:24 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 11:27:24 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 11:27:24 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 11:27:26 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 11:27:26 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 11:27:29 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 11:39:15 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 11:39:15 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 11:39:15 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 11:39:17 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 11:39:17 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 11:39:20 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 14:58:14 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 14:58:14 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 14:58:14 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 14:58:16 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-07 14:58:17 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 14:58:17 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 22:05:50 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 22:05:50 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 22:05:50 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 22:05:52 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-07 22:05:52 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 22:05:52 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:15:21 - wf_bom2excel - INFO - _on_extraction_complete:1444 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-07 23:15:21 - wf_bom2excel - INFO - _on_extraction_complete:1446 - [SYNC-AFTER-RUN] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:15:21 - wf_bom2excel - INFO - _on_extraction_complete:1457 - 🏁 작업 완료 처리 종료
+2025-11-07 23:21:46 - wf_bom2excel - INFO - on_closing:612 - 🔄 앱 종료 시 크레딧 동기화 시도...
+2025-11-07 23:21:46 - wf_bom2excel - INFO - on_closing:614 - [SYNC-EXIT] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:24:49 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 23:24:49 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 23:24:49 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 23:24:51 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-07 23:24:52 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 23:24:52 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:25:46 - wf_bom2excel - INFO - on_closing:612 - 🔄 앱 종료 시 크레딧 동기화 시도...
+2025-11-07 23:25:46 - wf_bom2excel - INFO - on_closing:614 - [SYNC-EXIT] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:26:03 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 23:26:03 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 23:26:03 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 23:26:06 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-07 23:26:06 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 23:26:06 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:26:19 - wf_bom2excel - INFO - on_closing:612 - 🔄 앱 종료 시 크레딧 동기화 시도...
+2025-11-07 23:26:19 - wf_bom2excel - INFO - on_closing:614 - [SYNC-EXIT] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:29:16 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 23:29:16 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 23:29:16 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 23:29:19 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-07 23:29:19 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 23:29:19 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:29:31 - wf_bom2excel - INFO - on_closing:612 - 🔄 앱 종료 시 크레딧 동기화 시도...
+2025-11-07 23:29:31 - wf_bom2excel - INFO - on_closing:614 - [SYNC-EXIT] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:32:37 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 23:32:37 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 23:32:37 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 23:32:40 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-07 23:32:40 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 23:32:40 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:34:15 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 23:34:15 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 23:34:15 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 23:34:17 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-07 23:34:18 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 23:34:18 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-07 23:35:13 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 23:35:13 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 23:35:13 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 23:35:16 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 23:35:21 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-07 23:35:29 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-07T23:35:29.472'}
+2025-11-07 23:36:35 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-07 23:36:35 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-07 23:36:35 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-07 23:36:37 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-07 23:36:37 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-07 23:36:42 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-08 01:23:11 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-08 01:23:11 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-08 01:23:11 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-08 01:23:14 - wf_bom2excel - INFO - _worker:177 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-08 01:23:19 - wf_bom2excel - INFO - worker:399 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-08 01:23:27 - wf_bom2excel - INFO - _worker:179 - [STARTUP-RECOVERY] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-08T01:23:27.197'}
+2025-11-08 02:30:29 - wf_bom2excel - INFO - _on_extraction_complete:1444 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-08 02:30:38 - wf_bom2excel - INFO - _on_extraction_complete:1446 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-08T02:30:38.945'}
+2025-11-08 02:30:38 - wf_bom2excel - INFO - _on_extraction_complete:1457 - 🏁 작업 완료 처리 종료
+2025-11-08 20:18:25 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-08 20:18:25 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-08 20:18:25 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-08 20:18:28 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-08 20:18:28 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-08 20:18:32 - wf_bom2excel - INFO - worker:450 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-08 21:37:38 - wf_bom2excel - INFO - _on_extraction_complete:1500 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-08 21:37:49 - wf_bom2excel - INFO - _on_extraction_complete:1502 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-08T21:37:49.771'}
+2025-11-08 21:37:49 - wf_bom2excel - INFO - _on_extraction_complete:1513 - 🏁 작업 완료 처리 종료
+2025-11-09 00:49:44 - wf_bom2excel - INFO - _on_extraction_complete:1500 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-09 00:49:55 - wf_bom2excel - INFO - _on_extraction_complete:1502 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-09T00:49:55.272'}
+2025-11-09 00:49:55 - wf_bom2excel - INFO - _on_extraction_complete:1513 - 🏁 작업 완료 처리 종료
+2025-11-09 15:05:47 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 15:05:47 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 15:05:47 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 15:05:49 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 15:05:49 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 15:05:52 - wf_bom2excel - INFO - worker:450 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 15:11:22 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 15:11:22 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 15:11:22 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 15:11:24 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 15:11:24 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 15:11:27 - wf_bom2excel - INFO - worker:450 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 15:14:11 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 15:14:11 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 15:14:11 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 15:14:14 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 15:14:14 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 15:14:16 - wf_bom2excel - INFO - worker:450 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 15:16:18 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 15:16:18 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 15:16:18 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 15:16:20 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 15:16:20 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 15:16:22 - wf_bom2excel - INFO - worker:450 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 16:02:02 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 16:02:02 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 16:02:02 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 16:02:05 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 16:02:05 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 16:02:08 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 16:40:45 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 16:40:45 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 16:40:45 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 16:40:47 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 16:40:47 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 16:40:51 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 16:44:25 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 16:44:25 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 16:44:25 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 16:44:27 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 16:44:27 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 16:44:30 - wf_bom2excel - WARNING - select_folder_license_check:1212 - 기능을 사용하려면 먼저 사용자 등록이 필요합니다. '등 록' 버튼을 눌러주세요.
+2025-11-09 16:44:30 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 17:19:15 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 17:19:15 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 17:19:15 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 17:19:17 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 17:19:17 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 17:19:21 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 19:21:54 - wf_bom2excel - INFO - _on_extraction_complete:1517 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-09 19:22:05 - wf_bom2excel - INFO - _on_extraction_complete:1519 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-09T19:22:05.035'}
+2025-11-09 19:22:05 - wf_bom2excel - INFO - _on_extraction_complete:1530 - 🏁 작업 완료 처리 종료
+2025-11-09 20:15:58 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 20:15:58 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 20:15:58 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 20:16:01 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 20:16:01 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 20:16:05 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 20:28:16 - wf_bom2excel - INFO - on_closing:680 - 🔄 앱 종료 시 크레딧 동기화 시도...
+2025-11-09 20:28:26 - wf_bom2excel - INFO - on_closing:682 - [SYNC-EXIT] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-09T20:28:26.499'}
+2025-11-09 20:36:02 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-09 20:36:02 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-09 20:36:02 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-09 20:36:04 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-09 20:36:04 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-09 20:36:08 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-09 20:40:03 - wf_bom2excel - INFO - on_closing:680 - 🔄 앱 종료 시 크레딧 동기화 시도...
+2025-11-09 20:40:11 - wf_bom2excel - INFO - on_closing:682 - [SYNC-EXIT] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-09T20:40:11.715'}
+2025-11-10 15:25:34 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-10 15:25:34 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 15:25:34 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-10 15:25:37 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-10 15:25:37 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-10 15:25:40 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-10 15:29:46 - wf_bom2excel - INFO - _on_extraction_complete:1517 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-10 15:29:55 - wf_bom2excel - INFO - _on_extraction_complete:1519 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-10T15:29:55.242'}
+2025-11-10 15:29:55 - wf_bom2excel - INFO - _on_extraction_complete:1530 - 🏁 작업 완료 처리 종료
+2025-11-10 15:58:14 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-10 15:58:14 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 15:58:14 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-10 15:58:17 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-10 15:58:17 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-10 15:58:20 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-10 20:01:33 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-10 20:01:33 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 20:01:33 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-10 20:01:35 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-10 20:01:36 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-10 20:01:36 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-10 20:04:09 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-10 20:04:09 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 20:04:09 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-10 20:04:11 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-10 20:04:12 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-10 20:04:12 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-10 20:07:59 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-10 20:07:59 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 20:07:59 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-10 20:08:01 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-10 20:08:02 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-10 20:08:02 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-10 20:10:59 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-10 20:10:59 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 20:10:59 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-10 20:11:01 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-10 20:11:01 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-10 20:11:04 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-10 20:11:49 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1278 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 20:11:49 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1279 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 20:22:06 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-10 20:22:06 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 20:22:06 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-10 20:22:08 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-10 20:22:08 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-10 20:22:11 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-10 20:22:26 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1278 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 20:22:26 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1279 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 20:25:05 - wf_bom2excel - INFO - _on_extraction_complete:1518 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-10 20:25:13 - wf_bom2excel - INFO - _on_extraction_complete:1520 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-10T20:25:13.419'}
+2025-11-10 20:25:13 - wf_bom2excel - INFO - _on_extraction_complete:1531 - 🏁 작업 완료 처리 종료
+2025-11-10 20:29:54 - wf_bom2excel - INFO - on_closing:680 - 🔄 앱 종료 시 크레딧 동기화 시도...
+2025-11-10 20:30:01 - wf_bom2excel - INFO - on_closing:682 - [SYNC-EXIT] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-10T20:30:01.448'}
+2025-11-10 20:57:20 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-10 20:57:20 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 20:57:20 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-10 20:57:23 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-10 20:57:23 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-10 20:57:27 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-10 20:58:04 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1278 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 20:58:04 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1279 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 22:08:17 - wf_bom2excel - INFO - _on_extraction_complete:1518 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-10 22:08:28 - wf_bom2excel - INFO - _on_extraction_complete:1520 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-10T22:08:28.162'}
+2025-11-10 22:08:28 - wf_bom2excel - INFO - _on_extraction_complete:1531 - 🏁 작업 완료 처리 종료
+2025-11-10 22:10:28 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1278 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 22:10:28 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1279 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 23:24:34 - wf_bom2excel - INFO - _on_extraction_complete:1518 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-10 23:24:45 - wf_bom2excel - INFO - _on_extraction_complete:1520 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-10T23:24:45.308'}
+2025-11-10 23:24:45 - wf_bom2excel - INFO - _on_extraction_complete:1531 - 🏁 작업 완료 처리 종료
+2025-11-10 23:29:55 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-10 23:29:55 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 23:29:55 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-10 23:29:57 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-10 23:29:57 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-10 23:30:01 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6}
+2025-11-10 23:30:02 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1278 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 23:30:02 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1279 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-11 00:39:38 - wf_bom2excel - INFO - _on_extraction_complete:1518 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-11 00:39:48 - wf_bom2excel - INFO - _on_extraction_complete:1520 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-11T00:39:48.955'}
+2025-11-11 00:39:48 - wf_bom2excel - INFO - _on_extraction_complete:1531 - 🏁 작업 완료 처리 종료
+2025-11-11 06:55:21 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 06:55:21 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 06:55:21 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 06:55:24 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 06:55:24 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 06:55:29 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-11 06:56:03 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1278 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-11 06:56:03 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1279 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-11 07:10:04 - wf_bom2excel - INFO - _on_extraction_complete:1518 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-11 07:10:15 - wf_bom2excel - INFO - _on_extraction_complete:1520 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-11T07:10:15.230'}
+2025-11-11 07:10:15 - wf_bom2excel - INFO - _on_extraction_complete:1531 - 🏁 작업 완료 처리 종료
+2025-11-11 16:00:17 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 16:00:17 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 16:00:17 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 16:00:20 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 16:00:20 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 16:00:24 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-11 16:03:37 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 16:03:37 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 16:03:37 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 16:03:41 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 16:03:41 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 16:03:44 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-11 16:04:13 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1278 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-11 16:04:13 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1279 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-11 16:04:24 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1278 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-11 16:04:24 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1279 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-11 16:06:39 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 16:06:39 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 16:06:39 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 16:06:41 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 16:06:41 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 16:07:54 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 16:07:54 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 16:07:54 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 16:07:56 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 16:07:56 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 16:11:02 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 16:11:02 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 16:11:02 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 16:11:04 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 16:11:04 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 16:11:06 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-11 16:13:35 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 16:13:35 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 16:13:35 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 16:13:37 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 16:13:37 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 16:13:40 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-11 16:14:27 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 16:14:27 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 16:14:27 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 16:14:29 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 16:14:29 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 16:14:31 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-11 16:16:47 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 16:16:47 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 16:16:47 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 16:16:49 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 16:16:49 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 16:16:52 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-11 17:34:22 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 17:34:22 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 17:34:22 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 17:34:25 - wf_bom2excel - INFO - _worker:228 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 17:34:25 - wf_bom2excel - INFO - _worker:230 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 17:34:28 - wf_bom2excel - INFO - worker:467 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-11 17:42:18 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 17:42:18 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 17:42:18 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 17:42:21 - wf_bom2excel - INFO - _worker:265 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-11 17:42:21 - wf_bom2excel - INFO - _worker:267 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-11 17:42:24 - wf_bom2excel - INFO - worker:486 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-11 17:43:18 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 17:43:18 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 17:43:18 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 17:43:22 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 17:43:22 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 17:43:22 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 17:43:27 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 17:43:27 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 17:43:27 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 17:43:31 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 17:43:31 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 17:43:31 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-11 17:43:35 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-11 17:43:35 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-11 17:43:35 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-13 00:05:20 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-13 00:05:20 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-13 00:05:20 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-13 00:05:21 - wf_bom2excel - INFO - _worker:305 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-13 00:05:21 - wf_bom2excel - INFO - _worker:307 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-13 00:05:25 - wf_bom2excel - INFO - worker:526 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-13 00:05:29 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1339 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 00:05:29 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1340 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 01:06:57 - wf_bom2excel - INFO - _on_extraction_complete:1579 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-13 01:07:08 - wf_bom2excel - INFO - _on_extraction_complete:1581 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-13T01:07:08.008'}
+2025-11-13 01:07:08 - wf_bom2excel - INFO - _on_extraction_complete:1592 - 🏁 작업 완료 처리 종료
+2025-11-13 07:51:58 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-13 07:51:58 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-13 07:51:58 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-13 07:52:00 - wf_bom2excel - INFO - _worker:305 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-13 07:52:00 - wf_bom2excel - INFO - _worker:307 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-13 07:52:06 - wf_bom2excel - INFO - worker:526 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-13 07:52:10 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1339 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 07:52:10 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1340 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 07:56:09 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-13 07:56:09 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-13 07:56:09 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-13 07:56:11 - wf_bom2excel - INFO - _worker:305 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-13 07:56:11 - wf_bom2excel - INFO - _worker:307 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-13 07:56:14 - wf_bom2excel - INFO - worker:526 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-13 07:56:21 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1339 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 07:56:21 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1340 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 08:09:00 - wf_bom2excel - INFO - _on_extraction_complete:1579 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-13 08:09:13 - wf_bom2excel - INFO - _on_extraction_complete:1581 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-13T08:09:13.769'}
+2025-11-13 08:09:13 - wf_bom2excel - INFO - _on_extraction_complete:1592 - 🏁 작업 완료 처리 종료
+2025-11-13 08:16:13 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1339 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 08:16:13 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1340 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 08:18:39 - wf_bom2excel - INFO - _on_extraction_complete:1579 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-13 08:18:49 - wf_bom2excel - INFO - _on_extraction_complete:1581 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-13T08:18:49.492'}
+2025-11-13 08:18:49 - wf_bom2excel - INFO - _on_extraction_complete:1592 - 🏁 작업 완료 처리 종료
+2025-11-13 08:19:35 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1339 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 08:19:35 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1340 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 09:18:32 - wf_bom2excel - INFO - _on_extraction_complete:1579 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-13 09:18:42 - wf_bom2excel - INFO - _on_extraction_complete:1581 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-13T09:18:42.173'}
+2025-11-13 09:18:42 - wf_bom2excel - INFO - _on_extraction_complete:1592 - 🏁 작업 완료 처리 종료
+2025-11-13 09:38:17 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1339 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 09:38:17 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1340 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 10:28:04 - wf_bom2excel - INFO - _on_extraction_complete:1579 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-13 10:28:15 - wf_bom2excel - INFO - _on_extraction_complete:1581 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-13T10:28:15.380'}
+2025-11-13 10:28:15 - wf_bom2excel - INFO - _on_extraction_complete:1592 - 🏁 작업 완료 처리 종료
+2025-11-13 13:43:56 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-13 13:43:56 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-13 13:43:56 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-13 13:43:57 - wf_bom2excel - INFO - _worker:305 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-13 13:43:57 - wf_bom2excel - INFO - _worker:307 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-13 13:44:01 - wf_bom2excel - INFO - worker:526 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-13 23:46:47 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-13 23:46:47 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-13 23:46:47 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-13 23:46:49 - wf_bom2excel - INFO - _worker:305 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-13 23:46:49 - wf_bom2excel - INFO - _worker:307 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-13 23:46:53 - wf_bom2excel - INFO - worker:526 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-13 23:46:54 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1339 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 23:46:54 - wf_bom2excel - DEBUG - verify_hardware_fingerprint:1340 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-14 00:50:16 - wf_bom2excel - INFO - _on_extraction_complete:1579 - 🧾 처리 완료 후 사용 내역 동기화 시도...
+2025-11-14 00:50:26 - wf_bom2excel - INFO - _on_extraction_complete:1581 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-14T00:50:26.021'}
+2025-11-14 00:50:26 - wf_bom2excel - INFO - _on_extraction_complete:1592 - 🏁 작업 완료 처리 종료
+2025-11-14 07:34:50 - wf_bom2excel - INFO - __init__:40 - App initialized: bom2excel v2.1.0
+2025-11-14 07:34:50 - wf_bom2excel - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-14 07:34:50 - wf_bom2excel - INFO - __init__:42 - Language: ko
+2025-11-14 07:34:52 - wf_bom2excel - INFO - _worker:305 - 🔄 백그라운드 복구 동기화 실행...
+2025-11-14 07:34:52 - wf_bom2excel - INFO - _worker:307 - [STARTUP-RECOVERY] {'success': True, 'message': '동기화가 필요하지 않습니다.', 'synced': False}
+2025-11-14 07:34:56 - wf_bom2excel - INFO - worker:526 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}

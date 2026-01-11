@@ -1,0 +1,22 @@
+2025-12-28 09:45:25,348 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:45:25,349 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:107 - App: DWG_Batch_Print
+2025-12-28 09:45:25,451 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:45:25,452 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:191 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2025-12-28 09:45:25,453 - INFO - [wf_rpa.dwg_batch_print] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:45:25,458 - INFO - [wf_rpa.dwg_batch_print] wf_log:107 - App: dwg_batch_print
+2025-12-28 09:45:25,458 - INFO - [wf_rpa.dwg_batch_print] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:45:25,544 - DEBUG - [wf_rpa.dwg_batch_print] ui_main:432 - [PERF] Early WorksFreeManager init: 5.07 ms, registered=True
+2025-12-28 09:45:25,544 - INFO - [wf_rpa.dwg_batch_print] ui_main:1273 - [DEBUG] geometry override at startup: 550x350+128+128
+2025-12-28 09:45:26,327 - INFO - [wf_rpa.dwg_batch_print] ui_main:1087 - 정책 동기화 결과: {'success': False, 'error': 'empty_policies', 'message': 'Google Sheets에 정책 데이터가 없습니다.'}
+2025-12-28 09:45:26,573 - INFO - [wf_rpa.dwg_batch_print] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-28 09:49:59,600 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:49:59,600 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:107 - App: DWG_Batch_Print
+2025-12-28 09:49:59,680 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:49:59,680 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:191 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2025-12-28 09:49:59,682 - INFO - [wf_rpa.dwg_batch_print] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-28 09:49:59,683 - INFO - [wf_rpa.dwg_batch_print] wf_log:107 - App: dwg_batch_print
+2025-12-28 09:49:59,683 - INFO - [wf_rpa.dwg_batch_print] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-28 09:49:59,724 - DEBUG - [wf_rpa.dwg_batch_print] ui_main:428 - Deferred WorksFreeManager init to background thread
+2025-12-28 09:49:59,724 - INFO - [wf_rpa.dwg_batch_print] ui_main:1269 - [DEBUG] geometry override at startup: 550x350+128+128
+2025-12-28 09:50:00,331 - INFO - [wf_rpa.dwg_batch_print] ui_main:1083 - 정책 동기화 결과: {'success': False, 'error': 'empty_policies', 'message': 'Google Sheets에 정책 데이터가 없습니다.'}
+2025-12-28 09:50:00,613 - INFO - [wf_rpa.dwg_batch_print] wf_app_init_helpers:72 - 🔄 동기화 불필요

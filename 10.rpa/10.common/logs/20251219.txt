@@ -1,0 +1,8 @@
+2025-12-19 11:35:03,370 - INFO - [wf_rpa.wf_hwinfo] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-19 11:35:03,370 - INFO - [wf_rpa.wf_hwinfo] wf_log:107 - App: wf_hwinfo
+2025-12-19 11:35:03,490 - INFO - [wf_rpa.wf_hwinfo] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-19 11:35:03,492 - INFO - [wf_rpa.wf_hwinfo] wf_hwinfo:110 - CPU Info: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1]
+2025-12-19 11:35:03,673 - INFO - [wf_rpa.wf_hwinfo] wf_hwinfo:165 - [HWINFO] 메인보드 정보: PTLPB00WBKR00W
+2025-12-19 11:35:03,673 - INFO - [wf_rpa.wf_hwinfo] wf_hwinfo:166 - [HWINFO] CPU 정보: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1]
+2025-12-19 11:35:03,678 - INFO - [wf_rpa.wf_hwinfo] wf_hwinfo:167 - [HWINFO] 저장장치 정보: 000000001532
+2025-12-19 11:35:03,679 - INFO - [wf_rpa.wf_hwinfo] wf_hwinfo:168 - [HWINFO] 하드웨어 지문: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658

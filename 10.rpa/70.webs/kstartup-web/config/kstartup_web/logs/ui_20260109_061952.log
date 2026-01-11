@@ -1,0 +1,24 @@
+[2026-01-09 06:19:54] INFO: ============================================================
+[2026-01-09 06:19:54] INFO: K-Startup 웹 자동화 시작
+[2026-01-09 06:19:54] INFO: ============================================================
+[2026-01-09 06:19:54] INFO: 앱 초기화 시작
+[2026-01-09 06:19:54] INFO: UI 생성 완료
+[2026-01-09 06:19:54] INFO: WorksFreeManager 초기화 중...
+[2026-01-09 06:19:54] INFO: 앱 초기화 완료
+[2026-01-09 06:19:54] INFO: 메인 루프 시작 - 메인 창이 화면에 표시됩니다
+[2026-01-09 06:19:54] INFO: WorksFreeManager 초기화 완료 (등록: False)
+[2026-01-09 06:20:45] INFO: 파일 선택됨: D:/drive_files/10.worksfree/10.rpa/70.webs/kstartup-web/kstartup_actions.xlsx
+[2026-01-09 06:20:50] INFO: 자동화 시작: D:/drive_files/10.worksfree/10.rpa/70.webs/kstartup-web/kstartup_actions.xlsx
+[2026-01-09 06:20:50] INFO: Excel 파일 파싱 중...
+[2026-01-09 06:20:50] INFO: 총 6개의 액션을 로드했습니다
+[2026-01-09 06:20:50] INFO: WebDriver 초기화 중...
+[2026-01-09 06:20:50] ERROR: 자동화 실행 중 오류: WebDriver.__init__() got multiple values for argument 'options'
+Traceback (most recent call last):
+  File "D:\drive_files\10.worksfree\10.rpa\70.webs\kstartup-web\ui_main.py", line 224, in _run_automation
+    engine.initialize_driver()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\drive_files\10.worksfree\10.rpa\70.webs\kstartup-web\automation.py", line 291, in initialize_driver
+    self.driver = webdriver.Chrome(driver_path, options=chrome_options)
+                  ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: WebDriver.__init__() got multiple values for argument 'options'
+[2026-01-09 06:20:58] INFO: 프로그램 종료

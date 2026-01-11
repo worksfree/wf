@@ -1,0 +1,19 @@
+{
+  "app_policy": {
+    "icon_text": "C2V",
+    "description": "변환 검증 앱",
+    "trial_credits": 2000,
+    "credit_per_work": 10,
+    "available_work": 200,
+    "permanent_price": 500000,
+    "credit_type": "per_execution",
+    "full_description": "변환 검증 - 실행당 10크레딧"
+  },
+  "credit_changed": false,
+  "trial_credits": 2000,
+  "purchased_credits": 0,
+  "created_at": "2025-11-23T21:53:11.215",
+  "last_updated": "2025-11-23T21:53:11.215",
+  "purchase_history": [],
+  "usage_history": []
+}

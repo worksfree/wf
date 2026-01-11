@@ -1,0 +1,19 @@
+{
+  "app_policy": {
+    "icon_text": "B2E",
+    "description": "도면 처리 앱",
+    "trial_credits": 2000,
+    "credit_per_work": 100,
+    "available_work": 20,
+    "permanent_price": 2000000,
+    "credit_type": "per_file",
+    "full_description": "BOM 엑셀 변환 - 파일당 100크레딧"
+  },
+  "credit_changed": false,
+  "trial_credits": 2000,
+  "purchased_credits": 0,
+  "created_at": "2025-11-23T21:53:11.161",
+  "last_updated": "2025-11-23T21:53:11.161",
+  "purchase_history": [],
+  "usage_history": []
+}

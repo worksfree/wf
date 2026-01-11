@@ -1,0 +1,173 @@
+{
+  "images": [
+    {
+      "path": "images/be_01_app_launch.png",
+      "description": "BOM 엑셀 저장 아이콘",
+      "borders": [
+        {
+          "x": 50,
+          "y": 50,
+          "width": 100,
+          "height": 100,
+          "thickness": 5,
+          "note": "바탕화면 아이콘 강조"
+        }
+      ]
+    },
+    {
+      "path": "images/be_02_folder_select.png",
+      "description": "폴더 선택 버튼",
+      "borders": [
+        {
+          "x": 20,
+          "y": 120,
+          "width": 120,
+          "height": 40,
+          "thickness": 5,
+          "note": "'폴더 선택' 버튼 강조"
+        }
+      ]
+    },
+    {
+      "path": "images/be_03_scan_progress.png",
+      "description": "진행률 바와 파일 개수",
+      "borders": [
+        {
+          "x": 20,
+          "y": 200,
+          "width": 540,
+          "height": 30,
+          "thickness": 5,
+          "note": "진행률 바 강조"
+        },
+        {
+          "x": 20,
+          "y": 240,
+          "width": 100,
+          "height": 30,
+          "thickness": 5,
+          "note": "파일 개수 강조"
+        }
+      ]
+    },
+    {
+      "path": "images/be_04_start_export.png",
+      "description": "저장시작 버튼",
+      "borders": [
+        {
+          "x": 20,
+          "y": 350,
+          "width": 120,
+          "height": 40,
+          "thickness": 5,
+          "note": "'저장시작' 버튼 강조"
+        }
+      ]
+    },
+    {
+      "path": "images/dc_01_app_launch.png",
+      "description": "DWG 파일 분류 아이콘",
+      "borders": [
+        {
+          "x": 50,
+          "y": 50,
+          "width": 100,
+          "height": 100,
+          "thickness": 5,
+          "note": "바탕화면 아이콘 강조"
+        }
+      ]
+    },
+    {
+      "path": "images/dc_02_folder_select.png",
+      "description": "DWG 폴더 선택",
+      "borders": [
+        {
+          "x": 20,
+          "y": 120,
+          "width": 120,
+          "height": 40,
+          "thickness": 5,
+          "note": "'폴더 선택' 버튼 강조"
+        }
+      ]
+    },
+    {
+      "path": "images/dc_03_excel_select.png",
+      "description": "엑셀 파일 선택",
+      "borders": [
+        {
+          "x": 20,
+          "y": 180,
+          "width": 120,
+          "height": 40,
+          "thickness": 5,
+          "note": "'엑셀 선택' 버튼 강조"
+        }
+      ]
+    },
+    {
+      "path": "images/dc_05_scan_toggle.png",
+      "description": "폴더 스캔 체크박스",
+      "borders": [
+        {
+          "x": 20,
+          "y": 270,
+          "width": 150,
+          "height": 30,
+          "thickness": 5,
+          "note": "'폴더 스캔' 체크박스 강조"
+        },
+        {
+          "x": 250,
+          "y": 270,
+          "width": 80,
+          "height": 30,
+          "thickness": 5,
+          "note": "파일 개수 강조"
+        }
+      ]
+    },
+    {
+      "path": "images/dc_06_start_classification.png",
+      "description": "분류시작 버튼",
+      "borders": [
+        {
+          "x": 20,
+          "y": 350,
+          "width": 120,
+          "height": 40,
+          "thickness": 5,
+          "note": "'분류시작' 버튼 강조"
+        }
+      ]
+    },
+    {
+      "path": "images/admin_01_toggle.png",
+      "description": "관리자 모드 진입",
+      "borders": [
+        {
+          "x": 20,
+          "y": 200,
+          "width": 100,
+          "height": 30,
+          "thickness": 5,
+          "note": "'진행률:' 레이블 강조"
+        }
+      ]
+    }
+  ],
+  "instructions": [
+    "1. FHD 해상도(1920x1080)로 각 앱을 실행하여 스크린샷 캡처",
+    "2. 캡처한 이미지를 docs/images/ 폴더에 저장",
+    "3. 이 JSON 파일의 x, y, width, height 값을 실제 버튼 위치에 맞게 조정",
+    "4. 명령어 실행: python add_red_border.py --batch border_config.json",
+    "5. 처리된 이미지가 자동으로 적색 경계선이 추가되어 덮어쓰기됨"
+  ],
+  "tips": [
+    "- 버튼 위치 확인: Paint나 이미지 뷰어로 마우스 좌표 확인",
+    "- 경계선이 버튼보다 약간 크게 그려지도록 x, y는 -5, width/height는 +10 추가 권장",
+    "- thickness는 5~8px 사이가 적당함 (FHD 기준)",
+    "- 여러 영역 강조 시 borders 배열에 추가"
+  ]
+}

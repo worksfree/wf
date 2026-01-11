@@ -1,0 +1,193 @@
+# 설정 파일 경로 정책
+
+## 개요
+
+WorksFree RPA 앱들은 **실행 환경**과 **실행 모드**에 따라 다른 설정 파일 경로를 사용합니다.
+
+## 실행 환경
+
+| 환경 | 설명 | 감지 방법 |
+|------|------|----------|
+| **소스** | Python 소스 코드로 직접 실행 | `sys.frozen == False` |
+| **exe** | PyInstaller로 빌드된 실행 파일 | `sys.frozen == True` |
+
+## 실행 모드
+
+| 모드 | 용도 | 설정 위치 (소스) | 특징 |
+|------|------|-----------------|------|
+| **dev** | 개발 환경 | `소스트리/config/앱이름/` | 로컬 파일 직접 수정 |
+| **demo** | 데모/영상 녹화 | `소스트리/config/앱이름/` | 미리 설정된 값 사용 |
+| **release** | 일반 배포 | `~/.wf_rpa/앱이름/` | 사용자별 독립 설정 |
+
+실행 모드는 `settings.json`의 `app_config.run_mode` 값으로 결정됩니다.
+
+## 설정 파일 경로 결정 로직
+
+```python
+import sys
+from pathlib import Path
+
+is_frozen = getattr(sys, 'frozen', False)  # exe 환경 감지
+run_mode = _detect_run_mode()  # settings.json에서 읽음
+
+if is_frozen or run_mode == "release":
+    # exe 또는 release 모드: 항상 사용자 홈 사용
+    app_config_dir = Path.home() / ".wf_rpa" / "앱이름"
+else:
+    # 소스 실행 & dev/demo: 소스 트리 사용
+    app_config_dir = Path(__file__).parent / "config" / "앱이름"
+```
+
+## 동작 매트릭스
+
+| 실행 방식 | run_mode | 설정 파일 경로 | 쓰기 가능 |
+|-----------|----------|---------------|----------|
+| **python (소스)** | dev | `소스트리/config/앱이름/settings.json` | ✅ |
+| **python (소스)** | demo | `소스트리/config/앱이름/settings.json` | ✅ |
+| **python (소스)** | release | `~/.wf_rpa/앱이름/settings.json` | ✅ |
+| **exe** | dev | `~/.wf_rpa/앱이름/settings.json` | ✅ |
+| **exe** | demo | `~/.wf_rpa/앱이름/settings.json` | ✅ |
+| **exe** | release | `~/.wf_rpa/앱이름/settings.json` | ✅ |
+
+## exe 빌드 시 초기 설정 복사 메커니즘
+
+### 문제점
+- exe로 빌드된 앱은 번들된 `config/` 폴더가 읽기 전용
+- Alt+G로 창 위치 저장, 폴더 경로 저장 등 쓰기 작업 불가
+
+### 해결책
+**첫 실행 시 번들 설정 → 사용자 홈으로 복사**
+
+```python
+def _ensure_settings_file(self):
+    """exe 첫 실행 시 번들된 설정을 사용자 홈으로 복사"""
+    if not self.settings_file.exists():
+        is_frozen = getattr(sys, 'frozen', False)
+        if is_frozen:
+            bundled = Path(self.base_dir) / "config" / "앱이름" / "settings.json"
+            if bundled.exists():
+                shutil.copy2(bundled, self.settings_file)
+                return
+        
+        # 번들 파일 없으면 기본값으로 생성
+        unified_settings = {...}
+        with open(self.settings_file, "w") as f:
+            json.dump(unified_settings, f)
+```
+
+### 동작 흐름
+
+1. **exe 첫 실행**:
+   - `~/.wf_rpa/앱이름/settings.json` 없음
+   - 번들된 `config/앱이름/settings.json` 발견
+   - 사용자 홈으로 복사 (demo 설정 포함)
+
+2. **이후 실행**:
+   - 사용자 홈의 `settings.json` 사용
+   - Alt+G 등으로 수정된 내용 유지
+
+3. **업데이트 설치**:
+   - 기존 `~/.wf_rpa/` 파일은 보존
+   - 새 버전 번들 파일은 무시됨
+   - **주의**: 설정 구조 변경 시 마이그레이션 로직 필요
+
+## demo 모드 exe의 특수성
+
+### demo 모드로 빌드하는 이유
+- 영상 녹화용 화면 캡처 기능 (Alt+C, Alt+G)
+- 데모 지연 효과 (우클릭 후 3초 sleep 등)
+- 미리 설정된 창 위치, 폴더 경로
+
+### exe demo의 동작
+```
+소스 demo 실행:
+  config/bom_exporter/settings.json (직접 읽기/쓰기)
+  ↓
+  Alt+G → 즉시 settings.json 수정
+
+exe demo 실행:
+  config/bom_exporter/settings.json (번들, 읽기 전용)
+  ↓ 첫 실행 시 복사
+  ~/.wf_rpa/bom_exporter/settings.json (쓰기 가능)
+  ↓
+  Alt+G → 사용자 홈 settings.json 수정
+```
+
+### 장점
+1. **demo 설정 활용**: 번들된 geometry, 폴더 경로 초기값 사용
+2. **쓰기 가능**: Alt+G로 창 위치 저장 가능
+3. **사용자별 독립**: 다른 사용자가 실행해도 간섭 없음
+
+### 단점
+1. **업데이트 미반영**: 업데이트된 demo 설정이 자동 적용 안됨
+2. **혼동 가능성**: run_mode=demo인데 경로는 release와 동일
+
+## 모범 사례
+
+### 개발 중
+```bash
+# 소스에서 직접 실행
+python bom_exporter.py
+# → config/bom_exporter/settings.json (dev/demo)
+```
+
+### 영상 녹화
+```bash
+# 1. settings.json run_mode=demo 설정
+# 2. 소스에서 실행 (번들 불필요)
+python bom_exporter.py
+# → config/bom_exporter/settings.json 직접 사용
+# → Alt+G로 즉시 저장
+```
+
+### 배포
+```bash
+# 1. settings.json run_mode=demo (or release)
+# 2. exe 빌드
+# 3. 첫 실행 시 자동으로 ~/.wf_rpa/로 복사
+# 4. 이후 사용자 홈 파일만 수정됨
+```
+
+## 주의사항
+
+### 1. 설정 초기화 방법
+사용자가 설정을 초기화하려면:
+```bash
+# Windows
+del %USERPROFILE%\.wf_rpa\bom_exporter\settings.json
+
+# 다음 실행 시 번들 설정으로 다시 복사됨
+```
+
+### 2. 버전 업데이트 시
+```python
+# 설정 구조가 변경된 경우 마이그레이션 로직 필요
+def _migrate_settings(old_version, new_version):
+    if old_version < "0.8.0":
+        # 새 필드 추가
+        settings["ui_config"]["new_field"] = default_value
+```
+
+### 3. 디버깅
+로그에서 실제 사용 중인 경로 확인:
+```
+[CONFIG] run_mode=demo, settings_file=C:\Users\USER\.wf_rpa\bom_exporter\settings.json
+```
+
+## 적용 앱 목록
+
+- ✅ bom_exporter (v0.8.8.6+)
+- ✅ dwg_classifier (v0.8.3.4+)
+- ✅ dwg_batch_print (v0.7.5.x+)
+- ✅ korean_filename_normalizer (v0.8.1.6+)
+- ✅ conversion_verifier (v0.8.1.2+)
+
+## 관련 파일
+
+- `app_setting_data.py`: 설정 경로 결정 로직
+- `settings.json`: 실행 모드 및 사용자 설정
+- `build_*.ps1`: exe 빌드 스크립트 (config 번들링)
+
+---
+**작성일**: 2026-01-03  
+**마지막 수정**: 2026-01-03

@@ -1,0 +1,36 @@
+{
+  "app_info": {
+    "app_name": "kstartup_web",
+    "display_name": "K-Startup 웹 자동화",
+    "version": "v1.0.0",
+    "last_updated": "2026-01-08"
+  },
+  "credit_policy": {
+    "credits_per_action": 1,
+    "trial_credits": 100,
+    "credit_unit_name": "액션",
+    "enable_credit_system": true
+  },
+  "registration_policy": {
+    "require_registration": true,
+    "trial_period_days": 30,
+    "allow_offline_mode": false
+  },
+  "usage_policy": {
+    "max_actions_per_session": 1000,
+    "allow_batch_processing": true
+  },
+  "feature_flags": {
+    "enable_demo_mode": true,
+    "enable_screenshots": true,
+    "enable_cookie_save": true
+  },
+  "policy": {
+    "description": "kstartup_web - 정책 미설정",
+    "trial_credits": 0,
+    "credit_per_work": 1,
+    "credit_type": "per_item"
+  },
+  "source": "fallback",
+  "last_updated": "2026-01-09T06:16:12.143"
+}

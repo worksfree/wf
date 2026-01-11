@@ -1,0 +1,4 @@
+2026-01-08 20:31:03,964 - INFO - [wf_rpa.kstartup_web] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-08 20:31:03,965 - INFO - [wf_rpa.kstartup_web] wf_log:109 - App: kstartup_web
+2026-01-08 20:31:04,004 - INFO - [wf_rpa.kstartup_web] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-08 20:31:04,005 - DEBUG - [wf_rpa.kstartup_web] ui_main:327 - Early WorksFreeManager init: registered=False

@@ -1,0 +1,49 @@
+{
+  "runtime_config": {
+    "run_mode": "demo",
+    "full_version": "v0.8.1.7",
+    "build_count": 117,
+    "ui_scale": 1.0,
+    "language": "ko"
+  },
+  "ui_config": {
+    "window_geometry_override": "580x180+990+480",
+    "admin_window_geometry": "700x800",
+    "show_admin_mode": false
+  },
+  "logging_config": {
+    "log_level": "INFO",
+    "max_log_lines": 1000,
+    "auto_scroll_log": true
+  },
+  "normalizer_settings": {
+    "default_folder_path": "D:/dep_test_data/한글자소분리_데모",
+    "backup_enabled": false,
+    "recursive_scan": true,
+    "include_hidden_files": false,
+    "auto_backup": true,
+    "supported_extensions": [
+      ".txt",
+      ".docx",
+      ".xlsx",
+      ".pptx",
+      ".pdf",
+      ".jpg",
+      ".png",
+      ".mp4",
+      ".avi",
+      ".zip",
+      ".rar"
+    ],
+    "skip_system_files": true,
+    "conflict_resolution": "overwrite",
+    "save_to_new_folder": false,
+    "normalization_method": "nfc_plus_manual",
+    "preserve_extension_case": true,
+    "log_changes": true
+  },
+  "app_config": {
+    "full_version": "v0.7.1.6",
+    "build_count": 16
+  }
+}

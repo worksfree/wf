@@ -1,0 +1,4 @@
+Total: 624.3ms
+[    0.0ms] main() called
+[  269.5ms] DwgClassifierApp.__init__
+[  624.3ms] App init complete

@@ -1,0 +1,666 @@
+# -*- mode: python ; coding: utf-8 -*-
+"""
+WorksFree 통합 앱 빌드 Spec Template
+- 모든 빌드 로직을 spec 파일에 통합
+- NSIS 인스톨러 자동 생성 
+- 멀티앱 지원 및 중복 설치 방지
+- 배포 후 자동 정리 및 패키징
+"""
+
+import os
+import sys
+import json
+import shutil
+import subprocess
+from pathlib import Path
+from datetime import datetime
+
+# ==================== 앱 정보 설정 (각 앱별로 수정) ====================
+APP_NAME = '{APP_NAME}'  # 빌드할 앱 이름
+APP_VERSION = '1.0.0'
+APP_DISPLAY_NAME = '{APP_DISPLAY_NAME}'
+APP_DESCRIPTION = '{APP_DESCRIPTION}'
+APP_PUBLISHER = 'WorksFree Co., Ltd.'
+APP_URL = 'https://worksfree.co.kr'
+APP_CONTACT = 'support@worksfree.co.kr'
+
+# ==================== 경로 및 환경 설정 ====================
+SPEC_DIR = Path(os.getcwd())
+WORKSPACE_ROOT = SPEC_DIR.parent.parent
+COMMON_DIR = WORKSPACE_ROOT / '10.common'
+TEMPLATES_DIR = WORKSPACE_ROOT / 'templates'
+BUILD_OUTPUT_DIR = Path('D:/release/candidates')
+
+# WorksFree 앱 목록 (NSIS 중복 설치 방지용)
+WORKSFREE_APPS = [
+    'bom2excel',
+    'dwg_classifier', 
+    'conversion_verifier',
+    'korean_filename_normalizer',
+    'file_list_check',
+    'spreadsheet_manager'
+]
+
+print(f"\\n{'='*80}")
+print(f"WorksFree {APP_DISPLAY_NAME} v{APP_VERSION} 통합 빌드 시작")
+print(f"{'='*80}")
+
+# ==================== 글로벌 정책 파일 생성 ====================
+def create_global_policies():
+    """전역 앱 정책 파일 생성 (첫 번째 앱 설치시에만)"""
+    policies = {
+        'bom2excel': {
+            'credit_per_file': 100,
+            'memory_limit_mb': 2048,
+            'max_files_per_batch': 50,
+            'timeout_seconds': 300
+        },
+        'dwg_classifier': {
+            'credit_per_work': 50,
+            'memory_limit_mb': 1024,
+            'max_files_per_batch': 100,
+            'timeout_seconds': 180
+        },
+        'conversion_verifier': {
+            'credit_per_file': 30,
+            'memory_limit_mb': 512,
+            'max_files_per_batch': 200,
+            'timeout_seconds': 120
+        },
+        'korean_filename_normalizer': {
+            'credit_per_file': 10,
+            'memory_limit_mb': 256,
+            'max_files_per_batch': 500,
+            'timeout_seconds': 60
+        },
+        'file_list_check': {
+            'credit_per_file': 20,
+            'memory_limit_mb': 512,
+            'max_files_per_batch': 300,
+            'timeout_seconds': 90
+        },
+        'spreadsheet_manager': {
+            'credit_per_operation': 40,
+            'memory_limit_mb': 1024,
+            'max_operations_per_batch': 100,
+            'timeout_seconds': 240
+        }
+    }
+    
+    policy_file = SPEC_DIR / 'global_policies.json'
+    with open(policy_file, 'w', encoding='utf-8') as f:
+        json.dump(policies, f, ensure_ascii=False, indent=2)
+    
+    print(f"✓ 글로벌 정책 파일 생성: {policy_file}")
+    return policy_file
+
+# ==================== 사용자 홈 설정 파일 준비 ====================
+def prepare_user_configs():
+    """사용자 홈 디렉토리용 설정 파일들 준비"""
+    home_dir = SPEC_DIR / 'installer_resources' / 'user_home'
+    home_dir.mkdir(parents=True, exist_ok=True)
+    
+    wf_rpa_dir = home_dir / '.wf_rpa'
+    app_dir = wf_rpa_dir / APP_NAME
+    credentials_dir = wf_rpa_dir / 'credentials'
+    
+    for directory in [wf_rpa_dir, app_dir, credentials_dir]:
+        directory.mkdir(parents=True, exist_ok=True)
+    
+    # 1. 전역 설정
+    global_config = {
+        'installation_info': {
+            'installed_apps': [],
+            'install_date': None,
+            'last_update': None,
+            'registry_version': '1.0'
+        },
+        'user_info': {
+            'email': None,
+            'hardware_id': None,
+            'registration_status': 'unregistered'
+        }
+    }
+    
+    with open(wf_rpa_dir / '.wf_global_config.json', 'w', encoding='utf-8') as f:
+        json.dump(global_config, f, ensure_ascii=False, indent=2)
+    
+    # 2. 앱별 설정
+    app_config = {
+        'app_info': {
+            'name': APP_NAME,
+            'version': APP_VERSION,
+            'install_date': None,
+            'last_run': None
+        },
+        'credits': {
+            'balance': 0,
+            'trial_credits': 2000,
+            'usage_today': 0,
+            'usage_total': 0
+        },
+        'settings': {
+            'auto_start': False,
+            'minimize_to_tray': True,
+            'check_updates': True,
+            'ui_scale': 1.0
+        }
+    }
+    
+    with open(app_dir / f'{APP_NAME}_config.json', 'w', encoding='utf-8') as f:
+        json.dump(app_config, f, ensure_ascii=False, indent=2)
+    
+    # 3. Google Credentials 복사 (있다면)
+    google_creds = COMMON_DIR / 'credentials' / 'google-service-account.json'
+    if google_creds.exists():
+        shutil.copy2(google_creds, credentials_dir / 'google-service-account.json')
+        print(f"✓ Google credentials 포함")
+    
+    print(f"✓ 사용자 설정 파일 준비 완료: {home_dir}")
+    return home_dir
+
+# ==================== NSIS 스크립트 생성 ====================
+def create_nsis_script():
+    """NSIS 인스톨러 스크립트 생성"""
+    nsis_script = f'''!include "MUI2.nsh"
+!include "FileFunc.nsh"
+!include "LogicLib.nsh"
+
+; ==================== 기본 정보 ====================
+Name "{APP_DISPLAY_NAME}"
+OutFile "{APP_NAME}_{APP_VERSION}_installer.exe"
+InstallDir "$PROGRAMFILES64\\WorksFree\\{APP_NAME}"
+InstallDirRegKey HKLM "Software\\WorksFree\\{APP_NAME}" "InstallPath"
+RequestExecutionLevel admin
+
+; ==================== 버전 정보 ====================
+VIProductVersion "{APP_VERSION}.0"
+VIAddVersionKey "ProductName" "{APP_DISPLAY_NAME}"
+VIAddVersionKey "CompanyName" "{APP_PUBLISHER}"
+VIAddVersionKey "ProductVersion" "{APP_VERSION}"
+VIAddVersionKey "FileVersion" "{APP_VERSION}.0"
+VIAddVersionKey "FileDescription" "{APP_DESCRIPTION}"
+VIAddVersionKey "LegalCopyright" "Copyright © 2024 {APP_PUBLISHER}"
+
+; ==================== 인터페이스 설정 ====================
+!define MUI_ABORTWARNING
+!define MUI_ICON "icon.ico"
+!define MUI_UNICON "icon.ico"
+
+; 페이지 설정
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "license.txt"
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
+
+!insertmacro MUI_LANGUAGE "Korean"
+!insertmacro MUI_LANGUAGE "English"
+
+; ==================== 전역 변수 ====================
+Var IsFirstWorksFreeApp
+Var GlobalConfigExists
+Var CredentialsExists
+
+; ==================== 사전 설치 검사 ====================
+Function .onInit
+    ; WorksFree 전역 설정 디렉토리 확인
+    IfFileExists "$PROFILE\\.wf_rpa\\.wf_global_config.json" 0 +3
+        StrCpy $GlobalConfigExists "true"
+        Goto +2
+        StrCpy $GlobalConfigExists "false"
+    
+    ; Google Credentials 존재 확인
+    IfFileExists "$PROFILE\\.wf_rpa\\credentials\\google-service-account.json" 0 +3
+        StrCpy $CredentialsExists "true"
+        Goto +2
+        StrCpy $CredentialsExists "false"
+    
+    ; 첫 번째 WorksFree 앱인지 확인
+    ${{If}} $GlobalConfigExists == "false"
+        StrCpy $IsFirstWorksFreeApp "true"
+        DetailPrint "첫 번째 WorksFree 앱 설치를 감지했습니다."
+    ${{Else}}
+        StrCpy $IsFirstWorksFreeApp "false"
+        DetailPrint "기존 WorksFree 환경에 추가 설치합니다."
+    ${{EndIf}}
+FunctionEnd
+
+; ==================== 설치 섹션 ====================
+Section "!{APP_DISPLAY_NAME} (필수)" SecMain
+    SectionIn RO ; 필수 섹션
+    
+    SetOutPath "$INSTDIR"
+    
+    ; 메인 앱 파일들 설치
+    File /r "dist\\{APP_NAME}\\*.*"
+    
+    ; 레지스트리 등록
+    WriteRegStr HKLM "Software\\WorksFree\\{APP_NAME}" "InstallPath" "$INSTDIR"
+    WriteRegStr HKLM "Software\\WorksFree\\{APP_NAME}" "Version" "{APP_VERSION}"
+    WriteRegStr HKLM "Software\\WorksFree\\{APP_NAME}" "DisplayName" "{APP_DISPLAY_NAME}"
+    WriteRegStr HKLM "Software\\WorksFree\\{APP_NAME}" "Publisher" "{APP_PUBLISHER}"
+    WriteRegStr HKLM "Software\\WorksFree\\{APP_NAME}" "InstallDate" "$DATE"
+    
+    ; 프로그램 추가/제거 등록
+    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{APP_NAME}" "DisplayName" "{APP_DISPLAY_NAME}"
+    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{APP_NAME}" "UninstallString" "$\\"$INSTDIR\\uninstall.exe$\\""
+    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{APP_NAME}" "DisplayIcon" "$INSTDIR\\{APP_NAME}.exe"
+    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{APP_NAME}" "Publisher" "{APP_PUBLISHER}"
+    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{APP_NAME}" "DisplayVersion" "{APP_VERSION}"
+    WriteRegDWORD HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{APP_NAME}" "NoModify" 1
+    WriteRegDWORD HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{APP_NAME}" "NoRepair" 1
+    
+    ; 설치 크기 계산
+    ${{GetSize}} "$INSTDIR" "/S=0K" $0 $1 $2
+    IntFmt $0 "0x%08X" $0
+    WriteRegDWORD HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{APP_NAME}" "EstimatedSize" "$0"
+    
+    ; 언인스톨러 생성
+    WriteUninstaller "$INSTDIR\\uninstall.exe"
+SectionEnd
+
+Section "사용자 설정 파일" SecUserConfig
+    ; 첫 번째 앱이거나 글로벌 설정이 없을 때만 설치
+    ${{If}} $IsFirstWorksFreeApp == "true"
+    ${{OrIf}} $GlobalConfigExists == "false"
+        DetailPrint "WorksFree 전역 설정을 초기화합니다..."
+        
+        ; .wf_rpa 디렉토리 생성
+        CreateDirectory "$PROFILE\\.wf_rpa"
+        CreateDirectory "$PROFILE\\.wf_rpa\\{APP_NAME}"
+        CreateDirectory "$PROFILE\\.wf_rpa\\credentials"
+        CreateDirectory "$PROFILE\\.wf_rpa\\logs"
+        
+        ; 전역 설정 파일들 복사
+        SetOutPath "$PROFILE\\.wf_rpa"
+        File "installer_resources\\user_home\\.wf_rpa\\.wf_global_config.json"
+        
+        ; 앱별 설정 파일 복사
+        SetOutPath "$PROFILE\\.wf_rpa\\{APP_NAME}"
+        File "installer_resources\\user_home\\.wf_rpa\\{APP_NAME}\\*.*"
+        
+        DetailPrint "✓ WorksFree 환경 설정 완료"
+    ${{Else}}
+        DetailPrint "기존 WorksFree 설정을 사용합니다."
+        
+        ; 앱별 설정 디렉토리만 생성
+        CreateDirectory "$PROFILE\\.wf_rpa\\{APP_NAME}"
+        SetOutPath "$PROFILE\\.wf_rpa\\{APP_NAME}"
+        File "installer_resources\\user_home\\.wf_rpa\\{APP_NAME}\\*.*"
+    ${{EndIf}}
+SectionEnd
+
+Section "Google Credentials" SecCredentials
+    ; Credentials가 없을 때만 설치
+    ${{If}} $CredentialsExists == "false"
+        DetailPrint "Google Service Account 인증 정보를 설치합니다..."
+        
+        SetOutPath "$PROFILE\\.wf_rpa\\credentials"
+        File "installer_resources\\user_home\\.wf_rpa\\credentials\\google-service-account.json"
+        
+        DetailPrint "✓ Google 인증 정보 설치 완료"
+    ${{Else}}
+        DetailPrint "기존 Google 인증 정보를 사용합니다."
+    ${{EndIf}}
+SectionEnd
+
+Section "바탕화면 바로가기" SecDesktopShortcut
+    CreateShortCut "$DESKTOP\\{APP_DISPLAY_NAME}.lnk" "$INSTDIR\\{APP_NAME}.exe"
+SectionEnd
+
+Section "시작 메뉴 항목" SecStartMenu
+    CreateDirectory "$SMPROGRAMS\\WorksFree"
+    CreateShortCut "$SMPROGRAMS\\WorksFree\\{APP_DISPLAY_NAME}.lnk" "$INSTDIR\\{APP_NAME}.exe"
+    CreateShortCut "$SMPROGRAMS\\WorksFree\\{APP_DISPLAY_NAME} 제거.lnk" "$INSTDIR\\uninstall.exe"
+SectionEnd
+
+; ==================== 컴포넌트 설명 ====================
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+    !insertmacro MUI_DESCRIPTION_TEXT ${{SecMain}} "{APP_DESCRIPTION}의 핵심 실행 파일들을 설치합니다."
+    !insertmacro MUI_DESCRIPTION_TEXT ${{SecUserConfig}} "사용자 설정 및 크레딧 관리 파일들을 설치합니다. (첫 설치시 자동 선택)"
+    !insertmacro MUI_DESCRIPTION_TEXT ${{SecCredentials}} "Google Sheets 연동을 위한 인증 정보를 설치합니다. (없을 경우에만)"
+    !insertmacro MUI_DESCRIPTION_TEXT ${{SecDesktopShortcut}} "바탕화면에 실행 바로가기를 만듭니다."
+    !insertmacro MUI_DESCRIPTION_TEXT ${{SecStartMenu}} "시작 메뉴에 프로그램 항목을 추가합니다."
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+; ==================== 설치 완료 후 처리 ====================
+Function .onInstSuccess
+    ; 전역 설정에 앱 추가
+    DetailPrint "설치된 앱 목록을 업데이트합니다..."
+    
+    ; 간단한 JSON 업데이트 (실제로는 Python 스크립트 실행하거나 더 정교한 방법 사용)
+    ExecWait '"$INSTDIR\\{APP_NAME}.exe" --register-install' $0
+    
+    DetailPrint "{APP_DISPLAY_NAME} 설치가 완료되었습니다."
+FunctionEnd
+
+; ==================== 제거 섹션 ====================
+Section "Uninstall"
+    ; 앱 파일들 제거
+    RMDir /r "$INSTDIR"
+    
+    ; 레지스트리 제거
+    DeleteRegKey HKLM "Software\\WorksFree\\{APP_NAME}"
+    DeleteRegKey HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{APP_NAME}"
+    
+    ; 바로가기 제거
+    Delete "$DESKTOP\\{APP_DISPLAY_NAME}.lnk"
+    Delete "$SMPROGRAMS\\WorksFree\\{APP_DISPLAY_NAME}.lnk"
+    Delete "$SMPROGRAMS\\WorksFree\\{APP_DISPLAY_NAME} 제거.lnk"
+    
+    ; WorksFree 폴더 정리 (다른 앱이 없으면)
+    RMDir "$SMPROGRAMS\\WorksFree"
+    
+    ; 사용자 데이터는 보존 (선택적 제거 메시지)
+    MessageBox MB_YESNO "사용자 설정 및 크레딧 정보를 함께 제거하시겠습니까?$\\n$\\n'아니오'를 선택하면 재설치시 기존 설정을 사용할 수 있습니다." IDNO +3
+        RMDir /r "$PROFILE\\.wf_rpa\\{APP_NAME}"
+        DetailPrint "사용자 데이터가 제거되었습니다."
+SectionEnd
+'''
+    
+    nsis_file = SPEC_DIR / f'{APP_NAME}_installer.nsi'
+    with open(nsis_file, 'w', encoding='utf-8') as f:
+        f.write(nsis_script)
+    
+    print(f"✓ NSIS 스크립트 생성: {nsis_file}")
+    return nsis_file
+
+# ==================== 리소스 수집 ====================
+def collect_essential_resources():
+    """필수 리소스 파일들만 수집 (최적화됨)"""
+    datas = []
+    
+    # 1. WorksFree 필수 공통 모듈만 (실제 사용되는 것만)
+    essential_modules = [
+        'wf_log.py',
+        'wf_credit_manager.py',  # 크레딧 시스템 필수
+        'wf_app_base.py',       # 앱 기본 구조 필수
+        'wf_register.py'        # 등록/인증 필수
+    ]
+    
+    for module in essential_modules:
+        module_path = COMMON_DIR / module
+        if module_path.exists():
+            datas.append((str(module_path), '.'))
+            print(f"✓ 포함됨: {module}")
+        else:
+            print(f"⚠️ 누락됨: {module}")
+    
+    # 2. 로컬 앱 모듈들 (앱 디렉토리의 .py 파일들)
+    local_modules = ['automation.py', 'config.py', 'ui_setting.py']
+    for module in local_modules:
+        module_path = SPEC_DIR / module
+        if module_path.exists():
+            datas.append((str(module_path), '.'))
+            print(f"✓ 로컬 모듈 포함: {module}")
+    
+    # 3. 글로벌 정책 파일
+    global_policy = create_global_policies()
+    datas.append((str(global_policy), '.'))
+    
+    # 4. 사용자 홈 설정 파일들
+    user_home = prepare_user_configs()
+    datas.append((str(user_home), 'installer_resources'))
+    
+    # 4. 앱별 리소스
+    app_res_dir = SPEC_DIR / 'res'
+    if app_res_dir.exists():
+        for file_path in app_res_dir.rglob('*'):
+            if file_path.is_file():
+                rel_path = file_path.relative_to(app_res_dir)
+                datas.append((str(file_path), f'res/{rel_path.parent}' if rel_path.parent != Path('.') else 'res'))
+    
+    # 5. 인스톨러 리소스들  
+    installer_resources = [
+        'license.txt',
+        'icon.ico',
+        'readme.txt'
+    ]
+    
+    for resource in installer_resources:
+        resource_path = SPEC_DIR / resource
+        if resource_path.exists():
+            datas.append((str(resource_path), '.'))
+    
+    print(f"✓ 필수 리소스만 수집 완료: {len(datas)}개 파일")
+    return datas
+
+# ==================== 히든 임포트 정의 ====================
+def get_optimized_hidden_imports():
+    """최적화된 숨겨진 import 모듈들 - 필수만 포함"""
+    # {APP_NAME}에 실제 필요한 모듈만
+    essential_imports = [
+        # WorksFree 핵심 (실제 사용되는 것만)
+        'wf_log',
+        'wf_credit_manager',  # 크레딧 관련만
+        'wf_app_base',       # create_app 함수 필요
+        'wf_register',       # create_trial_window 필요
+        
+        # GUI 관련 (필수만)
+        'tkinter', 
+        'tkinter.ttk', 
+        'tkinter.messagebox', 
+        'tkinter.filedialog',
+        'pyautogui',         # UI 자동화 (필요시)
+        'pyscreeze',         # pyautogui 의존성
+        'pymsgbox',          # pyautogui 의존성
+        'pytweening',        # pyautogui 의존성
+        
+        # 앱별 핵심 기능 (앱에 따라 조정)
+        'unicodedata',       # 문자 처리
+        're',               # 정규식
+        'os.path',
+        'pathlib',
+        'shutil',
+        'argparse',
+        'time',
+        
+        # PyInstaller 런타임 필수
+        'zipfile',           # PyInstaller 런타임 훅 필요
+        'multiprocessing',   # freeze_support 필요
+        
+        # 기본 시스템
+        'json',
+        'datetime',
+        'threading'
+    ]
+    
+    # 앱별 특화 imports
+    app_specific = {
+        'bom2excel': ['pyautogui', 'cv2', 'PIL', 'PIL.Image', 'PIL.ImageTk'],
+        'dwg_classifier': ['glob', 'zipfile', 'tempfile'],
+        'conversion_verifier': ['difflib', 'filecmp'],
+        'korean_filename_normalizer': ['unicodedata', 're'],
+        'file_list_check': ['csv', 'xml.etree.ElementTree'],
+        'spreadsheet_manager': ['xlrd', 'xlwt', 'xlutils']
+    }
+    
+    if APP_NAME in app_specific:
+        essential_imports.extend(app_specific[APP_NAME])
+    
+    return essential_imports
+
+# ==================== 빌드 후 처리 ====================
+def post_build_automation():
+    """빌드 완료 후 자동화 처리"""
+    dist_dir = SPEC_DIR / 'dist' / APP_NAME
+    
+    if not dist_dir.exists():
+        print(f"❌ 빌드 결과물을 찾을 수 없습니다: {dist_dir}")
+        return False
+    
+    print(f"\\n🔧 빌드 후 자동화 처리 시작...")
+    
+    # 1. NSIS 인스톨러 생성
+    try:
+        nsis_script = create_nsis_script()
+        
+        # makensis 실행
+        makensis_cmd = ['makensis', '/V2', str(nsis_script)]
+        result = subprocess.run(makensis_cmd, 
+                              cwd=SPEC_DIR,
+                              capture_output=True, 
+                              text=True,
+                              encoding='utf-8')
+        
+        if result.returncode == 0:
+            installer_file = SPEC_DIR / f'{APP_NAME}_{APP_VERSION}_installer.exe'
+            if installer_file.exists():
+                print(f"✓ NSIS 인스톨러 생성 성공: {installer_file}")
+                
+                # 인스톨러를 타임스탬프 폴더로 이동
+                BUILD_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+                final_installer = portable_base_dir / f'{APP_NAME}_{APP_VERSION}_installer.exe'
+                shutil.move(str(installer_file), str(final_installer))
+                print(f"✓ 최종 인스톨러: {final_installer}")
+            else:
+                print(f"❌ 인스톨러 파일 생성 실패")
+        else:
+            print(f"❌ NSIS 컴파일 실패: {result.stderr}")
+            
+    except FileNotFoundError:
+        print(f"❌ makensis를 찾을 수 없습니다. NSIS가 설치되어 있는지 확인하세요.")
+    except Exception as e:
+        print(f"❌ 인스톨러 생성 중 오류: {e}")
+    
+    # 2. 포터블 버전 생성 (타임스탬프 포함)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    portable_base_dir = BUILD_OUTPUT_DIR / f'{APP_NAME}_{timestamp}'
+    portable_dir = portable_base_dir / f'{APP_NAME}_{APP_VERSION}_portable'
+    if portable_base_dir.exists():
+        shutil.rmtree(portable_base_dir)
+    
+    portable_base_dir.mkdir(parents=True, exist_ok=True)
+    
+    shutil.copytree(dist_dir, portable_dir)
+    
+    # 포터블 실행 배치 파일 생성
+    bat_content = f'''@echo off
+chcp 65001 > nul
+cd /d "%~dp0"
+echo ========================================
+echo {APP_DISPLAY_NAME} (포터블 버전)
+echo ========================================
+echo.
+"{APP_NAME}.exe"
+'''
+    
+    with open(portable_dir / f'run_{APP_NAME}.bat', 'w', encoding='cp949') as f:
+        f.write(bat_content)
+    
+    print(f"✓ 포터블 버전 생성: {portable_dir}")
+    
+    # 3. 압축 파일 생성
+    try:
+        zip_file = portable_base_dir / f'{APP_NAME}_{APP_VERSION}_portable.zip'
+        shutil.make_archive(str(zip_file.with_suffix('')), 'zip', portable_dir)
+        print(f"✓ 포터블 압축 파일: {zip_file}")
+    except Exception as e:
+        print(f"⚠️ 압축 파일 생성 실패: {e}")
+    
+    # 4. 빌드 임시 파일 정리
+    temp_dirs = [
+        SPEC_DIR / 'build',
+        SPEC_DIR / 'dist',
+        SPEC_DIR / '__pycache__',
+        SPEC_DIR / 'installer_resources'
+    ]
+    
+    for temp_dir in temp_dirs:
+        if temp_dir.exists():
+            shutil.rmtree(temp_dir, ignore_errors=True)
+    
+    # 임시 파일들 정리
+    temp_files = [
+        SPEC_DIR / f'{APP_NAME}_installer.nsi',
+        SPEC_DIR / 'global_policies.json'
+    ]
+    
+    for temp_file in temp_files:
+        if temp_file.exists():
+            temp_file.unlink()
+    
+    print(f"✓ 임시 파일 정리 완료")
+    
+    print(f"\\n🎉 빌드 및 패키징 완료!")
+    print(f"📁 결과물 위치: {portable_base_dir}")
+    print(f"📦 포터블 폴더: {portable_dir}")
+    
+    return True
+
+# ==================== PyInstaller 설정 ====================
+block_cipher = None
+
+# 분석 단계
+a = Analysis(
+    ['ui_main.py'],
+    pathex=[str(SPEC_DIR), str(COMMON_DIR)],
+    binaries=[],
+    datas=collect_essential_resources(),
+    hiddenimports=get_optimized_hidden_imports(),
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[
+        # 대용량 라이브러리만 제외 (필수 모듈은 제외하지 않음)
+        'matplotlib', 'scipy', 'numpy.testing', 'pandas.tests',
+        'tensorflow', 'torch', 'jupyter', 'IPython', 'notebook',
+        'cv2', 'PIL.ImageCms', 'sklearn', 'seaborn', 'plotly',
+        'bokeh', 'altair', 'statsmodels', 'sympy'
+    ],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+# PYZ 압축
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+# EXE 생성 (최적화된 onedir 방식 - 빠른 로딩)
+exe = EXE(
+    pyz,
+    a.scripts,
+    [],
+    exclude_binaries=True,
+    name=APP_NAME,
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=True,              # 디버그 심볼 제거로 크기 감소
+    upx=False,               # UPX 비활성화로 로딩 시간 단축
+    console=False,
+    disable_windowed_traceback=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon='icon.ico' if Path('icon.ico').exists() else None,
+    version='version_info.txt' if Path('version_info.txt').exists() else None
+)
+
+# COLLECT - 최적화된 onedir 버전 생성
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=True,              # 디버그 심볼 제거
+    upx=False,               # UPX 비활성화로 빠른 로딩
+    name=f'{APP_NAME}_dev',
+)
+
+# ==================== 빌드 완료 후 자동 실행 ====================
+import atexit
+atexit.register(post_build_automation)
+
+print(f"\\n✅ {APP_NAME} 최적화 빌드 설정 완료")
+print(f"📋 히든 임포트: {len(get_optimized_hidden_imports())}개 (필수 모듈 포함)")
+print(f"📦 리소스 파일: 수집 중...")
+print(f"🎯 타겟: 빠른 로딩 onedir + 포터블 버전")
+print(f"⚡ 최적화: UPX 비활성화, 대용량 라이브러리만 제외, 디버그 심볼 제거")

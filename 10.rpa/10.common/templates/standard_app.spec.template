@@ -1,0 +1,235 @@
+# -*- mode: python ; coding: utf-8 -*-
+"""
+WorksFree 표준 PyInstaller Spec 템플릿
+- Google Service Account 키 자동 포함
+- 사용자 홈 디렉토리 설정 파일 관리
+- 다국어 리소스 포함
+"""
+
+import os
+import sys
+import json
+from pathlib import Path
+
+# ==================== 앱별 설정 (수정 필요) ====================
+APP_NAME = '{{APP_NAME}}'  # 실제 앱명으로 변경 필요
+APP_VERSION = '1.0.0'
+APP_DESCRIPTION = '{{APP_DESCRIPTION}}'  # 실제 설명으로 변경 필요
+APP_ICON = None  # 아이콘 파일 경로 (선택사항)
+
+# ==================== 경로 설정 ====================
+SPEC_DIR = Path(__file__).parent
+APP_ROOT = SPEC_DIR
+COMMON_DIR = APP_ROOT.parent.parent / '10.common'
+
+# ==================== 자원 파일 수집 ====================
+def collect_resources():
+    """앱에 포함할 자원 파일들 수집"""
+    datas = []
+    
+    # 1. Google Service Account 키 파일 포함
+    google_creds = COMMON_DIR / 'credentials' / 'google-service-account.json'
+    if google_creds.exists():
+        datas.append((str(google_creds), 'credentials'))
+        print(f"✓ Google credentials 포함: {google_creds}")
+    else:
+        print(f"⚠ Google credentials 누락: {google_creds}")
+    
+    # 2. 앱별 리소스 파일 포함
+    app_res_dir = APP_ROOT / 'res'
+    if app_res_dir.exists():
+        for file_path in app_res_dir.rglob('*'):
+            if file_path.is_file() and not file_path.name.startswith('.'):
+                rel_path = file_path.relative_to(app_res_dir)
+                datas.append((str(file_path), f'res/{rel_path.parent}' if rel_path.parent != Path('.') else 'res'))
+        print(f"✓ 앱 리소스 포함: {app_res_dir}")
+    
+    # 3. 공통 설정 템플릿 포함 (선택사항)
+    common_templates = COMMON_DIR / 'templates'
+    if common_templates.exists():
+        for file_path in common_templates.rglob('*.json'):
+            if file_path.is_file():
+                rel_path = file_path.relative_to(common_templates)
+                datas.append((str(file_path), f'templates/{rel_path.parent}' if rel_path.parent != Path('.') else 'templates'))
+        print(f"✓ 공통 템플릿 포함: {common_templates}")
+    
+    return datas
+
+# ==================== 히든 임포트 수집 ====================
+def collect_hidden_imports():
+    """숨겨진 import 모듈들 수집"""
+    hidden_imports = [
+        # 기본 WorksFree 모듈들
+        'wf_log',
+        'wf_app_base', 
+        'wf_credit_manager',
+        'wf_googlesheets_manager',
+        'wf_credentials_manager',
+        'wf_register',
+        'wf_hwinfo',
+        'wf_license',
+        'wf_email',
+        'wf_gen_code',
+        
+        # Google API 관련
+        'google',
+        'google.oauth2',
+        'google.oauth2.service_account',
+        'gspread',
+        'httplib2',
+        'oauth2client',
+        
+        # GUI 관련
+        'tkinter',
+        'tkinter.ttk',
+        'tkinter.messagebox',
+        'tkinter.filedialog',
+        
+        # 유틸리티
+        'requests',
+        'urllib3',
+        'certifi',
+        'charset_normalizer',
+        'idna',
+        
+        # 기타 필요 모듈
+        'json',
+        'pathlib',
+        'datetime',
+        'threading',
+        'multiprocessing',
+        'hashlib',
+        'platform',
+        'subprocess'
+    ]
+    
+    return hidden_imports
+
+# ==================== JSON 설정 파일 관리 ====================
+def get_user_config_templates():
+    """사용자 홈 디렉토리에 생성할 설정 파일 템플릿들"""
+    return {
+        # 1. 전역 실행 상태 및 사용자 정보
+        '.wf_rpa_config.json': {
+            'user_info': {
+                'user_email': None,
+                'is_registered': False,
+                'hardware_fingerprint': None,
+                'registration_date': None
+            },
+            'execution_status': {
+                'is_running': False,
+                'current_app': None,
+                'pid': None,
+                'start_time': None
+            },
+            'system_settings': {
+                'auto_update': True,
+                'send_usage_stats': True,
+                'log_level': 'INFO',
+                'language': 'ko'
+            },
+            'last_updated': None
+        },
+        # (Removed) 레거시 전역 정책 파일 `.wf_app_policies.json`은 더 이상 배포/초기화하지 않습니다.
+    }
+
+# ==================== 분석 설정 ====================
+block_cipher = None
+
+# 메인 스크립트 분석
+a = Analysis(
+    [str(APP_ROOT / f'{APP_NAME}.py')],  # 메인 스크립트 (ui_main.py 또는 앱명.py)
+    pathex=[str(APP_ROOT), str(COMMON_DIR)],
+    binaries=[],
+    datas=collect_resources(),
+    hiddenimports=collect_hidden_imports(),
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[
+        # 불필요한 대형 모듈 제외
+        'matplotlib',
+        'scipy',
+        'numpy',
+        'pandas', 
+        'PIL',
+        'cv2',
+        'tensorflow',
+        'torch',
+        'jupyter',
+        'notebook',
+        'IPython'
+    ],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+# 중복 제거 및 최적화
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+# 실행파일 생성
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name=APP_NAME,
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,  # UPX 압축 사용
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,  # GUI 앱이므로 콘솔 숨김
+    disable_windowed_traceback=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=APP_ICON,
+    version=f'version_info_{APP_NAME}.txt' if Path(f'version_info_{APP_NAME}.txt').exists() else None
+)
+
+# ==================== 사용자 홈 디렉토리 설정 ====================
+def create_user_home_configs():
+    """사용자 홈 디렉토리에 기본 설정 파일 생성"""
+    import json
+    from datetime import datetime
+    
+    home_dir = Path.home()
+    wf_rpa_dir = home_dir / '.wf_rpa'
+    
+    # .wf_rpa 디렉토리 생성
+    wf_rpa_dir.mkdir(exist_ok=True)
+    
+    # 설정 파일들 생성
+    templates = get_user_config_templates()
+    for filename, config_data in templates.items():
+        config_file = wf_rpa_dir / filename
+        
+        # 기존 파일이 있으면 백업
+        if config_file.exists():
+            backup_file = wf_rpa_dir / f"{filename}.backup.{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            config_file.rename(backup_file)
+            print(f"기존 설정 파일 백업: {backup_file}")
+        
+        # 새 설정 파일 생성
+        config_data['last_updated'] = datetime.now().isoformat()
+        with open(config_file, 'w', encoding='utf-8') as f:
+            json.dump(config_data, f, ensure_ascii=False, indent=2)
+        print(f"설정 파일 생성: {config_file}")
+
+# 빌드 완료 후 사용자 홈 설정 파일 생성 (개발 환경에서만)
+if not getattr(sys, 'frozen', False):  # 개발 환경에서만 실행
+    print("\n" + "="*60)
+    print(f"WorksFree {APP_NAME} 빌드 완료")
+    print("="*60)
+    print("다음 단계:")
+    print("1. dist/ 폴더의 실행파일 확인")
+    print("2. 사용자 테스트 실행")
+    print("3. Google Sheets 연동 확인")
+    print("="*60)

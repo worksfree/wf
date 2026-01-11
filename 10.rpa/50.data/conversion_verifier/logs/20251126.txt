@@ -1,0 +1,154 @@
+2025-11-26 12:30:16,019 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-11-26 12:30:16,019 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-11-26 12:30:16,162 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-11-26 12:30:16,456 - INFO - [wf_rpa.conversion_verifier] ui_main:409 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-11-26 12:30:16,975 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:68 - 🔄 동기화 불필요
+2025-11-26 12:30:19,482 - INFO - [wf_rpa.conversion_verifier] ui_main:651 - 정책 동기화 결과: {'success': True, 'message': '1개의 앱 정책이 동기화되었습니다.', 'count': 1, 'email_refreshed': True}
+2025-11-26 12:30:25,077 - INFO - [wf_rpa.conversion_verifier] ui_main:1009 - 관리자 모드 활성화
+2025-11-26 12:30:28,019 - INFO - [wf_rpa.conversion_verifier] ui_main:881 - 폴더 스캔 시작: D:/drive_files/10.worksfree/10.rpa/50.data/conversion_verifier/test
+2025-11-26 12:30:28,025 - INFO - [wf_rpa.conversion_verifier] ui_main:905 - 폴더 스캔 완료: 20개 파일
+2025-11-26 12:30:32,621 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 1/20, 남은 크레딧: 2390
+2025-11-26 12:30:32,711 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 2/20, 남은 크레딧: 2380
+2025-11-26 12:30:32,790 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 3/20, 남은 크레딧: 2370
+2025-11-26 12:30:32,861 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 4/20, 남은 크레딧: 2360
+2025-11-26 12:30:32,946 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 5/20, 남은 크레딧: 2350
+2025-11-26 12:30:33,042 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 6/20, 남은 크레딧: 2340
+2025-11-26 12:30:33,117 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 7/20, 남은 크레딧: 2330
+2025-11-26 12:30:33,204 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 8/20, 남은 크레딧: 2320
+2025-11-26 12:30:33,286 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 9/20, 남은 크레딧: 2310
+2025-11-26 12:30:33,363 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 10/20, 남은 크레딧: 2300
+2025-11-26 12:30:33,457 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 11/20, 남은 크레딧: 2290
+2025-11-26 12:30:33,574 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 12/20, 남은 크레딧: 2280
+2025-11-26 12:30:33,654 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 13/20, 남은 크레딧: 2270
+2025-11-26 12:30:33,734 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 14/20, 남은 크레딧: 2260
+2025-11-26 12:30:33,835 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 15/20, 남은 크레딧: 2250
+2025-11-26 12:30:33,915 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 16/20, 남은 크레딧: 2240
+2025-11-26 12:30:33,995 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 17/20, 남은 크레딧: 2230
+2025-11-26 12:30:34,081 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 18/20, 남은 크레딧: 2220
+2025-11-26 12:30:34,160 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 19/20, 남은 크레딧: 2210
+2025-11-26 12:30:34,248 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 20/20, 남은 크레딧: 2200
+2025-11-26 12:30:34,417 - INFO - [wf_rpa.conversion_verifier] ui_main:1736 - 🧾 처리 완료 후 사용 내역 동기화 시도 (백그라운드)...
+2025-11-26 12:30:34,417 - INFO - [wf_rpa.conversion_verifier] ui_main:1757 - 🏁 작업 완료 처리 종료
+2025-11-26 12:32:43,629 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-11-26 12:32:43,630 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-11-26 12:32:43,786 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-11-26 12:32:48,558 - INFO - [wf_rpa.conversion_verifier] ui_main:409 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-11-26 12:32:49,066 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:68 - 🔄 동기화 불필요
+2025-11-26 12:32:49,788 - INFO - [wf_rpa.conversion_verifier] ui_main:651 - 정책 동기화 결과: {'success': True, 'message': '1개의 앱 정책이 동기화되었습니다.', 'count': 1, 'email_refreshed': True}
+2025-11-26 12:32:56,636 - INFO - [wf_rpa.conversion_verifier] ui_main:1009 - 관리자 모드 활성화
+2025-11-26 12:32:59,985 - INFO - [wf_rpa.conversion_verifier] ui_main:1304 - 테스트 데이터 생성 완료: d:\drive_files\10.worksfree\10.rpa\50.data\conversion_verifier\test (SLDDRW: 20, DWG: 16, 실패: 4)
+2025-11-26 12:33:02,872 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 1/20, 남은 크레딧: 2190
+2025-11-26 12:33:02,947 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 2/20, 남은 크레딧: 2180
+2025-11-26 12:33:03,023 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 3/20, 남은 크레딧: 2170
+2025-11-26 12:33:03,101 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 4/20, 남은 크레딧: 2160
+2025-11-26 12:33:03,178 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 5/20, 남은 크레딧: 2150
+2025-11-26 12:33:03,252 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 6/20, 남은 크레딧: 2140
+2025-11-26 12:33:03,329 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 7/20, 남은 크레딧: 2130
+2025-11-26 12:33:03,414 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 8/20, 남은 크레딧: 2120
+2025-11-26 12:33:03,497 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 9/20, 남은 크레딧: 2110
+2025-11-26 12:33:03,574 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 10/20, 남은 크레딧: 2100
+2025-11-26 12:33:03,658 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 11/20, 남은 크레딧: 2090
+2025-11-26 12:33:03,738 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 12/20, 남은 크레딧: 2080
+2025-11-26 12:33:03,796 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 13/20, 남은 크레딧: 2070
+2025-11-26 12:33:03,876 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 14/20, 남은 크레딧: 2060
+2025-11-26 12:33:03,960 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 15/20, 남은 크레딧: 2050
+2025-11-26 12:33:04,019 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 16/20, 남은 크레딧: 2040
+2025-11-26 12:33:04,107 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 17/20, 남은 크레딧: 2030
+2025-11-26 12:33:04,184 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 18/20, 남은 크레딧: 2020
+2025-11-26 12:33:04,265 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 19/20, 남은 크레딧: 2010
+2025-11-26 12:33:04,348 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 20/20, 남은 크레딧: 2000
+2025-11-26 12:33:04,450 - INFO - [wf_rpa.conversion_verifier] ui_main:1757 - 🏁 작업 완료 처리 종료
+2025-11-26 12:33:04,451 - INFO - [wf_rpa.conversion_verifier] ui_main:1736 - 🧾 처리 완료 후 사용 내역 동기화 시도 (백그라운드)...
+2025-11-26 12:33:09,926 - INFO - [wf_rpa.conversion_verifier] ui_main:1740 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-26T12:33:09.924'}
+2025-11-26 12:35:57,934 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-11-26 12:35:57,934 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-11-26 12:35:58,078 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-11-26 12:35:58,370 - INFO - [wf_rpa.conversion_verifier] ui_main:409 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-11-26 12:35:58,888 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:68 - 🔄 동기화 불필요
+2025-11-26 12:36:01,860 - INFO - [wf_rpa.conversion_verifier] ui_main:651 - 정책 동기화 결과: {'success': True, 'message': '1개의 앱 정책이 동기화되었습니다.', 'count': 1, 'email_refreshed': True}
+2025-11-26 12:36:07,753 - INFO - [wf_rpa.conversion_verifier] ui_main:1009 - 관리자 모드 활성화
+2025-11-26 12:36:11,868 - INFO - [wf_rpa.conversion_verifier] ui_main:1304 - 테스트 데이터 생성 완료: d:\drive_files\10.worksfree\10.rpa\50.data\conversion_verifier\test (SLDDRW: 20, DWG: 16, 실패: 4)
+2025-11-26 12:36:14,360 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 1/20, 남은 크레딧: 1990
+2025-11-26 12:36:14,442 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 2/20, 남은 크레딧: 1980
+2025-11-26 12:36:14,519 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 3/20, 남은 크레딧: 1970
+2025-11-26 12:36:14,602 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 4/20, 남은 크레딧: 1960
+2025-11-26 12:36:14,688 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 5/20, 남은 크레딧: 1950
+2025-11-26 12:36:14,763 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 6/20, 남은 크레딧: 1940
+2025-11-26 12:36:14,841 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 7/20, 남은 크레딧: 1930
+2025-11-26 12:36:14,918 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 8/20, 남은 크레딧: 1920
+2025-11-26 12:36:14,998 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 9/20, 남은 크레딧: 1910
+2025-11-26 12:36:15,079 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 10/20, 남은 크레딧: 1900
+2025-11-26 12:36:15,169 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 11/20, 남은 크레딧: 1890
+2025-11-26 12:36:15,247 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 12/20, 남은 크레딧: 1880
+2025-11-26 12:36:15,332 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 13/20, 남은 크레딧: 1870
+2025-11-26 12:36:15,416 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 14/20, 남은 크레딧: 1860
+2025-11-26 12:36:15,503 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 15/20, 남은 크레딧: 1850
+2025-11-26 12:36:15,587 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 16/20, 남은 크레딧: 1840
+2025-11-26 12:36:15,663 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 17/20, 남은 크레딧: 1830
+2025-11-26 12:36:15,742 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 18/20, 남은 크레딧: 1820
+2025-11-26 12:36:15,828 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 19/20, 남은 크레딧: 1810
+2025-11-26 12:36:15,910 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 20/20, 남은 크레딧: 1800
+2025-11-26 12:36:16,022 - INFO - [wf_rpa.conversion_verifier] ui_main:1736 - 🧾 처리 완료 후 사용 내역 동기화 시도 (백그라운드)...
+2025-11-26 12:36:16,022 - INFO - [wf_rpa.conversion_verifier] ui_main:1757 - 🏁 작업 완료 처리 종료
+2025-11-26 12:41:05,962 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-11-26 12:41:05,963 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-11-26 12:41:06,095 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-11-26 12:41:14,801 - INFO - [wf_rpa.conversion_verifier] ui_main:409 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-11-26 12:41:15,324 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:68 - 🔄 동기화 불필요
+2025-11-26 12:41:16,179 - INFO - [wf_rpa.conversion_verifier] ui_main:651 - 정책 동기화 결과: {'success': True, 'message': '1개의 앱 정책이 동기화되었습니다.', 'count': 1, 'email_refreshed': True}
+2025-11-26 12:41:17,312 - INFO - [wf_rpa.conversion_verifier] ui_main:881 - 폴더 스캔 시작: D:/drive_files/10.worksfree/10.rpa/50.data/conversion_verifier/test
+2025-11-26 12:41:17,316 - INFO - [wf_rpa.conversion_verifier] ui_main:905 - 폴더 스캔 완료: 20개 파일
+2025-11-26 12:41:20,765 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 1/20, 남은 크레딧: 1790
+2025-11-26 12:41:20,847 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 2/20, 남은 크레딧: 1780
+2025-11-26 12:41:20,913 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 3/20, 남은 크레딧: 1770
+2025-11-26 12:41:20,978 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 4/20, 남은 크레딧: 1760
+2025-11-26 12:41:21,042 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 5/20, 남은 크레딧: 1750
+2025-11-26 12:41:21,107 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 6/20, 남은 크레딧: 1740
+2025-11-26 12:41:21,172 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 7/20, 남은 크레딧: 1730
+2025-11-26 12:41:21,255 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 8/20, 남은 크레딧: 1720
+2025-11-26 12:41:21,323 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 9/20, 남은 크레딧: 1710
+2025-11-26 12:41:21,393 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 10/20, 남은 크레딧: 1700
+2025-11-26 12:41:21,470 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 11/20, 남은 크레딧: 1690
+2025-11-26 12:41:21,537 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 12/20, 남은 크레딧: 1680
+2025-11-26 12:41:21,609 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 13/20, 남은 크레딧: 1670
+2025-11-26 12:41:21,680 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 14/20, 남은 크레딧: 1660
+2025-11-26 12:41:21,752 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 15/20, 남은 크레딧: 1650
+2025-11-26 12:41:21,816 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 16/20, 남은 크레딧: 1640
+2025-11-26 12:41:21,879 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 17/20, 남은 크레딧: 1630
+2025-11-26 12:41:21,944 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 18/20, 남은 크레딧: 1620
+2025-11-26 12:41:22,009 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 19/20, 남은 크레딧: 1610
+2025-11-26 12:41:22,076 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 20/20, 남은 크레딧: 1600
+2025-11-26 12:41:22,214 - INFO - [wf_rpa.conversion_verifier] ui_main:1757 - 🏁 작업 완료 처리 종료
+2025-11-26 12:41:22,215 - INFO - [wf_rpa.conversion_verifier] ui_main:1736 - 🧾 처리 완료 후 사용 내역 동기화 시도 (백그라운드)...
+2025-11-26 12:41:27,994 - INFO - [wf_rpa.conversion_verifier] ui_main:1740 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-26T12:41:27.991'}
+2025-11-26 12:42:57,224 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-11-26 12:42:57,225 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-11-26 12:42:57,346 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-11-26 12:42:57,670 - INFO - [wf_rpa.conversion_verifier] ui_main:409 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-11-26 12:42:58,160 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:68 - 🔄 동기화 불필요
+2025-11-26 12:43:00,635 - INFO - [wf_rpa.conversion_verifier] ui_main:881 - 폴더 스캔 시작: D:/drive_files/10.worksfree/10.rpa/50.data/conversion_verifier/test
+2025-11-26 12:43:00,638 - INFO - [wf_rpa.conversion_verifier] ui_main:905 - 폴더 스캔 완료: 20개 파일
+2025-11-26 12:43:01,173 - INFO - [wf_rpa.conversion_verifier] ui_main:651 - 정책 동기화 결과: {'success': True, 'message': '1개의 앱 정책이 동기화되었습니다.', 'count': 1, 'email_refreshed': True}
+2025-11-26 12:43:02,261 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 1/20, 남은 크레딧: 1590
+2025-11-26 12:43:02,347 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 2/20, 남은 크레딧: 1580
+2025-11-26 12:43:02,422 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 3/20, 남은 크레딧: 1570
+2025-11-26 12:43:02,495 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 4/20, 남은 크레딧: 1560
+2025-11-26 12:43:02,568 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 5/20, 남은 크레딧: 1550
+2025-11-26 12:43:02,666 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 6/20, 남은 크레딧: 1540
+2025-11-26 12:43:02,754 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 7/20, 남은 크레딧: 1530
+2025-11-26 12:43:02,838 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 8/20, 남은 크레딧: 1520
+2025-11-26 12:43:02,919 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 9/20, 남은 크레딧: 1510
+2025-11-26 12:43:03,045 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 10/20, 남은 크레딧: 1500
+2025-11-26 12:43:03,129 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 11/20, 남은 크레딧: 1490
+2025-11-26 12:43:03,205 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 12/20, 남은 크레딧: 1480
+2025-11-26 12:43:03,279 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 13/20, 남은 크레딧: 1470
+2025-11-26 12:43:03,361 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 14/20, 남은 크레딧: 1460
+2025-11-26 12:43:03,433 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 15/20, 남은 크레딧: 1450
+2025-11-26 12:43:03,508 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 16/20, 남은 크레딧: 1440
+2025-11-26 12:43:03,577 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 17/20, 남은 크레딧: 1430
+2025-11-26 12:43:03,652 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 18/20, 남은 크레딧: 1420
+2025-11-26 12:43:03,722 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 19/20, 남은 크레딧: 1410
+2025-11-26 12:43:03,800 - INFO - [wf_rpa.conversion_verifier] ui_main:1675 - 크레딧 차감 완료 - 파일 20/20, 남은 크레딧: 1400
+2025-11-26 12:43:03,979 - INFO - [wf_rpa.conversion_verifier] ui_main:1757 - 🏁 작업 완료 처리 종료
+2025-11-26 12:43:03,980 - INFO - [wf_rpa.conversion_verifier] ui_main:1736 - 🧾 처리 완료 후 사용 내역 동기화 시도 (백그라운드)...
+2025-11-26 12:43:10,350 - INFO - [wf_rpa.conversion_verifier] ui_main:1740 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-26T12:43:10.348'}

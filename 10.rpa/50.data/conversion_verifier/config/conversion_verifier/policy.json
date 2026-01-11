@@ -1,0 +1,14 @@
+{
+  "identity": {
+    "app_name": "conversion_verifier",
+    "short_name": "cv",
+    "display_name": "Conversion Verifier"
+  },
+  "policy": {
+    "icon_text": "CV",
+    "description": "변환 검증 앱 (무료)",
+    "trial_credits": -1,
+    "credit_per_work": 0,
+    "credit_type": "free"
+  }
+}

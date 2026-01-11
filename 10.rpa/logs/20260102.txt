@@ -1,0 +1,60 @@
+2026-01-02 10:59:18,370 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 10:59:18,371 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2026-01-02 10:59:18,515 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 10:59:18,515 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:188 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-02 10:59:18,557 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 10:59:18,562 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
+2026-01-02 10:59:18,562 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 10:59:18,562 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:172 - 사용자 설정 로드 완료: d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-02 10:59:18,563 - DEBUG - [wf_rpa.Dwg_Classifier] app_setting_data:213 - [새로 로드] 크레딧 정책 로드: {'icon_text': 'DWG', 'description': '도면 분류 앱', 'trial_credits': 50000, 'credit_per_work': 50, 'available_work': 1000, 'permanent_price': 0, 'credit_type': 'per_file', 'full_description': ''}
+2026-01-02 10:59:18,564 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:184 - 크레딧 정책 설정 적용: ['icon_text', 'description', 'trial_credits', 'credit_per_work', 'available_work', 'permanent_price', 'credit_type', 'full_description']
+2026-01-02 10:59:18,588 - INFO - [wf_rpa.conversion_verifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 10:59:18,588 - INFO - [wf_rpa.conversion_verifier] wf_log:109 - App: conversion_verifier
+2026-01-02 10:59:18,589 - INFO - [wf_rpa.conversion_verifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 10:59:49,047 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 10:59:49,047 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2026-01-02 10:59:49,183 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 10:59:49,183 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:188 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-02 10:59:49,190 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 10:59:49,190 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
+2026-01-02 10:59:49,191 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 10:59:49,191 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:172 - 사용자 설정 로드 완료: d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-02 10:59:49,191 - DEBUG - [wf_rpa.Dwg_Classifier] app_setting_data:213 - [새로 로드] 크레딧 정책 로드: {'icon_text': 'DWG', 'description': '도면 분류 앱', 'trial_credits': 50000, 'credit_per_work': 50, 'available_work': 1000, 'permanent_price': 0, 'credit_type': 'per_file', 'full_description': ''}
+2026-01-02 10:59:49,191 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:184 - 크레딧 정책 설정 적용: ['icon_text', 'description', 'trial_credits', 'credit_per_work', 'available_work', 'permanent_price', 'credit_type', 'full_description']
+2026-01-02 10:59:49,194 - INFO - [wf_rpa.conversion_verifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 10:59:49,194 - INFO - [wf_rpa.conversion_verifier] wf_log:109 - App: conversion_verifier
+2026-01-02 10:59:49,195 - INFO - [wf_rpa.conversion_verifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 11:00:20,025 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 11:00:20,025 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2026-01-02 11:00:20,156 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 11:00:20,156 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:188 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-02 11:00:20,162 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 11:00:20,162 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:109 - App: DWG_Batch_Print
+2026-01-02 11:00:20,162 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 11:00:20,162 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:201 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2026-01-02 11:00:20,166 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 11:00:20,166 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
+2026-01-02 11:00:20,166 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 11:00:20,167 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:172 - 사용자 설정 로드 완료: d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-02 11:00:20,167 - DEBUG - [wf_rpa.Dwg_Classifier] app_setting_data:213 - [새로 로드] 크레딧 정책 로드: {'icon_text': 'DWG', 'description': '도면 분류 앱', 'trial_credits': 50000, 'credit_per_work': 50, 'available_work': 1000, 'permanent_price': 0, 'credit_type': 'per_file', 'full_description': ''}
+2026-01-02 11:00:20,167 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:184 - 크레딧 정책 설정 적용: ['icon_text', 'description', 'trial_credits', 'credit_per_work', 'available_work', 'permanent_price', 'credit_type', 'full_description']
+2026-01-02 11:00:20,170 - INFO - [wf_rpa.conversion_verifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 11:00:20,171 - INFO - [wf_rpa.conversion_verifier] wf_log:109 - App: conversion_verifier
+2026-01-02 11:00:20,171 - INFO - [wf_rpa.conversion_verifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 11:12:10,590 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 11:12:10,591 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2026-01-02 11:12:10,732 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 11:12:10,732 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:188 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-02 11:12:10,739 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 11:12:10,739 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:109 - App: DWG_Batch_Print
+2026-01-02 11:12:10,740 - INFO - [wf_rpa.DWG_Batch_Print] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 11:12:10,740 - INFO - [wf_rpa.DWG_Batch_Print] app_setting_data:201 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\config\dwg_batch_print\settings.json
+2026-01-02 11:12:10,743 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 11:12:10,743 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
+2026-01-02 11:12:10,743 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2026-01-02 11:12:10,744 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:172 - 사용자 설정 로드 완료: d:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\settings.json
+2026-01-02 11:12:10,744 - DEBUG - [wf_rpa.Dwg_Classifier] app_setting_data:213 - [새로 로드] 크레딧 정책 로드: {'icon_text': 'DWG', 'description': '도면 분류 앱', 'trial_credits': 50000, 'credit_per_work': 50, 'available_work': 1000, 'permanent_price': 0, 'credit_type': 'per_file', 'full_description': ''}
+2026-01-02 11:12:10,745 - INFO - [wf_rpa.Dwg_Classifier] app_setting_data:184 - 크레딧 정책 설정 적용: ['icon_text', 'description', 'trial_credits', 'credit_per_work', 'available_work', 'permanent_price', 'credit_type', 'full_description']
+2026-01-02 11:12:10,749 - INFO - [wf_rpa.conversion_verifier] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-02 11:12:10,750 - INFO - [wf_rpa.conversion_verifier] wf_log:109 - App: conversion_verifier
+2026-01-02 11:12:10,750 - INFO - [wf_rpa.conversion_verifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W

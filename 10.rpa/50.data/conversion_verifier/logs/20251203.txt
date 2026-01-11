@@ -1,0 +1,135 @@
+2025-12-03 15:10:47,895 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 15:10:47,896 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 15:10:48,027 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 15:10:48,029 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 15:10:48,029 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 15:10:48,029 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 15:10:48,738 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 15:10:48,907 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 15:10:52,425 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 15:50:56,205 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 15:50:56,206 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 15:50:56,313 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 15:50:56,314 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 15:50:56,314 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 15:50:56,314 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 15:50:56,929 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 15:50:57,161 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 15:51:00,511 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 15:55:00,889 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 15:55:00,890 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 15:55:01,002 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 15:55:01,003 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 15:55:01,004 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 15:55:01,004 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 15:55:01,662 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 15:55:01,861 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 15:55:05,040 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:09:20,819 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:09:20,819 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:09:20,933 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:09:20,935 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:09:20,935 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:09:20,935 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:09:21,557 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:09:21,786 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:09:25,245 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:12:49,366 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:12:49,366 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:12:49,474 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:12:49,477 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:12:49,477 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:12:49,477 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:12:50,098 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:12:50,328 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:12:53,623 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:15:33,496 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:15:33,496 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:15:33,616 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:15:33,617 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:15:33,618 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:15:33,618 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:15:34,234 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:15:34,480 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:15:38,057 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:16:10,839 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:16:10,839 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:16:10,952 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:16:10,953 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:16:10,954 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:16:10,954 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:16:11,600 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:16:11,810 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:16:14,940 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:16:53,626 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:16:53,626 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:16:53,745 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:16:53,746 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:16:53,746 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:16:53,747 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:16:54,405 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:16:54,606 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:16:57,707 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:19:49,094 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:19:49,095 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:19:49,221 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:19:49,222 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:19:49,223 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:19:49,223 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:19:49,978 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:19:50,101 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:19:53,083 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:20:26,724 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:20:26,725 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:20:26,832 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:20:26,833 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:20:26,833 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:20:26,834 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:20:27,447 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:20:27,693 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:20:30,646 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:22:18,225 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:22:18,225 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:22:18,349 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:22:18,351 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:22:18,351 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:22:18,351 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:22:18,963 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:22:19,208 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:22:22,680 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:27:36,405 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:27:36,405 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:27:36,518 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:27:36,520 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:27:36,520 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:27:36,520 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:27:37,138 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:27:37,381 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:27:40,662 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:30:48,039 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:30:48,040 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:30:48,165 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:30:48,167 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:30:48,168 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:30:48,168 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:30:48,818 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:30:49,031 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:30:52,366 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:31:12,242 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:31:12,242 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:31:12,359 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:31:12,361 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:31:12,361 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:31:12,361 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:31:12,987 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:31:13,216 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:31:16,325 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 16:32:41,882 - INFO - [wf_rpa.Conversion_Verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:32:41,883 - INFO - [wf_rpa.Conversion_Verifier] wf_log:107 - App: Conversion_Verifier
+2025-12-03 16:32:41,989 - INFO - [wf_rpa.Conversion_Verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:32:41,990 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 16:32:41,990 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-12-03 16:32:41,990 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 16:32:42,606 - INFO - [wf_rpa.conversion_verifier] ui_main:418 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 16:32:42,846 - INFO - [wf_rpa.conversion_verifier] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 16:32:46,457 - INFO - [wf_rpa.conversion_verifier] ui_main:665 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}

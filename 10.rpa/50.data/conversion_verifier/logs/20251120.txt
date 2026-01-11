@@ -1,0 +1,6 @@
+2025-11-20 23:01:28,514 - INFO - [wf_rpa.conversion_verifier] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-11-20 23:01:28,515 - INFO - [wf_rpa.conversion_verifier] wf_log:107 - App: conversion_verifier
+2025-11-20 23:01:28,795 - INFO - [wf_rpa.conversion_verifier] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-11-20 23:01:29,698 - INFO - [wf_rpa.conversion_verifier] ui_main:353 - 🔄 동기화 불필요 - 로컬 크레딧만 사용
+2025-11-20 23:01:33,453 - INFO - [wf_rpa.conversion_verifier] ui_main:616 - 정책 동기화 결과: {'success': True, 'message': '1개의 앱 정책이 동기화되었습니다.', 'count': 1, 'email_refreshed': True}
+2025-11-20 23:01:35,439 - INFO - [wf_rpa.conversion_verifier] ui_main:967 - 관리자 모드 활성화

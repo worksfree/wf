@@ -1,0 +1,358 @@
+{
+  "credit_changed": false,
+  "trial_credits": -1,
+  "purchased_credits": 0,
+  "created_at": "2025-01-01T00:00:00.000",
+  "last_updated": "2025-12-03T19:25:30.209",
+  "purchase_history": [],
+  "usage_history": [
+    {
+      "timestamp": "2025-12-03T19:25:25.317",
+      "amount": 0,
+      "description": "자소분리 복원: 14개 파일",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-12-03T18:43:51.599",
+      "amount": 0,
+      "description": "자소분리 복원: 12개 파일",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-19T16:57:21.537",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-19T16:52:47.860",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-19T16:52:30.549",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-19T15:10:51.107",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-19T15:10:25.274",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T17:10:49.356",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T17:01:30.597",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:59:22.648",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:58:43.531",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:57:00.707",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:56:04.813",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:43:50.510",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:42:48.838",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:37:55.536",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:36:07.522",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:29:08.442",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:27:13.839",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T16:26:56.424",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-17T15:56:24.445",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-13T16:59:08.252",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-13T16:58:25.654",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-13T16:51:44.068",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-13T16:48:56.356",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-11-13T16:42:53.431",
+      "amount": 0,
+      "description": "filename_normalization_completed",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    }
+  ],
+  "last_synced": "2025-12-03T19:25:30.209",
+  "lifetime_usage": 0,
+  "current_credits": -1,
+  "applied_purchase_ids": [],
+  "usage_file_count": 14,
+  "usage_per_item_cost": 0,
+  "usage_description": "korean_filename_normalizer 파일 처리 (14개)",
+  "session_usage_amount": 0,
+  "session_file_count": 0,
+  "session_last_usage_ts": null
+}

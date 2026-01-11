@@ -1,0 +1,28 @@
+{
+  "app": "conversion_verifier",
+  "folder": "D:\\drive_files\\10.worksfree\\10.rpa\\50.data\\Conversion_Verifier\\test",
+  "processed": [
+    "Bottom_Plate_009.slddrw",
+    "End_Cap_020.slddrw",
+    "Section_View_004.slddrw",
+    "Front_Panel_006.slddrw",
+    "Top_View_008.slddrw",
+    "Base_Plate_016.slddrw",
+    "Assembly_Main_002.slddrw",
+    "Side_View_007.slddrw",
+    "Gear_Assembly_014.slddrw",
+    "Connector_Housing_019.slddrw",
+    "Part_Detail_003.slddrw",
+    "Drawing001_001.slddrw",
+    "Bearing_Housing_012.slddrw",
+    "Exploded_View_005.slddrw",
+    "Support_Bracket_017.slddrw",
+    "Shaft_Detail_013.slddrw",
+    "Motor_Mount_011.slddrw",
+    "Cover_Assembly_010.slddrw",
+    "Drive_Shaft_018.slddrw",
+    "Frame_Structure_015.slddrw"
+  ],
+  "last_updated": "2025-12-01T18:53:48.767026",
+  "version": "1"
+}

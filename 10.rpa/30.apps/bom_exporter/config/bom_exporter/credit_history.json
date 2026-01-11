@@ -1,0 +1,1457 @@
+{
+  "credit_changed": false,
+  "trial_credits": 0,
+  "purchased_credits": 3000,
+  "created_at": "2025-11-10T20:11:04.684",
+  "last_updated": "2026-01-08T08:53:51.405",
+  "purchase_history": [
+    {
+      "transaction_id": "2025-11-10T20:28:22:176",
+      "amount": 2400,
+      "purchase_date": "2025-11-10 20:28:22",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-10T20:28:48.305",
+      "purchased_credit": 2000,
+      "bonus_credit": 400,
+      "total_credit": 2400
+    },
+    {
+      "transaction_id": "2025-11-10T22:09:57:109",
+      "amount": -1,
+      "purchase_date": "2025-11-10 22:09:57",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-10T22:10:09.982",
+      "purchased_credit": -1,
+      "total_credit": -1
+    },
+    {
+      "transaction_id": "2025-11-19T12:47:40:560",
+      "amount": 2000,
+      "purchase_date": "2025-11-19 12:47:40",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-19T12:48:27.735",
+      "purchased_credit": 2000,
+      "total_credit": 2000
+    },
+    {
+      "transaction_id": "2025-11-19T12:50:27:043",
+      "amount": 2001,
+      "purchase_date": "2025-11-19 12:50:27",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-19T12:50:32.081",
+      "purchased_credit": 2001,
+      "total_credit": 2001
+    },
+    {
+      "transaction_id": "2025-11-19T13:28:55:661",
+      "amount": 300,
+      "purchase_date": "2025-11-19 13:28:55",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-19T13:29:03.014",
+      "purchased_credit": 300,
+      "total_credit": 300
+    },
+    {
+      "transaction_id": "2025-11-19T13:32:07:794",
+      "amount": 300,
+      "purchase_date": "2025-11-19 13:32:07",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-19T13:32:50.725",
+      "purchased_credit": 300,
+      "total_credit": 300
+    },
+    {
+      "transaction_id": "2025-11-19T13:37:22:887",
+      "amount": 300,
+      "purchase_date": "2025-11-19 13:37:22",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-19T13:37:28.697",
+      "purchased_credit": 300,
+      "total_credit": 300
+    },
+    {
+      "transaction_id": "2025-11-24T08:54:34:414",
+      "amount": -1,
+      "purchase_date": "2025-11-24 8:54:34",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-24T08:54:39.276",
+      "purchased_credit": -1,
+      "total_credit": -1
+    },
+    {
+      "transaction_id": "2025-11-24T09:00:55:031",
+      "amount": -1,
+      "purchase_date": "2025-11-24 9:00:55",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-24T09:00:59.285",
+      "purchased_credit": -1,
+      "total_credit": -1
+    },
+    {
+      "transaction_id": "2026-01-05T21:20:19:543",
+      "amount": 10000,
+      "purchase_date": "2026-01-05 21:20:19",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2026-01-05T21:21:22.562",
+      "purchased_credit": 10000,
+      "total_credit": 10000
+    }
+  ],
+  "usage_history": [
+    {
+      "timestamp": "2026-01-08T08:53:43.220",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-000-00 메인 어셈블리.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:51:21.210",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-020-00 SUB 어셈블리.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3100
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:50:05.635",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-040-00 제품 공급, 배출 로봇.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3200
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:49:14.092",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-190-00 180도 반전 상하.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3300
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:48:24.368",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-181-00 마넷 A 콘베이어 밸브.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3400
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:47:39.202",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-180-00 마넷 B 콘베이어 밸브.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3500
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:46:51.027",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-01C-00 상부 안전커버.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3600
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:46:00.431",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-01A-00 중간커버.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3700
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:45:13.216",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-060-00 서보 프레스.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3800
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:44:26.624",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-010-00 프레임 & 상부 안전커버.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 3900
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:43:31.350",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-050-00 제품 공급 P&P.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:42:46.149",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-182-00 마그넷 A, B 콘베이어 밸브.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4100
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:42:03.959",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-150-00 QR리딩.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4200
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:41:21.699",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-110-00 마그넷 B 공급 콘베이어.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4300
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:40:37.325",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-192-00 180도 반전 상하.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4400
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:39:58.299",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-041-00 제품 공급, 배출 케리어.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4500
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:39:22.525",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-061-00 백업 프레스.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4600
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:38:40.419",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-140-00 트레이 공급 전후.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4700
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:38:02.000",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-013-00 이동형 터치 스크린.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4800
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:37:25.332",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-090-00 마그넷 B 투입 유무검사.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 4900
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:36:50.080",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-120-00 마그넷 압입 검사.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:35:45.737",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-091-00 마그넷 A 투입 유무검사.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5100
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:34:58.869",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-075-00 마그넷 B 콘베이어.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5200
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:34:02.481",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-070-00 마그넷 A 콘베이어.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5300
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:33:07.493",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-130-00 스카라 로봇.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5400
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:32:22.799",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-100-00 회전 포지셔너.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5500
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:31:27.547",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-012-00 상부 안전커버.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5600
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:30:41.767",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-014-00 터치스크린 암.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5700
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:29:58.048",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-031-00 B 마그넷 투입지그.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5800
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:29:16.322",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-063-00 마그넷 A 압입지그.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 5900
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:28:34.708",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-062-00 마그넷 B 압입지그.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:27:51.813",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-032-00  A 마그넷 투입지그.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6100
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:27:12.111",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-12A-00 제품 유무 체크.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6200
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:26:33.661",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-011-00 하부 제관 프레임.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6300
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:25:50.723",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-191-00 제품 유무 체크.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6400
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:25:15.536",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-141-00 트레이 유무검사(공급).SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6500
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:24:40.061",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-142-00 트레이 유무검사(배출).SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6600
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:24:06.717",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-01B-00 하부 제관 프레임.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6700
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:23:26.855",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-043-00 마그넷 감지센서.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6800
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:22:51.920",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-131-00 스카라로봇 헨드.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 6900
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:22:16.654",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-114-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:21:19.873",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-042-00 제품 감지 센서.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7100
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:20:37.735",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-111-00 마그넷 B 이스케이프.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7200
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:19:51.239",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-112-00 마그넷 B 이스케이프 상하.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7300
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:19:04.380",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-113-00 마그넷 A 이스케이프.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7400
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:18:19.804",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-160-00 키보드 &  모니터.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7500
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:17:35.714",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-161-00 키보드.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7600
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:16:51.640",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-121-00 마그넷 압입 검사 인디게이터.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7700
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:16:10.462",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-118-00 마그넷 A 정렬 & A, B 검사.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7800
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:15:28.073",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-117-00 마그넷 B 정렬 & A, B 검사.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 7900
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:14:46.220",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-080-00 셔틀 푸셔 01.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:14:04.390",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-081-00 셔틀 푸셔 02.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8100
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:13:23.295",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-016-00 에어 유닛.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8200
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:12:44.824",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-018-00 에어리어 센서.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8300
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:12:07.403",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-071-00 지그 스톱퍼 업다운.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8400
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:11:30.122",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-072-00 지그 업다운.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8500
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:10:53.112",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-015-00 터치스크린 박스.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8600
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:10:16.944",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-073-00 지그 스톱퍼.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8700
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:09:43.135",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-074-00 콘베이어 스피드 콘트롤러.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8800
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:09:10.305",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-162-00 데이터 PC 모니터.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 8900
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:08:37.776",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-019-00 에어 밸브.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:06:18.003",
+      "amount": 100,
+      "description": "BOM 변환: 25ASC010-A00-120-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9100
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:05:44.308",
+      "amount": 100,
+      "description": "BOM 변환: 25ASC010-A00-121-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9200
+      }
+    },
+    {
+      "timestamp": "2026-01-08T08:05:13.692",
+      "amount": 100,
+      "description": "BOM 변환: 25ASC010-A00-101-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9300
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:43:02.973",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-000-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9400
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:42:10.602",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-020-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9500
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:41:19.875",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-030-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9600
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:40:36.241",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-026-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9700
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:39:58.836",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-010-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9800
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:39:21.219",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-011-00.SLDDRW",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 100
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9900
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:38:43.290",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-031-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:38:08.648",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-022-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 100,
+        "purchased": 10000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:37:34.386",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-027-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 200,
+        "purchased": 10000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:37:00.412",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-025-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 300,
+        "purchased": 10000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:17:15.571",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-000-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 400,
+        "purchased": 10000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:16:28.049",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-020-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 500,
+        "purchased": 10000
+      }
+    },
+    {
+      "timestamp": "2026-01-08T07:15:43.773",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-030-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 600,
+        "purchased": 10000
+      }
+    },
+    {
+      "timestamp": "2026-01-05T21:03:31.866",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-000-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9000,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-05T21:01:05.891",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-020-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9100,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-05T21:00:14.500",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-030-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9200,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-05T20:59:32.174",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-026-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9300,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-05T20:58:56.397",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-010-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9400,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-05T20:58:20.402",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-011-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9500,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-05T20:57:43.582",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-031-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9600,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-05T20:57:09.386",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-022-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9700,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-05T20:56:31.470",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-027-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9800,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-05T20:55:57.911",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-025-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9900,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:52:51.657",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-000-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 8800,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:52:00.323",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-020-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 8900,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:51:10.388",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-030-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9000,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:50:26.803",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-026-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9100,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:49:51.600",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-010-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9200,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:49:17.248",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-011-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9300,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:48:41.184",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-031-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9400,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:48:08.188",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-022-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9500,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:47:35.185",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-027-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9600,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-04T12:47:02.294",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-025-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9700,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-12-30T10:23:43.013",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-162-00 데이터 PC 모니터.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9800,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-12-30T10:23:14.067",
+      "amount": 100,
+      "description": "BOM 변환: 25SJC030-A10-019-00 에어 밸브.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 9900,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2025-12-19T16:23:19.786",
+      "amount": 100,
+      "description": "BOM 변환: 25PS020-P40-000-00.SLDDRW",
+      "deducted_from": {
+        "trial": 100,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 8700,
+        "purchased": 0
+      }
+    }
+  ],
+  "last_synced": "2026-01-08T08:53:51.405",
+  "lifetime_usage": 0,
+  "current_credits": 10700,
+  "applied_purchase_ids": [
+    "2025-11-24T08:54:34:414",
+    "2025-11-10T20:28:22:176",
+    "2025-11-10T22:09:57:109",
+    "2025-11-24T09:00:55:031",
+    "2026-01-05T21:20:19:543",
+    "2025-11-19T13:37:22:887",
+    "2025-11-19T12:47:40:560",
+    "2025-11-19T13:28:55:661",
+    "2025-11-19T12:50:27:043",
+    "2025-11-19T13:32:07:794"
+  ],
+  "credit_per_work": 100,
+  "session_usage_amount": 0,
+  "session_file_count": 0,
+  "session_last_usage_ts": null,
+  "last_usage_amount": 6100,
+  "last_usage_timestamp": "2026-01-08T08:53:43.220",
+  "usage_file_count": 61,
+  "usage_per_item_cost": 100,
+  "usage_description": "bom_exporter 파일 처리 (61개)",
+  "suppress_usage_log": true
+}

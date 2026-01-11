@@ -1,0 +1,27 @@
+{
+  "app_config": {
+    "run_mode": "demo",
+    "full_version": "v0.1.0.0",
+    "build_count": 1,
+    "ui_scale": 1.0,
+    "language": "ko",
+    "chrome_driver_path": "C:\\chromedriver.exe",
+    "headless_mode": false,
+    "wait_timeout": 10,
+    "screenshot_enabled": true
+  },
+  "ui_config": {
+    "topmost": false,
+    "window_width": 900,
+    "window_height": 700,
+    "font_family": "맑은 고딕",
+    "font_size": 12,
+    "last_excel_path": ""
+  },
+  "logging_config": {
+    "level": "INFO",
+    "format": "[%(asctime)s] %(levelname)s: %(message)s",
+    "max_bytes": 10485760,
+    "backup_count": 5
+  }
+}

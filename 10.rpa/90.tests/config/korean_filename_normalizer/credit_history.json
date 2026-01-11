@@ -1,0 +1,16 @@
+{
+  "app_policy": {
+    "description": "korean_filename_normalizer - 기본 앱",
+    "trial_credits": 2000,
+    "credit_per_work": 1,
+    "credit_type": "per_item",
+    "full_description": "korean_filename_normalizer - 아이템당 1크레딧 (기본값)"
+  },
+  "credit_changed": false,
+  "trial_credits": 2000,
+  "purchased_credits": 0,
+  "created_at": "2025-11-17T12:45:12.851",
+  "last_updated": "2025-11-17T12:45:12.851",
+  "purchase_history": [],
+  "usage_history": []
+}

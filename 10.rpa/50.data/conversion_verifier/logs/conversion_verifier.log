@@ -1,0 +1,126 @@
+2025-11-10 20:00:53 - wf_conversion_verifier - INFO - __init__:40 - App initialized: conversion_verifier v0.8.0
+2025-11-10 20:00:53 - wf_conversion_verifier - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-10 20:00:53 - wf_conversion_verifier - INFO - __init__:42 - Language: ko
+2025-11-10 20:00:53 - wf_conversion_verifier - INFO - deploy_config_files:528 - 앱 설정 파일 생성 (개발 환경)
+2025-11-10 20:00:53 - wf_conversion_verifier - INFO - deploy_from_dev_config:617 - 개발 환경 설정 파일 배포 완료
+2025-11-10 20:00:53 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:00:54 - wf_conversion_verifier - INFO - worker:457 - 정책 동기화 결과: {'success': False, 'error': 'fetch_failed', 'message': 'Google Sheets에서 정책을 가져오는데 실패했습니다.'}
+2025-11-10 20:00:54 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:00:54 - wf_conversion_verifier - INFO - _worker:216 - 🔄 동기화 불필요 - 로컬 크레딧만 사용
+2025-11-10 20:00:54 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:00:58 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:00 - wf_conversion_verifier - DEBUG - verify_hardware_fingerprint:1108 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 20:01:00 - wf_conversion_verifier - DEBUG - verify_hardware_fingerprint:1109 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-10 20:01:05 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 1/20, 남은 크레딧: 1790
+2025-11-10 20:01:05 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:05 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 2/20, 남은 크레딧: 1780
+2025-11-10 20:01:05 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:05 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 3/20, 남은 크레딧: 1770
+2025-11-10 20:01:05 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:05 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 4/20, 남은 크레딧: 1760
+2025-11-10 20:01:05 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:05 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 5/20, 남은 크레딧: 1750
+2025-11-10 20:01:05 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:05 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 6/20, 남은 크레딧: 1740
+2025-11-10 20:01:05 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:05 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 7/20, 남은 크레딧: 1730
+2025-11-10 20:01:05 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 8/20, 남은 크레딧: 1720
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 9/20, 남은 크레딧: 1710
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 10/20, 남은 크레딧: 1700
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 11/20, 남은 크레딧: 1690
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 12/20, 남은 크레딧: 1680
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 13/20, 남은 크레딧: 1670
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 14/20, 남은 크레딧: 1660
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 15/20, 남은 크레딧: 1650
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 16/20, 남은 크레딧: 1640
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 17/20, 남은 크레딧: 1630
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 18/20, 남은 크레딧: 1620
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 19/20, 남은 크레딧: 1610
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - INFO - worker:1256 - 크레딧 차감 완료 - 파일 20/20, 남은 크레딧: 1600
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:06 - wf_conversion_verifier - DEBUG - update_credit_display:356 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-10 20:01:07 - wf_conversion_verifier - INFO - _on_conversion_complete:1325 - 🏁 작업 완료 처리 종료
+2025-11-10 20:01:07 - wf_conversion_verifier - INFO - background_sync:1309 - 🧾 처리 완료 후 사용 내역 동기화 시도 (백그라운드)...
+2025-11-10 20:01:07 - wf_conversion_verifier - INFO - background_sync:1311 - [SYNC-AFTER-RUN] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-10 20:01:17 - wf_conversion_verifier - INFO - on_closing:486 - 🔄 앱 종료 시 크레딧 동기화 시도...
+2025-11-10 20:01:17 - wf_conversion_verifier - INFO - on_closing:488 - [SYNC-EXIT] {'success': False, 'error': 'sync_failed', 'message': '구글 시트 동기화 실패'}
+2025-11-13 16:54:14 - wf_conversion_verifier - INFO - __init__:40 - App initialized: conversion_verifier v0.8.0
+2025-11-13 16:54:14 - wf_conversion_verifier - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-13 16:54:14 - wf_conversion_verifier - INFO - __init__:42 - Language: ko
+2025-11-13 16:54:14 - wf_conversion_verifier - INFO - deploy_config_files:529 - 앱 설정 파일 생성 (개발 환경)
+2025-11-13 16:54:14 - wf_conversion_verifier - INFO - deploy_from_dev_config:618 - 개발 환경 설정 파일 배포 완료
+2025-11-13 16:54:25 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:26 - wf_conversion_verifier - INFO - _worker:217 - 🔄 동기화 불필요 - 로컬 크레딧만 사용
+2025-11-13 16:54:26 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:27 - wf_conversion_verifier - INFO - worker:458 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-13 16:54:27 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:30 - wf_conversion_verifier - DEBUG - verify_hardware_fingerprint:1110 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 16:54:30 - wf_conversion_verifier - DEBUG - verify_hardware_fingerprint:1111 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 16:54:42 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 1/20, 남은 크레딧: 1590
+2025-11-13 16:54:42 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:42 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 2/20, 남은 크레딧: 1580
+2025-11-13 16:54:42 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:42 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 3/20, 남은 크레딧: 1570
+2025-11-13 16:54:42 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:42 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 4/20, 남은 크레딧: 1560
+2025-11-13 16:54:42 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:42 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 5/20, 남은 크레딧: 1550
+2025-11-13 16:54:42 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:42 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 6/20, 남은 크레딧: 1540
+2025-11-13 16:54:42 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:42 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 7/20, 남은 크레딧: 1530
+2025-11-13 16:54:42 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 8/20, 남은 크레딧: 1520
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 9/20, 남은 크레딧: 1510
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 10/20, 남은 크레딧: 1500
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 11/20, 남은 크레딧: 1490
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 12/20, 남은 크레딧: 1480
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 13/20, 남은 크레딧: 1470
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 14/20, 남은 크레딧: 1460
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 15/20, 남은 크레딧: 1450
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 16/20, 남은 크레딧: 1440
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 17/20, 남은 크레딧: 1430
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 18/20, 남은 크레딧: 1420
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 19/20, 남은 크레딧: 1410
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - INFO - worker:1258 - 크레딧 차감 완료 - 파일 20/20, 남은 크레딧: 1400
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:43 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 16:54:44 - wf_conversion_verifier - INFO - _on_conversion_complete:1327 - 🏁 작업 완료 처리 종료
+2025-11-13 16:54:44 - wf_conversion_verifier - INFO - background_sync:1311 - 🧾 처리 완료 후 사용 내역 동기화 시도 (백그라운드)...
+2025-11-13 16:54:51 - wf_conversion_verifier - INFO - background_sync:1313 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-11-13T16:54:51.665'}
+2025-11-13 18:09:31 - wf_conversion_verifier - INFO - __init__:40 - App initialized: conversion_verifier v0.8.0
+2025-11-13 18:09:31 - wf_conversion_verifier - INFO - __init__:41 - Environment: Environment.DEVELOPMENT
+2025-11-13 18:09:31 - wf_conversion_verifier - INFO - __init__:42 - Language: ko
+2025-11-13 18:09:33 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 18:09:34 - wf_conversion_verifier - INFO - _worker:217 - 🔄 동기화 불필요 - 로컬 크레딧만 사용
+2025-11-13 18:09:34 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 18:09:37 - wf_conversion_verifier - INFO - worker:458 - 정책 동기화 결과: {'success': True, 'message': '6개의 정책이 동기화되었습니다.', 'count': 6, 'email_refreshed': True}
+2025-11-13 18:09:38 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10
+2025-11-13 18:09:43 - wf_conversion_verifier - DEBUG - verify_hardware_fingerprint:987 - 기존 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 18:09:43 - wf_conversion_verifier - DEBUG - verify_hardware_fingerprint:988 - 현재 지문: 7df0557b6503a2818775f239d818fab706b090b3fa6b577ad6dd46bc6c94482e
+2025-11-13 18:09:53 - wf_conversion_verifier - DEBUG - update_credit_display:357 - 🔧 UI: cost_per_item from get_per_item_cost() = 10

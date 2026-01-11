@@ -1,0 +1,31 @@
+{
+  "runtime_config": {
+    "run_mode": "release",
+    "full_version": "v1.0.0.0",
+    "admin_mode": false,
+    "ui_scale": 1.0,
+    "last_updated": "2026-01-08 20:28:35"
+  },
+  "ui_config": {
+    "last_excel_path": "",
+    "last_excel_dir": "",
+    "show_log": false,
+    "auto_scroll": true,
+    "topmost": true,
+    "window_width": 600,
+    "window_height": 200,
+    "window_geometry_override": ""
+  },
+  "logging_config": {
+    "log_level": "INFO",
+    "max_log_size_mb": 10,
+    "rotate_logs": true
+  },
+  "automation_config": {
+    "chrome_driver_path": "chromedriver",
+    "headless_mode": false,
+    "wait_timeout": 10,
+    "screenshot_enabled": true,
+    "save_cookies": true
+  }
+}

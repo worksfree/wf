@@ -1,0 +1,49 @@
+[2026-01-09 06:21:08] INFO: ============================================================
+[2026-01-09 06:21:08] INFO: K-Startup 웹 자동화 시작
+[2026-01-09 06:21:08] INFO: ============================================================
+[2026-01-09 06:21:08] INFO: 앱 초기화 시작
+[2026-01-09 06:21:08] INFO: UI 생성 완료
+[2026-01-09 06:21:08] INFO: WorksFreeManager 초기화 중...
+[2026-01-09 06:21:08] INFO: 앱 초기화 완료
+[2026-01-09 06:21:08] INFO: 메인 루프 시작 - 메인 창이 화면에 표시됩니다
+[2026-01-09 06:21:08] INFO: WorksFreeManager 초기화 완료 (등록: False)
+[2026-01-09 06:21:29] INFO: 파일 선택됨: D:/drive_files/10.worksfree/10.rpa/70.webs/kstartup-web/kstartup_actions.xlsx
+[2026-01-09 06:21:54] INFO: 자동화 시작: D:/drive_files/10.worksfree/10.rpa/70.webs/kstartup-web/kstartup_actions.xlsx
+[2026-01-09 06:21:54] INFO: Excel 파일 파싱 중...
+[2026-01-09 06:21:54] INFO: 총 6개의 액션을 로드했습니다
+[2026-01-09 06:21:54] INFO: WebDriver 초기화 중...
+[2026-01-09 06:21:54] ERROR: 자동화 실행 중 오류: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+Traceback (most recent call last):
+  File "C:\Users\USER\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\selenium\webdriver\common\driver_finder.py", line 64, in _binary_paths
+    raise ValueError(f"The path is not a valid file: {path}")
+ValueError: The path is not a valid file: chromedriver
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\drive_files\10.worksfree\10.rpa\70.webs\kstartup-web\ui_main.py", line 224, in _run_automation
+    engine.initialize_driver()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\drive_files\10.worksfree\10.rpa\70.webs\kstartup-web\automation.py", line 294, in initialize_driver
+    self.driver = webdriver.Chrome(service=service, options=chrome_options)
+                  ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\USER\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\selenium\webdriver\chrome\webdriver.py", line 46, in __init__
+    super().__init__(
+    ~~~~~~~~~~~~~~~~^
+        browser_name=DesiredCapabilities.CHROME["browserName"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        keep_alive=keep_alive,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\USER\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\selenium\webdriver\chromium\webdriver.py", line 51, in __init__
+    if finder.get_browser_path():
+       ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\USER\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\selenium\webdriver\common\driver_finder.py", line 47, in get_browser_path
+    return self._binary_paths()["browser_path"]
+           ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\USER\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\selenium\webdriver\common\driver_finder.py", line 78, in _binary_paths
+    raise NoSuchDriverException(msg) from err
+selenium.common.exceptions.NoSuchDriverException: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+

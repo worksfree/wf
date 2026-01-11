@@ -1,0 +1,1390 @@
+{
+  "credit_changed": false,
+  "trial_credits": 0,
+  "purchased_credits": 34250,
+  "created_at": "2025-01-01T00:00:00.000",
+  "last_updated": "2026-01-04T16:23:40.309",
+  "purchase_history": [
+    {
+      "transaction_id": "2025-11-23T20:58:58:524",
+      "amount": 6000,
+      "purchase_date": "2025-11-23 20:58:58",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-23T21:00:39.086",
+      "purchased_credit": 6000,
+      "total_credit": 6000
+    },
+    {
+      "transaction_id": "2025-11-24T08:28:26:097",
+      "amount": 12000,
+      "purchase_date": "2025-11-24 8:28:26",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-24T08:28:36.140",
+      "purchased_credit": 12000,
+      "total_credit": 12000
+    },
+    {
+      "transaction_id": "2025-11-26T13:47:28:468",
+      "amount": 10000,
+      "purchase_date": "2025-11-26 13:47:28",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-26T13:49:38.833",
+      "purchased_credit": 10000,
+      "total_credit": 10000
+    },
+    {
+      "transaction_id": "2025-11-30T15:25:23:554",
+      "amount": 100000,
+      "purchase_date": "2025-11-30 15:25:23",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-30T15:25:34.612",
+      "purchased_credit": 100000,
+      "total_credit": 100000
+    },
+    {
+      "transaction_id": "2025-12-02T10:12:39:193",
+      "amount": 10000,
+      "purchase_date": "2025-12-02 10:12:39",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-12-02T10:12:42.576",
+      "purchased_credit": 10000,
+      "total_credit": 10000
+    }
+  ],
+  "usage_history": [
+    {
+      "timestamp": "2026-01-04T16:23:34.836",
+      "amount": 50,
+      "description": "DWG 분류: DRW0045.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34250
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:34.330",
+      "amount": 50,
+      "description": "DWG 분류: DRW0044.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34300
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:33.824",
+      "amount": 50,
+      "description": "DWG 분류: DRW0043.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34350
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:33.317",
+      "amount": 50,
+      "description": "DWG 분류: DRW0042.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34400
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:32.806",
+      "amount": 50,
+      "description": "DWG 분류: DRW0041.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34450
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:32.296",
+      "amount": 50,
+      "description": "DWG 분류: DRW0040.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34500
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:31.788",
+      "amount": 50,
+      "description": "DWG 분류: DRW0039.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34550
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:31.279",
+      "amount": 50,
+      "description": "DWG 분류: DRW0038.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34600
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:30.771",
+      "amount": 50,
+      "description": "DWG 분류: DRW0037.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34650
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:30.264",
+      "amount": 50,
+      "description": "DWG 분류: DRW0036.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34700
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:29.758",
+      "amount": 50,
+      "description": "DWG 분류: DRW0035.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34750
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:29.252",
+      "amount": 50,
+      "description": "DWG 분류: DRW0034.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34800
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:28.746",
+      "amount": 50,
+      "description": "DWG 분류: DRW0033.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34850
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:28.240",
+      "amount": 50,
+      "description": "DWG 분류: DRW0032.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34900
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:27.735",
+      "amount": 50,
+      "description": "DWG 분류: DRW0031.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 34950
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:27.227",
+      "amount": 50,
+      "description": "DWG 분류: DRW0030.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35000
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:26.719",
+      "amount": 50,
+      "description": "DWG 분류: DRW0029.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35050
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:26.210",
+      "amount": 50,
+      "description": "DWG 분류: DRW0028.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35100
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:25.704",
+      "amount": 50,
+      "description": "DWG 분류: DRW0027.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35150
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:25.197",
+      "amount": 50,
+      "description": "DWG 분류: DRW0026.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35200
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:24.690",
+      "amount": 50,
+      "description": "DWG 분류: DRW0025.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35250
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:24.184",
+      "amount": 50,
+      "description": "DWG 분류: DRW0024.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35300
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:23.679",
+      "amount": 50,
+      "description": "DWG 분류: DRW0023.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35350
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:23.166",
+      "amount": 50,
+      "description": "DWG 분류: DRW0022.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35400
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:22.661",
+      "amount": 50,
+      "description": "DWG 분류: DRW0021.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35450
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:22.152",
+      "amount": 50,
+      "description": "DWG 분류: DRW0020.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35500
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:21.643",
+      "amount": 50,
+      "description": "DWG 분류: DRW0019.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35550
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:21.135",
+      "amount": 50,
+      "description": "DWG 분류: DRW0018.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35600
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:20.627",
+      "amount": 50,
+      "description": "DWG 분류: DRW0017.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35650
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:20.120",
+      "amount": 50,
+      "description": "DWG 분류: DRW0016.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35700
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:19.615",
+      "amount": 50,
+      "description": "DWG 분류: DRW0015.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35750
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:19.108",
+      "amount": 50,
+      "description": "DWG 분류: DRW0014.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35800
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:18.602",
+      "amount": 50,
+      "description": "DWG 분류: DRW0013.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35850
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:18.097",
+      "amount": 50,
+      "description": "DWG 분류: DRW0012.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35900
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:17.591",
+      "amount": 50,
+      "description": "DWG 분류: DRW0011.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 35950
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:17.085",
+      "amount": 50,
+      "description": "DWG 분류: DRW0010.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36000
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:16.580",
+      "amount": 50,
+      "description": "DWG 분류: DRW0009.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36050
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:16.074",
+      "amount": 50,
+      "description": "DWG 분류: DRW0008.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36100
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:15.569",
+      "amount": 50,
+      "description": "DWG 분류: DRW0007.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36150
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:15.063",
+      "amount": 50,
+      "description": "DWG 분류: DRW0006.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36200
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:14.558",
+      "amount": 50,
+      "description": "DWG 분류: DRW0005.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36250
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:14.054",
+      "amount": 50,
+      "description": "DWG 분류: DRW0004.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36300
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:13.548",
+      "amount": 50,
+      "description": "DWG 분류: DRW0003.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36350
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:13.041",
+      "amount": 50,
+      "description": "DWG 분류: DRW0002.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36400
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:23:12.534",
+      "amount": 50,
+      "description": "DWG 분류: DRW0001.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36450
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:49.345",
+      "amount": 50,
+      "description": "DWG 분류: DRW0045.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36500
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:48.838",
+      "amount": 50,
+      "description": "DWG 분류: DRW0044.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36550
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:48.329",
+      "amount": 50,
+      "description": "DWG 분류: DRW0043.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36600
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:47.819",
+      "amount": 50,
+      "description": "DWG 분류: DRW0042.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36650
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:47.312",
+      "amount": 50,
+      "description": "DWG 분류: DRW0041.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36700
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:46.804",
+      "amount": 50,
+      "description": "DWG 분류: DRW0040.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36750
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:46.297",
+      "amount": 50,
+      "description": "DWG 분류: DRW0039.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36800
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:45.789",
+      "amount": 50,
+      "description": "DWG 분류: DRW0038.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36850
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:45.282",
+      "amount": 50,
+      "description": "DWG 분류: DRW0037.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36900
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:44.774",
+      "amount": 50,
+      "description": "DWG 분류: DRW0036.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 36950
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:44.269",
+      "amount": 50,
+      "description": "DWG 분류: DRW0035.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37000
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:43.764",
+      "amount": 50,
+      "description": "DWG 분류: DRW0034.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37050
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:43.256",
+      "amount": 50,
+      "description": "DWG 분류: DRW0033.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37100
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:42.750",
+      "amount": 50,
+      "description": "DWG 분류: DRW0032.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37150
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:42.243",
+      "amount": 50,
+      "description": "DWG 분류: DRW0031.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37200
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:41.734",
+      "amount": 50,
+      "description": "DWG 분류: DRW0030.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37250
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:41.222",
+      "amount": 50,
+      "description": "DWG 분류: DRW0029.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37300
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:40.712",
+      "amount": 50,
+      "description": "DWG 분류: DRW0028.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37350
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:40.204",
+      "amount": 50,
+      "description": "DWG 분류: DRW0027.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37400
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:39.696",
+      "amount": 50,
+      "description": "DWG 분류: DRW0026.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37450
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:39.187",
+      "amount": 50,
+      "description": "DWG 분류: DRW0025.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37500
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:38.677",
+      "amount": 50,
+      "description": "DWG 분류: DRW0024.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37550
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:38.169",
+      "amount": 50,
+      "description": "DWG 분류: DRW0023.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37600
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:37.661",
+      "amount": 50,
+      "description": "DWG 분류: DRW0022.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37650
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:37.154",
+      "amount": 50,
+      "description": "DWG 분류: DRW0021.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37700
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:36.647",
+      "amount": 50,
+      "description": "DWG 분류: DRW0020.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37750
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:36.139",
+      "amount": 50,
+      "description": "DWG 분류: DRW0019.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37800
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:35.632",
+      "amount": 50,
+      "description": "DWG 분류: DRW0018.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37850
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:35.126",
+      "amount": 50,
+      "description": "DWG 분류: DRW0017.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37900
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:34.618",
+      "amount": 50,
+      "description": "DWG 분류: DRW0016.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 37950
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:34.110",
+      "amount": 50,
+      "description": "DWG 분류: DRW0015.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38000
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:33.603",
+      "amount": 50,
+      "description": "DWG 분류: DRW0014.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38050
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:33.096",
+      "amount": 50,
+      "description": "DWG 분류: DRW0013.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38100
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:32.590",
+      "amount": 50,
+      "description": "DWG 분류: DRW0012.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38150
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:32.083",
+      "amount": 50,
+      "description": "DWG 분류: DRW0011.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38200
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:31.577",
+      "amount": 50,
+      "description": "DWG 분류: DRW0010.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38250
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:31.071",
+      "amount": 50,
+      "description": "DWG 분류: DRW0009.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38300
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:30.566",
+      "amount": 50,
+      "description": "DWG 분류: DRW0008.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38350
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:30.060",
+      "amount": 50,
+      "description": "DWG 분류: DRW0007.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38400
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:29.555",
+      "amount": 50,
+      "description": "DWG 분류: DRW0006.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38450
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:29.050",
+      "amount": 50,
+      "description": "DWG 분류: DRW0005.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38500
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:28.546",
+      "amount": 50,
+      "description": "DWG 분류: DRW0004.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38550
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:28.040",
+      "amount": 50,
+      "description": "DWG 분류: DRW0003.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38600
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:27.535",
+      "amount": 50,
+      "description": "DWG 분류: DRW0002.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38650
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:22:26.960",
+      "amount": 50,
+      "description": "DWG 분류: DRW0001.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38700
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:41.070",
+      "amount": 50,
+      "description": "DWG 분류: DRW0045.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38750
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:40.564",
+      "amount": 50,
+      "description": "DWG 분류: DRW0044.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38800
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:40.059",
+      "amount": 50,
+      "description": "DWG 분류: DRW0043.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38850
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:39.553",
+      "amount": 50,
+      "description": "DWG 분류: DRW0042.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38900
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:39.047",
+      "amount": 50,
+      "description": "DWG 분류: DRW0041.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 38950
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:38.543",
+      "amount": 50,
+      "description": "DWG 분류: DRW0040.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 39000
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:38.038",
+      "amount": 50,
+      "description": "DWG 분류: DRW0039.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 39050
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:37.533",
+      "amount": 50,
+      "description": "DWG 분류: DRW0038.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 39100
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:37.028",
+      "amount": 50,
+      "description": "DWG 분류: DRW0037.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 39150
+      }
+    },
+    {
+      "timestamp": "2026-01-04T16:20:36.523",
+      "amount": 50,
+      "description": "DWG 분류: DRW0036.dwg",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 50
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 39200
+      }
+    }
+  ],
+  "last_synced": "2026-01-04T16:23:40.309",
+  "lifetime_usage": 0,
+  "current_credits": 10000,
+  "applied_purchase_ids": [
+    "2025-11-26T13:47:28:468",
+    "2025-11-23T20:58:58:524",
+    "2025-11-30T15:25:23:554",
+    "2025-11-24T08:28:26:097",
+    "2025-12-02T10:12:39:193"
+  ],
+  "credit_per_work": 50,
+  "session_usage_amount": 0,
+  "session_file_count": 0,
+  "session_last_usage_ts": null,
+  "last_usage_amount": 2250,
+  "last_usage_timestamp": "2026-01-04T16:23:34.836",
+  "usage_file_count": 45,
+  "usage_per_item_cost": 50,
+  "usage_description": "dwg_classifier 파일 처리 (45개)"
+}

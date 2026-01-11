@@ -1,0 +1,719 @@
+2025-12-03 18:22:25,241 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 18:22:25,241 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:107 - App: korean_filename_normalizer
+2025-12-03 18:22:25,400 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 18:22:26,079 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:434 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 18:22:26,185 - INFO - [wf_rpa.korean_filename_normalizer] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 18:22:30,228 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:564 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 18:39:53,357 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 18:39:53,357 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:107 - App: korean_filename_normalizer
+2025-12-03 18:39:53,496 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 18:39:54,125 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:434 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 18:39:54,257 - INFO - [wf_rpa.korean_filename_normalizer] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 18:39:57,186 - WARNING - [wf_rpa.korean_filename_normalizer] ui_main:1184 - 기능을 사용하려면 먼저 사용자 등록이 필요합니다. '등 록' 버튼을 눌러주세요.
+2025-12-03 18:39:57,764 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:564 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 18:40:20,281 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 18:40:20,281 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:107 - App: korean_filename_normalizer
+2025-12-03 18:40:20,415 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 18:40:21,070 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:434 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 18:40:21,183 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:943 - 폴더 스캔 시작: D:/dep_test_data/한글자소분리_데모
+2025-12-03 18:40:21,184 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 폴더 검사 중: D:/dep_test_data/한글자소분리_데모
+2025-12-03 18:40:21,193 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 총 30개 파일을 검사합니다.
+2025-12-03 18:40:21,194 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: abc_업무자료.docx
+2025-12-03 18:40:21,194 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 18:40:21,195 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 18:40:21,195 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 멤마_2.txt
+2025-12-03 18:40:21,195 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 멤마_2.txt → 멤마_2.txt
+2025-12-03 18:40:21,196 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 멤마_2.txt → 멤마_2.txt
+2025-12-03 18:40:21,196 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 사자리_4.txt
+2025-12-03 18:40:21,197 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 사자리_4.txt → 사자리_4.txt
+2025-12-03 18:40:21,197 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 사자리_4.txt → 사자리_4.txt
+2025-12-03 18:40:21,198 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 설계도면.dwg
+2025-12-03 18:40:21,198 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 설계도면.dwg → 설계도면.dwg
+2025-12-03 18:40:21,198 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 설계도면.dwg → 설계도면.dwg
+2025-12-03 18:40:21,198 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료.docx
+2025-12-03 18:40:21,198 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료.docx → 업무자료.docx
+2025-12-03 18:40:21,199 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료.docx → 업무자료.docx
+2025-12-03 18:40:21,201 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료_abc.docx
+2025-12-03 18:40:21,201 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 18:40:21,202 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 18:40:21,202 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_견적서_0826.pdf
+2025-12-03 18:40:21,202 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 18:40:21,202 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 18:40:21,203 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_수행계획서_수정본.docx
+2025-12-03 18:40:21,205 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 18:40:21,205 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 18:40:21,205 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리계약서_0826.pdf
+2025-12-03 18:40:21,206 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 18:40:21,208 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 18:40:21,208 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 읍무_3.txt
+2025-12-03 18:40:21,208 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 읍무_3.txt → 읍무_3.txt
+2025-12-03 18:40:21,208 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 읍무_3.txt → 읍무_3.txt
+2025-12-03 18:40:21,209 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서.pdf
+2025-12-03 18:40:21,209 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 18:40:21,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 18:40:21,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글_1.txt
+2025-12-03 18:40:21,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글_1.txt → 한글_1.txt
+2025-12-03 18:40:21,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글_1.txt → 한글_1.txt
+2025-12-03 18:40:21,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글문서.txt
+2025-12-03 18:40:21,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글문서.txt → 한글문서.txt
+2025-12-03 18:40:21,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글문서.txt → 한글문서.txt
+2025-12-03 18:40:21,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 회의록.hwp
+2025-12-03 18:40:21,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 회의록.hwp → 회의록.hwp
+2025-12-03 18:40:21,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 회의록.hwp → 회의록.hwp
+2025-12-03 18:40:21,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무_3 - 복사본.txt
+2025-12-03 18:40:21,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서 - 복사본.pdf
+2025-12-03 18:40:21,212 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: abc_업무자료.docx
+2025-12-03 18:40:21,212 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 멤마_2.txt
+2025-12-03 18:40:21,212 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 사자리_4.txt
+2025-12-03 18:40:21,212 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 설계도면.dwg
+2025-12-03 18:40:21,212 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료.docx
+2025-12-03 18:40:21,213 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료_abc.docx
+2025-12-03 18:40:21,213 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_견적서_0826.pdf
+2025-12-03 18:40:21,213 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_수행계획서_수정본.docx
+2025-12-03 18:40:21,214 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리계약서_0826.pdf
+2025-12-03 18:40:21,214 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 읍무_3.txt
+2025-12-03 18:40:21,214 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서.pdf
+2025-12-03 18:40:21,215 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글_1.txt
+2025-12-03 18:40:21,215 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글문서.txt
+2025-12-03 18:40:21,215 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 회의록.hwp
+2025-12-03 18:40:21,215 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 14개 발견
+2025-12-03 18:40:21,216 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:962 - 폴더 스캔 완료: 14개 파일
+2025-12-03 18:40:21,216 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:403 - 이전 작업 폴더 자동 스캔 완료
+2025-12-03 18:40:21,218 - INFO - [wf_rpa.korean_filename_normalizer] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 18:40:23,966 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:564 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 18:40:24,523 - ERROR - [wf_rpa.korean_filename_normalizer] ui_main:1196 - 등록된 사용자의 하드웨어 정보와 일치하지 않습니다. 다른 컴퓨터에서는 사용할 수 없습니다.
+2025-12-03 18:42:15,293 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 18:42:15,293 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:107 - App: korean_filename_normalizer
+2025-12-03 18:42:15,453 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 18:42:16,262 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:434 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 18:42:16,262 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:943 - 폴더 스캔 시작: D:/dep_test_data/한글자소분리_데모
+2025-12-03 18:42:16,262 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 폴더 검사 중: D:/dep_test_data/한글자소분리_데모
+2025-12-03 18:42:16,264 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 총 30개 파일을 검사합니다.
+2025-12-03 18:42:16,266 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: abc_업무자료.docx
+2025-12-03 18:42:16,268 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 18:42:16,268 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 18:42:16,269 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 멤마_2.txt
+2025-12-03 18:42:16,269 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 멤마_2.txt → 멤마_2.txt
+2025-12-03 18:42:16,269 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 멤마_2.txt → 멤마_2.txt
+2025-12-03 18:42:16,269 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 사자리_4.txt
+2025-12-03 18:42:16,270 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 사자리_4.txt → 사자리_4.txt
+2025-12-03 18:42:16,270 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 사자리_4.txt → 사자리_4.txt
+2025-12-03 18:42:16,270 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 설계도면.dwg
+2025-12-03 18:42:16,271 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 설계도면.dwg → 설계도면.dwg
+2025-12-03 18:42:16,271 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 설계도면.dwg → 설계도면.dwg
+2025-12-03 18:42:16,271 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료.docx
+2025-12-03 18:42:16,272 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료.docx → 업무자료.docx
+2025-12-03 18:42:16,272 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료.docx → 업무자료.docx
+2025-12-03 18:42:16,272 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료_abc.docx
+2025-12-03 18:42:16,272 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 18:42:16,273 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 18:42:16,273 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_견적서_0826.pdf
+2025-12-03 18:42:16,275 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 18:42:16,275 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 18:42:16,276 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_수행계획서_수정본.docx
+2025-12-03 18:42:16,276 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 18:42:16,276 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 18:42:16,277 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리계약서_0826.pdf
+2025-12-03 18:42:16,277 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 18:42:16,277 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 18:42:16,277 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 읍무_3.txt
+2025-12-03 18:42:16,278 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 읍무_3.txt → 읍무_3.txt
+2025-12-03 18:42:16,278 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 읍무_3.txt → 읍무_3.txt
+2025-12-03 18:42:16,278 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서.pdf
+2025-12-03 18:42:16,278 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 18:42:16,279 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 18:42:16,279 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글_1.txt
+2025-12-03 18:42:16,279 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글_1.txt → 한글_1.txt
+2025-12-03 18:42:16,279 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글_1.txt → 한글_1.txt
+2025-12-03 18:42:16,280 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글문서.txt
+2025-12-03 18:42:16,280 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글문서.txt → 한글문서.txt
+2025-12-03 18:42:16,280 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글문서.txt → 한글문서.txt
+2025-12-03 18:42:16,281 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 회의록.hwp
+2025-12-03 18:42:16,281 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 회의록.hwp → 회의록.hwp
+2025-12-03 18:42:16,283 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 회의록.hwp → 회의록.hwp
+2025-12-03 18:42:16,283 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무_3 - 복사본.txt
+2025-12-03 18:42:16,283 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서 - 복사본.pdf
+2025-12-03 18:42:16,283 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: abc_업무자료.docx
+2025-12-03 18:42:16,283 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 멤마_2.txt
+2025-12-03 18:42:16,284 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 사자리_4.txt
+2025-12-03 18:42:16,285 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 설계도면.dwg
+2025-12-03 18:42:16,285 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료.docx
+2025-12-03 18:42:16,285 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료_abc.docx
+2025-12-03 18:42:16,285 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_견적서_0826.pdf
+2025-12-03 18:42:16,286 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_수행계획서_수정본.docx
+2025-12-03 18:42:16,286 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리계약서_0826.pdf
+2025-12-03 18:42:16,286 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 읍무_3.txt
+2025-12-03 18:42:16,286 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서.pdf
+2025-12-03 18:42:16,286 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글_1.txt
+2025-12-03 18:42:16,287 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글문서.txt
+2025-12-03 18:42:16,287 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 회의록.hwp
+2025-12-03 18:42:16,287 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 14개 발견
+2025-12-03 18:42:16,289 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:962 - 폴더 스캔 완료: 14개 파일
+2025-12-03 18:42:16,289 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:403 - 이전 작업 폴더 자동 스캔 완료
+2025-12-03 18:42:16,293 - INFO - [wf_rpa.korean_filename_normalizer] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 18:42:19,442 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:564 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 18:43:05,335 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:943 - 폴더 스캔 시작: D:/drive_files/30.사업자 및 지도사/10.예비창업패키지/10.시행/오렌지랩/1단계_최종산출물
+2025-12-03 18:43:05,335 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 폴더 검사 중: D:/drive_files/30.사업자 및 지도사/10.예비창업패키지/10.시행/오렌지랩/1단계_최종산출물
+2025-12-03 18:43:05,336 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 총 69개 파일을 검사합니다.
+2025-12-03 18:43:05,337 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1.png
+2025-12-03 18:43:05,337 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2.png
+2025-12-03 18:43:05,337 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.png
+2025-12-03 18:43:05,337 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.png
+2025-12-03 18:43:05,337 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고-20251021T003131Z-1-001.zip
+2025-12-03 18:43:05,338 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 상품목업-20251021T034037Z-1-001.zip
+2025-12-03 18:43:05,338 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 배너-20251021T003809Z-1-001.zip
+2025-12-03 18:43:05,338 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 상세페이지-20251021T034126Z-1-001.zip
+2025-12-03 18:43:05,338 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 썸네일이미지-20251021T034152Z-1-001.zip
+2025-12-03 18:43:05,338 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: black.png
+2025-12-03 18:43:05,339 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: green.png
+2025-12-03 18:43:05,339 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: navy.png
+2025-12-03 18:43:05,339 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: white.png
+2025-12-03 18:43:05,339 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (black).png
+2025-12-03 18:43:05,339 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (blue).png
+2025-12-03 18:43:05,340 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (white).png
+2025-12-03 18:43:05,340 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (black).png
+2025-12-03 18:43:05,340 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: WORKSFREE 슬로건 (black).png → WORKSFREE 슬로건 (black).png
+2025-12-03 18:43:05,340 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: WORKSFREE 슬로건 (black).png → WORKSFREE 슬로건 (black).png
+2025-12-03 18:43:05,340 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (blue).png
+2025-12-03 18:43:05,340 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: WORKSFREE 슬로건 (blue).png → WORKSFREE 슬로건 (blue).png
+2025-12-03 18:43:05,341 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: WORKSFREE 슬로건 (blue).png → WORKSFREE 슬로건 (blue).png
+2025-12-03 18:43:05,341 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (white).png
+2025-12-03 18:43:05,341 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: WORKSFREE 슬로건 (white).png → WORKSFREE 슬로건 (white).png
+2025-12-03 18:43:05,341 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: WORKSFREE 슬로건 (white).png → WORKSFREE 슬로건 (white).png
+2025-12-03 18:43:05,342 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고 - 복사본.png
+2025-12-03 18:43:05,342 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 로고 - 복사본.png → 로고 - 복사본.png
+2025-12-03 18:43:05,342 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 로고 - 복사본.png → 로고 - 복사본.png
+2025-12-03 18:43:05,343 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고 원본.psd
+2025-12-03 18:43:05,343 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 로고 원본.psd → 로고 원본.psd
+2025-12-03 18:43:05,343 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 로고 원본.psd → 로고 원본.psd
+2025-12-03 18:43:05,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고.png
+2025-12-03 18:43:05,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-1.png
+2025-12-03 18:43:05,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-2.png
+2025-12-03 18:43:05,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-3.png
+2025-12-03 18:43:05,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-4.png
+2025-12-03 18:43:05,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-1.png
+2025-12-03 18:43:05,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-2.png
+2025-12-03 18:43:05,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-3.png
+2025-12-03 18:43:05,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-4.png
+2025-12-03 18:43:05,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-1.png
+2025-12-03 18:43:05,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-2.png
+2025-12-03 18:43:05,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-3.png
+2025-12-03 18:43:05,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-4.png
+2025-12-03 18:43:05,346 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 목업원본.psd
+2025-12-03 18:43:05,346 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: PC배너.jpg
+2025-12-03 18:43:05,346 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: PC배너.jpg → PC배너.jpg
+2025-12-03 18:43:05,346 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: PC배너.jpg → PC배너.jpg
+2025-12-03 18:43:05,346 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 모바일배너.jpg
+2025-12-03 18:43:05,347 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 모바일배너.jpg → 모바일배너.jpg
+2025-12-03 18:43:05,347 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 모바일배너.jpg → 모바일배너.jpg
+2025-12-03 18:43:05,347 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1 메인상세이미지(1).jpg
+2025-12-03 18:43:05,347 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 1 메인상세이미지(1).jpg → 1 메인상세이미지(1).jpg
+2025-12-03 18:43:05,347 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 1 메인상세이미지(1).jpg → 1 메인상세이미지(1).jpg
+2025-12-03 18:43:05,347 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1 메인상세이미지(2).jpg
+2025-12-03 18:43:05,347 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 1 메인상세이미지(2).jpg → 1 메인상세이미지(2).jpg
+2025-12-03 18:43:05,347 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 1 메인상세이미지(2).jpg → 1 메인상세이미지(2).jpg
+2025-12-03 18:43:05,348 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 10.jpg
+2025-12-03 18:43:05,348 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 11 BOM_엑셀저장_자동화_모자익.gif
+2025-12-03 18:43:05,348 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 11 BOM_엑셀저장_자동화_모자익.gif → 11 BOM_엑셀저장_자동화_모자익.gif
+2025-12-03 18:43:05,348 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 11 BOM_엑셀저장_자동화_모자익.gif → 11 BOM_엑셀저장_자동화_모자익.gif
+2025-12-03 18:43:05,348 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 12.jpg
+2025-12-03 18:43:05,349 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 13 솔리드웍스_속성변경_자동화_모자익_완료.gif
+2025-12-03 18:43:05,349 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 13 솔리드웍스_속성변경_자동화_모자익_완료.gif → 13 솔리드웍스_속성변경_자동화_모자익_완료.gif
+2025-12-03 18:43:05,349 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 13 솔리드웍스_속성변경_자동화_모자익_완료.gif → 13 솔리드웍스_속성변경_자동화_모자익_완료.gif
+2025-12-03 18:43:05,349 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 14.jpg
+2025-12-03 18:43:05,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 15 DWG_다량출력_자동화_모자익.gif
+2025-12-03 18:43:05,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 15 DWG_다량출력_자동화_모자익.gif → 15 DWG_다량출력_자동화_모자익.gif
+2025-12-03 18:43:05,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 15 DWG_다량출력_자동화_모자익.gif → 15 DWG_다량출력_자동화_모자익.gif
+2025-12-03 18:43:05,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 16.jpg
+2025-12-03 18:43:05,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 17.jpg
+2025-12-03 18:43:05,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 18.jpg
+2025-12-03 18:43:05,351 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 19.jpg
+2025-12-03 18:43:05,351 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-1.jpg
+2025-12-03 18:43:05,351 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-2.jpg
+2025-12-03 18:43:05,351 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 20.jpg
+2025-12-03 18:43:05,351 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.jpg
+2025-12-03 18:43:05,351 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.jpg
+2025-12-03 18:43:05,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 5.jpg
+2025-12-03 18:43:05,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 6.jpg
+2025-12-03 18:43:05,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 7.jpg
+2025-12-03 18:43:05,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8-1.jpg
+2025-12-03 18:43:05,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8-2.jpg
+2025-12-03 18:43:05,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 9.jpg
+2025-12-03 18:43:05,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1.jpg
+2025-12-03 18:43:05,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2.jpg
+2025-12-03 18:43:05,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.jpg
+2025-12-03 18:43:05,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.jpg
+2025-12-03 18:43:05,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 5.jpg
+2025-12-03 18:43:05,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 6.jpg
+2025-12-03 18:43:05,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 7.jpg
+2025-12-03 18:43:05,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8.jpg
+2025-12-03 18:43:05,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 9.jpg
+2025-12-03 18:43:05,355 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 12개 발견
+2025-12-03 18:43:05,356 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:962 - 폴더 스캔 완료: 12개 파일
+2025-12-03 18:43:51,341 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 폴더 검사 중: D:/drive_files/30.사업자 및 지도사/10.예비창업패키지/10.시행/오렌지랩/1단계_최종산출물
+2025-12-03 18:43:51,343 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 총 69개 파일을 검사합니다.
+2025-12-03 18:43:51,343 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1.png
+2025-12-03 18:43:51,343 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2.png
+2025-12-03 18:43:51,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.png
+2025-12-03 18:43:51,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.png
+2025-12-03 18:43:51,344 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고-20251021T003131Z-1-001.zip
+2025-12-03 18:43:51,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 상품목업-20251021T034037Z-1-001.zip
+2025-12-03 18:43:51,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 배너-20251021T003809Z-1-001.zip
+2025-12-03 18:43:51,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 상세페이지-20251021T034126Z-1-001.zip
+2025-12-03 18:43:51,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 썸네일이미지-20251021T034152Z-1-001.zip
+2025-12-03 18:43:51,345 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: black.png
+2025-12-03 18:43:51,346 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: green.png
+2025-12-03 18:43:51,346 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: navy.png
+2025-12-03 18:43:51,346 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: white.png
+2025-12-03 18:43:51,346 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (black).png
+2025-12-03 18:43:51,347 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (blue).png
+2025-12-03 18:43:51,348 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (white).png
+2025-12-03 18:43:51,348 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (black).png
+2025-12-03 18:43:51,348 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: WORKSFREE 슬로건 (black).png → WORKSFREE 슬로건 (black).png
+2025-12-03 18:43:51,348 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: WORKSFREE 슬로건 (black).png → WORKSFREE 슬로건 (black).png
+2025-12-03 18:43:51,349 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (blue).png
+2025-12-03 18:43:51,349 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: WORKSFREE 슬로건 (blue).png → WORKSFREE 슬로건 (blue).png
+2025-12-03 18:43:51,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: WORKSFREE 슬로건 (blue).png → WORKSFREE 슬로건 (blue).png
+2025-12-03 18:43:51,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (white).png
+2025-12-03 18:43:51,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: WORKSFREE 슬로건 (white).png → WORKSFREE 슬로건 (white).png
+2025-12-03 18:43:51,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: WORKSFREE 슬로건 (white).png → WORKSFREE 슬로건 (white).png
+2025-12-03 18:43:51,350 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고 - 복사본.png
+2025-12-03 18:43:51,351 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 로고 - 복사본.png → 로고 - 복사본.png
+2025-12-03 18:43:51,351 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 로고 - 복사본.png → 로고 - 복사본.png
+2025-12-03 18:43:51,351 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고 원본.psd
+2025-12-03 18:43:51,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 로고 원본.psd → 로고 원본.psd
+2025-12-03 18:43:51,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 로고 원본.psd → 로고 원본.psd
+2025-12-03 18:43:51,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고.png
+2025-12-03 18:43:51,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-1.png
+2025-12-03 18:43:51,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-2.png
+2025-12-03 18:43:51,352 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-3.png
+2025-12-03 18:43:51,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-4.png
+2025-12-03 18:43:51,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-1.png
+2025-12-03 18:43:51,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-2.png
+2025-12-03 18:43:51,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-3.png
+2025-12-03 18:43:51,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-4.png
+2025-12-03 18:43:51,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-1.png
+2025-12-03 18:43:51,353 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-2.png
+2025-12-03 18:43:51,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-3.png
+2025-12-03 18:43:51,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-4.png
+2025-12-03 18:43:51,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 목업원본.psd
+2025-12-03 18:43:51,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: PC배너.jpg
+2025-12-03 18:43:51,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: PC배너.jpg → PC배너.jpg
+2025-12-03 18:43:51,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: PC배너.jpg → PC배너.jpg
+2025-12-03 18:43:51,354 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 모바일배너.jpg
+2025-12-03 18:43:51,355 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 모바일배너.jpg → 모바일배너.jpg
+2025-12-03 18:43:51,355 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 모바일배너.jpg → 모바일배너.jpg
+2025-12-03 18:43:51,355 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1 메인상세이미지(1).jpg
+2025-12-03 18:43:51,355 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 1 메인상세이미지(1).jpg → 1 메인상세이미지(1).jpg
+2025-12-03 18:43:51,355 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 1 메인상세이미지(1).jpg → 1 메인상세이미지(1).jpg
+2025-12-03 18:43:51,355 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1 메인상세이미지(2).jpg
+2025-12-03 18:43:51,355 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 1 메인상세이미지(2).jpg → 1 메인상세이미지(2).jpg
+2025-12-03 18:43:51,355 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 1 메인상세이미지(2).jpg → 1 메인상세이미지(2).jpg
+2025-12-03 18:43:51,356 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 10.jpg
+2025-12-03 18:43:51,356 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 11 BOM_엑셀저장_자동화_모자익.gif
+2025-12-03 18:43:51,356 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 11 BOM_엑셀저장_자동화_모자익.gif → 11 BOM_엑셀저장_자동화_모자익.gif
+2025-12-03 18:43:51,356 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 11 BOM_엑셀저장_자동화_모자익.gif → 11 BOM_엑셀저장_자동화_모자익.gif
+2025-12-03 18:43:51,357 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 12.jpg
+2025-12-03 18:43:51,357 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 13 솔리드웍스_속성변경_자동화_모자익_완료.gif
+2025-12-03 18:43:51,357 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 13 솔리드웍스_속성변경_자동화_모자익_완료.gif → 13 솔리드웍스_속성변경_자동화_모자익_완료.gif
+2025-12-03 18:43:51,357 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 13 솔리드웍스_속성변경_자동화_모자익_완료.gif → 13 솔리드웍스_속성변경_자동화_모자익_완료.gif
+2025-12-03 18:43:51,357 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 14.jpg
+2025-12-03 18:43:51,357 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 15 DWG_다량출력_자동화_모자익.gif
+2025-12-03 18:43:51,357 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 15 DWG_다량출력_자동화_모자익.gif → 15 DWG_다량출력_자동화_모자익.gif
+2025-12-03 18:43:51,358 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 15 DWG_다량출력_자동화_모자익.gif → 15 DWG_다량출력_자동화_모자익.gif
+2025-12-03 18:43:51,358 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 16.jpg
+2025-12-03 18:43:51,358 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 17.jpg
+2025-12-03 18:43:51,358 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 18.jpg
+2025-12-03 18:43:51,358 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 19.jpg
+2025-12-03 18:43:51,358 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-1.jpg
+2025-12-03 18:43:51,359 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-2.jpg
+2025-12-03 18:43:51,359 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 20.jpg
+2025-12-03 18:43:51,359 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.jpg
+2025-12-03 18:43:51,360 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.jpg
+2025-12-03 18:43:51,360 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 5.jpg
+2025-12-03 18:43:51,360 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 6.jpg
+2025-12-03 18:43:51,360 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 7.jpg
+2025-12-03 18:43:51,361 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8-1.jpg
+2025-12-03 18:43:51,361 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8-2.jpg
+2025-12-03 18:43:51,361 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 9.jpg
+2025-12-03 18:43:51,362 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1.jpg
+2025-12-03 18:43:51,362 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2.jpg
+2025-12-03 18:43:51,362 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.jpg
+2025-12-03 18:43:51,363 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.jpg
+2025-12-03 18:43:51,363 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 5.jpg
+2025-12-03 18:43:51,363 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 6.jpg
+2025-12-03 18:43:51,363 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 7.jpg
+2025-12-03 18:43:51,363 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8.jpg
+2025-12-03 18:43:51,363 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 9.jpg
+2025-12-03 18:43:51,364 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 12개 발견
+2025-12-03 18:43:51,364 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 파일 변환 시작: 12개 파일
+2025-12-03 18:43:51,372 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: WORKSFREE 슬로건 (black).png → WORKSFREE 슬로건 (black).png
+2025-12-03 18:43:51,378 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: WORKSFREE 슬로건 (blue).png → WORKSFREE 슬로건 (blue).png
+2025-12-03 18:43:51,383 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: WORKSFREE 슬로건 (white).png → WORKSFREE 슬로건 (white).png
+2025-12-03 18:43:51,389 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 로고 - 복사본.png → 로고 - 복사본.png
+2025-12-03 18:43:51,538 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 로고 원본.psd → 로고 원본.psd
+2025-12-03 18:43:51,543 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: PC배너.jpg → PC배너.jpg
+2025-12-03 18:43:51,551 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 모바일배너.jpg → 모바일배너.jpg
+2025-12-03 18:43:51,559 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 1 메인상세이미지(1).jpg → 1 메인상세이미지(1).jpg
+2025-12-03 18:43:51,565 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 1 메인상세이미지(2).jpg → 1 메인상세이미지(2).jpg
+2025-12-03 18:43:51,580 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 11 BOM_엑셀저장_자동화_모자익.gif → 11 BOM_엑셀저장_자동화_모자익.gif
+2025-12-03 18:43:51,588 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 13 솔리드웍스_속성변경_자동화_모자익_완료.gif → 13 솔리드웍스_속성변경_자동화_모자익_완료.gif
+2025-12-03 18:43:51,597 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 15 DWG_다량출력_자동화_모자익.gif → 15 DWG_다량출력_자동화_모자익.gif
+2025-12-03 18:43:51,597 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 12개 파일 처리
+2025-12-03 18:43:51,602 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1117 - 크레딧 사용 로그 기록 완료: 12개 파일
+2025-12-03 18:43:51,672 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1602 - 🧾 처리 완료 후 사용 내역 동기화 시도 (백그라운드)...
+2025-12-03 18:43:53,367 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1605 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-12-03T18:43:53.362'}
+2025-12-03 19:15:41,859 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 19:15:41,859 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:107 - App: korean_filename_normalizer
+2025-12-03 19:15:42,042 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 19:15:42,892 - INFO - [wf_rpa.korean_filename_normalizer] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 19:15:43,029 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:434 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 19:15:43,134 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:943 - 폴더 스캔 시작: D:/drive_files/30.사업자 및 지도사/10.예비창업패키지/10.시행/오렌지랩/1단계_최종산출물
+2025-12-03 19:15:43,135 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 폴더 검사 중: D:/drive_files/30.사업자 및 지도사/10.예비창업패키지/10.시행/오렌지랩/1단계_최종산출물
+2025-12-03 19:15:43,140 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 총 70개 파일을 검사합니다.
+2025-12-03 19:15:43,141 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1.png
+2025-12-03 19:15:43,142 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2.png
+2025-12-03 19:15:43,142 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.png
+2025-12-03 19:15:43,143 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.png
+2025-12-03 19:15:43,143 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고-20251021T003131Z-1-001.zip
+2025-12-03 19:15:43,143 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 상품목업-20251021T034037Z-1-001.zip
+2025-12-03 19:15:43,143 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 배너-20251021T003809Z-1-001.zip
+2025-12-03 19:15:43,144 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 상세페이지-20251021T034126Z-1-001.zip
+2025-12-03 19:15:43,144 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 썸네일이미지-20251021T034152Z-1-001.zip
+2025-12-03 19:15:43,144 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 썸네일이미지.zip
+2025-12-03 19:15:43,144 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: black.png
+2025-12-03 19:15:43,145 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: green.png
+2025-12-03 19:15:43,145 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: navy.png
+2025-12-03 19:15:43,145 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: white.png
+2025-12-03 19:15:43,145 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (black).png
+2025-12-03 19:15:43,145 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (blue).png
+2025-12-03 19:15:43,146 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (white).png
+2025-12-03 19:15:43,146 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (black).png
+2025-12-03 19:15:43,146 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (blue).png
+2025-12-03 19:15:43,147 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (white).png
+2025-12-03 19:15:43,147 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고 - 복사본.png
+2025-12-03 19:15:43,148 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고 원본.psd
+2025-12-03 19:15:43,148 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고.png
+2025-12-03 19:15:43,148 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-1.png
+2025-12-03 19:15:43,148 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-2.png
+2025-12-03 19:15:43,149 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-3.png
+2025-12-03 19:15:43,150 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-4.png
+2025-12-03 19:15:43,150 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-1.png
+2025-12-03 19:15:43,150 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-2.png
+2025-12-03 19:15:43,150 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-3.png
+2025-12-03 19:15:43,151 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-4.png
+2025-12-03 19:15:43,151 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-1.png
+2025-12-03 19:15:43,151 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-2.png
+2025-12-03 19:15:43,151 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-3.png
+2025-12-03 19:15:43,152 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-4.png
+2025-12-03 19:15:43,152 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 목업원본.psd
+2025-12-03 19:15:43,152 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: PC배너.jpg
+2025-12-03 19:15:43,152 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 모바일배너.jpg
+2025-12-03 19:15:43,152 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1 메인상세이미지(1).jpg
+2025-12-03 19:15:43,153 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1 메인상세이미지(2).jpg
+2025-12-03 19:15:43,153 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 10.jpg
+2025-12-03 19:15:43,153 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 11 BOM_엑셀저장_자동화_모자익.gif
+2025-12-03 19:15:43,154 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 12.jpg
+2025-12-03 19:15:43,154 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 13 솔리드웍스_속성변경_자동화_모자익_완료.gif
+2025-12-03 19:15:43,154 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 14.jpg
+2025-12-03 19:15:43,154 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 15 DWG_다량출력_자동화_모자익.gif
+2025-12-03 19:15:43,154 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 16.jpg
+2025-12-03 19:15:43,155 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 17.jpg
+2025-12-03 19:15:43,155 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 18.jpg
+2025-12-03 19:15:43,155 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 19.jpg
+2025-12-03 19:15:43,155 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-1.jpg
+2025-12-03 19:15:43,155 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-2.jpg
+2025-12-03 19:15:43,156 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 20.jpg
+2025-12-03 19:15:43,156 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.jpg
+2025-12-03 19:15:43,156 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.jpg
+2025-12-03 19:15:43,157 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 5.jpg
+2025-12-03 19:15:43,157 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 6.jpg
+2025-12-03 19:15:43,157 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 7.jpg
+2025-12-03 19:15:43,157 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8-1.jpg
+2025-12-03 19:15:43,158 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8-2.jpg
+2025-12-03 19:15:43,158 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 9.jpg
+2025-12-03 19:15:43,158 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1.jpg
+2025-12-03 19:15:43,159 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2.jpg
+2025-12-03 19:15:43,159 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.jpg
+2025-12-03 19:15:43,159 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.jpg
+2025-12-03 19:15:43,159 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 5.jpg
+2025-12-03 19:15:43,159 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 6.jpg
+2025-12-03 19:15:43,160 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 7.jpg
+2025-12-03 19:15:43,160 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8.jpg
+2025-12-03 19:15:43,160 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 9.jpg
+2025-12-03 19:15:43,161 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 0개 발견
+2025-12-03 19:15:44,912 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:403 - 이전 작업 폴더 자동 스캔 완료
+2025-12-03 19:15:46,560 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:564 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 19:21:18,289 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:943 - 폴더 스캔 시작: D:/dep_test_data/한글자소분리_데모
+2025-12-03 19:21:18,290 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 폴더 검사 중: D:/dep_test_data/한글자소분리_데모
+2025-12-03 19:21:18,291 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 총 30개 파일을 검사합니다.
+2025-12-03 19:21:18,292 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: abc_업무자료.docx
+2025-12-03 19:21:18,292 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 19:21:18,292 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 19:21:18,293 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 멤마_2.txt
+2025-12-03 19:21:18,293 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 멤마_2.txt → 멤마_2.txt
+2025-12-03 19:21:18,294 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 멤마_2.txt → 멤마_2.txt
+2025-12-03 19:21:18,294 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 사자리_4.txt
+2025-12-03 19:21:18,295 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 사자리_4.txt → 사자리_4.txt
+2025-12-03 19:21:18,295 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 사자리_4.txt → 사자리_4.txt
+2025-12-03 19:21:18,296 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 설계도면.dwg
+2025-12-03 19:21:18,297 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 설계도면.dwg → 설계도면.dwg
+2025-12-03 19:21:18,297 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 설계도면.dwg → 설계도면.dwg
+2025-12-03 19:21:18,297 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료.docx
+2025-12-03 19:21:18,297 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료.docx → 업무자료.docx
+2025-12-03 19:21:18,298 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료.docx → 업무자료.docx
+2025-12-03 19:21:18,298 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료_abc.docx
+2025-12-03 19:21:18,298 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 19:21:18,298 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 19:21:18,299 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_견적서_0826.pdf
+2025-12-03 19:21:18,299 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 19:21:18,299 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 19:21:18,299 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:21:18,299 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:21:18,300 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:21:18,300 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리계약서_0826.pdf
+2025-12-03 19:21:18,300 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 19:21:18,300 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 19:21:18,301 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 읍무_3.txt
+2025-12-03 19:21:18,301 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 읍무_3.txt → 읍무_3.txt
+2025-12-03 19:21:18,301 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 읍무_3.txt → 읍무_3.txt
+2025-12-03 19:21:18,301 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서.pdf
+2025-12-03 19:21:18,301 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 19:21:18,301 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 19:21:18,302 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글_1.txt
+2025-12-03 19:21:18,302 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글_1.txt → 한글_1.txt
+2025-12-03 19:21:18,302 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글_1.txt → 한글_1.txt
+2025-12-03 19:21:18,303 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글문서.txt
+2025-12-03 19:21:18,303 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글문서.txt → 한글문서.txt
+2025-12-03 19:21:18,304 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글문서.txt → 한글문서.txt
+2025-12-03 19:21:18,304 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 회의록.hwp
+2025-12-03 19:21:18,304 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 회의록.hwp → 회의록.hwp
+2025-12-03 19:21:18,305 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 회의록.hwp → 회의록.hwp
+2025-12-03 19:21:18,305 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무_3 - 복사본.txt
+2025-12-03 19:21:18,305 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서 - 복사본.pdf
+2025-12-03 19:21:18,305 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: abc_업무자료.docx
+2025-12-03 19:21:18,305 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 멤마_2.txt
+2025-12-03 19:21:18,306 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 사자리_4.txt
+2025-12-03 19:21:18,306 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 설계도면.dwg
+2025-12-03 19:21:18,306 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료.docx
+2025-12-03 19:21:18,306 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료_abc.docx
+2025-12-03 19:21:18,307 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_견적서_0826.pdf
+2025-12-03 19:21:18,307 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:21:18,308 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리계약서_0826.pdf
+2025-12-03 19:21:18,308 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 읍무_3.txt
+2025-12-03 19:21:18,308 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서.pdf
+2025-12-03 19:21:18,309 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글_1.txt
+2025-12-03 19:21:18,309 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글문서.txt
+2025-12-03 19:21:18,309 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 회의록.hwp
+2025-12-03 19:21:18,310 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 14개 발견
+2025-12-03 19:21:18,310 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:962 - 폴더 스캔 완료: 14개 파일
+2025-12-03 19:24:24,133 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-03 19:24:24,133 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:107 - App: korean_filename_normalizer
+2025-12-03 19:24:24,282 - INFO - [wf_rpa.korean_filename_normalizer] wf_log:113 - HW Fingerprint: da83d2b7366244b9299b0ee6c034352737d1139443e76ddf6395d390fe50a658 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-03 19:24:25,089 - INFO - [wf_rpa.korean_filename_normalizer] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-03 19:24:25,094 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:434 - 사용자 디렉토리 구조 생성 완료: C:\Users\HP\.wf_rpa
+2025-12-03 19:24:25,204 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:943 - 폴더 스캔 시작: D:/drive_files/30.사업자 및 지도사/10.예비창업패키지/10.시행/오렌지랩/1단계_최종산출물
+2025-12-03 19:24:25,205 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 폴더 검사 중: D:/drive_files/30.사업자 및 지도사/10.예비창업패키지/10.시행/오렌지랩/1단계_최종산출물
+2025-12-03 19:24:25,208 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 총 70개 파일을 검사합니다.
+2025-12-03 19:24:25,208 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1.png
+2025-12-03 19:24:25,209 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2.png
+2025-12-03 19:24:25,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.png
+2025-12-03 19:24:25,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.png
+2025-12-03 19:24:25,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고-20251021T003131Z-1-001.zip
+2025-12-03 19:24:25,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 상품목업-20251021T034037Z-1-001.zip
+2025-12-03 19:24:25,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 배너-20251021T003809Z-1-001.zip
+2025-12-03 19:24:25,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 상세페이지-20251021T034126Z-1-001.zip
+2025-12-03 19:24:25,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 썸네일이미지-20251021T034152Z-1-001.zip
+2025-12-03 19:24:25,211 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 스마트스토어 썸네일이미지.zip
+2025-12-03 19:24:25,212 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: black.png
+2025-12-03 19:24:25,212 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: green.png
+2025-12-03 19:24:25,212 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: navy.png
+2025-12-03 19:24:25,213 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: white.png
+2025-12-03 19:24:25,213 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (black).png
+2025-12-03 19:24:25,213 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (blue).png
+2025-12-03 19:24:25,214 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE logo (white).png
+2025-12-03 19:24:25,214 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (black).png
+2025-12-03 19:24:25,214 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (blue).png
+2025-12-03 19:24:25,214 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: WORKSFREE 슬로건 (white).png
+2025-12-03 19:24:25,215 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고 - 복사본.png
+2025-12-03 19:24:25,215 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고 원본.psd
+2025-12-03 19:24:25,215 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 로고.png
+2025-12-03 19:24:25,216 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-1.png
+2025-12-03 19:24:25,216 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-2.png
+2025-12-03 19:24:25,216 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-3.png
+2025-12-03 19:24:25,216 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1-4.png
+2025-12-03 19:24:25,217 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-1.png
+2025-12-03 19:24:25,217 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-2.png
+2025-12-03 19:24:25,217 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-3.png
+2025-12-03 19:24:25,217 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-4.png
+2025-12-03 19:24:25,217 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-1.png
+2025-12-03 19:24:25,218 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-2.png
+2025-12-03 19:24:25,218 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-3.png
+2025-12-03 19:24:25,218 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3-4.png
+2025-12-03 19:24:25,218 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 목업원본.psd
+2025-12-03 19:24:25,218 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: PC배너.jpg
+2025-12-03 19:24:25,218 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 모바일배너.jpg
+2025-12-03 19:24:25,219 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1 메인상세이미지(1).jpg
+2025-12-03 19:24:25,219 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1 메인상세이미지(2).jpg
+2025-12-03 19:24:25,219 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 10.jpg
+2025-12-03 19:24:25,219 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 11 BOM_엑셀저장_자동화_모자익.gif
+2025-12-03 19:24:25,219 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 12.jpg
+2025-12-03 19:24:25,220 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 13 솔리드웍스_속성변경_자동화_모자익_완료.gif
+2025-12-03 19:24:25,220 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 14.jpg
+2025-12-03 19:24:25,220 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 15 DWG_다량출력_자동화_모자익.gif
+2025-12-03 19:24:25,220 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 16.jpg
+2025-12-03 19:24:25,221 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 17.jpg
+2025-12-03 19:24:25,221 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 18.jpg
+2025-12-03 19:24:25,221 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 19.jpg
+2025-12-03 19:24:25,222 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-1.jpg
+2025-12-03 19:24:25,222 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2-2.jpg
+2025-12-03 19:24:25,222 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 20.jpg
+2025-12-03 19:24:25,222 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.jpg
+2025-12-03 19:24:25,223 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.jpg
+2025-12-03 19:24:25,223 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 5.jpg
+2025-12-03 19:24:25,223 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 6.jpg
+2025-12-03 19:24:25,224 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 7.jpg
+2025-12-03 19:24:25,224 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8-1.jpg
+2025-12-03 19:24:25,224 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8-2.jpg
+2025-12-03 19:24:25,225 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 9.jpg
+2025-12-03 19:24:25,225 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 1.jpg
+2025-12-03 19:24:25,225 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 2.jpg
+2025-12-03 19:24:25,225 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 3.jpg
+2025-12-03 19:24:25,226 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 4.jpg
+2025-12-03 19:24:25,226 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 5.jpg
+2025-12-03 19:24:25,226 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 6.jpg
+2025-12-03 19:24:25,226 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 7.jpg
+2025-12-03 19:24:25,226 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 8.jpg
+2025-12-03 19:24:25,227 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 9.jpg
+2025-12-03 19:24:25,227 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 0개 발견
+2025-12-03 19:24:26,583 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:403 - 이전 작업 폴더 자동 스캔 완료
+2025-12-03 19:24:28,712 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:564 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-03 19:24:57,611 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:943 - 폴더 스캔 시작: D:/dep_test_data/한글자소분리_데모
+2025-12-03 19:24:57,612 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 폴더 검사 중: D:/dep_test_data/한글자소분리_데모
+2025-12-03 19:24:57,613 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 총 30개 파일을 검사합니다.
+2025-12-03 19:24:57,613 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: abc_업무자료.docx
+2025-12-03 19:24:57,613 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 19:24:57,614 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 19:24:57,614 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 멤마_2.txt
+2025-12-03 19:24:57,614 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 멤마_2.txt → 멤마_2.txt
+2025-12-03 19:24:57,614 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 멤마_2.txt → 멤마_2.txt
+2025-12-03 19:24:57,615 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 사자리_4.txt
+2025-12-03 19:24:57,615 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 사자리_4.txt → 사자리_4.txt
+2025-12-03 19:24:57,615 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 사자리_4.txt → 사자리_4.txt
+2025-12-03 19:24:57,616 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 설계도면.dwg
+2025-12-03 19:24:57,616 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 설계도면.dwg → 설계도면.dwg
+2025-12-03 19:24:57,616 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 설계도면.dwg → 설계도면.dwg
+2025-12-03 19:24:57,616 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료.docx
+2025-12-03 19:24:57,616 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료.docx → 업무자료.docx
+2025-12-03 19:24:57,617 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료.docx → 업무자료.docx
+2025-12-03 19:24:57,617 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료_abc.docx
+2025-12-03 19:24:57,618 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 19:24:57,618 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 19:24:57,618 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_견적서_0826.pdf
+2025-12-03 19:24:57,618 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 19:24:57,618 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 19:24:57,619 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:24:57,619 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:24:57,619 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:24:57,620 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리계약서_0826.pdf
+2025-12-03 19:24:57,620 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 19:24:57,621 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 19:24:57,621 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 읍무_3.txt
+2025-12-03 19:24:57,621 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 읍무_3.txt → 읍무_3.txt
+2025-12-03 19:24:57,622 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 읍무_3.txt → 읍무_3.txt
+2025-12-03 19:24:57,622 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서.pdf
+2025-12-03 19:24:57,622 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 19:24:57,623 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 19:24:57,623 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글_1.txt
+2025-12-03 19:24:57,623 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글_1.txt → 한글_1.txt
+2025-12-03 19:24:57,624 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글_1.txt → 한글_1.txt
+2025-12-03 19:24:57,624 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글문서.txt
+2025-12-03 19:24:57,625 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글문서.txt → 한글문서.txt
+2025-12-03 19:24:57,625 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글문서.txt → 한글문서.txt
+2025-12-03 19:24:57,625 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 회의록.hwp
+2025-12-03 19:24:57,626 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 회의록.hwp → 회의록.hwp
+2025-12-03 19:24:57,626 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 회의록.hwp → 회의록.hwp
+2025-12-03 19:24:57,626 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무_3 - 복사본.txt
+2025-12-03 19:24:57,626 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서 - 복사본.pdf
+2025-12-03 19:24:57,626 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: abc_업무자료.docx
+2025-12-03 19:24:57,627 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 멤마_2.txt
+2025-12-03 19:24:57,627 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 사자리_4.txt
+2025-12-03 19:24:57,627 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 설계도면.dwg
+2025-12-03 19:24:57,628 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료.docx
+2025-12-03 19:24:57,628 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료_abc.docx
+2025-12-03 19:24:57,628 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_견적서_0826.pdf
+2025-12-03 19:24:57,628 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:24:57,629 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리계약서_0826.pdf
+2025-12-03 19:24:57,629 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 읍무_3.txt
+2025-12-03 19:24:57,629 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서.pdf
+2025-12-03 19:24:57,630 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글_1.txt
+2025-12-03 19:24:57,630 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글문서.txt
+2025-12-03 19:24:57,630 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 회의록.hwp
+2025-12-03 19:24:57,630 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 14개 발견
+2025-12-03 19:24:57,631 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:962 - 폴더 스캔 완료: 14개 파일
+2025-12-03 19:25:25,249 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 폴더 검사 중: D:/dep_test_data/한글자소분리_데모
+2025-12-03 19:25:25,249 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 총 16개 파일을 검사합니다.
+2025-12-03 19:25:25,250 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: abc_업무자료.docx
+2025-12-03 19:25:25,250 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 19:25:25,250 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 19:25:25,251 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 멤마_2.txt
+2025-12-03 19:25:25,251 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 멤마_2.txt → 멤마_2.txt
+2025-12-03 19:25:25,251 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 멤마_2.txt → 멤마_2.txt
+2025-12-03 19:25:25,251 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 사자리_4.txt
+2025-12-03 19:25:25,252 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 사자리_4.txt → 사자리_4.txt
+2025-12-03 19:25:25,252 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 사자리_4.txt → 사자리_4.txt
+2025-12-03 19:25:25,252 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 설계도면.dwg
+2025-12-03 19:25:25,252 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 설계도면.dwg → 설계도면.dwg
+2025-12-03 19:25:25,252 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 설계도면.dwg → 설계도면.dwg
+2025-12-03 19:25:25,253 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료.docx
+2025-12-03 19:25:25,253 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료.docx → 업무자료.docx
+2025-12-03 19:25:25,253 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료.docx → 업무자료.docx
+2025-12-03 19:25:25,253 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무자료_abc.docx
+2025-12-03 19:25:25,253 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 19:25:25,253 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 19:25:25,253 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_견적서_0826.pdf
+2025-12-03 19:25:25,254 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 19:25:25,254 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 19:25:25,254 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:25:25,254 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:25:25,254 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:25:25,254 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 웍스프리계약서_0826.pdf
+2025-12-03 19:25:25,254 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 19:25:25,255 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 19:25:25,255 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 읍무_3.txt
+2025-12-03 19:25:25,255 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 읍무_3.txt → 읍무_3.txt
+2025-12-03 19:25:25,255 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 읍무_3.txt → 읍무_3.txt
+2025-12-03 19:25:25,256 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서.pdf
+2025-12-03 19:25:25,256 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 19:25:25,256 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 19:25:25,256 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글_1.txt
+2025-12-03 19:25:25,256 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글_1.txt → 한글_1.txt
+2025-12-03 19:25:25,256 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글_1.txt → 한글_1.txt
+2025-12-03 19:25:25,257 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 한글문서.txt
+2025-12-03 19:25:25,257 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 한글문서.txt → 한글문서.txt
+2025-12-03 19:25:25,257 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 한글문서.txt → 한글문서.txt
+2025-12-03 19:25:25,257 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 회의록.hwp
+2025-12-03 19:25:25,257 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - NFC 정규화: 회의록.hwp → 회의록.hwp
+2025-12-03 19:25:25,257 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 발견: 회의록.hwp → 회의록.hwp
+2025-12-03 19:25:25,257 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 업무_3 - 복사본.txt
+2025-12-03 19:25:25,257 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 검사 중: 프로젝트계획서 - 복사본.pdf
+2025-12-03 19:25:25,258 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 자소 분리 파일 14개 발견
+2025-12-03 19:25:25,258 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 파일 변환 시작 (원본 파일명 변경): 14개 파일
+2025-12-03 19:25:25,259 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: abc_업무자료.docx → abc_업무자료.docx
+2025-12-03 19:25:25,260 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 멤마_2.txt → 멤마_2.txt
+2025-12-03 19:25:25,260 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 사자리_4.txt → 사자리_4.txt
+2025-12-03 19:25:25,261 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 설계도면.dwg → 설계도면.dwg
+2025-12-03 19:25:25,263 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 업무자료.docx → 업무자료.docx
+2025-12-03 19:25:25,264 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 업무자료_abc.docx → 업무자료_abc.docx
+2025-12-03 19:25:25,284 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 웍스프리_견적서_0826.pdf → 웍스프리_견적서_0826.pdf
+2025-12-03 19:25:25,296 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 웍스프리_수행계획서_수정본.docx → 웍스프리_수행계획서_수정본.docx
+2025-12-03 19:25:25,309 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 웍스프리계약서_0826.pdf → 웍스프리계약서_0826.pdf
+2025-12-03 19:25:25,310 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 읍무_3.txt → 읍무_3.txt
+2025-12-03 19:25:25,311 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 프로젝트계획서.pdf → 프로젝트계획서.pdf
+2025-12-03 19:25:25,312 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 한글_1.txt → 한글_1.txt
+2025-12-03 19:25:25,313 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 한글문서.txt → 한글문서.txt
+2025-12-03 19:25:25,315 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 회의록.hwp → 회의록.hwp
+2025-12-03 19:25:25,316 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1620 - 변환 완료: 14개 파일 처리
+2025-12-03 19:25:25,318 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1117 - 크레딧 사용 로그 기록 완료: 14개 파일
+2025-12-03 19:25:25,403 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1602 - 🧾 처리 완료 후 사용 내역 동기화 시도 (백그라운드)...
+2025-12-03 19:25:30,210 - INFO - [wf_rpa.korean_filename_normalizer] ui_main:1605 - [SYNC-AFTER-RUN] {'success': True, 'message': '구글 시트와 동기화 완료: insung.lee@worksfree.co.kr', 'synced': True, 'sync_time': '2025-12-03T19:25:30.209'}

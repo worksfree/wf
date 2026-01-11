@@ -1,0 +1,1356 @@
+{
+  "credit_changed": false,
+  "trial_credits": -1,
+  "purchased_credits": 0,
+  "created_at": "2025-11-10T19:32:28.989",
+  "last_updated": "2025-12-03T15:10:48.087",
+  "purchase_history": [
+    {
+      "transaction_id": "2025-11-17T13:09:04:397",
+      "amount": 4000,
+      "purchase_date": "2025-11-17 13:09:04",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-11-17T13:09:24.945",
+      "purchased_credit": 4000,
+      "total_credit": 4000
+    },
+    {
+      "transaction_id": "2025-12-01T18:48:29:017",
+      "amount": 10000,
+      "purchase_date": "2025-12-01 18:48:29",
+      "channel": "",
+      "payment_method": "",
+      "price": "",
+      "status": "paid",
+      "applied_date": "2025-12-01T18:48:39.162",
+      "purchased_credit": 10000,
+      "total_credit": 10000
+    }
+  ],
+  "usage_history": [
+    {
+      "timestamp": "2025-12-01T18:53:48.758",
+      "amount": 20,
+      "description": "변환 확인: Top_View_008.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9600
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:48.676",
+      "amount": 20,
+      "description": "변환 확인: Support_Bracket_017.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9620
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:48.597",
+      "amount": 20,
+      "description": "변환 확인: Side_View_007.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9640
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:48.521",
+      "amount": 20,
+      "description": "변환 확인: Shaft_Detail_013.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9660
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:48.437",
+      "amount": 20,
+      "description": "변환 확인: Section_View_004.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9680
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:48.354",
+      "amount": 20,
+      "description": "변환 확인: Part_Detail_003.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9700
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:48.269",
+      "amount": 20,
+      "description": "변환 확인: Motor_Mount_011.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9720
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:48.177",
+      "amount": 20,
+      "description": "변환 확인: Gear_Assembly_014.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9740
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:48.098",
+      "amount": 20,
+      "description": "변환 확인: Front_Panel_006.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9760
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:48.023",
+      "amount": 20,
+      "description": "변환 확인: Frame_Structure_015.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9780
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.932",
+      "amount": 20,
+      "description": "변환 확인: Exploded_View_005.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9800
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.848",
+      "amount": 20,
+      "description": "변환 확인: End_Cap_020.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9820
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.770",
+      "amount": 20,
+      "description": "변환 확인: Drive_Shaft_018.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9840
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.683",
+      "amount": 20,
+      "description": "변환 확인: Drawing001_001.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9860
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.605",
+      "amount": 20,
+      "description": "변환 확인: Cover_Assembly_010.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9880
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.522",
+      "amount": 20,
+      "description": "변환 확인: Connector_Housing_019.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9900
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.435",
+      "amount": 20,
+      "description": "변환 확인: Bottom_Plate_009.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9920
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.355",
+      "amount": 20,
+      "description": "변환 확인: Bearing_Housing_012.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9940
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.273",
+      "amount": 20,
+      "description": "변환 확인: Base_Plate_016.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9960
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:53:47.188",
+      "amount": 20,
+      "description": "변환 확인: Assembly_Main_002.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 9980
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:59.576",
+      "amount": 20,
+      "description": "변환 확인: Top_View_008.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10000
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:59.493",
+      "amount": 20,
+      "description": "변환 확인: Support_Bracket_017.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10020
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:59.414",
+      "amount": 20,
+      "description": "변환 확인: Side_View_007.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10040
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:59.333",
+      "amount": 20,
+      "description": "변환 확인: Shaft_Detail_013.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10060
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:59.248",
+      "amount": 20,
+      "description": "변환 확인: Section_View_004.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10080
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:59.166",
+      "amount": 20,
+      "description": "변환 확인: Part_Detail_003.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10100
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:59.082",
+      "amount": 20,
+      "description": "변환 확인: Motor_Mount_011.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10120
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:59.002",
+      "amount": 20,
+      "description": "변환 확인: Gear_Assembly_014.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10140
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.919",
+      "amount": 20,
+      "description": "변환 확인: Front_Panel_006.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10160
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.834",
+      "amount": 20,
+      "description": "변환 확인: Frame_Structure_015.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10180
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.736",
+      "amount": 20,
+      "description": "변환 확인: Exploded_View_005.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10200
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.648",
+      "amount": 20,
+      "description": "변환 확인: End_Cap_020.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10220
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.565",
+      "amount": 20,
+      "description": "변환 확인: Drive_Shaft_018.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10240
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.488",
+      "amount": 20,
+      "description": "변환 확인: Drawing001_001.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10260
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.413",
+      "amount": 20,
+      "description": "변환 확인: Cover_Assembly_010.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10280
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.335",
+      "amount": 20,
+      "description": "변환 확인: Connector_Housing_019.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10300
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.257",
+      "amount": 20,
+      "description": "변환 확인: Bottom_Plate_009.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10320
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.181",
+      "amount": 20,
+      "description": "변환 확인: Bearing_Housing_012.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10340
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.111",
+      "amount": 20,
+      "description": "변환 확인: Base_Plate_016.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10360
+      }
+    },
+    {
+      "timestamp": "2025-12-01T18:48:58.022",
+      "amount": 20,
+      "description": "변환 확인: Assembly_Main_002.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 20
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 10380
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:59.037",
+      "amount": 10,
+      "description": "변환 확인: Top_View_008.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 400
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.946",
+      "amount": 10,
+      "description": "변환 확인: Support_Bracket_017.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 410
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.863",
+      "amount": 10,
+      "description": "변환 확인: Side_View_007.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 420
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.772",
+      "amount": 10,
+      "description": "변환 확인: Shaft_Detail_013.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 430
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.680",
+      "amount": 10,
+      "description": "변환 확인: Section_View_004.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 440
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.599",
+      "amount": 10,
+      "description": "변환 확인: Part_Detail_003.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 450
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.515",
+      "amount": 10,
+      "description": "변환 확인: Motor_Mount_011.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 460
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.436",
+      "amount": 10,
+      "description": "변환 확인: Gear_Assembly_014.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 470
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.355",
+      "amount": 10,
+      "description": "변환 확인: Front_Panel_006.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 480
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.274",
+      "amount": 10,
+      "description": "변환 확인: Frame_Structure_015.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 490
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.192",
+      "amount": 10,
+      "description": "변환 확인: Exploded_View_005.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 500
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.107",
+      "amount": 10,
+      "description": "변환 확인: End_Cap_020.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 510
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:58.025",
+      "amount": 10,
+      "description": "변환 확인: Drive_Shaft_018.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 520
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:57.934",
+      "amount": 10,
+      "description": "변환 확인: Drawing001_001.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 530
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:57.855",
+      "amount": 10,
+      "description": "변환 확인: Cover_Assembly_010.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 540
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:57.780",
+      "amount": 10,
+      "description": "변환 확인: Connector_Housing_019.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 550
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:57.703",
+      "amount": 10,
+      "description": "변환 확인: Bottom_Plate_009.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 560
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:57.622",
+      "amount": 10,
+      "description": "변환 확인: Bearing_Housing_012.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 570
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:57.547",
+      "amount": 10,
+      "description": "변환 확인: Base_Plate_016.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 580
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:54:57.464",
+      "amount": 10,
+      "description": "변환 확인: Assembly_Main_002.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 590
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.948",
+      "amount": 10,
+      "description": "변환 확인: Top_View_008.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 600
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.859",
+      "amount": 10,
+      "description": "변환 확인: Support_Bracket_017.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 610
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.775",
+      "amount": 10,
+      "description": "변환 확인: Side_View_007.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 620
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.688",
+      "amount": 10,
+      "description": "변환 확인: Shaft_Detail_013.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 630
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.605",
+      "amount": 10,
+      "description": "변환 확인: Section_View_004.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 640
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.507",
+      "amount": 10,
+      "description": "변환 확인: Part_Detail_003.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 650
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.418",
+      "amount": 10,
+      "description": "변환 확인: Motor_Mount_011.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 660
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.332",
+      "amount": 10,
+      "description": "변환 확인: Gear_Assembly_014.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 670
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.251",
+      "amount": 10,
+      "description": "변환 확인: Front_Panel_006.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 680
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.156",
+      "amount": 10,
+      "description": "변환 확인: Frame_Structure_015.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 690
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:10.074",
+      "amount": 10,
+      "description": "변환 확인: Exploded_View_005.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 700
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:09.983",
+      "amount": 10,
+      "description": "변환 확인: End_Cap_020.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 710
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:09.892",
+      "amount": 10,
+      "description": "변환 확인: Drive_Shaft_018.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 720
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:09.802",
+      "amount": 10,
+      "description": "변환 확인: Drawing001_001.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 730
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:09.722",
+      "amount": 10,
+      "description": "변환 확인: Cover_Assembly_010.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 740
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:09.649",
+      "amount": 10,
+      "description": "변환 확인: Connector_Housing_019.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 750
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:09.563",
+      "amount": 10,
+      "description": "변환 확인: Bottom_Plate_009.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 760
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:09.450",
+      "amount": 10,
+      "description": "변환 확인: Bearing_Housing_012.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 770
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:09.369",
+      "amount": 10,
+      "description": "변환 확인: Base_Plate_016.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 780
+      }
+    },
+    {
+      "timestamp": "2025-12-01T13:20:09.280",
+      "amount": 10,
+      "description": "변환 확인: Assembly_Main_002.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 790
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:37.591",
+      "amount": 10,
+      "description": "변환 확인: Top_View_008.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 800
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:37.411",
+      "amount": 10,
+      "description": "변환 확인: Support_Bracket_017.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 810
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:37.262",
+      "amount": 10,
+      "description": "변환 확인: Side_View_007.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 820
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:37.106",
+      "amount": 10,
+      "description": "변환 확인: Shaft_Detail_013.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 830
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:36.988",
+      "amount": 10,
+      "description": "변환 확인: Section_View_004.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 840
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:36.872",
+      "amount": 10,
+      "description": "변환 확인: Part_Detail_003.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 850
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:36.761",
+      "amount": 10,
+      "description": "변환 확인: Motor_Mount_011.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 860
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:36.623",
+      "amount": 10,
+      "description": "변환 확인: Gear_Assembly_014.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 870
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:36.466",
+      "amount": 10,
+      "description": "변환 확인: Front_Panel_006.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 880
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:36.287",
+      "amount": 10,
+      "description": "변환 확인: Frame_Structure_015.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 890
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:36.102",
+      "amount": 10,
+      "description": "변환 확인: Exploded_View_005.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 900
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:35.857",
+      "amount": 10,
+      "description": "변환 확인: End_Cap_020.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 910
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:35.723",
+      "amount": 10,
+      "description": "변환 확인: Drive_Shaft_018.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 920
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:35.507",
+      "amount": 10,
+      "description": "변환 확인: Drawing001_001.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 930
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:35.387",
+      "amount": 10,
+      "description": "변환 확인: Cover_Assembly_010.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 940
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:35.255",
+      "amount": 10,
+      "description": "변환 확인: Connector_Housing_019.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 950
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:35.105",
+      "amount": 10,
+      "description": "변환 확인: Bottom_Plate_009.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 960
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:34.951",
+      "amount": 10,
+      "description": "변환 확인: Bearing_Housing_012.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 970
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:34.827",
+      "amount": 10,
+      "description": "변환 확인: Base_Plate_016.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 980
+      }
+    },
+    {
+      "timestamp": "2025-11-29T15:21:34.661",
+      "amount": 10,
+      "description": "변환 확인: Assembly_Main_002.slddrw",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 10
+      },
+      "remaining_after": {
+        "trial": 0,
+        "purchased": 990
+      }
+    },
+    {
+      "timestamp": "2025-12-28T12:03:04.061249",
+      "amount": 10,
+      "description": "테스트 크레딧 사용"
+    }
+  ],
+  "last_synced": "2025-12-01T18:53:54.784",
+  "lifetime_usage": 230,
+  "current_credits": 10170,
+  "applied_purchase_ids": [
+    "2025-12-01T18:48:29:017",
+    "2025-11-17T13:09:04:397"
+  ],
+  "session_usage_amount": 0,
+  "session_file_count": 0,
+  "session_last_usage_ts": null,
+  "last_usage_amount": 400,
+  "last_usage_timestamp": "2025-12-01T18:53:48.758",
+  "usage_file_count": 20,
+  "usage_per_item_cost": 20,
+  "usage_description": "conversion_verifier 파일 처리 (20개)",
+  "credit_per_work": 10
+}

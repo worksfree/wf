@@ -1,0 +1,18 @@
+2026-01-06 20:21:25,302 - INFO - [wf_rpa.Bom_Exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-06 20:21:25,303 - INFO - [wf_rpa.Bom_Exporter] wf_log:109 - App: Bom_Exporter
+2026-01-06 20:21:25,335 - INFO - [wf_rpa.Bom_Exporter] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-06 20:21:25,336 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:92 - [CONFIG] run_mode=release, settings_file=D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-06 20:21:25,336 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:225 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2026-01-06 20:21:25,378 - INFO - [wf_rpa.bom_exporter] wf_log:108 - ===== WorksFree Logger Initialized =====
+2026-01-06 20:21:25,379 - INFO - [wf_rpa.bom_exporter] wf_log:109 - App: bom_exporter
+2026-01-06 20:21:25,379 - INFO - [wf_rpa.bom_exporter] wf_log:115 - HW Fingerprint: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CPU: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-01-06 20:21:25,381 - DEBUG - [wf_rpa.bom_exporter] ui_main:488 - [PERF] Early WorksFreeManager init: 0.50 ms, registered=True
+2026-01-06 20:21:25,382 - INFO - [wf_rpa.bom_exporter] ui_main:1300 - [DEBUG] geometry override at startup: 719x241+2521+212
+2026-01-06 20:21:25,400 - DEBUG - [wf_rpa.bom_exporter] ui_main:1321 - [FONT] self.ui['font_size'] = 21
+2026-01-06 20:21:25,409 - DEBUG - [wf_rpa.bom_exporter] ui_main:563 - 마지막 선택 폴더 저장 시도: D:/rc_test_old/assy_samples/sample10
+2026-01-06 20:21:25,410 - INFO - [wf_rpa.bom_exporter] ui_main:565 - 마지막 선택 폴더 저장 완료: D:/rc_test_old/assy_samples/sample10
+2026-01-06 20:21:25,742 - INFO - [wf_rpa.bom_exporter] ui_main:1882 - 폴더 스캔 시작: D:/rc_test_old/assy_samples/sample10
+2026-01-06 20:21:25,743 - DEBUG - [wf_rpa.bom_exporter] ui_main:1894 - SLDDRW_PATH: D:/rc_test_old/assy_samples/sample10
+2026-01-06 20:21:25,746 - DEBUG - [wf_rpa.bom_exporter] ui_main:1947 - 스캔 결과: 10개 파일
+2026-01-06 20:21:25,746 - INFO - [wf_rpa.bom_exporter] ui_main:1958 - 폴더 스캔 완료: 10개 파일
+2026-01-06 20:21:25,747 - INFO - [wf_rpa.bom_exporter] ui_main:707 - 이전 작업 폴더 자동 스캔 완료

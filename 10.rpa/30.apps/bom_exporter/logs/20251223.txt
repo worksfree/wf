@@ -1,0 +1,38 @@
+2025-12-23 10:51:58,851 - INFO - [wf_rpa.Bom_Exporter] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-23 10:51:58,852 - INFO - [wf_rpa.Bom_Exporter] wf_log:107 - App: Bom_Exporter
+2025-12-23 10:51:58,946 - INFO - [wf_rpa.Bom_Exporter] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-23 10:51:58,947 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:178 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2025-12-23 10:51:58,958 - INFO - [wf_rpa.bom_exporter] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-23 10:51:58,963 - INFO - [wf_rpa.bom_exporter] wf_log:107 - App: bom_exporter
+2025-12-23 10:51:58,963 - INFO - [wf_rpa.bom_exporter] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-23 10:51:59,069 - INFO - [wf_rpa.bom_exporter] ui_main:535 - [DEMO] Capture dir: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\demo_captures
+2025-12-23 10:51:59,071 - DEBUG - [wf_rpa.bom_exporter] ui_main:425 - [PERF] Early WorksFreeManager init: 1.18 ms, registered=True
+2025-12-23 10:51:59,195 - DEBUG - [wf_rpa.bom_exporter] ui_main:480 - 마지막 선택 폴더 저장 시도: D:/assy_samples/sample13
+2025-12-23 10:51:59,199 - INFO - [wf_rpa.bom_exporter] ui_main:482 - 마지막 선택 폴더 저장 완료: D:/assy_samples/sample13
+2025-12-23 10:51:59,641 - DEBUG - [wf_rpa.bom_exporter] ui_main:602 - [DEMO] capture saved (folder_selected): D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\demo_captures\demo_20251223_105159_484_folder_selected.png
+2025-12-23 10:51:59,644 - INFO - [wf_rpa.bom_exporter] ui_main:1574 - 폴더 스캔 시작: D:/assy_samples/sample13
+2025-12-23 10:51:59,644 - DEBUG - [wf_rpa.bom_exporter] ui_main:1586 - SLDDRW_PATH: D:/assy_samples/sample13
+2025-12-23 10:51:59,689 - DEBUG - [wf_rpa.bom_exporter] ui_main:1639 - 스캔 결과: 13개 파일
+2025-12-23 10:51:59,693 - INFO - [wf_rpa.bom_exporter] ui_main:1650 - 폴더 스캔 완료: 13개 파일
+2025-12-23 10:51:59,693 - INFO - [wf_rpa.bom_exporter] ui_main:621 - 이전 작업 폴더 자동 스캔 완료
+2025-12-23 10:52:00,396 - INFO - [wf_rpa.bom_exporter] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-23 10:52:03,593 - INFO - [wf_rpa.bom_exporter] ui_main:849 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
+2025-12-23 11:50:54,590 - INFO - [wf_rpa.Bom_Exporter] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-23 11:50:54,591 - INFO - [wf_rpa.Bom_Exporter] wf_log:107 - App: Bom_Exporter
+2025-12-23 11:50:54,672 - INFO - [wf_rpa.Bom_Exporter] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-23 11:50:54,673 - INFO - [wf_rpa.Bom_Exporter] app_setting_data:178 - 사용자 설정 로드 완료: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\config\bom_exporter\settings.json
+2025-12-23 11:50:54,681 - INFO - [wf_rpa.bom_exporter] wf_log:106 - ===== WorksFree Logger Initialized =====
+2025-12-23 11:50:54,681 - INFO - [wf_rpa.bom_exporter] wf_log:107 - App: bom_exporter
+2025-12-23 11:50:54,681 - INFO - [wf_rpa.bom_exporter] wf_log:113 - HW Fingerprint: ac86f5a7853df4f2000043bc3378dcce64e0b9cee8e86e97e2d96eaa93db43d5 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
+2025-12-23 11:50:54,764 - INFO - [wf_rpa.bom_exporter] ui_main:535 - [DEMO] Capture dir: D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\demo_captures
+2025-12-23 11:50:54,766 - DEBUG - [wf_rpa.bom_exporter] ui_main:425 - [PERF] Early WorksFreeManager init: 1.24 ms, registered=True
+2025-12-23 11:50:54,886 - DEBUG - [wf_rpa.bom_exporter] ui_main:480 - 마지막 선택 폴더 저장 시도: D:/assy_samples/sample13
+2025-12-23 11:50:54,888 - INFO - [wf_rpa.bom_exporter] ui_main:482 - 마지막 선택 폴더 저장 완료: D:/assy_samples/sample13
+2025-12-23 11:50:55,441 - DEBUG - [wf_rpa.bom_exporter] ui_main:602 - [DEMO] capture saved (folder_selected): D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\demo_captures\demo_20251223_115055_349_folder_selected.png
+2025-12-23 11:50:55,443 - INFO - [wf_rpa.bom_exporter] ui_main:1574 - 폴더 스캔 시작: D:/assy_samples/sample13
+2025-12-23 11:50:55,444 - DEBUG - [wf_rpa.bom_exporter] ui_main:1586 - SLDDRW_PATH: D:/assy_samples/sample13
+2025-12-23 11:50:55,450 - DEBUG - [wf_rpa.bom_exporter] ui_main:1639 - 스캔 결과: 13개 파일
+2025-12-23 11:50:55,450 - INFO - [wf_rpa.bom_exporter] ui_main:1650 - 폴더 스캔 완료: 13개 파일
+2025-12-23 11:50:55,451 - INFO - [wf_rpa.bom_exporter] ui_main:621 - 이전 작업 폴더 자동 스캔 완료
+2025-12-23 11:50:56,165 - INFO - [wf_rpa.bom_exporter] wf_app_init_helpers:72 - 🔄 동기화 불필요
+2025-12-23 11:50:59,267 - INFO - [wf_rpa.bom_exporter] ui_main:849 - 정책 동기화 결과: {'success': True, 'message': '0개의 앱 정책이 동기화되었습니다.', 'count': 0, 'email_refreshed': True}
