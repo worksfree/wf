@@ -59,18 +59,18 @@ class Config:
         # 런모드 판별: settings.json(app_config.run_mode)만 사용
         self.run_mode = self._detect_run_mode()
 
-        # 개발/데모는 소스 트리 config, 배포(release)만 사용자 홈 사용
+        # 통합 config 경로: 10.common/config/ (개발), ~/.wf_rpa/ (배포)
         app_root = Path(self.base_dir)
-        local_config_dir = app_root / "config"
-        
+        common_config_dir = app_root.parents[1] / "10.common" / "config"
+
         # PyInstaller frozen 환경(exe)에서는 항상 사용자 홈 경로 사용 (번들 파일은 읽기 전용)
         import sys
         is_frozen = getattr(sys, 'frozen', False)
-        
+
         if is_frozen or self.run_mode == "release":
             self.app_config_dir = self.user_home / ".wf_rpa" / "dwg_batch_print"
         else:
-            self.app_config_dir = local_config_dir / "dwg_batch_print"
+            self.app_config_dir = common_config_dir / "dwg_batch_print"
 
         # 🚀 최적화: 로거 lazy loading (첫 사용 시 초기화)
         self._logger = None
@@ -109,7 +109,9 @@ class Config:
 
     def _detect_run_mode(self) -> str:
         """settings.json의 runtime_config.run_mode만 사용하여 실행 모드 결정"""
-        settings_path = Path(__file__).resolve().parent / "config" / "dwg_batch_print" / "settings.json"
+        # 통합 config 경로 사용: 10.common/config/dwg_batch_print/settings.json
+        app_root = Path(__file__).resolve().parent
+        settings_path = app_root.parents[1] / "10.common" / "config" / "dwg_batch_print" / "settings.json"
         try:
             with open(settings_path, "r", encoding="utf-8") as f:
                 data = json.load(f) or {}
@@ -300,6 +302,64 @@ class Config:
                 pass
             return False
 
+    def update_settings_window_geometry(self, geometry: str | None) -> bool:
+        """세팅창 geometry를 settings.json에 반영한다."""
+        try:
+            data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+
+            if "ui_config" not in data:
+                data["ui_config"] = {}
+
+            data["ui_config"]["settings_window_geometry"] = geometry or ""
+
+            # runtime_config 업데이트
+            if "runtime_config" not in data:
+                data["runtime_config"] = {}
+            data["runtime_config"]["last_updated"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            return True
+        except Exception as e:
+            try:
+                self.logger.error(f"settings_window geometry 저장 실패: {e}")
+            except Exception:
+                pass
+            return False
+
+    def update_registration_window_geometry(self, geometry: str | None) -> bool:
+        """등록창 geometry를 settings.json에 반영한다."""
+        try:
+            data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+
+            if "ui_config" not in data:
+                data["ui_config"] = {}
+
+            data["ui_config"]["registration_window_geometry"] = geometry or ""
+
+            # runtime_config 업데이트
+            if "runtime_config" not in data:
+                data["runtime_config"] = {}
+            data["runtime_config"]["last_updated"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            return True
+        except Exception as e:
+            try:
+                self.logger.error(f"registration_window geometry 저장 실패: {e}")
+            except Exception:
+                pass
+            return False
+
     def load_policies_async(self):
         """🚀 백그라운드에서 정책 로드 및 적용 (UI 표시 후 호출)"""
         policy_config = self._load_app_policy_cached()
@@ -348,14 +408,14 @@ class Config:
     def _load_app_policy_cached(self):
         """🚀 캐시된 정책 로드 (파일 수정 시간 체크)"""
         try:
-            # DEV 모드에서는 앱 로컬 config 폴더의 정책 파일을 우선 사용
+            # 통합 config 경로: 10.common/config/ (개발), ~/.wf_rpa/ (배포)
             app_root = Path(self.base_dir)
-            local_config_dir = app_root / "config"
-            is_dev_mode = (os.environ.get("WF_RPA_DEV") == "1") or local_config_dir.exists()
+            common_config_dir = app_root.parents[1] / "10.common" / "config"
+            is_dev_mode = self.run_mode in ("dev", "demo")
 
             if is_dev_mode:
-                # 개발: config/dwg_batch_print/credit_policy.json
-                policy_file = local_config_dir / "dwg_batch_print" / "credit_policy.json"
+                # 개발: 10.common/config/dwg_batch_print/credit_policy.json
+                policy_file = common_config_dir / "dwg_batch_print" / "credit_policy.json"
             else:
                 # 배포: ~/.wf_rpa/dwg_batch_print/credit_policy.json
                 policy_file = self.app_config_dir / "credit_policy.json"
@@ -435,6 +495,8 @@ class Config:
         self.program_path = edrawings.get(
             "program_path", "C:\\Program Files\\SOLIDWORKS Corp\\eDrawings\\eDrawings.exe"
         )
+        # ui_setting.py에서 edrawings_path 속성을 사용하므로 동기화
+        self.edrawings_path = self.program_path
 
         # 인쇄 설정
         self.restart_count = runtime_config.get("restart_count", 30)
@@ -474,6 +536,49 @@ class Config:
     def get_edrawings_settings(self):
         """eDrawings 관련 설정을 딕셔너리로 반환"""
         return {"program_path": self.program_path}
+
+    def save_settings(self) -> bool:
+        """현재 설정을 settings.json에 저장
+
+        Returns:
+            bool: 저장 성공 여부
+        """
+        try:
+            data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+
+            # edrawings 섹션
+            if "edrawings" not in data:
+                data["edrawings"] = {}
+            # edrawings_path가 있으면 program_path로 저장
+            if hasattr(self, "edrawings_path") and self.edrawings_path:
+                data["edrawings"]["program_path"] = self.edrawings_path
+            elif hasattr(self, "program_path"):
+                data["edrawings"]["program_path"] = self.program_path
+
+            # runtime_config 섹션
+            if "runtime_config" not in data:
+                data["runtime_config"] = {}
+            data["runtime_config"]["restart_count"] = getattr(self, "restart_count", 30)
+            data["runtime_config"]["wait_timeout"] = getattr(self, "wait_timeout", 300)
+            data["runtime_config"]["restart_sleep"] = getattr(self, "restart_sleep", 5)
+            data["runtime_config"]["last_updated"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            # ui_config 섹션
+            if "ui_config" not in data:
+                data["ui_config"] = {}
+            data["ui_config"]["topmost"] = getattr(self, "topmost", True)
+
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            self.logger.info(f"설정 저장 완료: {self.settings_file}")
+            return True
+        except Exception as e:
+            self.logger.error(f"설정 저장 실패: {e}")
+            return False
 
 
 # 전역 설정 인스턴스

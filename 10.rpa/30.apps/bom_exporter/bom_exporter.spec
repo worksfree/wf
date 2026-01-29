@@ -86,6 +86,7 @@ print(f"[SPEC] Working directory set to: {SPEC_DIR}")
 
 WORKSPACE_ROOT = SPEC_DIR.parent.parent
 COMMON_DIR = WORKSPACE_ROOT / '10.common'
+COMMON_CONFIG_DIR = COMMON_DIR / 'config'  # 공통 config 폴더
 
 # ==================== 버전 관리 ====================
 def load_and_increment_version():
@@ -95,7 +96,7 @@ def load_and_increment_version():
     - 개발자/관리자용: 전체 버전 (0.7.0.1)
     - 사용자용: 앞 2자리만 (v0.7)
     """
-    settings_file = SPEC_DIR / 'config' / 'bom_exporter' / 'settings.json'
+    settings_file = COMMON_CONFIG_DIR / 'bom_exporter' / 'settings.json'
     default_version = [0, 7, 0, 0]
     
     # 기존 버전 읽기 (runtime_config에서만 읽기)
@@ -120,7 +121,10 @@ def load_and_increment_version():
         if version[2] > 9:
             version[2] = 0
             version[1] += 1
-    
+            if version[1] > 9:
+                version[1] = 0
+                version[0] += 1
+
     # settings.json 전체 읽기
     if settings_file.exists():
         with open(settings_file, 'r', encoding='utf-8') as f:
@@ -190,6 +194,25 @@ print(f"WorksFree Bom Exporter v{APP_VERSION} 통합 빌드 시작")
 print(f"{'='*80}")
 
 
+# ==================== 숨김 파일 처리 ====================
+def set_hidden_attribute(file_path):
+    """Windows에서 파일을 숨김 처리합니다."""
+    try:
+        import platform
+        if platform.system() == "Windows":
+            import ctypes
+            FILE_ATTRIBUTE_HIDDEN = 0x02
+            attrs = ctypes.windll.kernel32.GetFileAttributesW(str(file_path))
+            if attrs != -1:
+                ctypes.windll.kernel32.SetFileAttributesW(
+                    str(file_path), attrs | FILE_ATTRIBUTE_HIDDEN
+                )
+            else:
+                ctypes.windll.kernel32.SetFileAttributesW(str(file_path), FILE_ATTRIBUTE_HIDDEN)
+            print(f"  → 숨김 처리: {file_path.name}")
+    except Exception as e:
+        print(f"  ⚠️ 숨김 처리 실패: {file_path.name} - {e}")
+
 
 # ==================== 사용자 홈 설정 파일 준비 ====================
 def prepare_user_configs():
@@ -206,18 +229,48 @@ def prepare_user_configs():
     for directory in [wf_rpa_dir, app_dir]:
         directory.mkdir(parents=True, exist_ok=True)
     
-    # 1. wf_rpa_config.json - config 폴더에서 복사 (관리자 이메일, Google Sheets 포함)
-    app_config_dir = SPEC_DIR / 'config'
-    source_config = app_config_dir / 'wf_rpa_config.json'
+    # 1. wf_rpa_config.json - 공통 config 폴더에서 복사 (관리자 이메일, Google Sheets 포함)
+    source_config = COMMON_CONFIG_DIR / 'wf_rpa_config.json'
     
     if source_config.exists():
-        shutil.copy2(source_config, wf_rpa_dir / 'wf_rpa_config.json')
+        target_file = wf_rpa_dir / 'wf_rpa_config.json'
+        shutil.copy2(source_config, target_file)
+        set_hidden_attribute(target_file)
         print(f"✓ wf_rpa_config.json 복사 완료 (email_settings, google_sheets 포함)")
     else:
         print(f"⚠️ wf_rpa_config.json을 찾을 수 없음: {source_config}")
     
-    # 2. settings.json 처리: 버전 주입 + 사용자 경로 초기화
-    source_settings = app_config_dir / 'bom_exporter' / 'settings.json'
+    # 2. Google Credentials 복사 (.wf_rpa 루트에 직접 복사, wf_rpa_config와 동일 위치)
+    google_creds_dev_found = False
+    google_creds_release_found = False
+
+    # 공통 config 폴더에서 실제 키 파일 찾기
+    if COMMON_CONFIG_DIR.exists():
+        # DEV용 자격증명 파일 (silver-argon)
+        for json_file in COMMON_CONFIG_DIR.glob('silver-argon*.json'):
+            target_file = wf_rpa_dir / json_file.name
+            shutil.copy2(json_file, target_file)
+            set_hidden_attribute(target_file)
+            google_creds_dev_found = True
+            print(f"✓ Google credentials (DEV) 포함 (.wf_rpa 루트): {json_file.name}")
+            break
+        
+        # RELEASE용 자격증명 파일 (worksfree-b33a6b8f366b.json)
+        for json_file in COMMON_CONFIG_DIR.glob('worksfree-*.json'):
+            target_file = wf_rpa_dir / json_file.name
+            shutil.copy2(json_file, target_file)
+            set_hidden_attribute(target_file)
+            google_creds_release_found = True
+            print(f"✓ Google credentials (RELEASE) 포함 (.wf_rpa 루트): {json_file.name}")
+            break
+    
+    if not google_creds_dev_found:
+        print("⚠️ Google credentials (DEV)를 찾을 수 없습니다.")
+    if not google_creds_release_found:
+        print("⚠️ Google credentials (RELEASE)를 찾을 수 없습니다.")
+    
+    # 3. settings.json 처리: 버전 주입 + 사용자 경로 초기화
+    source_settings = COMMON_CONFIG_DIR / 'bom_exporter' / 'settings.json'
     if source_settings.exists():
         with open(source_settings, 'r', encoding='utf-8') as f:
             settings_data = json.load(f)
@@ -240,40 +293,20 @@ def prepare_user_configs():
         with open(bundled_settings, 'w', encoding='utf-8') as f:
             json.dump(settings_data, f, ensure_ascii=False, indent=2)
         
+        set_hidden_attribute(bundled_settings)
         print(f"✓ settings.json 처리 완료 (.wf_rpa/{APP_NAME}/) - 버전: {APP_VERSION_FULL}, 빌드: #{VERSION_INFO['build_count']}")
     else:
         print(f"⚠️ settings.json을 찾을 수 없음: {source_settings}")
-    
-    # 3. Google Credentials 복사 (.wf_rpa 루트에 직접 복사, wf_rpa_config와 동일 위치)
-    google_creds_found = False
-    
-    # config 폴더에서 실제 키 파일 찾기
-    if app_config_dir.exists():
-        # .silver-argon-445712-a0-4ce021aa64be.json 파일만 복사 (원본 이름 유지)
-        actual_key = app_config_dir / '.silver-argon-445712-a0-4ce021aa64be.json'
-        if actual_key.exists():
-            shutil.copy2(actual_key, wf_rpa_dir / actual_key.name)
-            google_creds_found = True
-            print(f"✓ Google credentials 포함 (.wf_rpa 루트): {actual_key.name}")
-        else:
-            # fallback: .silver-argon으로 시작하는 첫 번째 파일
-            for json_file in app_config_dir.glob('.silver-argon*.json'):
-                shutil.copy2(json_file, wf_rpa_dir / json_file.name)
-                google_creds_found = True
-                print(f"✓ Google credentials 포함 (.wf_rpa 루트): {json_file.name}")
-                break
-    
-    if not google_creds_found:
-        print("⚠️ Google credentials를 찾을 수 없습니다.")
     
     # 4. policy.json 복사 (버전 정보는 settings.json의 runtime_config에만 있음)
     # policy.json은 identity + policy만 포함 (변하지 않는 값들)
     # 버전 정보는 settings.json의 runtime_config에만 있음
     # policy.json은 그대로 복사만 함 (버전 주입 안함)
-    policy_src = app_config_dir / "bom_exporter" / "policy.json"
+    policy_src = COMMON_CONFIG_DIR / "bom_exporter" / "policy.json"
     if policy_src.exists():
         bundled_policy = app_dir / "policy.json"
         shutil.copy2(policy_src, bundled_policy)
+        set_hidden_attribute(bundled_policy)
         print(f"✓ policy.json 복사 완료 (.wf_rpa/{APP_NAME}/)")
     
     print(f"✓ 사용자 설정 파일 준비 완료: {home_dir}")
@@ -343,12 +376,16 @@ Function .onInit
         Goto +2
         StrCpy $GlobalConfigExists "false"
     
-    ; Google Credentials 존재 확인 (실제 키 파일명으로 확인)
-    IfFileExists "$PROFILE\\.wf_rpa\\credentials\\.silver-argon-445712-a0-4ce021aa64be.json" 0 +3
+    ; Google Credentials 존재 확인 (실제 키 파일명으로 확인 - DEV 또는 RELEASE)
+    IfFileExists "$PROFILE\\.wf_rpa\\silver-argon-445712-a0-7092493258f3.json" found_creds
+    IfFileExists "$PROFILE\\.wf_rpa\\worksfree-b33a6b8f366b.json" found_creds not_found_creds
+    found_creds:
         StrCpy $CredentialsExists "true"
-        Goto +2
+        Goto check_first_app
+    not_found_creds:
         StrCpy $CredentialsExists "false"
     
+    check_first_app:
     ; 첫 번째 WorksFree 앱인지 확인
     ${{If}} $GlobalConfigExists == "false"
         StrCpy $IsFirstWorksFreeApp "true"
@@ -446,7 +483,8 @@ Section "Google Credentials" SecCredentials
         DetailPrint "Google Service Account 인증 정보를 설치합니다..."
         
         SetOutPath "$PROFILE\\.wf_rpa"
-        File "build\\user_home_bundle\\.wf_rpa\\.silver-argon-*.json"
+        File "build\\user_home_bundle\\.wf_rpa\\silver-argon-*.json"
+        File "build\\user_home_bundle\\.wf_rpa\\worksfree-*.json"
         
         DetailPrint "✓ Google 인증 정보 설치 완료 (.wf_rpa 루트)"
     ${{Else}}
@@ -596,7 +634,8 @@ def collect_essential_resources():
     essential_modules = [
         'wf_log.py',
         'wf_credit_manager.py',  # 크레딧 시스템 필수
-        'wf_register.py'        # 등록/인증 필수
+        'wf_register.py',        # 등록/인증 필수
+        'wf_ui_adaptive.py',     # 적응형 UI 통합 모듈
     ]
     
     for module in essential_modules:
@@ -652,18 +691,23 @@ def collect_essential_resources():
             print(f"설정 파일 번들: policy.json → config/{APP_NAME}/")
     
     # 5. Google Service Account 자격증명 파일 (.wf_rpa 루트에 배치)
-    # config 폴더에서 직접 읽기
-    config_dir = SPEC_DIR / 'config'
-    silver_files = list(config_dir.glob('.silver-argon-*.json'))
-    for silver_file in silver_files:
-        datas.append((str(silver_file), '.wf_rpa'))
-        print(f"자격증명 파일 번들: {silver_file.name}")
+    # DEV용 자격증명 (silver-argon-*.json) - backup 파일 제외
+    for silver_file in COMMON_CONFIG_DIR.glob("silver-argon-*.json"):
+        if 'backup' not in silver_file.name.lower():
+            datas.append((str(silver_file), '.wf_rpa'))
+            print(f"자격증명 파일 번들 (DEV): {silver_file.name}")
     
-    # 6. 앱별 리소스
+    # RELEASE용 자격증명 (worksfree-*.json) - backup 파일 제외
+    for worksfree_file in COMMON_CONFIG_DIR.glob("worksfree-*.json"):
+        if 'backup' not in worksfree_file.name.lower():
+            datas.append((str(worksfree_file), '.wf_rpa'))
+            print(f"자격증명 파일 번들 (RELEASE): {worksfree_file.name}")
+    
+    # 6. 앱별 리소스 (SVG 파일 제외 - 소스용이므로 패키징 불필요)
     app_res_dir = SPEC_DIR / 'res'
     if app_res_dir.exists():
         for file_path in app_res_dir.rglob('*'):
-            if file_path.is_file():
+            if file_path.is_file() and file_path.suffix.lower() != '.svg':
                 rel_path = file_path.relative_to(app_res_dir)
                 datas.append((str(file_path), f'res/{rel_path.parent}' if rel_path.parent != Path('.') else 'res'))
     
@@ -681,7 +725,22 @@ def collect_essential_resources():
     
     # 8. policy.json은 사용자 홈 번들(.wf_rpa)에 포함됨 - 여기서는 제외
     # (prepare_home_config 함수에서 .wf_rpa/bom_exporter/policy.json로 복사됨)
-    
+
+    # 9. MANUAL.pdf 포함 (있는 경우에만)
+    manual_patterns = [
+        f'{APP_NAME.upper()}_USER_MANUAL.pdf',
+        f'{APP_DISPLAY_NAME.upper().replace(" ", "_")}_USER_MANUAL.pdf',
+        'MANUAL.pdf',
+        '*USER_MANUAL.pdf'
+    ]
+    for pattern in manual_patterns:
+        manual_files = list(SPEC_DIR.glob(pattern))
+        if manual_files:
+            manual_pdf = manual_files[0]
+            datas.append((str(manual_pdf), '.'))
+            print(f"매뉴얼 포함: {manual_pdf.name}")
+            break
+
     # print(f"필수 리소스만 수집 완료: {len(datas)}개 파일")
     return datas
 
@@ -696,11 +755,15 @@ def get_optimized_hidden_imports():
             'wf_credit_session_utils',
         'wf_app_init_helpers',
         'wf_register',
+        'wf_ui_adaptive',        # 적응형 UI 통합 모듈
         'wf_email',
         'wf_gen_code',
         'wf_googlesheets_manager',
         'wf_hwinfo',
         'wf_license',
+        
+        # WF-ACT 테스트 인프라
+        'test_server',  # IPC test server for certification
         
         # GUI 관련 (필수만)
         'tkinter', 
@@ -819,7 +882,21 @@ def get_optimized_hidden_imports():
     except Exception:
         pass
     
-    return essential_imports
+    # 🔧 hook-*.py 파일들이 하던 작업을 직접 처리 (collect_all로 자동 수집)
+    from PyInstaller.utils.hooks import collect_all
+    
+    additional_imports = []
+    hook_modules = ['gspread', 'google.auth', 'ntplib', 'requests', 'urllib3']
+    for module in hook_modules:
+        try:
+            datas, binaries, hiddenimports = collect_all(module)
+            if hiddenimports:
+                additional_imports.extend(hiddenimports)
+        except Exception as e:
+            print(f"⚠️ Warning: Could not collect imports for {module}: {e}")
+    
+    # 중복 제거하고 반환
+    return list(set(essential_imports + additional_imports))
 
 # ==================== 인스톨러 생성 여부 토글 ====================
 def _should_build_installer() -> bool:
@@ -1069,7 +1146,7 @@ a = Analysis(
     binaries=[],  # lib_binaries 제거
     datas=resource_datas,  # lib_datas 제거 - PyInstaller가 이미 모든 라이브러리 수집함
     hiddenimports=hidden_imports_list,
-    hookspath=[str(SPEC_DIR)],  # hook-*.py 파일들을 찾을 경로
+    hookspath=[],  # hook 파일 불필요 (get_optimized_hidden_imports에서 직접 처리)
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
@@ -1111,9 +1188,9 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    # 아이콘: 고정 B2E.ico (fallback 제거)
-    # 아이콘 생성 보장 후 사용
-    icon=str(ensure_b2e_icon()),
+    # 아이콘: 새 아이콘 (16, 32, 48, 256 멀티사이즈)
+    # icon=str(ensure_b2e_icon()),  # Old: B2E.ico (16x16 only)
+    icon=["res\\01_BOM_Exporter.ico"],
     version='version_info.txt' if Path('version_info.txt').exists() else None
 )
 

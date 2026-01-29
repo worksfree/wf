@@ -84,7 +84,12 @@ class KStartupWebApp:
         self.excel_file_var = tk.StringVar()
         self.is_running = False
         self.is_admin_mode = False
-        self.admin_password = "admin2024"
+        # admin 비밀번호: Google Sheets admin_config에서 로드 (실패 시 기본값)
+        try:
+            from wf_settings_common import get_admin_password  # type: ignore
+            self.admin_password = get_admin_password(logger)
+        except Exception:
+            self.admin_password = "admin2024"  # fallback
 
         # WorksFree 초기화
         self.wf_manager = None

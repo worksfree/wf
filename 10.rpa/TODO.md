@@ -1,13 +1,79 @@
-# TODO: 출시 후 구조 개선 작업
+# WorksFree RPA - TODO 목록
 
-> 작성일: 2025-12-01  
-> 우선순위: 🔴 즉시 / 🟡 단계적 / 🟢 장기
+**마지막 업데이트**: 2026-01-29
+**우선순위**: 🔴 즉시 / 🟡 단계적 / 🟢 장기
+
+---
+
+## ✅ 최근 완료 항목 (2026-01-29)
+
+### 1. 번들링 일관성 100% 달성 ✅
+
+**완료 내용**:
+- 7개 spec 파일 `prepare_user_configs()` 순서 통일
+- glob 패턴 표준화 (`'silver-argon*.json'`)
+- set_hidden_attribute() 함수 호출 추가
+- verify_bundle_structure.ps1 자동화 개선
+
+**영향**:
+- 모든 앱 배포 패키지 구조 일관성 확보
+- 번들 검증 자동화로 품질 향상
+
+### 2. 인증 테스트 완료 ✅
+
+**결과**:
+- **유료 앱 4개** (BE, DP, AR, DC): STANDARD 등급 (99.4% 통과)
+- **무료 앱 3개** (CV, KFN, QR): 94.8% 통과 (크레딧 로직 개선 필요)
+
+**테스트 커버리지**:
+- Deployment Suite (25 tests)
+- Package Integrity Suite (12 tests)
+- Execution Environment Suite (8 tests)
+- Config Suite (20 tests)
+- Security Suite (6 tests)
+- Registration Suite (15 tests)
+- Credit Suite (22 tests, 무료 앱은 스킵)
+- State Suite (14 tests)
+- Recovery Suite (12 tests)
+- UI Suite (22 tests)
+
+**통합 리포트**: `90.tests/ui_lifecycle_test/test_results/certification_20260129_065258_exe/index.html`
 
 ---
 
 ## 🔴 즉시 수정 필요 (Critical Priority)
 
-### 1. Bom_Exporter 앱명 통일
+### 1. 무료 앱 크레딧 테스트 로직 개선 ⭐
+
+**현재 문제**:
+- CV, KFN, QR (무료 앱)이 크레딧 관련 테스트에서 실패
+- `trial_credits: -1` (무제한) 정책으로 인한 테스트 케이스 불일치
+
+**실패 테스트**:
+1. `test_15_unregistered_limited_functionality`: 미등록 시 작업 차단
+2. `test_03_negative_credits_handled`: 크레딧 음수 방지
+3. `test_05_state_preserved_after_error`: 오류 후 크레딧 보존
+4. `test_12_partial_work_recovery`: 부분 작업 후 크레딧 처리
+5. `test_05_work_button_disabled_when_no_credits`: 버튼 비활성화
+6. `test_07_credits_display_updated`: 크레딧 표시 업데이트
+
+**해결 방안**:
+1. **테스트 프레임워크 개선** (권장):
+   - 무료 앱 감지 (`trial_credits == -1`)
+   - 크레딧 관련 테스트 자동 스킵 또는 수정된 기대값 적용
+
+2. **앱 로직 개선** (선택):
+   - 무료 앱도 형식적 크레딧 시스템 적용 (큰 값으로 초기화)
+   - UI에서 `trial_credits: -1` 처리 로직 보강
+
+**우선순위**: 🔴 즉시 (STANDARD 등급 달성을 위해)
+
+---
+
+## 🔴 즉시 수정 필요 (기존 항목)
+
+### 1. Bom_Exporter 앱명 통일 ⭐
+
 **현재 문제**:
 - 폴더명: `Bom_Exporter` (Title_Underscore)
 - 코드 내 app_name: `bom2excel` (레거시 이름)
@@ -20,30 +86,19 @@
 - 사용자 디렉토리 불일치
 
 **수정 범위**:
-```python
-# 30.apps/Bom_Exporter/ui_main.py
-# Line 89: _load_version_info() 함수
-settings_file = Path.home() / ".wf_rpa" / "bom2excel" / "settings.json"
-→ settings_file = Path.home() / ".wf_rpa" / "bom_exporter" / "settings.json"
+- `ui_main.py`의 모든 `bom2excel` → `bom_exporter` 변경
+- `automation.py` 내 app_name 참조 확인
+- config 폴더명 변경: `config/bom2excel` → `config/bom_exporter`
+- 기존 사용자 마이그레이션 스크립트 작성 (선택)
+- 빌드 후 테스트: 설정 로드, 크레딧 동기화 확인
 
-# Line 96: settings_file 개발 모드 경로
-settings_file = Path(__file__).parent / "config" / "bom2excel" / "settings.json"
-→ settings_file = Path(__file__).parent / "config" / "bom_exporter" / "settings.json"
-
-# 모든 "bom2excel" 문자열 검색 후 "bom_exporter"로 변경
-# 주의: 파일명, 폴더명은 유지 (빌드 스크립트 등)
-```
-
-**체크리스트**:
-- [ ] ui_main.py의 모든 `bom2excel` → `bom_exporter` 변경
-- [ ] automation.py 내 app_name 참조 확인
-- [ ] config 폴더명 변경: `config/bom2excel` → `config/bom_exporter`
-- [ ] 기존 사용자 마이그레이션 스크립트 작성 (선택)
-- [ ] 빌드 후 테스트: 설정 로드, 크레딧 동기화 확인
+**참고 파일**:
+- `d:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\ui_main.py` (Line 89, 96)
 
 ---
 
-### 2. BE/DC 관리자 모드 구현
+### 2. BE/DC 관리자 모드 구현 ⭐
+
 **현재 상태**:
 - ✅ **CV, KFN**: Progress Bar 클릭으로 관리자 모드 진입 가능
 - ❌ **BE, DC**: 관리자 모드 변수는 있으나 진입 방법 없음
@@ -55,44 +110,34 @@ settings_file = Path(__file__).parent / "config" / "bom2excel" / "settings.json"
 4. 테스트 데이터 생성/제거 기능
 
 **구현 위치**:
-```python
-# 30.apps/bom_exporter/ui_main.py
-# 50.data/dwg_classifier/ui_main.py
-
-# init_ui() 또는 create_ui_elements() 내 추가
-self.progress_bar_label.bind("<Button-1>", lambda e: self.toggle_admin_mode())
-
-# toggle_admin_mode() 메서드 추가 (CV/KFN 참고)
-def toggle_admin_mode(self):
-    if not self.is_admin_mode:
-        password = simpledialog.askstring("관리자 모드", "비밀번호를 입력하세요:", show="*")
-        if password == self.admin_password:
-            self._enter_admin_mode()
-        else:
-            messagebox.showerror("오류", "비밀번호가 틀렸습니다.")
-    else:
-        self._exit_admin_mode()
-
-# _enter_admin_mode(), _exit_admin_mode() 메서드 추가
-# _create_test_data(), _clear_test_data() 메서드 추가
-```
+- `30.apps/bom_exporter/ui_main.py`
+- `50.data/dwg_classifier/ui_main.py`
 
 **참고 파일**:
 - `50.data/conversion_verifier/ui_main.py` (Lines 1009-1090)
 - `50.data/korean_filename_normalizer/ui_main.py` (Lines 1770-1870)
 
-**체크리스트**:
-- [ ] BE에 관리자 모드 진입 메커니즘 추가
-- [ ] DC에 관리자 모드 진입 메커니즘 추가
-- [ ] 테스트 데이터 생성 기능 구현 (BE)
-- [ ] 테스트 데이터 생성 기능 구현 (DC)
-- [ ] 관리자 모드 UI 확장 테스트
+---
+
+### 3. 파일 덮어쓰기 취소 버그 (BE)
+
+**증상**:
+- 작업 결과 폴더에 기존 파일이 존재할 때 덮어쓰기 확인 다이얼로그에서 "아니오"를 클릭해도 작업이 계속 진행됨
+
+**영향 범위**:
+- BOM 추출 프로세스 시작 후 기존 파일 존재 시
+
+**임시 해결방법**:
+- "예"를 클릭하여 파일을 덮어쓰거나, 작업 시작 전에 결과 폴더를 비움
+
+**계획**: 다음 버전에서 수정 예정
 
 ---
 
 ## 🟡 단계적 개선 (High Priority)
 
-### 3. 초기화 시퀀스 표준화
+### 4. 초기화 시퀀스 표준화
+
 **현재 상황**:
 | 앱 | WFM 초기화 | CreditManager 초기화 | 성능 |
 |----|-----------|---------------------|------|
@@ -101,67 +146,24 @@ def toggle_admin_mode(self):
 | DC | Early blocking | Lazy (백그라운드) | 중간 |
 | KFN | Blocking (즉시) | 즉시 | 느림 |
 
-**표준 패턴 (BE 방식 채택)**:
-```python
-def __init__(self, master):
-    # 1. 필수 초기화만 (UI 표시 전)
-    self.master = master
-    self.logger = get_app_logger(...)
-    self.config = get_config()
-    self.ui = get_adaptive_ui_settings()
-    
-    # 2. Lazy 매니저 (백그라운드 초기화 예정)
-    self.wf_manager = None
-    self.credit_manager = None
-    self._wfm_available = WFM_AVAILABLE
-    
-    # 3. UI 먼저 생성 (빠른 표시)
-    self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
-    self.init_ui()
-    
-    # 4. 백그라운드 초기화 스케줄
-    self.master.after(100, self._lazy_init_managers)
-    self.master.after(200, lambda: threading.Thread(
-        target=self.create_user_directories, daemon=True
-    ).start())
-
-def _lazy_init_managers(self):
-    """백그라운드에서 WFM/CreditManager 초기화"""
-    def _worker():
-        # Config 정책 로딩
-        if self.config and hasattr(self.config, "load_policies_async"):
-            self.config.load_policies_async()
-        
-        # WorksFree 매니저 초기화
-        if self._wfm_available and WorksFreeManager:
-            self.wf_manager = WorksFreeManager()
-            self.is_registered_user = self.wf_manager.is_registered()
-            self.master.after(0, self.update_registration_button)
-        
-        # CreditManager 초기화
-        if CreditManager and self.wf_manager:
-            self.credit_manager = init_credit_and_policy_managers(...)
-            self.master.after(0, self.update_credit_display)
-            self.master.after(300, self._async_refresh_policies)
-    
-    threading.Thread(target=_worker, daemon=True).start()
-```
+**목표**: BE의 Lazy 초기화 패턴을 모든 앱에 적용
 
 **이점**:
 - UI가 300-500ms 더 빠르게 표시됨
 - 네트워크 동기화가 UI 블로킹하지 않음
 - 사용자가 즉시 앱 사용 가능
 
-**체크리스트**:
-- [ ] CV를 BE 패턴으로 리팩토링
-- [ ] DC를 BE 패턴으로 리팩토링
-- [ ] KFN을 BE 패턴으로 리팩토링
-- [ ] 각 앱 startup time 측정 및 비교
-- [ ] 크레딧 동기화 오류 처리 강화
+**작업**:
+- CV를 BE 패턴으로 리팩토링
+- DC를 BE 패턴으로 리팩토링
+- KFN을 BE 패턴으로 리팩토링
+- 각 앱 startup time 측정 및 비교
+- 크레딧 동기화 오류 처리 강화
 
 ---
 
-### 4. 버전 파일 경로 표준화
+### 5. 버전 파일 경로 표준화
+
 **현재 상황**:
 - CV: `~/.wf_rpa/conversion_verifier/settings.json` ✅
 - BE: `~/.wf_rpa/bom2excel/settings.json` ❌ (레거시)
@@ -178,31 +180,19 @@ def _lazy_init_managers(self):
   - korean_filename_normalizer
 ```
 
-**수정 범위**:
-```python
-# 30.apps/bom_exporter/ui_main.py (Line 89)
-settings_file = Path.home() / ".wf_rpa" / "bom_exporter" / "settings.json"
-
-# 50.data/dwg_classifier/ui_main.py (추가 확인 필요)
-settings_file = Path.home() / ".wf_rpa" / "dwg_classifier" / "settings.json"
-```
-
-**기존 사용자 대응**:
-- Option A: 마이그레이션 스크립트 (구 → 신 경로 자동 이동)
-- Option B: 둘 다 체크 (구 경로 있으면 로드, 없으면 신 경로)
-
-**체크리스트**:
-- [ ] BE 경로 변경 (Task #1과 통합)
-- [ ] DC 경로 변경
-- [ ] 마이그레이션 로직 추가 (선택)
-- [ ] 빌드 후 신규 설치 테스트
-- [ ] 기존 사용자 업그레이드 테스트
+**작업**:
+- BE 경로 변경 (Task #1과 통합)
+- DC 경로 변경
+- 마이그레이션 로직 추가 (선택)
+- 빌드 후 신규 설치 테스트
+- 기존 사용자 업그레이드 테스트
 
 ---
 
 ## 🟢 장기 개선 (Medium Priority)
 
-### 5. 테스트 데이터 기능 통일
+### 6. 테스트 데이터 기능 통일
+
 **현재 상태**:
 - ✅ CV, KFN: 완전한 테스트 데이터 생성/제거 구현
 - ❌ BE, DC: 테스트 기능 없음
@@ -212,48 +202,17 @@ settings_file = Path.home() / ".wf_rpa" / "dwg_classifier" / "settings.json"
 - 크레딧 시스템 검증
 - 데모/시연용 데이터 준비
 
-**구현 방법**:
-```python
-# BE/DC에 추가
-def _create_test_data(self):
-    """테스트용 크레딧 데이터 생성"""
-    try:
-        if self.credit_manager:
-            # 테스트 정책 설정
-            test_policy = {
-                "trial_credits": 10000,
-                "credit_per_work": 50,
-                "available_work": 200,
-            }
-            # 정책 업데이트 및 동기화
-            # ...
-        messagebox.showinfo("완료", "테스트 데이터가 생성되었습니다.")
-    except Exception as e:
-        messagebox.showerror("오류", f"테스트 데이터 생성 실패: {e}")
-
-def _clear_test_data(self):
-    """테스트 데이터 제거 및 초기화"""
-    try:
-        if self.credit_manager:
-            # 정책 리셋
-            # 크레딧 초기화
-            # 구글 시트 동기화
-            # ...
-        messagebox.showinfo("완료", "테스트 데이터가 제거되었습니다.")
-    except Exception as e:
-        messagebox.showerror("오류", f"테스트 데이터 제거 실패: {e}")
-```
-
-**체크리스트**:
-- [ ] BE에 테스트 데이터 기능 추가
-- [ ] DC에 테스트 데이터 기능 추가
-- [ ] 관리자 모드 UI에 버튼 추가
-- [ ] 환경 변수 제어 추가 (`WF_TEST_MODE=1`)
-- [ ] 테스트 시나리오 문서 작성
+**작업**:
+- BE에 테스트 데이터 기능 추가
+- DC에 테스트 데이터 기능 추가
+- 관리자 모드 UI에 버튼 추가
+- 환경 변수 제어 추가 (`WF_TEST_MODE=1`)
+- 테스트 시나리오 문서 작성
 
 ---
 
-### 6. 로깅 레벨 설정 통일
+### 7. 로깅 레벨 설정 통일
+
 **현재 상황**:
 - 모든 앱이 `settings.json`의 `logging_config.log_level` 지원
 - 기본값: `INFO`
@@ -277,40 +236,118 @@ def _clear_test_data(self):
    WF_LOG_LEVEL=DEBUG  # 환경 변수 우선
    ```
 
-**체크리스트**:
-- [ ] 설정 창에 로깅 레벨 UI 추가
-- [ ] 개발 모드 자동 DEBUG 활성화
-- [ ] 환경 변수 지원 추가
-- [ ] 로그 파일 로테이션 구현 (용량 제한)
-- [ ] 성능 프로파일링 로그 정리
+**작업**:
+- 설정 창에 로깅 레벨 UI 추가
+- 개발 모드 자동 DEBUG 활성화
+- 환경 변수 지원 추가
+- 로그 파일 로테이션 구현 (용량 제한)
+- 성능 프로파일링 로그 정리
 
 ---
 
-## 📝 추가 개선 아이디어
+### 8. 다국어 지원 준비
 
-### 7. 다국어 지원 준비
+**작업**:
 - i18n 구조 설계
 - 한국어/영어 전환 가능
 - UI 문자열 외부화
 
-### 8. 설정 백업/복원 기능
+---
+
+### 9. 설정 백업/복원 기능
+
+**작업**:
 - 사용자 설정 내보내기/가져오기
 - 앱 재설치 시 설정 복원
 - 크레딧 정보는 제외
 
-### 9. 업데이트 알림 시스템
+---
+
+### 10. 업데이트 알림 시스템
+
+**작업**:
 - 새 버전 자동 체크
 - Google Sheets 버전 정보 읽기
 - 다운로드 링크 제공
 
-### 10. 사용 통계 대시보드
+---
+
+### 11. 사용 통계 대시보드
+
+**작업**:
 - 앱별 사용 시간 추적
 - 크레딧 사용 패턴 분석
 - 구글 시트 집계 기능
 
 ---
 
-## 🔍 테스트 체크리스트
+## 완료된 작업 (Completed) ✅
+
+### Phase 1: Critical (출시 준비)
+
+- ✅ 버전 표시 및 경로 시스템 통합 (2025-12-02)
+  - settings.json 경로 불일치 해결
+  - frozen 모드 경로 통일
+  - win32timezone 누락 문제 해결
+- ✅ 빌드 시스템 표준화 (2025-11-30)
+  - PostClean 옵션 추가
+  - installer_resources 제거
+  - 통합 테스트 구조 도입
+- ✅ 크레딧 시스템 개선 (2025-11-02)
+  - 정책 우선순위 설정
+  - 체험판 크레딧 조정
+- ✅ UI 및 성능 최적화 (2025-10-18~27)
+  - "응답 없음" 현상 해결
+  - 더미 창 깜빡임 제거
+  - 단일 인스턴스 가드 추가
+
+### Phase 2: 앱별 기능 구현
+
+- ✅ Bom Exporter (BE)
+  - 크레딧 시스템 통합
+  - Google Sheets 동기화
+  - 메모리 모니터링
+  - 동적 타임아웃
+  - 체험판 크레딧 10,000개 설정 파일 기반
+
+- ✅ Conversion Verifier (CV)
+  - 관리자 모드 구현
+  - 검증 이력 로깅
+  - 파일 무결성 검증 강화
+
+- ✅ DWG Classifier (DC)
+  - 메모리 정책 추가
+  - DWG 버전 감지
+  - 크레딧 로깅
+
+- ✅ Korean Filename Normalizer (KFN)
+  - 관리자 모드 구현
+  - 정규화 옵션 추가
+  - 미리보기 기능
+
+- ✅ DWG Batch Print (DP)
+  - 첫 릴리즈 (v1.0.0)
+
+### Phase 3: 통합 및 배포
+
+- ✅ v1.0.0 통합 릴리즈 (2025-12-29)
+  - 5개 앱 통합 배포
+  - 89개 테스트 모두 통과
+  - 포터블 및 인스톨러 패키징
+
+---
+
+## 우선순위 변경 이력
+
+- **2026-01-14**: 문서 통폐합 완료, Critical Task #1~#3 재확인
+- **2025-12-29**: v1.0.0 릴리즈 완료, Critical 작업 제거
+- **2025-12-02**: 경로 통일 완료로 상태 업데이트
+- **2025-11-30**: 빌드 시스템 표준화 완료
+- **2025-11-02**: 크레딧 시스템 개선 완료
+
+---
+
+## 테스트 체크리스트
 
 ### Task #1 (Bom_Exporter 앱명 통일) 테스트
 - [ ] 신규 설치: 설정 파일이 `~/.wf_rpa/bom_exporter/`에 생성되는지 확인
@@ -326,49 +363,47 @@ def _clear_test_data(self):
 - [ ] 자동 복귀: 30분 후 자동으로 일반 모드로 전환되는지 확인
 - [ ] 종료 처리: 관리자 모드 중 앱 종료 시 정상 cleanup 확인
 
-### Task #3 (초기화 시퀀스) 테스트
-- [ ] UI 표시 속도: Lazy init 적용 후 startup time 측정
-- [ ] 크레딧 로딩: 백그라운드 초기화 후 UI에 정상 반영되는지 확인
-- [ ] 에러 핸들링: 네트워크 오류 시 앱이 정상 동작하는지 확인
-- [ ] 동기화 타이밍: 정책 sync가 적절한 시점에 호출되는지 확인
+### Task #3 (파일 덮어쓰기) 테스트
+- [ ] 덮어쓰기 확인 다이얼로그 표시
+- [ ] "예" 선택 시 파일 덮어쓰기 정상 동작
+- [ ] "아니오" 선택 시 작업 중단 확인
+- [ ] 사용자 피드백 메시지 표시
 
 ---
 
-## 📅 일정 제안
+## 일정 제안
 
-### Phase 1: Critical (출시 후 1주 이내)
+### Phase 1: Critical (2주 이내)
 - Week 1: Task #1 (Bom_Exporter 앱명 통일)
 - Week 1: Task #2 (BE/DC 관리자 모드 구현)
+- Week 2: Task #3 (파일 덮어쓰기 버그)
 
-### Phase 2: High (출시 후 1개월 이내)
-- Week 2-3: Task #3 (초기화 시퀀스 표준화)
-- Week 3-4: Task #4 (버전 파일 경로 표준화)
+### Phase 2: High (1개월 이내)
+- Week 2-3: Task #4 (초기화 시퀀스 표준화)
+- Week 3-4: Task #5 (버전 파일 경로 표준화)
 
-### Phase 3: Medium (출시 후 2-3개월)
-- Month 2: Task #5 (테스트 데이터 기능 통일)
-- Month 2-3: Task #6 (로깅 레벨 설정 통일)
-- Month 3: 추가 개선 아이디어 검토
+### Phase 3: Medium (2-3개월)
+- Month 2: Task #6 (테스트 데이터 기능 통일)
+- Month 2-3: Task #7 (로깅 레벨 설정 통일)
+- Month 3: Task #8~#11 (추가 개선 아이디어 검토)
 
 ---
 
-## 📚 참고 자료
+## 참고 자료
 
 ### 코드 참조
 - 관리자 모드 구현: `50.data/conversion_verifier/ui_main.py` (Lines 1009-1090)
 - Lazy 초기화: `30.apps/bom_exporter/ui_main.py` (Lines 430-470)
 - 테스트 데이터: `50.data/korean_filename_normalizer/ui_main.py` (Lines 1870-1950)
 
-### 관련 이슈
-- Credit Policy 통합: 완료 (2025-11-27)
-- 앱 명명 규칙 통일: 완료 (2025-11-28)
-- UI 정리 (원숫자 제거): 완료 (2025-12-01)
-
-### 연락처
-- 개발팀: insung.lee@worksfree.co.kr
-- 리포지토리: worksfree/rpa_pro (main branch)
+### 관련 문서
+- [DEVLOG.md](./DEVLOG.md) - 개발 일지
+- [RELEASE_NOTES_v1.0.0.md](./RELEASE_NOTES_v1.0.0.md) - 릴리즈 노트
+- [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) - 문제 해결
+- [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) - 배포 가이드
 
 ---
 
-**마지막 업데이트**: 2025-12-01  
-**작성자**: GitHub Copilot (Claude Sonnet 4.5)  
-**버전**: 1.0
+**마지막 업데이트**: 2026-01-14
+**문서 버전**: 2.0
+**정리**: 구현 완료 항목 제거, 실제 TODO만 남김

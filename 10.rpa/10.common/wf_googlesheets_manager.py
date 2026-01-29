@@ -27,20 +27,27 @@ Production version for Google Sheets integration
 자격증명 관리 기능 포함
 """
 
+# ==================== 중앙 기본값 상수 ====================
+# 구글 시트 미연결 시 사용되는 기본값 (단일 정의 지점)
+DEFAULT_TRIAL_CREDITS = 10000  # 체험판 기본 크레딧
+DEFAULT_CREDIT_PER_ITEM = 100  # 작업당 크레딧 소모량
+DEFAULT_WARNING_THRESHOLD = 500  # 크레딧 경고 임계값
+CREDENTIALS_FILENAME = "silver-argon-445712-a0-7092493258f3.json"  # 크리덴셜 파일명
+
 import sys
 import json
 from datetime import datetime, timezone
 from typing import Dict, Optional, Any
 from pathlib import Path
 
-# 🔧 자동 환경 감지: 개발 환경은 TEST, 배포(번들) 환경은 PROD 시트 사용
+# 🔧 자동 환경 감지: 개발 환경은 DEV, 배포(번들) 환경은 RELEASE 시트 사용
 def _get_active_sheet_mode() -> str:
     """실행 환경에 따라 시트 모드 결정"""
     # PyInstaller로 번들된 실행파일인지 확인
     is_bundled = getattr(sys, "frozen", False) or hasattr(sys, "_MEIPASS")
-    return "PROD" if is_bundled else "TEST"
+    return "RELEASE" if is_bundled else "DEV"
 
-ACTIVE_SHEET_MODE = _get_active_sheet_mode()  # "TEST" 또는 "PROD" (자동 감지)
+ACTIVE_SHEET_MODE = _get_active_sheet_mode()  # "DEV" 또는 "RELEASE" (자동 감지)
 
 
 class CredentialsHelper:
@@ -56,53 +63,85 @@ class CredentialsHelper:
         # 3중 안전망: 필수 설정 파일 자동 생성 (파일 함수 정의 후 호출되도록 지연)
         # ensure_config_files()는 모듈 끝에 정의되므로 여기서는 호출하지 않음
 
-    def _get_dev_credentials_dir(self) -> Optional[Path]:
-        """개발 환경의 .silver-argon-*.json 파일 디렉토리 경로 찾기"""
+    def _set_hidden_attribute(self, path: Path):
+        """Windows에서 파일/폴더를 숨김 처리합니다 (배포 환경에서만 적용)."""
         try:
-            # 🔧 개선: sys.argv[0] 대신 호출 스택 기반으로 앱 경로 찾기
+            import platform
+            if platform.system() == "Windows" and self._is_bundled():
+                import ctypes
+                FILE_ATTRIBUTE_HIDDEN = 0x02
+                attrs = ctypes.windll.kernel32.GetFileAttributesW(str(path))
+                if attrs != -1:
+                    ctypes.windll.kernel32.SetFileAttributesW(
+                        str(path), attrs | FILE_ATTRIBUTE_HIDDEN
+                    )
+                else:
+                    ctypes.windll.kernel32.SetFileAttributesW(str(path), FILE_ATTRIBUTE_HIDDEN)
+        except Exception as e:
+            logger.warning(f"크리덴셜 파일 숨김 처리 실패: {path} - {e}")
+
+    def _get_dev_credentials_dir(self) -> Optional[Path]:
+        """개발 환경의 silver-argon-*.json 파일 디렉토리 경로 찾기
+
+        탐색 순서:
+        1. 10.common/config/ (공통 폴더 - 최우선)
+        2. 앱별 config/ 폴더 (fallback)
+        """
+        try:
+            # 1. 공통 config 폴더 우선 탐색 (10.common/config/)
+            common_config = self._get_common_config_dir()
+            if common_config:
+                silver_files = list(common_config.glob("silver-argon-*.json"))
+                if silver_files:
+                    logger.debug(f"[DEV-CREDS] 공통 config 폴더에서 크리덴셜 발견: {common_config}")
+                    return common_config
+
+            # 2. sys.argv[0] 기반 앱별 config 폴더 탐색 (fallback)
             import inspect
-            
-            # 먼저 sys.argv[0]으로 시도
             app_root = Path(sys.argv[0]).resolve().parent
-            
+
             # sys.argv[0]이 유효하지 않은 경우 (예: -c, Untitled 등), 호출 스택에서 찾기
             if not app_root.exists() or app_root.name == "10.worksfree" or "-c" in str(app_root):
-                # 호출 스택에서 ui_main.py, automation.py 등의 실제 앱 파일 찾기
                 for frame_info in inspect.stack():
                     frame_path = Path(frame_info.filename).resolve()
-                    
-                    # 앱 디렉토리 패턴: 30.apps/*/ui_main.py, 30.apps/*/automation.py 등
                     if "30.apps" in frame_path.parts or "50.data" in frame_path.parts:
-                        # 앱 루트 디렉토리 찾기 (ui_main.py의 부모)
                         potential_app_root = frame_path.parent
-                        
-                        # config 폴더가 있는지 확인
                         potential_config = potential_app_root / "config"
                         if potential_config.exists():
-                            silver_files = list(potential_config.glob(".silver-argon-*.json"))
+                            silver_files = list(potential_config.glob("silver-argon-*.json"))
                             if silver_files:
                                 logger.debug(f"[DEV-CREDS] 호출 스택에서 앱 경로 발견: {potential_app_root}")
                                 return potential_config
-                
-                # 호출 스택에서도 찾지 못한 경우 None 반환
-                logger.debug(f"[DEV-CREDS] sys.argv[0]이 유효하지 않고 호출 스택에서도 앱 경로를 찾을 수 없음")
                 return None
-            
-            # 10.rpa 폴더에서 직접 실행되는 경우는 None 반환 (사용자 홈폴더 사용)
-            if app_root.name == "10.rpa" or (app_root.parent.name == "10.rpa" and app_root.name not in ["30.apps", "50.data"]):
-                return None
-            
-            app_config_dir = app_root / "config"
 
+            # 10.rpa 폴더에서 직접 실행되는 경우는 공통 폴더만 사용
+            if app_root.name == "10.rpa" or (app_root.parent.name == "10.rpa" and app_root.name not in ["30.apps", "50.data"]):
+                return common_config
+
+            # 앱별 config 폴더 확인 (fallback)
+            app_config_dir = app_root / "config"
             if app_config_dir.exists() and app_config_dir.is_dir():
-                # .silver-argon-*.json 파일이 있는지 확인
-                silver_files = list(app_config_dir.glob(".silver-argon-*.json"))
+                silver_files = list(app_config_dir.glob("silver-argon-*.json"))
                 if silver_files:
                     return app_config_dir
 
-            return None
+            return common_config  # 앱별 폴더에 없으면 공통 폴더 반환
         except Exception as e:
             logger.debug(f"[DEV-CREDS] 개발 자격증명 경로 찾기 실패: {e}")
+            return None
+
+    def _get_common_config_dir(self) -> Optional[Path]:
+        """10.common/config/ 공통 설정 폴더 경로 반환"""
+        try:
+            # 현재 파일(wf_googlesheets_manager.py)이 10.common에 있으므로
+            current_file = Path(__file__).resolve()
+            common_dir = current_file.parent  # 10.common
+            common_config = common_dir / "config"
+
+            if common_config.exists() and common_config.is_dir():
+                return common_config
+            return None
+        except Exception:
             return None
 
     def _is_bundled(self) -> bool:
@@ -117,8 +156,8 @@ class CredentialsHelper:
                 bundled_path = Path(getattr(sys, "_MEIPASS")) / ".wf_rpa"
                 logger.info(f"[DEBUG] 번들 크리덴셜 경로 시도: {bundled_path}, 존재={bundled_path.exists()}")
                 if bundled_path.exists():
-                    silver_files = list(bundled_path.glob(".silver-argon-*.json"))
-                    logger.info(f"[DEBUG] .silver-argon 파일 검색: {len(silver_files)}개 발견")
+                    silver_files = list(bundled_path.glob("silver-argon-*.json"))
+                    logger.info(f"[DEBUG] silver-argon 파일 검색: {len(silver_files)}개 발견")
                     logger.debug(f"번들 크리덴셜 경로 (_MEIPASS): {bundled_path}")
                     return bundled_path
                 else:
@@ -154,18 +193,18 @@ class CredentialsHelper:
             return False
 
     def ensure_user_credentials(self) -> bool:
-        """환경에 따라 다른 위치에서 .silver-argon-*.json 파일 확인"""
+        """환경에 따라 다른 위치에서 silver-argon-*.json 파일 확인"""
         try:
             logger.info(f"[DEBUG] ensure_user_credentials 시작 (번들={self._is_bundled()})")
             
-            # 배포 환경: _internal/.wf_rpa/.silver-argon-*.json 직접 참조
+            # 배포 환경: _internal/.wf_rpa/silver-argon-*.json 직접 참조
             if self._is_bundled():
                 bundled_dir = self._get_bundled_credentials_dir()
                 logger.info(f"[DEBUG] 번들 디렉토리: {bundled_dir}")
                 
                 if bundled_dir:
-                    silver_files = list(bundled_dir.glob(".silver-argon-*.json"))
-                    logger.info(f"[DEBUG] .silver-argon 파일 검색 결과: {len(silver_files)}개")
+                    silver_files = list(bundled_dir.glob("silver-argon-*.json"))
+                    logger.info(f"[DEBUG] silver-argon 파일 검색 결과: {len(silver_files)}개")
                     
                     if silver_files:
                         logger.info(f"[DEBUG] 첫 번째 파일: {silver_files[0]}")
@@ -175,16 +214,16 @@ class CredentialsHelper:
                         else:
                             logger.warning(f"[DEBUG] 자격증명 파일 유효성 검증 실패")
                     else:
-                        logger.warning(f"번들에서 .silver-argon 파일을 찾을 수 없음: {bundled_dir}")
+                        logger.warning(f"번들에서 silver-argon 파일을 찾을 수 없음: {bundled_dir}")
                         return False
 
-            # 개발 환경: 앱 폴더 아래 config에서 .silver-argon-*.json 직접 사용
+            # 개발 환경: 앱 폴더 아래 config에서 silver-argon-*.json 직접 사용
             else:
                 dev_dir = self._get_dev_credentials_dir()
                 logger.info(f"[DEBUG] 개발 디렉토리: {dev_dir}")
                 
                 if dev_dir:
-                    silver_files = list(dev_dir.glob(".silver-argon-*.json"))
+                    silver_files = list(dev_dir.glob("silver-argon-*.json"))
                     if silver_files and self._validate_credentials_file(silver_files[0]):
                         logger.info(f"개발환경 자격증명 파일 사용: {silver_files[0]}")
                         return True
@@ -197,25 +236,244 @@ class CredentialsHelper:
             logger.error(traceback.format_exc())
             return False
 
+    def _get_configured_credentials_filename(self) -> Optional[str]:
+        """wf_rpa_config.json에서 환경별 크리덴셜 파일명 조회"""
+        try:
+            config_dir = self._get_common_config_dir()
+            if not config_dir:
+                config_dir = self.wf_rpa_dir
+
+            config_file = config_dir / "wf_rpa_config.json"
+            if not config_file.exists():
+                config_file = self.wf_rpa_dir / "wf_rpa_config.json"
+
+            if config_file.exists():
+                with open(config_file, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+                gs_config = config.get("google_sheets", {})
+
+                # ACTIVE_SHEET_MODE에 따라 크리덴셜 파일 선택
+                if ACTIVE_SHEET_MODE == "RELEASE":
+                    return gs_config.get("credentials_file_release")
+                else:  # DEV
+                    return gs_config.get("credentials_file_dev")
+        except Exception as e:
+            logger.debug(f"크리덴셜 파일명 설정 조회 실패: {e}")
+        return None
+
     def get_google_credentials_path(self) -> Optional[Path]:
-        """.silver-argon-*.json 파일 경로 반환 (환경에 따라 다른 위치)"""
-        if self.ensure_user_credentials():
-            # 배포 환경: _internal/.wf_rpa/.silver-argon-*.json 직접 반환
+        """환경별 크리덴셜 파일 경로 반환 (RELEASE/DEV에 따라 다른 파일 사용)"""
+        # 1. 설정에서 지정된 크리덴셜 파일명 조회
+        configured_filename = self._get_configured_credentials_filename()
+
+        if configured_filename:
+            # 배포 환경: _internal/.wf_rpa/ 또는 ~/.wf_rpa/
             if self._is_bundled():
                 bundled_dir = self._get_bundled_credentials_dir()
                 if bundled_dir:
-                    silver_files = list(bundled_dir.glob(".silver-argon-*.json"))
-                    if silver_files:
-                        logger.info(f"배포환경 자격증명 파일 반환: {silver_files[0]}")
-                        return silver_files[0]
-            # 개발 환경: config 폴더에서 찾기
+                    creds_file = bundled_dir / configured_filename
+                    if creds_file.exists() and self._validate_credentials_file(creds_file):
+                        self._set_hidden_attribute(creds_file)
+                        logger.info(f"배포환경 자격증명 파일 반환 (설정): {creds_file}")
+                        return creds_file
+                # 사용자 홈 폴더에서도 탐색
+                home_creds = self.wf_rpa_dir / configured_filename
+                if home_creds.exists() and self._validate_credentials_file(home_creds):
+                    logger.info(f"배포환경 자격증명 파일 반환 (홈): {home_creds}")
+                    return home_creds
+            # 개발 환경: 10.common/config/
             else:
                 dev_dir = self._get_dev_credentials_dir()
                 if dev_dir:
-                    silver_files = list(dev_dir.glob(".silver-argon-*.json"))
+                    creds_file = dev_dir / configured_filename
+                    if creds_file.exists() and self._validate_credentials_file(creds_file):
+                        logger.info(f"개발환경 자격증명 파일 반환 (설정): {creds_file}")
+                        return creds_file
+
+        # 2. 폴백: 기존 silver-argon-*.json 패턴으로 탐색
+        if self.ensure_user_credentials():
+            if self._is_bundled():
+                bundled_dir = self._get_bundled_credentials_dir()
+                if bundled_dir:
+                    silver_files = list(bundled_dir.glob("*.json"))
+                    for sf in silver_files:
+                        if self._validate_credentials_file(sf):
+                            self._set_hidden_attribute(sf)
+                            logger.info(f"배포환경 자격증명 파일 반환 (폴백): {sf}")
+                            return sf
+            else:
+                dev_dir = self._get_dev_credentials_dir()
+                if dev_dir:
+                    silver_files = list(dev_dir.glob("silver-argon-*.json"))
                     if silver_files:
                         return silver_files[0]
         return None
+    
+    # def get_google_credentials_path(self) -> Optional[Path]:
+    #     """silver-argon-*.json 파일 경로 반환"""
+    #     if self.ensure_user_credentials():
+    #         if self._is_bundled():
+    #             # 배포 환경 로직...
+    #             pass
+    #         else:
+    #             # 개발 환경
+    #             dev_dir = self._get_dev_credentials_dir()
+    #             if dev_dir:
+    #                 # _load_config()에서 지정한 파일명 사용
+    #                 config = self._load_config()
+    #                 target_file = dev_dir / config["CREDENTIALS_FILE"]
+                    
+    #                 if target_file.exists():
+    #                     return target_file
+    #                 else:
+    #                     # 지정된 파일이 없으면 기존 방식 (glob) 사용
+    #                     silver_files = list(dev_dir.glob("silver-argon-*.json"))
+    #                     if silver_files:
+    #                         return silver_files[0]
+    #     return None
+
+    def update_credentials_from_drive(self, drive_file_id: str) -> Dict[str, Any]:
+        """
+        구글 드라이브에서 새 크리덴셜 파일을 다운로드하여 기존 파일을 교체합니다.
+
+        Args:
+            drive_file_id: 구글 드라이브의 크리덴셜 파일 ID
+
+        Returns:
+            Dict with 'success' (bool), 'message' (str), 'backup_path' (str, optional)
+        """
+        import shutil
+        from datetime import datetime
+
+        try:
+            # 현재 크리덴셜 파일 경로 가져오기
+            current_creds_path = self.get_google_credentials_path()
+            if not current_creds_path or not current_creds_path.exists():
+                return {
+                    "success": False,
+                    "message": "현재 크리덴셜 파일을 찾을 수 없습니다. 수동으로 설치해주세요."
+                }
+
+            # 기존 크리덴셜로 드라이브 접근
+            try:
+                from google.oauth2.service_account import Credentials
+                from googleapiclient.discovery import build
+                from googleapiclient.http import MediaIoBaseDownload
+                import io
+
+                SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
+                credentials = Credentials.from_service_account_file(
+                    str(current_creds_path), scopes=SCOPES
+                )
+                drive_service = build('drive', 'v3', credentials=credentials)
+
+            except ImportError as e:
+                return {
+                    "success": False,
+                    "message": f"Google Drive API 라이브러리가 없습니다: {e}"
+                }
+            except Exception as e:
+                return {
+                    "success": False,
+                    "message": f"크리덴셜 인증 실패: {e}"
+                }
+
+            # 드라이브에서 파일 다운로드
+            try:
+                request = drive_service.files().get_media(fileId=drive_file_id)
+                file_content = io.BytesIO()
+                downloader = MediaIoBaseDownload(file_content, request)
+
+                done = False
+                while not done:
+                    _, done = downloader.next_chunk()
+
+                file_content.seek(0)
+                new_creds_data = file_content.read()
+
+            except Exception as e:
+                return {
+                    "success": False,
+                    "message": f"드라이브에서 파일 다운로드 실패: {e}"
+                }
+
+            # JSON 유효성 검사
+            try:
+                import json
+                json.loads(new_creds_data.decode('utf-8'))
+            except json.JSONDecodeError:
+                return {
+                    "success": False,
+                    "message": "다운로드된 파일이 유효한 JSON 형식이 아닙니다."
+                }
+
+            # 기존 파일 백업
+            backup_suffix = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_path = current_creds_path.with_suffix(f".backup_{backup_suffix}.json")
+
+            try:
+                shutil.copy2(current_creds_path, backup_path)
+                logger.info(f"기존 크리덴셜 파일 백업: {backup_path}")
+            except Exception as e:
+                return {
+                    "success": False,
+                    "message": f"기존 파일 백업 실패: {e}"
+                }
+
+            # 새 파일 저장 (기존 파일명 유지)
+            try:
+                # 배포 환경에서 숨김 속성 임시 해제
+                if self._is_bundled():
+                    self._remove_hidden_for_write(current_creds_path)
+
+                with open(current_creds_path, 'wb') as f:
+                    f.write(new_creds_data)
+
+                # 배포 환경에서 숨김 속성 재적용
+                if self._is_bundled():
+                    self._set_hidden_attribute(current_creds_path)
+
+                logger.info(f"새 크리덴셜 파일 저장 완료: {current_creds_path}")
+
+            except Exception as e:
+                # 저장 실패 시 백업 복원
+                try:
+                    shutil.copy2(backup_path, current_creds_path)
+                except:
+                    pass
+                return {
+                    "success": False,
+                    "message": f"새 파일 저장 실패 (백업 복원됨): {e}"
+                }
+
+            return {
+                "success": True,
+                "message": "크리덴셜 파일이 성공적으로 업데이트되었습니다.",
+                "backup_path": str(backup_path)
+            }
+
+        except Exception as e:
+            logger.error(f"크리덴셜 업데이트 중 예외 발생: {e}")
+            return {
+                "success": False,
+                "message": f"크리덴셜 업데이트 실패: {e}"
+            }
+
+    def _remove_hidden_for_write(self, path: Path):
+        """Windows에서 파일의 숨김 속성을 임시 제거합니다 (쓰기 위해)."""
+        try:
+            import platform
+            if platform.system() == "Windows":
+                import ctypes
+                FILE_ATTRIBUTE_HIDDEN = 0x02
+                attrs = ctypes.windll.kernel32.GetFileAttributesW(str(path))
+                if attrs != -1 and (attrs & FILE_ATTRIBUTE_HIDDEN):
+                    ctypes.windll.kernel32.SetFileAttributesW(
+                        str(path), attrs & ~FILE_ATTRIBUTE_HIDDEN
+                    )
+        except Exception as e:
+            logger.warning(f"숨김 해제 실패: {path} - {e}")
+
 
 
 class GoogleSheetsManager:
@@ -257,6 +515,7 @@ class GoogleSheetsManager:
         desired = [
             "user_email",
             "app_name",
+            "app_version",
             "hardware_fingerprint",
             "trial_credits",
             "purchased_credits",
@@ -282,6 +541,7 @@ class GoogleSheetsManager:
             "event_tz_name",
             "user_email",
             "app_name",
+            "app_version",
             "hardware_fingerprint",
             "usage_amount",
             "file_count",
@@ -307,6 +567,7 @@ class GoogleSheetsManager:
             "uc_hw_mbinfo",
             "uc_hw_storageinfo",
             "uc_first_app",
+            "uc_first_app_version",
             "reg_time_local",
             "reg_time_utc",
             "reg_tz_name",
@@ -461,7 +722,7 @@ class GoogleSheetsManager:
 
             # 시트 ID 선택
             # sheet_id = (config[f"SHEET_ID_{ACTIVE_SHEET_MODE}"] if self.test_mode
-            #            else config["SHEET_ID_PROD"])
+            #            else config["SHEET_ID_RELEASE"])
             sheet_id = config[f"SHEET_ID_{ACTIVE_SHEET_MODE}"]
 
             # CredentialsHelper 직접 사용
@@ -515,7 +776,7 @@ class GoogleSheetsManager:
                     f"⚠️ Google Service Account 인증서 파일을 찾을 수 없거나 설정할 수 없습니다"
                 )
                 logger.warning(
-                    f"   예상 위치: {Path.home() / '.wf_rpa' / '.silver-argon-*.json'} (배포) 또는 앱의 config 폴더 (개발)"
+                    f"   예상 위치: {Path.home() / '.wf_rpa' / 'silver-argon-*.json'} (배포) 또는 앱의 config 폴더 (개발)"
                 )
                 self.gc = None
                 self.worksheet = None
@@ -530,7 +791,15 @@ class GoogleSheetsManager:
             self.admin_worksheet = None
             self.usage_worksheet = None
         except Exception as e:
-            logger.error(f"❌ 구글 시트 서비스 설정 오류: {e}")
+            error_str = str(e).lower()
+            if 'invalid_grant' in error_str or 'invalid jwt' in error_str:
+                user_friendly_error = (
+                    "❌ 구글 시트 인증 실패: 서비스 계정 키(.json) 파일이 유효하지 않습니다.\n"
+                    "   ▶ 해결 방법: 구글 클라우드 콘솔(GCP)에서 새 키를 발급받아 기존 파일을 교체해주세요."
+                )
+                logger.error(user_friendly_error)
+            
+            logger.error(f"❌ 구글 시트 서비스 설정 중 예기치 않은 오류 발생: {e}")
             import traceback
             logger.error(traceback.format_exc())
             self.gc = None
@@ -781,7 +1050,10 @@ class GoogleSheetsManager:
         """설정 로드 (wf_rpa_config.json에서만 로드)"""
         # get_sheets_config()를 사용하여 중앙화된 설정 로드
         config = get_sheets_config()
-        config["CREDENTIALS_FILE"] = ".silver-argon-445712-a0-4ce021aa64be.json"
+        # config["CREDENTIALS_FILE"] = "silver-argon-445712-a0-4ce021aa64be.json"
+        config["CREDENTIALS_FILE"] = "silver-argon-445712-a0-7092493258f3.json"
+        # silver-argon-445712-a0-7092493258f3
+
         return config
 
     def _get_hardware_info_once(self) -> Dict[str, str]:
@@ -811,6 +1083,7 @@ class GoogleSheetsManager:
         user_phone: str,
         user_email_consent: str,
         app_name: str,
+        app_version: str = "",
     ) -> Dict[str, Any]:
         """등록 데이터 준비"""
         # 타임존 포함 타임스탬프 구성
@@ -834,6 +1107,7 @@ class GoogleSheetsManager:
             "uc_hw_mbinfo": hw_info["mainboard_id"],
             "uc_hw_storageinfo": hw_info["storage_id"],
             "uc_first_app": canonical_app,
+            "uc_first_app_version": app_version,
             "reg_time_local": reg_time_local,
             "reg_time_utc": reg_time_utc,
             "reg_tz_name": tz_name,
@@ -865,6 +1139,7 @@ class GoogleSheetsManager:
                 registration_data.get("uc_hw_mbinfo", ""),
                 registration_data.get("uc_hw_storageinfo", ""),
                 registration_data.get("uc_first_app", ""),
+                registration_data.get("uc_first_app_version", ""),
                 registration_data.get("reg_time_local", ""),
                 registration_data.get("reg_time_utc", ""),
                 registration_data.get("reg_tz_name", ""),
@@ -889,6 +1164,7 @@ class GoogleSheetsManager:
         user_phone: str,
         user_email_consent: str,
         app_name: str,
+        app_version: str = "",
     ) -> bool:
         """사용자 등록 (전체 프로세스) - gspread 방식
 
@@ -898,7 +1174,7 @@ class GoogleSheetsManager:
         try:
             # 등록 데이터 준비
             registration_data = self.prepare_registration_data(
-                user_email, user_name, user_phone, user_email_consent, app_name
+                user_email, user_name, user_phone, user_email_consent, app_name, app_version
             )
 
             # 구글 시트에 추가
@@ -911,6 +1187,87 @@ class GoogleSheetsManager:
         except Exception as e:
             logger.error(f"❌ 사용자 등록 오류: {e}")
             return False
+
+    def sync_local_registration_to_sheets(self, app_name: str, app_version: str = "") -> dict:
+        """로컬에 저장된 등록정보를 Google Sheets에 동기화
+
+        네트워크 문제로 등록이 완료되지 않은 경우, wf_rpa_config.json의
+        user_info 블록에서 등록 정보를 읽어 Google Sheets에 업로드합니다.
+
+        Args:
+            app_name: 앱 이름 (bom_exporter, dwg_batch_print 등)
+            app_version: 앱 버전 (선택)
+
+        Returns:
+            dict: {
+                "success": bool,
+                "message": str,
+                "already_synced": bool  # 이미 동기화되어 있는 경우 True
+            }
+        """
+        result = {"success": False, "message": "", "already_synced": False}
+
+        try:
+            # wf_rpa_config.json에서 사용자 정보 읽기
+            config_path = Path.home() / ".wf_rpa" / "wf_rpa_config.json"
+            if not config_path.exists():
+                result["message"] = "설정 파일이 없습니다. 먼저 앱에서 등록을 완료하세요."
+                return result
+
+            with open(config_path, "r", encoding="utf-8") as f:
+                config_data = json.load(f)
+
+            user_block = config_data.get("user_info", {})
+            if not isinstance(user_block, dict):
+                user_block = {}
+
+            if not user_block.get("is_registered"):
+                result["message"] = "로컬에 등록 정보가 없습니다. 먼저 앱에서 등록을 완료하세요."
+                return result
+
+            user_email = user_block.get("user_email", "")
+            user_name = user_block.get("user_name", "")
+            hardware_fingerprint = user_block.get("client_hw_fingerprint", "")
+
+            if not user_email or not hardware_fingerprint:
+                result["message"] = "등록 정보가 불완전합니다 (이메일 또는 하드웨어 지문 누락)."
+                return result
+
+            # Google Sheets 연결 확인
+            if not self.gc or not self.worksheet:
+                result["message"] = "Google Sheets에 연결할 수 없습니다. 네트워크 연결을 확인하세요."
+                return result
+
+            # 이미 등록되어 있는지 확인 (하드웨어 지문 기준)
+            if self.is_fingerprint_registered(hardware_fingerprint):
+                result["success"] = True
+                result["already_synced"] = True
+                result["message"] = f"이미 Google Sheets에 등록되어 있습니다 ({user_email})."
+                return result
+
+            # 등록 데이터 준비 및 업로드
+            registration_data = self.prepare_registration_data(
+                user_email=user_email,
+                user_name=user_name,
+                user_phone=user_block.get("user_phone", ""),
+                user_email_consent=user_block.get("user_email_consent", "동의"),
+                app_name=app_name,
+                app_version=app_version
+            )
+
+            # Google Sheets에 등록
+            if self.add_registration_to_sheet(registration_data):
+                result["success"] = True
+                result["message"] = f"등록 정보가 Google Sheets에 동기화되었습니다 ({user_email})."
+                logger.info(f"✅ 로컬 등록정보 동기화 완료: {user_email}")
+            else:
+                result["message"] = "Google Sheets 등록 중 오류가 발생했습니다."
+
+        except Exception as e:
+            result["message"] = f"동기화 중 오류 발생: {e}"
+            logger.error(f"❌ 로컬 등록정보 동기화 오류: {e}")
+
+        return result
 
     def sync_credit_data(self, user_email: str, app_name: str, credit_data: Dict[str, Any]) -> bool:
         """크레딧 데이터를 구글 시트에 동기화 (테스트 모드 강제, json 필드 제외)"""
@@ -988,9 +1345,11 @@ class GoogleSheetsManager:
                 event_time_utc = self._now_utc_iso_ms_z()
 
             last_sync_utc = self._now_utc_iso_ms_z()
+            app_version = credit_data.get("app_version", "")
             sync_data = [
                 user_email,
                 app_name,
+                app_version,
                 hardware_fingerprint,
                 credit_data.get("trial_credits", 0),
                 credit_data.get("purchased_credits", 0),
@@ -1036,6 +1395,9 @@ class GoogleSheetsManager:
                             f"[DEBUG-SYNC] 사용 로그 추가 시도: amount={last_usage}, files={file_count}, cost={per_item_cost}"
                         )
 
+                        # 앱 버전 정보 추출
+                        app_version = str(credit_data.get("app_version", ""))
+
                         self._append_credit_usage_log(
                             user_email=user_email,
                             app_name=app_name,
@@ -1045,6 +1407,7 @@ class GoogleSheetsManager:
                             per_item_cost=float(per_item_cost),
                             description=str(description),
                             timestamp_override=usage_event_ts,
+                            app_version=app_version,
                         )
                         logger.info(f"[DEBUG-SYNC] 사용 로그 추가 완료")
                     except Exception as log_err:
@@ -1074,10 +1437,11 @@ class GoogleSheetsManager:
         per_item_cost: float = 0.0,
         description: str = "",
         timestamp_override: Optional[str] = None,
+        app_version: str = "",
     ):
         """credit_usage_log 워크시트에 사용 기록을 한 줄 추가합니다."""
         logger.info(
-            f"[DEBUG-USAGE-LOG] 호출됨: user={user_email}, app={app_name}, amount={usage_amount}, files={file_count}"
+            f"[DEBUG-USAGE-LOG] 호출됨: user={user_email}, app={app_name} ({app_version}), amount={usage_amount}, files={file_count}"
         )
 
         # 가드: 클라이언트 또는 워크시트 없음
@@ -1120,6 +1484,7 @@ class GoogleSheetsManager:
             tz_name,
             user_email,
             app_name,
+            app_version,
             hardware_fingerprint,
             usage_amount,
             file_count,
@@ -1131,7 +1496,7 @@ class GoogleSheetsManager:
         # registrations와 동일하게 self.usage_worksheet 사용
         self.usage_worksheet.append_row(row)
         logger.info(
-            f"🧾 크레딧 사용 로그 기록: {user_email} {app_name} {usage_amount} (파일:{file_count}, 단가:{per_item_cost})"
+            f"🧾 크레딧 사용 로그 기록: {user_email} {app_name} ({app_version}) {usage_amount} (파일:{file_count}, 단가:{per_item_cost})"
         )
 
     def append_usage_log(
@@ -1144,6 +1509,7 @@ class GoogleSheetsManager:
         per_item_cost: float = 0.0,
         description: str = "",
         timestamp_override: Optional[str] = None,
+        app_version: str = "",
     ) -> bool:
         """외부에서 호출 가능한 공개 메서드: 사용 로그만 적재"""
         try:
@@ -1159,6 +1525,7 @@ class GoogleSheetsManager:
                 per_item_cost=per_item_cost,
                 description=description,
                 timestamp_override=timestamp_override,
+                app_version=app_version,
             )
             return True
         except Exception as e:
@@ -1261,8 +1628,8 @@ def get_sheets_config() -> Dict[str, Any]:
 
     Returns:
         Dict: {
-          'SHEET_ID_PROD': str,
-          'SHEET_ID_TEST': str,
+          'SHEET_ID_RELEASE': str,
+          'SHEET_ID_DEV': str,
           'SHEET_NAME_REGISTRATIONS': str,
           'SCOPE': list[str]
         }
@@ -1291,8 +1658,8 @@ def get_sheets_config() -> Dict[str, Any]:
     gs_config = config["google_sheets"]
     
     return {
-        "SHEET_ID_PROD": gs_config["sheet_id_prod"],
-        "SHEET_ID_TEST": gs_config["sheet_id_test"],
+        "SHEET_ID_RELEASE": gs_config["sheet_id_release"],
+        "SHEET_ID_DEV": gs_config["sheet_id_dev"],
         "SHEET_NAME_REGISTRATIONS": gs_config["sheet_name_registrations"],
         "SCOPE": gs_config["scope"],
     }
@@ -1440,8 +1807,10 @@ def _create_default_wf_rpa_config(config_file: Path):
         "app_settings": {"language": "ko"},
         "system_settings": {"auto_update": True, "send_usage_stats": False, "log_level": "INFO"},
         "google_sheets": {
-            "sheet_id_prod": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
-            "sheet_id_test": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
+            "sheet_id_release": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
+            "sheet_id_dev": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
+            "credentials_file_release": "worksfree-b33a6b8f366b.json",
+            "credentials_file_dev": "silver-argon-445712-a0-7092493258f3.json",
             "sheet_name_registrations": "registrations",
             "scope": [
                 "https://spreadsheets.google.com/feeds",
@@ -1468,9 +1837,9 @@ def _create_default_policy(config_file: Path, app_name: str):
         "version": "1.0",
         "identity": {"app_name": app_name},
         "policy": {
-            "trial_credits": 10,
-            "credit_per_item": 1,
-            "warning_threshold": 5,
+            "trial_credits": DEFAULT_TRIAL_CREDITS,
+            "credit_per_item": DEFAULT_CREDIT_PER_ITEM,
+            "warning_threshold": DEFAULT_WARNING_THRESHOLD,
         },
         "last_updated": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3],
         "source": "local_default",

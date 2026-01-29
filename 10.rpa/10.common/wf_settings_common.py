@@ -4,10 +4,8 @@ Provides unified retrieval of user registration and hardware information
 for display in each app's Settings window. This centralizes logic so UI
 modules don't duplicate file parsing and hardware probing code.
 
-Retrieval order (first available wins):
-1. ~/.wf_rpa/.wf_user_info.json  (explicit registration state file)
-2. ~/.wf_rpa/wf_rpa_config.json  (legacy or aggregated config with user_info block)
-3. Live hardware info via wf_hwinfo.HardwareInfo() (fallback when no stored data)
+Data source: ~/.wf_rpa/wf_rpa_config.json (user_info block)
+Fallback: Live hardware info via wf_hwinfo.HardwareInfo()
 
 Returned dictionary keys (all optional – missing values become empty strings):
   email                Registered user email
@@ -39,28 +37,17 @@ def _safe_read_json(path: Path) -> Dict[str, Any]:
 
 
 def get_user_hardware_info() -> Dict[str, Any]:
-    """Return consolidated user & hardware info.
+    """Return consolidated user & hardware info from wf_rpa_config.json.
 
     Falls back gracefully; never raises. Missing fields become ''.
     """
-    home = Path.home()
-    wf_root = home / ".wf_rpa"
-
+    wf_root = Path.home() / ".wf_rpa"
     info: Dict[str, Any] = {}
 
-    # 1. Primary user info file
-    user_info_path = wf_root / ".wf_user_info.json"
-    user_info = _safe_read_json(user_info_path)
-
-    # 2. Legacy / aggregate config file
-    legacy_path = wf_root / "wf_rpa_config.json"
-    legacy_cfg = _safe_read_json(legacy_path)
-    legacy_user_block = (
-        legacy_cfg.get("user_info", {}) if isinstance(legacy_cfg.get("user_info"), dict) else {}
-    )
-
-    # Preferred source layering
-    src = user_info if user_info else legacy_user_block
+    # wf_rpa_config.json의 user_info 블록에서 읽기
+    config_path = wf_root / "wf_rpa_config.json"
+    config = _safe_read_json(config_path)
+    src = config.get("user_info", {}) if isinstance(config.get("user_info"), dict) else {}
 
     # Live hardware fallback
     cpu_id = ""
@@ -80,18 +67,15 @@ def get_user_hardware_info() -> Dict[str, Any]:
 
     info["email"] = src.get("user_email", src.get("email", ""))
     info["name"] = src.get("user_name", src.get("name", ""))
-    info["registration_date"] = src.get("registration_date", "")
-    # Fingerprint priority: explicit file, legacy, then live
+    info["registration_date"] = src.get("reg_time_local", src.get("registration_date", ""))
     info["hardware_fingerprint"] = (
-        src.get("hardware_fingerprint") or src.get("client_hw_fingerprint") or fingerprint or ""
+        src.get("client_hw_fingerprint") or src.get("hardware_fingerprint") or fingerprint or ""
     )
     info["cpu_id"] = src.get("cpu_id", cpu_id)
     info["mainboard_id"] = src.get("mainboard_id", mainboard_id)
     info["storage_id"] = src.get("storage_id", storage_id)
-    # Registration flag inference
     info["is_registered"] = bool(
-        src.get("registered")
-        or src.get("is_registered")
+        src.get("is_registered")
         or src.get("user_email")
         or src.get("email")
     )
@@ -304,10 +288,10 @@ def sync_policies_from_sheets(app_name: str, logger=None) -> Dict[str, Any]:
                 existing_config["email_settings"] = email_settings
                 
                 # google_sheets 설정도 업데이트 (Sheet ID 등이 변경될 수 있음)
-                if "sheet_id_prod" in admin_config_data or "sheet_id_test" in admin_config_data:
+                if "sheet_id_release" in admin_config_data or "sheet_id_dev" in admin_config_data:
                     google_sheets_config = {
-                        "sheet_id_prod": admin_config_data.get("sheet_id_prod", "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww"),
-                        "sheet_id_test": admin_config_data.get("sheet_id_test", "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww"),
+                        "sheet_id_release": admin_config_data.get("sheet_id_release", "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww"),
+                        "sheet_id_dev": admin_config_data.get("sheet_id_dev", "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww"),
                         "sheet_name_registrations": admin_config_data.get("sheet_name_registrations", "registrations"),
                         "scope": [
                             "https://spreadsheets.google.com/feeds",
@@ -454,10 +438,99 @@ def apply_dpi_scale_to_ui_settings(
     return scaled_settings
 
 
+def update_credentials_from_drive(drive_file_id: str, logger=None) -> Dict[str, Any]:
+    """구글 드라이브에서 새 크리덴셜 파일을 다운로드하여 교체합니다.
+
+    Args:
+        drive_file_id: 구글 드라이브의 크리덴셜 파일 ID
+        logger: 로거 객체 (선택사항)
+
+    Returns:
+        Dict with 'success' (bool), 'message' (str), 'backup_path' (str, optional)
+    """
+    try:
+        from wf_googlesheets_manager import get_credentials_helper
+
+        creds_helper = get_credentials_helper()
+        if not creds_helper:
+            return {
+                "success": False,
+                "message": "크리덴셜 헬퍼를 초기화할 수 없습니다."
+            }
+
+        result = creds_helper.update_credentials_from_drive(drive_file_id)
+
+        if logger:
+            if result.get("success"):
+                logger.info(f"크리덴셜 업데이트 성공: {result.get('message')}")
+                if result.get("backup_path"):
+                    logger.info(f"백업 파일: {result.get('backup_path')}")
+            else:
+                logger.error(f"크리덴셜 업데이트 실패: {result.get('message')}")
+
+        return result
+
+    except ImportError as e:
+        error_msg = f"wf_googlesheets_manager 모듈을 불러올 수 없습니다: {e}"
+        if logger:
+            logger.error(error_msg)
+        return {"success": False, "message": error_msg}
+    except Exception as e:
+        error_msg = f"크리덴셜 업데이트 중 오류: {e}"
+        if logger:
+            logger.error(error_msg)
+        return {"success": False, "message": error_msg}
+
+
+# ==================== 기본 admin 비밀번호 (시트 미연결 시 fallback) ====================
+DEFAULT_ADMIN_PASSWORD = "admin2024"
+
+
+def get_admin_password(logger=None) -> str:
+    """구글 시트 admin_config에서 admin_pw를 가져옵니다.
+
+    시트에서 가져오지 못하면 기본값(DEFAULT_ADMIN_PASSWORD)을 반환합니다.
+
+    Args:
+        logger: 로거 객체 (선택사항)
+
+    Returns:
+        str: admin 비밀번호
+    """
+    try:
+        from wf_googlesheets_manager import get_sheets_manager
+
+        sheets_manager = get_sheets_manager(test_mode=False)
+        admin_config = sheets_manager.get_admin_config_full()
+
+        if isinstance(admin_config, dict):
+            admin_pw = admin_config.get("admin_pw", "").strip()
+            if admin_pw:
+                if logger:
+                    logger.debug("admin_pw를 Google Sheets에서 로드했습니다.")
+                return admin_pw
+
+        if logger:
+            logger.warning("admin_config에서 admin_pw를 찾을 수 없어 기본값 사용")
+        return DEFAULT_ADMIN_PASSWORD
+
+    except ImportError as e:
+        if logger:
+            logger.warning(f"wf_googlesheets_manager 불러오기 실패, 기본값 사용: {e}")
+        return DEFAULT_ADMIN_PASSWORD
+    except Exception as e:
+        if logger:
+            logger.warning(f"admin_pw 조회 실패, 기본값 사용: {e}")
+        return DEFAULT_ADMIN_PASSWORD
+
+
 __all__ = [
     "get_user_hardware_info",
     "format_info_for_tree",
     "sync_policies_from_sheets",
     "get_windows_dpi_scale",
     "apply_dpi_scale_to_ui_settings",
+    "update_credentials_from_drive",
+    "get_admin_password",
+    "DEFAULT_ADMIN_PASSWORD",
 ]

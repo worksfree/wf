@@ -877,3 +877,58 @@ if failed_files_1st and not credit_shortage:
 else:
     final_failed = failed_files_1st
 ```
+
+---
+
+## 📋 빌드 검증 보고서
+
+### 빌드 전 종합 검증
+
+**날짜**: 2026-01-06 (Updated)
+**버전**: Alpha v0.9.1.2 (Build #212)
+**테스터**: GitHub Copilot (Automated)
+
+### 검증 결과: ✅ 모든 테스트 통과 (6/6)
+
+#### Test 1: 체험판 크레딧 10000개 부여 (설정 파일 기반) ✅
+
+**개선 사항**: 하드코딩에서 설정 파일 기반으로 전환
+- config/bom_exporter/app_config.json에서 정책 설정
+- wf_credit_manager.py가 설정 파일에서 크레딧 로드
+- 코드 재빌드 없이 정책 변경 가능
+
+#### Test 2: 하드웨어 정보 수집 (CPU/Board/Storage) ✅
+
+- ✅ CPU 정보 수집
+- ✅ Mainboard 정보 수집
+- ✅ Storage 정보 수집
+- ✅ MAC 주소 미사용 확인
+
+#### Test 3~6: 메시지박스, UI, 모듈 임포트, 설정 구조 ✅
+
+모든 테스트 항목 통과 확인
+
+### 빌드 준비 상태: ✅ READY
+
+---
+
+## 🔧 체험판 크레딧 설정 가이드
+
+### 설정 구조
+
+체험판 크레딧은 **설정 파일 기반**으로 관리되며, 코드 수정 없이 배포 후에도 정책 변경이 가능합니다.
+
+#### 크레딧 로드 우선순위
+
+```
+1. config/{app_name}/app_config.json (번들 정책)
+2. ~/.wf_rpa/{app_name}/app_config.json (로컬 오버라이드)
+3. WorksFreeManager.policy['trial_credits']
+4. 기본값: 10000 (fallback)
+```
+
+### 장점
+
+- ✅ 코드 재빌드 없이 정책 변경 가능
+- ✅ 앱별로 다른 크레딧 정책 적용 가능
+- ✅ 유지보수성 향상

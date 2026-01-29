@@ -31,11 +31,13 @@ try:
         get_sheets_manager,
         get_sheets_config,
         get_credentials_helper,
+        CREDENTIALS_FILENAME,
     )
 
     SHEETS_AUTH_AVAILABLE = True
 except Exception:
     SHEETS_AUTH_AVAILABLE = False
+    CREDENTIALS_FILENAME = "silver-argon-445712-a0-7092493258f3.json"
 
 now = datetime.now()
 
@@ -149,7 +151,7 @@ def init(dir_to_find_creds=None):
             creds_path = (
                 creds_helper.get_google_credentials_path()
                 if creds_helper
-                else (Path.home() / ".wf_rpa" / ".silver-argon-445712-a0-4ce021aa64be.json")
+                else (Path.home() / ".wf_rpa" / CREDENTIALS_FILENAME)
             )
 
             if not creds_path or not Path(creds_path).exists():
@@ -160,8 +162,8 @@ def init(dir_to_find_creds=None):
             )
             client = gspread.authorize(credentials)
 
-            # 폴백 경로에서는 테스트 시트를 기본으로 사용
-            sheet_id = cfg["SHEET_ID_TEST"]
+            # 폴백 경로에서는 개발 시트를 기본으로 사용
+            sheet_id = cfg["SHEET_ID_DEV"]
             sheet = client.open_by_key(sheet_id).worksheet(sheet_name)
             df = pd.DataFrame(sheet.get_all_records())
 
@@ -399,7 +401,7 @@ def _run_test(email_from: str | None = None, email_to: str | None = None):
     """안전한 테스트: 실제 사용자에게 메일을 보내지 않음"""
     try:
         # 홈 디렉터리 wf_rpa 경로 기준으로 테스트 수행
-        creds_file = Path.home() / ".wf_rpa" / ".silver-argon-445712-a0-4ce021aa64be.json"
+        creds_file = Path.home() / ".wf_rpa" / CREDENTIALS_FILENAME
         if creds_file.exists():
             init()
             # 테스트 수신자를 어드민 본인으로 설정 (유출 방지, 개인 메일 하드코딩 제거)

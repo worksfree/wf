@@ -1,16 +1,14 @@
 {
-  "identity": {
-    "app_name": "bom_exporter",
-    "short_name": "be",
-    "display_name": "Bom Exporter"
-  },
   "policy": {
-    "icon_text": "B2E",
-    "description": "도면 처리 앱",
+    "icon_text": "BE",
+    "description": "BOM 엑셀 저장 자동화 앱",
     "trial_credits": 10000,
     "credit_per_work": 100,
     "credit_type": "per_file"
   },
-  "source": "bundled",
-  "last_updated": "2026-01-08T08:07:06.944"
+  "last_updated": "2026-01-26T15:08:16.540",
+  "source": "google_sheets",
+  "identity": {
+    "app_name": "bom_exporter"
+  }
 }

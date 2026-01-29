@@ -191,3 +191,96 @@ def _migrate_settings(old_version, new_version):
 ---
 **작성일**: 2026-01-03  
 **마지막 수정**: 2026-01-03
+
+---
+
+## 부록 A: JSON 필드 상세 분류
+
+### policy.json - 앱별 정책 (불변)
+
+#### 유지할 값 (배포 시 그대로 복사)
+
+| 필드 | 예시 값 | 설명 | 변경 금지 이유 |
+|------|---------|------|---------------|
+| identity.app_name | "bom_exporter" | 앱 내부 ID | 앱 식별자 |
+| identity.short_name | "be" | 앱 단축명 | 코드에서 사용 |
+| identity.display_name | "BOM Exporter" | UI 표시명 | 사용자 표시용 |
+| policy.icon_text | "B2E" | 아이콘 텍스트 | UI 아이콘 |
+| policy.description | "도면 처리 앱" | 앱 설명 | 메타데이터 |
+| policy.trial_credits | 10000 / 50000 / -1 | 체험판 크레딧 | **핵심 비즈니스 정책** |
+| policy.credit_per_work | 100 | 작업당 차감 크레딧 | **핵심 비즈니스 정책** |
+| policy.credit_type | "per_file" | 크레딧 차감 방식 | 정책 설정 |
+
+### settings.json - 런타임 설정 (가변)
+
+#### runtime_config 섹션 (빌드 시 주입)
+
+| 필드 | 예시 값 | 설명 | 주입 시점 |
+|------|---------|------|----------|
+| runtime_config.run_mode | "release" | 실행 모드 | spec 파일이 강제로 "release" 설정 |
+| runtime_config.full_version | "v0.9.1.2" | 전체 버전 | spec 파일이 빌드 시 주입 |
+| runtime_config.build_count | 212 | 빌드 횟수 | spec 파일이 빌드 시 주입 |
+| runtime_config.last_updated | "2026-01-05 21:17:43" | 마지막 업데이트 | spec 파일이 빌드 시 주입 |
+
+#### ui_config 섹션 (사용자 경로 초기화)
+
+| 필드 | 초기화 값 | 이유 | 배포 시 처리 |
+|------|----------|------|-------------|
+| ui_config.last_selected_folder | "" | 개발자 경로 유출 방지 | spec 파일이 빈 문자열로 초기화 |
+| ui_config.window_geometry_override | "" | 개발PC 창 위치 유출 방지 | spec 파일이 빈 문자열로 초기화 |
+
+### credit_history.json - 크레딧 이력 (배포 제외)
+
+이 파일은 사용자가 앱을 처음 등록할 때 자동으로 생성됩니다.
+
+**배포 시 처리**:
+- ❌ 번들에 포함하지 않음
+- ❌ 템플릿 파일도 필요 없음
+- ✅ 사용자 등록 시 `wf_credit_manager.py`가 자동 생성
+
+---
+
+## 부록 B: JSON 값 분류 및 배포 전략
+
+### 배포 필수 - 변하지 않는 값
+
+- policy.json: 전체 (identity + policy)
+- settings.json: solidworks, runtime_config 기본값
+
+### 배포 필수 - 초기값 설정 필요
+
+- settings.json: full_version, build_count, last_updated (빌드 시 주입)
+- settings.json: ui_config (빈 문자열로 초기화)
+
+### 사용자별 값 (배포 제외, 런타임 생성)
+
+- credit_history.json: 전체 파일
+- 하드웨어 지문, CPU ID, 메인보드 ID는 사용자 등록 시 자동 생성
+
+### 보안 체크리스트
+
+#### 배포 시 자동 보장되는 사항 (spec 파일)
+
+1. **개발자 정보 유출 방지**
+   - ui_config.last_selected_folder: 빈 문자열로 초기화
+   - ui_config.window_geometry_override: 빈 문자열로 초기화
+   - 앱별 경로 필드: 빈 문자열로 초기화
+
+2. **하드웨어 정보 유출 방지**
+   - credit_history.json: 번들에 미포함
+   - hardware_fingerprint: 번들에 미포함
+   - cpu_id: 번들에 미포함
+   - mainboard_id: 번들에 미포함
+
+3. **배포 모드 보장**
+   - runtime_config.run_mode: 강제로 "release"
+   - 소스가 "demo"여도 배포는 "release"
+
+4. **버전 정보 자동화**
+   - runtime_config.full_version: 빌드 시 자동 주입
+   - runtime_config.build_count: 빌드 시 자동 증가
+   - runtime_config.last_updated: 빌드 시각 자동 기록
+
+---
+
+**마지막 업데이트**: 2026-01-14

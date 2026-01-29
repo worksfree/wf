@@ -59,17 +59,18 @@ class Config:
         self.run_mode = self._detect_run_mode()
 
         app_root = Path(self.base_dir)
-        local_config_dir = app_root / "config"
-        
+        # 통합 config 경로: 10.common/config/ (개발), ~/.wf_rpa/ (배포)
+        common_config_dir = app_root.parents[1] / "10.common" / "config"
+
         # PyInstaller frozen 환경(exe)에서는 항상 사용자 홈 경로 사용 (번들 파일은 읽기 전용)
         import sys
         is_frozen = getattr(sys, 'frozen', False)
-        
-        # exe 빌드에서만 사용자 홈 사용, 소스 실행은 항상 config/ 사용
+
+        # exe 빌드에서만 사용자 홈 사용, 소스 실행은 10.common/config/ 사용
         if is_frozen:
             self.app_config_dir = self.user_home / ".wf_rpa" / "bom_exporter"
         else:
-            self.app_config_dir = local_config_dir / "bom_exporter"
+            self.app_config_dir = common_config_dir / "bom_exporter"
         
         # PyInstaller frozen 환경에서 번들 리소스 경로 저장
         if is_frozen:
@@ -113,7 +114,9 @@ class Config:
         self._load_config_fast()
 
     def _detect_run_mode(self) -> str:
-        settings_path = Path(__file__).resolve().parent / "config" / "bom_exporter" / "settings.json"
+        # 통합 config 경로 사용: 10.common/config/bom_exporter/settings.json
+        app_root = Path(__file__).resolve().parent
+        settings_path = app_root.parents[1] / "10.common" / "config" / "bom_exporter" / "settings.json"
         try:
             with open(settings_path, "r", encoding="utf-8") as f:
                 data = json.load(f) or {}
@@ -193,7 +196,6 @@ class Config:
                 "runtime_config": {
                     "run_mode": "release",  # dev | release | demo (env WF_RPA_MODE로도 설정 가능)
                     "restart_count": 20,
-                    "topmost": True,
                     "auto_restart": True,
                     "speed_mode": "normal",
                     "base_wait_time": 60,
@@ -203,6 +205,7 @@ class Config:
                     "last_updated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 },
                 "ui_config": {
+                    "topmost": True,
                     "last_selected_folder": ""
                 }
             }
@@ -319,14 +322,14 @@ class Config:
     def _load_app_policy_cached(self):
         """🚀 캐시된 정책 로드 (파일 수정 시간 체크)"""
         try:
-            # DEV 모드에서는 앱 로컬 config 폴더의 정책 파일을 우선 사용
+            # 통합 config 경로: 10.common/config/ (개발), ~/.wf_rpa/ (배포)
             app_root = Path(self.base_dir)
-            local_config_dir = app_root / "config"
-            is_dev_mode = (self.run_mode in ("dev", "demo")) or local_config_dir.exists()
+            common_config_dir = app_root.parents[1] / "10.common" / "config"
+            is_dev_mode = self.run_mode in ("dev", "demo")
 
             if is_dev_mode:
-                # 개발: config/bom_exporter/credit_policy.json
-                policy_file = local_config_dir / "bom_exporter" / "credit_policy.json"
+                # 개발: 10.common/config/bom_exporter/credit_policy.json
+                policy_file = common_config_dir / "bom_exporter" / "credit_policy.json"
             else:
                 # 배포: ~/.wf_rpa/bom_exporter/credit_policy.json
                 policy_file = self.app_config_dir / "credit_policy.json"
@@ -477,6 +480,64 @@ class Config:
         except Exception as e:
             try:
                 self.logger.error(f"geometry 저장 실패: {e}")
+            except Exception:
+                pass
+            return False
+
+    def update_settings_window_geometry(self, geometry: str | None) -> bool:
+        """세팅창 geometry를 settings.json에 반영한다."""
+        try:
+            data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+
+            if "ui_config" not in data:
+                data["ui_config"] = {}
+
+            data["ui_config"]["settings_window_geometry"] = geometry or ""
+
+            # app_info 업데이트
+            if "app_info" not in data:
+                data["app_info"] = {}
+            data["app_info"]["last_updated"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            return True
+        except Exception as e:
+            try:
+                self.logger.error(f"settings_window geometry 저장 실패: {e}")
+            except Exception:
+                pass
+            return False
+
+    def update_registration_window_geometry(self, geometry: str | None) -> bool:
+        """등록창 geometry를 settings.json에 반영한다."""
+        try:
+            data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+
+            if "ui_config" not in data:
+                data["ui_config"] = {}
+
+            data["ui_config"]["registration_window_geometry"] = geometry or ""
+
+            # app_info 업데이트
+            if "app_info" not in data:
+                data["app_info"] = {}
+            data["app_info"]["last_updated"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            return True
+        except Exception as e:
+            try:
+                self.logger.error(f"registration_window geometry 저장 실패: {e}")
             except Exception:
                 pass
             return False

@@ -1,5 +1,14 @@
 import os
 import sys
+from pathlib import Path
+
+# Windows 콘솔 UTF-8 강제 설정 (GUI 모드에서는 stdout/stderr가 None일 수 있음)
+if sys.platform == "win32":
+    import io
+    if sys.stdout is not None and hasattr(sys.stdout, 'buffer'):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    if sys.stderr is not None and hasattr(sys.stderr, 'buffer'):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 # ==================== STARTUP PROFILER ====================
 _STARTUP_LOG = []
@@ -8,11 +17,15 @@ _STARTUP_FLUSHED = False
 
 
 def _detect_run_mode():
+    """
+    실행 모드 감지 (환경변수 + sys.argv 기반 통일 방식)
+    - 1순위: WF_RPA_MODE 환경변수 (demo 모드 명시적 지정용)
+    - 2순위: .py 파일 직접 실행 → dev
+    - 3순위: 기본값 release (exe 실행)
+    """
     env_mode = (os.environ.get("WF_RPA_MODE") or "").strip().lower()
-    if env_mode:
+    if env_mode in ("dev", "demo", "release"):
         return env_mode
-    if os.environ.get("WF_RPA_DEV") == "1":
-        return "dev"
     if sys.argv[0].endswith(".py"):
         return "dev"
     return "release"
@@ -32,16 +45,15 @@ def _get_startup_log_path():
 
 
 def _log_startup(msg):
-    """Startup 타이밍 로그 수집"""
+    """Startup 타이밍 로그 수집 (버퍼 방식)"""
     if not _STARTUP_ENABLED:
         return
     import time
-
     _STARTUP_LOG.append((time.perf_counter(), msg))
 
 
 def _flush_startup_log():
-    """수집한 startup 로그를 콘솔과 파일로 출력"""
+    """수집한 startup 로그를 파일로 출력 (콘솔 출력 제거 - GUI 앱)"""
     global _STARTUP_FLUSHED
     if _STARTUP_FLUSHED:
         return
@@ -49,14 +61,18 @@ def _flush_startup_log():
         return
     base_time = _STARTUP_LOG[0][0]
     total_ms = (_STARTUP_LOG[-1][0] - base_time) * 1000
+
     try:
         log_path = _get_startup_log_path()
         with open(log_path, "w", encoding="utf-8") as f:
             f.write(f"Total: {total_ms:.1f}ms\n")
             for t, msg in _STARTUP_LOG:
-                f.write(f"[{(t - base_time)*1000:7.1f}ms] {msg}\n")
+                elapsed_ms = (t - base_time) * 1000
+                f.write(f"[{elapsed_ms:7.1f}ms] {msg}\n")
     except Exception:
         pass
+
+    _STARTUP_FLUSHED = True
 
 
 _log_startup("Script start")
@@ -77,23 +93,26 @@ def _load_version_info():
 
     try:
         if getattr(sys, "frozen", False):
-            # 릴리스 모드: 번들된 settings.json 우선, 없으면 사용자 홈으로 fallback
+            # 릴리스 모드: 번들 버전 우선 (정확한 빌드 버전), fallback으로 사용자 홈
             base_path = Path(sys._MEIPASS) if hasattr(sys, '_MEIPASS') else Path(sys.executable).parent
             settings_file = base_path / ".wf_rpa" / "korean_filename_normalizer" / "settings.json"
             if not settings_file.exists():
                 settings_file = Path.home() / ".wf_rpa" / "korean_filename_normalizer" / "settings.json"
         else:
-            # 개발 모드: config/korean_filename_normalizer/settings.json
-            settings_file = (
-                Path(__file__).parent / "config" / "korean_filename_normalizer" / "settings.json"
-            )
+            # 개발 모드: 10.common/config/korean_filename_normalizer/settings.json (통합 경로)
+            app_root = Path(__file__).parent
+            settings_file = app_root.parent.parent / "10.common" / "config" / "korean_filename_normalizer" / "settings.json"
+            # fallback: 앱 폴더의 config
+            if not settings_file.exists():
+                settings_file = app_root / "config" / "korean_filename_normalizer" / "settings.json"
 
         if settings_file.exists():
             with open(settings_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                # runtime_config에서 버전 읽기
+                # app_config.full_version 우선 (새 표준), 없으면 runtime_config.full_version
+                app_config = data.get("app_config", {})
                 runtime_config = data.get("runtime_config", {})
-                full_version = runtime_config.get("full_version", default_full)
+                full_version = app_config.get("full_version") or runtime_config.get("full_version", default_full)
                 # v 접두사 보장
                 if not full_version.startswith("v"):
                     full_version = "v" + full_version
@@ -117,6 +136,39 @@ try:
     _log_startup("multiprocessing.freeze_support()")
 except Exception:
     pass
+
+
+# --- Single instance guard (Windows named mutex) ---
+_instance_mutex_handle = None
+
+
+def _acquire_single_instance(mutex_name: str = r"Global\\WF_KOREAN_FILENAME_NORMALIZER"):
+    """Try to acquire a global mutex so only one instance runs.
+    Returns (is_first_instance: bool, handle: int|None).
+    Works on Windows; no-op on other OSes.
+    """
+    if os.name != "nt":
+        return True, None
+    try:
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        # BOOL bInitialOwner=False so we don't need to ReleaseMutex later
+        handle = kernel32.CreateMutexW(
+            ctypes.c_void_p(None), ctypes.c_bool(False), ctypes.c_wchar_p(mutex_name)
+        )
+        if not handle:
+            return True, None  # fail-open to avoid blocking start
+        ERROR_ALREADY_EXISTS = 183
+        existed = kernel32.GetLastError() == ERROR_ALREADY_EXISTS
+        if existed:
+            # Another instance already created the mutex
+            kernel32.CloseHandle(handle)
+            return False, None
+        return True, handle
+    except Exception:
+        # If anything goes wrong, don't block startup (fail-open)
+        return True, None
 
 
 # --- Cross-app execution status helpers (unified skeleton) ---
@@ -240,7 +292,8 @@ _log_startup("APP_NAME defined")
 from automation import FilenameProcessor
 
 _log_startup("import automation.FilenameProcessor")
-from ui_setting import create_settings_window, get_adaptive_ui_settings, _apply_global_fonts
+from ui_setting import create_settings_window
+from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
 
 _log_startup("import ui_setting")
 
@@ -278,6 +331,9 @@ class KoreanFilenameNormalizerApp:
         self.itself_dir = os.path.dirname(os.path.abspath(__file__))
         # MessageBox들이 메인창 기준으로 뜨도록 parent를 강제 지정
         self._bind_messagebox_parent()
+
+        # 아이콘 경로 저장 (등록창/설정창에서 사용)
+        self.icon_path = self._find_icon_path()
 
         # 적응형 UI 설정 초기화
         self.ui = get_adaptive_ui_settings()
@@ -322,7 +378,8 @@ class KoreanFilenameNormalizerApp:
         self.is_admin_mode = False
         self.admin_mode_timer = None
         self.admin_mode_start_time = None
-        self.admin_password = "admin2024"
+        # 🚀 최적화: admin 비밀번호 lazy 로딩 (Google Sheets 호출 지연)
+        self._admin_password = None  # lazy load
 
         # 로그 창 관련 변수
         self.log_frame = None
@@ -331,25 +388,19 @@ class KoreanFilenameNormalizerApp:
         self.auto_scroll_var = None
         self.auto_scroll_checkbox = None
 
-    def _bind_messagebox_parent(self):
-        """Route all tkinter messageboxes to use the main window as parent for centering."""
-        def _wrap(func):
-            def inner(*args, **kwargs):
-                kwargs.setdefault("parent", self.master)
-                return func(*args, **kwargs)
-            return inner
+        # 매니저 및 UI 초기화 (모든 변수 초기화 후 호출)
+        self._init_managers_and_ui()
 
-        for name in (
-            "showinfo",
-            "showwarning",
-            "showerror",
-            "askyesno",
-            "askquestion",
-            "askokcancel",
-            "askyesnocancel",
-        ):
-            if hasattr(messagebox, name):
-                setattr(messagebox, name, _wrap(getattr(messagebox, name)))
+    @property
+    def admin_password(self) -> str:
+        """🚀 Lazy 로딩: admin 비밀번호 (첫 접근 시 Google Sheets에서 로드)"""
+        if self._admin_password is None:
+            try:
+                from wf_settings_common import get_admin_password  # type: ignore
+                self._admin_password = get_admin_password(self.logger)
+            except Exception:
+                self._admin_password = "admin2024"  # fallback
+        return self._admin_password
 
     def _bind_messagebox_parent(self):
         """Route all tkinter messageboxes to use the main window as parent for centering."""
@@ -370,8 +421,27 @@ class KoreanFilenameNormalizerApp:
         ):
             if hasattr(messagebox, name):
                 setattr(messagebox, name, _wrap(getattr(messagebox, name)))
-        self.original_window_height = 180  # 4행 기본 높이 (DPI 비스케일)
-        self.expanded_window_height = int(self.original_window_height * 1.8)
+
+    def _find_icon_path(self):
+        """앱 아이콘 경로 찾기 (개발/릴리스 환경 모두 지원)"""
+        try:
+            icon_names = ["06_Korean_Filename_Normalizer.ico", "KFN.ico"]
+            if getattr(sys, 'frozen', False):
+                base_paths = [
+                    Path(sys.executable).parent / "res",
+                    Path(sys.executable).parent / "_internal" / "res",
+                ]
+            else:
+                base_paths = [Path(__file__).parent / "res"]
+            icon_candidates = [bp / name for bp in base_paths for name in icon_names]
+            return next((p for p in icon_candidates if p.exists()), None)
+        except Exception:
+            return None
+
+    def _init_managers_and_ui(self):
+        """wf_manager 초기화 후 호출되는 매니저 및 UI 초기화"""
+        self.original_window_height = 160  # 1입력 앱 기본 높이
+        self.expanded_window_height = self.original_window_height + 300  # 관리자 모드: +300 고정
 
         # 사용자 등록 상태 Early 확인 (플래그/reg_time_local)
         self.is_registered_user = False
@@ -464,20 +534,14 @@ class KoreanFilenameNormalizerApp:
                 pass
      
     def _restore_last_session(self):
-        """이전 작업 세션 복원: 폴더 자동 스캔 (CV 패턴)"""
+        """이전 작업 세션 복원: 폴더 경로만 복원, 스캔은 사용자가 체크박스 선택 시에만"""
         try:
             folder = self.folder_path.get().strip()
-            # 등록된 사용자이고 폴더가 유효한 경우 자동 스캔
+            # 등록된 사용자이고 폴더가 유효한 경우에만 경로 복원
+            # 스캔은 scan_toggle_var가 True인 경우에만 on_scan_toggle에서 자동 실행됨
             if self.is_registered_user and folder and os.path.isdir(folder):
-                try:
-                    if hasattr(self, "scan_toggle_btn"):
-                        self.scan_toggle_btn.config(state="disabled")
-                    self.scan_toggle_var.set(True)
-                    self.on_scan_toggle()
-                    self.logger.info("이전 작업 폴더 자동 스캔 완료")
-                finally:
-                    if hasattr(self, "scan_toggle_btn"):
-                        self.scan_toggle_btn.config(state="normal")
+                self.logger.info(f"이전 작업 폴더 경로 복원: {folder}")
+                # scan_toggle_var는 이미 False로 초기화되어 있으므로 스캔하지 않음
         except Exception as e:
             self.logger.warning(f"이전 세션 복원 중 오류 (무시): {e}")
 
@@ -629,11 +693,7 @@ class KoreanFilenameNormalizerApp:
                 self.logger.error(f"실행 상태 해제 오류: {e}")
 
     def _async_refresh_policies(self):
-        """정책 동기화 (백그라운드, 배포본에서는 토스트 비활성화)"""
-        import sys
-        is_bundled = getattr(sys, 'frozen', False) or hasattr(sys, '_MEIPASS')
-        if not is_bundled:
-            self._show_toast("정책 동기화 중...")
+        """정책 동기화 (백그라운드, 토스트 메시지 없음)"""
 
         def worker():
             try:
@@ -651,12 +711,21 @@ class KoreanFilenameNormalizerApp:
                             self.credit_manager._save_credit_data(cd)
                     except Exception:
                         pass
-                msg = "정책 동기화 완료" if result.get("success") else "정책 동기화 실패"
-                self.master.after(0, lambda: self._show_toast(msg, 1400))
             finally:
                 self.master.after(0, self.update_credit_display)
 
         threading.Thread(target=worker, daemon=True).start()
+
+    def update_registration_button(self):
+        """등록 상태에 따라 설정/등록 버튼 텍스트 업데이트"""
+        try:
+            if getattr(self, "settings_button", None):
+                if self.is_registered_user:
+                    self.settings_button.config(text="설 정", command=self.open_settings_window)
+                else:
+                    self.settings_button.config(text="등 록", command=self.open_registration_window)
+        except Exception:
+            pass
 
     def update_credit_display(self):
         """크레딧 표시 업데이트"""
@@ -669,8 +738,8 @@ class KoreanFilenameNormalizerApp:
 
             status = self.credit_manager.get_credit_status()
             ct = status.get("credit_type", "standard")
-            trial_raw = status.get("trial_credits", 0)
-            purchased_raw = status.get("purchased_credits", 0)
+            trial_raw = status.get("remaining_trial", 0)
+            purchased_raw = status.get("remaining_purchased", 0)
             trial = max(0, trial_raw)
             purchased = max(0, purchased_raw)
             cost = self.credit_manager.policy.get("credit_per_work", 1)
@@ -791,7 +860,7 @@ class KoreanFilenameNormalizerApp:
         self.master.wm_attributes("-topmost", 1)
 
         # 전역 폰트 설정 적용 (메인창 폰트 크기 일관성 보장)
-        _apply_global_fonts(self.master, self.ui)
+        apply_global_fonts(self.master, self.ui)
 
         # UI 요소 생성
         self.create_ui_elements()
@@ -1086,61 +1155,75 @@ class KoreanFilenameNormalizerApp:
             return
 
         try:
-            messages = []
+            popup_messages = []
+            credentials_updated = False
 
-            # 1. 앱 정책 및 관리자 설정 동기화 (비활성화)
-            # try:
-            #     from wf_settings_common import sync_policies_from_sheets
-            # 
-            #     policy_result = sync_policies_from_sheets("korean_filename_normalizer", self.logger)
-            #     if policy_result.get("success"):
-            #         updates_list = policy_result.get("updates") or []
-            #         errors_list = policy_result.get("errors") or []
-            #         if updates_list:
-            #             messages.append("\n".join(map(str, updates_list)))
-            #         if errors_list:
-            #             messages.append("\n".join(map(str, errors_list)))
-            #     else:
-            #         messages.append(f"⚠️ 정책 동기화 실패: {policy_result.get('message')}")
-            # except Exception as e:
-            #     self.logger.warning(f"정책 동기화 중 오류 (무시): {e}")
-            #     messages.append(f"⚠️ 정책 동기화 오류: {str(e)}")
+            # 1. 앱 정책 및 관리자 설정 동기화 (백그라운드)
+            try:
+                from wf_settings_common import sync_policies_from_sheets  # type: ignore
+                policy_result = sync_policies_from_sheets("korean_filename_normalizer", self.logger)
+                if policy_result.get("success"):
+                    self.logger.info("정책 동기화 완료")
+                else:
+                    self.logger.warning(f"정책 동기화 실패: {policy_result.get('message')}")
+            except Exception as e:
+                self.logger.warning(f"정책 동기화 중 오류 (무시): {e}")
 
-            # 정책 동기화 후 최신 크레딧 데이터 로드 (free/permanent 여부 판단)
+            # 정책 동기화 후 최신 크레딧 데이터 로드
             status = self.credit_manager.get_credit_status()
-            trial_credits = status.get("trial_credits", 0)
-            purchased_credits = status.get("purchased_credits", 0)
+            trial_credits = status.get("remaining_trial", 0)
+            purchased_credits = status.get("remaining_purchased", 0)
 
-            # 2. 구매 이력(credit_purchase_log) 반영: 무료(-1 trial) 또는 영구(-1 purchased) 라이선스는 스킵
+            # 2. 구매 이력 반영 - 팝업에 표시
             if trial_credits == -1:
-                messages.append("무료 앱 - 구매 이력 동기화 건너뜀")
+                popup_messages.append("무료 앱 - 구매 이력 동기화 건너뜀")
             elif purchased_credits == -1:
-                messages.append("영구 라이선스 - 구매 이력 동기화 불필요")
+                popup_messages.append("영구 라이선스 - 구매 이력 동기화 불필요")
             else:
                 try:
                     result = self.credit_manager.pull_and_apply_purchases()
                     if result.get("success"):
                         added = result.get("added", 0)
                         if added > 0:
-                            messages.append(f"✅ 구매 이력 반영: {added:,}개 크레딧 추가")
+                            popup_messages.append(f"✅ 구매 이력 반영: {added:,}개 크레딧 추가")
                         else:
-                            messages.append("신규 구매 이력이 없습니다.")
+                            popup_messages.append("신규 구매 이력이 없습니다.")
                     else:
-                        messages.append(f"⚠️ 구매 이력 갱신 실패: {result.get('message')}")
+                        popup_messages.append(f"⚠️ 구매 이력 갱신 실패: {result.get('message')}")
                 except Exception as e:
-                    messages.append(f"⚠️ 구매 이력 갱신 오류: {str(e)}")
+                    popup_messages.append(f"⚠️ 구매 이력 갱신 오류: {str(e)}")
                     self.logger.error(f"크레딧 갱신 오류: {e}")
 
-            # 결과 표시
-            final_message = "\n".join(messages)
-            messagebox.showinfo("업데이트 완료", final_message)
+            # 3. 크리덴셜 파일 업데이트 체크
+            try:
+                from wf_googlesheets_manager import get_sheets_manager  # type: ignore
+                sheets_manager = get_sheets_manager(test_mode=False)
+                admin_config = sheets_manager.get_admin_config_full()
+                creds_file_id = admin_config.get("credentials_file_id", "").strip()
 
+                if creds_file_id:
+                    from wf_settings_common import update_credentials_from_drive  # type: ignore
+                    creds_result = update_credentials_from_drive(creds_file_id, self.logger)
+                    if creds_result.get("success"):
+                        credentials_updated = True
+                        self.logger.info(f"크리덴셜 업데이트 완료: {creds_result.get('backup_path')}")
+                    else:
+                        self.logger.warning(f"크리덴셜 업데이트 실패: {creds_result.get('message')}")
+            except Exception as e:
+                self.logger.warning(f"크리덴셜 업데이트 체크 중 오류 (무시): {e}")
+
+            # 결과 표시
+            final_message = "\n".join(popup_messages)
+            if credentials_updated:
+                final_message += "\n\n🔄 인증 정보가 업데이트되었습니다.\n변경사항 적용을 위해 앱을 재시작해주세요."
+
+            messagebox.showinfo("업데이트 완료", final_message)
             self.update_credit_display()
+
         except Exception as e:
             messagebox.showerror("업데이트 오류", str(e))
             self.logger.error(f"업데이트 오류: {e}")
             import traceback
-
             self.logger.error(traceback.format_exc())
 
     def start_normalization(self):
@@ -1337,16 +1420,14 @@ class KoreanFilenameNormalizerApp:
             self.logger.warning(f"[DEMO] capture failed ({safe_reason}): {e}")
 
     def _bind_debug_geometry_hotkey(self):
-        """Alt+G 하나로 geometry 캡처/저장, Alt+C 화면 캡처 (demo 전용)"""
+        """Alt+G: geometry 저장 (모든 모드), Alt+C: 화면 캡처 (demo 전용)"""
         try:
-            if not (self.config and hasattr(self.config, "is_demo") and self.config.is_demo()):
-                return
-        except Exception:
-            return
-
-        try:
+            # Alt+G는 항상 바인딩 (geometry 저장용)
             self.master.bind_all("<Alt-g>", self._on_debug_geometry_capture)
-            self.master.bind_all("<Alt-c>", self._on_manual_capture)
+
+            # Alt+C는 demo 모드에서만 바인딩 (화면 캡처용)
+            if self.config and hasattr(self.config, "is_demo") and self.config.is_demo():
+                self.master.bind_all("<Alt-c>", self._on_manual_capture)
         except Exception as e:
             try:
                 self.logger.debug(f"Alt hotkey bind 실패: {e}")
@@ -1507,14 +1588,233 @@ class KoreanFilenameNormalizerApp:
         except Exception:
             pass
     
+    # ==================== WF-ACT Test Mode ====================
+    def init_test_server(self):
+        """WF-ACT 인증 테스트용 TestServer 초기화"""
+        try:
+            # TestServer import (로컬 test_server.py 사용)
+            from test_server import TestServer
+            self.test_server = TestServer(app_name="korean_filename_normalizer")
+            self.test_server.register_handlers({
+                'get_credits': self._test_get_credits,
+                'set_credits': self._test_set_credits,
+                'add_credits': self._test_add_credits,
+                'get_credit_status': self._test_get_credit_status,
+                'get_trial_info': self._test_get_trial_info,
+                'get_registration_status': self._test_get_registration_status,
+                'register': self._test_register,
+                'clear_registration': self._test_clear_registration,
+                'sync_registration': self._test_sync_registration,
+                'simulate_work': self._test_simulate_work,
+                'get_state': self._test_get_state,
+                'get_policy': self._test_get_policy,
+                'get_settings': self._test_get_settings,
+                'save_settings': self._test_save_settings,
+                'load_settings': self._test_load_settings,
+                'reload_config': self._test_reload_config,
+                'get_button_state': self._test_get_button_state,
+                'click_button': self._test_click_button,
+            })
+            self.test_server.start()
+            self.logger.info("[WF-ACT] Test server started on port " + str(self.test_server.port))
+        except Exception as e:
+            self.logger.error(f"[WF-ACT] Failed to initialize test server: {e}")
+            raise
+
+    def _test_get_credits(self) -> int:
+        if not self.credit_manager:
+            return 0
+        try:
+            data = self.credit_manager._load_credit_data()
+            rt, rp = data.get("remaining_trial", 0), data.get("remaining_purchased", 0)
+            return -1 if rt == -1 or rp == -1 else rt + rp
+        except Exception:
+            return self.credit_manager.get_credit_status().get("remaining_credits", 0)
+
+    def _test_set_credits(self, amount: int, credit_type: str = "trial") -> bool:
+        if not self.credit_manager or amount is None or amount < 0:
+            return False
+        try:
+            data = self.credit_manager._load_credit_data()
+            if credit_type == "purchased":
+                data["remaining_purchased"], data["remaining_trial"] = amount, 0
+            else:
+                data["remaining_trial"], data["remaining_purchased"] = amount, 0
+            if amount == 0:
+                data.setdefault("usage_history", []).append({"timestamp": "2000-01-01T00:00:00", "credits_used": 0, "operation": "wf_act_test_marker"})
+            self.credit_manager._save_credit_data(data)
+            self.master.after(0, self.update_credit_display)
+            return True
+        except Exception:
+            return False
+
+    def _test_add_credits(self, amount: int) -> bool:
+        if not self.credit_manager:
+            return False
+        try:
+            data = self.credit_manager._load_credit_data()
+            if data.get("remaining_purchased", 0) != -1:
+                data["remaining_purchased"] = data.get("remaining_purchased", 0) + amount
+            self.credit_manager._save_credit_data(data)
+            self.master.after(0, self.update_credit_display)
+            return True
+        except Exception:
+            return False
+
+    def _test_get_credit_status(self) -> dict:
+        return self.credit_manager.get_credit_status() if self.credit_manager else {"error": "not_initialized"}
+
+    def _test_get_trial_info(self) -> dict:
+        if not self.credit_manager:
+            return {"error": "not_initialized"}
+        policy = self.credit_manager.policy or {}
+        data = self.credit_manager._load_credit_data()
+        return {"initial_credits": policy.get("trial_credits", 0), "remaining_trial": data.get("remaining_trial", 0), "trial_credits": policy.get("trial_credits", 0)}
+
+    def _test_get_registration_status(self) -> dict:
+        if not self.wf_manager:
+            return {"is_registered": False, "email": None}
+        ui = self.wf_manager.get_user_info()
+        return {"is_registered": self.wf_manager.is_registered(), "email": ui.get("user_email") or ui.get("email"), "registered_at": ui.get("reg_time_local"), "app_version": APP_VERSION_FULL}
+
+    def _test_register(self, email: str) -> dict:
+        if not self.wf_manager:
+            return {"success": False, "error": "not_initialized"}
+        try:
+            try:
+                from wf_hwinfo import HardwareInfo
+                hw_fp = HardwareInfo().fingerprint
+            except Exception:
+                hw_fp = "test_" + email.split("@")[0]
+            success = self.wf_manager.register_user(user_email=email, hw_fingerprint=hw_fp, user_name="Test", user_phone="", user_email_consent="Y")
+            if success:
+                self.is_registered_user = True
+                self.master.after(0, self.update_registration_button)
+                # WF-ACT: Grant trial credits on registration
+                if self.credit_manager:
+                    trial = self.credit_manager.policy.get("trial_credits", 4000)
+                    data = self.credit_manager._load_credit_data()
+                    data["remaining_trial"] = trial
+                    self.credit_manager._save_credit_data(data)
+            return {"success": success}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def _test_clear_registration(self) -> bool:
+        if not self.wf_manager:
+            return False
+        try:
+            config = self.wf_manager.load_config()
+            config["user_info"] = {"is_registered": False, "user_email": None, "reg_time_local": None, "reg_time_utc": None}
+            self.wf_manager.save_config(config)
+            self.is_registered_user = False
+            self.master.after(0, self.update_registration_button)
+            return True
+        except Exception:
+            return False
+
+    def _test_sync_registration(self) -> dict:
+        return {"success": True, "message": "sync_attempted"} if self.wf_manager else {"success": False, "error": "not_initialized"}
+
+    def _test_simulate_work(self, file_count: int = 1) -> dict:
+        if not self.credit_manager:
+            return {"success": False, "error": "not_initialized"}
+        cost = self.credit_manager.policy.get("credit_per_work", 0)
+        if cost == 0:
+            return {"success": True, "processed_count": file_count, "blocked": False, "free_app": True}
+        try:
+            data = self.credit_manager._load_credit_data()
+            rt, rp = data.get("remaining_trial", 0), data.get("remaining_purchased", 0)
+            if rt == -1 or rp == -1:
+                return {"success": True, "processed_count": file_count, "blocked": False}
+            current = rt + rp
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+        processed = 0
+        for _ in range(file_count):
+            if current < cost:
+                return {"success": False, "blocked": True, "processed_count": processed, "exhausted": True, "remaining_credits": current}
+            data = self.credit_manager._load_credit_data()
+            t, p = data.get("remaining_trial", 0), data.get("remaining_purchased", 0)
+            if p >= cost:
+                data["remaining_purchased"] = p - cost
+            elif t >= cost:
+                data["remaining_trial"] = t - cost
+            else:
+                data["remaining_purchased"], data["remaining_trial"] = 0, t - (cost - p)
+            self.credit_manager._save_credit_data(data)
+            processed += 1
+            current = data.get("remaining_trial", 0) + data.get("remaining_purchased", 0)
+        self.master.after(0, self.update_credit_display)
+        return {"success": True, "processed_count": processed, "blocked": False, "remaining_credits": current}
+
+    def _test_get_state(self) -> dict:
+        return {"is_registered": self.is_registered_user, "has_credit_manager": self.credit_manager is not None, "selected_path": self.SELECTED_PATH, "is_admin_mode": self.is_admin_mode}
+
+    def _test_get_policy(self) -> dict:
+        p = dict(self.credit_manager.policy) if self.credit_manager else {}
+        return {"identity": {"app_name": "korean_filename_normalizer", "display_name": "Korean Filename Normalizer"}, "policy": {"credit_per_work": p.get("credit_per_work", 0), "trial_credits": p.get("trial_credits", 0)}, "app_name": "korean_filename_normalizer", **p}
+
+    def _test_get_settings(self) -> dict:
+        return {"app_name": "korean_filename_normalizer", "run_mode": getattr(self.config, "run_mode", "release"), "full_version": APP_VERSION_FULL, "version": APP_VERSION_FULL}
+
+    def _test_reload_config(self) -> bool:
+        """설정 및 정책 재로드 (테스트용)"""
+        try:
+            if self.credit_manager:
+                self.credit_manager._reload_policy()
+            return True
+        except Exception:
+            return False
+
+    def _test_save_settings(self, settings: dict) -> dict:
+        try:
+            import json
+            sf = self.config.settings_file
+            data = json.load(open(sf, "r", encoding="utf-8")) if sf.exists() else {}
+            data.setdefault("test_config", {}).update(settings)
+            json.dump(data, open(sf, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def _test_load_settings(self) -> dict:
+        try:
+            import json
+            sf = self.config.settings_file
+            data = json.load(open(sf, "r", encoding="utf-8")) if sf.exists() else {}
+            return {"app_config": data.get("app_config", {}), "test_config": data.get("test_config", {})}
+        except Exception as e:
+            return {"error": str(e)}
+
+    def _test_get_button_state(self, button_name: str) -> dict:
+        bmap = {"work": getattr(self, "start_button", None), "register": getattr(self, "register_button", None), "settings": getattr(self, "settings_button", None)}
+        btn = bmap.get(button_name)
+        return {"exists": True, "state": str(btn.cget("state")), "text": str(btn.cget("text"))} if btn else {"exists": False}
+
+    def _test_click_button(self, button_name: str) -> bool:
+        bmap = {"work": getattr(self, "start_button", None), "register": getattr(self, "register_button", None), "settings": getattr(self, "settings_button", None)}
+        btn = bmap.get(button_name)
+        if btn and str(btn.cget("state")) != "disabled":
+            btn.invoke()
+            return True
+        return False
+
     def on_closing(self):
         """앱 종료 처리 (BOM2Excel에서 복사)"""
+        # WF-ACT 테스트 서버 정리
+        try:
+            if hasattr(self, "test_server") and self.test_server:
+                self.test_server.stop()
+        except Exception:
+            pass
+
         # 전역 핫키 리스너 정리
         try:
             self._stop_global_hotkey_listener()
         except Exception:
             pass
-        
+
         # 관리자 모드 정리
         if self.is_admin_mode:
             self.remove_log_handler()
@@ -2065,7 +2365,7 @@ class KoreanFilenameNormalizerApp:
     def open_settings_window(self):
         """설정 창 표시"""
         try:
-            result = create_settings_window(self.master, self.config)
+            result = create_settings_window(self.master, self.config, self.icon_path)
             # 설정이 저장되었다면 기본 폴더 값을 반영
             if result:
                 try:
@@ -2175,7 +2475,7 @@ class KoreanFilenameNormalizerApp:
                 self.update_credit_display()
             else:
                 run_mode = getattr(self.config, "run_mode", getattr(self.config, "get", lambda *_: "release")("run_mode", "release"))
-                if run_mode in ("dev", "demo"):
+                if run_mode == "dev":  # dev 모드에서만 암호 없이 진입
                     self._enter_admin_mode()
                 else:
                     from tkinter import simpledialog
@@ -2214,19 +2514,53 @@ class KoreanFilenameNormalizerApp:
         # 로그 창 생성
         self.create_log_frame()
 
-        # 관리자 모드 활성화 로그
+        # 관리자 모드 활성화 로그 - UI 로그창에 직접 출력
         import ctypes
         import os
 
+        def write_to_log(msg):
+            """UI 로그창에 직접 출력"""
+            if self.log_text and self.log_text.winfo_exists():
+                self.log_text.config(state="normal")
+                self.log_text.insert("end", msg + "\n")
+                self.log_text.config(state="disabled")
+                self.log_text.see("end")
+
+        write_to_log("=" * 50)
+        write_to_log("  관리자 모드 활성화")
+        write_to_log("=" * 50)
+
         try:
             is_admin = ctypes.windll.shell32.IsUserAnAdmin()
-            print(f"관리자 권한으로 실행 중: {is_admin}")
+            write_to_log(f"관리자 권한으로 실행 중: {is_admin}")
         except Exception:
-            print("관리자 권한 확인 실패")
+            write_to_log("관리자 권한 확인 실패")
 
-        print(f"현재 사용자: {os.environ.get('USERNAME', 'Unknown')}")
-        print(f"현재 작업 디렉토리: {os.getcwd()}")
-        print("관리자 모드가 활성화되었습니다 (30분 후 자동 해제)")
+        write_to_log(f"현재 사용자: {os.environ.get('USERNAME', 'Unknown')}")
+        write_to_log(f"현재 작업 디렉토리: {os.getcwd()}")
+
+        # 하드웨어 정보 출력
+        write_to_log("-" * 50)
+        write_to_log("  하드웨어 정보")
+        write_to_log("-" * 50)
+        try:
+            import wf_hwinfo
+            hw_info = wf_hwinfo.HardwareInfo()
+            write_to_log(f"하드웨어 지문: {hw_info.fingerprint}")
+            write_to_log(f"CPU ID: {hw_info.cpu_id}")
+            write_to_log(f"메인보드 ID: {hw_info.mainboard_id}")
+            if hasattr(hw_info, "storage_id"):
+                write_to_log(f"스토리지 ID: {hw_info.storage_id}")
+            if hasattr(hw_info, "cpu_name"):
+                write_to_log(f"CPU 이름: {hw_info.cpu_name}")
+            if hasattr(hw_info, "cpu_cores"):
+                write_to_log(f"CPU 코어: {hw_info.cpu_cores}")
+        except Exception as e:
+            write_to_log(f"하드웨어 정보 조회 실패: {e}")
+
+        write_to_log("-" * 50)
+        write_to_log("30분 후 자동 해제 또는 클릭시 해제")
+        write_to_log("=" * 50)
 
         self._show_toast("관리자 모드 활성화", 1000)
 
@@ -2630,18 +2964,81 @@ class KoreanFilenameNormalizerApp:
             messagebox.showerror("오류", f"테스트 데이터 삭제 실패:\n{e}", parent=self.master)
 
 
+def _handle_sync_registration():
+    """--sync-registration 인자 처리: 로컬 등록정보를 Google Sheets에 동기화"""
+    print("\n" + "=" * 50)
+    print("WorksFree 등록정보 동기화")
+    print("=" * 50 + "\n")
+
+    try:
+        from wf_googlesheets_manager import get_sheets_manager
+        manager = get_sheets_manager()
+
+        if not manager:
+            print("[오류] Google Sheets 연결에 실패했습니다.")
+            print("네트워크 연결을 확인하세요.")
+            return 1
+
+        # 앱 버전 가져오기
+        try:
+            from app_setting_data import SettingsData
+            settings = SettingsData()
+            app_version = settings.full_version
+        except Exception:
+            app_version = ""
+
+        result = manager.sync_local_registration_to_sheets("korean_filename_normalizer", app_version)
+
+        if result["success"]:
+            if result.get("already_synced"):
+                print("[정보] " + result["message"])
+            else:
+                print("[성공] " + result["message"])
+            return 0
+        else:
+            print("[실패] " + result["message"])
+            return 1
+
+    except Exception as e:
+        print(f"[오류] 동기화 중 예외 발생: {e}")
+        return 1
+
+
 def main():
     """메인 함수"""
+    global _instance_mutex_handle
+    # --test-mode 인자 처리 (WF-ACT 인증 테스트 모드)
+    test_mode = "--test-mode" in sys.argv
+
+    # --sync-registration 인자 처리 (GUI 없이 동기화만 수행)
+    if "--sync-registration" in sys.argv:
+        sys.exit(_handle_sync_registration())
+
     # 3중 안전망: 필수 설정 파일 자동 생성
     # DWG 기준: 별도 ensure_config_files 호출 제거 (wf_rpa_config 접근 시 지연 생성)
 
     _log_startup("main() called")
-    
-    # 교차 앱 실행 방지 (공통 헬퍼 사용)
-    if check_cross_app_running_and_exit:
-        check_cross_app_running_and_exit("korean_filename_normalizer")
-    
-    _log_startup("single instance guard passed")
+
+    # 테스트 모드에서는 single instance 및 cross-app 체크 건너뛰기
+    if not test_mode:
+        # Enforce single instance across the system (prevents recursive spawns)
+        is_first, _instance_mutex_handle = _acquire_single_instance()
+        _log_startup("single instance check complete")
+        if not is_first:
+            # Avoid creating any UI if another instance is running
+            try:
+                print("Another korean_filename_normalizer instance is already running. Exiting.")
+            except Exception:
+                pass
+            return
+
+        # 교차 앱 실행 방지 (공통 헬퍼 사용)
+        if check_cross_app_running_and_exit:
+            check_cross_app_running_and_exit("korean_filename_normalizer")
+
+        _log_startup("single instance guard passed")
+    else:
+        _log_startup("Test mode: skipping single instance and cross-app checks")
 
     # Mark running for cross-app guard and ensure cleanup on exit
     try:
@@ -2662,16 +3059,20 @@ def main():
     
     # 작업표시줄 아이콘 설정 (개발/릴리스 환경 모두 지원)
     try:
+        # 아이콘 파일명 (새 아이콘: 06_Korean_Filename_Normalizer.ico, 기존: KFN.ico)
+        icon_names = ["06_Korean_Filename_Normalizer.ico", "KFN.ico"]
+
         if getattr(sys, 'frozen', False):
-            # 릴리스: 실행 파일 인접 res 폴더
-            icon_candidates = [
-                Path(sys.executable).parent / "res" / "KFN.ico",
-                Path(sys.executable).parent / "_internal" / "res" / "KFN.ico",
+            # 릴리스: 실행 파일 인접 res 폴더 또는 _internal/res
+            base_paths = [
+                Path(sys.executable).parent / "res",
+                Path(sys.executable).parent / "_internal" / "res",
             ]
         else:
             # 개발: 앱 폴더 내 res 폴더
-            icon_candidates = [Path(__file__).parent / "res" / "KFN.ico"]
-        
+            base_paths = [Path(__file__).parent / "res"]
+
+        icon_candidates = [bp / name for bp in base_paths for name in icon_names]
         icon_path = next((p for p in icon_candidates if p.exists()), None)
         if icon_path:
             root.iconbitmap(str(icon_path))
@@ -2700,6 +3101,13 @@ def main():
 
     app = KoreanFilenameNormalizerApp(root)
     _log_startup("KoreanFilenameNormalizerApp initialized")
+
+    # WF-ACT 테스트 모드 초기화
+    if test_mode:
+        try:
+            app.init_test_server()
+        except Exception as e:
+            print(f"[WF-ACT] Failed to initialize test server: {e}")
 
     # Startup profiling 완료
     _flush_startup_log()
@@ -2741,6 +3149,14 @@ def main():
             root.after(400, _auto_show)
         except Exception as e:
             print(f"[AUTO-TEST] Setup failure: {e}")
+
+    # WF-ACT 테스트 모드 초기화
+    if test_mode:
+        try:
+            app.init_test_server()
+        except Exception as e:
+            print(f"[WF-ACT] Failed to initialize test server: {e}")
+
     # 초기화가 끝난 후 창 표시 및 포커스
     try:
         root.deiconify(); root.lift(); root.focus_force()

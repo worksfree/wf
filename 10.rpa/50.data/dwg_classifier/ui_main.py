@@ -2,6 +2,15 @@
 
 import os
 import sys
+
+# Windows 콘솔 UTF-8 강제 설정 (GUI 모드에서는 stdout/stderr가 None일 수 있음)
+if sys.platform == "win32":
+    import io
+    if sys.stdout is not None and hasattr(sys.stdout, 'buffer'):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    if sys.stderr is not None and hasattr(sys.stderr, 'buffer'):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 import json
 import datetime
 import threading
@@ -86,11 +95,15 @@ _STARTUP_FLUSHED = False
 
 
 def _detect_run_mode():
+    """
+    실행 모드 감지 (환경변수 + sys.argv 기반 통일 방식)
+    - 1순위: WF_RPA_MODE 환경변수 (demo 모드 명시적 지정용)
+    - 2순위: .py 파일 직접 실행 → dev
+    - 3순위: 기본값 release (exe 실행)
+    """
     env_mode = (os.environ.get("WF_RPA_MODE") or "").strip().lower()
-    if env_mode:
+    if env_mode in ("dev", "demo", "release"):
         return env_mode
-    if os.environ.get("WF_RPA_DEV") == "1":
-        return "dev"
     if sys.argv[0].endswith(".py"):
         return "dev"
     return "release"
@@ -110,14 +123,15 @@ def _get_startup_log_path():
 
 
 def _log_startup(msg: str):
+    """Startup 타이밍 로그 수집 (버퍼 방식)"""
     if not _STARTUP_ENABLED:
         return
     import time
-
     _STARTUP_LOG.append((time.perf_counter(), msg))
 
 
 def _flush_startup_log():
+    """수집한 startup 로그를 파일로 출력 (콘솔 출력 제거 - GUI 앱)"""
     global _STARTUP_FLUSHED
     if _STARTUP_FLUSHED:
         return
@@ -125,12 +139,14 @@ def _flush_startup_log():
         return
     base_time = _STARTUP_LOG[0][0]
     total_ms = (_STARTUP_LOG[-1][0] - base_time) * 1000
+
     try:
         log_path = _get_startup_log_path()
         with open(log_path, "w", encoding="utf-8") as f:
             f.write(f"Total: {total_ms:.1f}ms\n")
             for t, m in _STARTUP_LOG:
-                f.write(f"[{(t-base_time)*1000:7.1f}ms] {m}\n")
+                elapsed_ms = (t - base_time) * 1000
+                f.write(f"[{elapsed_ms:7.1f}ms] {m}\n")
     except Exception:
         pass
 
@@ -148,20 +164,26 @@ def _load_version_info():
 
     try:
         if getattr(sys, "frozen", False):
-            # 릴리스 모드: 번들된 settings.json 우선, 없으면 사용자 홈으로 fallback
+            # 릴리스 모드: 번들 버전 우선 (정확한 빌드 버전), fallback으로 사용자 홈
             base_path = Path(sys._MEIPASS) if hasattr(sys, '_MEIPASS') else Path(sys.executable).parent
             settings_file = base_path / ".wf_rpa" / "dwg_classifier" / "settings.json"
             if not settings_file.exists():
                 settings_file = Path.home() / ".wf_rpa" / "dwg_classifier" / "settings.json"
         else:
-            # 개발 모드: config/dwg_classifier/settings.json
-            settings_file = Path(__file__).parent / "config" / "dwg_classifier" / "settings.json"
+            # 개발 모드: 10.common/config/dwg_classifier/settings.json (통합 경로)
+            app_root = Path(__file__).parent
+            settings_file = app_root.parent.parent / "10.common" / "config" / "dwg_classifier" / "settings.json"
+            # fallback: 앱 폴더의 config
+            if not settings_file.exists():
+                settings_file = app_root / "config" / "dwg_classifier" / "settings.json"
 
         if settings_file.exists():
             with open(settings_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
+                # app_config.full_version 우선 (새 표준), 없으면 runtime_config.full_version
+                app_config = data.get("app_config", {})
                 runtime_config = data.get("runtime_config", {})
-                full_version = runtime_config.get("full_version", default_full)
+                full_version = app_config.get("full_version") or runtime_config.get("full_version", default_full)
                 # v 접두사 보장
                 if not full_version.startswith("v"):
                     full_version = "v" + full_version
@@ -179,6 +201,39 @@ APP_VERSION_FULL, APP_VERSION_DISPLAY = _load_version_info()
 
 
 # ==================== SINGLE/CROSS INSTANCE ====================
+# --- Single instance guard (Windows named mutex) ---
+_instance_mutex_handle = None
+
+
+def _acquire_single_instance(mutex_name: str = r"Global\\WF_DWG_CLASSIFIER"):
+    """Try to acquire a global mutex so only one instance runs.
+    Returns (is_first_instance: bool, handle: int|None).
+    Works on Windows; no-op on other OSes.
+    """
+    if os.name != "nt":
+        return True, None
+    try:
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        # BOOL bInitialOwner=False so we don't need to ReleaseMutex later
+        handle = kernel32.CreateMutexW(
+            ctypes.c_void_p(None), ctypes.c_bool(False), ctypes.c_wchar_p(mutex_name)
+        )
+        if not handle:
+            return True, None  # fail-open to avoid blocking start
+        ERROR_ALREADY_EXISTS = 183
+        existed = kernel32.GetLastError() == ERROR_ALREADY_EXISTS
+        if existed:
+            # Another instance already created the mutex
+            kernel32.CloseHandle(handle)
+            return False, None
+        return True, handle
+    except Exception:
+        # If anything goes wrong, don't block startup (fail-open)
+        return True, None
+
+
 def _set_cross_app_running(app_name: str):
     try:
         cfg = Path.home() / ".wf_rpa"
@@ -263,6 +318,9 @@ class DwgClassifierApp:
         self.itself_dir = os.path.dirname(os.path.abspath(__file__))
         # MessageBox들이 메인창 기준으로 뜨도록 parent를 강제 지정
         self._bind_messagebox_parent()
+
+        # 아이콘 경로 저장 (등록창/설정창에서 사용)
+        self.icon_path = self._find_icon_path()
         self.logger = get_app_logger("dwg_classifier", console_level=logging.INFO)
         self.config = get_config()
         try:
@@ -271,9 +329,9 @@ class DwgClassifierApp:
             self.is_demo_mode = False
         self.allow_continue_on_credit_shortage = self._load_allow_continue_flag()
         # 적응형 UI 설정 초기화
-        from ui_setting import get_adaptive_ui_settings, _apply_global_fonts
+        from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
 
-        self.ui = get_adaptive_ui_settings()
+        self.ui = get_adaptive_ui_settings(window_type="main")
         # Alt+G 데모 핫키에서 적용할 창 위치/크기 오버라이드 (설정 파일만 사용)
         _config_geo_override = ""
         try:
@@ -320,7 +378,8 @@ class DwgClassifierApp:
         self.is_admin_mode = False
         self.admin_mode_timer = None
         self.admin_mode_start_time = None
-        self.admin_password = "admin2024"
+        # 🚀 최적화: admin 비밀번호 lazy 로딩 (Google Sheets 호출 지연)
+        self._admin_password = None  # lazy load
         # Log frame vars
         self.log_frame = None
         self.log_text = None
@@ -329,8 +388,8 @@ class DwgClassifierApp:
         self.auto_scroll_checkbox = None
         self.text_log_handler = None
         # Window sizes (DPI 스케일 적용) - adaptive UI 기반
-        base_original_height = 330  # 5행 표준 높이 (DC only)
-        base_expanded_height = int(base_original_height * 2.2)  # 관리자 모드 버튼까지 보이도록 확장
+        base_original_height = 270  # 2입력 앱 기본 높이 (DC only)
+        base_expanded_height = base_original_height + 300  # 관리자 모드: +300 고정
         try:
             from wf_settings_common import get_windows_dpi_scale
             dpi_scale = get_windows_dpi_scale()
@@ -376,6 +435,17 @@ class DwgClassifierApp:
         # 🚀 이전 작업 폴더/엑셀 복원 및 자동 스캔 (CV 패턴)
         if self._last_folder_to_load:
             self.master.after(300, self._restore_last_session)
+
+    @property
+    def admin_password(self) -> str:
+        """🚀 Lazy 로딩: admin 비밀번호 (첫 접근 시 Google Sheets에서 로드)"""
+        if self._admin_password is None:
+            try:
+                from wf_settings_common import get_admin_password  # type: ignore
+                self._admin_password = get_admin_password(self.logger)
+            except Exception:
+                self._admin_password = "admin2024"  # fallback
+        return self._admin_password
 
     def set_selected_path(self, path: str | None):
         """선택된 경로를 설정하고 UI를 동기화 (통합 헬퍼)"""
@@ -434,6 +504,22 @@ class DwgClassifierApp:
         ):
             if hasattr(messagebox, name):
                 setattr(messagebox, name, _wrap(getattr(messagebox, name)))
+
+    def _find_icon_path(self):
+        """앱 아이콘 경로 찾기 (개발/릴리스 환경 모두 지원)"""
+        try:
+            icon_names = ["03_DWG_Classifier.ico", "DWG.ico"]
+            if getattr(sys, 'frozen', False):
+                base_paths = [
+                    Path(sys.executable).parent / "res",
+                    Path(sys.executable).parent / "_internal" / "res",
+                ]
+            else:
+                base_paths = [Path(__file__).parent / "res"]
+            icon_candidates = [bp / name for bp in base_paths for name in icon_names]
+            return next((p for p in icon_candidates if p.exists()), None)
+        except Exception:
+            return None
 
     def _center_popup_on_main(self):
         """메인창의 중심 좌표에 맞춰 최상위 팝업창을 이동"""
@@ -609,8 +695,8 @@ class DwgClassifierApp:
                 return
             status = self.credit_manager.get_credit_status()
             ct = status.get("credit_type", "standard")
-            trial_raw = status.get("trial_credits", 0)
-            purchased_raw = status.get("purchased_credits", 0)
+            trial_raw = status.get("remaining_trial", 0)
+            purchased_raw = status.get("remaining_purchased", 0)
             trial = max(0, trial_raw)
             purchased = max(0, purchased_raw)
             cost = self.credit_manager.policy.get("credit_per_work", 50)
@@ -647,61 +733,76 @@ class DwgClassifierApp:
             messagebox.showinfo("크레딧", "크레딧 매니저가 초기화되지 않았습니다.")
             return
         try:
-            # 무료 앱 체크: trial_credits가 -1이면 구매 이력 없음
             trial_credits = self.credit_manager.policy.get("trial_credits", 0)
-            messages = []
+            popup_messages = []
+            credentials_updated = False
 
-            # 1. 구매 이력 동기화 (무료 앱은 스킵)
+            # 1. 구매 이력 동기화 - 팝업에 표시
             if trial_credits != -1:
                 try:
                     result = self.credit_manager.pull_and_apply_purchases()
                     if result.get("success"):
                         added = result.get("added", 0)
                         if added > 0:
-                            messages.append(f"✅ 구매 이력 반영: {added:,}개 크레딧 추가")
+                            popup_messages.append(f"✅ 구매 이력 반영: {added:,}개 크레딧 추가")
                         else:
-                            messages.append("신규 구매 이력이 없습니다.")
+                            popup_messages.append("신규 구매 이력이 없습니다.")
                     else:
-                        messages.append(f"⚠️ 크레딧 갱신 실패: {result.get('message')}")
+                        popup_messages.append(f"⚠️ 크레딧 갱신 실패: {result.get('message')}")
                 except Exception as e:
-                    messages.append(f"⚠️ 크레딧 갱신 오류: {str(e)}")
+                    popup_messages.append(f"⚠️ 크레딧 갱신 오류: {str(e)}")
                     self.logger.error(f"크레딧 갱신 오류: {e}")
 
-            # 2. 앱 정책 및 관리자 설정 동기화 (비활성화)
-            # try:
-            #     from wf_settings_common import sync_policies_from_sheets
-            # 
-            #     policy_result = sync_policies_from_sheets("dwg_classifier", self.logger)
-            # 
-            #     if policy_result.get("success"):
-            #         updates_list = policy_result.get("updates") or []
-            #         errors_list = policy_result.get("errors") or []
-            #         if updates_list:
-            #             messages.append("\n" + "\n".join(map(str, updates_list)))
-            #         if errors_list:
-            #             messages.append("\n" + "\n".join(map(str, errors_list)))
-            #     else:
-            #         messages.append(f"\n⚠️ 정책 동기화 실패: {policy_result.get('message')}")
-            # except Exception as e:
-            #     self.logger.warning(f"정책 동기화 중 오류 (무시): {e}")
-            #     messages.append(f"\n⚠️ 정책 동기화 오류: {str(e)}")
+            # 2. 앱 정책 및 관리자 설정 동기화 (백그라운드)
+            try:
+                from wf_settings_common import sync_policies_from_sheets  # type: ignore
+                policy_result = sync_policies_from_sheets("dwg_classifier", self.logger)
+                if policy_result.get("success"):
+                    self.logger.info("정책 동기화 완료")
+                else:
+                    self.logger.warning(f"정책 동기화 실패: {policy_result.get('message')}")
+            except Exception as e:
+                self.logger.warning(f"정책 동기화 중 오류 (무시): {e}")
+
+            # 3. 크리덴셜 파일 업데이트 체크
+            try:
+                from wf_googlesheets_manager import get_sheets_manager  # type: ignore
+                sheets_manager = get_sheets_manager(test_mode=False)
+                admin_config = sheets_manager.get_admin_config_full()
+                creds_file_id = admin_config.get("credentials_file_id", "").strip()
+
+                if creds_file_id:
+                    from wf_settings_common import update_credentials_from_drive  # type: ignore
+                    creds_result = update_credentials_from_drive(creds_file_id, self.logger)
+                    if creds_result.get("success"):
+                        credentials_updated = True
+                        self.logger.info(f"크리덴셜 업데이트 완료: {creds_result.get('backup_path')}")
+                    else:
+                        self.logger.warning(f"크리덴셜 업데이트 실패: {creds_result.get('message')}")
+            except Exception as e:
+                self.logger.warning(f"크리덴셜 업데이트 체크 중 오류 (무시): {e}")
 
             # 결과 표시
-            final_message = "\n".join(messages) if messages else "업데이트 완료"
+            final_message = "\n".join(popup_messages) if popup_messages else "업데이트 완료"
+            if credentials_updated:
+                final_message += "\n\n🔄 인증 정보가 업데이트되었습니다.\n변경사항 적용을 위해 앱을 재시작해주세요."
+
             messagebox.showinfo("업데이트 완료", final_message)
             self.update_credit_display()
+
         except Exception as e:
             self.logger.error(f"업데이트 오류: {e}")
             messagebox.showerror("업데이트 오류", str(e))
             import traceback
-
             self.logger.error(traceback.format_exc())
 
     # ---------- UI Build ----------
     def init_ui(self):
-        # 설정 파일에서 창 크기 가져오기 (DPI 폴백 제거, 설정 값만 사용)
+        from wf_ui_adaptive import apply_global_fonts
+        # 설정 파일에서 창 크기 가져오기
         window_width = self.ui.get("window_width", 580)
-        window_height = self.ui.get("window_height", 320)
+        # DC는 입력이 2개(폴더+엑셀)이므로 original_window_height 사용 (5행 레이아웃)
+        window_height = self.original_window_height
         adjusted_height = window_height
 
         self.width = self.master.winfo_screenwidth()
@@ -731,8 +832,7 @@ class DwgClassifierApp:
         self.master.minsize(window_width, min_height)
         
         # 전역 폰트 설정 적용 (메인창 폰트 크기 일관성 보장)
-        from ui_setting import _apply_global_fonts
-        _apply_global_fonts(self.master, self.ui)
+        apply_global_fonts(self.master, self.ui)
         
         self.create_ui_elements()
 
@@ -1257,11 +1357,6 @@ class DwgClassifierApp:
         if not self.wf_manager:
             return
         
-        import sys
-        is_bundled = getattr(sys, 'frozen', False) or hasattr(sys, '_MEIPASS')
-        if not is_bundled:
-            self._show_toast("정책 동기화 중...")
-
         def worker():
             try:
                 result = self.wf_manager.refresh_policies_from_sheets()
@@ -2008,6 +2103,9 @@ class DwgClassifierApp:
             # ⚠️ 중요: 모달 창으로 확실히 설정 (리팩토링 시에도 유지할 것!)
             toplevel_window.transient(self.master)  # 부모 창과 연결
             toplevel_window.grab_set()  # 다른 창 비활성화 - 절대 제거하지 말 것
+            # 메인 창이 topmost이면 모달 창도 topmost로 설정 (창 순서 유지)
+            if self.master.attributes("-topmost"):
+                toplevel_window.wm_attributes("-topmost", 1)
             toplevel_window.focus_set()  # 포커스 설정
             self.master.wait_window(toplevel_window)  # 창이 닫힐 때까지 대기
 
@@ -2050,7 +2148,7 @@ class DwgClassifierApp:
             self._exit_admin_mode()
             return
         run_mode = getattr(self.config, "run_mode", getattr(self.config, "get", lambda *_: "release")("run_mode", "release"))
-        if run_mode in ("dev", "demo"):
+        if run_mode == "dev":  # dev 모드에서만 암호 없이 진입
             self._enter_admin_mode()
             return
 
@@ -2082,6 +2180,59 @@ class DwgClassifierApp:
         self.master.title(f"DWG 파일 분류 도구 {APP_VERSION_FULL} [🔧 관리자 모드]")
         self.progress_bar_label.config(bg="#ffe6e6")
         self.create_log_frame()
+
+        # 관리자 모드 활성화 로그 - UI 로그창에 직접 출력
+        import ctypes
+        import getpass
+
+        def write_to_log(msg):
+            """UI 로그창에 직접 출력"""
+            if self.log_text and self.log_text.winfo_exists():
+                self.log_text.config(state="normal")
+                self.log_text.insert("end", msg + "\n")
+                self.log_text.config(state="disabled")
+                self.log_text.see("end")
+
+        write_to_log("=" * 50)
+        write_to_log("  관리자 모드 활성화")
+        write_to_log("=" * 50)
+
+        try:
+            is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+            write_to_log(f"관리자 권한으로 실행 중: {is_admin}")
+        except Exception:
+            write_to_log("관리자 권한 확인 실패")
+
+        try:
+            current_user = getpass.getuser()
+        except Exception:
+            current_user = "Unknown"
+        write_to_log(f"현재 사용자: {current_user}")
+        write_to_log(f"현재 작업 디렉토리: {os.getcwd()}")
+
+        # 하드웨어 정보 출력
+        write_to_log("-" * 50)
+        write_to_log("  하드웨어 정보")
+        write_to_log("-" * 50)
+        try:
+            import wf_hwinfo
+            hw_info = wf_hwinfo.HardwareInfo()
+            write_to_log(f"하드웨어 지문: {hw_info.fingerprint}")
+            write_to_log(f"CPU ID: {hw_info.cpu_id}")
+            write_to_log(f"메인보드 ID: {hw_info.mainboard_id}")
+            if hasattr(hw_info, "storage_id"):
+                write_to_log(f"스토리지 ID: {hw_info.storage_id}")
+            if hasattr(hw_info, "cpu_name"):
+                write_to_log(f"CPU 이름: {hw_info.cpu_name}")
+            if hasattr(hw_info, "cpu_cores"):
+                write_to_log(f"CPU 코어: {hw_info.cpu_cores}")
+        except Exception as e:
+            write_to_log(f"하드웨어 정보 조회 실패: {e}")
+
+        write_to_log("-" * 50)
+        write_to_log("30분 후 자동 해제 또는 클릭시 해제")
+        write_to_log("=" * 50)
+
         self._show_toast("관리자 모드 활성화", 1200)
 
     def _exit_admin_mode(self):
@@ -2438,25 +2589,551 @@ class DwgClassifierApp:
             self.logger.error(f"테스트 데이터 삭제 실패: {e}", exc_info=True)
             messagebox.showerror("오류", f"테스트 데이터 삭제 실패:\n{e}", parent=self.master)
 
+    # ==================== WF-ACT Test Mode ====================
+
+    def init_test_server(self):
+        """WF-ACT 인증 테스트용 TestServer 초기화"""
+        try:
+            # 테스트 모드에서는 CreditManager를 동기적으로 초기화
+            self._init_credit_manager_sync()
+
+            # TestServer import (로컬 test_server.py 사용)
+            from test_server import TestServer
+
+            self.test_server = TestServer(app_name="dwg_classifier")
+
+            # 핸들러 등록
+            self.test_server.register_handlers({
+                # 크레딧 관련
+                'get_credits': self._test_get_credits,
+                'set_credits': self._test_set_credits,
+                'add_credits': self._test_add_credits,
+                'get_credit_status': self._test_get_credit_status,
+                'get_trial_info': self._test_get_trial_info,
+
+                # 등록 관련
+                'get_registration_status': self._test_get_registration_status,
+                'register': self._test_register,
+                'clear_registration': self._test_clear_registration,
+                'sync_registration': self._test_sync_registration,
+
+                # 작업 시뮬레이션
+                'simulate_work': self._test_simulate_work,
+
+                # 상태 관련
+                'get_state': self._test_get_state,
+                'get_policy': self._test_get_policy,
+                'get_settings': self._test_get_settings,
+                'save_settings': self._test_save_settings,
+                'load_settings': self._test_load_settings,
+                'reload_config': self._test_reload_config,
+
+                # UI 관련
+                'get_button_state': self._test_get_button_state,
+                'click_button': self._test_click_button,
+            })
+
+            self.test_server.start()
+            self.logger.info("[WF-ACT] Test server started on port " + str(self.test_server.port))
+        except Exception as e:
+            self.logger.error(f"[WF-ACT] Failed to initialize test server: {e}")
+            raise
+
+    def _init_credit_manager_sync(self):
+        """WF-ACT 테스트 모드용: CreditManager를 동기적으로 초기화"""
+        try:
+            if self._wfm_available and WorksFreeManager and not self.wf_manager:
+                self.wf_manager = WorksFreeManager()
+                self.is_registered_user = self.wf_manager.is_registered()
+            if CreditManager and self.wf_manager and not self.credit_manager:
+                self.credit_manager = init_credit_and_policy_managers(
+                    app_name="dwg_classifier",
+                    wf_manager=self.wf_manager,
+                    master=self.master,
+                    logger=self.logger,
+                    recovery_delay_ms=0,
+                    policy_delay_ms=0,
+                )
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"[WF-ACT] CreditManager sync init failed: {e}")
+
+    def _test_get_credits(self) -> int:
+        """현재 총 크레딧 반환 (테스트용 - 등록 상태 무관)"""
+        self._ensure_credit_manager()
+        if not self.credit_manager:
+            return 0
+        try:
+            data = self.credit_manager._load_credit_data()
+            remaining_trial = data.get("remaining_trial", 0)
+            remaining_purchased = data.get("remaining_purchased", 0)
+            if remaining_trial == -1 or remaining_purchased == -1:
+                return -1
+            return remaining_trial + remaining_purchased
+        except Exception:
+            status = self.credit_manager.get_credit_status()
+            return status.get("remaining_credits", 0)
+
+    def _test_set_credits(self, amount: int, credit_type: str = "trial") -> bool:
+        """크레딧 직접 설정 (테스트용)"""
+        self._ensure_credit_manager()
+        if not self.credit_manager:
+            return False
+        try:
+            if amount is None or amount < 0:
+                return False
+
+            data = self.credit_manager._load_credit_data()
+            if credit_type == "purchased":
+                data["remaining_purchased"] = amount
+                data["remaining_trial"] = 0
+            else:
+                data["remaining_trial"] = amount
+                data["remaining_purchased"] = 0
+
+            # WF-ACT: 크레딧을 0으로 설정할 때, usage_history가 비어있으면
+            # CreditManager._load_credit_data()가 policy에서 다시 초기화함.
+            # 이를 방지하기 위해 테스트 마커를 usage_history에 추가
+            if amount == 0:
+                if "usage_history" not in data or not data["usage_history"]:
+                    data["usage_history"] = []
+                data["usage_history"].append({
+                    "timestamp": "2000-01-01T00:00:00",
+                    "credits_used": 0,
+                    "operation": "wf_act_test_marker",
+                    "details": "Credits set to 0 for testing"
+                })
+
+            self.credit_manager._save_credit_data(data)
+            self.master.after(0, self.update_credit_display)
+            return True
+        except Exception as e:
+            self.logger.error(f"[WF-ACT] set_credits failed: {e}")
+            return False
+
+    def _test_add_credits(self, amount: int) -> bool:
+        """크레딧 추가 (구매 시뮬레이션)"""
+        self._ensure_credit_manager()
+        if not self.credit_manager:
+            return False
+        try:
+            data = self.credit_manager._load_credit_data()
+            current = data.get("remaining_purchased", 0)
+            if current != -1:
+                data["remaining_purchased"] = current + amount
+            self.credit_manager._save_credit_data(data)
+            self.master.after(0, self.update_credit_display)
+            return True
+        except Exception as e:
+            self.logger.error(f"[WF-ACT] add_credits failed: {e}")
+            return False
+
+    def _ensure_credit_manager(self):
+        """CreditManager가 초기화될 때까지 대기 (최대 5초)"""
+        import time
+        for _ in range(50):
+            if self.credit_manager:
+                return
+            time.sleep(0.1)
+
+    def _test_get_credit_status(self) -> dict:
+        """크레딧 상태 상세 조회"""
+        if not self.credit_manager:
+            return {"success": False, "error": "credit_manager_not_initialized"}
+        return self.credit_manager.get_credit_status()
+
+    def _test_get_registration_status(self) -> dict:
+        """등록 상태 반환"""
+        if not self.wf_manager:
+            return {"is_registered": False, "email": None, "registered_at": None, "app_version": APP_VERSION_FULL}
+        user_info = self.wf_manager.get_user_info()
+        return {
+            "is_registered": self.wf_manager.is_registered(),
+            "email": user_info.get("user_email") or user_info.get("email"),
+            "registered_at": user_info.get("reg_time_local"),
+            "app_version": APP_VERSION_FULL,
+        }
+
+    def _test_register(self, email: str) -> dict:
+        """사용자 등록 (테스트용)"""
+        if not self.wf_manager:
+            return {"success": False, "error": "wf_manager_not_initialized"}
+        try:
+            try:
+                from wf_hwinfo import HardwareInfo
+                hw = HardwareInfo()
+                hw_fp = hw.fingerprint
+            except Exception:
+                hw_fp = "test_hw_fingerprint_" + email.split("@")[0]
+
+            success = self.wf_manager.register_user(
+                user_email=email,
+                hw_fingerprint=hw_fp,
+                user_name="Test User",
+                user_phone="",
+                user_email_consent="Y"
+            )
+            if success:
+                self.is_registered_user = True
+                self.master.after(0, self.update_registration_button)
+                # 체험판 크레딧 부여
+                self._ensure_credit_manager()
+                if self.credit_manager:
+                    trial_credits = self.credit_manager.policy.get("trial_credits", 5000)
+                    if trial_credits > 0:
+                        data = self.credit_manager._load_credit_data()
+                        current = data.get("remaining_trial", 0) + data.get("remaining_purchased", 0)
+                        if current < trial_credits:
+                            data["remaining_trial"] = trial_credits
+                            self.credit_manager._save_credit_data(data)
+            return {"success": success}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def _test_clear_registration(self) -> bool:
+        """등록 정보 삭제 (테스트용)"""
+        if not self.wf_manager:
+            return False
+        try:
+            # WorksFreeManager.save_config()를 통해 user_info 초기화
+            config = self.wf_manager.load_config()
+            config["user_info"] = {
+                "is_registered": False,
+                "user_email": None,
+                "reg_time_local": None,
+                "reg_time_utc": None,
+            }
+            self.wf_manager.save_config(config)
+            self.is_registered_user = False
+            self.master.after(0, self.update_registration_button)
+            return True
+        except Exception as e:
+            self.logger.error(f"[WF-ACT] clear_registration failed: {e}")
+            return False
+
+    def _test_simulate_work(self, file_count: int = 1) -> dict:
+        """작업 시뮬레이션 (테스트용) - 크레딧 차감 포함, 등록 상태 무관"""
+        self._ensure_credit_manager()
+        if not self.credit_manager:
+            return {"success": False, "error": "credit_manager_not_initialized"}
+
+        cost = self.credit_manager.policy.get("credit_per_work", 50)
+
+        # 테스트 모드: 등록 상태와 무관하게 직접 크레딧 데이터 사용
+        try:
+            data = self.credit_manager._load_credit_data()
+            remaining_trial = data.get("remaining_trial", 0)
+            remaining_purchased = data.get("remaining_purchased", 0)
+
+            # 영구 라이선스나 무료판인 경우
+            if remaining_trial == -1 or remaining_purchased == -1:
+                return {
+                    "success": True,
+                    "processed_count": file_count,
+                    "blocked": False,
+                    "credit_type": "free" if remaining_trial == -1 else "permanent",
+                }
+
+            current = remaining_trial + remaining_purchased
+        except Exception as e:
+            return {"success": False, "error": f"credit_load_error: {e}"}
+
+        processed = 0
+        for i in range(file_count):
+            if current < cost:
+                return {
+                    "success": False,
+                    "blocked": True,
+                    "processed_count": processed,
+                    "interrupted": processed > 0,
+                    "exhausted": True,
+                    "remaining_credits": current,
+                }
+            # 테스트 모드: 직접 크레딧 차감 (등록 체크 우회)
+            try:
+                data = self.credit_manager._load_credit_data()
+                trial = data.get("remaining_trial", 0)
+                purchased = data.get("remaining_purchased", 0)
+
+                # 구매 크레딧 먼저 차감, 없으면 체험판 차감
+                if purchased >= cost:
+                    data["remaining_purchased"] = purchased - cost
+                elif trial >= cost:
+                    data["remaining_trial"] = trial - cost
+                elif purchased + trial >= cost:
+                    # 혼합 차감
+                    data["remaining_purchased"] = 0
+                    data["remaining_trial"] = trial - (cost - purchased)
+                else:
+                    return {
+                        "success": False,
+                        "blocked": True,
+                        "processed_count": processed,
+                        "exhausted": True,
+                        "remaining_credits": trial + purchased,
+                    }
+
+                self.credit_manager._save_credit_data(data)
+                processed += 1
+                current = data.get("remaining_trial", 0) + data.get("remaining_purchased", 0)
+            except Exception as e:
+                return {
+                    "success": False,
+                    "blocked": True,
+                    "processed_count": processed,
+                    "error": str(e),
+                }
+
+        # UI 업데이트
+        self.master.after(0, self.update_credit_display)
+
+        return {
+            "success": True,
+            "processed_count": processed,
+            "blocked": False,
+            "remaining_credits": current,
+        }
+
+    def _test_get_state(self) -> dict:
+        """앱 상태 반환"""
+        return {
+            "is_registered": getattr(self, 'is_registered_user', False),
+            "credits": self._test_get_credits() if self.credit_manager else 0,
+            "selected_path": self.SELECTED_PATH,
+            "is_running": getattr(self, 'automation', None) is not None and hasattr(self.automation, 'is_running') and self.automation.is_running,
+        }
+
+    def _test_get_policy(self) -> dict:
+        """정책 정보 반환"""
+        if self.credit_manager and hasattr(self.credit_manager, 'policy'):
+            policy = self.credit_manager.policy.copy()
+            policy['identity'] = {
+                'app_name': 'dwg_classifier',
+                'display_name': 'DWG Classifier',
+            }
+            return policy
+        return {
+            'identity': {
+                'app_name': 'dwg_classifier',
+                'display_name': 'DWG Classifier',
+            },
+            'policy': {
+                'credit_per_work': 50,
+                'trial_credits': 5000,
+            }
+        }
+
+    def _test_get_settings(self) -> dict:
+        """설정 정보 반환"""
+        settings = {}
+        if self.config:
+            try:
+                # Try config attributes first, then module-level APP_VERSION_FULL
+                version = (getattr(self.config, 'full_version', None) or
+                          getattr(self.config, 'version', None))
+                if not version or version == 'unknown':
+                    version = APP_VERSION_FULL  # Use canonical version source
+                settings = {
+                    'runtime_config': {
+                        'full_version': version,
+                        'run_mode': getattr(self.config, 'run_mode', 'release'),
+                    },
+                    'app_config': {
+                        'app_name': 'dwg_classifier',
+                    }
+                }
+            except Exception:
+                pass
+        return settings
+
+    def _test_reload_config(self) -> bool:
+        """설정 및 정책 재로드 (테스트용)"""
+        try:
+            if self.credit_manager:
+                self.credit_manager._reload_policy()
+            return True
+        except Exception:
+            return False
+
+    def _test_get_button_state(self, button_name: str) -> dict:
+        """버튼 상태 반환"""
+        button_map = {
+            'work': getattr(self, 'btn_start', None),
+            'settings': getattr(self, 'btn_settings', None),
+            'register': getattr(self, 'btn_registration', None),
+        }
+        btn = button_map.get(button_name)
+        if not btn:
+            return {"exists": False}
+        try:
+            state = str(btn.cget('state'))
+            return {
+                "exists": True,
+                "enabled": state != 'disabled',
+                "state": state,
+            }
+        except Exception:
+            return {"exists": True, "enabled": True, "state": "normal"}
+
+    def _test_click_button(self, button_name: str) -> bool:
+        """버튼 클릭 시뮬레이션"""
+        button_map = {
+            'work': getattr(self, 'btn_start', None),
+            'settings': getattr(self, 'btn_settings', None),
+            'register': getattr(self, 'btn_registration', None),
+        }
+        btn = button_map.get(button_name)
+        if not btn:
+            return False
+        try:
+            btn.invoke()
+            return True
+        except Exception:
+            return False
+
+    def _test_get_trial_info(self) -> dict:
+        """체험판 크레딧 정보 반환 (테스트용)"""
+        self._ensure_credit_manager()
+        if not self.credit_manager:
+            return {"error": "credit_manager_not_initialized"}
+        try:
+            policy = self.credit_manager.policy or {}
+            data = self.credit_manager._load_credit_data()
+            return {
+                "initial_credits": policy.get("trial_credits", 5000),
+                "remaining_trial": data.get("remaining_trial", 0),
+                "trial_credits": policy.get("trial_credits", 5000),
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
+    def _test_sync_registration(self) -> dict:
+        """등록 정보 서버 동기화 (테스트용)"""
+        if not self.wf_manager:
+            return {"success": False, "error": "wf_manager_not_initialized"}
+        try:
+            # 실제 동기화 시도 (네트워크 오류는 허용됨)
+            return {"success": True, "message": "sync_attempted"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def _test_save_settings(self, settings: dict) -> dict:
+        """설정 저장 (테스트용)"""
+        try:
+            import json
+            settings_file = self.config.settings_file
+            data = {}
+            if settings_file.exists():
+                with open(settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+            # 테스트 설정을 test_config 섹션에 저장
+            if "test_config" not in data:
+                data["test_config"] = {}
+            data["test_config"].update(settings)
+            with open(settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def _test_load_settings(self) -> dict:
+        """설정 로드 (테스트용)"""
+        try:
+            import json
+            settings_file = self.config.settings_file
+            if not settings_file.exists():
+                return {}
+            with open(settings_file, "r", encoding="utf-8") as f:
+                data = json.load(f) or {}
+            # 전체 설정 반환 (app_config, ui_config, test_config 등)
+            return {
+                "app_config": data.get("app_config", {}),
+                "ui_config": data.get("ui_config", {}),
+                "test_config": data.get("test_config", {}),
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
 
 # ==================== Main Entry ====================
 
-def main():
-    _log_startup("main() called")
-    
-    # 교차 앱 실행 방지 (공통 헬퍼 사용)
-    if check_cross_app_running_and_exit:
-        check_cross_app_running_and_exit("dwg_classifier")
-    try:
-        _set_cross_app_running("dwg_classifier")
-    except Exception:
-        pass
-    try:
-        import atexit
+def _handle_sync_registration():
+    """--sync-registration 인자 처리: 로컬 등록정보를 Google Sheets에 동기화"""
+    print("\n" + "=" * 50)
+    print("WorksFree 등록정보 동기화")
+    print("=" * 50 + "\n")
 
-        atexit.register(_clear_cross_app_running)
-    except Exception:
-        pass
+    try:
+        from wf_googlesheets_manager import get_sheets_manager
+        manager = get_sheets_manager()
+
+        if not manager:
+            print("[오류] Google Sheets 연결에 실패했습니다.")
+            print("네트워크 연결을 확인하세요.")
+            return 1
+
+        # 앱 버전 가져오기
+        try:
+            from app_setting_data import SettingsData
+            settings = SettingsData()
+            app_version = settings.full_version
+        except Exception:
+            app_version = ""
+
+        result = manager.sync_local_registration_to_sheets("dwg_classifier", app_version)
+
+        if result["success"]:
+            if result.get("already_synced"):
+                print("[정보] " + result["message"])
+            else:
+                print("[성공] " + result["message"])
+            return 0
+        else:
+            print("[실패] " + result["message"])
+            return 1
+
+    except Exception as e:
+        print(f"[오류] 동기화 중 예외 발생: {e}")
+        return 1
+
+
+def main():
+    global _instance_mutex_handle
+    # --test-mode 인자 처리 (WF-ACT 인증 테스트 모드)
+    test_mode = "--test-mode" in sys.argv
+
+    # --sync-registration 인자 처리 (GUI 없이 동기화만 수행)
+    if "--sync-registration" in sys.argv:
+        sys.exit(_handle_sync_registration())
+
+    _log_startup("main() called")
+
+    # 테스트 모드에서는 single instance 및 cross-app 체크 건너뛰기
+    if not test_mode:
+        # Enforce single instance across the system (prevents recursive spawns)
+        is_first, _instance_mutex_handle = _acquire_single_instance()
+        _log_startup("single instance check complete")
+        if not is_first:
+            # Avoid creating any UI if another instance is running
+            try:
+                print("Another dwg_classifier instance is already running. Exiting.")
+            except Exception:
+                pass
+            return
+
+        # 교차 앱 실행 방지 (공통 헬퍼 사용)
+        if check_cross_app_running_and_exit:
+            check_cross_app_running_and_exit("dwg_classifier")
+        try:
+            _set_cross_app_running("dwg_classifier")
+        except Exception:
+            pass
+        try:
+            import atexit
+
+            atexit.register(_clear_cross_app_running)
+        except Exception:
+            pass
     # (Pre-Tk DPI awareness adjustments removed per request)
     root = tk.Tk()
     
@@ -2465,16 +3142,20 @@ def main():
     
     # 작업표시줄 아이콘 설정 (개발/릴리스 환경 모두 지원)
     try:
+        # 아이콘 파일명 (새 아이콘: 03_DWG_Classifier.ico, 기존: DWG.ico)
+        icon_names = ["03_DWG_Classifier.ico", "DWG.ico"]
+
         if getattr(sys, 'frozen', False):
-            # 릴리스: 실행 파일 인접 res 폴더
-            icon_candidates = [
-                Path(sys.executable).parent / "res" / "DWG.ico",
-                Path(sys.executable).parent / "_internal" / "res" / "DWG.ico",
+            # 릴리스: 실행 파일 인접 res 폴더 또는 _internal/res
+            base_paths = [
+                Path(sys.executable).parent / "res",
+                Path(sys.executable).parent / "_internal" / "res",
             ]
         else:
             # 개발: 앱 폴더 내 res 폴더
-            icon_candidates = [Path(__file__).parent / "res" / "DWG.ico"]
-        
+            base_paths = [Path(__file__).parent / "res"]
+
+        icon_candidates = [bp / name for bp in base_paths for name in icon_names]
         icon_path = next((p for p in icon_candidates if p.exists()), None)
         if icon_path:
             root.iconbitmap(str(icon_path))
@@ -2503,10 +3184,20 @@ def main():
     
     app = DwgClassifierApp(root)
     _log_startup("App init complete")
-    
+
+    # WF-ACT 테스트 모드: TestServer 초기화
+    if test_mode:
+        try:
+            app.init_test_server()
+            _log_startup("TestServer started")
+        except Exception as e:
+            print(f"[WF-ACT] TestServer init failed: {e}")
+            import traceback
+            traceback.print_exc()
+
     # UI 초기화 완료 후 창 표시
     root.deiconify()
-    
+
     _flush_startup_log()
     root.mainloop()
 

@@ -5,6 +5,7 @@
 """
 import logging
 import os
+import sys
 import time
 import threading
 from datetime import datetime, timedelta
@@ -18,11 +19,42 @@ def _detect_run_mode():
         return env_mode
     if os.environ.get("WF_RPA_DEV") == "1":
         return "dev"
-    import sys
-
+    
     if sys.argv[0].endswith(".py"):
         return "dev"
     return "release"
+
+
+def _find_app_folder():
+    """
+    실행 스크립트가 속한 앱 폴더를 찾아 반환.
+    앱 폴더 구조: .../30.apps/앱이름/ 또는 .../50.data/앱이름/ 등
+    앱 폴더 내에 ui_main.py, automation.py, app_setting_data.py 등이 있음.
+
+    Returns:
+        Path: 앱 폴더 경로 (찾지 못하면 스크립트의 부모 폴더)
+    """
+    script_path = Path(sys.argv[0]).resolve()
+    script_dir = script_path.parent
+
+    # 표준 앱 폴더 구조 확인: 앱 폴더에는 보통 app_setting_data.py 또는 ui_main.py가 있음
+    app_markers = ["app_setting_data.py", "ui_main.py", "automation.py"]
+
+    # 현재 폴더부터 상위로 올라가며 앱 폴더 찾기 (최대 3단계)
+    current = script_dir
+    for _ in range(3):
+        # 앱 마커 파일이 있으면 앱 폴더로 인식
+        if any((current / marker).exists() for marker in app_markers):
+            return current
+
+        # 상위 폴더로 이동
+        parent = current.parent
+        if parent == current:  # 루트 도달
+            break
+        current = parent
+
+    # 찾지 못하면 스크립트의 직접 부모 폴더 반환
+    return script_dir
 
 
 class GlobalLoggerManager:
@@ -56,16 +88,13 @@ class GlobalLoggerManager:
 
     def _create_logger(self, app_name, console_level):
         """실제 로거 생성"""
-        # 로거 생성
         logger = logging.getLogger(f"wf_rpa.{app_name}")
-        logger.setLevel(logging.DEBUG)  # 로거 자체는 모든 레벨 허용
-        logger.propagate = False  # 부모 로거로 전파 방지 (중복 출력 방지)
+        logger.setLevel(logging.DEBUG)
+        logger.propagate = False
 
-        # 기존 핸들러 제거 (중복 방지)
         for handler in logger.handlers[:]:
             logger.removeHandler(handler)
 
-        # 콘솔은 간결하게, 파일은 자세하게 (모듈/라인/로거명 포함)
         console_formatter = logging.Formatter(
             "%(asctime)s - %(levelname)s - [%(name)s] - %(message)s"
         )
@@ -73,16 +102,16 @@ class GlobalLoggerManager:
             "%(asctime)s - %(levelname)s - [%(name)s] %(module)s:%(lineno)d - %(message)s"
         )
 
-        # 1. 콘솔 핸들러 (레벨 설정 가능)
         console_handler = logging.StreamHandler()
         console_handler.setLevel(console_level)
         console_handler.setFormatter(console_formatter)
         logger.addHandler(console_handler)
 
-        # 2. 파일 핸들러 (항상 DEBUG, 전량 출력)
         mode = _detect_run_mode()
         if mode in ("dev", "demo"):
-            log_dir = Path.cwd() / "logs"
+            # 앱 폴더를 찾아서 그 안에 logs 폴더 생성
+            app_folder = _find_app_folder()
+            log_dir = app_folder / "logs"
         else:
             log_dir = Path.home() / ".wf_rpa" / app_name / "logs"
 
@@ -90,14 +119,11 @@ class GlobalLoggerManager:
 
         log_file = log_dir / f"{time.strftime('%Y%m%d')}.txt"
         file_handler = logging.FileHandler(log_file, encoding="utf-8")
-        file_handler.setLevel(logging.DEBUG)  # 파일은 전량 출력
+        file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
 
-        # 3. 30일 경과 로그 파일 정리
         self._clean_old_logs(log_dir, days=30)
-
-        # 4. 시작 배너 + 하드웨어 지문 로그 (안전하게 시도)
         self._log_startup_banner(logger, app_name)
 
         return logger

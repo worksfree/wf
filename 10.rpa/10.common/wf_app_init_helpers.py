@@ -257,3 +257,53 @@ def check_cross_app_running_and_exit(app_name: str) -> None:
     
     # 다른 앱이 실행 중이지 않으면 정상 진행
     return
+
+
+def set_json_files_hidden():
+    """사용자 홈의 .wf_rpa 폴더 내 모든 JSON 파일에 숨김 속성 설정"""
+    try:
+        import platform
+        if platform.system() != "Windows":
+            return
+        
+        import ctypes
+        FILE_ATTRIBUTE_HIDDEN = 0x02
+        
+        wf_rpa_dir = Path.home() / ".wf_rpa"
+        if not wf_rpa_dir.exists():
+            return
+        
+        # .wf_rpa 루트의 JSON 파일들 (wf_rpa_config.json, credentials)
+        for json_file in wf_rpa_dir.glob("*.json"):
+            try:
+                attrs = ctypes.windll.kernel32.GetFileAttributesW(str(json_file))
+                if attrs != -1:
+                    ctypes.windll.kernel32.SetFileAttributesW(
+                        str(json_file), attrs | FILE_ATTRIBUTE_HIDDEN
+                    )
+                else:
+                    ctypes.windll.kernel32.SetFileAttributesW(
+                        str(json_file), FILE_ATTRIBUTE_HIDDEN
+                    )
+            except Exception:
+                pass
+        
+        # 각 앱 폴더의 JSON 파일들 (settings.json, policy.json)
+        for app_dir in wf_rpa_dir.iterdir():
+            if app_dir.is_dir() and not app_dir.name.startswith('.'):
+                for json_file in app_dir.glob("*.json"):
+                    try:
+                        attrs = ctypes.windll.kernel32.GetFileAttributesW(str(json_file))
+                        if attrs != -1:
+                            ctypes.windll.kernel32.SetFileAttributesW(
+                                str(json_file), attrs | FILE_ATTRIBUTE_HIDDEN
+                            )
+                        else:
+                            ctypes.windll.kernel32.SetFileAttributesW(
+                                str(json_file), FILE_ATTRIBUTE_HIDDEN
+                            )
+                    except Exception:
+                        pass
+    except Exception:
+        # 숨김 처리 실패해도 앱 실행에는 영향 없음
+        pass

@@ -1,31 +1,31 @@
 ﻿# build_all.ps1 - sequential build helper (Windows)
 <#
 .SYNOPSIS
-    5개 RPA 앱 순차 빌드 스크립트
+    6개 RPA 앱 순차 빌드 스크립트
 
 .DESCRIPTION
-    BOM2Excel, DWG Batch Print, DWG Classifier, Conversion Verifier, Korean Filename Normalizer를 순차적으로 빌드합니다.
+    BOM Exporter, DWG Batch Print, Attribute Reset, DWG Classifier, Conversion Verifier, Korean Filename Normalizer를 순차적으로 빌드합니다.
     stdin 리다이렉션으로 "Aborted by user request" 문제 해결
 
-.PARAMETER Mode
-    빌드 모드:
-    - Mode 1: onedir만 (1개 아웃풋)
-    - Mode 2: onedir + zip (2개 아웃풋)
-    - Mode 3: onedir + zip + installer (3개 아웃풋)
-    - Mode 4: zip만 (1개 아웃풋)
-    - Mode 5: installer만 (1개 아웃풋)
+.PARAMETER BuildType
+    빌드 출력 형식 (run_mode와 구분하기 위해 BuildType 사용):
+    - BuildType 1: onedir만 (1개 아웃풋)
+    - BuildType 2: onedir + zip (2개 아웃풋) - 기본값
+    - BuildType 3: onedir + zip + installer (3개 아웃풋)
+    - BuildType 4: zip만 (1개 아웃풋)
+    - BuildType 5: installer만 (1개 아웃풋)
 
 .EXAMPLE
-    .\build_all.ps1 -Mode 3
-    # 5개 앱을 순차적으로 onedir + ZIP + installer로 빌드
-    
+    .\build_all.ps1 -BuildType 3
+    # 6개 앱을 순차적으로 onedir + ZIP + installer로 빌드
+
 .EXAMPLE
-    .\build_all.ps1 -Mode 2
-    # 5개 앱을 순차적으로 onedir + ZIP로 빌드
+    .\build_all.ps1 -BuildType 2
+    # 6개 앱을 순차적으로 onedir + ZIP로 빌드
 #>
 
 param(
-    [int]$Mode = 2,
+    [int]$BuildType = 2,  # 1=onedir, 2=onedir+zip, 3=onedir+zip+installer, 4=zip만, 5=installer만
     [switch]$PostClean
 )
 
@@ -44,6 +44,11 @@ $Apps = @(
         Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\build_dwg_batch_print.ps1'
     },
     @{
+        Name = 'Attribute Reset'
+        Dir = 'D:\drive_files\10.worksfree\10.rpa\30.apps\attribute_reset'
+        Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\attribute_reset\build_attribute_reset.ps1'
+    },
+    @{
         Name = 'DWG Classifier'
         Dir = 'D:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier'
         Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\build_dwg_classifier.ps1'
@@ -57,6 +62,11 @@ $Apps = @(
         Name = 'Korean Filename Normalizer'
         Dir = 'D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer'
         Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\build_korean_filename_normalizer.ps1'
+    },
+    @{
+        Name = 'QRCode Generator'
+        Dir = 'D:\drive_files\10.worksfree\10.rpa\50.data\qrcode_generator'
+        Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\qrcode_generator\build_qrcode_generator.ps1'
     }
 )
 
@@ -64,7 +74,7 @@ $Results = @()
 $StartTime = Get-Date
 
 Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host "5개 RPA 앱 순차 빌드 (Mode $Mode)" -ForegroundColor Cyan
+Write-Host "7개 RPA 앱 순차 빌드 (BuildType $BuildType)" -ForegroundColor Cyan
 Write-Host "시작 시간: $($StartTime.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
@@ -81,7 +91,7 @@ foreach ($App in $Apps) {
         }
         
         # 빌드 실행 (stdin을 $null로 리다이렉트하여 PyInstaller "Aborted by user request" 문제 방지)
-        $null | & $App.Script -Mode $Mode
+        $null | & $App.Script -BuildType $BuildType
         
         if ($LASTEXITCODE -eq 0) {
             $Duration = (Get-Date) - $AppStartTime

@@ -41,17 +41,17 @@ class Config:
         # 런모드 판별: settings.json(app_config.run_mode)만 사용
         self.run_mode = self._detect_run_mode()
 
-        # 개발/데모는 소스 트리 config, 배포(release)만 사용자 홈 사용
-        local_config_root = self.base_dir / "config"
-        
+        # 통합 config 경로: 10.common/config/ (개발), ~/.wf_rpa/ (배포)
+        common_config_dir = self.base_dir.parents[1] / "10.common" / "config"
+
         # PyInstaller frozen 환경(exe)에서는 항상 사용자 홈 경로 사용 (번들 파일은 읽기 전용)
         import sys
         is_frozen = getattr(sys, 'frozen', False)
-        
+
         if is_frozen or self.run_mode == "release":
             self.app_config_dir = self.user_home / ".wf_rpa" / APP_NAME
         else:
-            self.app_config_dir = local_config_root / APP_NAME
+            self.app_config_dir = common_config_dir / APP_NAME
         self.app_config_dir.mkdir(parents=True, exist_ok=True)
 
         # Files
@@ -121,7 +121,9 @@ class Config:
 
     def _detect_run_mode(self) -> str:
         """settings.json의 runtime_config.run_mode만 사용하여 실행 모드 결정"""
-        settings_path = Path(__file__).resolve().parent / "config" / APP_NAME / "settings.json"
+        # 통합 config 경로 사용: 10.common/config/conversion_verifier/settings.json
+        app_root = Path(__file__).resolve().parent
+        settings_path = app_root.parents[1] / "10.common" / "config" / APP_NAME / "settings.json"
         try:
             with open(settings_path, "r", encoding="utf-8") as f:
                 data = json.load(f) or {}
@@ -440,6 +442,54 @@ class Config:
         except Exception as e:
             try:
                 self.logger.warning(f"geometry 저장 실패: {e}")
+            except Exception:
+                pass
+            return False
+
+    def update_settings_window_geometry(self, geometry: str | None) -> bool:
+        """세팅창 geometry를 settings.json에 반영한다."""
+        try:
+            data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+
+            if "ui_config" not in data:
+                data["ui_config"] = {}
+
+            data["ui_config"]["settings_window_geometry"] = geometry or ""
+
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            return True
+        except Exception as e:
+            try:
+                self.logger.warning(f"settings_window geometry 저장 실패: {e}")
+            except Exception:
+                pass
+            return False
+
+    def update_registration_window_geometry(self, geometry: str | None) -> bool:
+        """등록창 geometry를 settings.json에 반영한다."""
+        try:
+            data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+
+            if "ui_config" not in data:
+                data["ui_config"] = {}
+
+            data["ui_config"]["registration_window_geometry"] = geometry or ""
+
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            return True
+        except Exception as e:
+            try:
+                self.logger.warning(f"registration_window geometry 저장 실패: {e}")
             except Exception:
                 pass
             return False

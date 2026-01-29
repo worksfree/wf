@@ -15,9 +15,18 @@ import datetime
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox
-import pyautogui
 import platform
 from pathlib import Path
+
+# Adaptive UI 통합 모듈
+try:
+    from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
+except ImportError:
+    import os
+    _common_dir = os.path.join(os.path.dirname(__file__), "..", "..", "10.common")
+    if _common_dir not in sys.path:
+        sys.path.insert(0, _common_dir)
+    from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
 
 # 현재 스크립트의 디렉토리를 Python 경로에 추가
 current_dir = Path(__file__).resolve().parent
@@ -57,9 +66,29 @@ def _resolve_global_config_file():
     return GLOBAL_CONFIG_FILE_SOURCE
 
 
-# 버전 정보 로드 (settings.json에서 직접 읽기)
-def _load_version_from_settings():
-    """settings.json에서 버전 정보 읽기 (없으면 소스 설정값으로 폴백)"""
+# 버전 정보: ui_main.py와 동일한 소스 사용 (중복 로직 제거)
+# ⚠️ 중요: 버전 정보는 반드시 ui_main.py의 APP_VERSION_FULL을 참조해야 함
+# 직접 settings.json을 읽으면 경로 불일치로 잘못된 버전이 표시될 수 있음
+APP_VERSION_FULL = None  # 지연 로드
+
+
+def _get_version_from_main():
+    """ui_main.py에서 버전 정보 가져오기 (단일 소스 원칙)"""
+    global APP_VERSION_FULL
+    if APP_VERSION_FULL is not None:
+        return APP_VERSION_FULL
+
+    try:
+        from ui_main import APP_VERSION_FULL as main_full
+        APP_VERSION_FULL = main_full
+    except ImportError:
+        APP_VERSION_FULL = _load_version_fallback()
+
+    return APP_VERSION_FULL
+
+
+def _load_version_fallback():
+    """fallback: settings.json에서 직접 버전 읽기 (ui_main.py와 동일 로직)"""
     default_full = "v0.7.0.0"
 
     def _ensure_prefix(v: str) -> str:
@@ -68,22 +97,22 @@ def _load_version_from_settings():
             return default_full
         return v if v.startswith("v") else "v" + v
 
-    # 소스 설정의 full_version을 우선 확보 (빌드 시점 기준 버전)
-    source_full = default_full
     try:
-        if SETTINGS_FILE_SOURCE.exists():
-            with open(SETTINGS_FILE_SOURCE, "r", encoding="utf-8") as f:
-                src_data = json.load(f)
-            src_runtime_cfg = src_data.get("runtime_config", {}) or {}
-            source_full = _ensure_prefix(src_runtime_cfg.get("full_version", default_full))
-    except Exception:
-        source_full = default_full
+        if getattr(sys, "frozen", False):
+            # 릴리스 모드: 사용자 홈 우선 (사용자 설정 반영), 없으면 번들 폴더로 fallback
+            settings_file = Path.home() / ".wf_rpa" / "bom_exporter" / "settings.json"
+            if not settings_file.exists():
+                base_path = Path(sys._MEIPASS) if hasattr(sys, '_MEIPASS') else Path(sys.executable).parent
+                settings_file = base_path / ".wf_rpa" / "bom_exporter" / "settings.json"
+        else:
+            # ⚠️ 개발 모드: 10.common/config가 표준 경로
+            app_root = Path(__file__).parent
+            settings_file = app_root.parent.parent / "10.common" / "config" / "bom_exporter" / "settings.json"
+            if not settings_file.exists():
+                settings_file = app_root / "config" / "bom_exporter" / "settings.json"
 
-    # 런타임 설정 파일에서 읽기 (사용자/배포 설정 우선)
-    try:
-        settings_path = _resolve_settings_file()
-        if settings_path.exists():
-            with open(settings_path, "r", encoding="utf-8") as f:
+        if settings_file.exists():
+            with open(settings_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
             runtime_config = data.get("runtime_config", {}) or {}
             runtime_full = runtime_config.get("full_version")
@@ -92,10 +121,7 @@ def _load_version_from_settings():
     except Exception:
         pass
 
-    # 런타임에 없으면 소스 설정의 full_version 사용
-    return source_full
-
-APP_VERSION_FULL = _load_version_from_settings()
+    return default_full
 
 from app_setting_data import get_config
 import wf_hwinfo
@@ -151,108 +177,13 @@ def _apply_ui_scale(settings: dict) -> dict:
     return settings
 
 
-def _apply_global_fonts(root, ui: dict) -> None:
-    """Force all Tk default fonts to unified sizes."""
-    try:
-        root.tk.call("tk", "scaling", 1.0)
-        import tkinter.font as tkfont
-
-        for name in (
-            "TkDefaultFont",
-            "TkTextFont",
-            "TkFixedFont",
-            "TkMenuFont",
-            "TkIconFont",
-            "TkTooltipFont",
-        ):
-            tkfont.nametofont(name).configure(size=ui.get("font_size", 10), weight="normal")
-
-        for name in ("TkHeadingFont", "TkCaptionFont"):
-            tkfont.nametofont(name).configure(size=ui.get("font_size_title", 10), weight="bold")
-
-        try:
-            tkfont.nametofont("TkSmallCaptionFont").configure(
-                size=ui.get("font_size_bold", 10), weight="bold"
-            )
-        except Exception:
-            pass
-    except Exception:
-        pass
-
-
-def get_adaptive_ui_settings():
-    """화면 해상도에 따른 적응형 UI 설정 (설정 파일 ui_config 값을 우선 적용)"""
-    screen_width, screen_height = pyautogui.size()
-
-    # 해상도별 scale factor
-    if screen_width >= 3840:  # UHD (4K)
-        resolution_scale = 1.5
-    elif screen_width >= 2560:  # QHD (1440p)
-        resolution_scale = 1.2
-    else:  # FHD (1080p)
-        resolution_scale = 1.0
-
-    # 저장된 ui_config를 불러와 base 값에 덮어씌움 (사용자 지정값은 스케일링 제외)
-    saved_ui = {}
+def _get_saved_ui_config() -> dict:
+    """앱 설정에서 저장된 UI 설정 로드"""
     try:
         cfg = get_config()
-        saved_ui = getattr(cfg, "ui_config", {}) or getattr(cfg, "get", lambda *_: {})("ui_config", {})
+        return getattr(cfg, "ui_config", {}) or {}
     except Exception:
-        saved_ui = {}
-
-    try:
-        default_width = int(saved_ui.get("window_width", 580))
-    except Exception:
-        default_width = 580
-
-    try:
-        default_height = int(saved_ui.get("window_height", 180))
-    except Exception:
-        default_height = 180
-
-    base_settings = {
-        "window_width": default_width,
-        "window_height": default_height,
-        "font_size": 14,
-        "font_size_bold": 14,
-        "font_size_title": 14,
-        "tree_rowheight": 22,
-        "padding": 12,
-        "button_width": 10,
-    }
-
-    use_saved_width = isinstance(saved_ui, dict) and "window_width" in saved_ui
-    use_saved_height = isinstance(saved_ui, dict) and "window_height" in saved_ui
-
-    # resolution scale 적용 (사용자 지정 width/height는 스케일 제외)
-    scaled = {}
-    for key, value in base_settings.items():
-        if isinstance(value, (int, float)) and key != "window_width":
-            if key == "window_height" and use_saved_height:
-                scaled[key] = value
-            else:
-                scaled[key] = int(round(value * resolution_scale))
-        else:
-            scaled[key] = value
-
-    result = _apply_ui_scale(scaled)
-
-    # ui_scale 적용 이후에도 사용자 지정 크기는 원본 유지
-    if use_saved_width:
-        result["window_width"] = base_settings["window_width"]
-    if use_saved_height:
-        result["window_height"] = base_settings["window_height"]
-
-    # 디버깅: 최종 값 확인
-    try:
-        import logging
-        logger = logging.getLogger("bom_exporter")
-        logger.debug(
-            f"[FONT-DEBUG] base font_size: {base_settings['font_size']}, resolution_scale: {resolution_scale}, final font_size: {result.get('font_size', 'N/A')}, window_height: {result.get('window_height')}, saved_ui: {bool(saved_ui)}"
-        )
-    except Exception:
-        pass
-    return result
+        return {}
 
 
 def center_window_on_screen(window, width, height):
@@ -385,11 +316,21 @@ class SettingsWindow:
         ui_settings = get_adaptive_ui_settings()
 
         self.settings_win = tk.Toplevel(parent_master)
+        self.settings_win.withdraw()  # 깜빡임 방지: geometry 설정 전까지 숨김
         # parent_app에서 버전 정보 가져오기 (ui_main.APP_VERSION_FULL)
         version_str = getattr(self.parent_app, 'APP_VERSION_FULL', APP_VERSION_FULL)
         self.settings_win.title(f"Bom Exporter 알파 {version_str} - 설정")
         self.settings_win.resizable(True, True)
-        _apply_global_fonts(self.settings_win, ui_settings)
+        apply_global_fonts(self.settings_win, ui_settings)
+
+        # 앱별 아이콘 적용 (parent_app에서 icon_path 가져오기)
+        try:
+            icon_path = getattr(self.parent_app, "icon_path", None)
+            if icon_path:
+                self.settings_win.iconbitmap(str(icon_path))
+        except Exception:
+            pass
+
         # 설정창은 항상 기본값(비-최상위) 유지: 메인창만 설정에 따라 변경
         try:
             self.settings_win.wm_attributes("-topmost", 0)
@@ -423,7 +364,7 @@ class SettingsWindow:
 
         # 적응형 창 크기와 위치 설정 (설정창은 더 큰 기본값을 사용해 내용이 모두 보이도록 조정)
         win_width = max(ui_settings["window_width"], 600)
-        # Increased default height so all sections fit without clipping
+        # BE 설정창 최적 높이: 580px (항목 수에 맞춤)
         win_height = max(ui_settings["window_height"], 580)
         center_window_on_screen(self.settings_win, win_width, win_height)
 
@@ -433,6 +374,7 @@ class SettingsWindow:
             self.settings_win.transient(parent_master)
         self.settings_win.grab_set()  # 항상 모달로 설정 - 절대 제거하지 말 것
         self.settings_win.focus_set()  # 포커스 설정
+        self.settings_win.deiconify()  # 모든 설정 완료 후 표시
 
         # 메인 프레임 생성 (적응형 패딩)
         main_frame = tk.Frame(
@@ -560,8 +502,8 @@ class SettingsWindow:
 
         # 화면 최상위 고정 체크박스 (적응형 폰트)
         topmost_default = False
-        if self.custom_settings and "runtime_config" in self.custom_settings:
-            topmost_default = self.custom_settings["runtime_config"].get("topmost", False)
+        if self.custom_settings and "ui_config" in self.custom_settings:
+            topmost_default = self.custom_settings["ui_config"].get("topmost", False)
         else:
             topmost_default = getattr(self.config, "topmost", False)
         self.topmost_var = tk.BooleanVar(value=topmost_default)
@@ -708,6 +650,9 @@ class SettingsWindow:
         )
         cancel_btn.pack(side="left", padx=20)
 
+        # Alt+G: geometry 저장 (디버깅용)
+        self.settings_win.bind_all("<Alt-g>", self._on_debug_geometry_capture)
+
         # 창 닫기 이벤트 처리
         self.settings_win.protocol("WM_DELETE_WINDOW", self.close_settings_window)
 
@@ -809,20 +754,21 @@ class SettingsWindow:
                 except Exception:
                     pass
 
-            # 설정 데이터 준비 (기존 ui_config 보존)
+            # 설정 데이터 준비 (기존 ui_config 보존 + topmost 추가)
+            existing_ui_config = existing_data.get("ui_config", {"last_selected_folder": ""})
+            existing_ui_config["topmost"] = self.topmost_var.get()
             settings_data = {
                 "app_info": {"last_updated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
                 "solidworks": {"program_path": app_path},
                 "app_config": {
                     "restart_count": restart_count,
-                    "topmost": self.topmost_var.get(),
                     "auto_restart": self.restart_var.get(),
                     "speed_mode": self.speed_var.get(),
                     "base_wait_time": base_wait_time_sec,
                     "seconds_per_10mb": seconds_per_10mb,
                     "include_thumbnail": self.thumbnail_var.get(),
                 },
-                "ui_config": existing_data.get("ui_config", {"last_selected_folder": ""})
+                "ui_config": existing_ui_config
             }
 
             # JSON 파일로 저장
@@ -883,6 +829,7 @@ class SettingsWindow:
                 # 이전 설정이 있는 경우 비교
                 old_settings = self.custom_settings
                 old_app_config = old_settings.get("app_config", {})
+                old_ui_config = old_settings.get("ui_config", {})
 
                 # SolidWorks 경로 비교
                 if app_path != old_settings.get("solidworks", {}).get("program_path", ""):
@@ -893,7 +840,7 @@ class SettingsWindow:
                     changed_settings.append(f"재시작 카운트: {restart_count}")
 
                 # 최상위 고정 비교
-                if self.topmost_var.get() != old_app_config.get("topmost", False):
+                if self.topmost_var.get() != old_ui_config.get("topmost", False):
                     changed_settings.append(
                         f"최상위 고정: {'켜짐' if self.topmost_var.get() else '꺼짐'}"
                     )
@@ -985,6 +932,48 @@ class SettingsWindow:
         # 실제 적용은 save_settings()에서 메인창(master)에만 수행.
         try:
             pass
+        except Exception:
+            pass
+
+    def _on_debug_geometry_capture(self, _event=None):
+        """Alt+G: 현재 geometry를 로그에 출력하고 settings.json에 저장"""
+        if not self.settings_win or not self.settings_win.winfo_exists():
+            return
+        try:
+            geo = self.settings_win.geometry()
+            msg = f"[DEBUG] SettingsWindow geometry: {geo}"
+            print(msg)
+            self.logger.info(msg)
+            # settings.json에 저장
+            ok = False
+            if self.config and hasattr(self.config, "update_settings_window_geometry"):
+                ok = self.config.update_settings_window_geometry(geo)
+            # 토스트 메시지 표시
+            if ok:
+                self._show_geometry_toast(f"geometry 저장됨: {geo}")
+            else:
+                self._show_geometry_toast(f"geometry: {geo}")
+        except Exception as e:
+            self.logger.debug(f"Alt+G 실패: {e}")
+
+    def _show_geometry_toast(self, message: str, duration_ms: int = 1400):
+        """간단한 토스트 메시지 표시"""
+        if not self.settings_win or not self.settings_win.winfo_exists():
+            return
+        try:
+            toast = tk.Toplevel(self.settings_win)
+            toast.overrideredirect(True)
+            toast.attributes("-topmost", True)
+            lbl = tk.Label(
+                toast, text=message, bg="#333333", fg="white",
+                font=("맑은 고딕", 9), padx=10, pady=5
+            )
+            lbl.pack()
+            toast.update_idletasks()
+            x = self.settings_win.winfo_x() + (self.settings_win.winfo_width() - toast.winfo_reqwidth()) // 2
+            y = self.settings_win.winfo_y() + self.settings_win.winfo_height() - toast.winfo_reqheight() - 10
+            toast.geometry(f"+{x}+{y}")
+            toast.after(duration_ms, toast.destroy)
         except Exception:
             pass
 

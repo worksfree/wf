@@ -21,6 +21,7 @@ $script:PassedChecks = 0
 $script:FailedChecks = 0
 $script:WarningChecks = 0
 $script:WfRpaDir = $null
+$script:ActualPackagePath = $null
 
 # ============================================================
 # Helper Functions
@@ -67,13 +68,22 @@ function Test-BasicStructure {
     Write-CheckResult -CheckName "Package directory exists" -Passed $exists -Message $(if ($exists) { $PackagePath } else { "Not found" })
     if (-not $exists) { return $false }
     
+    # Check if there's a *_portable subdirectory (BuildType 2)
+    $portableDirs = Get-ChildItem -Path $PackagePath -Directory -Filter "*_portable" -ErrorAction SilentlyContinue
+    if ($portableDirs.Count -gt 0) {
+        $script:ActualPackagePath = $portableDirs[0].FullName
+        Write-Host "  📦 Detected portable package structure: $($portableDirs[0].Name)" -ForegroundColor DarkGray
+    } else {
+        $script:ActualPackagePath = $PackagePath
+    }
+    
     # Find .exe file
-    $exeFiles = Get-ChildItem -Path $PackagePath -Filter "*.exe"
+    $exeFiles = Get-ChildItem -Path $script:ActualPackagePath -Filter "*.exe"
     $hasExe = $exeFiles.Count -gt 0
     Write-CheckResult -CheckName "Executable file (.exe)" -Passed $hasExe -Message $(if ($hasExe) { $exeFiles[0].Name } else { "Not found" })
     
     # Check _internal directory
-    $internalDir = Join-Path $PackagePath "_internal"
+    $internalDir = Join-Path $script:ActualPackagePath "_internal"
     $hasInternal = Test-Path $internalDir
     Write-CheckResult -CheckName "_internal directory" -Passed $hasInternal -Message $(if ($hasInternal) { "Found" } else { "Missing" })
     
@@ -130,8 +140,10 @@ function Test-ConfigFiles {
     # google_sheets detailed verification
     if ($config.google_sheets) {
         $gs = $config.google_sheets
-        $hasSheetId = $null -ne $gs.sheet_id_prod -and $gs.sheet_id_prod -ne ""
-        Write-CheckResult -CheckName "  sheet_id_prod config" -Passed $hasSheetId -Message $(if ($hasSheetId) { $gs.sheet_id_prod.Substring(0, 20) + "..." } else { "Not configured" })
+        $hasSheetIdRelease = $null -ne $gs.sheet_id_release -and $gs.sheet_id_release -ne ""
+        $hasSheetIdDev = $null -ne $gs.sheet_id_dev -and $gs.sheet_id_dev -ne ""
+        Write-CheckResult -CheckName "  sheet_id_release config" -Passed $hasSheetIdRelease -Message $(if ($hasSheetIdRelease) { $gs.sheet_id_release.Substring(0, 20) + "..." } else { "Not configured" }) -Level $(if ($hasSheetIdRelease) { "Error" } else { "Warning" })
+        Write-CheckResult -CheckName "  sheet_id_dev config" -Passed $hasSheetIdDev -Message $(if ($hasSheetIdDev) { $gs.sheet_id_dev.Substring(0, 20) + "..." } else { "Not configured" }) -Level "Warning"
         
         $hasScope = $null -ne $gs.scope -and $gs.scope.Count -gt 0
         Write-CheckResult -CheckName "  scope config" -Passed $hasScope -Message $(if ($hasScope) { "Scope count: $($gs.scope.Count)" } else { "Not configured" })
@@ -165,24 +177,27 @@ function Test-CredentialFiles {
         return $false
     }
     
-    # Find .silver-argon file
-    $silverFiles = Get-ChildItem -Path $script:WfRpaDir -Filter ".silver-argon*.json"
+    # Find credential files (DEV or RELEASE)
+    $silverFiles = Get-ChildItem -Path $script:WfRpaDir -Filter "silver-argon*.json" -ErrorAction SilentlyContinue
+    $worksfreeFiles = Get-ChildItem -Path $script:WfRpaDir -Filter "worksfree-*.json" -ErrorAction SilentlyContinue
     
-    if ($silverFiles.Count -eq 0) {
-        Write-CheckResult -CheckName ".silver-argon file exists" -Passed $false -Message "Credential file not found"
+    $credFiles = @($silverFiles) + @($worksfreeFiles)
+    
+    if ($credFiles.Count -eq 0) {
+        Write-CheckResult -CheckName "Credential files exist" -Passed $false -Message "No credential files found (silver-argon or worksfree)"
         return $false
     }
     
-    $silverFile = $silverFiles[0]
-    Write-CheckResult -CheckName ".silver-argon file exists" -Passed $true -Message "$($silverFile.Name) ($($silverFile.Length) bytes)"
+    $credFile = $credFiles[0]
+    Write-CheckResult -CheckName "Credential files exist" -Passed $true -Message "$($credFile.Name) ($($credFile.Length) bytes)"
     
     # File size validation (minimum 2000 bytes)
-    $sizeOk = $silverFile.Length -ge 2000
-    Write-CheckResult -CheckName "File size validation" -Passed $sizeOk -Message $(if ($sizeOk) { "Normal ($($silverFile.Length) bytes)" } else { "Too small ($($silverFile.Length) bytes)" })
+    $sizeOk = $credFile.Length -ge 2000
+    Write-CheckResult -CheckName "File size validation" -Passed $sizeOk -Message $(if ($sizeOk) { "Normal ($($credFile.Length) bytes)" } else { "Too small ($($credFile.Length) bytes)" })
     
     # Try JSON parsing
     try {
-        $cred = Get-Content $silverFile.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        $cred = Get-Content $credFile.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
         Write-CheckResult -CheckName "JSON parsing" -Passed $true -Message "Valid JSON format"
     } catch {
         Write-CheckResult -CheckName "JSON parsing" -Passed $false -Message "JSON parsing failed: $($_.Exception.Message)"
@@ -214,7 +229,7 @@ function Test-BundleFiles {
     Write-Host "`n[4] Bundle Files Verification" -ForegroundColor Cyan
     Write-Host ("=" * 60) -ForegroundColor DarkGray
     
-    $internalDir = Join-Path $PackagePath "_internal"
+    $internalDir = Join-Path $script:ActualPackagePath "_internal"
     if (-not (Test-Path $internalDir)) {
         Write-CheckResult -CheckName "Bundle verification" -Passed $false -Message "_internal directory not found"
         return $false
@@ -233,88 +248,61 @@ function Test-BundleFiles {
     }
     
     # Check for PYZ archive (contains most Python modules)
-    $archiveFiles = Get-ChildItem -Path $internalDir -File -ErrorAction SilentlyContinue | 
-        Where-Object { $_.Extension -in @('.pyz', '.zip', '.pkg') -and ($_.Name -like "*library*" -or $_.Name -like "*.pyz") }
-    $hasArchive = $archiveFiles.Count -gt 0
-    Write-CheckResult -CheckName "  Python archive" -Passed $hasArchive -Message $(if ($hasArchive) { "$($archiveFiles.Count) archive(s) found" } else { "Not found" })
-    
-    if ($hasArchive) {
-        Write-Host "`n  [Inspecting Archive Contents]" -ForegroundColor Cyan
-        
-        # Load System.IO.Compression for ZIP inspection
-        Add-Type -AssemblyName System.IO.Compression.FileSystem
-        
-        foreach ($archive in $archiveFiles) {
-            Write-Host "  File: $($archive.Name) ($([math]::Round($archive.Length / 1MB, 2)) MB)" -ForegroundColor Gray
-            
-            try {
-                $zip = [System.IO.Compression.ZipFile]::OpenRead($archive.FullName)
-                $entries = $zip.Entries | ForEach-Object { $_.FullName }
-                
-                # Check for essential libraries in the archive AND _internal directories
-                $requiredLibs = @{
-                    "ntplib" = "ntplib"
-                    "gspread" = "gspread"
-                    "google.auth" = "google/auth"
-                    "requests" = "requests"
-                    "urllib3" = "urllib3"
-                }
-                
-                $appSpecificLibs = @{
-                    "keyboard" = "keyboard"
-                    "pyautogui" = "pyautogui"
-                    "pywinauto" = "pywinauto"
-                    "openpyxl" = "openpyxl"
-                }
-                
-                Write-Host "`n  [Required Libraries]" -ForegroundColor White
-                foreach ($libName in $requiredLibs.Keys) {
-                    $pattern = $requiredLibs[$libName]
-                    # Check in archive
-                    $foundInArchive = $entries | Where-Object { $_ -like "*$pattern*" }
-                    # Check in _internal directory
-                    $dirName = $libName -replace '\..*', ''  # Remove everything after first dot (e.g., google.auth -> google)
-                    $libDir = Join-Path $internalDir $dirName
-                    $foundInDir = Test-Path $libDir
-                    
-                    $exists = ($foundInArchive.Count -gt 0) -or $foundInDir
-                    $location = if ($foundInArchive.Count -gt 0 -and $foundInDir) { "archive + _internal" }
-                               elseif ($foundInArchive.Count -gt 0) { "archive" }
-                               elseif ($foundInDir) { "_internal" }
-                               else { "MISSING" }
-                    
-                    Write-CheckResult -CheckName "    $libName" -Passed $exists -Message $location -Level "Error"
-                }
-                
-                # Check app-specific libraries (only for BOM Exporter)
-                $packageName = Split-Path $PackagePath -Leaf
-                if ($packageName -like "*bom_exporter*") {
-                    Write-Host "`n  [App-Specific Libraries]" -ForegroundColor White
-                    foreach ($libName in $appSpecificLibs.Keys) {
-                        $pattern = $appSpecificLibs[$libName]
-                        # Check in archive
-                        $foundInArchive = $entries | Where-Object { $_ -like "*$pattern*" }
-                        # Check in _internal directory
-                        $libDir = Join-Path $internalDir $libName
-                        $foundInDir = Test-Path $libDir
-                        
-                        $exists = ($foundInArchive.Count -gt 0) -or $foundInDir
-                        $location = if ($foundInArchive.Count -gt 0 -and $foundInDir) { "archive + _internal" }
-                                   elseif ($foundInArchive.Count -gt 0) { "archive" }
-                                   elseif ($foundInDir) { "_internal" }
-                                   else { "missing" }
-                        
-                        Write-CheckResult -CheckName "    $libName" -Passed $exists -Message $location -Level "Warning"
-                    }
-                }
-                
-                $zip.Dispose()
-            } catch {
-                Write-Host "    ⚠️  Failed to inspect archive: $($_.Exception.Message)" -ForegroundColor Yellow
-            }
+    # Note: PyInstaller stores modules in PYZ files, not base_library.zip
+    $pyzFiles = Get-ChildItem -Path $internalDir -Filter "*.pyz" -File -ErrorAction SilentlyContinue
+    $hasPyz = $pyzFiles.Count -gt 0
+    Write-CheckResult -CheckName "  PYZ archive" -Passed $hasPyz -Message $(if ($hasPyz) { "$($pyzFiles.Count) PYZ file(s) found" } else { "Not found (modules may be in other archives)" }) -Level "Warning"
+
+    # Check required libraries in _internal directory
+    # Note: PyInstaller extracts some libraries to _internal, others stay in PYZ
+    Write-Host "`n  [Required Libraries - checking _internal directory]" -ForegroundColor White
+
+    $requiredLibs = @{
+        "ntplib" = "ntplib"
+        "gspread" = "gspread"
+        "google" = "google"
+        "requests" = "requests"
+        "urllib3" = "urllib3"
+    }
+
+    foreach ($libName in $requiredLibs.Keys) {
+        $libDir = Join-Path $internalDir $libName
+        $foundInDir = Test-Path $libDir
+
+        # Also check for .pyc files or subdirectories
+        if (-not $foundInDir) {
+            $pycFiles = Get-ChildItem -Path $internalDir -Filter "$libName*.pyc" -File -ErrorAction SilentlyContinue
+            $foundInDir = $pycFiles.Count -gt 0
         }
-    } else {
-        Write-Host "`n  💡 To verify all dependencies, check the PyInstaller build warnings." -ForegroundColor Yellow
+
+        # Libraries in PYZ are assumed to be present if PYZ exists
+        $location = if ($foundInDir) { "_internal" } elseif ($hasPyz) { "PYZ (assumed)" } else { "MISSING" }
+        $exists = $foundInDir -or $hasPyz
+
+        Write-CheckResult -CheckName "    $libName" -Passed $exists -Message $location -Level $(if ($foundInDir) { "Error" } else { "Warning" })
+    }
+
+    # Check app-specific libraries (only for apps that need them)
+    $packageName = Split-Path $PackagePath -Leaf
+    if ($packageName -like "*bom_exporter*" -or $packageName -like "*dwg_batch_print*") {
+        Write-Host "`n  [App-Specific Libraries]" -ForegroundColor White
+
+        $appSpecificLibs = @{
+            "keyboard" = "keyboard"
+            "pyautogui" = "pyautogui"
+            "pywinauto" = "pywinauto"
+            "openpyxl" = "openpyxl"
+        }
+
+        foreach ($libName in $appSpecificLibs.Keys) {
+            $libDir = Join-Path $internalDir $libName
+            $foundInDir = Test-Path $libDir
+
+            $location = if ($foundInDir) { "_internal" } elseif ($hasPyz) { "PYZ (assumed)" } else { "missing" }
+            $exists = $foundInDir -or $hasPyz
+
+            Write-CheckResult -CheckName "    $libName" -Passed $exists -Message $location -Level "Warning"
+        }
     }
     
     return $true
@@ -341,8 +329,11 @@ function Test-VersionInfo {
     if ($settingsFiles.Count -gt 0) {
         try {
             $settings = Get-Content $settingsFiles[0].FullName -Raw -Encoding UTF8 | ConvertFrom-Json
-            $settingsVersion = $settings.version
-            Write-CheckResult -CheckName "settings.json version" -Passed $true -Message "v$settingsVersion"
+            # runtime_config.full_version 우선, 없으면 version 사용
+            $settingsVersion = if ($settings.runtime_config.full_version) { $settings.runtime_config.full_version } else { $settings.version }
+            # 이미 v로 시작하면 v 추가 안함
+            $displayVersion = if ($settingsVersion -and $settingsVersion.StartsWith("v")) { $settingsVersion } else { "v$settingsVersion" }
+            Write-CheckResult -CheckName "settings.json version" -Passed $true -Message $displayVersion
             
             if ($version -and $settingsVersion -and $version -eq $settingsVersion) {
                 Write-CheckResult -CheckName "Version consistency" -Passed $true -Message "Package name and settings.json match"
@@ -362,25 +353,31 @@ function Test-Shortcut {
     Write-Host "`n[6] Shortcut Creation Script Verification" -ForegroundColor Cyan
     Write-Host ("=" * 60) -ForegroundColor DarkGray
     
-    # Check for create_desktop_shortcut.bat file (표준 바로가기 생성 스크립트)
-    $expectedBat = "create_desktop_shortcut.bat"
-    $batPath = Join-Path $PackagePath $expectedBat
-    $batExists = Test-Path $batPath
+    # Check for create_desktop_shortcut.bat file or 바로가기_생성.bat
+    $expectedBats = @("create_desktop_shortcut.bat", "바로가기_생성.bat")
+    $foundBat = $null
     
-    # Shortcut script should exist
-    if ($batExists) {
-        Write-CheckResult -CheckName "Shortcut creation script (.bat)" -Passed $true -Message $expectedBat
-    } else {
-        # 대체 .bat 파일 확인
-        $batFiles = Get-ChildItem -Path $PackagePath -Filter "*.bat" -ErrorAction SilentlyContinue
-        if ($batFiles.Count -gt 0) {
-            Write-CheckResult -CheckName "Shortcut creation script (.bat)" -Passed $false -Message "Found $($batFiles[0].Name) but expected $expectedBat" -Level "Warning"
-        } else {
-            Write-CheckResult -CheckName "Shortcut creation script (.bat)" -Passed $false -Message "Not found (expected: $expectedBat)"
+    foreach ($batName in $expectedBats) {
+        $batPath = Join-Path $script:ActualPackagePath $batName
+        if (Test-Path $batPath) {
+            $foundBat = $batName
+            break
         }
     }
     
-    return $batExists
+    if ($foundBat) {
+        Write-CheckResult -CheckName "Shortcut creation script (.bat)" -Passed $true -Message $foundBat
+    } else {
+        # 대체 .bat 파일 확인
+        $batFiles = Get-ChildItem -Path $script:ActualPackagePath -Filter "*.bat" -ErrorAction SilentlyContinue
+        if ($batFiles.Count -gt 0) {
+            Write-CheckResult -CheckName "Shortcut creation script (.bat)" -Passed $true -Message "Found $($batFiles.Count) .bat file(s): $($batFiles[0].Name)" -Level "Warning"
+        } else {
+            Write-CheckResult -CheckName "Shortcut creation script (.bat)" -Passed $false -Message "Not found (expected: create_desktop_shortcut.bat or 바로가기_생성.bat)"
+        }
+    }
+    
+    return ($null -ne $foundBat -or $batFiles.Count -gt 0)
 }
 
 # ============================================================

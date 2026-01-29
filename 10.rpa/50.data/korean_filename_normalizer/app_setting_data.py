@@ -58,16 +58,17 @@ class Config:
         self.run_mode = self._detect_run_mode()
 
         app_root = Path(self.base_dir)
-        local_config_dir = app_root / "config"
-        
+        # 통합 config 경로: 10.common/config/ (개발), ~/.wf_rpa/ (배포)
+        common_config_dir = app_root.parents[1] / "10.common" / "config"
+
         # PyInstaller frozen 환경(exe)에서는 항상 사용자 홈 경로 사용 (번들 파일은 읽기 전용)
         import sys
         is_frozen = getattr(sys, 'frozen', False)
-        
+
         if is_frozen or self.run_mode == "release":
             self.app_config_dir = self.user_home / ".wf_rpa" / "korean_filename_normalizer"
         else:
-            self.app_config_dir = local_config_dir / "korean_filename_normalizer"
+            self.app_config_dir = common_config_dir / "korean_filename_normalizer"
 
         # Lazy logger
         self._logger = None
@@ -101,7 +102,9 @@ class Config:
 
     def _detect_run_mode(self) -> str:
         """settings.json(runtime_config.run_mode)만 사용하여 실행 모드 결정"""
-        settings_path = Path(__file__).resolve().parent / "config" / "korean_filename_normalizer" / "settings.json"
+        # 통합 config 경로 사용: 10.common/config/korean_filename_normalizer/settings.json
+        app_root = Path(__file__).resolve().parent
+        settings_path = app_root.parents[1] / "10.common" / "config" / "korean_filename_normalizer" / "settings.json"
         try:
             with open(settings_path, "r", encoding="utf-8") as f:
                 data = json.load(f) or {}
@@ -180,8 +183,8 @@ class Config:
                 },
                 "logging_config": {
                     "log_level": "INFO",
-                    "max_log_lines": 1000,
-                    "auto_scroll_log": True
+                    "max_log_size_mb": 10,
+                    "rotate_logs": True
                 },
                 "normalizer_settings": {
                     "default_folder_path": "",
@@ -242,8 +245,8 @@ class Config:
 
         # Logging
         self.log_level = logging_config.get("log_level", "INFO")
-        self.max_log_lines = logging_config.get("max_log_lines", 1000)
-        self.auto_scroll_log = logging_config.get("auto_scroll_log", True)
+        self.max_log_size_mb = logging_config.get("max_log_size_mb", 10)
+        self.rotate_logs = logging_config.get("rotate_logs", True)
 
         # Domain settings
         self.default_folder_path = normalizer.get("default_folder_path", "")
@@ -313,8 +316,8 @@ class Config:
 
             data["logging_config"] = {
                 "log_level": self.log_level,
-                "max_log_lines": self.max_log_lines,
-                "auto_scroll_log": self.auto_scroll_log,
+                "max_log_size_mb": self.max_log_size_mb,
+                "rotate_logs": self.rotate_logs,
             }
 
             data["normalizer_settings"] = {
@@ -442,6 +445,56 @@ class Config:
             try:
                 if hasattr(self, "logger"):
                     self.logger.warning(f"geometry 저장 실패: {e}")
+            except Exception:
+                pass
+            return False
+
+    def update_settings_window_geometry(self, geometry: str | None) -> bool:
+        """세팅창 geometry를 settings.json에 반영한다."""
+        try:
+            data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+
+            if "ui_config" not in data:
+                data["ui_config"] = {}
+
+            data["ui_config"]["settings_window_geometry"] = geometry or ""
+
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            return True
+        except Exception as e:
+            try:
+                if hasattr(self, "logger"):
+                    self.logger.warning(f"settings_window geometry 저장 실패: {e}")
+            except Exception:
+                pass
+            return False
+
+    def update_registration_window_geometry(self, geometry: str | None) -> bool:
+        """등록창 geometry를 settings.json에 반영한다."""
+        try:
+            data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, "r", encoding="utf-8") as f:
+                    data = json.load(f) or {}
+
+            if "ui_config" not in data:
+                data["ui_config"] = {}
+
+            data["ui_config"]["registration_window_geometry"] = geometry or ""
+
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            return True
+        except Exception as e:
+            try:
+                if hasattr(self, "logger"):
+                    self.logger.warning(f"registration_window geometry 저장 실패: {e}")
             except Exception:
                 pass
             return False

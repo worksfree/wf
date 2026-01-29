@@ -273,6 +273,63 @@ pyautogui.hotkey('ctrl', 'v')
 
 ---
 
+### ⚠️ Cross-origin iframe 처리
+
+#### 문제 상황
+K-Startup 사이트에는 보안을 위한 Cross-domain iframe이 존재합니다:
+```html
+<iframe title="Cross Domain Process" 
+        src="https://pms.k-startup.go.kr/biz/static/3rdparty/initech/webui/crossd_iframe.html"
+        style="position: absolute; width: 1px; height: 1px; left: -9999px; top: -9999px;">
+</iframe>
+```
+
+이런 iframe은:
+- **화면 밖에 숨겨짐** (left: -9999px)
+- **크기가 매우 작음** (1x1px)
+- **Cross-origin 정책**으로 DOM 접근 차단
+- **자동화 대상이 아님** (보안 프로세스용)
+
+#### 자동 감지 및 경고
+스크립트가 자동으로 감지하여 경고를 표시합니다:
+```
+⚠️ Cross-domain 프로세스 iframe 감지: https://pms.k-startup.go.kr/.../crossd_iframe.html
+   → 이 iframe은 접근이 제한될 수 있습니다. 필요 없다면 건너뛰세요.
+❌ Cross-origin iframe 접근 거부
+   → 해결책: 1) iframe_out으로 복귀 2) 다른 방법 사용 3) 이 단계 건너뛰기
+```
+
+#### 대응 방법
+
+**방법 1: iframe 진입 액션 제거**
+```excel
+# 불필요한 Cross-origin iframe 진입은 삭제
+# ❌ 24  iframe_in  크로스도메인  //*[@title='Cross Domain Process']
+   25  click      실제작업       //*[@id="submitBtn"]
+```
+
+**방법 2: 조건부 실행 (try-except)**
+스크립트가 자동으로 실패 시 루트로 복귀하므로, 다음 액션을 계속 진행합니다.
+
+**방법 3: 올바른 iframe 선택**
+```excel
+# 작업 대상이 되는 실제 iframe을 찾아서 진입
+순번   타입       XPath/값
+24     iframe_in  //*[@id="mainContent"]    ← 실제 작업 영역 iframe
+25     click      //*[@id="submitBtn"]      ← iframe 내부 요소
+26     iframe_out (빈값)                    ← 루트로 복귀
+```
+
+#### 숨겨진 iframe 식별 팁
+Chrome DevTools에서 확인:
+1. F12 → Elements 탭
+2. iframe 태그 검색 (`Ctrl+F` → `iframe`)
+3. 각 iframe의 속성 확인:
+   - `style="left: -9999px"` → 숨겨진 iframe (건너뛰기)
+   - `id="mainContent"` 등 명확한 ID → 작업 대상 iframe
+
+---
+
 ## 개발 중 발생한 이슈 및 해결
 
 ### 1. 숫자 0 전달 문제 ⚠️
@@ -404,34 +461,153 @@ if xpath:
 
 ## XPath 작성 가이드
 
-### 고정 ID (권장)
+### 1. 고정 ID (가장 권장)
 ```xpath
 //*[@id="submitButton"]
 ```
+**장점:** 가장 빠르고 정확  
+**단점:** 동적 ID에는 사용 불가
 
-### 동적 ID (contains 사용)
+---
+
+### 2. 동적 ID 처리 (실전 필수!)
+
+#### 문제 상황
 ```xpath
+# 이런 ID는 페이지 로드마다 변경됨
+//*[@id="uuid_1451"]  ❌ 다음에 uuid_1452로 변경됨
+//*[@id="button_20250111_1234"]  ❌ 시간마다 변경
+```
+
+#### 해결 방법 1: contains() - 부분 매칭 (가장 많이 사용)
+```xpath
+# 예시: //*[@id="mf_wfm_contents_...uuid_1451"]
+//*[contains(@id, 'mf_wfm_contents')]
+//*[contains(@id, 'wq_uuid_')]  ← 고정된 부분만 사용
+
+# 복수 조건 조합
 //*[contains(@id, 'submit') and contains(@id, 'btn')]
 ```
 
-### 텍스트 기반 (가장 안정적)
+#### 해결 방법 2: starts-with() - 시작 부분 매칭
 ```xpath
-//button[text()='확인']
-//a[contains(text(), '다음')]
-//span[text()='저장']/parent::button
+//*[starts-with(@id, 'button_')]
+//*[starts-with(@id, 'mf_wfm_contents_')]
 ```
 
-### 복합 조건
+#### 해결 방법 3: 부모 + 자식 조합
 ```xpath
+# 안정적인 부모에서 시작
+//div[@id='stable-container']//button[contains(@id, 'uuid_')]
+
+# 여러 단계 탐색
+//form[@name='userForm']//div[@class='button-group']//button[contains(@id, 'submit')]
+```
+
+#### 해결 방법 4: class 속성 사용
+```xpath
+//*[@class='submit-button']
+//*[contains(@class, 'btn-primary')]
+```
+
+#### 해결 방법 5: 다른 속성과 조합
+```xpath
+# type + name
 //input[@type='text' and @name='userId']
-//div[@class='modal']//button[text()='확인']
+
+# class + data 속성
+//button[@class='btn' and @data-action='submit']
+
+# 동적 ID + 안정 속성
+//*[contains(@id, 'uuid_') and @type='submit']
 ```
 
-### 형제/부모 탐색
-```xpath
-//label[text()='이메일']/following-sibling::input
-//td[text()='합계']/following-sibling::td
+**실전 팁:**
 ```
+동적 ID: //*[@id="mf_wfm_contents_tabCtrl_...uuid_1451"]
+
+✅ 권장 XPath:
+   //*[contains(@id, 'wq_uuid_')]
+   
+   또는 (더 구체적)
+   //*[contains(@id, 'NBEG0112P06_wframe_wq_uuid_')]
+```
+
+---
+
+### 3. 텍스트 기반 (매우 안정적)
+```xpath
+# 정확한 텍스트 매칭
+//button[text()='확인']
+//a[text()='다음 단계']
+
+# 부분 텍스트 매칭
+//button[contains(text(), '저장')]
+//span[contains(text(), '등록')]
+
+# 텍스트 + 상위 요소
+//span[text()='저장']/parent::button
+//div[contains(text(), '완료')]/ancestor::button
+```
+
+---
+
+### 4. 복합 조건
+```xpath
+# AND 조건
+//input[@type='text' and @name='userId']
+//button[@class='btn' and contains(text(), '확인')]
+
+# 계층 구조 + 조건
+//div[@class='modal']//button[text()='확인']
+//form[@id='loginForm']//input[@type='password']
+```
+
+---
+
+### 5. 형제/부모 탐색
+```xpath
+# 라벨 → 입력 필드
+//label[text()='이메일']/following-sibling::input
+
+# 테이블 셀
+//td[text()='합계']/following-sibling::td[1]
+
+# 부모로 이동
+//span[@class='error']/parent::div
+
+# 조상으로 이동
+//span[text()='에러']/ancestor::form
+```
+
+---
+
+### 6. Chrome DevTools로 XPath 테스트
+
+1. **F12** → **Elements** 탭
+2. **Ctrl+F** (검색창)
+3. XPath 입력:
+   ```
+   //*[contains(@id, 'uuid_')]
+   ```
+4. **결과 확인:**
+   - `1 of 1` → ✅ 완벽! 하나만 찾음
+   - `1 of 5` → ⚠️ 5개 중 1번째, 조건 추가 필요
+   - `0 of 0` → ❌ 못 찾음, XPath 수정
+
+**팁:** 요소에 마우스 우클릭 → **Copy** → **Copy XPath** 로 기본 XPath 확인 후 동적 부분 수정
+
+---
+
+### 7. XPath vs CSS Selector 선택
+
+| 상황 | 권장 |
+|------|------|
+| 고정 ID | 둘 다 가능 (`#id` vs `//*[@id='id']`) |
+| 동적 ID | **XPath** (contains 지원) |
+| 텍스트로 찾기 | **XPath** (text() 지원) |
+| 부모로 이동 | **XPath** (parent, ancestor) |
+| nth-child | CSS가 더 간결 |
 
 ### 피해야 할 패턴
 ```xpath

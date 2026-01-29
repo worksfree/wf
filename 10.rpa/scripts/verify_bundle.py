@@ -192,12 +192,15 @@ def verify_bundle(bundle_dir: Path, app_name: str, check_version: bool = True) -
     else:
         print(f"  ⚠️ wf_rpa_config.json 없음")
     
-    # Google credentials 확인
-    silver_files = list(wf_rpa.glob('.silver-argon*.json'))
-    if silver_files:
-        print(f"  ✅ Google credentials 존재: {silver_files[0].name}")
+    # Google credentials 확인 (DEV 또는 RELEASE)
+    silver_files = list(wf_rpa.glob('silver-argon*.json'))
+    worksfree_files = list(wf_rpa.glob('worksfree-*.json'))
+    cred_files = silver_files + worksfree_files
+    
+    if cred_files:
+        print(f"  ✅ Google credentials 존재: {', '.join([f.name for f in cred_files])}")
     else:
-        print(f"  ⚠️ Google credentials 없음")
+        print(f"  ⚠️ Google credentials 없음 (silver-argon 또는 worksfree)")
     
     # 최종 결과
     print(f"\n{'='*60}")

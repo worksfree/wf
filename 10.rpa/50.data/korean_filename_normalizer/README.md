@@ -725,3 +725,136 @@ function manual_jamo_combination(text):
 4. **자모 확장 영역** (문자별 검사, 느림)
 
 **최적화**: 한 가지 방법이라도 True 반환하면 즉시 종료
+---
+
+## 부록
+
+### 부록 A: 빌드 시 크레딧 및 사용자 상태 초기화
+
+> 빌드 스크립트에서 자동 초기화 로직 구현 (2025-11-20)
+
+#### 템플릿 파일 위치
+`.build_templates/` 디렉토리에 초기화 템플릿 생성:
+
+**credit_history.template.json**:
+```json
+{
+  "credit_changed": false,
+  "trial_credits": 2000,
+  "purchased_credits": 0,
+  "created_at": "2025-01-01T00:00:00.000",
+  "last_updated": "2025-01-01T00:00:00.000",
+  "purchase_history": [],
+  "usage_history": []
+}
+```
+- 체험판 크레딧 2000으로 초기화
+- 사용 이력 없음
+
+**wf_rpa_config.template.json**:
+```json
+{
+  "user_info": {
+    "registration_id": "",
+    "hardware_fingerprint": "",
+    "is_registered": false,
+    "registration_date": null,
+    "last_sync": null
+  },
+  "app_execution": {
+    "last_run": null,
+    "run_count": 0
+  },
+  "auto_update": {
+    "enabled": true,
+    "last_check": null,
+    "update_channel": "stable"
+  }
+}
+```
+- 미등록 상태로 초기화
+- 실행 이력 없음
+
+#### 빌드 스크립트 적용
+`build_{app}.ps1`에서 템플릿 파일을 dist 폴더로 복사:
+```powershell
+# 체험판 크레딧 초기화
+Copy-Item ".build_templates\credit_history.template.json" `
+    "dist\_internal\.wf_rpa\{app}\credit_history.json"
+
+# 사용자 등록 상태 초기화  
+Copy-Item ".build_templates\wf_rpa_config.template.json" `
+    "dist\_internal\.wf_rpa\wf_rpa_config.json"
+```
+
+#### 효과
+- 모든 배포 패키지가 체험판 상태로 시작
+- 사용자별 독립적인 체험 환경 제공
+- 개발자 설정이 배포 패키지에 포함되지 않음
+
+---
+
+### 부록 B: UI 자동화 테스트 가이드
+
+> pytest 기반 UI 컴포넌트 및 기능 자동 테스트
+
+#### 테스트 범위
+
+**1. UI 컴포넌트 테스트**:
+- UI 초기화, 창 제목 검증
+- 버튼 존재 여부
+- 진행률 바 초기 상태
+
+**2. 폴더 선택 기능**:
+- 폴더 경로 변수 설정
+- 폴더 없이 스캔 시도
+- 유효한 폴더 선택
+
+**3. 파일명 정규화**:
+- NFC 정규화 동작
+- 자소 분리 감지
+- 자소 분리 파일 검색
+- 정상 파일 필터링
+
+**4. 진행 상황 추적**:
+- 초기 카운트 확인
+- 진행률 업데이트
+- 스피너 애니메이션
+
+**5. 스캔 기능**:
+- 자소 분리 파일 스캔
+- 빈 폴더 처리
+- 버튼 상태 변경
+
+**6. 관리자 모드**:
+- 관리자 모드 진입/종료
+- 로그 프레임 생성/제거
+
+**7. 테스트 데이터 생성**:
+- 테스트 파일 생성/삭제
+
+**8. 전체 워크플로우**:
+- 폴더 선택 → 스캔 → 정규화 완전 흐름
+
+**9. UI 반응성**:
+- 버튼 클릭 반응
+- 크레딧 표시 업데이트
+
+#### 테스트 실행
+```bash
+# 전체 테스트
+pytest 90.tests/unit/apps/korean_filename_normalizer/ -v
+
+# 특정 테스트만
+pytest 90.tests/unit/apps/korean_filename_normalizer/test_ui.py::TestUIComponents -v
+```
+
+#### 테스트 파일 위치
+- `90.tests/unit/apps/korean_filename_normalizer/test_ui.py`
+- `90.tests/integration/korean_filename_normalizer/test_e2e.py`
+
+자세한 내용은 `KOREAN_FILENAME_NORMALIZER_USER_MANUAL.md` 참조
+
+---
+
+*최종 수정: 2026-01-28*

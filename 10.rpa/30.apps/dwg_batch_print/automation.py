@@ -36,6 +36,11 @@ if str(common_path) not in sys.path:
 from wf_log import get_app_logger
 
 try:
+    import wf_email as wfm
+except ImportError:
+    wfm = None
+
+try:
     from pywinauto.application import Application
     import pyautogui as pgui
 except ImportError:
@@ -93,6 +98,23 @@ class DwgBatchPrintAutomation:
         # 크레딧 관리자
         self.credit_manager = None
 
+        # 이메일 설정 (에러/완료 알림용)
+        self.itself_dir = str(Path(__file__).resolve().parent)
+        self.user_email = ""
+        self.report_email = ""
+
+        # 로그 디렉토리 설정
+        if self.run_mode in ("dev", "demo"):
+            log_dir_path = Path(self.itself_dir) / "logs"
+        else:
+            log_dir_path = Path.home() / ".wf_rpa" / "dwg_batch_print" / "logs"
+        log_dir_path.mkdir(parents=True, exist_ok=True)
+        self.log_dir = str(log_dir_path).replace("\\", "/")
+        self.logfile = str(log_dir_path / f"{time.strftime('%Y%m%d')}.txt").replace("\\", "/")
+
+        # 이메일 설정 초기화
+        self._init_email_settings()
+
         # 데모 캡처 초기화
         if self.demo_capture_enabled:
             self._init_demo_capture()
@@ -108,6 +130,107 @@ class DwgBatchPrintAutomation:
     def set_credit_manager(self, credit_manager):
         """크레딧 관리자 설정"""
         self.credit_manager = credit_manager
+
+    def _init_email_settings(self):
+        """이메일 설정 초기화 (wf_rpa_config.json에서 로드)"""
+        try:
+            import json
+            config_file = Path.home() / ".wf_rpa" / "wf_rpa_config.json"
+
+            if config_file.exists():
+                with open(config_file, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+
+                # 사용자 이메일
+                self.user_email = config.get("user_info", {}).get("user_email", "")
+
+                # 리포트 수신 이메일
+                email_settings = config.get("email_settings", {})
+                self.report_email = email_settings.get("email_to", "")
+
+                # report_email이 없으면 user_email로 폴백
+                if not self.report_email:
+                    self.report_email = self.user_email
+            else:
+                self.logger.debug(f"설정 파일 없음: {config_file}")
+
+        except Exception as e:
+            self.logger.warning(f"이메일 설정 로드 실패: {e}")
+
+        self.logger.debug(f"이메일 설정: user={self.user_email}, report={self.report_email}")
+
+    def handle_error(self, error, context="", mail_title_prefix="[DBP] [Error]", send_email=True):
+        """공통 에러 처리: 스크린샷 저장 및 이메일 전송
+
+        Args:
+            error: 발생한 예외 또는 에러 메시지
+            context: 에러 발생 컨텍스트 (파일명, 단계 등)
+            mail_title_prefix: 이메일 제목 접두사
+            send_email: 이메일 전송 여부 (기본값: True)
+
+        Returns:
+            tuple: (screenshot_path, timestamp) - 스크린샷 경로와 타임스탬프
+        """
+        timestamp4img = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # 스크린샷 캡처
+        screenshot_path = None
+        try:
+            if pgui:
+                screenshot = pgui.screenshot()
+                screenshot_path = Path(self.log_dir) / f"{timestamp4img}.png"
+                screenshot.save(str(screenshot_path))
+                self.logger.debug(f"스크린샷 저장: {screenshot_path}")
+        except Exception as e:
+            self.logger.warning(f"스크린샷 캡처 실패: {e}")
+
+        # 이메일 전송
+        if send_email and wfm and self.report_email:
+            error_content = f"{str(error)}"
+            if context:
+                error_content = f"{error_content}\n{context}"
+
+            attach = []
+            if screenshot_path:
+                attach.append(str(screenshot_path).replace("\\", "/"))
+            attach.append(self.logfile)
+
+            try:
+                wfm.init(self.itself_dir)
+                mail_title = f"{mail_title_prefix} {self.user_email}"
+                wfm.mail_send_attach(mail_title, self.report_email, error_content, attach)
+                self.logger.debug("에러 이메일 전송 완료")
+            except Exception as mail_e:
+                self.logger.error(f"에러 이메일 전송 실패: {mail_e}")
+
+        return str(screenshot_path) if screenshot_path else None, timestamp4img
+
+    def send_completion_email(self, total_count: int, success_count: int, fail_count: int):
+        """작업 완료 이메일 전송
+
+        Args:
+            total_count: 전체 파일 수
+            success_count: 성공 파일 수
+            fail_count: 실패 파일 수
+        """
+        if not wfm or not self.report_email:
+            self.logger.debug("이메일 전송 건너뜀 (설정 없음)")
+            return
+
+        try:
+            wfm.init(self.itself_dir)
+            mail_title = f"[DBP] [Complete] {self.user_email}"
+            content = (
+                f"DWG 일괄 인쇄 완료\n\n"
+                f"• 전체: {total_count}개\n"
+                f"• 성공: {success_count}개\n"
+                f"• 실패: {fail_count}개\n"
+            )
+            attach = [self.logfile]
+            wfm.mail_send_attach(mail_title, self.report_email, content, attach)
+            self.logger.info("완료 이메일 전송 완료")
+        except Exception as e:
+            self.logger.error(f"완료 이메일 전송 실패: {e}")
 
     def stop(self):
         """중지 신호 전송"""

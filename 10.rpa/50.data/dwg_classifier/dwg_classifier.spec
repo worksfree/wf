@@ -28,14 +28,15 @@ def load_and_increment_version():
     except NameError:
         SPEC_DIR_LOCAL = Path(os.getcwd())
 
-    settings_file = SPEC_DIR_LOCAL / "config" / "dwg_classifier" / "settings.json"
+    COMMON_CONFIG_LOCAL = SPEC_DIR_LOCAL.parent.parent / "10.common" / "config"
+    settings_file = COMMON_CONFIG_LOCAL / "dwg_classifier" / "settings.json"
     default_version = [0, 7, 0, 0]
 
     if settings_file.exists():
         try:
             with open(settings_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                full_version = data.get("app_config", {}).get("full_version", "v0.7.0.0")
+                full_version = data.get("runtime_config", {}).get("full_version", "v0.7.0.0")
                 version = [int(x) for x in full_version.lstrip("v").split(".")]
         except Exception:
             version = default_version
@@ -49,21 +50,24 @@ def load_and_increment_version():
         if version[2] > 9:
             version[2] = 0
             version[1] += 1
+            if version[1] > 9:
+                version[1] = 0
+                version[0] += 1
 
     if settings_file.exists():
         with open(settings_file, "r", encoding="utf-8") as f:
             settings_data = json.load(f)
     else:
-        settings_data = {"app_config": {}}
+        settings_data = {"runtime_config": {}}
 
-    if "app_config" not in settings_data:
-        settings_data["app_config"] = {}
+    if "runtime_config" not in settings_data:
+        settings_data["runtime_config"] = {}
 
-    settings_data["app_config"][
+    settings_data["runtime_config"][
         "full_version"
     ] = f"v{version[0]}.{version[1]}.{version[2]}.{version[3]}"
-    settings_data["app_config"]["build_count"] = (
-        settings_data.get("app_config", {}).get("build_count", 0) + 1
+    settings_data["runtime_config"]["build_count"] = (
+        settings_data.get("runtime_config", {}).get("build_count", 0) + 1
     )
 
     with open(settings_file, "w", encoding="utf-8") as f:
@@ -72,7 +76,7 @@ def load_and_increment_version():
     version_data = {
         "full_version": f"{version[0]}.{version[1]}.{version[2]}.{version[3]}",
         "display_version": f"v{version[0]}.{version[1]}",
-        "build_count": settings_data["app_config"]["build_count"],
+        "build_count": settings_data["runtime_config"]["build_count"],
     }
 
     print(f"✓ 버전 증가: {version_data['full_version']} (빌드 #{version_data['build_count']})")
@@ -97,6 +101,7 @@ except NameError:
     SPEC_DIR = Path(os.getcwd())
 WORKSPACE_ROOT = SPEC_DIR.parent.parent
 COMMON_DIR = WORKSPACE_ROOT / "10.common"
+COMMON_CONFIG_DIR = COMMON_DIR / "config"  # 공통 config 폴더
 BUILD_OUTPUT_DIR = Path("D:/release/candidates")
 
 print(f"\n{'='*80}")
@@ -104,38 +109,76 @@ print(f"WorksFree {APP_DISPLAY_NAME} v{APP_VERSION} 빌드 시작")
 print(f"{'='*80}")
 
 
-# ==================== 설정 파일 번들링 ====================
-def bundle_config_files():
-    """필수 설정 파일을 .wf_rpa 루트에 번들링"""
+# ==================== 리소스 수집 ====================
+def collect_essential_resources():
+    """필수 설정 파일을 .wf_rpa 루트에 번들링 (공통 config 폴더 사용)"""
     datas = []
-    # config 폴더를 직접 사용 (installer_resources 불필요)
-    config_base = SPEC_DIR / "config"
+
+    # WorksFree 공통 모듈 번들링 (필수)
+    essential_modules = [
+        'wf_log.py', 'wf_credit_manager.py', 'wf_register.py',
+        'wf_ui_adaptive.py', 'wf_credit_session_utils.py',
+        'wf_app_init_helpers.py', 'wf_hwinfo.py',
+    ]
+    for module in essential_modules:
+        module_path = COMMON_DIR / module
+        if module_path.exists():
+            datas.append((str(module_path), '.'))
+            print(f"포함됨: {module}")
 
     # wf_rpa_config.json (관리자 이메일, Google Sheets 포함)
-    wf_config = config_base / "wf_rpa_config.json"
+    wf_config = COMMON_CONFIG_DIR / "wf_rpa_config.json"
     if wf_config.exists():
         datas.append((str(wf_config), ".wf_rpa"))
         print(f"✓ wf_rpa_config.json 번들링됨 (email_settings, google_sheets 포함)")
 
-    # Google Service Account 자격증명
-    for silver_file in config_base.glob(".silver-argon-*.json"):
+    # Google Service Account 자격증명 (공통 config 폴더에서, backup 파일 제외)
+    for silver_file in COMMON_CONFIG_DIR.glob("silver-argon-*.json"):
+        if 'backup' in silver_file.name.lower():
+            continue
         datas.append((str(silver_file), ".wf_rpa"))
         print(f"자격증명 파일 번들: {silver_file.name}")
-    
+
+    # RELEASE용 자격증명 (worksfree-*.json) - backup 파일 제외
+    for worksfree_file in COMMON_CONFIG_DIR.glob("worksfree-*.json"):
+        if 'backup' not in worksfree_file.name.lower():
+            datas.append((str(worksfree_file), ".wf_rpa"))
+            print(f"자격증명 파일 번들 (RELEASE): {worksfree_file.name}")
+
     # settings.json을 .wf_rpa/dwg_classifier/ 위치로 번들링
-    settings_src = config_base / "dwg_classifier" / "settings.json"
+    settings_src = COMMON_CONFIG_DIR / "dwg_classifier" / "settings.json"
     if settings_src.exists():
         datas.append((str(settings_src), ".wf_rpa/dwg_classifier"))
         print(f"설정 파일 번들: settings.json → .wf_rpa/dwg_classifier/")
 
     # policy.json은 identity + policy만 포함 (변하지 않는 값들)
-    # 버전 정보는 settings.json의 runtime_config에만 있음
-    # policy.json은 그대로 복사만 함 (버전 주입 안함)
-    policy_src = config_base / "dwg_classifier" / "policy.json"
+    policy_src = COMMON_CONFIG_DIR / "dwg_classifier" / "policy.json"
     if policy_src.exists():
         datas.append((str(policy_src), ".wf_rpa/dwg_classifier"))
         print(f"✓ policy.json 번들링됨 (.wf_rpa/dwg_classifier/)")
-    
+
+    # res 폴더 (아이콘 포함) 번들링
+    res_dir = SPEC_DIR / "res"
+    if res_dir.exists():
+        for ico_file in res_dir.glob("*.ico"):
+            datas.append((str(ico_file), "res"))
+            print(f"아이콘 포함: {ico_file.name}")
+
+    # MANUAL.pdf 포함 (있는 경우에만)
+    manual_patterns = [
+        f'{APP_NAME.upper()}_USER_MANUAL.pdf',
+        f'{APP_DISPLAY_NAME.upper().replace(" ", "_")}_USER_MANUAL.pdf',
+        'MANUAL.pdf',
+        '*USER_MANUAL.pdf'
+    ]
+    for pattern in manual_patterns:
+        manual_files = list(SPEC_DIR.glob(pattern))
+        if manual_files:
+            manual_pdf = manual_files[0]
+            datas.append((str(manual_pdf), '.'))
+            print(f"매뉴얼 포함: {manual_pdf.name}")
+            break
+
     return datas
 
 
@@ -166,6 +209,24 @@ def collect_missing_libraries():
     return datas, binaries
 
 
+def _collect_hook_imports():
+    """hook-*.py 파일들이 하던 작업을 직접 처리"""
+    from PyInstaller.utils.hooks import collect_all
+    
+    additional_imports = []
+    hook_modules = ['gspread', 'google.auth', 'ntplib', 'requests', 'urllib3']
+    
+    for module in hook_modules:
+        try:
+            datas, binaries, hiddenimports = collect_all(module)
+            if hiddenimports:
+                additional_imports.extend(hiddenimports)
+        except Exception as e:
+            print(f"⚠️ Warning: Could not collect imports for {module}: {e}")
+    
+    return additional_imports
+
+
 # collect_missing_libraries() 실행
 # lib_datas, lib_binaries = collect_missing_libraries()  # DISABLED: 불필요한 중복 복사 (254MB 절약)
 
@@ -173,7 +234,7 @@ a = Analysis(
     ["ui_main.py"],
     pathex=[str(SPEC_DIR), str(COMMON_DIR)],
     binaries=[],  # lib_binaries 제거
-    datas=bundle_config_files(),  # lib_datas 제거 - PyInstaller가 이미 모든 라이브러리 수집함
+    datas=collect_essential_resources(),  # lib_datas 제거 - PyInstaller가 이미 모든 라이브러리 수집함
     hiddenimports=[
         # WorksFree 공통 모듈 (DWG 사용 모듈만)
         "wf_log",
@@ -182,6 +243,9 @@ a = Analysis(
         "wf_app_init_helpers",
         "wf_hwinfo",
         "wf_register",
+        "wf_ui_adaptive",  # 적응형 UI 통합 모듈
+        # WF-ACT 테스트 인프라
+        "test_server",  # IPC test server for certification
         # 하드웨어 정보 (wf_hwinfo.py에서 필요)
         "cpuinfo.cpuinfo",
         "ntplib",
@@ -204,8 +268,8 @@ a = Analysis(
         "win32con",
         "pywintypes",
         "pythoncom",
-    ],
-    hookspath=[str(SPEC_DIR)],  # hook 파일들 경로
+    ] + _collect_hook_imports(),  # hook-*.py 파일들이 하던 작업을 함수로 처리
+    hookspath=[],  # hook 파일 불필요 (hiddenimports에 직접 통합)
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
@@ -248,7 +312,8 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=["res\\DWG.ico"],
+    # icon=["res\\DWG.ico"],  # Old icon (16x16 only)
+    icon=["res\\03_DWG_Classifier.ico"],  # New icon (16, 32, 48, 256)
 )
 coll = COLLECT(
     exe,
@@ -259,6 +324,26 @@ coll = COLLECT(
     upx_exclude=[],
     name="dwg_classifier",
 )
+
+
+# ==================== 숨김 파일 처리 ====================
+def set_hidden_attribute(file_path):
+    """Windows에서 파일을 숨김 처리합니다."""
+    try:
+        import platform
+        if platform.system() == "Windows":
+            import ctypes
+            FILE_ATTRIBUTE_HIDDEN = 0x02
+            attrs = ctypes.windll.kernel32.GetFileAttributesW(str(file_path))
+            if attrs != -1:
+                ctypes.windll.kernel32.SetFileAttributesW(
+                    str(file_path), attrs | FILE_ATTRIBUTE_HIDDEN
+                )
+            else:
+                ctypes.windll.kernel32.SetFileAttributesW(str(file_path), FILE_ATTRIBUTE_HIDDEN)
+            print(f"  → 숨김 처리: {file_path.name}")
+    except Exception as e:
+        print(f"  ⚠️ 숨김 처리 실패: {file_path.name} - {e}")
 
 
 # ==================== 사용자 홈 설정 파일 준비 ====================
@@ -274,37 +359,46 @@ def prepare_user_configs():
     for directory in [wf_rpa_dir, app_dir]:
         directory.mkdir(parents=True, exist_ok=True)
 
-    # 1. wf_rpa_config.json - 실제 config 파일에서 복사
-    app_config_dir = SPEC_DIR / "config"
-    source_wf_config = app_config_dir / "wf_rpa_config.json"
+    # 1. wf_rpa_config.json - 공통 config 폴더에서 복사
+    source_wf_config = COMMON_CONFIG_DIR / "wf_rpa_config.json"
     
     if source_wf_config.exists():
-        shutil.copy2(source_wf_config, wf_rpa_dir / "wf_rpa_config.json")
+        target_file = wf_rpa_dir / "wf_rpa_config.json"
+        shutil.copy2(source_wf_config, target_file)
+        set_hidden_attribute(target_file)
         print(f"✓ wf_rpa_config.json 복사 완료 (email_settings, google_sheets 포함)")
     else:
         print(f"⚠️ wf_rpa_config.json을 찾을 수 없음: {source_wf_config}")
 
-    # 2. Google Credentials 복사 (.wf_rpa 루트에 직접 복사)
-    google_creds_found = False
-    if app_config_dir.exists():
-        actual_key = app_config_dir / ".silver-argon-445712-a0-4ce021aa64be.json"
-        if actual_key.exists():
-            shutil.copy2(actual_key, wf_rpa_dir / actual_key.name)
-            google_creds_found = True
-            print(f"✓ Google credentials 포함 (.wf_rpa 루트): {actual_key.name}")
-        else:
-            # fallback: .silver-argon으로 시작하는 첫 번째 파일
-            for json_file in app_config_dir.glob(".silver-argon*.json"):
-                shutil.copy2(json_file, wf_rpa_dir / json_file.name)
-                google_creds_found = True
-                print(f"✓ Google credentials 포함 (.wf_rpa 루트): {json_file.name}")
-                break
+    # 2. Google Credentials 복사 (.wf_rpa 루트에 직접 복사) - 공통 config 폴더에서
+    google_creds_dev_found = False
+    google_creds_release_found = False
+    if COMMON_CONFIG_DIR.exists():
+        # DEV용 자격증명 파일 (silver-argon)
+        for json_file in COMMON_CONFIG_DIR.glob("silver-argon*.json"):
+            target_file = wf_rpa_dir / json_file.name
+            shutil.copy2(json_file, target_file)
+            set_hidden_attribute(target_file)
+            google_creds_dev_found = True
+            print(f"✓ Google credentials (DEV) 포함 (.wf_rpa 루트): {json_file.name}")
+            break
+        
+        # RELEASE용 자격증명 파일 (worksfree-b33a6b8f366b.json)
+        for json_file in COMMON_CONFIG_DIR.glob("worksfree-*.json"):
+            target_file = wf_rpa_dir / json_file.name
+            shutil.copy2(json_file, target_file)
+            set_hidden_attribute(target_file)
+            google_creds_release_found = True
+            print(f"✓ Google credentials (RELEASE) 포함 (.wf_rpa 루트): {json_file.name}")
+            break
 
-    if not google_creds_found:
-        print("⚠️ Google credentials를 찾을 수 없습니다.")
+    if not google_creds_dev_found:
+        print("⚠️ Google credentials (DEV)를 찾을 수 없습니다.")
+    if not google_creds_release_found:
+        print("⚠️ Google credentials (RELEASE)를 찾을 수 없습니다.")
     
     # 3. settings.json 처리: 버전 주입 + 사용자 경로 초기화
-    settings_src = app_config_dir / "dwg_classifier" / "settings.json"
+    settings_src = COMMON_CONFIG_DIR / "dwg_classifier" / "settings.json"
     if settings_src.exists():
         with open(settings_src, 'r', encoding='utf-8') as f:
             settings_data = json.load(f)
@@ -328,10 +422,21 @@ def prepare_user_configs():
         bundled_settings = app_settings_dir / "settings.json"
         with open(bundled_settings, 'w', encoding='utf-8') as f:
             json.dump(settings_data, f, ensure_ascii=False, indent=2)
+        set_hidden_attribute(bundled_settings)
         
         print(f"✓ settings.json 처리 완료 (.wf_rpa/dwg_classifier/) - 버전: {APP_VERSION_FULL}, 빌드: #{VERSION_INFO['build_count']}")
     else:
         print(f"⚠️ settings.json을 찾을 수 없음: {settings_src}")
+
+    # 4. policy.json 복사
+    policy_src = COMMON_CONFIG_DIR / "dwg_classifier" / "policy.json"
+    if policy_src.exists():
+        app_settings_dir = wf_rpa_dir / "dwg_classifier"
+        app_settings_dir.mkdir(parents=True, exist_ok=True)
+        target_file = app_settings_dir / "policy.json"
+        shutil.copy2(policy_src, target_file)
+        set_hidden_attribute(target_file)
+        print(f"✓ policy.json 복사 완료 (.wf_rpa/dwg_classifier/)")
 
     return home_dir
 
@@ -404,11 +509,12 @@ Section "Install"
     File "build\\user_home_bundle\\.wf_rpa\\wf_rpa_config.json"
     skip_wf_config:
     
-    ; Google Credentials 설치 (덮어쓰기)
-    IfFileExists "$PROFILE\\.wf_rpa\\.silver-argon-445712-a0-4ce021aa64be.json" 0 +3
-        DetailPrint "기존 credentials 유지"
-        Goto skip_creds
-    File "build\\user_home_bundle\\.wf_rpa\\.silver-argon-*.json"
+    ; Google Credentials 설치 (덮어쓰기 - DEV와 RELEASE 모두)
+    IfFileExists "$PROFILE\\.wf_rpa\\silver-argon-445712-a0-7092493258f3.json" skip_creds
+    IfFileExists "$PROFILE\\.wf_rpa\\worksfree-b33a6b8f366b.json" skip_creds install_creds
+    install_creds:
+        File "build\\user_home_bundle\\.wf_rpa\\silver-argon-*.json"
+        File "build\\user_home_bundle\\.wf_rpa\\worksfree-*.json"
     skip_creds:
     
     ; settings.json 설치 (항상 최신 버전으로 업데이트)

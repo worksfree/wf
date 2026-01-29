@@ -16,8 +16,22 @@ import argparse
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
+# 10.common 경로 추가
+common_path = os.path.abspath(os.path.join(current_dir, "..", "..", "10.common"))
+if common_path not in sys.path:
+    sys.path.insert(0, common_path)
+
 # 로컬 모듈 import
 from app_setting_data import get_config
+
+# 이메일 모듈 import
+try:
+    import wf_email as wfm
+except ImportError:
+    wfm = None
+
+
+from datetime import datetime
 
 
 class KoreanNormalizer:
@@ -26,6 +40,24 @@ class KoreanNormalizer:
     def __init__(self, config=None, log_callback=None):
         self.config = config or get_config()
         self.log_callback = log_callback or self.default_log_callback
+
+        # 이메일 설정 (에러/완료 알림용)
+        self.itself_dir = current_dir
+        self.user_email = ""
+        self.report_email = ""
+
+        # 로그 디렉토리 설정
+        run_mode = os.environ.get("WF_RPA_MODE", "release")
+        if run_mode in ("dev", "demo"):
+            log_dir_path = Path(current_dir) / "logs"
+        else:
+            log_dir_path = Path.home() / ".wf_rpa" / "korean_filename_normalizer" / "logs"
+        log_dir_path.mkdir(parents=True, exist_ok=True)
+        self.log_dir = str(log_dir_path).replace("\\", "/")
+        self.logfile = str(log_dir_path / f"{time.strftime('%Y%m%d')}.txt").replace("\\", "/")
+
+        # 이메일 설정 초기화
+        self._init_email_settings()
 
         # 한글 자모 정의
         self.CHOSEONG = [
@@ -102,6 +134,103 @@ class KoreanNormalizer:
             "ㅍ",
             "ㅎ",
         ]
+
+    def _init_email_settings(self):
+        """이메일 설정 초기화 (wf_rpa_config.json에서 로드)"""
+        try:
+            import json
+            config_file = Path.home() / ".wf_rpa" / "wf_rpa_config.json"
+
+            if config_file.exists():
+                with open(config_file, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+
+                # 사용자 이메일
+                self.user_email = config.get("user_info", {}).get("user_email", "")
+
+                # 리포트 수신 이메일
+                email_settings = config.get("email_settings", {})
+                self.report_email = email_settings.get("email_to", "")
+
+                # report_email이 없으면 user_email로 폴백
+                if not self.report_email:
+                    self.report_email = self.user_email
+
+        except Exception as e:
+            self.log_callback(f"이메일 설정 로드 실패: {e}")
+
+    def handle_error(self, error, context="", mail_title_prefix="[KFN] [Error]", send_email=True):
+        """공통 에러 처리: 스크린샷 저장 및 이메일 전송
+
+        Args:
+            error: 발생한 예외 또는 에러 메시지
+            context: 에러 발생 컨텍스트 (파일명, 단계 등)
+            mail_title_prefix: 이메일 제목 접두사
+            send_email: 이메일 전송 여부 (기본값: True)
+
+        Returns:
+            tuple: (screenshot_path, timestamp) - 스크린샷 경로와 타임스탬프
+        """
+        timestamp4img = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # 스크린샷 캡처
+        screenshot_path = None
+        try:
+            import pyautogui
+            screenshot = pyautogui.screenshot()
+            screenshot_path = Path(self.log_dir) / f"{timestamp4img}.png"
+            screenshot.save(str(screenshot_path))
+            self.log_callback(f"스크린샷 저장: {screenshot_path}")
+        except Exception as e:
+            self.log_callback(f"스크린샷 캡처 실패: {e}")
+
+        # 이메일 전송
+        if send_email and wfm and self.report_email and hasattr(wfm, 'mail_send_attach'):
+            error_content = f"{str(error)}"
+            if context:
+                error_content = f"{error_content}\n{context}"
+
+            attach = []
+            if screenshot_path:
+                attach.append(str(screenshot_path).replace("\\", "/"))
+            attach.append(self.logfile)
+
+            try:
+                wfm.init(self.itself_dir)
+                mail_title = f"{mail_title_prefix} {self.user_email}"
+                wfm.mail_send_attach(mail_title, self.report_email, error_content, attach)
+                self.log_callback("에러 이메일 전송 완료")
+            except Exception as mail_e:
+                self.log_callback(f"에러 이메일 전송 실패: {mail_e}")
+
+        return str(screenshot_path) if screenshot_path else None, timestamp4img
+
+    def send_completion_email(self, total_count: int, normalized_count: int, skipped_count: int):
+        """작업 완료 이메일 전송
+
+        Args:
+            total_count: 전체 파일 수
+            normalized_count: 정규화 파일 수
+            skipped_count: 건너뛴 파일 수
+        """
+        if not wfm or not self.report_email or not hasattr(wfm, 'mail_send_attach'):
+            self.log_callback("이메일 전송 건너뜀 (설정 없음)")
+            return
+
+        try:
+            wfm.init(self.itself_dir)
+            mail_title = f"[KFN] [Complete] {self.user_email}"
+            content = (
+                f"파일명 정규화 완료\n\n"
+                f"• 전체: {total_count}개\n"
+                f"• 정규화: {normalized_count}개\n"
+                f"• 건너뜀: {skipped_count}개\n"
+            )
+            attach = [self.logfile]
+            wfm.mail_send_attach(mail_title, self.report_email, content, attach)
+            self.log_callback("완료 이메일 전송 완료")
+        except Exception as e:
+            self.log_callback(f"완료 이메일 전송 실패: {e}")
 
     def default_log_callback(self, message):
         """기본 로그 콜백"""

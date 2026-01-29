@@ -13,6 +13,31 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+# ============================================================================
+# UTF-8 TextIOWrapper 충돌 방지
+# pytest의 capture 시스템과 TextIOWrapper가 충돌하는 문제 해결
+# ============================================================================
+_original_stdout = sys.stdout
+_original_stderr = sys.stderr
+
+def _restore_stdio():
+    """원래 stdout/stderr 복원 (pytest cleanup 전에 호출)"""
+    import sys
+    import io
+    # TextIOWrapper가 적용된 경우 원래 스트림으로 복원
+    if hasattr(sys.stdout, 'buffer') and isinstance(sys.stdout, io.TextIOWrapper):
+        try:
+            if not sys.stdout.closed:
+                sys.stdout.flush()
+        except:
+            pass
+    if hasattr(sys.stderr, 'buffer') and isinstance(sys.stderr, io.TextIOWrapper):
+        try:
+            if not sys.stderr.closed:
+                sys.stderr.flush()
+        except:
+            pass
+
 # Python 경로에 10.common 추가
 project_root = Path(__file__).parent.parent
 common_path = project_root / "10.common"
@@ -350,6 +375,33 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "unit: 단위 테스트")
     config.addinivalue_line("markers", "integration: 통합 테스트")
     config.addinivalue_line("markers", "staging: 스테이징 테스트")
+
+    # 원래 stdout/stderr 저장 (pytest가 캡처하기 전)
+    config._original_stdout = sys.stdout
+    config._original_stderr = sys.stderr
+
+
+def pytest_unconfigure(config):
+    """Pytest 종료 시 cleanup - UTF-8 TextIOWrapper 충돌 방지"""
+    import sys
+    import io
+
+    # TextIOWrapper로 감싸진 경우 flush하고 원래 스트림 복원
+    try:
+        if hasattr(sys.stdout, 'buffer') and isinstance(sys.stdout, io.TextIOWrapper):
+            if not sys.stdout.closed:
+                sys.stdout.flush()
+        if hasattr(sys.stderr, 'buffer') and isinstance(sys.stderr, io.TextIOWrapper):
+            if not sys.stderr.closed:
+                sys.stderr.flush()
+    except (ValueError, OSError):
+        pass  # "I/O operation on closed file" 무시
+
+    # 원래 스트림 복원
+    if hasattr(config, '_original_stdout'):
+        sys.stdout = config._original_stdout
+    if hasattr(config, '_original_stderr'):
+        sys.stderr = config._original_stderr
 
 
 def pytest_collection_modifyitems(config, items):

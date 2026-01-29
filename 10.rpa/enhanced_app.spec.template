@@ -409,7 +409,26 @@ def collect_essential_resources():
     user_home = prepare_user_configs()
     datas.append((str(user_home), 'installer_resources'))
     
-    # 4. 앱별 리소스
+    # 5. Google 크리덴셜 파일들 (_internal/.wf_rpa에 복사)
+    # DEV 크리덴셜
+    dev_cred = COMMON_DIR / 'config' / 'silver-argon-445712-a0-7092493258f3.json'
+    if dev_cred.exists():
+        datas.append((str(dev_cred), '.wf_rpa'))
+        print(f"✓ DEV 크리덴셜 포함: {dev_cred.name}")
+    
+    # RELEASE 크리덴셜
+    release_cred = COMMON_DIR / 'config' / 'worksfree-b33a6b8f366b.json'
+    if release_cred.exists():
+        datas.append((str(release_cred), '.wf_rpa'))
+        print(f"✓ RELEASE 크리덴셜 포함: {release_cred.name}")
+    
+    # wf_rpa_config.json
+    wf_config = COMMON_DIR / 'config' / 'wf_rpa_config.json'
+    if wf_config.exists():
+        datas.append((str(wf_config), '.wf_rpa'))
+        print(f"✓ WF-RPA 설정 포함: {wf_config.name}")
+    
+    # 6. 앱별 리소스
     app_res_dir = SPEC_DIR / 'res'
     if app_res_dir.exists():
         for file_path in app_res_dir.rglob('*'):
@@ -442,6 +461,9 @@ def get_optimized_hidden_imports():
         'wf_credit_manager',  # 크레딧 관련만
         'wf_app_base',       # create_app 함수 필요
         'wf_register',       # create_trial_window 필요
+        
+        # WF-ACT 테스트 인프라 (모든 앱에 필수)
+        'test_server',       # IPC test server for certification
         
         # GUI 관련 (필수만)
         'tkinter', 
@@ -488,6 +510,44 @@ def get_optimized_hidden_imports():
     return essential_imports
 
 # ==================== 빌드 후 처리 ====================
+def set_credentials_hidden(dist_dir):
+    """크리덴셜 및 설정 JSON 파일을 숨김 속성으로 설정 (보안 강화)"""
+    import ctypes
+    from ctypes import wintypes
+    
+    # Windows FILE_ATTRIBUTE_HIDDEN 상수
+    FILE_ATTRIBUTE_HIDDEN = 0x02
+    
+    wf_rpa_dir = dist_dir / '_internal' / '.wf_rpa'
+    if not wf_rpa_dir.exists():
+        print(f"⚠️ .wf_rpa 디렉토리를 찾을 수 없습니다: {wf_rpa_dir}")
+        return
+    
+    # 숨김 처리할 파일 패턴들 - 모든 JSON 파일
+    hidden_patterns = [
+        '*.json',  # 모든 JSON 파일 (worksfree, silver-argon, wf_rpa_config 등)
+    ]
+    
+    hidden_count = 0
+    for pattern in hidden_patterns:
+        for json_file in wf_rpa_dir.rglob(pattern):
+            if json_file.is_file():
+                try:
+                    # Windows API로 숨김 속성 설정
+                    ctypes.windll.kernel32.SetFileAttributesW(
+                        str(json_file), 
+                        FILE_ATTRIBUTE_HIDDEN
+                    )
+                    print(f"🔒 숨김 처리: {json_file.name}")
+                    hidden_count += 1
+                except Exception as e:
+                    print(f"⚠️ 숨김 설정 실패 ({json_file.name}): {e}")
+    
+    if hidden_count > 0:
+        print(f"✓ {hidden_count}개 JSON 파일을 숨김 처리했습니다 (보안 강화)")
+    else:
+        print(f"ℹ️ 숨김 처리할 JSON 파일을 찾지 못했습니다")
+
 def post_build_automation():
     """빌드 완료 후 자동화 처리"""
     dist_dir = SPEC_DIR / 'dist' / APP_NAME
@@ -496,7 +556,10 @@ def post_build_automation():
         print(f"❌ 빌드 결과물을 찾을 수 없습니다: {dist_dir}")
         return False
     
-    print(f"\\n🔧 빌드 후 자동화 처리 시작...")
+    print(f"\n🔧 빌드 후 자동화 처리 시작...")
+    
+    # 크리덴셜 파일 숨김 처리 (보안 강화)
+    set_credentials_hidden(dist_dir)
     
     # 1. NSIS 인스톨러 생성
     try:

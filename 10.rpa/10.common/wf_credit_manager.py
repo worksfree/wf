@@ -29,6 +29,14 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 import logging
 
+# 중앙 기본값 상수 import
+try:
+    from wf_googlesheets_manager import DEFAULT_TRIAL_CREDITS, DEFAULT_CREDIT_PER_ITEM
+except ImportError:
+    # wf_googlesheets_manager가 없는 경우 기본값
+    DEFAULT_TRIAL_CREDITS = 10000
+    DEFAULT_CREDIT_PER_ITEM = 100
+
 # 모듈 레벨 로거 (부모에서 주입 가능). 기본은 NullHandler로 안전하게 무시
 logger: logging.Logger = logging.getLogger("wf_creditmanager_simple")
 logger.setLevel(logging.DEBUG)  # DEBUG 레벨 설정
@@ -146,23 +154,28 @@ class WorksFreeManager:
 
         # 기본 루트 경로 설정
         if self.is_dev_mode:
-            # 개발 모드: 앱별 로컬 config 폴더 사용
+            # 개발 모드: 10.common/config 폴더 사용 (공통 설정)
             try:
                 app_exec = Path(sys.argv[0]).resolve()
                 app_root = app_exec.parent
-                
-                # 10.rpa 루트에서 직접 실행되는 경우 사용자 홈폴더 사용
-                # (앱 폴더에서 실행 시엔 해당 폴더의 config 사용)
-                if app_root.name == "10.rpa" or (app_root.parent.name == "10.rpa" and app_root.name not in ["30.apps", "50.data"]):
-                    # 10.rpa 루트에서 실행: 사용자 홈폴더 사용
-                    self.wf_rpa_dir = self.user_home / ".wf_rpa"
-                    logger.debug(f"[DEV] 10.rpa 루트에서 실행 감지 - 사용자 홈폴더 사용: {self.wf_rpa_dir}")
+
+                # 10.common/config 폴더 찾기 (앱 위치에서 상위로 탐색)
+                common_config_dir = None
+                search_root = app_root
+                for _ in range(5):  # 최대 5단계 상위까지 탐색
+                    candidate = search_root / "10.common" / "config"
+                    if candidate.exists():
+                        common_config_dir = candidate
+                        break
+                    search_root = search_root.parent
+
+                if common_config_dir:
+                    self.wf_rpa_dir = common_config_dir
+                    logger.debug(f"[DEV] 개발 환경 - 10.common/config 사용: {self.wf_rpa_dir}")
                 else:
-                    # 앱 폴더에서 실행: 앱별 config 폴더 사용
-                    local_config_dir = app_root / "config"
-                    local_config_dir.mkdir(exist_ok=True)
-                    self.wf_rpa_dir = local_config_dir
-                    logger.debug(f"[DEV] 개발 환경 감지: {self.wf_rpa_dir}")
+                    # 10.common/config를 찾지 못하면 사용자 홈폴더 사용
+                    self.wf_rpa_dir = self.user_home / ".wf_rpa"
+                    logger.debug(f"[DEV] 10.common/config 없음 - 사용자 홈폴더 사용: {self.wf_rpa_dir}")
             except Exception as e:
                 logger.warning(f"DEV 로컬 config 경로 설정 실패 - 기본 경로 사용: {e}")
                 # Fallback: 사용자 홈 폴더
@@ -287,8 +300,10 @@ class WorksFreeManager:
                     "start_time": None,
                 },
                 "google_sheets": {
-                    "sheet_id_prod": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
-                    "sheet_id_test": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
+                    "sheet_id_release": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
+                    "sheet_id_dev": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
+                    "credentials_file_release": "worksfree-b33a6b8f366b.json",
+                    "credentials_file_dev": "silver-argon-445712-a0-7092493258f3.json",
                     "scope": [
                         "https://spreadsheets.google.com/feeds",
                         "https://www.googleapis.com/auth/drive",
@@ -902,15 +917,15 @@ class CreditManager:
                 
                 # Apply: -1은 영구 라이선스로 처리
                 if amt == -1:
-                    # 영구 라이선스: purchased_credits를 -1로 설정
-                    data["purchased_credits"] = -1
+                    # 영구 라이선스: remaining_purchased를 -1로 설정
+                    data["remaining_purchased"] = -1
                     logger.info(f"✨ 영구 라이선스 적용: {tid}")
                 else:
-                    # 일반 크레딧: 기존 purchased_credits에 더하기
-                    current_purchased = data.get("purchased_credits", 0)
+                    # 일반 크레딧: 기존 remaining_purchased에 더하기
+                    current_purchased = data.get("remaining_purchased", 0)
                     # 이미 영구 라이선스(-1)인 경우 유지
                     if current_purchased != -1:
-                        data["purchased_credits"] = current_purchased + amt
+                        data["remaining_purchased"] = current_purchased + amt
 
                 # 상세 구매 정보 저장 (확장 구조)
                 purchase_detail = {
@@ -970,16 +985,15 @@ class CreditManager:
                 data["purchase_history"] = purchase_history
                 data["credit_changed"] = True
 
-                # current_credits 자동 계산 (trial + purchased - lifetime_usage)
-                trial_credits = data.get("trial_credits", 0)
-                purchased_credits = data.get("purchased_credits", 0)
-                lifetime_usage = data.get("lifetime_usage", 0)
+                # current_credits 자동 계산 (remaining_trial + remaining_purchased)
+                remaining_trial = data.get("remaining_trial", 0)
+                remaining_purchased = data.get("remaining_purchased", 0)
 
                 # -1은 무제한을 의미
-                if trial_credits == -1 or purchased_credits == -1:
+                if remaining_trial == -1 or remaining_purchased == -1:
                     data["current_credits"] = -1
                 else:
-                    data["current_credits"] = trial_credits + purchased_credits - lifetime_usage
+                    data["current_credits"] = remaining_trial + remaining_purchased
 
                 # 마지막 동기화 시각 업데이트
                 data["last_synced"] = _get_timestamp()
@@ -1023,7 +1037,7 @@ class CreditManager:
 
             # Google Sheets에서 해당 transaction_id 행을 찾아서 applied_date 업데이트
             config = sheets_manager._load_config()
-            sheet_id = config["SHEET_ID_TEST"]
+            sheet_id = config["SHEET_ID_DEV"]
             purchase_ws = sheets_manager.gc.open_by_key(sheet_id).worksheet("credit_purchase_log")
 
             # 헤더 정보 가져오기
@@ -1193,8 +1207,30 @@ class CreditManager:
             if self.wf_manager.is_dev_mode:
                 app_exec = Path(sys.argv[0]).resolve()
                 app_root = app_exec.parent
-                bundled_file = app_root / "config" / app_name / "policy.json"
-                logger.debug(f"[DEV] 번들 정책 경로: {bundled_file}")
+
+                # 개발 모드 경로 우선순위:
+                # 1. 앱 폴더/config/{app_name}/policy.json
+                # 2. 10.common/config/{app_name}/policy.json (fallback)
+                # app_root에서 상위로 올라가서 10.common 찾기
+                common_config = app_root.parent.parent / "10.common" / "config" / app_name / "policy.json"
+                dev_candidate_paths = [
+                    app_root / "config" / app_name / "policy.json",
+                    common_config,
+                ]
+
+                for bundled_file in dev_candidate_paths:
+                    logger.debug(f"[DEV] 번들 정책 경로 확인: {bundled_file}")
+                    if bundled_file.exists():
+                        logger.debug(f"✅ 번들 정책 파일 존재: {bundled_file}")
+                        with open(bundled_file, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                            if isinstance(data, dict):
+                                logger.debug(f"✅ 번들 정책 파싱 성공: {app_name}")
+                                return data
+                            else:
+                                logger.error(f"❌ 번들 정책이 딕셔너리가 아님: {type(data)}")
+
+                logger.debug(f"[DEV] 번들 정책 파일 없음 (시도한 경로: {dev_candidate_paths})")
             else:
                 # 배포 모드: _MEIPASS (PyInstaller 임시 폴더) 또는 실행 파일 옆
                 if hasattr(sys, '_MEIPASS'):
@@ -1203,21 +1239,26 @@ class CreditManager:
                 else:
                     base_path = Path(sys.executable).parent
                     logger.debug(f"[RELEASE] 실행 파일 경로 사용: {base_path}")
-                bundled_file = base_path / "config" / app_name / "policy.json"
-                logger.debug(f"[RELEASE] 번들 정책 경로: {bundled_file}")
-            
-            logger.info(f"번들 정책 파일 확인 중: {bundled_file}")
-            if bundled_file.exists():
-                logger.info(f"✅ 번들 정책 파일 존재: {bundled_file}")
-                with open(bundled_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    if isinstance(data, dict):
-                        logger.info(f"✅ 번들 정책 파싱 성공: {app_name}")
-                        return data
-                    else:
-                        logger.error(f"❌ 번들 정책이 딕셔너리가 아님: {type(data)}")
-            else:
-                logger.error(f"❌ 번들 정책 파일 없음: {bundled_file}")
+
+                # 배포 모드 경로 우선순위: .wf_rpa/ > config/
+                candidate_paths = [
+                    base_path / ".wf_rpa" / app_name / "policy.json",
+                    base_path / "config" / app_name / "policy.json",
+                ]
+
+                for bundled_file in candidate_paths:
+                    logger.debug(f"[RELEASE] 번들 정책 경로 확인: {bundled_file}")
+                    if bundled_file.exists():
+                        logger.info(f"✅ 번들 정책 파일 존재: {bundled_file}")
+                        with open(bundled_file, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                            if isinstance(data, dict):
+                                logger.info(f"✅ 번들 정책 파싱 성공: {app_name}")
+                                return data
+                            else:
+                                logger.error(f"❌ 번들 정책이 딕셔너리가 아님: {type(data)}")
+
+                logger.error(f"❌ 번들 정책 파일 없음 (시도한 경로: {candidate_paths})")
         except Exception as e:
             logger.error(f"❌ 번들 정책 전체 로드 실패 ({app_name}): {e}", exc_info=True)
         return None
@@ -1244,6 +1285,30 @@ class CreditManager:
         except Exception as e:
             logger.debug(f"앱별 정책 파일 로드 실패 ({app_name}): {e}")
         return None
+
+    def _reload_policy(self) -> bool:
+        """정책 재로드 (테스트/업데이트용)"""
+        try:
+            # 1) 번들 정책 재로드
+            base_policy = self._load_bundled_policy(self.app_name)
+            
+            if not base_policy:
+                logger.warning(f"⚠️ {self.app_name}: 번들 정책 재로드 실패. 기존 정책 유지")
+                return False
+            
+            # 2) 로컬 정책 재로드
+            local_policy = self._load_app_policy_file(self.app_name)
+            if local_policy:
+                logger.info(f"✅ 로컬 정책 발견 - 번들 정책 위에 덮어쓰기")
+                base_policy = {**base_policy, **local_policy}
+            
+            # 3) self.policy 업데이트
+            self.policy = base_policy
+            logger.info(f"✅ 정책 재로드 완료: trial_credits={base_policy.get('trial_credits')}, credit_per_work={base_policy.get('credit_per_work')}")
+            return True
+        except Exception as e:
+            logger.error(f"❌ 정책 재로드 실패: {e}")
+            return False
 
     def _sync_on_startup(self):
         """앱 시작 시: credit_changed=True이면 구글 시트와 동기화 시도"""
@@ -1288,72 +1353,123 @@ class CreditManager:
             logger.error(f"디렉토리 생성 오류: {e}")
 
     def _initialize_credits(self):
-        """크레딧 파일이 없을 경우 체험판으로 초기화합니다."""
+        """크레딧 파일이 없을 경우 체험판으로 초기화합니다.
+
+        새 구조: policy.json에서 정책을 읽고, credit_history.json은 잔액만 저장
+        - remaining_trial: 남은 체험판 크레딧
+        - remaining_purchased: 남은 구매 크레딧
+        """
         if not self.credit_file.exists():
             now = _get_timestamp()
-            trial_amount = self.policy.get("trial_credits", 10000)
+            trial_amount = self.policy.get("trial_credits", DEFAULT_TRIAL_CREDITS)
 
             initial_data = {
-                "app_policy": self.policy,
+                "remaining_trial": trial_amount,
+                "remaining_purchased": 0,
                 "credit_changed": False,
-                "trial_credits": trial_amount,
-                "purchased_credits": 0,
                 "created_at": now,
                 "last_updated": now,
                 "purchase_history": [],
                 "usage_history": [],
             }
             self._save_credit_data(initial_data)
+            logger.info(f"✅ 크레딧 초기화: remaining_trial={trial_amount}")
 
     def _migrate_old_format(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """이전 크레딧 포맷을 새 포맷으로 변환합니다."""
+        """이전 크레딧 포맷을 새 포맷(remaining_trial/remaining_purchased)으로 변환합니다.
+
+        마이그레이션 케이스:
+        1. remaining_credits 형식 (아주 오래된 형식)
+        2. trial_credits/purchased_credits + app_policy 형식 (이전 형식)
+        3. remaining_trial/remaining_purchased 형식 (현재 형식) - 변환 불필요
+        """
+        migrated = False
+
+        # 케이스 1: 아주 오래된 remaining_credits 형식
         if "remaining_credits" in data:
-            logger.info("이전 크레딧 포맷을 발견하여 새 포맷으로 변환합니다.")
+            logger.info("⏫ 마이그레이션: remaining_credits → remaining_trial/remaining_purchased")
             credit_type = data.get("credit_type", "trial")
             remaining = data.get("remaining_credits", 0)
 
-            new_data = {
-                "trial_credits": 0,
-                "purchased_credits": 0,
-                "created_at": data.get("created_at", _get_timestamp()),
-                "last_updated": _get_timestamp(),
-                "usage_history": data.get("usage_history", []),
-                "purchase_history": data.get("purchase_history", []),
-            }
-
             if credit_type == "trial":
-                new_data["trial_credits"] = remaining
+                data["remaining_trial"] = remaining
+                data["remaining_purchased"] = 0
             elif credit_type == "purchased":
-                new_data["purchased_credits"] = remaining
+                data["remaining_trial"] = 0
+                data["remaining_purchased"] = remaining
             else:
-                new_data["trial_credits"] = remaining
+                data["remaining_trial"] = remaining
+                data["remaining_purchased"] = 0
 
-            self._save_credit_data(new_data)
-            return new_data
+            # 이전 필드 제거
+            data.pop("remaining_credits", None)
+            data.pop("credit_type", None)
+            migrated = True
+
+        # 케이스 2: trial_credits/purchased_credits 형식 (app_policy 포함)
+        if "trial_credits" in data and "remaining_trial" not in data:
+            logger.info("⏫ 마이그레이션: trial_credits → remaining_trial")
+            data["remaining_trial"] = data.pop("trial_credits")
+            data["remaining_purchased"] = data.pop("purchased_credits", 0)
+
+            # app_policy 제거 (더 이상 사용하지 않음)
+            if "app_policy" in data:
+                data.pop("app_policy")
+                logger.debug("  - app_policy 필드 제거됨 (policy.json으로 이관)")
+
+            migrated = True
+
+        # 마이그레이션이 발생했으면 저장
+        if migrated:
+            data["credit_changed"] = data.get("credit_changed", False)
+            data["created_at"] = data.get("created_at", _get_timestamp())
+            data["last_updated"] = _get_timestamp()
+            data["usage_history"] = data.get("usage_history", [])
+            data["purchase_history"] = data.get("purchase_history", [])
+            self._save_credit_data(data)
+            logger.info(f"✅ 마이그레이션 완료: remaining_trial={data.get('remaining_trial')}, remaining_purchased={data.get('remaining_purchased')}")
+
         return data
 
     def _load_credit_data(self) -> Dict[str, Any]:
-        """크레딧 데이터를 로드하고, 필요시 마이그레이션합니다."""
+        """크레딧 데이터를 로드하고, 필요시 마이그레이션합니다.
+
+        새 구조에서는 policy.json에서 정책을 읽고, credit_history.json은 잔액만 저장합니다.
+        - remaining_trial: 남은 체험판 크레딧
+        - remaining_purchased: 남은 구매 크레딧
+        """
         try:
             if self.credit_file.exists():
                 with open(self.credit_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
+
+                # 기존 포맷 마이그레이션
                 data = self._migrate_old_format(data)
-                # 정책이 무료(-1)로 변경되었는데 기존 파일이 체험판 수량을 유지하고 있다면 무료 정책을 반영
+
+                # 정책 동기화: policy.json 기반으로 체험판 크레딧 초기화
                 try:
-                    if self.policy.get("trial_credits") == -1 and data.get("trial_credits") != -1:
-                        data["trial_credits"] = -1
-                        # 무료 앱에서는 구매 크레딧도 0으로 정규화 (혼동 방지)
-                        data["purchased_credits"] = 0
-                        # 무료 앱은 credit_per_work가 0이어야 함. 기존 app_policy 있으면 갱신
-                        if isinstance(data.get("app_policy"), dict):
-                            data["app_policy"]["trial_credits"] = -1
-                            data["app_policy"]["credit_per_work"] = 0
-                            data["app_policy"]["credit_type"] = "free"
-                        # 변경 사항 저장
+                    policy_trial = self.policy.get("trial_credits", 0)
+                    current_trial = data.get("remaining_trial", 0)
+
+                    # 케이스 1: 무료(-1)로 변경된 경우
+                    if policy_trial == -1 and current_trial != -1:
+                        data["remaining_trial"] = -1
+                        data["remaining_purchased"] = 0
                         self._save_credit_data(data)
-                except Exception:
-                    pass
+                        logger.info(f"✅ 무료 정책으로 동기화됨 (remaining_trial: -1)")
+
+                    # 케이스 2: 체험판 크레딧이 0인데 policy.json에 양수 값이 있는 경우
+                    # (신규 설치 후 첫 실행 또는 정책 업데이트)
+                    elif policy_trial > 0 and current_trial == 0:
+                        # usage_history가 비어있으면 초기화 (한 번도 사용 안 한 경우)
+                        if not data.get("usage_history"):
+                            data["remaining_trial"] = policy_trial
+                            self._save_credit_data(data)
+                            logger.info(f"✅ 체험판 크레딧 초기화됨: {policy_trial}")
+
+                except Exception as e:
+                    logger.debug(f"정책 동기화 중 오류: {e}")
+
                 return _normalize_credit_timestamps(data)
             else:
                 self._initialize_credits()
@@ -1361,11 +1477,11 @@ class CreditManager:
                     return _normalize_credit_timestamps(json.load(f))
         except Exception as e:
             logger.error(f"크레딧 데이터 로드 오류: {e}")
-            trial_amount = self.policy.get("trial_credits", 2000)
+            trial_amount = self.policy.get("trial_credits", DEFAULT_TRIAL_CREDITS)
             return _normalize_credit_timestamps(
                 {
-                    "trial_credits": trial_amount,
-                    "purchased_credits": 0,
+                    "remaining_trial": trial_amount,
+                    "remaining_purchased": 0,
                     "created_at": _get_timestamp(),
                     "last_updated": _get_timestamp(),
                     "usage_history": [],
@@ -1382,11 +1498,11 @@ class CreditManager:
 
             data["last_updated"] = _get_timestamp()
             data = _normalize_credit_timestamps(data)
+            # 새 구조: app_policy 제거, remaining_trial/remaining_purchased 사용
             key_order = [
-                "app_policy",
+                "remaining_trial",
+                "remaining_purchased",
                 "credit_changed",
-                "trial_credits",
-                "purchased_credits",
                 "created_at",
                 "last_updated",
                 "purchase_history",
@@ -1463,12 +1579,15 @@ class CreditManager:
         return {}
 
     def get_credit_status(self) -> Dict[str, Any]:
-        """현재 크레딧 상태를 상세히 조회합니다."""
+        """현재 크레딧 상태를 상세히 조회합니다.
+
+        새 구조에서는 remaining_trial, remaining_purchased를 사용합니다.
+        """
         with self.lock:
             requires_registration = self.policy.get("requires_registration", True)
-            credit_type = self.policy.get("credit_type")
+            policy_credit_type = self.policy.get("credit_type")
 
-            if requires_registration and credit_type != "free" and not self.wf_manager.is_registered():
+            if requires_registration and policy_credit_type != "free" and not self.wf_manager.is_registered():
                 return {
                     "success": False,
                     "error": "not_registered",
@@ -1479,24 +1598,24 @@ class CreditManager:
 
             try:
                 data = self._load_credit_data()
-                trial_credits = data.get("trial_credits", 0)
-                purchased_credits = data.get("purchased_credits", 0)
+                remaining_trial = data.get("remaining_trial", 0)
+                remaining_purchased = data.get("remaining_purchased", 0)
 
-                if trial_credits == -1:
+                if remaining_trial == -1:
                     credit_type, message, total_remaining = "free", "무료 배포판", -1
-                elif purchased_credits == -1:
+                elif remaining_purchased == -1:
                     credit_type, message, total_remaining = "permanent", "영구 라이선스", -1
                 else:
-                    total_remaining = trial_credits + purchased_credits
-                    if purchased_credits > 0 and trial_credits > 0:
+                    total_remaining = remaining_trial + remaining_purchased
+                    if remaining_purchased > 0 and remaining_trial > 0:
                         credit_type, message = (
                             "mixed",
-                            f"체험판 {trial_credits} + 구매 {purchased_credits}",
+                            f"체험판 {remaining_trial} + 구매 {remaining_purchased}",
                         )
-                    elif purchased_credits > 0:
-                        credit_type, message = "purchased", f"구매 크레딧 {purchased_credits}개"
-                    elif trial_credits > 0:
-                        credit_type, message = "trial", f"체험판 크레딧 {trial_credits}개"
+                    elif remaining_purchased > 0:
+                        credit_type, message = "purchased", f"구매 크레딧 {remaining_purchased}개"
+                    elif remaining_trial > 0:
+                        credit_type, message = "trial", f"체험판 크레딧 {remaining_trial}개"
                     else:
                         credit_type, message = "empty", "크레딧 없음"
 
@@ -1505,8 +1624,8 @@ class CreditManager:
                     "app_name": self.app_name,
                     "credit_type": credit_type,
                     "remaining_credits": total_remaining,
-                    "trial_credits": trial_credits,
-                    "purchased_credits": purchased_credits,
+                    "remaining_trial": remaining_trial,
+                    "remaining_purchased": remaining_purchased,
                     "created_at": data.get("created_at", ""),
                     "last_updated": data.get("last_updated", ""),
                     "usage_count": len(data.get("usage_history", [])),
@@ -1524,17 +1643,20 @@ class CreditManager:
     def deduct_credits(
         self, amount: int, description: str = "", file_count: int = 0
     ) -> Dict[str, Any]:
-        """크레딧을 차감합니다."""
+        """크레딧을 차감합니다.
+
+        새 구조에서는 remaining_trial, remaining_purchased를 사용합니다.
+        """
         with self.lock:
             requires_registration = self.policy.get("requires_registration", True)
-            credit_type = self.policy.get("credit_type")
+            policy_credit_type = self.policy.get("credit_type")
 
-            if requires_registration and credit_type != "free" and not self.wf_manager.is_registered():
+            if requires_registration and policy_credit_type != "free" and not self.wf_manager.is_registered():
                 return {"success": False, "error": "not_registered", "message": "사용자 등록 필요"}
 
             data = self._load_credit_data()
-            trial = data.get("trial_credits", 0)
-            purchased = data.get("purchased_credits", 0)
+            trial = data.get("remaining_trial", 0)
+            purchased = data.get("remaining_purchased", 0)
 
             if trial == -1 or purchased == -1:
                 usage_record = {
@@ -1578,8 +1700,8 @@ class CreditManager:
             new_trial = trial - deducted_from_trial
             new_purchased = purchased - deducted_from_purchased
 
-            data["trial_credits"] = new_trial
-            data["purchased_credits"] = new_purchased
+            data["remaining_trial"] = new_trial
+            data["remaining_purchased"] = new_purchased
 
             usage_record = {
                 "timestamp": _get_timestamp(),
@@ -1619,6 +1741,24 @@ class CreditManager:
         )
         return cost
 
+    def get_app_version(self) -> str:
+        """앱 버전 정보 조회 (settings.json의 full_version)"""
+        try:
+            settings_file = self.app_dir / "settings.json"
+            if settings_file.exists():
+                with open(settings_file, "r", encoding="utf-8") as f:
+                    settings = json.load(f)
+                # runtime_config.full_version 또는 app_config.full_version
+                runtime_version = settings.get("runtime_config", {}).get("full_version", "")
+                if runtime_version:
+                    return runtime_version
+                app_version = settings.get("app_config", {}).get("full_version", "")
+                if app_version:
+                    return app_version
+        except Exception as e:
+            logger.debug(f"앱 버전 조회 실패: {e}")
+        return ""
+
     def deduct_credits_by_policy(
         self, item_count: int = 1, description: str = ""
     ) -> Dict[str, Any]:
@@ -1644,12 +1784,12 @@ class CreditManager:
         with self.lock:
             try:
                 data = self._load_credit_data()
-                data["purchased_credits"] = data.get("purchased_credits", 0) + amount
+                data["remaining_purchased"] = data.get("remaining_purchased", 0) + amount
                 purchase_record = {
                     "timestamp": _get_timestamp(),
                     "amount": amount,
                     "payment_info": payment_info or {},
-                    "new_total_purchased": data["purchased_credits"],
+                    "new_total_purchased": data["remaining_purchased"],
                 }
                 if "purchase_history" not in data:
                     data["purchase_history"] = []
@@ -1659,7 +1799,7 @@ class CreditManager:
                 return {
                     "success": True,
                     "message": f"{amount} 구매 크레딧 추가 완료.",
-                    "total_purchased_credits": data["purchased_credits"],
+                    "total_purchased_credits": data["remaining_purchased"],
                 }
             except Exception as e:
                 return {"success": False, "error": str(e), "message": "구매 크레딧 추가 중 오류"}
@@ -1714,6 +1854,9 @@ class CreditManager:
 
                     sheets_manager = get_sheets_manager(test_mode=True)
 
+                    # 앱 버전 정보 조회
+                    app_version = self.get_app_version()
+
                     # ✨ 동기화 전에 사용 로그 적재 (로그 누락 방지)
                     if session_usage > 0:
                         try:
@@ -1725,14 +1868,16 @@ class CreditManager:
                                 file_count=int(session_file_count),
                                 per_item_cost=float(self.get_per_item_cost()),
                                 description=f"{self.app_name} 크레딧 사용 ({session_file_count}개 파일)",
-                                timestamp_override=session_last_ts
+                                timestamp_override=session_last_ts,
+                                app_version=app_version,
                             )
-                            logger.info(f"🧾 사용 로그 적재 완료: {session_usage} 크레딧")
+                            logger.info(f"🧾 사용 로그 적재 완료: {session_usage} 크레딧 ({app_version})")
                         except Exception as log_err:
                             logger.warning(f"⚠️ 사용 로그 적재 실패 (무시): {log_err}")
 
                     # 동기화 시 중복 로그 방지를 위해 suppress_usage_log 설정
                     data["suppress_usage_log"] = True
+                    data["app_version"] = app_version  # 동기화 시에도 버전 정보 전달
 
                     # 동기화 실행 (필요시 hardware_fingerprint도 전달)
                     sync_result = sheets_manager.sync_credit_data(
@@ -1802,6 +1947,225 @@ class CreditManager:
         except Exception as e:
             return {"error": str(e)}
 
+    # ========== 작업 진행 상태 관리 (work_progress) ==========
+
+    def init_work_progress(self, folder_path: str, total_files: int) -> Dict[str, Any]:
+        """새 작업 시작 시 work_progress 초기화
+
+        Args:
+            folder_path: 작업 폴더 경로
+            total_files: 전체 파일 개수
+
+        Returns:
+            성공 여부 및 메시지
+        """
+        with self.lock:
+            try:
+                data = self._load_credit_data()
+                data["work_progress"] = {
+                    "folder_path": folder_path,
+                    "total_files": total_files,
+                    "processed_files": [],
+                    "last_updated": _get_timestamp(),
+                }
+                self._save_credit_data(data)
+                logger.info(f"✅ 작업 진행 상태 초기화: {folder_path} ({total_files}개 파일)")
+                return {"success": True, "message": "작업 진행 상태 초기화 완료"}
+            except Exception as e:
+                logger.error(f"작업 진행 상태 초기화 실패: {e}")
+                return {"success": False, "error": str(e)}
+
+    def add_processed_file(self, filename: str) -> Dict[str, Any]:
+        """처리 완료된 파일 추가
+
+        Args:
+            filename: 처리 완료된 파일명
+
+        Returns:
+            성공 여부 및 현재 진행 상태
+        """
+        with self.lock:
+            try:
+                data = self._load_credit_data()
+                if "work_progress" not in data:
+                    return {"success": False, "error": "work_progress가 초기화되지 않았습니다."}
+
+                progress = data["work_progress"]
+                if filename not in progress["processed_files"]:
+                    progress["processed_files"].append(filename)
+                    progress["last_updated"] = _get_timestamp()
+                    self._save_credit_data(data)
+
+                processed_count = len(progress["processed_files"])
+                total_files = progress["total_files"]
+                return {
+                    "success": True,
+                    "processed_count": processed_count,
+                    "total_files": total_files,
+                    "remaining": total_files - processed_count,
+                }
+            except Exception as e:
+                logger.error(f"처리 파일 추가 실패: {e}")
+                return {"success": False, "error": str(e)}
+
+    def get_work_progress(self, folder_path: str = None, result_folder: str = "bom") -> Dict[str, Any]:
+        """작업 진행 상태 조회
+
+        Args:
+            folder_path: 확인할 폴더 경로 (None이면 저장된 진행 상태 반환)
+            result_folder: 결과물 폴더명 (기본값: "bom")
+
+        Returns:
+            진행 상태 정보:
+            - status: "new" | "in_progress" | "completed" | "different_folder"
+            - total_files: 전체 파일 수
+            - processed_count: 처리된 파일 수 (실제 결과 파일 기준)
+            - remaining: 남은 파일 수
+            - processed_files: 처리된 파일 목록
+        """
+        try:
+            data = self._load_credit_data()
+
+            # work_progress가 없는 경우에도 결과 폴더 확인
+            if "work_progress" not in data:
+                # 폴더 경로가 있으면 실제 결과 파일 확인
+                if folder_path:
+                    actual_count = self._count_result_files(folder_path, result_folder)
+                    if actual_count > 0:
+                        # 결과 파일이 있으면 완료 또는 진행중 상태
+                        return {
+                            "status": "completed",  # 일단 완료로 표시 (total_files 모름)
+                            "total_files": actual_count,
+                            "processed_count": actual_count,
+                            "remaining": 0,
+                            "processed_files": [],
+                            "from_result_folder": True,
+                        }
+                return {
+                    "status": "new",
+                    "total_files": 0,
+                    "processed_count": 0,
+                    "remaining": 0,
+                    "processed_files": [],
+                }
+
+            progress = data["work_progress"]
+            stored_folder = progress.get("folder_path", "")
+            total_files = progress.get("total_files", 0)
+            processed_files = progress.get("processed_files", [])
+            processed_count = len(processed_files)
+
+            # 다른 폴더인 경우
+            if folder_path and stored_folder and folder_path != stored_folder:
+                # 새 폴더의 결과 파일 확인
+                actual_count = self._count_result_files(folder_path, result_folder)
+                if actual_count > 0:
+                    return {
+                        "status": "completed",
+                        "stored_folder": stored_folder,
+                        "total_files": actual_count,
+                        "processed_count": actual_count,
+                        "remaining": 0,
+                        "processed_files": [],
+                        "from_result_folder": True,
+                    }
+                return {
+                    "status": "different_folder",
+                    "stored_folder": stored_folder,
+                    "total_files": 0,
+                    "processed_count": 0,
+                    "remaining": 0,
+                    "processed_files": [],
+                }
+
+            # 실제 결과 파일 수 확인 (폴더 경로가 있는 경우)
+            check_folder = folder_path or stored_folder
+            actual_count = 0
+            if check_folder:
+                actual_count = self._count_result_files(check_folder, result_folder)
+
+            # processed_count와 actual_count 중 큰 값 사용
+            effective_count = max(processed_count, actual_count)
+
+            # 상태 판단
+            if effective_count == 0:
+                status = "new"
+            elif effective_count >= total_files and total_files > 0:
+                status = "completed"
+            else:
+                status = "in_progress"
+
+            return {
+                "status": status,
+                "folder_path": stored_folder,
+                "total_files": total_files,
+                "processed_count": effective_count,
+                "remaining": max(0, total_files - effective_count),
+                "processed_files": processed_files,
+                "last_updated": progress.get("last_updated", ""),
+            }
+        except Exception as e:
+            logger.error(f"작업 진행 상태 조회 실패: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "total_files": 0,
+                "processed_count": 0,
+                "remaining": 0,
+                "processed_files": [],
+            }
+
+    def _count_result_files(self, folder_path: str, result_folder: str = "bom") -> int:
+        """결과 폴더의 엑셀 파일 개수 반환
+
+        Args:
+            folder_path: 기본 폴더 경로
+            result_folder: 결과물 폴더명 (기본값: "bom")
+
+        Returns:
+            엑셀 파일 개수
+        """
+        try:
+            result_path = Path(folder_path) / result_folder
+            if result_path.exists() and result_path.is_dir():
+                return sum(1 for f in result_path.glob("*.xlsx") if f.is_file())
+            return 0
+        except Exception:
+            return 0
+
+    def clear_work_progress(self) -> Dict[str, Any]:
+        """작업 진행 상태 초기화 (완료 또는 처음부터 다시 시작 시)
+
+        Returns:
+            성공 여부 및 메시지
+        """
+        with self.lock:
+            try:
+                data = self._load_credit_data()
+                if "work_progress" in data:
+                    del data["work_progress"]
+                    self._save_credit_data(data)
+                    logger.info("✅ 작업 진행 상태 초기화됨")
+                return {"success": True, "message": "작업 진행 상태 초기화 완료"}
+            except Exception as e:
+                logger.error(f"작업 진행 상태 초기화 실패: {e}")
+                return {"success": False, "error": str(e)}
+
+    def is_file_processed(self, filename: str) -> bool:
+        """특정 파일이 이미 처리되었는지 확인
+
+        Args:
+            filename: 확인할 파일명
+
+        Returns:
+            처리 여부
+        """
+        try:
+            progress = self.get_work_progress()
+            return filename in progress.get("processed_files", [])
+        except Exception:
+            return False
+
 
 # 테스트 함수
 def test_simple_credit_manager():
@@ -1821,7 +2185,7 @@ def test_simple_credit_manager():
     status = cm.get_credit_status()
     logger.info(f"\n[1] 초기 상태: {status['message']}")
     assert status["credit_type"] == "trial"
-    assert status["trial_credits"] == cm.policy.get("trial_credits")
+    assert status["remaining_trial"] == cm.policy.get("trial_credits")
 
     # ... (기존 테스트 로직) ...
 
@@ -1888,7 +2252,7 @@ def test_purchase_sync():
     logger.info(f"[구매 동기화 결과] {result}")
     status = cm.get_credit_status()
     logger.info(
-        f"[최종 크레딧 상태] 구매 크레딧: {status['purchased_credits']}, 히스토리: {status.get('purchase_history', [])}"
+        f"[최종 크레딧 상태] 구매 크레딧: {status['remaining_purchased']}, 히스토리: {status.get('purchase_history', [])}"
     )
     logger.info("🧪 구매 이력 동기화 테스트 완료\n")
 

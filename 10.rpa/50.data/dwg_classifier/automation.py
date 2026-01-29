@@ -25,6 +25,15 @@ if common_path not in sys.path:
 
 from wf_log import get_app_logger
 
+# 이메일 모듈 import
+try:
+    import wf_email as wfm
+except ImportError:
+    wfm = None
+
+# 현재 스크립트 디렉토리
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
 
 class DwgClassifierAutomation:
     """DWG 파일 분류 자동화 클래스"""
@@ -33,6 +42,24 @@ class DwgClassifierAutomation:
         self.folder_path = folder_path
         self.console_mode = console_mode
         self.logger = get_app_logger("dwg_classifier", console_level=logging.INFO)
+
+        # 이메일 설정 (에러/완료 알림용)
+        self.itself_dir = current_dir
+        self.user_email = ""
+        self.report_email = ""
+
+        # 로그 디렉토리 설정
+        run_mode = os.environ.get("WF_RPA_MODE", "release")
+        if run_mode in ("dev", "demo"):
+            log_dir_path = Path(current_dir) / "logs"
+        else:
+            log_dir_path = Path.home() / ".wf_rpa" / "dwg_classifier" / "logs"
+        log_dir_path.mkdir(parents=True, exist_ok=True)
+        self.log_dir = str(log_dir_path).replace("\\", "/")
+        self.logfile = str(log_dir_path / f"{time.strftime('%Y%m%d')}.txt").replace("\\", "/")
+
+        # 이메일 설정 초기화
+        self._init_email_settings()
 
         # 설정 로드 (config 속성 초기화)
         try:
@@ -108,6 +135,104 @@ class DwgClassifierAutomation:
     def set_progress_callback(self, callback: Callable):
         """진행률 업데이트 콜백 설정"""
         self.progress_callback = callback
+
+    def _init_email_settings(self):
+        """이메일 설정 초기화 (wf_rpa_config.json에서 로드)"""
+        try:
+            config_file = Path.home() / ".wf_rpa" / "wf_rpa_config.json"
+
+            if config_file.exists():
+                with open(config_file, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+
+                # 사용자 이메일
+                self.user_email = config.get("user_info", {}).get("user_email", "")
+
+                # 리포트 수신 이메일
+                email_settings = config.get("email_settings", {})
+                self.report_email = email_settings.get("email_to", "")
+
+                # report_email이 없으면 user_email로 폴백
+                if not self.report_email:
+                    self.report_email = self.user_email
+
+        except Exception as e:
+            self.logger.warning(f"이메일 설정 로드 실패: {e}")
+
+        self.logger.debug(f"이메일 설정: user={self.user_email}, report={self.report_email}")
+
+    def handle_error(self, error, context="", mail_title_prefix="[DC] [Error]", send_email=True):
+        """공통 에러 처리: 스크린샷 저장 및 이메일 전송
+
+        Args:
+            error: 발생한 예외 또는 에러 메시지
+            context: 에러 발생 컨텍스트 (파일명, 단계 등)
+            mail_title_prefix: 이메일 제목 접두사
+            send_email: 이메일 전송 여부 (기본값: True)
+
+        Returns:
+            tuple: (screenshot_path, timestamp) - 스크린샷 경로와 타임스탬프
+        """
+        timestamp4img = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # 스크린샷 캡처
+        screenshot_path = None
+        try:
+            import pyautogui
+            screenshot = pyautogui.screenshot()
+            screenshot_path = Path(self.log_dir) / f"{timestamp4img}.png"
+            screenshot.save(str(screenshot_path))
+            self.logger.debug(f"스크린샷 저장: {screenshot_path}")
+        except Exception as e:
+            self.logger.warning(f"스크린샷 캡처 실패: {e}")
+
+        # 이메일 전송
+        if send_email and wfm and self.report_email and hasattr(wfm, 'mail_send_attach'):
+            error_content = f"{str(error)}"
+            if context:
+                error_content = f"{error_content}\n{context}"
+
+            attach = []
+            if screenshot_path:
+                attach.append(str(screenshot_path).replace("\\", "/"))
+            attach.append(self.logfile)
+
+            try:
+                wfm.init(self.itself_dir)
+                mail_title = f"{mail_title_prefix} {self.user_email}"
+                wfm.mail_send_attach(mail_title, self.report_email, error_content, attach)
+                self.logger.debug("에러 이메일 전송 완료")
+            except Exception as mail_e:
+                self.logger.error(f"에러 이메일 전송 실패: {mail_e}")
+
+        return str(screenshot_path) if screenshot_path else None, timestamp4img
+
+    def send_completion_email(self, total_count: int, classified_count: int, failed_count: int):
+        """작업 완료 이메일 전송
+
+        Args:
+            total_count: 전체 파일 수
+            classified_count: 분류된 파일 수
+            failed_count: 실패 파일 수
+        """
+        if not wfm or not self.report_email or not hasattr(wfm, 'mail_send_attach'):
+            self.logger.debug("이메일 전송 건너뜀 (설정 없음)")
+            return
+
+        try:
+            wfm.init(self.itself_dir)
+            mail_title = f"[DC] [Complete] {self.user_email}"
+            content = (
+                f"DWG 분류 완료\n\n"
+                f"• 전체: {total_count}개\n"
+                f"• 분류 성공: {classified_count}개\n"
+                f"• 실패: {failed_count}개\n"
+            )
+            attach = [self.logfile]
+            wfm.mail_send_attach(mail_title, self.report_email, content, attach)
+            self.logger.info("완료 이메일 전송 완료")
+        except Exception as e:
+            self.logger.error(f"완료 이메일 전송 실패: {e}")
 
     def _get_file_hash(self, file_path: str) -> str:
         """SHA256 파일 해시 계산 (첫 1MB만 사용하여 속도 향상)"""
@@ -708,11 +833,34 @@ class DwgClassifierAutomation:
                     )
                     continue
 
-                # 분류 규칙 추가 (설정된 컬럼명 사용)
+                # 실제 컬럼명 찾기 (case-insensitive 매칭 지원)
+                def find_actual_column(target: str, columns: List[str]) -> str:
+                    """설정된 컬럼명과 매칭되는 실제 컬럼명 반환"""
+                    target_norm = target.strip().replace('\u00A0', ' ')
+                    if not self.case_sensitive:
+                        t = target_norm.lower()
+                        for c in columns:
+                            if c.lower() == t:
+                                return c
+                    return target_norm if target_norm in columns else target
+
+                actual_drawing_col = find_actual_column(self.drawing_column, cols_list)
+                actual_category_col = find_actual_column(self.category_column, cols_list)
+
+                # 분류 규칙 추가 (실제 컬럼명 사용)
                 for _, row in df.iterrows():
-                    pattern = str(row.get(self.drawing_column, "")).strip()
-                    category = str(row.get(self.category_column, "")).strip()
+                    pattern = str(row.get(actual_drawing_col, "")).strip()
+                    category = str(row.get(actual_category_col, "")).strip()
+                    # 줄바꿈/탭 문자를 공백으로 변환 (폴더명에 사용 불가)
+                    category = category.replace('\n', ' ').replace('\r', '').replace('\t', ' ')
+                    # 연속 공백을 단일 공백으로 정리
+                    while '  ' in category:
+                        category = category.replace('  ', ' ')
                     folder = str(row.get("folder", category)).strip()
+                    # folder도 동일하게 처리
+                    folder = folder.replace('\n', ' ').replace('\r', '').replace('\t', ' ')
+                    while '  ' in folder:
+                        folder = folder.replace('  ', ' ')
 
                     if pattern and category:
                         if category not in rules:
@@ -734,6 +882,13 @@ class DwgClassifierAutomation:
         filename = os.path.basename(file_path)
         filename_lower = filename.lower()
 
+        # 공백 정규화 함수 (연속 공백을 단일 공백으로)
+        def normalize_spaces(s: str) -> str:
+            import re
+            return re.sub(r'\s+', ' ', s).strip()
+
+        filename_normalized = normalize_spaces(filename_lower)
+
         # 기본 분류 결과
         result = {
             "file_path": file_path,
@@ -747,9 +902,10 @@ class DwgClassifierAutomation:
         for category, pattern_list in rules.items():
             for rule in pattern_list:
                 pattern = rule["pattern"].lower()
+                pattern_normalized = normalize_spaces(pattern)
 
-                # 패턴 매칭 (간단한 포함 검사)
-                if pattern in filename_lower:
+                # 패턴 매칭 (공백 정규화 후 포함 검사)
+                if pattern_normalized in filename_normalized:
                     result["category"] = category
                     result["target_folder"] = rule["folder"]
                     result["matched_pattern"] = pattern

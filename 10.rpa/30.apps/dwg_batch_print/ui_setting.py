@@ -19,7 +19,15 @@ import json
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
-import pyautogui
+
+# Adaptive UI 통합 모듈
+try:
+    from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
+except ImportError:
+    _common_dir = os.path.join(os.path.dirname(__file__), "..", "..", "10.common")
+    if _common_dir not in sys.path:
+        sys.path.insert(0, _common_dir)
+    from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
 
 
 class Tooltip:
@@ -117,103 +125,14 @@ def _apply_ui_scale(settings: dict) -> dict:
     return settings
 
 
-def _apply_global_fonts(root, ui: dict) -> None:
-    """Force all Tk default fonts to unified sizes."""
-    try:
-        root.tk.call("tk", "scaling", 1.0)
-        import tkinter.font as tkfont
-
-        for name in (
-            "TkDefaultFont",
-            "TkTextFont",
-            "TkFixedFont",
-            "TkMenuFont",
-            "TkIconFont",
-            "TkTooltipFont",
-        ):
-            tkfont.nametofont(name).configure(size=ui.get("font_size", 10), weight="normal")
-
-        for name in ("TkHeadingFont", "TkCaptionFont"):
-            tkfont.nametofont(name).configure(size=ui.get("font_size_title", 10), weight="bold")
-
-        try:
-            tkfont.nametofont("TkSmallCaptionFont").configure(
-                size=ui.get("font_size_bold", 10), weight="bold"
-            )
-        except Exception:
-            pass
-    except Exception:
-        pass
-
-
-def get_adaptive_ui_settings():
-    """화면 해상도에 따른 적응형 UI 설정 (설정 파일 값을 우선 사용)"""
-    try:
-        screen_width, _ = pyautogui.size()
-    except Exception:
-        screen_width = 1920
-
-    # 해상도별 scale factor
-    if screen_width >= 3840:  # UHD (4K)
-        resolution_scale = 1.5
-    elif screen_width >= 2560:  # QHD (1440p)
-        resolution_scale = 1.2
-    else:  # FHD (1080p)
-        resolution_scale = 1.0
-
-    # 저장된 ui_config를 불러와 base 값에 덮어씌움 (사용자 지정값은 스케일 제외)
-    saved_ui = {}
+def _get_saved_ui_config() -> dict:
+    """앱 설정에서 저장된 UI 설정 로드"""
     try:
         from app_setting_data import get_config
-
         cfg = get_config()
-        saved_ui = getattr(cfg, "ui_config", {}) or {}
+        return getattr(cfg, "ui_config", {}) or {}
     except Exception:
-        saved_ui = {}
-
-    try:
-        default_width = int(saved_ui.get("window_width", 580))
-    except Exception:
-        default_width = 580
-
-    try:
-        default_height = int(saved_ui.get("window_height", 230))
-    except Exception:
-        default_height = 230
-
-    base_settings = {
-        "window_width": default_width,
-        "window_height": default_height,
-        "font_size": 14,
-        "font_size_bold": 14,
-        "font_size_title": 14,
-        "padding": 12,
-        "button_width": 10,
-    }
-
-    use_saved_width = isinstance(saved_ui, dict) and "window_width" in saved_ui
-    use_saved_height = isinstance(saved_ui, dict) and "window_height" in saved_ui
-
-    # resolution scale 적용 (사용자 지정 width/height는 스케일 제외)
-    scaled = {}
-    for key, value in base_settings.items():
-        if isinstance(value, (int, float)) and key != "window_width":
-            if key == "window_height" and use_saved_height:
-                scaled[key] = value
-            else:
-                scaled[key] = int(round(value * resolution_scale))
-        else:
-            scaled[key] = value
-
-    result = _apply_ui_scale(scaled)
-
-    # ui_scale 적용 이후에도 사용자 지정 크기는 원본 유지
-    if use_saved_width:
-        result["window_width"] = base_settings["window_width"]
-    if use_saved_height:
-        result["window_height"] = base_settings["window_height"]
-
-    return result
+        return {}
 
 
 class SettingsDialog:
@@ -232,12 +151,26 @@ class SettingsDialog:
             version_str = "v0.7"
 
         self.top = tk.Toplevel(parent)
+        self.top.withdraw()  # 깜빡임 방지: geometry 설정 전까지 숨김
         self.top.title(f"DWG Batch Print 알파 {version_str} - 설정")
+
+        # 앱별 아이콘 적용 (parent_app에서 icon_path 가져오기)
+        try:
+            icon_path = getattr(self.parent_app, "icon_path", None)
+            if icon_path:
+                self.top.iconbitmap(str(icon_path))
+        except Exception:
+            pass
+
         self.top.transient(parent)
         self.top.grab_set()
+        # 메인 창이 topmost이면 설정 창도 topmost로 설정 (창 순서 유지)
+        if parent.attributes("-topmost"):
+            self.top.wm_attributes("-topmost", 1)
 
-        ui_settings = get_adaptive_ui_settings()
-        _apply_global_fonts(self.top, ui_settings)
+        saved_ui = _get_saved_ui_config()
+        ui_settings = get_adaptive_ui_settings(window_type="sub", saved_ui=saved_ui)
+        apply_global_fonts(self.top, ui_settings)
 
         base_font = ("맑은 고딕", ui_settings["font_size"])
         title_font = ("맑은 고딕", ui_settings["font_size_title"], "bold")
@@ -263,7 +196,7 @@ class SettingsDialog:
 
         # 센터링 + 충분한 기본 크기 (콘텐츠가 잘리지 않도록 최소 크기 보장)
         win_width = max(ui_settings["window_width"], 700)
-        # Taller default to reveal all sections without heavy scrolling
+        # DBP 설정창 최적 높이: 500px (항목 수에 맞춤)
         win_height = max(ui_settings["window_height"], 500)
 
         # Center over parent if available; fallback to screen center
@@ -289,6 +222,7 @@ class SettingsDialog:
             y = (screen_h - win_height) // 2
 
         self.top.geometry(f"{win_width}x{win_height}+{x}+{y}")
+        self.top.deiconify()  # 모든 설정 완료 후 표시
 
         # UI
         self._build_ui()
@@ -415,7 +349,10 @@ class SettingsDialog:
 
         # ESC
         self.top.bind('<Escape>', lambda e: self.on_cancel())
-        
+
+        # Alt+G: geometry 저장 (디버깅용)
+        self.top.bind_all("<Alt-g>", self._on_debug_geometry_capture)
+
         # 마우스 휠 스크롤
         def _on_mousewheel(event):
             canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
@@ -474,6 +411,48 @@ class SettingsDialog:
         """취소"""
         self.top.destroy()
 
+    def _on_debug_geometry_capture(self, _event=None):
+        """Alt+G: 현재 geometry를 로그에 출력하고 settings.json에 저장"""
+        if not self.top or not self.top.winfo_exists():
+            return
+        try:
+            geo = self.top.geometry()
+            msg = f"[DEBUG] SettingsDialog geometry: {geo}"
+            print(msg)
+            self.logger.info(msg)
+            # settings.json에 저장
+            ok = False
+            if self.config and hasattr(self.config, "update_settings_window_geometry"):
+                ok = self.config.update_settings_window_geometry(geo)
+            # 토스트 메시지 표시
+            if ok:
+                self._show_geometry_toast(f"geometry 저장됨: {geo}")
+            else:
+                self._show_geometry_toast(f"geometry: {geo}")
+        except Exception as e:
+            self.logger.debug(f"Alt+G 실패: {e}")
+
+    def _show_geometry_toast(self, message: str, duration_ms: int = 1400):
+        """간단한 토스트 메시지 표시"""
+        if not self.top or not self.top.winfo_exists():
+            return
+        try:
+            toast = tk.Toplevel(self.top)
+            toast.overrideredirect(True)
+            toast.attributes("-topmost", True)
+            lbl = tk.Label(
+                toast, text=message, bg="#333333", fg="white",
+                font=("맑은 고딕", 9), padx=10, pady=5
+            )
+            lbl.pack()
+            toast.update_idletasks()
+            x = self.top.winfo_x() + (self.top.winfo_width() - toast.winfo_reqwidth()) // 2
+            y = self.top.winfo_y() + self.top.winfo_height() - toast.winfo_reqheight() - 10
+            toast.geometry(f"+{x}+{y}")
+            toast.after(duration_ms, toast.destroy)
+        except Exception:
+            pass
+
 
 # ==================== 유틸리티 함수들 (bom_exporter에서 마이그레이션) ====================
 
@@ -510,10 +489,6 @@ def apply_custom_settings_to_config(config, custom_settings):
                 config.restart_sleep = app_config["restart_sleep"]
             if "final_sleep" in app_config:
                 config.final_sleep = app_config["final_sleep"]
-            if "credits_per_print" in app_config:
-                config.credits_per_print = app_config["credits_per_print"]
-            if "check_shortage_stop" in app_config:
-                config.check_shortage_stop = app_config["check_shortage_stop"]
 
         print("커스텀 설정이 config 객체에 적용되었습니다.")
     except Exception as e:

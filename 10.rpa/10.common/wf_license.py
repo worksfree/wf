@@ -46,7 +46,7 @@ def check_admin(sheet_name="admin"):
             raise FileNotFoundError(f"자격증명 파일을 찾을 수 없습니다: {creds_path}")
         creds = Credentials.from_service_account_file(str(creds_path), scopes=cfg["SCOPE"])
         client = gspread.authorize(creds)
-        sheet_id = cfg["SHEET_ID_PROD"]
+        sheet_id = cfg["SHEET_ID_RELEASE"]
         sheet = client.open_by_key(sheet_id).worksheet(sheet_name)
     except Exception as e:
         logger.error(f"관리자 시트 접근 실패: {e}")
@@ -216,7 +216,7 @@ def register_license(email, hw_info=None, verification_code=None, trial=False):
                 raise FileNotFoundError(f"자격증명 파일을 찾을 수 없습니다: {creds_path}")
             creds = Credentials.from_service_account_file(str(creds_path), scopes=cfg["SCOPE"])
             client = gspread.authorize(creds)
-            sheet_id = cfg["SHEET_ID_PROD"]
+            sheet_id = cfg["SHEET_ID_RELEASE"]
             sheet_name = "hwinfo"  # 하드웨어 정보용 새 시트
 
             try:

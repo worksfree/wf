@@ -313,28 +313,23 @@ class BomAutomation:
         """데모 캡처 콜백 설정"""
         self.capture_callback = callback_func
 
-    def has_credit_shortage_interruption(self) -> bool:
-        """크레딧 부족으로 중단된 기록이 있는지 확인
-        wf_pending_list.txt 파일이 존재하면 크레딧 부족으로 중단된 상태"""
-        if not self.folder_path:
+    def has_work_in_progress(self) -> bool:
+        """작업 진행 중인 상태인지 확인 (work_progress 기반)"""
+        if not self.credit_manager:
             return False
         try:
-            from pathlib import Path
-            pending_path = Path(self.folder_path) / "wf_pending_list.txt"
-            return pending_path.exists()
+            progress = self.credit_manager.get_work_progress(self.folder_path)
+            return progress.get("status") == "in_progress"
         except Exception:
             return False
 
-    def count_exported_files(self) -> int:
-        """exported_bom 폴더의 엑셀 파일 개수 반환"""
-        if not self.folder_path:
+    def count_processed_files(self) -> int:
+        """처리 완료된 파일 개수 반환 (work_progress 기반)"""
+        if not self.credit_manager:
             return 0
         try:
-            from pathlib import Path
-            export_folder = Path(self.folder_path) / "exported_bom"
-            if export_folder.exists() and export_folder.is_dir():
-                return sum(1 for f in export_folder.rglob("*.xls*") if f.is_file())
-            return 0
+            progress = self.credit_manager.get_work_progress(self.folder_path)
+            return progress.get("processed_count", 0)
         except Exception:
             return 0
 
@@ -843,54 +838,35 @@ class BomAutomation:
         self._compute_work_dir(folder_path)
         self.logger.debug(f"작업 폴더: {self.WORK_DIR}")
 
-        # 우선 pending 목록(wf_pending_list.txt) 확인
-        pending_path = Path(folder_path) / "wf_pending_list.txt"
-        pending_names: list[str] = []
-        if pending_path.exists():
-            try:
-                with open(pending_path, "r", encoding="utf-8") as f:
-                    pending_names = [line.strip() for line in f if line.strip()]
-                self.logger.info(
-                    f"재개 가능한 목록 감지: {len(pending_names)}개 (wf_pending_list.txt)"
-                )
-            except Exception as e:
-                self.logger.warning(f"wf_pending_list.txt 읽기 실패(무시): {e}")
-
-        # Check if there are any ~00.slddrw files in the folder (또는 pending 목록 기반)
+        # Check if there are any ~00.slddrw files in the folder
         try:
             folder_path_obj = Path(folder_path)
             found_files = []
 
-            if pending_names:
-                for name in pending_names:
-                    p = folder_path_obj / name
-                    if p.exists() and p.suffix.lower() == ".slddrw":
-                        found_files.append(name)
-            else:
-                # 1) 기본 규칙: not '~', len>18, name[15:]에 '-00', 확장자 .slddrw
-                primary = []
-                for f in folder_path_obj.iterdir():
-                    if (
-                        f.is_file()
-                        and not f.name.lower().startswith("~")
-                        and len(f.name) > 18
-                        and "-00" in f.name[15:].lower()
-                        and f.suffix.lower() == ".slddrw"
-                    ):
-                        primary.append(f.name)
+            # 1) 기본 규칙: not '~', len>18, name[15:]에 '-00', 확장자 .slddrw
+            primary = []
+            for f in folder_path_obj.iterdir():
+                if (
+                    f.is_file()
+                    and not f.name.lower().startswith("~")
+                    and len(f.name) > 18
+                    and "-00" in f.name[15:].lower()
+                    and f.suffix.lower() == ".slddrw"
+                ):
+                    primary.append(f.name)
 
-                if primary:
-                    found_files = sorted(primary)
-                else:
-                    # 2) 폴백 규칙: 파일명이 '-00.slddrw'로 끝나고 '~'로 시작하지 않음
-                    fallback = [
-                        f.name
-                        for f in folder_path_obj.iterdir()
-                        if f.is_file()
-                        and f.name.lower().endswith("-00.slddrw")
-                        and not f.name.lower().startswith("~")
-                    ]
-                    found_files = sorted(fallback)
+            if primary:
+                found_files = sorted(primary)
+            else:
+                # 2) 폴백 규칙: 파일명이 '-00.slddrw'로 끝나고 '~'로 시작하지 않음
+                fallback = [
+                    f.name
+                    for f in folder_path_obj.iterdir()
+                    if f.is_file()
+                    and f.name.lower().endswith("-00.slddrw")
+                    and not f.name.lower().startswith("~")
+                ]
+                found_files = sorted(fallback)
 
             self.sldprt_files = found_files
             self.logger.debug(f"폴더 내 ~00.slddrw 파일 개수: {len(self.sldprt_files)}")
@@ -904,25 +880,7 @@ class BomAutomation:
         if self.sldprt_files:
             # 기존 BOM 폴더가 있는 경우 처리된 파일 확인 (재실행시)
             work_dir_path = Path(self.WORK_DIR)
-            if work_dir_path.exists():
-                existing_excel_files = list(work_dir_path.glob("*.xlsx"))
-                
-                # 기존 엑셀 파일이 있으면 덮어쓰기 확인
-                if existing_excel_files:
-                    from tkinter import messagebox
-                    response = messagebox.askyesno(
-                        "기존 파일 덮어쓰기",
-                        f"BOM 폴더에 {len(existing_excel_files)}개의 엑셀 파일이 이미 존재합니다.\n\n"
-                        "덮어쓰기를 진행하시겠습니까?\n\n"
-                        "예: 기존 파일을 덮어쓰고 BOM 추출 시작\n"
-                        "아니오: 작업 취소"
-                    )
-                    if not response:
-                        self.logger.info("사용자가 덮어쓰기를 취소했습니다.")
-                        return
-                    else:
-                        self.logger.info("사용자가 덮어쓰기를 승인했습니다. BOM 추출을 시작합니다.")
-                
+            if work_dir_path.exists() and not self.ignore_processed_for_rerun:
                 # 이미 처리된 파일 집합 저장 (재실행 감지용)
                 self.processed_files = {
                     f.stem for f in work_dir_path.iterdir() if f.suffix.lower() == ".xlsx"
@@ -931,6 +889,7 @@ class BomAutomation:
                     f for f in self.sldprt_files if Path(f).stem not in self.processed_files
                 ]
             else:
+                # 신규 폴더이거나 강제 재처리 모드: 전체 파일 처리
                 self.processed_files = set()
                 self.sldprt_files_to_process = self.sldprt_files
 
@@ -974,7 +933,7 @@ class BomAutomation:
     def open_sldprt_files(self):
         self.logger.debug(f"open_sldprt_files() 실행할 때 폴더명: {self.folder_path}")
         """sldprt 파일들을 열어서 BOM 추출 (재시도 로직 포함)"""
-        
+
         # BOM 추출 프로세스 시작 캡처
         if self.capture_callback:
             try:
@@ -998,6 +957,20 @@ class BomAutomation:
         if not work_dir_obj.exists():
             work_dir_obj.mkdir(parents=True, exist_ok=True)
             self.logger.debug(f"Create BOM Folder : {self.WORK_DIR}")
+
+        # ===== 강제 재처리 모드: 파일 목록 재계산 =====
+        # process_folder()가 팝업 전에 호출되어 ignore_processed_for_rerun이 적용 안 된 경우 대비
+        if self.ignore_processed_for_rerun and len(self.sldprt_files_to_process) == 0:
+            self.logger.info("강제 재처리 모드: 전체 파일 목록 재계산")
+            if self.sldprt_files:
+                folder_path_obj = Path(self.folder_path) if self.folder_path else Path(self.SLDDRW_PATH)
+                file_info = [
+                    (f, (folder_path_obj / f).stat().st_size) for f in self.sldprt_files
+                ]
+                file_info.sort(key=lambda x: x[1])
+                self.sldprt_files_to_process = file_info
+                self.total_count = len(self.sldprt_files_to_process)
+                self.logger.info(f"재계산 완료: {self.total_count}개 파일 처리 예정")
 
         # 사전 점검: SolidWorks가 시작/연결 가능한지 확인 (실패 시 즉시 중단)
         if not self._sanity_check_solidworks():
@@ -1876,7 +1849,7 @@ class BomAutomation:
         # Turn off Caps Lock if it is on
         if self.is_caps_lock_on():
             self.logger.info(f"CAPs lock is on, it forces CAP lock is off")
-            self.set_caps_lock(False)
+            self.caps_lock_off()
 
         timestamp_format = "%Y/%m/%d %H:%M:%S"
         start_time = time.time()
@@ -2064,24 +2037,14 @@ class BomAutomation:
                 # 파일 처리 성공 시에만 크레딧 차감 및 성공 파일 기록
                 # 크레딧 차감 (파일 처리 성공 후, UI/동기화 일관성)
                 if not self.console_mode and self.credit_manager:
-                    # 중복 파일 크레딧 차감 방지
-                    should_deduct_credit = True
-                    
-                    # rerun_only_new_duplicates=True: 완료 후 재실행 모드
-                    if getattr(self, "only_count_new_duplicates", False):
-                        # exported_bom 폴더에 이미 존재하는 파일인지 확인
-                        from pathlib import Path
-                        export_folder = Path(self.folder_path) / "exported_bom"
-                        expected_filename = Path(sldprt_file).stem + ".xlsx"
-                        existing_file = export_folder / expected_filename
-                        
-                        if existing_file.exists():
-                            should_deduct_credit = False
-                            self.logger.info(
-                                f"중복 파일 감지 - 크레딧 차감 제외: {sldprt_file}"
-                            )
-                    
-                    if should_deduct_credit:
+                    # 재실행 모드면 이미 처리된 파일도 다시 크레딧 차감
+                    if self.ignore_processed_for_rerun:
+                        should_deduct = True
+                    else:
+                        # 이미 처리된 파일인지 확인 (work_progress 기반)
+                        should_deduct = not self.credit_manager.is_file_processed(sldprt_file)
+
+                    if should_deduct:
                         credit_result = self.credit_manager.deduct_credits_by_policy(
                             1, f"BOM 변환: {sldprt_file}"
                         )
@@ -2096,8 +2059,11 @@ class BomAutomation:
                         if self.credit_update_callback:
                             self.credit_update_callback()
                         self._capture_demo("credit_progress", delay_ms=120)
+
+                        # 처리 완료 파일 기록 (work_progress에 추가)
+                        self.credit_manager.add_processed_file(sldprt_file)
                     else:
-                        self.logger.debug(f"중복 파일 - 크레딧 차감 생략: {sldprt_file}")
+                        self.logger.debug(f"이미 처리된 파일 - 크레딧 차감 생략: {sldprt_file}")
 
                 # 성공 파일 기록 (세션 누적용)
                 if "success_files" not in locals():
@@ -2532,37 +2498,6 @@ class BomAutomation:
                 import traceback
 
                 self.logger.error(f"상세 오류:\n{traceback.format_exc()}")
-
-        # 세션 재개 파일 목록 저장/정리
-        try:
-            folder_base = (
-                Path(self.SLDDRW_PATH)
-                if hasattr(self, "SLDDRW_PATH")
-                else (Path(self.folder_path) if self.folder_path else None)
-            )
-            if folder_base is not None:
-                pending_path = folder_base / "wf_pending_list.txt"
-                if self.credit_shortage_stop and getattr(self, "remaining_files_after_stop", None):
-                    # 파일명(베이스네임)만 저장하여 경로 이동 변화에도 견고하게
-                    names = [Path(p).name for p in self.remaining_files_after_stop if p]
-                    if names:
-                        tmp = pending_path.with_suffix(".tmp")
-                        with open(tmp, "w", encoding="utf-8") as f:
-                            for n in names:
-                                f.write(n + "\n")
-                        # 원자적 치환
-                        os.replace(tmp, pending_path)
-                        self.logger.info(f"잔여 파일 목록 저장: {pending_path} ({len(names)}개)")
-                else:
-                    # 완료 또는 크레딧 이외 중단: 보류 목록 제거
-                    if pending_path.exists():
-                        try:
-                            pending_path.unlink()
-                            self.logger.info(f"보류 목록 삭제: {pending_path}")
-                        except Exception as ue:
-                            self.logger.warning(f"보류 목록 삭제 실패(무시): {ue}")
-        except Exception as pe:
-            self.logger.warning(f"보류 목록 처리 중 경고(무시): {pe}")
 
         return self.sldprt_files_missed
 

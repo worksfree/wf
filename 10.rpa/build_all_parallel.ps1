@@ -1,17 +1,17 @@
 ﻿# build_all_parallel.ps1 - parallel build helper (Windows PowerShell)
 <#
 .SYNOPSIS
-    Parallel build for the five RPA apps.
+    Parallel build for the six RPA apps.
 .DESCRIPTION
     Launch each app build script in its own PowerShell process and wait for completion.
-.PARAMETER Mode
+.PARAMETER BuildType
     Build mode to pass to each app script (1-5).
 .PARAMETER PostClean
     Reserved for post-build cleanup (not used yet).
 #>
 
 param(
-    [int]$Mode = 2,
+    [int]$BuildType = 2,
     [switch]$PostClean
 )
 
@@ -19,11 +19,48 @@ $ErrorActionPreference = 'Stop'
 
 # App metadata (absolute paths to avoid cwd issues)
 $Apps = @(
-    @{ Name = 'Bom Exporter';              ShortName = 'be';  ExeName = 'bom_exporter.exe';           Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\build_bom_exporter.ps1' },
-    @{ Name = 'DWG Batch Print';           ShortName = 'dp';  ExeName = 'dwg_batch_print.exe';         Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\build_dwg_batch_print.ps1' },
-    @{ Name = 'DWG Classifier';            ShortName = 'dc';  ExeName = 'dwg_classifier.exe';          Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\build_dwg_classifier.ps1' },
-    @{ Name = 'Conversion Verifier';       ShortName = 'cv';  ExeName = 'conversion_verifier.exe';     Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\conversion_verifier\build_conversion_verifier.ps1' },
-    @{ Name = 'Korean Filename Normalizer';ShortName = 'kfn'; ExeName = 'korean_filename_normalizer.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\build_korean_filename_normalizer.ps1' }
+    @{ 
+        Name = 'Bom Exporter';
+        ShortName = 'be';
+        ExeName = 'bom_exporter.exe';
+        Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\build_bom_exporter.ps1'
+    },
+    @{ 
+        Name = 'DWG Batch Print';
+        ShortName = 'dp';
+        ExeName = 'dwg_batch_print.exe';
+        Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\build_dwg_batch_print.ps1'
+    },
+    @{ 
+        Name = 'Attribute Reset';
+        ShortName = 'ar';
+        ExeName = 'attribute_reset.exe';
+        Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\attribute_reset\build_attribute_reset.ps1'
+    },
+    @{ 
+        Name = 'DWG Classifier';
+        ShortName = 'dc';
+        ExeName = 'dwg_classifier.exe';
+        Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\build_dwg_classifier.ps1'
+    },
+    @{ 
+        Name = 'Conversion Verifier';
+        ShortName = 'cv';
+        ExeName = 'conversion_verifier.exe';
+        Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\conversion_verifier\build_conversion_verifier.ps1'
+    },
+    @{ 
+        Name = 'Korean Filename Normalizer';
+        ShortName = 'kfn';
+        ExeName = 'korean_filename_normalizer.exe';
+        Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\build_korean_filename_normalizer.ps1'
+    },
+    @{ 
+        Name = 'QRCode Generator';
+        ShortName = 'qr';
+        ExeName = 'qrcode_generator.exe';
+        Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\qrcode_generator\build_qrcode_generator.ps1'
+    }
 )
 
 function Create-DesktopShortcut {
@@ -51,13 +88,13 @@ function Create-DesktopShortcut {
     $Shortcut.Save()
     
     $DisplayText = if ($Description) { $Description } else { $ShortcutName }
-    Write-Host "  OK shortcut created: $DisplayText" -ForegroundColor Green
+    Write-Host "  OK shortcut c7eated: $DisplayText" -ForegroundColor Green
     return $true
 }
 
 $StartTime = Get-Date
 Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host "Parallel build for 5 apps (Mode $Mode)" -ForegroundColor Cyan
+Write-Host "Parallel build for 6 apps (BuildType $BuildType)" -ForegroundColor Cyan
 Write-Host "Start time: $($StartTime.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
@@ -73,9 +110,9 @@ foreach ($App in $Apps) {
     $LogFile = Join-Path $env:TEMP "$($App.ShortName)_build_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
     $ErrorLogFile = Join-Path $env:TEMP "$($App.ShortName)_error_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
 
-    # Use Windows PowerShell executable to ensure availability on this system
-    $psExe = 'powershell.exe'
-    $argList = @('-NoLogo', '-NoProfile', '-File', $App.Script, '-Mode', $Mode)
+    # Use PowerShell 7 (pwsh) or Windows PowerShell with bypass policy
+    $psExe = if (Get-Command pwsh -ErrorAction SilentlyContinue) { 'pwsh' } else { 'powershell.exe' }
+    $argList = @('-NoLogo', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $App.Script, '-BuildType', $BuildType)
     if ($PostClean.IsPresent) { $argList += '-PostClean' }
     $Process = Start-Process -FilePath $psExe `
         -ArgumentList $argList `
@@ -119,9 +156,11 @@ while ($Jobs.Count -gt $Completed.Count) {
             $FilePatterns = @{
                 'be'  = 'bom_exporter'
                 'dp'  = 'dwg_batch_print'
+                'ar'  = 'attribute_reset'
                 'dc'  = 'dwg_classifier'
                 'cv'  = 'conversion_verifier'
                 'kfn' = 'korean_filename_normalizer'
+                'qr'  = 'qrcode_generator'
             }
             $FilePattern = $FilePatterns[$JobInfo.ShortName]
             
@@ -270,17 +309,17 @@ exit ($(if ($FailCount -eq 0) { 0 } else { 1 }))
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Build the five RPA apps in parallel.
+    Build the six RPA apps in parallel.
 .DESCRIPTION
     Launches each app's build script in its own PowerShell process and waits for completion.
-.PARAMETER Mode
+.PARAMETER BuildType
     Build mode to pass through to each app script (1-5).
 .PARAMETER PostClean
     Reserved for future post-build cleanup.
 #>
 
 param(
-    [int]$Mode = 2,
+    [int]$BuildType = 2,
     [switch]$PostClean
 )
 
@@ -290,9 +329,11 @@ $ErrorActionPreference = 'Stop'
 $Apps = @(
     @{ Name = 'Bom Exporter'; ShortName = 'be'; ExeName = 'bom_exporter.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\build_bom_exporter.ps1' },
     @{ Name = 'DWG Batch Print'; ShortName = 'dp'; ExeName = 'dwg_batch_print.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\build_dwg_batch_print.ps1' },
+    @{ Name = 'Attribute Reset'; ShortName = 'ar'; ExeName = 'attribute_reset.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\attribute_reset\build_attribute_reset.ps1' },
     @{ Name = 'DWG Classifier'; ShortName = 'dc'; ExeName = 'dwg_classifier.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\build_dwg_classifier.ps1' },
     @{ Name = 'Conversion Verifier'; ShortName = 'cv'; ExeName = 'conversion_verifier.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\conversion_verifier\build_conversion_verifier.ps1' },
-    @{ Name = 'Korean Filename Normalizer'; ShortName = 'kfn'; ExeName = 'korean_filename_normalizer.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\build_korean_filename_normalizer.ps1' }
+    @{ Name = 'Korean Filename Normalizer'; ShortName = 'kfn'; ExeName = 'korean_filename_normalizer.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\build_korean_filename_normalizer.ps1' },
+    @{ Name = 'QRCode Generator'; ShortName = 'qr'; ExeName = 'qrcode_generator.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\qrcode_generator\build_qrcode_generator.ps1' }
 )
 
 function Create-DesktopShortcut {
@@ -324,7 +365,7 @@ function Create-DesktopShortcut {
 
 $StartTime = Get-Date
 Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host "5개 RPA 앱 병렬 빌드 (Mode $Mode)" -ForegroundColor Cyan
+Write-Host "7개 RPA 앱 병렬 빌드 (BuildType $BuildType)" -ForegroundColor Cyan
 Write-Host "시작 시간: $($StartTime.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
@@ -340,7 +381,7 @@ foreach ($App in $Apps) {
     $LogFile = Join-Path $env:TEMP "$($App.ShortName)_build_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
 
     $Process = Start-Process -FilePath "powershell.exe" `
-        -ArgumentList @('-NoLogo', '-NoProfile', '-File', $App.Script, '-Mode', $Mode) `
+        -ArgumentList @('-NoLogo', '-NoProfile', '-File', $App.Script, '-BuildType', $BuildType) `
         -RedirectStandardOutput $LogFile `
         -RedirectStandardError $LogFile `
         -PassThru `

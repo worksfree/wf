@@ -1,7 +1,0 @@
-2025-11-07 05:49:50 - wf_test_app - INFO - __init__:57 - App initialized: test_app v1.0.0
-2025-11-07 05:49:50 - wf_test_app - INFO - __init__:58 - Environment: Environment.DEVELOPMENT
-2025-11-07 05:49:50 - wf_test_app - INFO - __init__:59 - Language: ko
-2025-11-07 05:49:50 - wf_test_app - INFO - log_info:197 - This is a test log message
-2025-11-07 05:49:50 - wf_test_app - WARNING - log_warning:201 - This is a test warning
-2025-11-07 05:49:50 - wf_test_app - INFO - cleanup:213 - App cleanup: test_app
-2025-11-07 05:49:50 - wf_test_app - INFO - cleanup:277 - Error handler cleanup completed for test_app

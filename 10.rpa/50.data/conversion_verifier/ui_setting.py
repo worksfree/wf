@@ -17,15 +17,43 @@ if sys.platform == 'win32':
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 import re
-import pyautogui
 import json
+
+# Adaptive UI 통합 모듈
+try:
+    from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
+except ImportError:
+    import os
+    _common_dir = os.path.join(os.path.dirname(__file__), "..", "..", "10.common")
+    if _common_dir not in sys.path:
+        sys.path.insert(0, _common_dir)
+    from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
 import logging
 from pathlib import Path
 
 
-# 버전 정보 로드 (settings.json에서 직접 읽기)
-def _load_version_from_settings():
-    """settings.json에서 버전 정보 읽기 (소스 설정 버전을 폴백으로 사용)"""
+# 버전 정보: ui_main.py와 동일한 소스 사용 (중복 로직 제거)
+# ⚠️ 중요: 버전 정보는 반드시 ui_main.py의 APP_VERSION_FULL을 참조해야 함
+APP_VERSION_FULL = None  # 지연 로드
+
+
+def _get_version_from_main():
+    """ui_main.py에서 버전 정보 가져오기 (단일 소스 원칙)"""
+    global APP_VERSION_FULL
+    if APP_VERSION_FULL is not None:
+        return APP_VERSION_FULL
+
+    try:
+        from ui_main import APP_VERSION_FULL as main_full
+        APP_VERSION_FULL = main_full
+    except ImportError:
+        APP_VERSION_FULL = _load_version_fallback()
+
+    return APP_VERSION_FULL
+
+
+def _load_version_fallback():
+    """fallback: settings.json에서 직접 버전 읽기 (ui_main.py와 동일 로직)"""
     default_full = "v0.7.0.0"
 
     def _ensure_prefix(v: str) -> str:
@@ -34,26 +62,19 @@ def _load_version_from_settings():
             return default_full
         return v if v.startswith("v") else "v" + v
 
-    # 소스 설정 full_version 확보 (빌드 시 기준 버전)
-    source_full = default_full
-    try:
-        src_settings = Path(__file__).parent / "config" / "conversion_verifier" / "settings.json"
-        if src_settings.exists():
-            with open(src_settings, "r", encoding="utf-8") as f:
-                src_data = json.load(f)
-            src_app_cfg = src_data.get("app_config", {}) or {}
-            source_full = _ensure_prefix(src_app_cfg.get("full_version", default_full))
-    except Exception:
-        source_full = default_full
-
     try:
         if getattr(sys, "frozen", False):
-            base_path = Path(sys._MEIPASS) if hasattr(sys, '_MEIPASS') else Path(sys.executable).parent
-            settings_file = base_path / ".wf_rpa" / "conversion_verifier" / "settings.json"
+            # 릴리스 모드: 사용자 홈 우선 (사용자 설정 반영), 없으면 번들 폴더로 fallback
+            settings_file = Path.home() / ".wf_rpa" / "conversion_verifier" / "settings.json"
             if not settings_file.exists():
-                settings_file = Path.home() / ".wf_rpa" / "conversion_verifier" / "settings.json"
+                base_path = Path(sys._MEIPASS) if hasattr(sys, '_MEIPASS') else Path(sys.executable).parent
+                settings_file = base_path / ".wf_rpa" / "conversion_verifier" / "settings.json"
         else:
-            settings_file = Path(__file__).parent / "config" / "conversion_verifier" / "settings.json"
+            # ⚠️ 개발 모드: 10.common/config가 표준 경로
+            app_root = Path(__file__).parent
+            settings_file = app_root.parent.parent / "10.common" / "config" / "conversion_verifier" / "settings.json"
+            if not settings_file.exists():
+                settings_file = app_root / "config" / "conversion_verifier" / "settings.json"
 
         if settings_file.exists():
             with open(settings_file, "r", encoding="utf-8") as f:
@@ -65,9 +86,7 @@ def _load_version_from_settings():
     except Exception:
         pass
 
-    return source_full
-
-APP_VERSION_FULL = _load_version_from_settings()
+    return default_full
 
 
 def _get_ui_scale() -> float:
@@ -104,117 +123,14 @@ def _apply_ui_scale(settings: dict) -> dict:
     return settings
 
 
-def _apply_global_fonts(root, ui: dict) -> None:
-    """Force all Tk default fonts to match the unified sizes."""
-    try:
-        root.tk.call("tk", "scaling", 1.0)
-        import tkinter.font as tkfont
-
-        for name in (
-            "TkDefaultFont",
-            "TkTextFont",
-            "TkFixedFont",
-            "TkMenuFont",
-            "TkIconFont",
-            "TkTooltipFont",
-        ):
-            tkfont.nametofont(name).configure(size=ui.get("font_size", 10), weight="normal")
-
-        for name in ("TkHeadingFont", "TkCaptionFont"):
-            tkfont.nametofont(name).configure(size=ui.get("font_size_title", 10), weight="bold")
-
-        try:
-            tkfont.nametofont("TkSmallCaptionFont").configure(
-                size=ui.get("font_size_bold", 10), weight="bold"
-            )
-        except Exception:
-            pass
-    except Exception:
-        pass
-
-
-def get_adaptive_ui_settings():
-    """화면 해상도에 따른 적응형 UI 설정 (설정 파일 값을 우선 사용)"""
-    screen_width, _ = pyautogui.size()
-
-    # 해상도별 scale factor
-    if screen_width >= 3840:  # UHD (4K)
-        resolution_scale = 1.5
-    elif screen_width >= 2560:  # QHD (1440p)
-        resolution_scale = 1.2
-    else:  # FHD (1080p)
-        resolution_scale = 1.0
-
-    # 저장된 ui_config를 불러와 base 값에 덮어씌움 (사용자 지정값은 스케일 제외)
-    saved_ui = {}
+def _get_saved_ui_config() -> dict:
+    """앱 설정에서 저장된 UI 설정 로드"""
     try:
         from app_setting_data import get_config
-
         cfg = get_config()
-        saved_ui = getattr(cfg, "ui_config", {}) or {}
+        return getattr(cfg, "ui_config", {}) or {}
     except Exception:
-        saved_ui = {}
-
-    # geometry 문자열(예: 580x230+990+480)에서 폭/높이 추출
-    parsed_w = None
-    parsed_h = None
-    try:
-        geo_str = saved_ui.get("window_geometry_override", "") or saved_ui.get("window_geometry", "")
-        if geo_str:
-            size_part = geo_str.split("+", 1)[0]
-            if "x" in size_part:
-                w_str, h_str = size_part.split("x", 1)
-                parsed_w = int(w_str)
-                parsed_h = int(h_str)
-    except Exception:
-        parsed_w = parsed_w if parsed_w is not None else None
-        parsed_h = parsed_h if parsed_h is not None else None
-
-    try:
-        default_width = parsed_w if parsed_w is not None else saved_ui.get("window_width", 580)
-        default_width = int(default_width)
-    except Exception:
-        default_width = 580
-
-    try:
-        default_height = parsed_h if parsed_h is not None else saved_ui.get("window_height", 230)
-        default_height = int(default_height)
-    except Exception:
-        default_height = 230
-
-    base_settings = {
-        "window_width": default_width,
-        "window_height": default_height,
-        "font_size": 14,
-        "font_size_bold": 14,
-        "font_size_title": 14,
-        "padding": 12,
-        "button_width": 10,
-    }
-
-    use_saved_width = (parsed_w is not None) or (isinstance(saved_ui, dict) and "window_width" in saved_ui)
-    use_saved_height = (parsed_h is not None) or (isinstance(saved_ui, dict) and "window_height" in saved_ui)
-
-    # resolution scale 적용 (사용자 지정 width/height는 스케일 제외)
-    scaled = {}
-    for key, value in base_settings.items():
-        if isinstance(value, (int, float)) and key != "window_width":
-            if key == "window_height" and use_saved_height:
-                scaled[key] = value
-            else:
-                scaled[key] = int(round(value * resolution_scale))
-        else:
-            scaled[key] = value
-
-    result = _apply_ui_scale(scaled)
-
-    # ui_scale 적용 이후에도 사용자 지정 크기는 원본 유지
-    if use_saved_width:
-        result["window_width"] = base_settings["window_width"]
-    if use_saved_height:
-        result["window_height"] = base_settings["window_height"]
-
-    return result
+        return {}
 
 
 def _bind_tooltip(widget, text: str):
@@ -299,7 +215,9 @@ def create_license_registration_dialog(parent, config, license_password):
             self.ui_settings = get_adaptive_ui_settings()
 
             self.dialog = tk.Toplevel(parent)
-            self.dialog.title(f"Conversion Verifier 알파 {APP_VERSION_FULL} - 영구 라이선스 등록")
+            self.dialog.withdraw()  # 깜빡임 방지: geometry 설정 전까지 숨김
+            version_full = _get_version_from_main()
+            self.dialog.title(f"Conversion Verifier 알파 {version_full} - 영구 라이선스 등록")
             # Center over parent; fallback to default placement
             dialog_w = self.ui_settings['window_width']
             dialog_h = self.ui_settings['window_height']
@@ -321,13 +239,45 @@ def create_license_registration_dialog(parent, config, license_password):
             self.dialog.resizable(False, False)
             self.dialog.grab_set()
 
-            _apply_global_fonts(self.dialog, self.ui_settings)
+            apply_global_fonts(self.dialog, self.ui_settings)
 
             # 창을 화면 중앙에 배치
             self.dialog.transient(parent)
             self.dialog.focus_set()
+            self.dialog.deiconify()  # 모든 설정 완료 후 표시
 
             self.create_widgets()
+
+            # Alt+G: geometry 저장 (디버깅용)
+            self.dialog.bind_all("<Alt-g>", self._on_debug_geometry_capture)
+
+        def _on_debug_geometry_capture(self, _event=None):
+            """Alt+G: 현재 geometry를 출력하고 settings.json에 저장"""
+            try:
+                geo = self.dialog.geometry()
+                msg = f"[DEBUG] LicenseDialog geometry: {geo}"
+                print(msg)
+                # settings.json에 저장
+                ok = False
+                if self.config and hasattr(self.config, "update_settings_window_geometry"):
+                    ok = self.config.update_settings_window_geometry(geo)
+                # 토스트 메시지 표시
+                toast = tk.Toplevel(self.dialog)
+                toast.overrideredirect(True)
+                toast.attributes("-topmost", True)
+                toast_msg = f"geometry 저장됨: {geo}" if ok else f"geometry: {geo}"
+                lbl = tk.Label(
+                    toast, text=toast_msg, bg="#333333", fg="white",
+                    font=("맑은 고딕", 9), padx=10, pady=5
+                )
+                lbl.pack()
+                toast.update_idletasks()
+                x = self.dialog.winfo_x() + (self.dialog.winfo_width() - toast.winfo_reqwidth()) // 2
+                y = self.dialog.winfo_y() + self.dialog.winfo_height() - toast.winfo_reqheight() - 10
+                toast.geometry(f"+{x}+{y}")
+                toast.after(1400, toast.destroy)
+            except Exception:
+                pass
 
         def create_widgets(self):
             # 메인 프레임
@@ -463,7 +413,9 @@ def create_credits_management_dialog(parent, config):
             self.ui_settings = get_adaptive_ui_settings()
 
             self.dialog = tk.Toplevel(parent)
-            self.dialog.title(f"Conversion Verifier 알파 {APP_VERSION_FULL} - 크레딧 관리")
+            self.dialog.withdraw()  # 깜빡임 방지: geometry 설정 전까지 숨김
+            version_full = _get_version_from_main()
+            self.dialog.title(f"Conversion Verifier 알파 {version_full} - 크레딧 관리")
             dialog_w = int(self.ui_settings['window_width']*0.875)
             dialog_h = int(self.ui_settings['window_height']*0.833)
             try:
@@ -484,13 +436,45 @@ def create_credits_management_dialog(parent, config):
             self.dialog.resizable(False, False)
             self.dialog.grab_set()
 
-            _apply_global_fonts(self.dialog, self.ui_settings)
+            apply_global_fonts(self.dialog, self.ui_settings)
 
             # 창을 화면 중앙에 배치
             self.dialog.transient(parent)
             self.dialog.focus_set()
+            self.dialog.deiconify()  # 모든 설정 완료 후 표시
 
             self.create_widgets()
+
+            # Alt+G: geometry 저장 (디버깅용)
+            self.dialog.bind_all("<Alt-g>", self._on_debug_geometry_capture)
+
+        def _on_debug_geometry_capture(self, _event=None):
+            """Alt+G: 현재 geometry를 출력하고 settings.json에 저장"""
+            try:
+                geo = self.dialog.geometry()
+                msg = f"[DEBUG] CreditsDialog geometry: {geo}"
+                print(msg)
+                # settings.json에 저장
+                ok = False
+                if self.config and hasattr(self.config, "update_settings_window_geometry"):
+                    ok = self.config.update_settings_window_geometry(geo)
+                # 토스트 메시지 표시
+                toast = tk.Toplevel(self.dialog)
+                toast.overrideredirect(True)
+                toast.attributes("-topmost", True)
+                toast_msg = f"geometry 저장됨: {geo}" if ok else f"geometry: {geo}"
+                lbl = tk.Label(
+                    toast, text=toast_msg, bg="#333333", fg="white",
+                    font=("맑은 고딕", 9), padx=10, pady=5
+                )
+                lbl.pack()
+                toast.update_idletasks()
+                x = self.dialog.winfo_x() + (self.dialog.winfo_width() - toast.winfo_reqwidth()) // 2
+                y = self.dialog.winfo_y() + self.dialog.winfo_height() - toast.winfo_reqheight() - 10
+                toast.geometry(f"+{x}+{y}")
+                toast.after(1400, toast.destroy)
+            except Exception:
+                pass
 
         def create_widgets(self):
             # 메인 프레임
@@ -599,7 +583,7 @@ def create_admin_tab_content(parent, config):
     """관리자 탭 내용 생성"""
     ui_settings = get_adaptive_ui_settings()
 
-    _apply_global_fonts(parent, ui_settings)
+    apply_global_fonts(parent, ui_settings)
 
     # 스크롤 가능한 프레임 설정
     canvas = tk.Canvas(parent, bg="#f0f0f0")

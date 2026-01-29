@@ -1,8 +1,13 @@
 ﻿param(
-    [object]$Option = 1,  # Option 1: onedir, Option 2: onedir+zip, Option 3: onedir+zip+installer
+    [object]$BuildType = 2,  # 1=onedir, 2=onedir+zip, 3=onedir+zip+installer, 4=zip만, 5=installer만
     [switch]$Clean,  # 빌드 후 build, dist, exe 파일 정리
     [switch]$PostClean # 빌드 성공 후 루트 정리 실행
 )
+
+# Workaround: coerce $BuildType array -> int if necessary
+if ($BuildType -is [System.Object[]]) {
+    try { $BuildType = [int]($BuildType -join '') } catch { }
+}
 
 $ErrorActionPreference = 'Stop'
 $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
@@ -15,7 +20,7 @@ Write-Host "[BUILD] Working directory: $ScriptDir" -ForegroundColor Cyan
 $AppName = 'bom_exporter'
 $AppDir = $ScriptDir
 $SpecFile = Join-Path $AppDir 'bom_exporter.spec'
-$Python = 'C:/Users/USER/AppData/Local/Python/pythoncore-3.14-64/python.exe'
+$Python = 'C:\Python313\python.exe'
 $PyInstallerArgs = @('-m','PyInstaller','--noconfirm','--log-level=ERROR', $SpecFile)
 $Candidates = 'D:\release\candidates'
 $script:VerifyScript = Join-Path $AppDir '..\..\scripts\verify_package_integrity.ps1'
@@ -66,16 +71,31 @@ function Copy-Portable($src,$targetRoot,$version){
     if(Test-Path $portable){ Remove-Item -Recurse -Force $portable }
     Copy-Item -Recurse -Force -LiteralPath $src -Destination $portable
     
-    # 공용 바탕화면 바로가기 생성 스크립트 복사
-    $commonScriptSrc = Join-Path $PSScriptRoot '..\..\10.common\create_desktop_shortcut.bat'
-    if (Test-Path $commonScriptSrc) {
-        $scriptDest = Join-Path $portable 'create_desktop_shortcut.bat'
-        Copy-Item -Path $commonScriptSrc -Destination $scriptDest -Force
-        Write-Host "✓ 바로가기 생성 스크립트 포함: create_desktop_shortcut.bat" -ForegroundColor Green
-    } else {
-        Write-Host "⚠️  공용 스크립트 없음: $commonScriptSrc" -ForegroundColor Yellow
+    # 공용 설정 스크립트 복사 (setup_worksfree.bat + 래퍼 BAT 파일들)
+    $commonDir = Join-Path $PSScriptRoot '..\..\10.common'
+    $batFiles = @(
+        'setup_worksfree.bat',
+        '바로가기_생성.bat',
+        '설정_초기화.bat',
+        '전체_초기화.bat',
+        '등록정보_동기화.bat',
+        '제거.bat'
+    )
+    foreach ($batFile in $batFiles) {
+        $srcPath = Join-Path $commonDir $batFile
+        if (Test-Path $srcPath) {
+            Copy-Item -Path $srcPath -Destination $portable -Force
+        }
     }
-    
+    Write-Host "✓ 설정 스크립트 포함: setup_worksfree.bat 외 $(($batFiles.Count - 1))개" -ForegroundColor Green
+
+    # MANUAL.pdf 복사 (있는 경우)
+    $manualPdf = Get-ChildItem -Path $AppDir -Filter "*USER_MANUAL.pdf" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($manualPdf) {
+        Copy-Item -Path $manualPdf.FullName -Destination $portable -Force
+        Write-Host "✓ 매뉴얼 포함: $($manualPdf.Name)" -ForegroundColor Green
+    }
+
     return @{ Base=$base; Portable=$portable }
 }
 function Make-Zip($portablePath){
@@ -189,32 +209,46 @@ if ($PostClean.IsPresent) {
   if (Test-Path $cleanup) { & $cleanup }
 }
 
-Write-Host "==== ${AppName} 패키징(Build Option=$Option) 시작 ====" -ForegroundColor Cyan
+Write-Host "==== ${AppName} 패키징(BuildType=$BuildType) 시작 ====" -ForegroundColor Cyan
 Ensure-Dir $Candidates
 
-# 1) 빌드 (onedir 필요 여부)
-$needOnedir = $true
-switch($Option){ 1 { } 2 { } 3 { } 4 { } 5 { } default { $Option = 1 } }
+# 1) 빌드 - BuildType 유효성 검사
+switch($BuildType){ 1 { } 2 { } 3 { } 4 { } 5 { } default { $BuildType = 1 } }
 
 $distPath = Build-Onedir
-$version = Read-Version (Join-Path $AppDir 'config\bom_exporter\settings.json')
-if(-not $version){ $version = '0.0.0.0' }
+
+# 버전 읽기: PyInstaller 빌드 후 생성된 settings.json에서 읽음
+$versionPaths = @(
+    (Join-Path $AppDir "build\user_home_bundle\.wf_rpa\$AppName\settings.json"),
+    (Join-Path $AppDir "dist\$AppName\_internal\.wf_rpa\$AppName\settings.json")
+)
+$version = $null
+foreach ($vp in $versionPaths) {
+    if (Test-Path $vp) {
+        $version = Read-Version $vp
+        if ($version) {
+            Write-Host "   버전 확인: $version (from $vp)" -ForegroundColor Gray
+            break
+        }
+    }
+}
+if(-not $version){ $version = '0.0.0.0'; Write-Host "   버전 정보 없음, 기본값 사용: $version" -ForegroundColor Yellow }
 
 # 2) 결과 복사/압축/인스톨러
 $paths = $null
-switch($Option){
-  1 { 
+switch($BuildType){
+  1 {
     $paths = Copy-Portable -src $distPath -targetRoot $Candidates -version $version
     $exePath = Join-Path $paths.Portable "$AppName.exe"
     if (Test-Path $exePath) { Create-DesktopShortcut -ExePath $exePath -AppDisplayName "Bom Exporter" -Version $version }
   }
-  2 { 
+  2 {
     $paths = Copy-Portable -src $distPath -targetRoot $Candidates -version $version
     $null = Make-Zip $paths.Portable
     $exePath = Join-Path $paths.Portable "$AppName.exe"
     if (Test-Path $exePath) { Create-DesktopShortcut -ExePath $exePath -AppDisplayName "Bom Exporter" -Version $version }
   }
-  3 { 
+  3 {
     $paths = Copy-Portable -src $distPath -targetRoot $Candidates -version $version
     $null = Make-Zip $paths.Portable
     $null = Make-Installer $paths.Portable
@@ -230,6 +264,12 @@ Write-Host "완료: $($paths.Base)" -ForegroundColor Green
 
 # 릴리스 경로 저장 (무결성 검증용)
 $script:ReleasePath = $paths.Base
+
+# 빌드 완료 후 dist/build 폴더 항상 정리 (소스트리 정리)
+Write-Host "`n==> 소스트리 정리 (dist/build 폴더 삭제)..." -ForegroundColor Yellow
+Clean-Tree "$AppDir\dist"
+Clean-Tree "$AppDir\build"
+Write-Host "   소스트리 정리 완료!" -ForegroundColor Green
 
 # 3) Clean 모드: 빌드 산출물 정리
 if($Clean){
@@ -270,7 +310,7 @@ if($Clean){
 # ============================================================
 # 패키지 무결성 검증 (릴리스 모드만)
 # ============================================================
-if ($Mode -eq 2 -and (Test-Path $script:VerifyScript)) {
+if ($BuildType -eq 2 -and (Test-Path $script:VerifyScript)) {
     Write-Host "`n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
     Write-Host "   패키지 무결성 검증 실행" -ForegroundColor Cyan
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
@@ -289,7 +329,7 @@ if ($Mode -eq 2 -and (Test-Path $script:VerifyScript)) {
         Write-Host "`n⚠️  무결성 검증 스크립트 실행 중 오류: $($_.Exception.Message)" -ForegroundColor Yellow
         Write-Host "검증을 건너뛰고 계속합니다..." -ForegroundColor Gray
     }
-} elseif ($Option -eq 2) {
+} elseif ($BuildType -eq 2) {
     Write-Host "`n⚠️  무결성 검증 스크립트를 찾을 수 없습니다: $script:VerifyScript" -ForegroundColor Yellow
 }
 
