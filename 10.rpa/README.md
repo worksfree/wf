@@ -372,17 +372,20 @@ test_results/certification_YYYYMMDD_HHMMSS/
 - 무료 앱이든 무제한이든 **모든 사용 로그는 Google Sheets에 동기화**
 - 사용량 추적 및 통계 목적으로 사용
 
-### 개발/배포 모드 자동 감지
+### 개발/배포/데모 모드 자동 감지
 
-**개발 모드:**
-- `sys.argv[0]`가 `.py` 파일이거나 `WF_RPA_DEV=1` 환경변수 설정 시
-- `10.common/config/` 디렉토리에서 설정 파일 로드
-- 예: `10.common/config/bom_exporter/settings.json`
+**3가지 실행 모드:**
 
-**배포 모드:**
-- PyInstaller로 빌드된 실행 파일 실행 시
-- 사용자 홈폴더(`~/.wf_rpa`) 사용
-- 모든 설정 파일이 사용자 홈에 생성/참조됨
+| 모드 | 설정 위치 | 용도 | 활성화 조건 |
+|------|---------|------|-----------|
+| **dev** | `10.common/config/앱이름/` | 개발 환경 | `.py` 파일 직접 실행 또는 `WF_RPA_MODE=dev` |
+| **demo** | `10.common/config/앱이름/` | 데모/영상 녹화 | `WF_RPA_MODE=demo` 환경변수 설정 |
+| **release** | `~/.wf_rpa/앱이름/` | 배포/사용자 환경 | PyInstaller exe 실행 또는 `WF_RPA_MODE=release` |
+
+**특징:**
+- DEV/DEMO 모드: 소스 트리(`10.common/config/`) 사용 - 개발자가 직접 수정 가능
+- RELEASE 모드: 사용자 홈 폴더(`~/.wf_rpa/`) 사용 - 사용자별 독립 설정
+- 모드 감지는 `settings.json`의 `runtime_config.run_mode` 값 기반
 
 ### 로깅 시스템
 
@@ -1212,7 +1215,7 @@ flowchart LR
     end
 
     subgraph demo ["DEMO 모드"]
-        M1[설정 경로: 10.common/config/]
+        M1[설정 경로: ~/.wf_rpa/]
         M2[관리자 비밀번호 필요]
         M3[데모용 크레딧 제한]
         M4[프로파일링 비활성]
@@ -1232,8 +1235,8 @@ flowchart LR
 flowchart TD
     A[_detect_run_mode] --> B{모드?}
 
-    B --> |dev/demo| C[10.common/config/]
-    B --> |release| D[~/.wf_rpa/]
+    B --> |dev| C[10.common/config/]
+    B --> |demo/release| D[~/.wf_rpa/]
 
     C --> E[wf_rpa_config.json<br/>전역 설정]
     C --> F[{app}/policy.json<br/>크레딧 정책]

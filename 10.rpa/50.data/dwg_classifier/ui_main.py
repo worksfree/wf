@@ -25,6 +25,8 @@ COMMON_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."
 if COMMON_PATH not in sys.path:
     sys.path.insert(0, COMMON_PATH)
 
+from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts, apply_equal_vertical_pack
+
 from wf_credit_session_utils import (
     calculate_processable_count,
     compute_session_stats,
@@ -42,7 +44,7 @@ try:
     from wf_log import get_app_logger
 except Exception:
 
-    def get_app_logger(name, console_level=logging.INFO):
+    def get_app_logger(name, console_level=logging.DEBUG):
         logger = logging.getLogger(name)
         if not logger.handlers:
             h = logging.StreamHandler()
@@ -321,17 +323,16 @@ class DwgClassifierApp:
 
         # 아이콘 경로 저장 (등록창/설정창에서 사용)
         self.icon_path = self._find_icon_path()
-        self.logger = get_app_logger("dwg_classifier", console_level=logging.INFO)
+        self.logger = get_app_logger("dwg_classifier", console_level=logging.DEBUG)
         self.config = get_config()
         try:
             self.is_demo_mode = bool(self.config and hasattr(self.config, "is_demo") and self.config.is_demo())
         except Exception:
             self.is_demo_mode = False
         self.allow_continue_on_credit_shortage = self._load_allow_continue_flag()
-        # 적응형 UI 설정 초기화
-        from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
-
-        self.ui = get_adaptive_ui_settings(window_type="main")
+        # 적응형 UI 설정 초기화 (config 로드 후 호출 - saved_ui 적용)
+        saved_ui = getattr(self.config, "ui_config", None)
+        self.ui = get_adaptive_ui_settings(window_type="main", saved_ui=saved_ui)
         # Alt+G 데모 핫키에서 적용할 창 위치/크기 오버라이드 (설정 파일만 사용)
         _config_geo_override = ""
         try:
@@ -387,17 +388,9 @@ class DwgClassifierApp:
         self.auto_scroll_var = None
         self.auto_scroll_checkbox = None
         self.text_log_handler = None
-        # Window sizes (DPI 스케일 적용) - adaptive UI 기반
-        base_original_height = 270  # 2입력 앱 기본 높이 (DC only)
-        base_expanded_height = base_original_height + 300  # 관리자 모드: +300 고정
-        try:
-            from wf_settings_common import get_windows_dpi_scale
-            dpi_scale = get_windows_dpi_scale()
-            self.original_window_height = int(base_original_height * dpi_scale)
-            self.expanded_window_height = int(base_expanded_height * dpi_scale)
-        except Exception:
-            self.original_window_height = base_original_height
-            self.expanded_window_height = base_expanded_height
+        # Window sizes (adaptive UI 기반)
+        self.original_window_height = self.ui.get("window_height", getattr(self.config, "window_height", 320))
+        self.expanded_window_height = self.original_window_height + getattr(self.config, "admin_window_height", 300)  # 관리자 모드: settings.json에서 로드
         # Early 등록 상태 확인 (is_registered 플래그 또는 reg_time_local)
         self.is_registered_user = False
         try:
@@ -799,11 +792,15 @@ class DwgClassifierApp:
     # ---------- UI Build ----------
     def init_ui(self):
         from wf_ui_adaptive import apply_global_fonts
-        # 설정 파일에서 창 크기 가져오기
-        window_width = self.ui.get("window_width", 580)
+        # app_setting_data.py에서 정의한 앱별 고정 창 크기 사용
+        window_width = self.config.window_width
         # DC는 입력이 2개(폴더+엑셀)이므로 original_window_height 사용 (5행 레이아웃)
         window_height = self.original_window_height
         adjusted_height = window_height
+
+        # 🔥 DEBUG: 창 높이 로깅
+        self.logger.info(f"[INIT_UI] window_width={window_width}, original_window_height={self.original_window_height}, window_height={window_height}, adjusted_height={adjusted_height}")
+        self.logger.info(f"[INIT_UI] config.window_height={self.config.window_height}, ui.window_height={self.ui.get('window_height', 'N/A')}")
 
         self.width = self.master.winfo_screenwidth()
         self.height = self.master.winfo_screenheight()
@@ -812,6 +809,7 @@ class DwgClassifierApp:
         y_coord = int((self.height - adjusted_height) / 2)
 
         self.master.geometry(f"{window_width}x{adjusted_height}+{x_coord}+{y_coord}")
+        self.logger.info(f"[INIT_UI] final geometry: {window_width}x{adjusted_height}+{x_coord}+{y_coord}")
 
         # Saved/demo geometry override (env > settings)
         override_geo = self._get_geometry_override_if_allowed()
@@ -827,9 +825,8 @@ class DwgClassifierApp:
         self.master.title(f"DWG 파일 분류 도구 {APP_VERSION_DISPLAY}")
         self.master.wm_attributes("-topmost", 1)
         self.master.resizable(True, True)
-        # Allow smaller resizing by capping the minimum height at half of the initial height (with a floor of 120)
-        min_height = max(120, int(adjusted_height / 2))
-        self.master.minsize(window_width, min_height)
+        # 최소 크기를 기본 크기로 설정
+        self.master.minsize(window_width, adjusted_height)
         
         # 전역 폰트 설정 적용 (메인창 폰트 크기 일관성 보장)
         apply_global_fonts(self.master, self.ui)
@@ -1046,6 +1043,9 @@ class DwgClassifierApp:
             font=("맑은 고딕", self.ui["font_size"]),
         )
         self.exit_button.grid(row=0, column=3, padx=5, sticky="ew")
+        
+        # Apply adaptive equal vertical spacing
+        apply_equal_vertical_pack(main_frame)
 
     # ---------- Tooltip ----------
     def _bind_tooltip(self, widget, text: str):
@@ -1359,7 +1359,7 @@ class DwgClassifierApp:
         
         def worker():
             try:
-                result = self.wf_manager.refresh_policies_from_sheets()
+                result = self.credit_manager.refresh_policies_from_sheets()
                 self.logger.info(f"정책 동기화 결과: {result}")
             finally:
                 self.master.after(0, self.update_credit_display)
@@ -2259,7 +2259,7 @@ class DwgClassifierApp:
                 # override 적용 실패시 기본값으로 폴백
                 geo = self.master.geometry()
                 pos = geo.split("+", 1)[1] if "+" in geo else "0+0"
-                window_width = self.ui.get("window_width", 480)
+                window_width = self.ui.get("window_width", 580)
                 self.master.geometry(f"{window_width}x{target_height}+{pos}")
                 if self.logger:
                     self.logger.warning(f"[ADMIN-EXIT] geometry override 적용 실패, 기본값 사용: {e}")
@@ -2267,7 +2267,7 @@ class DwgClassifierApp:
             # override 없으면 기본 geometry 사용
             geo = self.master.geometry()
             pos = geo.split("+", 1)[1] if "+" in geo else "0+0"
-            window_width = self.ui.get("window_width", 480)
+            window_width = self.ui.get("window_width", 580)
             self.master.geometry(f"{window_width}x{target_height}+{pos}")
         
         self.master.resizable(True, True)
@@ -3021,31 +3021,60 @@ class DwgClassifierApp:
         """설정 저장 (테스트용)"""
         try:
             import json
+            from pathlib import Path
+            
             settings_file = self.config.settings_file
+            if not settings_file or not isinstance(settings_file, Path):
+                return {"success": False, "error": f"Invalid settings_file: {type(settings_file)}"}
+            
+            # 파일 읽기
             data = {}
-            if settings_file.exists():
-                with open(settings_file, "r", encoding="utf-8") as f:
-                    data = json.load(f) or {}
+            try:
+                if settings_file.exists():
+                    with open(settings_file, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        data = json.loads(content) or {}
+            except json.JSONDecodeError as je:
+                return {"success": False, "error": f"JSON decode error: {je}"}
+            except Exception as re:
+                return {"success": False, "error": f"Read error: {re}"}
+            
             # 테스트 설정을 test_config 섹션에 저장
             if "test_config" not in data:
                 data["test_config"] = {}
             data["test_config"].update(settings)
-            with open(settings_file, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
+            
+            # 파일 쓰기
+            try:
+                settings_file.parent.mkdir(parents=True, exist_ok=True)
+                with open(settings_file, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+            except Exception as we:
+                return {"success": False, "error": f"Write error: {we}"}
+            
             return {"success": True}
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            import traceback
+            return {"success": False, "error": f"Unexpected error: {e}\n{traceback.format_exc()}"}
 
     def _test_load_settings(self) -> dict:
         """설정 로드 (테스트용)"""
         try:
             import json
-            settings_file = self.config.settings_file
+            from pathlib import Path
+            
+            # 설정 파일 경로 안전하게 가져오기
+            settings_file = self.config.settings_file if hasattr(self.config, 'settings_file') else None
+            if not settings_file or not isinstance(settings_file, Path):
+                return {}
+            
             if not settings_file.exists():
                 return {}
+            
             with open(settings_file, "r", encoding="utf-8") as f:
                 data = json.load(f) or {}
-            # 전체 설정 반환 (app_config, ui_config, test_config 등)
+            
+            # 전체 설정 반환
             return {
                 "app_config": data.get("app_config", {}),
                 "ui_config": data.get("ui_config", {}),

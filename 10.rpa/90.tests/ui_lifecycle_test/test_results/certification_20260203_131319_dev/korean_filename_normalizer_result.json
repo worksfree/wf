@@ -1,0 +1,1204 @@
+{
+  "app_name": "korean_filename_normalizer",
+  "app_version": "korean_filename_normalizer_v0.8.5.2_portable",
+  "level": "FULL",
+  "passed": true,
+  "total_tests": 135,
+  "passed_tests": 135,
+  "failed_tests": 0,
+  "duration": 24.962196,
+  "start_time": "2026-02-03T13:15:38.622373",
+  "end_time": "2026-02-03T13:16:03.584569",
+  "error": "",
+  "suites": [
+    {
+      "name": "Deployment Suite",
+      "description": "배포 파일 및 환경 설정 인증 테스트 (BAT 파일, DEV/RELEASE 환경)",
+      "total": 25,
+      "passed": 25,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 0.00397,
+      "tests": [
+        {
+          "name": "test_01_setup_worksfree_bat_exists",
+          "description": "setup_worksfree.bat 파일 존재 확인 (메인 설정 스크립트)",
+          "result": "PASSED",
+          "duration": 3.123283386230469e-05,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_shortcut_bat_exists",
+          "description": "바로가기_생성.bat 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 1.5974044799804688e-05,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_app_reset_bat_exists",
+          "description": "앱_설정_초기화.bat 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 1.049041748046875e-05,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_wf_reset_all_bat_exists",
+          "description": "wf_전체_초기화.bat 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 9.5367431640625e-06,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_05_uninstall_bat_exists",
+          "description": "제거.bat 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 1.0013580322265625e-05,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_06_sync_registration_bat_exists",
+          "description": "등록정보_동기화.bat 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 9.775161743164062e-06,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_07_wf_rpa_config_exists",
+          "description": "wf_rpa_config.json 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 1.1444091796875e-05,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_google_sheets_section_exists",
+          "description": "wf_rpa_config.json에 google_sheets 섹션 존재 확인",
+          "result": "PASSED",
+          "duration": 0.00016736984252929688,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_sheet_id_release_exists",
+          "description": "google_sheets.sheet_id_release 설정 존재 확인",
+          "result": "PASSED",
+          "duration": 8.392333984375e-05,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_10_sheet_id_dev_exists",
+          "description": "google_sheets.sheet_id_dev 설정 존재 확인",
+          "result": "PASSED",
+          "duration": 7.271766662597656e-05,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_11_credentials_file_release_exists",
+          "description": "google_sheets.credentials_file_release 설정 존재 확인",
+          "result": "PASSED",
+          "duration": 7.176399230957031e-05,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_12_credentials_file_dev_exists",
+          "description": "google_sheets.credentials_file_dev 설정 존재 확인",
+          "result": "PASSED",
+          "duration": 6.747245788574219e-05,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_13_release_credentials_file_exists",
+          "description": "RELEASE 크리덴셜 파일 실제 존재 확인",
+          "result": "PASSED",
+          "duration": 8.153915405273438e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_14_dev_credentials_file_exists",
+          "description": "DEV 크리덴셜 파일 실제 존재 확인",
+          "result": "PASSED",
+          "duration": 7.82012939453125e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_15_sheet_ids_are_different",
+          "description": "DEV와 RELEASE 시트 ID가 다른지 확인",
+          "result": "PASSED",
+          "duration": 6.341934204101562e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_16_credentials_files_are_different",
+          "description": "DEV와 RELEASE 크리덴셜 파일이 다른지 확인",
+          "result": "PASSED",
+          "duration": 6.270408630371094e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_17_setup_bat_has_korean_encoding",
+          "description": "setup_worksfree.bat에 한글 인코딩 설정(chcp 65001) 존재 확인",
+          "result": "PASSED",
+          "duration": 9.417533874511719e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_18_no_duplicate_shortcut_bat",
+          "description": "중복 바로가기 스크립트(create_desktop_shortcut.bat) 제거 확인",
+          "result": "PASSED",
+          "duration": 2.002716064453125e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_19_email_settings_exist",
+          "description": "wf_rpa_config.json에 email_settings 섹션 존재 확인",
+          "result": "PASSED",
+          "duration": 7.033348083496094e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_20_app_policy_files_exist",
+          "description": "현재 앱의 policy.json 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 1.6927719116210938e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_21_app_settings_files_exist",
+          "description": "현재 앱의 settings.json 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 1.1920928955078125e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_22_user_manual_pdf_exists",
+          "description": "앱의 사용자 매뉴얼 PDF 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 0.0006020069122314453,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_23_app_icon_exists",
+          "description": "앱의 아이콘 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 0.0006017684936523438,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_24_spec_file_exists",
+          "description": "앱의 PyInstaller spec 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 0.0003886222839355469,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_25_build_script_exists",
+          "description": "앱의 빌드 스크립트(build_*.ps1) 존재 확인",
+          "result": "PASSED",
+          "duration": 0.0003032684326171875,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "Package Integrity Suite",
+      "description": "배포 패키지 완전성 인증 테스트 (exe 내부 파일, 크리덴셜, 버전 정보)",
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 0.000877,
+      "tests": [
+        {
+          "name": "test_01_internal_directory_exists",
+          "description": "_internal 디렉토리 존재 확인 (PyInstaller 번들)",
+          "result": "PASSED",
+          "duration": 1.1920928955078125e-06,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_wf_rpa_bundle_dir_exists",
+          "description": "_internal/.wf_rpa 번들 설정 디렉토리 존재 확인",
+          "result": "PASSED",
+          "duration": 7.152557373046875e-07,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_bundle_settings_json_exists",
+          "description": "_internal/.wf_rpa/{app}/settings.json 존재 확인",
+          "result": "PASSED",
+          "duration": 9.5367431640625e-07,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_bundle_version_info_exists",
+          "description": "번들 settings.json에 full_version 정보 존재 확인",
+          "result": "PASSED",
+          "duration": 1.1920928955078125e-06,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_05_release_credential_file_exists",
+          "description": "RELEASE 크리덴셜 파일 번들 포함 확인 (worksfree-*.json, 숨김 파일)",
+          "result": "PASSED",
+          "duration": 7.152557373046875e-07,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_06_dev_credential_file_exists",
+          "description": "DEV 크리덴셜 파일 번들 포함 확인 (silver-argon-*.json, 권장: 숨김)",
+          "result": "PASSED",
+          "duration": 1.430511474609375e-06,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_release_credential_valid_json",
+          "description": "RELEASE 크리덴셜 파일 JSON 유효성 검증",
+          "result": "PASSED",
+          "duration": 9.5367431640625e-07,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_bundle_config_file_exists",
+          "description": "번들 wf_rpa_config.json 존재 확인",
+          "result": "PASSED",
+          "duration": 1.430511474609375e-06,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_bundle_config_sheet_ids",
+          "description": "번들 config에 sheet_id_release/dev 설정 확인",
+          "result": "PASSED",
+          "duration": 9.5367431640625e-07,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_10_nsis_installer_exists",
+          "description": "NSIS 설치 파일 존재 확인 ({app}_installer.exe)",
+          "result": "PASSED",
+          "duration": 7.152557373046875e-07,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_11_google_sheets_config_consistency",
+          "description": "번들 config와 크리덴셜 파일의 project_id 일치 확인",
+          "result": "PASSED",
+          "duration": 1.1920928955078125e-06,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_credential_environment_separation",
+          "description": "DEV/RELEASE 크리덴셜 분리 확인 (다른 project_id)",
+          "result": "PASSED",
+          "duration": 9.5367431640625e-07,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "Execution Environment Suite",
+      "description": "실행 환경 인증 테스트 (싱글 인스턴스, 설정 폴더 참조)",
+      "total": 8,
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 0.195191,
+      "tests": [
+        {
+          "name": "test_01_config_folder_location",
+          "description": "설정 폴더 참조 위치 확인 (DEV: 프로젝트, EXE: 사용자 홈)",
+          "result": "PASSED",
+          "duration": 0.014173030853271484,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_config_files_exist",
+          "description": "설정 파일 존재 확인 (해당 모드의 폴더에)",
+          "result": "PASSED",
+          "duration": 0.01537942886352539,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_user_home_initialized",
+          "description": "사용자 홈 폴더 초기화 확인 (EXE 모드만)",
+          "result": "PASSED",
+          "duration": 3.5762786865234375e-06,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_04_wf_rpa_config_accessible",
+          "description": "wf_rpa_config.json 접근 가능 확인",
+          "result": "PASSED",
+          "duration": 0.00128173828125,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_05_credentials_accessible",
+          "description": "크리덴셜 파일 접근 가능 확인 (Google Sheets 연결용)",
+          "result": "PASSED",
+          "duration": 0.015291452407836914,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_06_config_reload_works",
+          "description": "설정 재로드 기능 확인",
+          "result": "PASSED",
+          "duration": 0.0159761905670166,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_07_multiple_config_reads",
+          "description": "설정 파일 여러 번 읽기 (동시성 테스트)",
+          "result": "PASSED",
+          "duration": 0.11687493324279785,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_08_dev_exe_mode_detection",
+          "description": "DEV/EXE 모드 자동 감지 확인",
+          "result": "PASSED",
+          "duration": 0.01506662368774414,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "Config Suite",
+      "description": "설정 관리 인증 테스트 (policy.json, settings.json 로드 및 검증)",
+      "total": 20,
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 21.386841,
+      "tests": [
+        {
+          "name": "test_01_initial_deployment_policy",
+          "description": "초기 배포 형상 검증 (BASIC_RULES.md Part 2.1 크레딧 정책 준수)",
+          "result": "PASSED",
+          "duration": 0.01918816566467285,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_get_policy",
+          "description": "정책(policy) 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.015488862991333008,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_policy_has_identity",
+          "description": "정책에 앱 식별 정보가 있는지 확인",
+          "result": "PASSED",
+          "duration": 0.0013115406036376953,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_policy_has_credit_info",
+          "description": "정책에 크레딧 정보가 있는지 확인",
+          "result": "PASSED",
+          "duration": 0.013519525527954102,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_05_get_settings",
+          "description": "설정(settings) 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.01572728157043457,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_06_settings_has_version",
+          "description": "설정에 버전 정보가 있는지 확인",
+          "result": "PASSED",
+          "duration": 0.017771482467651367,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_07_policy_trial_credits",
+          "description": "정책의 체험판 크레딧 정보 확인",
+          "result": "PASSED",
+          "duration": 0.015277385711669922,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_policy_display_name",
+          "description": "정책의 표시 이름 확인",
+          "result": "PASSED",
+          "duration": 0.019095182418823242,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_config_consistency",
+          "description": "설정과 정책의 일관성 확인",
+          "result": "PASSED",
+          "duration": 0.03233623504638672,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_10_wf_rpa_config_exists",
+          "description": "wf_rpa_config.json 로드 확인",
+          "result": "PASSED",
+          "duration": 0.018120765686035156,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_11_email_settings_exist",
+          "description": "이메일 설정이 존재하는지 확인",
+          "result": "PASSED",
+          "duration": 0.014404058456420898,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_google_sheets_config",
+          "description": "Google Sheets 설정이 존재하는지 확인",
+          "result": "PASSED",
+          "duration": 0.015412092208862305,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_13_credentials_available",
+          "description": "인증 정보 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 0.01781940460205078,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_14_google_sheets_connectivity",
+          "description": "Google Sheets API 연결성 확인 (재시도 로직 포함)",
+          "result": "PASSED",
+          "duration": 21.125489473342896,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_15_config_reload",
+          "description": "설정 리로드 기능 확인",
+          "result": "PASSED",
+          "duration": 0.027578115463256836,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_16_version_format_valid",
+          "description": "버전 형식이 유효한지 확인 (v0.0.0.0 형식)",
+          "result": "PASSED",
+          "duration": 0.013933897018432617,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_17_log_directory_structure",
+          "description": "로그 디렉토리 구조 확인",
+          "result": "PASSED",
+          "duration": 7.176399230957031e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_18_version_minimum_requirement",
+          "description": "버전이 최소 0.7.0.0 이상인지 확인",
+          "result": "PASSED",
+          "duration": 0.001481771469116211,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_19_version_display_format",
+          "description": "메인창 2자리, 설정/관리자 4자리 버전 표기 확인",
+          "result": "PASSED",
+          "duration": 0.000690460205078125,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_20_trial_credits_formula",
+          "description": "체험판 크레딧이 100건 작업 기준인지 확인 (trial = credit_per_work × 100)",
+          "result": "PASSED",
+          "duration": 2.7894973754882812e-05,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        }
+      ]
+    },
+    {
+      "name": "Security Suite",
+      "description": "보안 인증 테스트 (자격증명 하드코딩, 민감파일 관리)",
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 0.016948,
+      "tests": [
+        {
+          "name": "test_01_no_hardcoded_passwords",
+          "description": "소스코드에 하드코딩된 비밀번호가 없는지 확인",
+          "result": "PASSED",
+          "duration": 0.01134634017944336,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_02_no_private_keys_in_source",
+          "description": "소스코드에 개인키가 포함되지 않았는지 확인",
+          "result": "PASSED",
+          "duration": 0.0011146068572998047,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_03_gitignore_has_sensitive_patterns",
+          "description": ".gitignore에 민감 파일 패턴이 있는지 확인",
+          "result": "PASSED",
+          "duration": 8.606910705566406e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_04_no_env_files_in_app",
+          "description": "앱 폴더에 .env 파일이 없는지 확인",
+          "result": "PASSED",
+          "duration": 0.0003261566162109375,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_05_credentials_in_config_not_source",
+          "description": "자격증명 파일이 config 폴더에 있는지 확인 (소스 폴더 아님)",
+          "result": "PASSED",
+          "duration": 5.125999450683594e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_06_no_debug_credentials",
+          "description": "디버그용 자격증명이 남아있지 않은지 확인",
+          "result": "PASSED",
+          "duration": 0.003673076629638672,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "Registration Suite",
+      "description": "등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화)",
+      "total": 15,
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 0.514998,
+      "tests": [
+        {
+          "name": "test_01_get_registration_status",
+          "description": "등록 상태 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.0009591579437255859,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_status_has_required_fields",
+          "description": "등록 상태에 필수 필드가 있는지 확인",
+          "result": "PASSED",
+          "duration": 0.000823974609375,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_unregistered_state_detected",
+          "description": "미등록 상태가 올바르게 감지되는지 확인",
+          "result": "PASSED",
+          "duration": 0.012372255325317383,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_register_with_email",
+          "description": "이메일 등록이 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.08104753494262695,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_05_registered_email_stored",
+          "description": "등록된 이메일이 저장되는지 확인",
+          "result": "PASSED",
+          "duration": 0.01695418357849121,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_06_duplicate_registration_handled",
+          "description": "중복 등록 시도 처리 확인",
+          "result": "PASSED",
+          "duration": 0.05159902572631836,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_invalid_email_rejected",
+          "description": "잘못된 이메일 형식이 거부되는지 확인",
+          "result": "PASSED",
+          "duration": 0.08629345893859863,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_registration_timestamp",
+          "description": "등록 시간이 기록되는지 확인",
+          "result": "PASSED",
+          "duration": 0.0302579402923584,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_clear_registration",
+          "description": "등록 해제가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.06769680976867676,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_10_registration_persists",
+          "description": "등록 상태가 유지되는지 확인 (재시작 없이)",
+          "result": "PASSED",
+          "duration": 0.035047054290771484,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_11_registration_with_trial_credits",
+          "description": "등록 시 체험판 크레딧이 부여되는지 확인",
+          "result": "PASSED",
+          "duration": 0.0621187686920166,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_hardware_id_stored",
+          "description": "하드웨어 ID가 등록 정보에 포함되는지 확인",
+          "result": "PASSED",
+          "duration": 0.021225690841674805,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_13_sync_registration_to_server",
+          "description": "등록 정보 서버 동기화 확인",
+          "result": "PASSED",
+          "duration": 0.030188560485839844,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_14_registration_version_tracked",
+          "description": "등록된 앱 버전이 기록되는지 확인",
+          "result": "PASSED",
+          "duration": 0.016072988510131836,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_15_unregistered_limited_functionality",
+          "description": "미등록 상태에서 기능 제한 확인",
+          "result": "PASSED",
+          "duration": 2.4318695068359375e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "Credit Suite",
+      "description": "크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)",
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 6e-05,
+      "tests": []
+    },
+    {
+      "name": "State Suite",
+      "description": "상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 0.281521,
+      "tests": [
+        {
+          "name": "test_01_get_state",
+          "description": "앱 상태 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.0012254714965820312,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_state_has_required_fields",
+          "description": "상태에 필수 필드가 있는지 확인",
+          "result": "PASSED",
+          "duration": 0.013712167739868164,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_state_consistency",
+          "description": "상태가 일관성 있게 유지되는지 확인",
+          "result": "PASSED",
+          "duration": 0.10368537902832031,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_save_settings",
+          "description": "설정 저장 기능 확인",
+          "result": "PASSED",
+          "duration": 0.013018131256103516,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_05_load_settings",
+          "description": "설정 로드 기능 확인",
+          "result": "PASSED",
+          "duration": 0.0015480518341064453,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_06_settings_persistence",
+          "description": "설정이 저장 후 로드되는지 확인",
+          "result": "PASSED",
+          "duration": 0.0022232532501220703,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_session_id_exists",
+          "description": "세션 ID가 존재하는지 확인",
+          "result": "PASSED",
+          "duration": 0.014726877212524414,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_last_activity_tracked",
+          "description": "마지막 활동 시간이 추적되는지 확인",
+          "result": "PASSED",
+          "duration": 0.03264141082763672,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_work_progress_saved",
+          "description": "작업 진행 상태가 저장되는지 확인",
+          "result": "PASSED",
+          "duration": 0.0175168514251709,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_10_state_after_error",
+          "description": "오류 발생 후 상태 유지 확인",
+          "result": "PASSED",
+          "duration": 0.03305625915527344,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_11_concurrent_state_access",
+          "description": "동시 상태 접근 시 일관성 확인",
+          "result": "PASSED",
+          "duration": 0.0019173622131347656,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_state_size_reasonable",
+          "description": "상태 크기가 합리적인지 확인",
+          "result": "PASSED",
+          "duration": 0.0008485317230224609,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_13_cross_app_mutex",
+          "description": "동시 실행 방지(크로스앱 뮤텍스) 확인",
+          "result": "PASSED",
+          "duration": 0.012586832046508789,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_14_memory_usage_reasonable",
+          "description": "메모리 사용량이 합리적인지 확인 (< 500MB)",
+          "result": "PASSED",
+          "duration": 0.015580415725708008,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "Recovery Suite",
+      "description": "오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)",
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 0.418673,
+      "tests": [
+        {
+          "name": "test_01_invalid_command_handled",
+          "description": "잘못된 명령어 처리 확인",
+          "result": "PASSED",
+          "duration": 0.016187191009521484,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_null_argument_handled",
+          "description": "null 인자 처리 확인",
+          "result": "PASSED",
+          "duration": 0.05152559280395508,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_negative_credits_handled",
+          "description": "음수 크레딧 설정 처리 확인",
+          "result": "PASSED",
+          "duration": 5.054473876953125e-05,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_empty_string_handled",
+          "description": "빈 문자열 처리 확인",
+          "result": "PASSED",
+          "duration": 0.03232431411743164,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_05_state_preserved_after_error",
+          "description": "오류 발생 후 상태 유지 확인",
+          "result": "PASSED",
+          "duration": 2.2649765014648438e-05,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_06_rapid_error_recovery",
+          "description": "연속 오류 후 복구 확인",
+          "result": "PASSED",
+          "duration": 0.0870981216430664,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_work_with_invalid_file_count",
+          "description": "잘못된 파일 수로 작업 시도",
+          "result": "PASSED",
+          "duration": 0.07699966430664062,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_large_number_handled",
+          "description": "매우 큰 숫자 처리 확인",
+          "result": "PASSED",
+          "duration": 0.01659989356994629,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_timeout_handling",
+          "description": "타임아웃 처리 확인",
+          "result": "PASSED",
+          "duration": 0.03555178642272949,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_10_unicode_handling",
+          "description": "유니코드 문자 처리 확인",
+          "result": "PASSED",
+          "duration": 0.03242087364196777,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_11_special_characters_handled",
+          "description": "특수 문자 처리 확인",
+          "result": "PASSED",
+          "duration": 0.033113718032836914,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_partial_work_recovery",
+          "description": "부분 작업 실패 후 복구 확인",
+          "result": "PASSED",
+          "duration": 3.0040740966796875e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "UI Suite",
+      "description": "UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)",
+      "total": 23,
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 0.583294,
+      "tests": [
+        {
+          "name": "test_01_get_ui_state",
+          "description": "UI 상태 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.017011404037475586,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_app_responsive",
+          "description": "앱이 응답하는지 확인",
+          "result": "PASSED",
+          "duration": 0.014696598052978516,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_multiple_rapid_calls",
+          "description": "빠른 연속 호출 처리 확인",
+          "result": "PASSED",
+          "duration": 0.11763739585876465,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_button_states",
+          "description": "버튼 상태 조회 확인",
+          "result": "PASSED",
+          "duration": 0.018589258193969727,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_05_work_button_disabled_when_no_credits",
+          "description": "크레딧 부족 시 작업 버튼 비활성화 확인",
+          "result": "PASSED",
+          "duration": 2.5272369384765625e-05,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_06_work_button_enabled_when_credits_available",
+          "description": "크레딧 있을 때 작업 버튼 활성화 확인",
+          "result": "PASSED",
+          "duration": 0.032955169677734375,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_credits_display_updated",
+          "description": "크레딧 표시 업데이트 확인",
+          "result": "PASSED",
+          "duration": 2.6702880859375e-05,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_progress_indication",
+          "description": "작업 진행률 표시 확인",
+          "result": "PASSED",
+          "duration": 0.0639190673828125,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_09_non_blocking_response",
+          "description": "UI가 블로킹되지 않는지 확인",
+          "result": "PASSED",
+          "duration": 0.08348798751831055,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_10_status_message_available",
+          "description": "상태 메시지 사용 가능 확인",
+          "result": "PASSED",
+          "duration": 0.015424251556396484,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_11_window_title_reflects_state",
+          "description": "창 제목이 상태를 반영하는지 확인",
+          "result": "PASSED",
+          "duration": 0.01585841178894043,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_screenshot_capability",
+          "description": "스크린샷 기능 확인",
+          "result": "PASSED",
+          "duration": 0.017984867095947266,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_13_tooltips_bound_to_labels",
+          "description": "라벨에 툴팁이 바인딩되어 있는지 확인",
+          "result": "PASSED",
+          "duration": 0.014736175537109375,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_14_app_loading_time",
+          "description": "앱 로딩 시간 확인 (< 3초 필수, < 1초 권장)",
+          "result": "PASSED",
+          "duration": 0.01526951789855957,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_15_alt_g_admin_toggle",
+          "description": "Alt+G 키로 관리자 모드 토글 기능 확인",
+          "result": "PASSED",
+          "duration": 0.020975351333618164,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_16_window_popup_center_alignment",
+          "description": "메인창과 팝업/메시지박스의 중심 좌표 일치 확인",
+          "result": "PASSED",
+          "duration": 0.01624751091003418,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_17_adaptive_ui_font_size",
+          "description": "Adaptive UI: 폰트 크기가 시스템 타이틀바 폰트 이상인지 확인",
+          "result": "PASSED",
+          "duration": 0.01525259017944336,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_18_adaptive_ui_window_height",
+          "description": "Adaptive UI: 창 높이가 BASIC_RULES 표준을 따르는지 확인",
+          "result": "PASSED",
+          "duration": 0.0007443428039550781,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_19_dpi_scaling_support",
+          "description": "DPI 스케일링 지원 확인",
+          "result": "PASSED",
+          "duration": 0.01710200309753418,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_20_window_geometry_saved",
+          "description": "창 위치/크기 저장 기능 확인",
+          "result": "PASSED",
+          "duration": 0.01508021354675293,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_21_credits_display_comma_separator",
+          "description": "크레딧 4자리 이상일 때 콤마(,) 자릿수 표시 확인 (예: 3800 → 3,800)",
+          "result": "PASSED",
+          "duration": 2.6226043701171875e-05,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_22_free_app_credit_display",
+          "description": "무료 앱(trial_credits=-1)은 \"건당 XX\" 텍스트가 없어야 함",
+          "result": "PASSED",
+          "duration": 0.015247821807861328,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_23_credit_display_error_check",
+          "description": "설치 직후 크레딧 표시 정확성 검증 (배포물 필수)\n- 유료 앱: 체험판 크레딧이 정확히 표시되는지 확인 (BE:10,000, DC:5,000, AR:20,000, DBP:4,000)\n- 무료 앱: \"무료\" 또는 \"Free\" 표시\n- \"오류\" 문구가 표시되면 안 됨\n",
+          "result": "PASSED",
+          "duration": 0.05318474769592285,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        }
+      ]
+    }
+  ]
+}

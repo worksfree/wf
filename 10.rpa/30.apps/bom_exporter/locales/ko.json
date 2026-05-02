@@ -1,0 +1,6 @@
+{
+  "title":               "BOM 엑셀 저장 {ver}",
+  "run_button":          "BOM 저장",
+  "complete_msg":        "BOM 변환 작업이 완료되었습니다.",
+  "failed_files_title":  "처리 실패 파일 목록"
+}

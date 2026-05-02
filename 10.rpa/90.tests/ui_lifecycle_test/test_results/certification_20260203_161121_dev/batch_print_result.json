@@ -1,0 +1,14 @@
+{
+  "app_name": "batch_print",
+  "app_version": "",
+  "level": "NONE",
+  "passed": false,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "duration": 15.659831,
+  "start_time": "2026-02-03T16:12:41.276392",
+  "end_time": "2026-02-03T16:12:56.936223",
+  "error": "Failed to launch batch_print in test mode",
+  "suites": []
+}

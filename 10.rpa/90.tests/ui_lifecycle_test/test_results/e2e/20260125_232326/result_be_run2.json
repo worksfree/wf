@@ -1,0 +1,71 @@
+{
+  "app": "be",
+  "run_number": 2,
+  "start_time": "2026-01-25T23:26:34.948466",
+  "end_time": "2026-01-25T23:27:34.398292",
+  "duration": 59.449826,
+  "passed": false,
+  "phases": {
+    "init": {
+      "passed": true,
+      "message": "Initialized"
+    },
+    "launch_unreg": {
+      "passed": true,
+      "message": "Launched in unregistered state"
+    },
+    "registration": {
+      "passed": false,
+      "message": "Register window not found"
+    },
+    "check_credits": {
+      "passed": true,
+      "message": "Credits: 10"
+    },
+    "work_1": {
+      "passed": true,
+      "message": "Work done, credits: 9"
+    },
+    "work_2": {
+      "passed": true,
+      "message": "Work done, credits: 8"
+    },
+    "exhaust": {
+      "passed": true,
+      "message": "Credits exhausted (0)"
+    },
+    "insufficient": {
+      "passed": true,
+      "message": "Work blocked (no dialog)"
+    },
+    "purchase": {
+      "passed": true,
+      "message": "Purchased 50 credits"
+    },
+    "work_after_purchase": {
+      "passed": true,
+      "message": "Work successful, credits: 49"
+    },
+    "final_check": {
+      "passed": true,
+      "message": "Final state captured"
+    },
+    "cleanup": {
+      "passed": true,
+      "message": "State restored"
+    }
+  },
+  "screenshots": [
+    "test_results\\e2e\\20260125_232326\\be_01_unregistered_232640.png",
+    "test_results\\e2e\\20260125_232326\\be_05_credits_initial_232701.png",
+    "test_results\\e2e\\20260125_232326\\be_06_after_work_1_232705.png",
+    "test_results\\e2e\\20260125_232326\\be_07_after_work_2_232711.png",
+    "test_results\\e2e\\20260125_232326\\be_08_credits_zero_232714.png",
+    "test_results\\e2e\\20260125_232326\\be_09_insufficient_state_232723.png",
+    "test_results\\e2e\\20260125_232326\\be_10_after_purchase_232726.png",
+    "test_results\\e2e\\20260125_232326\\be_11_work_after_purchase_232730.png",
+    "test_results\\e2e\\20260125_232326\\be_12_settings_final_232733.png",
+    "test_results\\e2e\\20260125_232326\\be_13_final_state_232734.png"
+  ],
+  "error": ""
+}

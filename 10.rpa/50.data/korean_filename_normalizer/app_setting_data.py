@@ -31,7 +31,7 @@ except Exception:
         _fallback_logger.setLevel(logging.INFO)
 
     class _DummyLog:
-        def get_app_logger(self, name, console_level=logging.INFO):
+        def get_app_logger(self, name, console_level=logging.DEBUG):
             lg = logging.getLogger(name)
             if not lg.handlers:
                 h = logging.StreamHandler()
@@ -65,10 +65,10 @@ class Config:
         import sys
         is_frozen = getattr(sys, 'frozen', False)
 
-        if is_frozen or self.run_mode == "release":
-            self.app_config_dir = self.user_home / ".wf_rpa" / "korean_filename_normalizer"
-        else:
+        if self.run_mode == "dev":
             self.app_config_dir = common_config_dir / "korean_filename_normalizer"
+        else:
+            self.app_config_dir = self.user_home / ".wf_rpa" / "korean_filename_normalizer"
 
         # Lazy logger
         self._logger = None
@@ -177,9 +177,12 @@ class Config:
                 },
                 "ui_config": {
                     "last_selected_folder": "",
-                    "window_geometry": "700x400",
+                    "window_geometry": "580x200",
                     "admin_window_geometry": "700x800",
-                    "show_admin_mode": False
+                    "show_admin_mode": False,
+                    "window_geometry_override": "",
+                    "window_width": 580,
+                    "window_height": 200
                 },
                 "logging_config": {
                     "log_level": "INFO",
@@ -237,11 +240,12 @@ class Config:
 
         # UI
         self.window_geometry = ui_config.get("window_geometry", "700x400")
-        self.admin_window_geometry = ui_config.get("admin_window_geometry", "700x800")
+        self.admin_window_height = ui_config.get("admin_window_height", 300)
         self.show_admin_mode = ui_config.get("show_admin_mode", False)
-        # 선택적으로 저장된 폭/높이 사용 (없으면 기존 로직 유지)
-        self.window_width = ui_config.get("window_width")
-        self.window_height = ui_config.get("window_height")
+
+        # 창 크기 (settings.json 우선, 없으면 코드 기본값)
+        self.window_width = ui_config.get("window_width", 580)  # korean_filename_normalizer 기본 너비
+        self.window_height = ui_config.get("window_height", 200)  # korean_filename_normalizer 기본 높이
 
         # Logging
         self.log_level = logging_config.get("log_level", "INFO")
@@ -310,7 +314,7 @@ class Config:
 
             data["ui_config"] = {
                 "window_geometry": self.window_geometry,
-                "admin_window_geometry": self.admin_window_geometry,
+                "admin_window_height": self.admin_window_height,
                 "show_admin_mode": self.show_admin_mode,
             }
 

@@ -13,13 +13,13 @@ WorksFree RPA 앱들은 **실행 환경**과 **실행 모드**에 따라 다른 
 
 ## 실행 모드
 
-| 모드 | 용도 | 설정 위치 (소스) | 특징 |
-|------|------|-----------------|------|
-| **dev** | 개발 환경 | `소스트리/config/앱이름/` | 로컬 파일 직접 수정 |
-| **demo** | 데모/영상 녹화 | `소스트리/config/앱이름/` | 미리 설정된 값 사용 |
-| **release** | 일반 배포 | `~/.wf_rpa/앱이름/` | 사용자별 독립 설정 |
+| 모드 | 용도 | 설정 위치 (소스) | 설정 위치 (exe) | 특징 |
+|------|------|-----------------|-----------------|------|
+| **dev** | 개발 환경 | `소스트리/config/앱이름/` | N/A | 로컬 파일 직접 수정 |
+| **demo** | 데모/영상 녹화 | `~/.wf_rpa/앱이름/` | `~/.wf_rpa/앱이름/` | 데이터 격리, 재사용 가능 |
+| **release** | 일반 배포 | `~/.wf_rpa/앱이름/` | `~/.wf_rpa/앱이름/` | 사용자별 독립 설정 |
 
-실행 모드는 `settings.json`의 `app_config.run_mode` 값으로 결정됩니다.
+실행 모드는 `settings.json`의 `runtime_config.run_mode` 값으로 결정됩니다.
 
 ## 설정 파일 경로 결정 로직
 
@@ -27,15 +27,14 @@ WorksFree RPA 앱들은 **실행 환경**과 **실행 모드**에 따라 다른 
 import sys
 from pathlib import Path
 
-is_frozen = getattr(sys, 'frozen', False)  # exe 환경 감지
 run_mode = _detect_run_mode()  # settings.json에서 읽음
 
-if is_frozen or run_mode == "release":
-    # exe 또는 release 모드: 항상 사용자 홈 사용
-    app_config_dir = Path.home() / ".wf_rpa" / "앱이름"
-else:
-    # 소스 실행 & dev/demo: 소스 트리 사용
+if run_mode == "dev":
+    # dev 모드: 항상 소스 트리 사용
     app_config_dir = Path(__file__).parent / "config" / "앱이름"
+else:
+    # demo/release 모드: 항상 사용자 홈 사용
+    app_config_dir = Path.home() / ".wf_rpa" / "앱이름"
 ```
 
 ## 동작 매트릭스
@@ -43,9 +42,9 @@ else:
 | 실행 방식 | run_mode | 설정 파일 경로 | 쓰기 가능 |
 |-----------|----------|---------------|----------|
 | **python (소스)** | dev | `소스트리/config/앱이름/settings.json` | ✅ |
-| **python (소스)** | demo | `소스트리/config/앱이름/settings.json` | ✅ |
+| **python (소스)** | demo | `~/.wf_rpa/앱이름/settings.json` | ✅ |
 | **python (소스)** | release | `~/.wf_rpa/앱이름/settings.json` | ✅ |
-| **exe** | dev | `~/.wf_rpa/앱이름/settings.json` | ✅ |
+| **exe** | dev | N/A (불가능) | N/A |
 | **exe** | demo | `~/.wf_rpa/앱이름/settings.json` | ✅ |
 | **exe** | release | `~/.wf_rpa/앱이름/settings.json` | ✅ |
 

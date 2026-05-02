@@ -1,0 +1,69 @@
+{
+  "app": "dc",
+  "run_number": 3,
+  "start_time": "2026-01-26T00:03:13.461612",
+  "end_time": "2026-01-26T00:04:13.546273",
+  "duration": 60.084661,
+  "passed": false,
+  "phases": {
+    "init": {
+      "passed": true,
+      "message": "Initialized"
+    },
+    "launch_unreg": {
+      "passed": false,
+      "message": "Launch failed"
+    },
+    "registration": {
+      "passed": false,
+      "message": "Register window not found"
+    },
+    "check_credits": {
+      "passed": true,
+      "message": "Credits: 10"
+    },
+    "work_1": {
+      "passed": true,
+      "message": "Work done, credits: 9"
+    },
+    "work_2": {
+      "passed": true,
+      "message": "Work done, credits: 8"
+    },
+    "exhaust": {
+      "passed": true,
+      "message": "Credits exhausted (0)"
+    },
+    "insufficient": {
+      "passed": true,
+      "message": "Work blocked (no dialog)"
+    },
+    "purchase": {
+      "passed": true,
+      "message": "Purchased 50 credits"
+    },
+    "work_after_purchase": {
+      "passed": true,
+      "message": "Work successful, credits: 49"
+    },
+    "final_check": {
+      "passed": true,
+      "message": "Final state captured"
+    },
+    "cleanup": {
+      "passed": true,
+      "message": "State restored"
+    }
+  },
+  "screenshots": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "error": ""
+}

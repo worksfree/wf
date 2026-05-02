@@ -1,0 +1,6 @@
+{
+  "title":               "BOM Excel Export {ver}",
+  "run_button":          "Export BOM",
+  "complete_msg":        "BOM export completed.",
+  "failed_files_title":  "Failed Files"
+}

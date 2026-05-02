@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E88E5"/>
+      <stop offset="100%" style="stop-color:#0D47A1"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0D47A1" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+  
+  <!-- QR Code container -->
+  <rect x="76" y="76" width="360" height="360" rx="24" fill="#FFFFFF"/>
+  
+  <!-- QR Code pattern -->
+  <g transform="translate(100, 100)" fill="#1A237E">
+    <!-- Position detection pattern - Top Left -->
+    <rect x="0" y="0" width="70" height="70" rx="6"/>
+    <rect x="10" y="10" width="50" height="50" rx="4" fill="#FFFFFF"/>
+    <rect x="20" y="20" width="30" height="30" rx="2"/>
+    
+    <!-- Position detection pattern - Top Right -->
+    <rect x="242" y="0" width="70" height="70" rx="6"/>
+    <rect x="252" y="10" width="50" height="50" rx="4" fill="#FFFFFF"/>
+    <rect x="262" y="20" width="30" height="30" rx="2"/>
+    
+    <!-- Position detection pattern - Bottom Left -->
+    <rect x="0" y="242" width="70" height="70" rx="6"/>
+    <rect x="10" y="252" width="50" height="50" rx="4" fill="#FFFFFF"/>
+    <rect x="20" y="262" width="30" height="30" rx="2"/>
+    
+    <!-- Data modules -->
+    <g fill="#1565C0">
+      <!-- Row 1 data -->
+      <rect x="90" y="15" width="20" height="20" rx="3"/>
+      <rect x="130" y="15" width="20" height="20" rx="3"/>
+      <rect x="170" y="15" width="20" height="20" rx="3"/>
+      <rect x="210" y="15" width="20" height="20" rx="3"/>
+      
+      <!-- Row 2 data -->
+      <rect x="90" y="50" width="20" height="20" rx="3"/>
+      <rect x="150" y="50" width="20" height="20" rx="3"/>
+      <rect x="190" y="50" width="20" height="20" rx="3"/>
+      
+      <!-- Middle rows -->
+      <rect x="15" y="90" width="20" height="20" rx="3"/>
+      <rect x="50" y="90" width="20" height="20" rx="3"/>
+      <rect x="110" y="90" width="20" height="20" rx="3"/>
+      <rect x="150" y="90" width="20" height="20" rx="3"/>
+      <rect x="210" y="90" width="20" height="20" rx="3"/>
+      <rect x="250" y="90" width="20" height="20" rx="3"/>
+      <rect x="285" y="90" width="20" height="20" rx="3"/>
+      
+      <rect x="15" y="130" width="20" height="20" rx="3"/>
+      <rect x="90" y="130" width="20" height="20" rx="3"/>
+      <rect x="130" y="130" width="20" height="20" rx="3"/>
+      <rect x="190" y="130" width="20" height="20" rx="3"/>
+      <rect x="250" y="130" width="20" height="20" rx="3"/>
+      <rect x="285" y="130" width="20" height="20" rx="3"/>
+      
+      <rect x="50" y="170" width="20" height="20" rx="3"/>
+      <rect x="110" y="170" width="20" height="20" rx="3"/>
+      <rect x="170" y="170" width="20" height="20" rx="3"/>
+      <rect x="210" y="170" width="20" height="20" rx="3"/>
+      <rect x="285" y="170" width="20" height="20" rx="3"/>
+      
+      <rect x="15" y="210" width="20" height="20" rx="3"/>
+      <rect x="50" y="210" width="20" height="20" rx="3"/>
+      <rect x="130" y="210" width="20" height="20" rx="3"/>
+      <rect x="190" y="210" width="20" height="20" rx="3"/>
+      <rect x="250" y="210" width="20" height="20" rx="3"/>
+      
+      <!-- Bottom rows -->
+      <rect x="90" y="255" width="20" height="20" rx="3"/>
+      <rect x="150" y="255" width="20" height="20" rx="3"/>
+      <rect x="190" y="255" width="20" height="20" rx="3"/>
+      <rect x="250" y="255" width="20" height="20" rx="3"/>
+      <rect x="285" y="255" width="20" height="20" rx="3"/>
+      
+      <rect x="110" y="290" width="20" height="20" rx="3"/>
+      <rect x="170" y="290" width="20" height="20" rx="3"/>
+      <rect x="210" y="290" width="20" height="20" rx="3"/>
+      <rect x="285" y="290" width="20" height="20" rx="3"/>
+    </g>
+  </g>
+  
+  <!-- Plus sign badge (bottom right) -->
+  <g transform="translate(370, 370)">
+    <circle cx="40" cy="40" r="50" fill="#4CAF50"/>
+    <rect x="20" y="32" width="40" height="16" rx="4" fill="#FFFFFF"/>
+    <rect x="32" y="20" width="16" height="40" rx="4" fill="#FFFFFF"/>
+  </g>
+</svg>

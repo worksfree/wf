@@ -1,0 +1,21 @@
+Gemini API 키값
+AIzaSyBd0ROnh5BJzCLrDeUV7-LGORqEd1bwTRc
+
+Telegram HTTP API 키값
+8282314766:AAG_h760ifMhiGjaGKWsJBWVu-l0TWjW03c
+
+Telegram HTTP API 키값
+8736560480:AAEVCuyMq_b1sahEbbiTgCWp4NbpwzG6p24
+
+Control UI ─────────────────────────────────────────────────────────────────────╮
+│                                                                                  │
+│  Web UI: http://127.0.0.1:18789/                                                 │
+│  Web UI (with token):                                                            │
+│  http://127.0.0.1:18789/#token=fc33f2f24b99738d4e5711acac636c6c00e3a12fb1afc186  │
+│  Gateway WS: ws://127.0.0.1:18789                                                │
+│  Gateway: reachable                                                              │
+│  Docs: https://docs.openclaw.ai/web/control-ui 
+
+
+
+창업중심대학 관련 내용은 제거해주는데 단순히 그냥 제거하는 것이 아니라 해당 문장의 내용을 자연스럽게 작성해줘야해. 그렇게 보완할 내용에 대한 가이드를 제시해주고 해당 내용이 포함된 기준으로 ppt 발표자료를 작성해줘.

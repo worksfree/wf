@@ -1,0 +1,16 @@
+{
+  "trial_credits": -1,
+  "credit_per_work": 0,
+  "credit_type": "free",
+  "icon_text": "BR",
+  "short_name": "br",
+  "display_name": "리다이렉션 차단",
+  "policy": {
+    "description": "ban_redirection - 정책 미설정",
+    "trial_credits": 0,
+    "credit_per_work": 1,
+    "credit_type": "per_item"
+  },
+  "source": "bundled",
+  "last_updated": "2026-04-28T19:04:55.165"
+}

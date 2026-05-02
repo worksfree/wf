@@ -41,7 +41,7 @@ class DwgClassifierAutomation:
     def __init__(self, folder_path: Optional[str] = None, console_mode: bool = False):
         self.folder_path = folder_path
         self.console_mode = console_mode
-        self.logger = get_app_logger("dwg_classifier", console_level=logging.INFO)
+        self.logger = get_app_logger("dwg_classifier", console_level=logging.DEBUG)
 
         # 이메일 설정 (에러/완료 알림용)
         self.itself_dir = current_dir

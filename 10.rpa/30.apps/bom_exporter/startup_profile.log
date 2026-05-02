@@ -1,31 +1,31 @@
-Total: 2636.8ms
+Total: 506.6ms
 [    0.0ms] Script start
-[   22.3ms] multiprocessing.freeze_support()
-[   22.3ms] sys.path setup complete
-[   46.8ms] import tkinter
-[   49.2ms] import tkinter.ttk, messagebox
-[   50.2ms] import datetime
-[   50.2ms] pyautogui deferred (lazy import)
-[   53.8ms] import filedialog, Path
-[   66.5ms] import logging, threading
-[   71.7ms] import app_setting_data
-[   71.7ms] automation.BomAutomation deferred (lazy import)
-[  166.6ms] import ui_setting
-[  166.6ms] import wf_log
-[  871.0ms] main() entry
-[  871.0ms] Test mode: skipping single instance and cross-app checks
-[  889.4ms] Creating Tk root window
-[ 1107.0ms] Tk root created
-[ 1883.1ms] __init__ started
-[ 1883.3ms] Master and directory initialized
-[ 2478.4ms] Adaptive UI settings loaded
-[ 2480.3ms] Logger initialized
-[ 2480.3ms] WFM availability checked
-[ 2480.3ms] Config loaded
-[ 2480.3ms] Geometry override initialized: 
-[ 2480.9ms] Custom settings applied
-[ 2480.9ms] Basic variables initialized
-[ 2480.9ms] UI-related variables initialized
-[ 2482.3ms] About to set WM_DELETE_WINDOW protocol
-[ 2482.3ms] About to call init_ui()
-[ 2636.8ms] BomGUIApplication initialized - UI ready
+[    7.6ms] multiprocessing.freeze_support()
+[    7.6ms] sys.path setup complete
+[   22.1ms] import tkinter
+[   23.0ms] import tkinter.ttk, messagebox
+[   23.2ms] import datetime
+[   23.2ms] pyautogui deferred (lazy import)
+[   23.8ms] import filedialog, Path
+[   36.5ms] import logging, threading
+[   37.2ms] import app_setting_data
+[   37.2ms] automation.BomAutomation deferred (lazy import)
+[   79.3ms] import ui_setting
+[   79.3ms] import wf_log
+[  217.3ms] main() entry
+[  217.3ms] Test mode: skipping single instance and cross-app checks
+[  217.9ms] Creating Tk root window
+[  265.8ms] Tk root created
+[  367.2ms] __init__ started
+[  367.3ms] Master and directory initialized
+[  367.9ms] Logger initialized
+[  367.9ms] WFM availability checked
+[  367.9ms] Config loaded
+[  464.7ms] Adaptive UI settings loaded
+[  464.7ms] Geometry override initialized: 
+[  464.8ms] Custom settings applied
+[  464.8ms] Basic variables initialized
+[  464.8ms] UI-related variables initialized
+[  465.5ms] About to set WM_DELETE_WINDOW protocol
+[  465.6ms] About to call init_ui()
+[  506.6ms] BomGUIApplication initialized - UI ready

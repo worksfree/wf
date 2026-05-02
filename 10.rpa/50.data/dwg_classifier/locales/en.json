@@ -1,0 +1,12 @@
+{
+  "title":            "DWG File Classifier {ver}",
+  "run_button":       "Classify",
+  "complete_msg":     "File classification completed.",
+  "part_col":         "Part Number Column",
+  "class_col":        "Process Class Column",
+  "sheet_name":       "Excel Sheet Name",
+  "output_path":      "Output Path",
+  "file_mode":        "File Operation Mode",
+  "col_hint":         "💡 The Excel file must contain the column names configured below.",
+  "col_error_title":  "Excel Column Error"
+}

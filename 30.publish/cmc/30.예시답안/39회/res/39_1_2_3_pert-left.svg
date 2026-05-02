@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 255" font-family="Arial, Helvetica, sans-serif" font-size="11">
+  <defs>
+    <marker id="ah" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#666"/>
+    </marker>
+    <marker id="ahb" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#111"/>
+    </marker>
+  </defs>
+
+  <rect width="430" height="255" fill="white"/>
+
+  <!-- ===== LEFT DIAGRAM ===== -->
+  <!-- 노드 좌표: A(50,120) B(140,55) C(140,185) D(230,120) E(320,55) F(320,185) G(400,120) r=22 -->
+
+  <!-- 비주경로 엣지 (가는선) -->
+  <!-- A→B -->
+  <line x1="68" y1="107" x2="122" y2="68" stroke="#666" stroke-width="1.5" marker-end="url(#ah)"/>
+  <!-- B→D -->
+  <line x1="158" y1="68" x2="212" y2="107" stroke="#666" stroke-width="1.5" marker-end="url(#ah)"/>
+  <!-- B→E -->
+  <line x1="162" y1="55" x2="298" y2="55" stroke="#666" stroke-width="1.5" marker-end="url(#ah)"/>
+  <!-- C→F -->
+  <line x1="162" y1="185" x2="298" y2="185" stroke="#666" stroke-width="1.5" marker-end="url(#ah)"/>
+  <!-- F→G -->
+  <line x1="337" y1="171" x2="383" y2="134" stroke="#666" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- 주경로 엣지: A→C, C→D, D→E, E→G (굵은선) -->
+  <!-- A→C -->
+  <line x1="68" y1="133" x2="122" y2="172" stroke="#111" stroke-width="2.5" marker-end="url(#ahb)"/>
+  <!-- C→D -->
+  <line x1="158" y1="172" x2="212" y2="133" stroke="#111" stroke-width="2.5" marker-end="url(#ahb)"/>
+  <!-- D→E -->
+  <line x1="248" y1="107" x2="302" y2="68" stroke="#111" stroke-width="2.5" marker-end="url(#ahb)"/>
+  <!-- E→G -->
+  <line x1="337" y1="69" x2="383" y2="106" stroke="#111" stroke-width="2.5" marker-end="url(#ahb)"/>
+
+  <!-- 비주경로 노드 (가는 테두리) -->
+  <circle cx="140" cy="55"  r="22" fill="white" stroke="#666" stroke-width="1.5"/>
+  <circle cx="320" cy="185" r="22" fill="white" stroke="#666" stroke-width="1.5"/>
+
+  <!-- 주경로 노드 (굵은 테두리) -->
+  <circle cx="50"  cy="120" r="22" fill="white" stroke="#111" stroke-width="2.5"/>
+  <circle cx="140" cy="185" r="22" fill="white" stroke="#111" stroke-width="2.5"/>
+  <circle cx="230" cy="120" r="22" fill="white" stroke="#111" stroke-width="2.5"/>
+  <circle cx="320" cy="55"  r="22" fill="white" stroke="#111" stroke-width="2.5"/>
+  <circle cx="400" cy="120" r="22" fill="white" stroke="#111" stroke-width="2.5"/>
+
+  <!-- 노드 라벨 -->
+  <text x="50"  y="117" text-anchor="middle" font-size="11" font-weight="bold">A</text>
+  <text x="50"  y="130" text-anchor="middle" font-size="9">(5.33)</text>
+
+  <text x="140" y="52"  text-anchor="middle" font-size="11" font-weight="bold">B</text>
+  <text x="140" y="65"  text-anchor="middle" font-size="9">(6.00)</text>
+
+  <text x="140" y="182" text-anchor="middle" font-size="11" font-weight="bold">C</text>
+  <text x="140" y="195" text-anchor="middle" font-size="9">(7.00)</text>
+
+  <text x="230" y="117" text-anchor="middle" font-size="11" font-weight="bold">D</text>
+  <text x="230" y="130" text-anchor="middle" font-size="9">(5.00)</text>
+
+  <text x="320" y="52"  text-anchor="middle" font-size="11" font-weight="bold">E</text>
+  <text x="320" y="65"  text-anchor="middle" font-size="9">(4.33)</text>
+
+  <text x="320" y="182" text-anchor="middle" font-size="11" font-weight="bold">F</text>
+  <text x="320" y="195" text-anchor="middle" font-size="9">(7.00)</text>
+
+  <text x="400" y="117" text-anchor="middle" font-size="11" font-weight="bold">G</text>
+  <text x="400" y="130" text-anchor="middle" font-size="9">(3.33)</text>
+
+  <!-- 왼쪽 캡션 -->
+  <text x="225" y="242" text-anchor="middle" font-size="10" fill="#333">A → C → D → E → G = 25.00</text>
+
+</svg>

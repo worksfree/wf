@@ -1,0 +1,62 @@
+{
+  "app": "be",
+  "run_number": 1,
+  "start_time": "2026-01-25T19:01:17.781590",
+  "end_time": "2026-01-25T19:01:25.511319",
+  "duration": 7.729729,
+  "passed": false,
+  "phases": {
+    "init": {
+      "passed": true,
+      "message": "Initialized"
+    },
+    "launch_unreg": {
+      "passed": true,
+      "message": "Launched in unregistered state"
+    },
+    "registration": {
+      "passed": false,
+      "message": "PyAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set pyautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED."
+    },
+    "check_credits": {
+      "passed": false,
+      "message": "PyAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set pyautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED."
+    },
+    "work_1": {
+      "passed": false,
+      "message": "PyAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set pyautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED."
+    },
+    "work_2": {
+      "passed": false,
+      "message": "PyAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set pyautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED."
+    },
+    "exhaust": {
+      "passed": false,
+      "message": "PyAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set pyautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED."
+    },
+    "insufficient": {
+      "passed": false,
+      "message": "PyAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set pyautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED."
+    },
+    "purchase": {
+      "passed": false,
+      "message": "PyAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set pyautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED."
+    },
+    "work_after": {
+      "passed": false,
+      "message": "PyAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set pyautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED."
+    },
+    "final": {
+      "passed": false,
+      "message": "PyAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set pyautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED."
+    },
+    "cleanup": {
+      "passed": true,
+      "message": "State restored"
+    }
+  },
+  "screenshots": [
+    ""
+  ],
+  "error": ""
+}

@@ -1,0 +1,16 @@
+{
+  "identity": {
+    "app_name": "dwg_classifier",
+    "short_name": "dc",
+    "display_name": "DWG Classifier"
+  },
+  "policy": {
+    "icon_text": "DC",
+    "description": "DWG 파일 분류 도구",
+    "trial_credits": 25000,
+    "credit_per_work": 50,
+    "credit_type": "per_file"
+  },
+  "source": "bundled",
+  "last_updated": "2026-02-03T16:12:05.200"
+}

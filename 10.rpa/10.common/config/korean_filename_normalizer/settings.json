@@ -1,0 +1,53 @@
+{
+  "runtime_config": {
+    "run_mode": "dev",
+    "full_version": "v0.8.6.2",
+    "build_count": 162,
+    "last_updated": "2026-01-25 00:00:00",
+    "ui_scale": 1.0,
+    "language": "ko"
+  },
+  "ui_config": {
+    "topmost": true,
+    "window_geometry_override": "",
+    "admin_window_height": 300,
+    "show_admin_mode": false,
+    "window_width": 580,
+    "window_height": 200
+  },
+  "logging_config": {
+    "log_level": "INFO",
+    "max_log_size_mb": 10,
+    "rotate_logs": true
+  },
+  "normalizer_settings": {
+    "default_folder_path": "D:/dep_test_data/한글자소분리_데모",
+    "backup_enabled": false,
+    "recursive_scan": true,
+    "include_hidden_files": false,
+    "auto_backup": true,
+    "supported_extensions": [
+      ".txt",
+      ".docx",
+      ".xlsx",
+      ".pptx",
+      ".pdf",
+      ".jpg",
+      ".png",
+      ".mp4",
+      ".avi",
+      ".zip",
+      ".rar"
+    ],
+    "skip_system_files": true,
+    "conflict_resolution": "overwrite",
+    "save_to_new_folder": false,
+    "normalization_method": "nfc_plus_manual",
+    "preserve_extension_case": true,
+    "log_changes": true
+  },
+  "test_config": {
+    "test_key": "test_value_1770102831.4266872",
+    "persistence_test": "persist_test_1770102831"
+  }
+}

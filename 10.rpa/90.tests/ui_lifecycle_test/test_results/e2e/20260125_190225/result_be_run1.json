@@ -1,0 +1,70 @@
+{
+  "app": "be",
+  "run_number": 1,
+  "start_time": "2026-01-25T19:02:25.357251",
+  "end_time": "2026-01-25T19:03:27.589819",
+  "duration": 62.232568,
+  "passed": false,
+  "phases": {
+    "init": {
+      "passed": true,
+      "message": "Initialized"
+    },
+    "launch_unreg": {
+      "passed": true,
+      "message": "Launched in unregistered state"
+    },
+    "registration": {
+      "passed": false,
+      "message": "Register window not found"
+    },
+    "check_credits": {
+      "passed": true,
+      "message": "Credits: 10"
+    },
+    "work_1": {
+      "passed": true,
+      "message": "Work done, credits: 9"
+    },
+    "work_2": {
+      "passed": true,
+      "message": "Work done, credits: 8"
+    },
+    "exhaust": {
+      "passed": true,
+      "message": "Credits exhausted (0)"
+    },
+    "insufficient": {
+      "passed": true,
+      "message": "Work blocked (no dialog)"
+    },
+    "purchase": {
+      "passed": true,
+      "message": "Purchased 50 credits"
+    },
+    "work_after_purchase": {
+      "passed": true,
+      "message": "Work successful, credits: 49"
+    },
+    "final": {
+      "passed": false,
+      "message": "Error code from Windows: 0 - 작업을 완료했습니다."
+    },
+    "cleanup": {
+      "passed": true,
+      "message": "State restored"
+    }
+  },
+  "screenshots": [
+    "test_results\\e2e\\20260125_190225\\be_01_unregistered_190230.png",
+    "",
+    "",
+    "",
+    "test_results\\e2e\\20260125_190225\\be_08_credits_zero_190308.png",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "error": ""
+}

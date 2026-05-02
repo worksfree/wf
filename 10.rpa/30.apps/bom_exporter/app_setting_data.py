@@ -27,12 +27,12 @@ except Exception:
     _fallback_logger = logging.getLogger(__name__)
     if not _fallback_logger.handlers:
         _handler = logging.StreamHandler()
-        _handler.setLevel(logging.INFO)
+        _handler.setLevel(logging.DEBUG)
         _fallback_logger.addHandler(_handler)
-        _fallback_logger.setLevel(logging.INFO)
+        _fallback_logger.setLevel(logging.DEBUG)
 
     class _DummyLog:
-        def get_app_logger(self, name, console_level=logging.INFO):
+        def get_app_logger(self, name, console_level=logging.DEBUG):
             lg = logging.getLogger(name)
             if not lg.handlers:
                 h = logging.StreamHandler()
@@ -66,11 +66,11 @@ class Config:
         import sys
         is_frozen = getattr(sys, 'frozen', False)
 
-        # exe 빌드에서만 사용자 홈 사용, 소스 실행은 10.common/config/ 사용
-        if is_frozen:
-            self.app_config_dir = self.user_home / ".wf_rpa" / "bom_exporter"
-        else:
+        # dev: 소스트리, demo/release: 홈폴더
+        if self.run_mode == "dev":
             self.app_config_dir = common_config_dir / "bom_exporter"
+        else:
+            self.app_config_dir = self.user_home / ".wf_rpa" / "bom_exporter"
         
         # PyInstaller frozen 환경에서 번들 리소스 경로 저장
         if is_frozen:
@@ -206,7 +206,10 @@ class Config:
                 },
                 "ui_config": {
                     "topmost": True,
-                    "last_selected_folder": ""
+                    "last_selected_folder": "",
+                    "window_geometry_override": "",
+                    "window_width": 580,
+                    "window_height": 200
                 }
             }
             
@@ -389,6 +392,10 @@ class Config:
         ui_config = config_data.get("ui_config", {}) or {}
         self.ui_config = ui_config
         self.window_geometry_override = ui_config.get("window_geometry_override", "")
+
+        # 창 크기 (settings.json 우선, 없으면 코드 기본값)
+        self.window_width = ui_config.get("window_width", 580)  # bom_exporter 기본 너비
+        self.window_height = ui_config.get("window_height", 200)  # bom_exporter 기본 높이
 
         # 실행 모드 결정: settings.json 값만 사용, 없으면 초기 런모드 유지
         cfg_mode = str(app_config.get("run_mode", "")).strip().lower() if app_config else ""

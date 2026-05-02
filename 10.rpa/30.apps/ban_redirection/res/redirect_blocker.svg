@@ -1,0 +1,49 @@
+<svg width="256" height="256" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
+
+<defs>
+  <clipPath id="shieldClip">
+    <path d="M 205,262 Q 205,162 340,148 Q 475,162 475,262 L 475,382 Q 458,474 340,530 Q 222,474 205,382 Z"/>
+  </clipPath>
+</defs>
+
+<!-- App icon background -->
+<rect x="40" y="40" width="600" height="600" rx="96" fill="#0B1629"/>
+
+<!-- Shield outer shadow layer -->
+<path d="M 200,264 Q 200,160 340,146 Q 480,160 480,264 L 480,384 Q 462,478 340,534 Q 218,478 200,384 Z" 
+      fill="#1539A0" opacity="0.6"/>
+
+<!-- Shield main body -->
+<path d="M 207,264 Q 207,163 340,149 Q 473,163 473,264 L 473,382 Q 456,473 340,529 Q 224,473 207,382 Z" 
+      fill="#1D4ED8"/>
+
+<!-- Shield inner face -->
+<path d="M 230,273 Q 230,185 340,172 Q 450,185 450,273 L 450,378 Q 435,454 340,502 Q 245,454 230,378 Z" 
+      fill="#2563EB"/>
+
+<!-- Shield top-center highlight -->
+<path d="M 230,273 Q 230,220 340,207 Q 450,220 450,273 L 450,295 Q 340,278 230,295 Z"
+      fill="#3B82F6" opacity="0.45"/>
+
+<!-- Chain link LEFT ring -->
+<rect x="238" y="296" width="104" height="60" rx="30"
+      fill="none" stroke="white" stroke-width="22"/>
+
+<!-- Chain link RIGHT ring -->
+<rect x="338" y="296" width="104" height="60" rx="30"
+      fill="none" stroke="white" stroke-width="22"/>
+
+<!-- Center cover to separate rings -->
+<rect x="325" y="279" width="30" height="94" fill="#2563EB"/>
+
+<!-- Red prohibition circle -->
+<circle cx="340" cy="326" r="116" fill="none" stroke="#EF4444" stroke-width="23"/>
+
+<!-- Red prohibition slash -->
+<line x1="258" y1="244" x2="422" y2="408" stroke="#EF4444" stroke-width="23" stroke-linecap="round"/>
+
+<!-- Green check badge -->
+<circle cx="435" cy="468" r="36" fill="#16A34A"/>
+<polyline points="420,468 432,481 453,455" fill="none" stroke="white" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+
+</svg>

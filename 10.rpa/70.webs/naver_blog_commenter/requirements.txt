@@ -1,0 +1,4 @@
+# NaverBlogCommenter 의존 패키지
+selenium>=4.18.0
+anthropic>=0.25.0
+webdriver-manager>=4.0.1

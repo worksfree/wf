@@ -1,0 +1,14 @@
+{
+  "app_name": "bom_exporter",
+  "app_version": "bom_exporter_v1.0.3.2_portable",
+  "level": "NONE",
+  "passed": false,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "duration": 15.717885,
+  "start_time": "2026-02-02T19:15:10.313301",
+  "end_time": "2026-02-02T19:15:26.031186",
+  "error": "Failed to launch app in test mode",
+  "suites": []
+}

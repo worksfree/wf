@@ -1,0 +1,20 @@
+{
+  "identity": {
+    "app_name": "attribute_reset",
+    "short_name": "ar",
+    "display_name": "Attribute Reset"
+  },
+  "policy": {
+    "icon_text": "AR",
+    "description": "파트의 속성을 정리해주는 앱",
+    "pricing_model": "trial_500works",
+    "trial_credits": 100000,
+    "credit_per_work": 200,
+    "auto_activate_trial": true,
+    "require_registration": false,
+    "max_installations": 1,
+    "hardware_based_activation": true
+  },
+  "source": "bundled",
+  "last_updated": "2026-02-03T16:13:54.143"
+}

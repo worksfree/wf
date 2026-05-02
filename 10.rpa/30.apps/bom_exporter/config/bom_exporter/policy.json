@@ -6,7 +6,7 @@
     "credit_per_work": 100,
     "credit_type": "per_file"
   },
-  "last_updated": "2026-01-26T15:08:16.540",
+  "last_updated": "2026-04-29T18:50:57.674",
   "source": "google_sheets",
   "identity": {
     "app_name": "bom_exporter"

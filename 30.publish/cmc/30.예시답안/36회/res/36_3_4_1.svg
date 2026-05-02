@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="360"
+     viewBox="0 0 1100 360"
+     font-family="'Malgun Gothic','Apple SD Gothic Neo',Arial,sans-serif">
+
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- ── Arrows ── -->
+  <!-- A(15): ①→② -->
+  <line x1="98" y1="191" x2="242" y2="119" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="158" y="143" text-anchor="middle" font-size="13">A(15)</text>
+
+  <!-- B(10): ②→③ -->
+  <line x1="281" y1="110" x2="449" y2="110" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="365" y="99" text-anchor="middle" font-size="13">B(10)</text>
+
+  <!-- D(13): ②→④ -->
+  <line x1="260" y1="131" x2="260" y2="269" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="273" y="205" text-anchor="start" font-size="13">D(13)</text>
+
+  <!-- C(30): ③→⑤ -->
+  <line x1="491" y1="110" x2="659" y2="110" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="575" y="99" text-anchor="middle" font-size="13">C(30)</text>
+
+  <!-- E(20): ④→⑥ -->
+  <line x1="281" y1="290" x2="559" y2="290" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="420" y="306" text-anchor="middle" font-size="13">E(20)</text>
+
+  <!-- F(13): ⑤→⑦ -->
+  <line x1="697" y1="120" x2="823" y2="190" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="768" y="147" text-anchor="middle" font-size="13">F(13)</text>
+
+  <!-- G(22): ⑥→⑦ -->
+  <line x1="599" y1="283" x2="821" y2="207" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="718" y="258" text-anchor="middle" font-size="13">G(22)</text>
+
+  <!-- H(18): ⑦→⑧ -->
+  <line x1="861" y1="200" x2="949" y2="200" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="905" y="189" text-anchor="middle" font-size="13">H(18)</text>
+
+  <!-- I(20): ⑧→⑨ -->
+  <line x1="991" y1="200" x2="1039" y2="200" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="1015" y="189" text-anchor="middle" font-size="13">I(20)</text>
+
+  <!-- ── Nodes ── -->
+  <!-- ① -->
+  <circle cx="80"  cy="200" r="20" fill="white" stroke="#333" stroke-width="1.5"/>
+  <text x="80"  y="205" text-anchor="middle" font-size="14">①</text>
+
+  <!-- ② -->
+  <circle cx="260" cy="110" r="20" fill="white" stroke="#333" stroke-width="1.5"/>
+  <text x="260" y="115" text-anchor="middle" font-size="14">②</text>
+
+  <!-- ③ -->
+  <circle cx="470" cy="110" r="20" fill="white" stroke="#333" stroke-width="1.5"/>
+  <text x="470" y="115" text-anchor="middle" font-size="14">③</text>
+
+  <!-- ④ -->
+  <circle cx="260" cy="290" r="20" fill="white" stroke="#333" stroke-width="1.5"/>
+  <text x="260" y="295" text-anchor="middle" font-size="14">④</text>
+
+  <!-- ⑤ -->
+  <circle cx="680" cy="110" r="20" fill="white" stroke="#333" stroke-width="1.5"/>
+  <text x="680" y="115" text-anchor="middle" font-size="14">⑤</text>
+
+  <!-- ⑥ -->
+  <circle cx="580" cy="290" r="20" fill="white" stroke="#333" stroke-width="1.5"/>
+  <text x="580" y="295" text-anchor="middle" font-size="14">⑥</text>
+
+  <!-- ⑦ -->
+  <circle cx="840" cy="200" r="20" fill="white" stroke="#333" stroke-width="1.5"/>
+  <text x="840" y="205" text-anchor="middle" font-size="14">⑦</text>
+
+  <!-- ⑧ -->
+  <circle cx="970" cy="200" r="20" fill="white" stroke="#333" stroke-width="1.5"/>
+  <text x="970" y="205" text-anchor="middle" font-size="14">⑧</text>
+
+  <!-- ⑨ -->
+  <circle cx="1060" cy="200" r="20" fill="white" stroke="#333" stroke-width="1.5"/>
+  <text x="1060" y="205" text-anchor="middle" font-size="14">⑨</text>
+
+</svg>

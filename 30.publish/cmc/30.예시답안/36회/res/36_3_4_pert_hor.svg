@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340"
+     viewBox="0 0 1200 340"
+     font-family="'Malgun Gothic','Apple SD Gothic Neo',sans-serif">
+
+  <defs>
+    <marker id="arr-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#DC2626"/>
+    </marker>
+    <marker id="arr-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="340" fill="white"/>
+
+  <!-- ── 화살표 (노드보다 먼저 그려서 노드가 위에 표시됨) ── -->
+
+  <!-- A: ①→② 임계경로 -->
+  <line x1="95" y1="175" x2="202" y2="175" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="148" y="164" text-anchor="middle" font-size="13" font-weight="bold" fill="#DC2626">A</text>
+  <text x="148" y="191" text-anchor="middle" font-size="12" fill="#DC2626">15</text>
+
+  <!-- B: ②→③ 비임계 -->
+  <line x1="271" y1="159" x2="389" y2="101" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arr-gray)"/>
+  <text x="314" y="116" text-anchor="middle" font-size="13" font-weight="bold" fill="#6B7280">B</text>
+  <text x="314" y="131" text-anchor="middle" font-size="12" fill="#6B7280">10</text>
+
+  <!-- D: ②→④ 임계경로 -->
+  <line x1="271" y1="191" x2="389" y2="249" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="314" y="228" text-anchor="middle" font-size="13" font-weight="bold" fill="#DC2626">D</text>
+  <text x="314" y="243" text-anchor="middle" font-size="12" fill="#DC2626">13</text>
+
+  <!-- C: ③→⑤ 비임계 -->
+  <line x1="455" y1="85" x2="585" y2="85" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arr-gray)"/>
+  <text x="520" y="73" text-anchor="middle" font-size="13" font-weight="bold" fill="#6B7280">C</text>
+  <text x="520" y="100" text-anchor="middle" font-size="12" fill="#6B7280">30</text>
+
+  <!-- E: ④→⑥ 임계경로 -->
+  <line x1="455" y1="265" x2="585" y2="265" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="520" y="253" text-anchor="middle" font-size="13" font-weight="bold" fill="#DC2626">E</text>
+  <text x="520" y="281" text-anchor="middle" font-size="12" fill="#DC2626">20</text>
+
+  <!-- F: ⑤→⑦ 비임계 -->
+  <line x1="651" y1="101" x2="769" y2="159" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arr-gray)"/>
+  <text x="703" y="116" text-anchor="middle" font-size="13" font-weight="bold" fill="#6B7280">F</text>
+  <text x="703" y="131" text-anchor="middle" font-size="12" fill="#6B7280">13</text>
+
+  <!-- G: ⑥→⑦ 임계경로 -->
+  <line x1="651" y1="249" x2="769" y2="191" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="703" y="234" text-anchor="middle" font-size="13" font-weight="bold" fill="#DC2626">G</text>
+  <text x="703" y="220" text-anchor="middle" font-size="12" fill="#DC2626">22</text>
+
+  <!-- H: ⑦→⑧ 임계경로 -->
+  <line x1="835" y1="175" x2="945" y2="175" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="890" y="164" text-anchor="middle" font-size="13" font-weight="bold" fill="#DC2626">H</text>
+  <text x="890" y="191" text-anchor="middle" font-size="12" fill="#DC2626">18</text>
+
+  <!-- I: ⑧→⑨ 임계경로 -->
+  <line x1="1015" y1="175" x2="1112" y2="175" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="1063" y="164" text-anchor="middle" font-size="13" font-weight="bold" fill="#DC2626">I</text>
+  <text x="1063" y="191" text-anchor="middle" font-size="12" fill="#DC2626">20</text>
+
+  <!-- ── 노드 ── -->
+
+  <!-- ① 시작 (60, 175) 노란색 -->
+  <circle cx="60" cy="175" r="33" fill="#FEF08A" stroke="#EAB308" stroke-width="3"/>
+  <text x="60" y="171" text-anchor="middle" font-size="15" font-weight="bold" fill="#78350F">①</text>
+  <text x="60" y="187" text-anchor="middle" font-size="11" fill="#78350F">시작</text>
+
+  <!-- ② (240, 175) 초록 - 임계 -->
+  <circle cx="240" cy="175" r="33" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="240" y="181" text-anchor="middle" font-size="18" font-weight="bold" fill="#14532D">②</text>
+
+  <!-- ③ (420, 85) 보라 - 비임계 -->
+  <circle cx="420" cy="85" r="33" fill="#DDD6FE" stroke="#7C3AED" stroke-width="2.5"/>
+  <text x="420" y="91" text-anchor="middle" font-size="18" font-weight="bold" fill="#4C1D95">③</text>
+
+  <!-- ④ (420, 265) 초록 - 임계 -->
+  <circle cx="420" cy="265" r="33" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="420" y="271" text-anchor="middle" font-size="18" font-weight="bold" fill="#14532D">④</text>
+
+  <!-- ⑤ (620, 85) 보라 - 비임계 -->
+  <circle cx="620" cy="85" r="33" fill="#DDD6FE" stroke="#7C3AED" stroke-width="2.5"/>
+  <text x="620" y="91" text-anchor="middle" font-size="18" font-weight="bold" fill="#4C1D95">⑤</text>
+
+  <!-- ⑥ (620, 265) 초록 - 임계 -->
+  <circle cx="620" cy="265" r="33" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="620" y="271" text-anchor="middle" font-size="18" font-weight="bold" fill="#14532D">⑥</text>
+
+  <!-- ⑦ (800, 175) 초록 - 임계 합류 -->
+  <circle cx="800" cy="175" r="33" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="800" y="181" text-anchor="middle" font-size="18" font-weight="bold" fill="#14532D">⑦</text>
+
+  <!-- ⑧ (980, 175) 초록 - 임계 -->
+  <circle cx="980" cy="175" r="33" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="980" y="181" text-anchor="middle" font-size="18" font-weight="bold" fill="#14532D">⑧</text>
+
+  <!-- ⑨ 종료 (1148, 175) 노란색 -->
+  <circle cx="1148" cy="175" r="33" fill="#FEF08A" stroke="#EAB308" stroke-width="3"/>
+  <text x="1148" y="171" text-anchor="middle" font-size="15" font-weight="bold" fill="#78350F">⑨</text>
+  <text x="1148" y="187" text-anchor="middle" font-size="11" fill="#78350F">종료</text>
+
+  <!-- ── 범례 ── -->
+  <circle cx="22" cy="318" r="8" fill="#FEF08A" stroke="#EAB308" stroke-width="2"/>
+  <text x="36" y="323" font-size="11" fill="#555">시작/종료</text>
+
+  <circle cx="118" cy="318" r="8" fill="#BBF7D0" stroke="#16A34A" stroke-width="2"/>
+  <text x="132" y="323" font-size="11" fill="#555">임계경로 노드</text>
+
+  <circle cx="240" cy="318" r="8" fill="#DDD6FE" stroke="#7C3AED" stroke-width="2"/>
+  <text x="254" y="323" font-size="11" fill="#555">비임계 노드</text>
+
+  <line x1="345" y1="318" x2="372" y2="318" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="386" y="323" font-size="11" fill="#555">임계경로 A→D→E→G→H→I (108일)</text>
+
+  <line x1="610" y1="318" x2="637" y2="318" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arr-gray)"/>
+  <text x="651" y="323" font-size="11" fill="#555">비임계경로 B→C→F (106일)</text>
+
+</svg>

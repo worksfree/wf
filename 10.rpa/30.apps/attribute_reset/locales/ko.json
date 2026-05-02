@@ -1,0 +1,7 @@
+{
+  "title":         "속성 리셋 {ver}",
+  "run_button":    "시작",
+  "complete_msg":  "속성 변경 작업이 완료되었습니다.",
+  "folder_dialog": "DWG 파일이 있는 폴더 선택",
+  "excel_dialog":  "엑셀 파일 선택"
+}

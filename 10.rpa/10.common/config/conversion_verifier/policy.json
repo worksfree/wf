@@ -1,0 +1,16 @@
+{
+  "identity": {
+    "app_name": "conversion_verifier",
+    "short_name": "cv",
+    "display_name": "Conversion Verifier"
+  },
+  "policy": {
+    "icon_text": "CV",
+    "description": "도면 변환 검증 앱(SLDDRW=>DWG) - 무료",
+    "trial_credits": -1,
+    "credit_per_work": 0,
+    "credit_type": "free"
+  },
+  "source": "bundled",
+  "last_updated": "2026-02-03T16:12:57.422"
+}

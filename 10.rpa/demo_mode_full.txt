@@ -1,0 +1,2094 @@
+﻿python : 2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: Deplo
+ymentSuite
+위치 줄:1 문자:68
++ ... ycle_test ; python run_certification.py --app be dp ar dc cv kfn q
+r - ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo          : NotSpecified: (2026-02-02 22:2...Deployme 
+   ntSuite:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: PackageIntegri
+tySuite
+2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: ExecutionEnvir
+onmentSuite
+2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: ConfigSuite
+2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: SecuritySuite
+2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: RegistrationSu
+ite
+2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: CreditSuite
+2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: StateSuite
+2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: RecoverySuite
+2026-02-02 22:23:21 [INFO] [CertEngine] Registered suite: UISuite
+2026-02-02 22:23:21 [INFO] =============================================
+===============
+2026-02-02 22:23:21 [INFO]   WF-ACT Certification: bom_exporter
+2026-02-02 22:23:21 [INFO]   Target Level: FULL
+2026-02-02 22:23:21 [INFO] =============================================
+===============
+2026-02-02 22:23:21 [INFO] [TestClient] Dev mode: running D:\drive_files
+\10.worksfree\10.rpa\30.apps\bom_exporter\ui_main.py
+2026-02-02 22:23:21 [INFO] [TestClient] Launched BOM Exporter (PID: 3726
+4)
+2026-02-02 22:23:25 [INFO] [TestClient] Server ready
+2026-02-02 22:23:25 [INFO] 
+[Suite] Deployment Suite
+2026-02-02 22:23:25 [INFO]   배포 파일 및 환경 설정 인증 테스트 (BAT 파일, DEV/RELEASE 환
+경)
+2026-02-02 22:23:25 [INFO] ----------------------------------------
+2026-02-02 22:23:25 [INFO]   ✓ test_01_setup_worksfree_bat_exists: Passe
+d
+2026-02-02 22:23:25 [INFO]   ✓ test_02_shortcut_bat_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_03_app_reset_bat_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_04_wf_reset_all_bat_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_05_uninstall_bat_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_06_sync_registration_bat_exists: Pas
+sed
+2026-02-02 22:23:25 [INFO]   ✓ test_07_wf_rpa_config_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_08_google_sheets_section_exists: Pas
+sed
+2026-02-02 22:23:25 [INFO]   ✓ test_09_sheet_id_release_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_10_sheet_id_dev_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_11_credentials_file_release_exists: 
+Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_12_credentials_file_dev_exists: Pass
+ed
+2026-02-02 22:23:25 [INFO]   ✓ test_13_release_credentials_file_exists: 
+Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_14_dev_credentials_file_exists: Pass
+ed
+2026-02-02 22:23:25 [INFO]   ✓ test_15_sheet_ids_are_different: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_16_credentials_files_are_different: 
+Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_17_setup_bat_has_korean_encoding: Pa
+ssed
+2026-02-02 22:23:25 [INFO]   ✓ test_18_no_duplicate_shortcut_bat: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_19_email_settings_exist: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_20_app_policy_files_exist: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_21_app_settings_files_exist: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_22_user_manual_pdf_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_23_app_icon_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_24_spec_file_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_25_build_script_exists: Passed
+2026-02-02 22:23:25 [INFO]   [PASS] Deployment Suite: 25/25
+2026-02-02 22:23:25 [INFO] 
+[Suite] Package Integrity Suite
+2026-02-02 22:23:25 [INFO]   배포 패키지 완전성 인증 테스트 (exe 내부 파일, 크리덴셜, 버전 정보)
+2026-02-02 22:23:25 [INFO] ----------------------------------------
+2026-02-02 22:23:25 [WARNING] [PackageIntegrity] Skipping - only runs in
+ EXE mode
+2026-02-02 22:23:25 [INFO]   ✓ test_01_internal_directory_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_02_wf_rpa_bundle_dir_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_03_bundle_settings_json_exists: Pass
+ed
+2026-02-02 22:23:25 [INFO]   ✓ test_04_bundle_version_info_exists: Passe
+d
+2026-02-02 22:23:25 [INFO]   ✓ test_05_release_credential_file_exists: P
+assed
+2026-02-02 22:23:25 [INFO]   ✓ test_06_dev_credential_file_exists: Passe
+d
+2026-02-02 22:23:25 [INFO]   ✓ test_07_release_credential_valid_json: Pa
+ssed
+2026-02-02 22:23:25 [INFO]   ✓ test_08_bundle_config_file_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_09_bundle_config_sheet_ids: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_10_nsis_installer_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_11_google_sheets_config_consistency:
+ Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_12_credential_environment_separation
+: Passed
+2026-02-02 22:23:25 [INFO]   [PASS] Package Integrity Suite: 12/12
+2026-02-02 22:23:25 [INFO] 
+[Suite] Execution Environment Suite
+2026-02-02 22:23:25 [INFO]   실행 환경 인증 테스트 (싱글 인스턴스, 설정 폴더 참조)
+2026-02-02 22:23:25 [INFO] ----------------------------------------
+2026-02-02 22:23:25 [INFO]   ✓ test_01_config_folder_location: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_02_config_files_exist: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_03_user_home_initialized: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_04_wf_rpa_config_accessible: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_05_credentials_accessible: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_06_config_reload_works: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_07_multiple_config_reads: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_08_dev_exe_mode_detection: Passed
+2026-02-02 22:23:25 [INFO]   [PASS] Execution Environment Suite: 8/8
+2026-02-02 22:23:25 [INFO] 
+[Suite] Config Suite
+2026-02-02 22:23:25 [INFO]   설정 관리 인증 테스트 (policy.json, settings.json 로드
+ 및 검증)
+2026-02-02 22:23:25 [INFO] ----------------------------------------
+2026-02-02 22:23:25 [INFO] 📋 유료 앱 정책 검증: trial=10000, per_work=100, 공식=
+100×100=10000
+2026-02-02 22:23:25 [INFO] ✅ 유료 앱 정책 확인: trial_credits=10000, credit_per
+_work=100
+2026-02-02 22:23:25 [INFO]   ✓ test_01_initial_deployment_policy: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_02_get_policy: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_03_policy_has_identity: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_04_policy_has_credit_info: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_05_get_settings: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_06_settings_has_version: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_07_policy_trial_credits: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_08_policy_display_name: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_09_config_consistency: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_10_wf_rpa_config_exists: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_11_email_settings_exist: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_12_google_sheets_config: Passed
+2026-02-02 22:23:25 [INFO]   ✓ test_13_credentials_available: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_14_google_sheets_connectivity: Passe
+d
+2026-02-02 22:23:26 [INFO]   ✓ test_15_config_reload: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_16_version_format_valid: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_17_log_directory_structure: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_18_version_minimum_requirement: Pass
+ed
+2026-02-02 22:23:26 [INFO]   ✓ test_19_version_display_format: Passed
+2026-02-02 22:23:26 [INFO] 📋 유료 앱 체험판 공식 검증: trial = 100 × 100 = 10000
+2026-02-02 22:23:26 [INFO]   ✓ test_20_trial_credits_formula: Passed
+2026-02-02 22:23:26 [INFO]   [PASS] Config Suite: 20/20
+2026-02-02 22:23:26 [INFO] 
+[Suite] Security Suite
+2026-02-02 22:23:26 [INFO]   보안 인증 테스트 (자격증명 하드코딩, 민감파일 관리)
+2026-02-02 22:23:26 [INFO] ----------------------------------------
+2026-02-02 22:23:26 [INFO]   ✓ test_01_no_hardcoded_passwords: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_02_no_private_keys_in_source: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_03_gitignore_has_sensitive_patterns:
+ Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_04_no_env_files_in_app: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_05_credentials_in_config_not_source:
+ Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_06_no_debug_credentials: Passed
+2026-02-02 22:23:26 [INFO]   [PASS] Security Suite: 6/6
+2026-02-02 22:23:26 [INFO] 
+[Suite] Registration Suite
+2026-02-02 22:23:26 [INFO]   등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화
+)
+2026-02-02 22:23:26 [INFO] ----------------------------------------
+2026-02-02 22:23:26 [INFO]   ✓ test_01_get_registration_status: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_02_status_has_required_fields: Passe
+d
+2026-02-02 22:23:26 [INFO]   ✓ test_03_unregistered_state_detected: Pass
+ed
+2026-02-02 22:23:26 [INFO]   ✓ test_04_register_with_email: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_05_registered_email_stored: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_06_duplicate_registration_handled: P
+assed
+2026-02-02 22:23:26 [INFO]   ✓ test_07_invalid_email_rejected: Passed
+2026-02-02 22:23:26 [INFO]   ✓ test_08_registration_timestamp: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_09_clear_registration: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_10_registration_persists: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_11_registration_with_trial_credits: 
+Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_12_hardware_id_stored: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_13_sync_registration_to_server: Pass
+ed
+2026-02-02 22:23:27 [INFO]   ✓ test_14_registration_version_tracked: Pas
+sed
+2026-02-02 22:23:27 [INFO]   ✓ test_15_unregistered_limited_functionalit
+y: Passed
+2026-02-02 22:23:27 [INFO]   [PASS] Registration Suite: 15/15
+2026-02-02 22:23:27 [INFO] 
+[Suite] Credit Suite
+2026-02-02 22:23:27 [INFO]   크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)
+2026-02-02 22:23:27 [INFO] ----------------------------------------
+2026-02-02 22:23:27 [INFO]   ✓ test_01_get_credits: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_02_set_credits: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_03_credit_deduction_single: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_04_insufficient_credits_blocked: Pas
+sed
+2026-02-02 22:23:27 [INFO]   ✓ test_05_zero_credits_blocked: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_06_credit_deduction_multiple: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_07_exact_credits_works: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_08_one_short_blocked: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_09_mid_work_exhaustion: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_10_purchase_credits: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_11_resume_after_purchase: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_12_continuous_work_sequence: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_13_resume_continuous_work: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_14_negative_credits_prevented: Passe
+d
+2026-02-02 22:23:27 [INFO]   ✓ test_15_large_credit_amount: Passed
+2026-02-02 22:23:27 [INFO]   ✓ test_16_credit_persistence_check: Passed
+2026-02-02 22:23:28 [INFO]   ✓ test_17_concurrent_credit_operations: Pas
+sed
+2026-02-02 22:23:28 [INFO]   ✓ test_18_trial_credits_initial: Passed
+2026-02-02 22:23:28 [INFO]   ✓ test_19_credit_history_json_exists: Passe
+d
+2026-02-02 22:23:28 [INFO]   ✓ test_20_credit_usage_log_after_work: Pass
+ed
+2026-02-02 22:23:28 [INFO]   ✓ test_21_google_sheets_sync_config: Passed
+2026-02-02 22:23:28 [INFO]   ✓ test_22_credit_sync_on_exit_handler: Pass
+ed
+2026-02-02 22:23:30 [INFO]   ✗ test_23_end_to_end_credit_sync: credit_da
+ta.json이 생성되지 않았습니다 (무료 앱일 수 있음)
+2026-02-02 22:23:30 [INFO]   ✗ test_24_google_sheets_write_verification:
+ wf_googlesheets_manager를 임포트할 수 없습니다
+2026-02-02 22:23:30 [INFO]   ✗ test_26_e2e_credit_sync_flow: credit_data
+.json 파일이 없습니다: C:\Users\USER\.wf_rpa\bom_exporter\credit_data.json
+2026-02-02 22:23:30 [INFO]   ✗ test_27_google_sheets_sync_actual: Google
+ Sheets 동기화 테스트 실패: [Errno 2] No such file or directory: 'C:\\Users\\USE
+R\\.wf_rpa\\bom_exporter\\credit_data.json'
+2026-02-02 22:23:30 [INFO]   [FAIL] Credit Suite: 22/26
+2026-02-02 22:23:30 [INFO] 
+[Suite] State Suite
+2026-02-02 22:23:30 [INFO]   상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)
+2026-02-02 22:23:30 [INFO] ----------------------------------------
+2026-02-02 22:23:30 [INFO]   ✓ test_01_get_state: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_02_state_has_required_fields: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_03_state_consistency: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_04_save_settings: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_05_load_settings: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_06_settings_persistence: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_07_session_id_exists: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_08_last_activity_tracked: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_09_work_progress_saved: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_10_state_after_error: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_11_concurrent_state_access: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_12_state_size_reasonable: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_13_cross_app_mutex: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_14_memory_usage_reasonable: Passed
+2026-02-02 22:23:30 [INFO]   [PASS] State Suite: 14/14
+2026-02-02 22:23:30 [INFO] 
+[Suite] Recovery Suite
+2026-02-02 22:23:30 [INFO]   오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)
+2026-02-02 22:23:30 [INFO] ----------------------------------------
+2026-02-02 22:23:30 [INFO]   ✓ test_01_invalid_command_handled: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_02_null_argument_handled: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_03_negative_credits_handled: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_04_empty_string_handled: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_05_state_preserved_after_error: Pass
+ed
+2026-02-02 22:23:30 [INFO]   ✓ test_06_rapid_error_recovery: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_07_work_with_invalid_file_count: Pas
+sed
+2026-02-02 22:23:30 [INFO]   ✓ test_08_large_number_handled: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_09_timeout_handling: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_10_unicode_handling: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_11_special_characters_handled: Passe
+d
+2026-02-02 22:23:30 [INFO]   ✓ test_12_partial_work_recovery: Passed
+2026-02-02 22:23:30 [INFO]   [PASS] Recovery Suite: 12/12
+2026-02-02 22:23:30 [INFO] 
+[Suite] UI Suite
+2026-02-02 22:23:30 [INFO]   UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)
+2026-02-02 22:23:30 [INFO] ----------------------------------------
+2026-02-02 22:23:30 [INFO]   ✓ test_01_get_ui_state: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_02_app_responsive: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_03_multiple_rapid_calls: Passed
+2026-02-02 22:23:30 [INFO]   ✓ test_04_button_states: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_05_work_button_disabled_when_no_cred
+its: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_06_work_button_enabled_when_credits_
+available: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_07_credits_display_updated: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_08_progress_indication: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_09_non_blocking_response: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_10_status_message_available: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_11_window_title_reflects_state: Pass
+ed
+2026-02-02 22:23:31 [INFO]   ✓ test_12_screenshot_capability: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_13_tooltips_bound_to_labels: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_14_app_loading_time: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_15_alt_g_admin_toggle: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_16_window_popup_center_alignment: Pa
+ssed
+2026-02-02 22:23:31 [INFO]   ✓ test_17_adaptive_ui_font_size: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_18_adaptive_ui_window_height: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_19_dpi_scaling_support: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_20_window_geometry_saved: Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_21_credits_display_comma_separator: 
+Passed
+2026-02-02 22:23:31 [INFO]   ✓ test_22_free_app_credit_display: Passed
+2026-02-02 22:23:31 [INFO] [bom_exporter] 체험판 크레딧 표시 정상: 체험판:10,000(건당 1
+00) (정책: 10,000)
+2026-02-02 22:23:31 [INFO]   ✓ test_23_credit_display_error_check: Passe
+d
+2026-02-02 22:23:31 [INFO]   [PASS] UI Suite: 23/23
+2026-02-02 22:23:32 [INFO] [TestClient] App terminated
+2026-02-02 22:23:32 [INFO] =============================================
+===============
+2026-02-02 22:23:32 [INFO]   Certification Result: NONE
+2026-02-02 22:23:32 [INFO]   Tests: 157/161 passed
+2026-02-02 22:23:32 [INFO]   Duration: 10.7s
+2026-02-02 22:23:32 [INFO] =============================================
+===============
+2026-02-02 22:23:32 [INFO] =============================================
+===============
+2026-02-02 22:23:32 [INFO]   WF-ACT Certification: dwg_batch_print
+2026-02-02 22:23:32 [INFO]   Target Level: FULL
+2026-02-02 22:23:32 [INFO] =============================================
+===============
+2026-02-02 22:23:32 [INFO] [TestClient] Dev mode: running D:\drive_files
+\10.worksfree\10.rpa\30.apps\dwg_batch_print\ui_main.py
+2026-02-02 22:23:32 [INFO] [TestClient] Launched DWG Batch Print (PID: 3
+7704)
+2026-02-02 22:23:35 [INFO] [TestClient] Server ready
+2026-02-02 22:23:35 [INFO] 
+[Suite] Deployment Suite
+2026-02-02 22:23:35 [INFO]   배포 파일 및 환경 설정 인증 테스트 (BAT 파일, DEV/RELEASE 환
+경)
+2026-02-02 22:23:35 [INFO] ----------------------------------------
+2026-02-02 22:23:35 [INFO]   ✓ test_01_setup_worksfree_bat_exists: Passe
+d
+2026-02-02 22:23:35 [INFO]   ✓ test_02_shortcut_bat_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_03_app_reset_bat_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_04_wf_reset_all_bat_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_05_uninstall_bat_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_06_sync_registration_bat_exists: Pas
+sed
+2026-02-02 22:23:35 [INFO]   ✓ test_07_wf_rpa_config_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_08_google_sheets_section_exists: Pas
+sed
+2026-02-02 22:23:35 [INFO]   ✓ test_09_sheet_id_release_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_10_sheet_id_dev_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_11_credentials_file_release_exists: 
+Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_12_credentials_file_dev_exists: Pass
+ed
+2026-02-02 22:23:35 [INFO]   ✓ test_13_release_credentials_file_exists: 
+Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_14_dev_credentials_file_exists: Pass
+ed
+2026-02-02 22:23:35 [INFO]   ✓ test_15_sheet_ids_are_different: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_16_credentials_files_are_different: 
+Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_17_setup_bat_has_korean_encoding: Pa
+ssed
+2026-02-02 22:23:35 [INFO]   ✓ test_18_no_duplicate_shortcut_bat: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_19_email_settings_exist: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_20_app_policy_files_exist: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_21_app_settings_files_exist: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_22_user_manual_pdf_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_23_app_icon_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_24_spec_file_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_25_build_script_exists: Passed
+2026-02-02 22:23:35 [INFO]   [PASS] Deployment Suite: 25/25
+2026-02-02 22:23:35 [INFO] 
+[Suite] Package Integrity Suite
+2026-02-02 22:23:35 [INFO]   배포 패키지 완전성 인증 테스트 (exe 내부 파일, 크리덴셜, 버전 정보)
+2026-02-02 22:23:35 [INFO] ----------------------------------------
+2026-02-02 22:23:35 [WARNING] [PackageIntegrity] Skipping - only runs in
+ EXE mode
+2026-02-02 22:23:35 [INFO]   ✓ test_01_internal_directory_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_02_wf_rpa_bundle_dir_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_03_bundle_settings_json_exists: Pass
+ed
+2026-02-02 22:23:35 [INFO]   ✓ test_04_bundle_version_info_exists: Passe
+d
+2026-02-02 22:23:35 [INFO]   ✓ test_05_release_credential_file_exists: P
+assed
+2026-02-02 22:23:35 [INFO]   ✓ test_06_dev_credential_file_exists: Passe
+d
+2026-02-02 22:23:35 [INFO]   ✓ test_07_release_credential_valid_json: Pa
+ssed
+2026-02-02 22:23:35 [INFO]   ✓ test_08_bundle_config_file_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_09_bundle_config_sheet_ids: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_10_nsis_installer_exists: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_11_google_sheets_config_consistency:
+ Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_12_credential_environment_separation
+: Passed
+2026-02-02 22:23:35 [INFO]   [PASS] Package Integrity Suite: 12/12
+2026-02-02 22:23:35 [INFO] 
+[Suite] Execution Environment Suite
+2026-02-02 22:23:35 [INFO]   실행 환경 인증 테스트 (싱글 인스턴스, 설정 폴더 참조)
+2026-02-02 22:23:35 [INFO] ----------------------------------------
+2026-02-02 22:23:35 [INFO]   ✓ test_01_config_folder_location: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_02_config_files_exist: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_03_user_home_initialized: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_04_wf_rpa_config_accessible: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_05_credentials_accessible: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_06_config_reload_works: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_07_multiple_config_reads: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_08_dev_exe_mode_detection: Passed
+2026-02-02 22:23:35 [INFO]   [PASS] Execution Environment Suite: 8/8
+2026-02-02 22:23:35 [INFO] 
+[Suite] Config Suite
+2026-02-02 22:23:35 [INFO]   설정 관리 인증 테스트 (policy.json, settings.json 로드
+ 및 검증)
+2026-02-02 22:23:35 [INFO] ----------------------------------------
+2026-02-02 22:23:35 [INFO] 📋 유료 앱 정책 검증: trial=4000, per_work=40, 공식=40
+×100=4000
+2026-02-02 22:23:35 [INFO] ✅ 유료 앱 정책 확인: trial_credits=4000, credit_per_
+work=40
+2026-02-02 22:23:35 [INFO]   ✓ test_01_initial_deployment_policy: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_02_get_policy: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_03_policy_has_identity: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_04_policy_has_credit_info: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_05_get_settings: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_06_settings_has_version: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_07_policy_trial_credits: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_08_policy_display_name: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_09_config_consistency: Passed
+2026-02-02 22:23:35 [INFO]   ✓ test_10_wf_rpa_config_exists: Passed
+2026-02-02 22:23:36 [INFO]   ✓ test_11_email_settings_exist: Passed
+2026-02-02 22:23:36 [INFO]   ✓ test_12_google_sheets_config: Passed
+2026-02-02 22:23:36 [INFO]   ✓ test_13_credentials_available: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_14_google_sheets_connectivity: Passe
+d
+2026-02-02 22:23:37 [INFO]   ✓ test_15_config_reload: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_16_version_format_valid: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_17_log_directory_structure: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_18_version_minimum_requirement: Pass
+ed
+2026-02-02 22:23:37 [INFO]   ✓ test_19_version_display_format: Passed
+2026-02-02 22:23:37 [INFO] 📋 유료 앱 체험판 공식 검증: trial = 40 × 100 = 4000
+2026-02-02 22:23:37 [INFO]   ✓ test_20_trial_credits_formula: Passed
+2026-02-02 22:23:37 [INFO]   [PASS] Config Suite: 20/20
+2026-02-02 22:23:37 [INFO] 
+[Suite] Security Suite
+2026-02-02 22:23:37 [INFO]   보안 인증 테스트 (자격증명 하드코딩, 민감파일 관리)
+2026-02-02 22:23:37 [INFO] ----------------------------------------
+2026-02-02 22:23:37 [INFO]   ✓ test_01_no_hardcoded_passwords: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_02_no_private_keys_in_source: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_03_gitignore_has_sensitive_patterns:
+ Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_04_no_env_files_in_app: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_05_credentials_in_config_not_source:
+ Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_06_no_debug_credentials: Passed
+2026-02-02 22:23:37 [INFO]   [PASS] Security Suite: 6/6
+2026-02-02 22:23:37 [INFO] 
+[Suite] Registration Suite
+2026-02-02 22:23:37 [INFO]   등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화
+)
+2026-02-02 22:23:37 [INFO] ----------------------------------------
+2026-02-02 22:23:37 [INFO]   ✓ test_01_get_registration_status: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_02_status_has_required_fields: Passe
+d
+2026-02-02 22:23:37 [INFO]   ✓ test_03_unregistered_state_detected: Pass
+ed
+2026-02-02 22:23:37 [INFO]   ✓ test_04_register_with_email: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_05_registered_email_stored: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_06_duplicate_registration_handled: P
+assed
+2026-02-02 22:23:37 [INFO]   ✓ test_07_invalid_email_rejected: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_08_registration_timestamp: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_09_clear_registration: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_10_registration_persists: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_11_registration_with_trial_credits: 
+Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_12_hardware_id_stored: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_13_sync_registration_to_server: Pass
+ed
+2026-02-02 22:23:37 [INFO]   ✓ test_14_registration_version_tracked: Pas
+sed
+2026-02-02 22:23:37 [INFO]   ✓ test_15_unregistered_limited_functionalit
+y: Passed
+2026-02-02 22:23:37 [INFO]   [PASS] Registration Suite: 15/15
+2026-02-02 22:23:37 [INFO] 
+[Suite] Credit Suite
+2026-02-02 22:23:37 [INFO]   크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)
+2026-02-02 22:23:37 [INFO] ----------------------------------------
+2026-02-02 22:23:37 [INFO]   ✓ test_01_get_credits: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_02_set_credits: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_03_credit_deduction_single: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_04_insufficient_credits_blocked: Pas
+sed
+2026-02-02 22:23:37 [INFO]   ✓ test_05_zero_credits_blocked: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_06_credit_deduction_multiple: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_07_exact_credits_works: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_08_one_short_blocked: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_09_mid_work_exhaustion: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_10_purchase_credits: Passed
+2026-02-02 22:23:37 [INFO]   ✓ test_11_resume_after_purchase: Passed
+2026-02-02 22:23:38 [INFO]   ✓ test_12_continuous_work_sequence: Passed
+2026-02-02 22:23:38 [INFO]   ✓ test_13_resume_continuous_work: Passed
+2026-02-02 22:23:38 [INFO]   ✓ test_14_negative_credits_prevented: Passe
+d
+2026-02-02 22:23:38 [INFO]   ✓ test_15_large_credit_amount: Passed
+2026-02-02 22:23:38 [INFO]   ✓ test_16_credit_persistence_check: Passed
+2026-02-02 22:23:38 [INFO]   ✓ test_17_concurrent_credit_operations: Pas
+sed
+2026-02-02 22:23:38 [INFO]   ✓ test_18_trial_credits_initial: Passed
+2026-02-02 22:23:38 [INFO]   ✓ test_19_credit_history_json_exists: Passe
+d
+2026-02-02 22:23:38 [INFO]   ✓ test_20_credit_usage_log_after_work: Pass
+ed
+2026-02-02 22:23:38 [INFO]   ✓ test_21_google_sheets_sync_config: Passed
+2026-02-02 22:23:38 [INFO]   ✓ test_22_credit_sync_on_exit_handler: Pass
+ed
+2026-02-02 22:23:40 [INFO]   ✗ test_23_end_to_end_credit_sync: credit_da
+ta.json이 생성되지 않았습니다 (무료 앱일 수 있음)
+2026-02-02 22:23:40 [INFO]   ✗ test_24_google_sheets_write_verification:
+ wf_googlesheets_manager를 임포트할 수 없습니다
+2026-02-02 22:23:40 [INFO]   ✗ test_26_e2e_credit_sync_flow: credit_data
+.json 파일이 없습니다: C:\Users\USER\.wf_rpa\dwg_batch_print\credit_data.json
+2026-02-02 22:23:40 [INFO]   ✗ test_27_google_sheets_sync_actual: Google
+ Sheets 동기화 테스트 실패: [Errno 2] No such file or directory: 'C:\\Users\\USE
+R\\.wf_rpa\\dwg_batch_print\\credit_data.json'
+2026-02-02 22:23:40 [INFO]   [FAIL] Credit Suite: 22/26
+2026-02-02 22:23:40 [INFO] 
+[Suite] State Suite
+2026-02-02 22:23:40 [INFO]   상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)
+2026-02-02 22:23:40 [INFO] ----------------------------------------
+2026-02-02 22:23:40 [INFO]   ✓ test_01_get_state: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_02_state_has_required_fields: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_03_state_consistency: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_04_save_settings: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_05_load_settings: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_06_settings_persistence: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_07_session_id_exists: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_08_last_activity_tracked: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_09_work_progress_saved: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_10_state_after_error: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_11_concurrent_state_access: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_12_state_size_reasonable: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_13_cross_app_mutex: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_14_memory_usage_reasonable: Passed
+2026-02-02 22:23:40 [INFO]   [PASS] State Suite: 14/14
+2026-02-02 22:23:40 [INFO] 
+[Suite] Recovery Suite
+2026-02-02 22:23:40 [INFO]   오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)
+2026-02-02 22:23:40 [INFO] ----------------------------------------
+2026-02-02 22:23:40 [INFO]   ✓ test_01_invalid_command_handled: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_02_null_argument_handled: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_03_negative_credits_handled: Passed
+2026-02-02 22:23:40 [INFO]   ✓ test_04_empty_string_handled: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_05_state_preserved_after_error: Pass
+ed
+2026-02-02 22:23:41 [INFO]   ✓ test_06_rapid_error_recovery: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_07_work_with_invalid_file_count: Pas
+sed
+2026-02-02 22:23:41 [INFO]   ✓ test_08_large_number_handled: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_09_timeout_handling: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_10_unicode_handling: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_11_special_characters_handled: Passe
+d
+2026-02-02 22:23:41 [INFO]   ✓ test_12_partial_work_recovery: Passed
+2026-02-02 22:23:41 [INFO]   [PASS] Recovery Suite: 12/12
+2026-02-02 22:23:41 [INFO] 
+[Suite] UI Suite
+2026-02-02 22:23:41 [INFO]   UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)
+2026-02-02 22:23:41 [INFO] ----------------------------------------
+2026-02-02 22:23:41 [INFO]   ✓ test_01_get_ui_state: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_02_app_responsive: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_03_multiple_rapid_calls: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_04_button_states: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_05_work_button_disabled_when_no_cred
+its: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_06_work_button_enabled_when_credits_
+available: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_07_credits_display_updated: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_08_progress_indication: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_09_non_blocking_response: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_10_status_message_available: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_11_window_title_reflects_state: Pass
+ed
+2026-02-02 22:23:41 [INFO]   ✓ test_12_screenshot_capability: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_13_tooltips_bound_to_labels: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_14_app_loading_time: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_15_alt_g_admin_toggle: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_16_window_popup_center_alignment: Pa
+ssed
+2026-02-02 22:23:41 [INFO]   ✓ test_17_adaptive_ui_font_size: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_18_adaptive_ui_window_height: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_19_dpi_scaling_support: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_20_window_geometry_saved: Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_21_credits_display_comma_separator: 
+Passed
+2026-02-02 22:23:41 [INFO]   ✓ test_22_free_app_credit_display: Passed
+2026-02-02 22:23:42 [INFO] [dwg_batch_print] 체험판 크레딧 표시 정상: 체험판:4,000(건당
+ 40) (정책: 4,000)
+2026-02-02 22:23:42 [INFO]   ✓ test_23_credit_display_error_check: Passe
+d
+2026-02-02 22:23:42 [INFO]   [PASS] UI Suite: 23/23
+2026-02-02 22:23:42 [INFO] [TestClient] App terminated
+2026-02-02 22:23:42 [INFO] =============================================
+===============
+2026-02-02 22:23:42 [INFO]   Certification Result: NONE
+2026-02-02 22:23:42 [INFO]   Tests: 157/161 passed
+2026-02-02 22:23:42 [INFO]   Duration: 10.6s
+2026-02-02 22:23:42 [INFO] =============================================
+===============
+2026-02-02 22:23:42 [INFO] =============================================
+===============
+2026-02-02 22:23:42 [INFO]   WF-ACT Certification: attribute_reset
+2026-02-02 22:23:42 [INFO]   Target Level: FULL
+2026-02-02 22:23:42 [INFO] =============================================
+===============
+2026-02-02 22:23:42 [INFO] [TestClient] Dev mode: running D:\drive_files
+\10.worksfree\10.rpa\30.apps\attribute_reset\ui_main.py
+2026-02-02 22:23:42 [INFO] [TestClient] Launched Attribute Reset (PID: 1
+4280)
+2026-02-02 22:23:43 [INFO] [TestClient] Server ready
+2026-02-02 22:23:43 [INFO] 
+[Suite] Deployment Suite
+2026-02-02 22:23:43 [INFO]   배포 파일 및 환경 설정 인증 테스트 (BAT 파일, DEV/RELEASE 환
+경)
+2026-02-02 22:23:43 [INFO] ----------------------------------------
+2026-02-02 22:23:43 [INFO]   ✓ test_01_setup_worksfree_bat_exists: Passe
+d
+2026-02-02 22:23:43 [INFO]   ✓ test_02_shortcut_bat_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_03_app_reset_bat_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_04_wf_reset_all_bat_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_05_uninstall_bat_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_06_sync_registration_bat_exists: Pas
+sed
+2026-02-02 22:23:43 [INFO]   ✓ test_07_wf_rpa_config_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_08_google_sheets_section_exists: Pas
+sed
+2026-02-02 22:23:43 [INFO]   ✓ test_09_sheet_id_release_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_10_sheet_id_dev_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_11_credentials_file_release_exists: 
+Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_12_credentials_file_dev_exists: Pass
+ed
+2026-02-02 22:23:43 [INFO]   ✓ test_13_release_credentials_file_exists: 
+Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_14_dev_credentials_file_exists: Pass
+ed
+2026-02-02 22:23:43 [INFO]   ✓ test_15_sheet_ids_are_different: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_16_credentials_files_are_different: 
+Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_17_setup_bat_has_korean_encoding: Pa
+ssed
+2026-02-02 22:23:43 [INFO]   ✓ test_18_no_duplicate_shortcut_bat: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_19_email_settings_exist: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_20_app_policy_files_exist: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_21_app_settings_files_exist: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_22_user_manual_pdf_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_23_app_icon_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_24_spec_file_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_25_build_script_exists: Passed
+2026-02-02 22:23:43 [INFO]   [PASS] Deployment Suite: 25/25
+2026-02-02 22:23:43 [INFO] 
+[Suite] Package Integrity Suite
+2026-02-02 22:23:43 [INFO]   배포 패키지 완전성 인증 테스트 (exe 내부 파일, 크리덴셜, 버전 정보)
+2026-02-02 22:23:43 [INFO] ----------------------------------------
+2026-02-02 22:23:43 [WARNING] [PackageIntegrity] Skipping - only runs in
+ EXE mode
+2026-02-02 22:23:43 [INFO]   ✓ test_01_internal_directory_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_02_wf_rpa_bundle_dir_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_03_bundle_settings_json_exists: Pass
+ed
+2026-02-02 22:23:43 [INFO]   ✓ test_04_bundle_version_info_exists: Passe
+d
+2026-02-02 22:23:43 [INFO]   ✓ test_05_release_credential_file_exists: P
+assed
+2026-02-02 22:23:43 [INFO]   ✓ test_06_dev_credential_file_exists: Passe
+d
+2026-02-02 22:23:43 [INFO]   ✓ test_07_release_credential_valid_json: Pa
+ssed
+2026-02-02 22:23:43 [INFO]   ✓ test_08_bundle_config_file_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_09_bundle_config_sheet_ids: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_10_nsis_installer_exists: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_11_google_sheets_config_consistency:
+ Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_12_credential_environment_separation
+: Passed
+2026-02-02 22:23:43 [INFO]   [PASS] Package Integrity Suite: 12/12
+2026-02-02 22:23:43 [INFO] 
+[Suite] Execution Environment Suite
+2026-02-02 22:23:43 [INFO]   실행 환경 인증 테스트 (싱글 인스턴스, 설정 폴더 참조)
+2026-02-02 22:23:43 [INFO] ----------------------------------------
+2026-02-02 22:23:43 [INFO]   ✓ test_01_config_folder_location: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_02_config_files_exist: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_03_user_home_initialized: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_04_wf_rpa_config_accessible: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_05_credentials_accessible: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_06_config_reload_works: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_07_multiple_config_reads: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_08_dev_exe_mode_detection: Passed
+2026-02-02 22:23:43 [INFO]   [PASS] Execution Environment Suite: 8/8
+2026-02-02 22:23:43 [INFO] 
+[Suite] Config Suite
+2026-02-02 22:23:43 [INFO]   설정 관리 인증 테스트 (policy.json, settings.json 로드
+ 및 검증)
+2026-02-02 22:23:43 [INFO] ----------------------------------------
+2026-02-02 22:23:43 [INFO] 📋 유료 앱 정책 검증: trial=20000, per_work=200, 공식=
+200×100=20000
+2026-02-02 22:23:43 [INFO] ✅ 유료 앱 정책 확인: trial_credits=20000, credit_per
+_work=200
+2026-02-02 22:23:43 [INFO]   ✓ test_01_initial_deployment_policy: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_02_get_policy: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_03_policy_has_identity: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_04_policy_has_credit_info: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_05_get_settings: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_06_settings_has_version: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_07_policy_trial_credits: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_08_policy_display_name: Passed
+2026-02-02 22:23:43 [INFO]   ✓ test_09_config_consistency: Passed
+2026-02-02 22:23:44 [INFO]   ✓ test_10_wf_rpa_config_exists: Passed
+2026-02-02 22:23:44 [INFO]   ✓ test_11_email_settings_exist: Passed
+2026-02-02 22:23:44 [INFO]   ✓ test_12_google_sheets_config: Passed
+2026-02-02 22:23:44 [INFO]   ✓ test_13_credentials_available: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_14_google_sheets_connectivity: Passe
+d
+2026-02-02 22:23:45 [INFO]   ✓ test_15_config_reload: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_16_version_format_valid: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_17_log_directory_structure: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_18_version_minimum_requirement: Pass
+ed
+2026-02-02 22:23:45 [INFO]   ✓ test_19_version_display_format: Passed
+2026-02-02 22:23:45 [INFO] 📋 유료 앱 체험판 공식 검증: trial = 200 × 100 = 20000
+2026-02-02 22:23:45 [INFO]   ✓ test_20_trial_credits_formula: Passed
+2026-02-02 22:23:45 [INFO]   [PASS] Config Suite: 20/20
+2026-02-02 22:23:45 [INFO] 
+[Suite] Security Suite
+2026-02-02 22:23:45 [INFO]   보안 인증 테스트 (자격증명 하드코딩, 민감파일 관리)
+2026-02-02 22:23:45 [INFO] ----------------------------------------
+2026-02-02 22:23:45 [INFO]   ✓ test_01_no_hardcoded_passwords: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_02_no_private_keys_in_source: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_03_gitignore_has_sensitive_patterns:
+ Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_04_no_env_files_in_app: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_05_credentials_in_config_not_source:
+ Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_06_no_debug_credentials: Passed
+2026-02-02 22:23:45 [INFO]   [PASS] Security Suite: 6/6
+2026-02-02 22:23:45 [INFO] 
+[Suite] Registration Suite
+2026-02-02 22:23:45 [INFO]   등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화
+)
+2026-02-02 22:23:45 [INFO] ----------------------------------------
+2026-02-02 22:23:45 [INFO]   ✓ test_01_get_registration_status: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_02_status_has_required_fields: Passe
+d
+2026-02-02 22:23:45 [INFO]   ✓ test_03_unregistered_state_detected: Pass
+ed
+2026-02-02 22:23:45 [INFO]   ✓ test_04_register_with_email: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_05_registered_email_stored: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_06_duplicate_registration_handled: P
+assed
+2026-02-02 22:23:45 [INFO]   ✓ test_07_invalid_email_rejected: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_08_registration_timestamp: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_09_clear_registration: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_10_registration_persists: Passed
+2026-02-02 22:23:45 [INFO]   ✗ test_11_registration_with_trial_credits: 
+체험판 크레딧 부여: 예상 20000, 실제 0
+2026-02-02 22:23:45 [INFO]   ✓ test_12_hardware_id_stored: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_13_sync_registration_to_server: Pass
+ed
+2026-02-02 22:23:45 [INFO]   ✓ test_14_registration_version_tracked: Pas
+sed
+2026-02-02 22:23:45 [INFO]   ✓ test_15_unregistered_limited_functionalit
+y: Passed
+2026-02-02 22:23:45 [INFO]   [FAIL] Registration Suite: 14/15
+2026-02-02 22:23:45 [INFO] 
+[Suite] Credit Suite
+2026-02-02 22:23:45 [INFO]   크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)
+2026-02-02 22:23:45 [INFO] ----------------------------------------
+2026-02-02 22:23:45 [INFO]   ✓ test_01_get_credits: Passed
+2026-02-02 22:23:45 [INFO]   ✗ test_02_set_credits: 크레딧 설정 실패: 0 != 5000
+2026-02-02 22:23:45 [INFO]   ✗ test_03_credit_deduction_single: 크레딧 차감 오
+류: 1000 - 200 = 800, 실제: 0
+2026-02-02 22:23:45 [INFO]   ✗ test_04_insufficient_credits_blocked: 차단된
+ 작업은 크레딧을 변경하면 안됨
+2026-02-02 22:23:45 [INFO]   ✓ test_05_zero_credits_blocked: Passed
+2026-02-02 22:23:45 [INFO]   ✗ test_06_credit_deduction_multiple: 다중 파일 
+크레딧 차감 오류: 3개 파일, 예상: 1400, 실제: 0
+2026-02-02 22:23:45 [INFO]   ✓ test_07_exact_credits_works: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_08_one_short_blocked: Passed
+2026-02-02 22:23:45 [INFO]   ✗ test_09_mid_work_exhaustion: 크레딧 소진 시 처리된
+ 파일 수: 예상 2, 실제 0
+2026-02-02 22:23:45 [INFO]   ✗ test_10_purchase_credits: 크레딧 구매 후: 예상 10
+00, 실제 0
+2026-02-02 22:23:45 [INFO]   ✓ test_11_resume_after_purchase: Passed
+2026-02-02 22:23:45 [INFO]   ✗ test_12_continuous_work_sequence: 5개 파일만 
+처리되어야 함: 실제 0
+2026-02-02 22:23:45 [INFO]   ✗ test_13_resume_continuous_work: 첫 번째 배치: 
+3개 처리되어야 함, 실제 0
+2026-02-02 22:23:45 [INFO]   ✓ test_14_negative_credits_prevented: Passe
+d
+2026-02-02 22:23:45 [INFO]   ✗ test_15_large_credit_amount: 대용량 크레딧 설정: 
+예상 999999999, 실제 0
+2026-02-02 22:23:45 [INFO]   ✗ test_16_credit_persistence_check: 크레딧 일관성
+ 오류 (읽기 #1): 예상 12345, 실제 0
+2026-02-02 22:23:45 [INFO]   ✗ test_17_concurrent_credit_operations: 연속 
+작업 후 크레딧: 예상 18000, 실제 0
+2026-02-02 22:23:45 [INFO]   ✓ test_18_trial_credits_initial: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_19_credit_history_json_exists: Passe
+d
+2026-02-02 22:23:45 [INFO]   ✓ test_20_credit_usage_log_after_work: Pass
+ed
+2026-02-02 22:23:45 [INFO]   ✓ test_21_google_sheets_sync_config: Passed
+2026-02-02 22:23:45 [INFO]   ✓ test_22_credit_sync_on_exit_handler: Pass
+ed
+2026-02-02 22:23:48 [INFO]   ✗ test_23_end_to_end_credit_sync: credit_da
+ta.json이 생성되지 않았습니다 (무료 앱일 수 있음)
+2026-02-02 22:23:48 [INFO]   ✗ test_24_google_sheets_write_verification:
+ wf_googlesheets_manager를 임포트할 수 없습니다
+2026-02-02 22:23:48 [INFO]   ✗ test_26_e2e_credit_sync_flow: credit_data
+.json 파일이 없습니다: C:\Users\USER\.wf_rpa\attribute_reset\credit_data.json
+2026-02-02 22:23:48 [INFO]   ✗ test_27_google_sheets_sync_actual: Google
+ Sheets 동기화 테스트 실패: [Errno 2] No such file or directory: 'C:\\Users\\USE
+R\\.wf_rpa\\attribute_reset\\credit_data.json'
+2026-02-02 22:23:48 [INFO]   [FAIL] Credit Suite: 11/26
+2026-02-02 22:23:48 [INFO] 
+[Suite] State Suite
+2026-02-02 22:23:48 [INFO]   상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)
+2026-02-02 22:23:48 [INFO] ----------------------------------------
+2026-02-02 22:23:48 [INFO]   ✓ test_01_get_state: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_02_state_has_required_fields: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_03_state_consistency: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_04_save_settings: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_05_load_settings: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_06_settings_persistence: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_07_session_id_exists: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_08_last_activity_tracked: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_09_work_progress_saved: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_10_state_after_error: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_11_concurrent_state_access: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_12_state_size_reasonable: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_13_cross_app_mutex: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_14_memory_usage_reasonable: Passed
+2026-02-02 22:23:48 [INFO]   [PASS] State Suite: 14/14
+2026-02-02 22:23:48 [INFO] 
+[Suite] Recovery Suite
+2026-02-02 22:23:48 [INFO]   오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)
+2026-02-02 22:23:48 [INFO] ----------------------------------------
+2026-02-02 22:23:48 [INFO]   ✓ test_01_invalid_command_handled: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_02_null_argument_handled: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_03_negative_credits_handled: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_04_empty_string_handled: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_05_state_preserved_after_error: Pass
+ed
+2026-02-02 22:23:48 [INFO]   ✓ test_06_rapid_error_recovery: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_07_work_with_invalid_file_count: Pas
+sed
+2026-02-02 22:23:48 [INFO]   ✓ test_08_large_number_handled: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_09_timeout_handling: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_10_unicode_handling: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_11_special_characters_handled: Passe
+d
+2026-02-02 22:23:48 [INFO]   ✓ test_12_partial_work_recovery: Passed
+2026-02-02 22:23:48 [INFO]   [PASS] Recovery Suite: 12/12
+2026-02-02 22:23:48 [INFO] 
+[Suite] UI Suite
+2026-02-02 22:23:48 [INFO]   UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)
+2026-02-02 22:23:48 [INFO] ----------------------------------------
+2026-02-02 22:23:48 [INFO]   ✓ test_01_get_ui_state: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_02_app_responsive: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_03_multiple_rapid_calls: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_04_button_states: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_05_work_button_disabled_when_no_cred
+its: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_06_work_button_enabled_when_credits_
+available: Passed
+2026-02-02 22:23:48 [INFO]   ✓ test_07_credits_display_updated: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_08_progress_indication: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_09_non_blocking_response: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_10_status_message_available: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_11_window_title_reflects_state: Pass
+ed
+2026-02-02 22:23:49 [INFO]   ✓ test_12_screenshot_capability: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_13_tooltips_bound_to_labels: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_14_app_loading_time: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_15_alt_g_admin_toggle: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_16_window_popup_center_alignment: Pa
+ssed
+2026-02-02 22:23:49 [INFO]   ✓ test_17_adaptive_ui_font_size: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_18_adaptive_ui_window_height: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_19_dpi_scaling_support: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_20_window_geometry_saved: Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_21_credits_display_comma_separator: 
+Passed
+2026-02-02 22:23:49 [INFO]   ✓ test_22_free_app_credit_display: Passed
+2026-02-02 22:23:49 [INFO] [attribute_reset] 체험판 크레딧 표시 정상: 체험판 20,000 (
+정책: 20,000)
+2026-02-02 22:23:49 [INFO]   ✓ test_23_credit_display_error_check: Passe
+d
+2026-02-02 22:23:49 [INFO]   [PASS] UI Suite: 23/23
+2026-02-02 22:23:49 [INFO] [TestClient] App terminated
+2026-02-02 22:23:49 [INFO] =============================================
+===============
+2026-02-02 22:23:49 [INFO]   Certification Result: NONE
+2026-02-02 22:23:49 [INFO]   Tests: 145/161 passed
+2026-02-02 22:23:49 [INFO]   Duration: 7.2s
+2026-02-02 22:23:49 [INFO] =============================================
+===============
+2026-02-02 22:23:49 [INFO] =============================================
+===============
+2026-02-02 22:23:49 [INFO]   WF-ACT Certification: dwg_classifier
+2026-02-02 22:23:49 [INFO]   Target Level: FULL
+2026-02-02 22:23:49 [INFO] =============================================
+===============
+2026-02-02 22:23:49 [INFO] [TestClient] Dev mode: running D:\drive_files
+\10.worksfree\10.rpa\50.data\dwg_classifier\ui_main.py
+2026-02-02 22:23:49 [INFO] [TestClient] Launched DWG Classifier (PID: 10
+628)
+2026-02-02 22:23:53 [INFO] [TestClient] Server ready
+2026-02-02 22:23:53 [INFO] 
+[Suite] Deployment Suite
+2026-02-02 22:23:53 [INFO]   배포 파일 및 환경 설정 인증 테스트 (BAT 파일, DEV/RELEASE 환
+경)
+2026-02-02 22:23:53 [INFO] ----------------------------------------
+2026-02-02 22:23:53 [INFO]   ✓ test_01_setup_worksfree_bat_exists: Passe
+d
+2026-02-02 22:23:53 [INFO]   ✓ test_02_shortcut_bat_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_03_app_reset_bat_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_04_wf_reset_all_bat_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_05_uninstall_bat_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_06_sync_registration_bat_exists: Pas
+sed
+2026-02-02 22:23:53 [INFO]   ✓ test_07_wf_rpa_config_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_08_google_sheets_section_exists: Pas
+sed
+2026-02-02 22:23:53 [INFO]   ✓ test_09_sheet_id_release_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_10_sheet_id_dev_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_11_credentials_file_release_exists: 
+Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_12_credentials_file_dev_exists: Pass
+ed
+2026-02-02 22:23:53 [INFO]   ✓ test_13_release_credentials_file_exists: 
+Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_14_dev_credentials_file_exists: Pass
+ed
+2026-02-02 22:23:53 [INFO]   ✓ test_15_sheet_ids_are_different: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_16_credentials_files_are_different: 
+Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_17_setup_bat_has_korean_encoding: Pa
+ssed
+2026-02-02 22:23:53 [INFO]   ✓ test_18_no_duplicate_shortcut_bat: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_19_email_settings_exist: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_20_app_policy_files_exist: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_21_app_settings_files_exist: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_22_user_manual_pdf_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_23_app_icon_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_24_spec_file_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_25_build_script_exists: Passed
+2026-02-02 22:23:53 [INFO]   [PASS] Deployment Suite: 25/25
+2026-02-02 22:23:53 [INFO] 
+[Suite] Package Integrity Suite
+2026-02-02 22:23:53 [INFO]   배포 패키지 완전성 인증 테스트 (exe 내부 파일, 크리덴셜, 버전 정보)
+2026-02-02 22:23:53 [INFO] ----------------------------------------
+2026-02-02 22:23:53 [WARNING] [PackageIntegrity] Skipping - only runs in
+ EXE mode
+2026-02-02 22:23:53 [INFO]   ✓ test_01_internal_directory_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_02_wf_rpa_bundle_dir_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_03_bundle_settings_json_exists: Pass
+ed
+2026-02-02 22:23:53 [INFO]   ✓ test_04_bundle_version_info_exists: Passe
+d
+2026-02-02 22:23:53 [INFO]   ✓ test_05_release_credential_file_exists: P
+assed
+2026-02-02 22:23:53 [INFO]   ✓ test_06_dev_credential_file_exists: Passe
+d
+2026-02-02 22:23:53 [INFO]   ✓ test_07_release_credential_valid_json: Pa
+ssed
+2026-02-02 22:23:53 [INFO]   ✓ test_08_bundle_config_file_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_09_bundle_config_sheet_ids: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_10_nsis_installer_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_11_google_sheets_config_consistency:
+ Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_12_credential_environment_separation
+: Passed
+2026-02-02 22:23:53 [INFO]   [PASS] Package Integrity Suite: 12/12
+2026-02-02 22:23:53 [INFO] 
+[Suite] Execution Environment Suite
+2026-02-02 22:23:53 [INFO]   실행 환경 인증 테스트 (싱글 인스턴스, 설정 폴더 참조)
+2026-02-02 22:23:53 [INFO] ----------------------------------------
+2026-02-02 22:23:53 [INFO]   ✓ test_01_config_folder_location: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_02_config_files_exist: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_03_user_home_initialized: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_04_wf_rpa_config_accessible: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_05_credentials_accessible: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_06_config_reload_works: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_07_multiple_config_reads: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_08_dev_exe_mode_detection: Passed
+2026-02-02 22:23:53 [INFO]   [PASS] Execution Environment Suite: 8/8
+2026-02-02 22:23:53 [INFO] 
+[Suite] Config Suite
+2026-02-02 22:23:53 [INFO]   설정 관리 인증 테스트 (policy.json, settings.json 로드
+ 및 검증)
+2026-02-02 22:23:53 [INFO] ----------------------------------------
+2026-02-02 22:23:53 [INFO] 📋 유료 앱 정책 검증: trial=5000, per_work=50, 공식=50
+×100=5000
+2026-02-02 22:23:53 [INFO] ✅ 유료 앱 정책 확인: trial_credits=5000, credit_per_
+work=50
+2026-02-02 22:23:53 [INFO]   ✓ test_01_initial_deployment_policy: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_02_get_policy: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_03_policy_has_identity: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_04_policy_has_credit_info: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_05_get_settings: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_06_settings_has_version: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_07_policy_trial_credits: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_08_policy_display_name: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_09_config_consistency: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_10_wf_rpa_config_exists: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_11_email_settings_exist: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_12_google_sheets_config: Passed
+2026-02-02 22:23:53 [INFO]   ✓ test_13_credentials_available: Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_14_google_sheets_connectivity: Passe
+d
+2026-02-02 22:23:54 [INFO]   ✓ test_15_config_reload: Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_16_version_format_valid: Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_17_log_directory_structure: Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_18_version_minimum_requirement: Pass
+ed
+2026-02-02 22:23:54 [INFO]   ✓ test_19_version_display_format: Passed
+2026-02-02 22:23:54 [INFO] 📋 유료 앱 체험판 공식 검증: trial = 50 × 100 = 5000
+2026-02-02 22:23:54 [INFO]   ✓ test_20_trial_credits_formula: Passed
+2026-02-02 22:23:54 [INFO]   [PASS] Config Suite: 20/20
+2026-02-02 22:23:54 [INFO] 
+[Suite] Security Suite
+2026-02-02 22:23:54 [INFO]   보안 인증 테스트 (자격증명 하드코딩, 민감파일 관리)
+2026-02-02 22:23:54 [INFO] ----------------------------------------
+2026-02-02 22:23:54 [INFO]   ✓ test_01_no_hardcoded_passwords: Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_02_no_private_keys_in_source: Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_03_gitignore_has_sensitive_patterns:
+ Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_04_no_env_files_in_app: Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_05_credentials_in_config_not_source:
+ Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_06_no_debug_credentials: Passed
+2026-02-02 22:23:54 [INFO]   [PASS] Security Suite: 6/6
+2026-02-02 22:23:54 [INFO] 
+[Suite] Registration Suite
+2026-02-02 22:23:54 [INFO]   등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화
+)
+2026-02-02 22:23:54 [INFO] ----------------------------------------
+2026-02-02 22:23:54 [INFO]   ✓ test_01_get_registration_status: Passed
+2026-02-02 22:23:54 [INFO]   ✓ test_02_status_has_required_fields: Passe
+d
+2026-02-02 22:23:54 [INFO]   ✓ test_03_unregistered_state_detected: Pass
+ed
+2026-02-02 22:23:54 [INFO]   ✓ test_04_register_with_email: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_05_registered_email_stored: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_06_duplicate_registration_handled: P
+assed
+2026-02-02 22:23:55 [INFO]   ✓ test_07_invalid_email_rejected: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_08_registration_timestamp: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_09_clear_registration: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_10_registration_persists: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_11_registration_with_trial_credits: 
+Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_12_hardware_id_stored: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_13_sync_registration_to_server: Pass
+ed
+2026-02-02 22:23:55 [INFO]   ✓ test_14_registration_version_tracked: Pas
+sed
+2026-02-02 22:23:55 [INFO]   ✓ test_15_unregistered_limited_functionalit
+y: Passed
+2026-02-02 22:23:55 [INFO]   [PASS] Registration Suite: 15/15
+2026-02-02 22:23:55 [INFO] 
+[Suite] Credit Suite
+2026-02-02 22:23:55 [INFO]   크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)
+2026-02-02 22:23:55 [INFO] ----------------------------------------
+2026-02-02 22:23:55 [INFO]   ✓ test_01_get_credits: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_02_set_credits: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_03_credit_deduction_single: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_04_insufficient_credits_blocked: Pas
+sed
+2026-02-02 22:23:55 [INFO]   ✓ test_05_zero_credits_blocked: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_06_credit_deduction_multiple: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_07_exact_credits_works: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_08_one_short_blocked: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_09_mid_work_exhaustion: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_10_purchase_credits: Passed
+2026-02-02 22:23:55 [INFO]   ✓ test_11_resume_after_purchase: Passed
+2026-02-02 22:23:56 [INFO]   ✓ test_12_continuous_work_sequence: Passed
+2026-02-02 22:23:56 [INFO]   ✓ test_13_resume_continuous_work: Passed
+2026-02-02 22:23:56 [INFO]   ✓ test_14_negative_credits_prevented: Passe
+d
+2026-02-02 22:23:56 [INFO]   ✓ test_15_large_credit_amount: Passed
+2026-02-02 22:23:56 [INFO]   ✓ test_16_credit_persistence_check: Passed
+2026-02-02 22:23:56 [INFO]   ✓ test_17_concurrent_credit_operations: Pas
+sed
+2026-02-02 22:23:56 [INFO]   ✓ test_18_trial_credits_initial: Passed
+2026-02-02 22:23:56 [INFO]   ✓ test_19_credit_history_json_exists: Passe
+d
+2026-02-02 22:23:56 [INFO]   ✓ test_20_credit_usage_log_after_work: Pass
+ed
+2026-02-02 22:23:56 [INFO]   ✓ test_21_google_sheets_sync_config: Passed
+2026-02-02 22:23:56 [INFO]   ✓ test_22_credit_sync_on_exit_handler: Pass
+ed
+2026-02-02 22:23:58 [INFO]   ✗ test_23_end_to_end_credit_sync: credit_da
+ta.json이 생성되지 않았습니다 (무료 앱일 수 있음)
+2026-02-02 22:23:58 [INFO]   ✗ test_24_google_sheets_write_verification:
+ wf_googlesheets_manager를 임포트할 수 없습니다
+2026-02-02 22:23:58 [INFO]   ✗ test_26_e2e_credit_sync_flow: credit_data
+.json 파일이 없습니다: C:\Users\USER\.wf_rpa\dwg_classifier\credit_data.json
+2026-02-02 22:23:58 [INFO]   ✗ test_27_google_sheets_sync_actual: Google
+ Sheets 동기화 테스트 실패: [Errno 2] No such file or directory: 'C:\\Users\\USE
+R\\.wf_rpa\\dwg_classifier\\credit_data.json'
+2026-02-02 22:23:58 [INFO]   [FAIL] Credit Suite: 22/26
+2026-02-02 22:23:58 [INFO] 
+[Suite] State Suite
+2026-02-02 22:23:58 [INFO]   상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)
+2026-02-02 22:23:58 [INFO] ----------------------------------------
+2026-02-02 22:23:58 [INFO]   ✓ test_01_get_state: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_02_state_has_required_fields: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_03_state_consistency: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_04_save_settings: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_05_load_settings: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_06_settings_persistence: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_07_session_id_exists: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_08_last_activity_tracked: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_09_work_progress_saved: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_10_state_after_error: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_11_concurrent_state_access: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_12_state_size_reasonable: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_13_cross_app_mutex: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_14_memory_usage_reasonable: Passed
+2026-02-02 22:23:58 [INFO]   [PASS] State Suite: 14/14
+2026-02-02 22:23:58 [INFO] 
+[Suite] Recovery Suite
+2026-02-02 22:23:58 [INFO]   오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)
+2026-02-02 22:23:58 [INFO] ----------------------------------------
+2026-02-02 22:23:58 [INFO]   ✓ test_01_invalid_command_handled: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_02_null_argument_handled: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_03_negative_credits_handled: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_04_empty_string_handled: Passed
+2026-02-02 22:23:58 [INFO]   ✓ test_05_state_preserved_after_error: Pass
+ed
+2026-02-02 22:23:59 [INFO]   ✓ test_06_rapid_error_recovery: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_07_work_with_invalid_file_count: Pas
+sed
+2026-02-02 22:23:59 [INFO]   ✓ test_08_large_number_handled: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_09_timeout_handling: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_10_unicode_handling: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_11_special_characters_handled: Passe
+d
+2026-02-02 22:23:59 [INFO]   ✓ test_12_partial_work_recovery: Passed
+2026-02-02 22:23:59 [INFO]   [PASS] Recovery Suite: 12/12
+2026-02-02 22:23:59 [INFO] 
+[Suite] UI Suite
+2026-02-02 22:23:59 [INFO]   UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)
+2026-02-02 22:23:59 [INFO] ----------------------------------------
+2026-02-02 22:23:59 [INFO]   ✓ test_01_get_ui_state: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_02_app_responsive: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_03_multiple_rapid_calls: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_04_button_states: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_05_work_button_disabled_when_no_cred
+its: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_06_work_button_enabled_when_credits_
+available: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_07_credits_display_updated: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_08_progress_indication: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_09_non_blocking_response: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_10_status_message_available: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_11_window_title_reflects_state: Pass
+ed
+2026-02-02 22:23:59 [INFO]   ✓ test_12_screenshot_capability: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_13_tooltips_bound_to_labels: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_14_app_loading_time: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_15_alt_g_admin_toggle: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_16_window_popup_center_alignment: Pa
+ssed
+2026-02-02 22:23:59 [INFO]   ✓ test_17_adaptive_ui_font_size: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_18_adaptive_ui_window_height: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_19_dpi_scaling_support: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_20_window_geometry_saved: Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_21_credits_display_comma_separator: 
+Passed
+2026-02-02 22:23:59 [INFO]   ✓ test_22_free_app_credit_display: Passed
+2026-02-02 22:23:59 [WARNING] [dwg_classifier] 크레딧 표시 확인 불가 - UI 노출 없음
+2026-02-02 22:23:59 [INFO]   ✓ test_23_credit_display_error_check: Passe
+d
+2026-02-02 22:23:59 [INFO]   [PASS] UI Suite: 23/23
+2026-02-02 22:24:00 [INFO] [TestClient] App terminated
+2026-02-02 22:24:00 [INFO] =============================================
+===============
+2026-02-02 22:24:00 [INFO]   Certification Result: NONE
+2026-02-02 22:24:00 [INFO]   Tests: 157/161 passed
+2026-02-02 22:24:00 [INFO]   Duration: 10.5s
+2026-02-02 22:24:00 [INFO] =============================================
+===============
+2026-02-02 22:24:00 [INFO] =============================================
+===============
+2026-02-02 22:24:00 [INFO]   WF-ACT Certification: conversion_verifier
+2026-02-02 22:24:00 [INFO]   Target Level: FULL
+2026-02-02 22:24:00 [INFO] =============================================
+===============
+2026-02-02 22:24:00 [INFO] [TestClient] Dev mode: running D:\drive_files
+\10.worksfree\10.rpa\50.data\conversion_verifier\ui_main.py
+2026-02-02 22:24:00 [INFO] [TestClient] Launched Conversion Verifier (PI
+D: 39560)
+2026-02-02 22:24:02 [INFO] [TestClient] Server ready
+2026-02-02 22:24:02 [INFO] 
+[Suite] Deployment Suite
+2026-02-02 22:24:02 [INFO]   배포 파일 및 환경 설정 인증 테스트 (BAT 파일, DEV/RELEASE 환
+경)
+2026-02-02 22:24:02 [INFO] ----------------------------------------
+2026-02-02 22:24:02 [INFO]   ✓ test_01_setup_worksfree_bat_exists: Passe
+d
+2026-02-02 22:24:02 [INFO]   ✓ test_02_shortcut_bat_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_03_app_reset_bat_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_04_wf_reset_all_bat_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_05_uninstall_bat_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_06_sync_registration_bat_exists: Pas
+sed
+2026-02-02 22:24:02 [INFO]   ✓ test_07_wf_rpa_config_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_08_google_sheets_section_exists: Pas
+sed
+2026-02-02 22:24:02 [INFO]   ✓ test_09_sheet_id_release_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_10_sheet_id_dev_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_11_credentials_file_release_exists: 
+Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_12_credentials_file_dev_exists: Pass
+ed
+2026-02-02 22:24:02 [INFO]   ✓ test_13_release_credentials_file_exists: 
+Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_14_dev_credentials_file_exists: Pass
+ed
+2026-02-02 22:24:02 [INFO]   ✓ test_15_sheet_ids_are_different: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_16_credentials_files_are_different: 
+Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_17_setup_bat_has_korean_encoding: Pa
+ssed
+2026-02-02 22:24:02 [INFO]   ✓ test_18_no_duplicate_shortcut_bat: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_19_email_settings_exist: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_20_app_policy_files_exist: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_21_app_settings_files_exist: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_22_user_manual_pdf_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_23_app_icon_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_24_spec_file_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_25_build_script_exists: Passed
+2026-02-02 22:24:02 [INFO]   [PASS] Deployment Suite: 25/25
+2026-02-02 22:24:02 [INFO] 
+[Suite] Package Integrity Suite
+2026-02-02 22:24:02 [INFO]   배포 패키지 완전성 인증 테스트 (exe 내부 파일, 크리덴셜, 버전 정보)
+2026-02-02 22:24:02 [INFO] ----------------------------------------
+2026-02-02 22:24:02 [WARNING] [PackageIntegrity] Skipping - only runs in
+ EXE mode
+2026-02-02 22:24:02 [INFO]   ✓ test_01_internal_directory_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_02_wf_rpa_bundle_dir_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_03_bundle_settings_json_exists: Pass
+ed
+2026-02-02 22:24:02 [INFO]   ✓ test_04_bundle_version_info_exists: Passe
+d
+2026-02-02 22:24:02 [INFO]   ✓ test_05_release_credential_file_exists: P
+assed
+2026-02-02 22:24:02 [INFO]   ✓ test_06_dev_credential_file_exists: Passe
+d
+2026-02-02 22:24:02 [INFO]   ✓ test_07_release_credential_valid_json: Pa
+ssed
+2026-02-02 22:24:02 [INFO]   ✓ test_08_bundle_config_file_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_09_bundle_config_sheet_ids: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_10_nsis_installer_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_11_google_sheets_config_consistency:
+ Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_12_credential_environment_separation
+: Passed
+2026-02-02 22:24:02 [INFO]   [PASS] Package Integrity Suite: 12/12
+2026-02-02 22:24:02 [INFO] 
+[Suite] Execution Environment Suite
+2026-02-02 22:24:02 [INFO]   실행 환경 인증 테스트 (싱글 인스턴스, 설정 폴더 참조)
+2026-02-02 22:24:02 [INFO] ----------------------------------------
+2026-02-02 22:24:02 [INFO]   ✓ test_01_config_folder_location: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_02_config_files_exist: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_03_user_home_initialized: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_04_wf_rpa_config_accessible: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_05_credentials_accessible: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_06_config_reload_works: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_07_multiple_config_reads: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_08_dev_exe_mode_detection: Passed
+2026-02-02 22:24:02 [INFO]   [PASS] Execution Environment Suite: 8/8
+2026-02-02 22:24:02 [INFO] 
+[Suite] Config Suite
+2026-02-02 22:24:02 [INFO]   설정 관리 인증 테스트 (policy.json, settings.json 로드
+ 및 검증)
+2026-02-02 22:24:02 [INFO] ----------------------------------------
+2026-02-02 22:24:02 [INFO] 📋 무료 앱 정책 검증: trial=-1, per_work=0
+2026-02-02 22:24:02 [INFO] ✅ 무료 앱 정책 확인: trial_credits=-1, credit_per_wo
+rk=0
+2026-02-02 22:24:02 [INFO]   ✓ test_01_initial_deployment_policy: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_02_get_policy: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_03_policy_has_identity: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_04_policy_has_credit_info: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_05_get_settings: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_06_settings_has_version: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_07_policy_trial_credits: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_08_policy_display_name: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_09_config_consistency: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_10_wf_rpa_config_exists: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_11_email_settings_exist: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_12_google_sheets_config: Passed
+2026-02-02 22:24:02 [INFO]   ✓ test_13_credentials_available: Passed
+2026-02-02 22:24:03 [INFO]   ✗ test_14_google_sheets_connectivity: Googl
+e Sheets 쿼터 초과로 스킵: APIError: [429]: Quota exceeded for quota metric 'Re
+ad requests' and limit 'Read requests per minute per user' of service 's
+heets.googleapis.com' for consumer 'project_number:586578091870'.
+2026-02-02 22:24:03 [INFO]   ✓ test_15_config_reload: Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_16_version_format_valid: Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_17_log_directory_structure: Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_18_version_minimum_requirement: Pass
+ed
+2026-02-02 22:24:03 [INFO]   ✓ test_19_version_display_format: Passed
+2026-02-02 22:24:03 [INFO] 📋 무료 앱 체험판 검증: trial_credits=-1 (무료 앱은 스킵)
+2026-02-02 22:24:03 [INFO]   ✓ test_20_trial_credits_formula: Passed
+2026-02-02 22:24:03 [INFO]   [PASS] Config Suite: 19/20
+2026-02-02 22:24:03 [INFO] 
+[Suite] Security Suite
+2026-02-02 22:24:03 [INFO]   보안 인증 테스트 (자격증명 하드코딩, 민감파일 관리)
+2026-02-02 22:24:03 [INFO] ----------------------------------------
+2026-02-02 22:24:03 [INFO]   ✓ test_01_no_hardcoded_passwords: Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_02_no_private_keys_in_source: Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_03_gitignore_has_sensitive_patterns:
+ Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_04_no_env_files_in_app: Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_05_credentials_in_config_not_source:
+ Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_06_no_debug_credentials: Passed
+2026-02-02 22:24:03 [INFO]   [PASS] Security Suite: 6/6
+2026-02-02 22:24:03 [INFO] 
+[Suite] Registration Suite
+2026-02-02 22:24:03 [INFO]   등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화
+)
+2026-02-02 22:24:03 [INFO] ----------------------------------------
+2026-02-02 22:24:03 [INFO]   ✓ test_01_get_registration_status: Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_02_status_has_required_fields: Passe
+d
+2026-02-02 22:24:03 [INFO]   ✓ test_03_unregistered_state_detected: Pass
+ed
+2026-02-02 22:24:03 [INFO]   ✓ test_04_register_with_email: Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_05_registered_email_stored: Passed
+2026-02-02 22:24:03 [INFO]   ✓ test_06_duplicate_registration_handled: P
+assed
+2026-02-02 22:24:04 [INFO]   ✓ test_07_invalid_email_rejected: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_08_registration_timestamp: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_09_clear_registration: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_10_registration_persists: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_11_registration_with_trial_credits: 
+Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_12_hardware_id_stored: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_13_sync_registration_to_server: Pass
+ed
+2026-02-02 22:24:04 [INFO]   ✓ test_14_registration_version_tracked: Pas
+sed
+2026-02-02 22:24:04 [INFO] [conversion_verifier] 무료 앱이므로 test_15 스킵
+2026-02-02 22:24:04 [INFO]   ✓ test_15_unregistered_limited_functionalit
+y: Passed
+2026-02-02 22:24:04 [INFO]   [PASS] Registration Suite: 15/15
+2026-02-02 22:24:04 [INFO] 
+[Suite] Credit Suite
+2026-02-02 22:24:04 [INFO]   크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)
+2026-02-02 22:24:04 [INFO] ----------------------------------------
+2026-02-02 22:24:04 [INFO] [conversion_verifier] 무료 앱이므로 Credit Suite 스킵
+2026-02-02 22:24:04 [INFO]   [SKIP] Suite skipped
+2026-02-02 22:24:04 [INFO]   [PASS] Credit Suite: 0/0
+2026-02-02 22:24:04 [INFO] 
+[Suite] State Suite
+2026-02-02 22:24:04 [INFO]   상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)
+2026-02-02 22:24:04 [INFO] ----------------------------------------
+2026-02-02 22:24:04 [INFO]   ✓ test_01_get_state: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_02_state_has_required_fields: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_03_state_consistency: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_04_save_settings: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_05_load_settings: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_06_settings_persistence: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_07_session_id_exists: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_08_last_activity_tracked: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_09_work_progress_saved: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_10_state_after_error: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_11_concurrent_state_access: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_12_state_size_reasonable: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_13_cross_app_mutex: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_14_memory_usage_reasonable: Passed
+2026-02-02 22:24:04 [INFO]   [PASS] State Suite: 14/14
+2026-02-02 22:24:04 [INFO] 
+[Suite] Recovery Suite
+2026-02-02 22:24:04 [INFO]   오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)
+2026-02-02 22:24:04 [INFO] ----------------------------------------
+2026-02-02 22:24:04 [INFO]   ✓ test_01_invalid_command_handled: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_02_null_argument_handled: Passed
+2026-02-02 22:24:04 [INFO] [conversion_verifier] 무료 앱이므로 test_03 스킵
+2026-02-02 22:24:04 [INFO]   ✓ test_03_negative_credits_handled: Passed
+2026-02-02 22:24:04 [INFO]   ✓ test_04_empty_string_handled: Passed
+2026-02-02 22:24:04 [INFO] [conversion_verifier] 무료 앱이므로 test_05 스킵
+2026-02-02 22:24:04 [INFO]   ✓ test_05_state_preserved_after_error: Pass
+ed
+2026-02-02 22:24:04 [INFO]   ✓ test_06_rapid_error_recovery: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_07_work_with_invalid_file_count: Pas
+sed
+2026-02-02 22:24:05 [INFO]   ✓ test_08_large_number_handled: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_09_timeout_handling: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_10_unicode_handling: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_11_special_characters_handled: Passe
+d
+2026-02-02 22:24:05 [INFO] [conversion_verifier] 무료 앱이므로 test_12 스킵
+2026-02-02 22:24:05 [INFO]   ✓ test_12_partial_work_recovery: Passed
+2026-02-02 22:24:05 [INFO]   [PASS] Recovery Suite: 12/12
+2026-02-02 22:24:05 [INFO] 
+[Suite] UI Suite
+2026-02-02 22:24:05 [INFO]   UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)
+2026-02-02 22:24:05 [INFO] ----------------------------------------
+2026-02-02 22:24:05 [INFO]   ✓ test_01_get_ui_state: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_02_app_responsive: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_03_multiple_rapid_calls: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_04_button_states: Passed
+2026-02-02 22:24:05 [INFO] [conversion_verifier] 무료 앱이므로 test_05 스킵
+2026-02-02 22:24:05 [INFO]   ✓ test_05_work_button_disabled_when_no_cred
+its: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_06_work_button_enabled_when_credits_
+available: Passed
+2026-02-02 22:24:05 [INFO] [conversion_verifier] 무료 앱이므로 test_07 스킵
+2026-02-02 22:24:05 [INFO]   ✓ test_07_credits_display_updated: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_08_progress_indication: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_09_non_blocking_response: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_10_status_message_available: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_11_window_title_reflects_state: Pass
+ed
+2026-02-02 22:24:05 [INFO]   ✓ test_12_screenshot_capability: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_13_tooltips_bound_to_labels: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_14_app_loading_time: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_15_alt_g_admin_toggle: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_16_window_popup_center_alignment: Pa
+ssed
+2026-02-02 22:24:05 [INFO]   ✓ test_17_adaptive_ui_font_size: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_18_adaptive_ui_window_height: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_19_dpi_scaling_support: Passed
+2026-02-02 22:24:05 [INFO]   ✓ test_20_window_geometry_saved: Passed
+2026-02-02 22:24:05 [INFO] [conversion_verifier] 무료 앱이므로 test_21 스킵
+2026-02-02 22:24:05 [INFO]   ✓ test_21_credits_display_comma_separator: 
+Passed
+2026-02-02 22:24:05 [INFO] 무료 앱 표시: 🎁 무료 앱 (무료 표시 여부: True)
+2026-02-02 22:24:05 [INFO]   ✓ test_22_free_app_credit_display: Passed
+2026-02-02 22:24:05 [INFO] [conversion_verifier] 무료 앱 표시 정상: 🎁 무료 앱
+2026-02-02 22:24:05 [INFO]   ✓ test_23_credit_display_error_check: Passe
+d
+2026-02-02 22:24:05 [INFO]   [PASS] UI Suite: 23/23
+2026-02-02 22:24:06 [INFO] [TestClient] App terminated
+2026-02-02 22:24:06 [INFO] =============================================
+===============
+2026-02-02 22:24:06 [INFO]   Certification Result: FULL
+2026-02-02 22:24:06 [INFO]   Tests: 134/135 passed
+2026-02-02 22:24:06 [INFO]   Duration: 5.7s
+2026-02-02 22:24:06 [INFO] =============================================
+===============
+2026-02-02 22:24:06 [INFO] =============================================
+===============
+2026-02-02 22:24:06 [INFO]   WF-ACT Certification: korean_filename_norma
+lizer
+2026-02-02 22:24:06 [INFO]   Target Level: FULL
+2026-02-02 22:24:06 [INFO] =============================================
+===============
+2026-02-02 22:24:06 [INFO] [TestClient] Dev mode: running D:\drive_files
+\10.worksfree\10.rpa\50.data\korean_filename_normalizer\ui_main.py
+2026-02-02 22:24:06 [INFO] [TestClient] Launched Korean Filename Normali
+zer (PID: 19244)
+2026-02-02 22:24:08 [INFO] [TestClient] Server ready
+2026-02-02 22:24:08 [INFO] 
+[Suite] Deployment Suite
+2026-02-02 22:24:08 [INFO]   배포 파일 및 환경 설정 인증 테스트 (BAT 파일, DEV/RELEASE 환
+경)
+2026-02-02 22:24:08 [INFO] ----------------------------------------
+2026-02-02 22:24:08 [INFO]   ✓ test_01_setup_worksfree_bat_exists: Passe
+d
+2026-02-02 22:24:08 [INFO]   ✓ test_02_shortcut_bat_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_03_app_reset_bat_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_04_wf_reset_all_bat_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_05_uninstall_bat_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_06_sync_registration_bat_exists: Pas
+sed
+2026-02-02 22:24:08 [INFO]   ✓ test_07_wf_rpa_config_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_08_google_sheets_section_exists: Pas
+sed
+2026-02-02 22:24:08 [INFO]   ✓ test_09_sheet_id_release_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_10_sheet_id_dev_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_11_credentials_file_release_exists: 
+Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_12_credentials_file_dev_exists: Pass
+ed
+2026-02-02 22:24:08 [INFO]   ✓ test_13_release_credentials_file_exists: 
+Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_14_dev_credentials_file_exists: Pass
+ed
+2026-02-02 22:24:08 [INFO]   ✓ test_15_sheet_ids_are_different: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_16_credentials_files_are_different: 
+Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_17_setup_bat_has_korean_encoding: Pa
+ssed
+2026-02-02 22:24:08 [INFO]   ✓ test_18_no_duplicate_shortcut_bat: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_19_email_settings_exist: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_20_app_policy_files_exist: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_21_app_settings_files_exist: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_22_user_manual_pdf_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_23_app_icon_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_24_spec_file_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_25_build_script_exists: Passed
+2026-02-02 22:24:08 [INFO]   [PASS] Deployment Suite: 25/25
+2026-02-02 22:24:08 [INFO] 
+[Suite] Package Integrity Suite
+2026-02-02 22:24:08 [INFO]   배포 패키지 완전성 인증 테스트 (exe 내부 파일, 크리덴셜, 버전 정보)
+2026-02-02 22:24:08 [INFO] ----------------------------------------
+2026-02-02 22:24:08 [WARNING] [PackageIntegrity] Skipping - only runs in
+ EXE mode
+2026-02-02 22:24:08 [INFO]   ✓ test_01_internal_directory_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_02_wf_rpa_bundle_dir_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_03_bundle_settings_json_exists: Pass
+ed
+2026-02-02 22:24:08 [INFO]   ✓ test_04_bundle_version_info_exists: Passe
+d
+2026-02-02 22:24:08 [INFO]   ✓ test_05_release_credential_file_exists: P
+assed
+2026-02-02 22:24:08 [INFO]   ✓ test_06_dev_credential_file_exists: Passe
+d
+2026-02-02 22:24:08 [INFO]   ✓ test_07_release_credential_valid_json: Pa
+ssed
+2026-02-02 22:24:08 [INFO]   ✓ test_08_bundle_config_file_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_09_bundle_config_sheet_ids: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_10_nsis_installer_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_11_google_sheets_config_consistency:
+ Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_12_credential_environment_separation
+: Passed
+2026-02-02 22:24:08 [INFO]   [PASS] Package Integrity Suite: 12/12
+2026-02-02 22:24:08 [INFO] 
+[Suite] Execution Environment Suite
+2026-02-02 22:24:08 [INFO]   실행 환경 인증 테스트 (싱글 인스턴스, 설정 폴더 참조)
+2026-02-02 22:24:08 [INFO] ----------------------------------------
+2026-02-02 22:24:08 [INFO]   ✓ test_01_config_folder_location: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_02_config_files_exist: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_03_user_home_initialized: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_04_wf_rpa_config_accessible: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_05_credentials_accessible: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_06_config_reload_works: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_07_multiple_config_reads: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_08_dev_exe_mode_detection: Passed
+2026-02-02 22:24:08 [INFO]   [PASS] Execution Environment Suite: 8/8
+2026-02-02 22:24:08 [INFO] 
+[Suite] Config Suite
+2026-02-02 22:24:08 [INFO]   설정 관리 인증 테스트 (policy.json, settings.json 로드
+ 및 검증)
+2026-02-02 22:24:08 [INFO] ----------------------------------------
+2026-02-02 22:24:08 [INFO] 📋 무료 앱 정책 검증: trial=-1, per_work=0
+2026-02-02 22:24:08 [INFO] ✅ 무료 앱 정책 확인: trial_credits=-1, credit_per_wo
+rk=0
+2026-02-02 22:24:08 [INFO]   ✓ test_01_initial_deployment_policy: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_02_get_policy: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_03_policy_has_identity: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_04_policy_has_credit_info: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_05_get_settings: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_06_settings_has_version: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_07_policy_trial_credits: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_08_policy_display_name: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_09_config_consistency: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_10_wf_rpa_config_exists: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_11_email_settings_exist: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_12_google_sheets_config: Passed
+2026-02-02 22:24:08 [INFO]   ✓ test_13_credentials_available: Passed
+2026-02-02 22:24:09 [INFO]   ✗ test_14_google_sheets_connectivity: Googl
+e Sheets 쿼터 초과로 스킵: APIError: [429]: Quota exceeded for quota metric 'Re
+ad requests' and limit 'Read requests per minute per user' of service 's
+heets.googleapis.com' for consumer 'project_number:586578091870'.
+2026-02-02 22:24:09 [INFO]   ✓ test_15_config_reload: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_16_version_format_valid: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_17_log_directory_structure: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_18_version_minimum_requirement: Pass
+ed
+2026-02-02 22:24:09 [INFO]   ✓ test_19_version_display_format: Passed
+2026-02-02 22:24:09 [INFO] 📋 무료 앱 체험판 검증: trial_credits=-1 (무료 앱은 스킵)
+2026-02-02 22:24:09 [INFO]   ✓ test_20_trial_credits_formula: Passed
+2026-02-02 22:24:09 [INFO]   [PASS] Config Suite: 19/20
+2026-02-02 22:24:09 [INFO] 
+[Suite] Security Suite
+2026-02-02 22:24:09 [INFO]   보안 인증 테스트 (자격증명 하드코딩, 민감파일 관리)
+2026-02-02 22:24:09 [INFO] ----------------------------------------
+2026-02-02 22:24:09 [INFO]   ✓ test_01_no_hardcoded_passwords: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_02_no_private_keys_in_source: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_03_gitignore_has_sensitive_patterns:
+ Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_04_no_env_files_in_app: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_05_credentials_in_config_not_source:
+ Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_06_no_debug_credentials: Passed
+2026-02-02 22:24:09 [INFO]   [PASS] Security Suite: 6/6
+2026-02-02 22:24:09 [INFO] 
+[Suite] Registration Suite
+2026-02-02 22:24:09 [INFO]   등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화
+)
+2026-02-02 22:24:09 [INFO] ----------------------------------------
+2026-02-02 22:24:09 [INFO]   ✓ test_01_get_registration_status: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_02_status_has_required_fields: Passe
+d
+2026-02-02 22:24:09 [INFO]   ✓ test_03_unregistered_state_detected: Pass
+ed
+2026-02-02 22:24:09 [INFO]   ✓ test_04_register_with_email: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_05_registered_email_stored: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_06_duplicate_registration_handled: P
+assed
+2026-02-02 22:24:09 [INFO]   ✓ test_07_invalid_email_rejected: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_08_registration_timestamp: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_09_clear_registration: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_10_registration_persists: Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_11_registration_with_trial_credits: 
+Passed
+2026-02-02 22:24:09 [INFO]   ✓ test_12_hardware_id_stored: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_13_sync_registration_to_server: Pass
+ed
+2026-02-02 22:24:10 [INFO]   ✓ test_14_registration_version_tracked: Pas
+sed
+2026-02-02 22:24:10 [INFO] [korean_filename_normalizer] 무료 앱이므로 test_15 
+스킵
+2026-02-02 22:24:10 [INFO]   ✓ test_15_unregistered_limited_functionalit
+y: Passed
+2026-02-02 22:24:10 [INFO]   [PASS] Registration Suite: 15/15
+2026-02-02 22:24:10 [INFO] 
+[Suite] Credit Suite
+2026-02-02 22:24:10 [INFO]   크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)
+2026-02-02 22:24:10 [INFO] ----------------------------------------
+2026-02-02 22:24:10 [INFO] [korean_filename_normalizer] 무료 앱이므로 Credit S
+uite 스킵
+2026-02-02 22:24:10 [INFO]   [SKIP] Suite skipped
+2026-02-02 22:24:10 [INFO]   [PASS] Credit Suite: 0/0
+2026-02-02 22:24:10 [INFO] 
+[Suite] State Suite
+2026-02-02 22:24:10 [INFO]   상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)
+2026-02-02 22:24:10 [INFO] ----------------------------------------
+2026-02-02 22:24:10 [INFO]   ✓ test_01_get_state: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_02_state_has_required_fields: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_03_state_consistency: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_04_save_settings: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_05_load_settings: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_06_settings_persistence: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_07_session_id_exists: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_08_last_activity_tracked: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_09_work_progress_saved: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_10_state_after_error: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_11_concurrent_state_access: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_12_state_size_reasonable: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_13_cross_app_mutex: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_14_memory_usage_reasonable: Passed
+2026-02-02 22:24:10 [INFO]   [PASS] State Suite: 14/14
+2026-02-02 22:24:10 [INFO] 
+[Suite] Recovery Suite
+2026-02-02 22:24:10 [INFO]   오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)
+2026-02-02 22:24:10 [INFO] ----------------------------------------
+2026-02-02 22:24:10 [INFO]   ✓ test_01_invalid_command_handled: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_02_null_argument_handled: Passed
+2026-02-02 22:24:10 [INFO] [korean_filename_normalizer] 무료 앱이므로 test_03 
+스킵
+2026-02-02 22:24:10 [INFO]   ✓ test_03_negative_credits_handled: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_04_empty_string_handled: Passed
+2026-02-02 22:24:10 [INFO] [korean_filename_normalizer] 무료 앱이므로 test_05 
+스킵
+2026-02-02 22:24:10 [INFO]   ✓ test_05_state_preserved_after_error: Pass
+ed
+2026-02-02 22:24:10 [INFO]   ✓ test_06_rapid_error_recovery: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_07_work_with_invalid_file_count: Pas
+sed
+2026-02-02 22:24:10 [INFO]   ✓ test_08_large_number_handled: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_09_timeout_handling: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_10_unicode_handling: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_11_special_characters_handled: Passe
+d
+2026-02-02 22:24:10 [INFO] [korean_filename_normalizer] 무료 앱이므로 test_12 
+스킵
+2026-02-02 22:24:10 [INFO]   ✓ test_12_partial_work_recovery: Passed
+2026-02-02 22:24:10 [INFO]   [PASS] Recovery Suite: 12/12
+2026-02-02 22:24:10 [INFO] 
+[Suite] UI Suite
+2026-02-02 22:24:10 [INFO]   UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)
+2026-02-02 22:24:10 [INFO] ----------------------------------------
+2026-02-02 22:24:10 [INFO]   ✓ test_01_get_ui_state: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_02_app_responsive: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_03_multiple_rapid_calls: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_04_button_states: Passed
+2026-02-02 22:24:10 [INFO] [korean_filename_normalizer] 무료 앱이므로 test_05 
+스킵
+2026-02-02 22:24:10 [INFO]   ✓ test_05_work_button_disabled_when_no_cred
+its: Passed
+2026-02-02 22:24:10 [INFO]   ✓ test_06_work_button_enabled_when_credits_
+available: Passed
+2026-02-02 22:24:10 [INFO] [korean_filename_normalizer] 무료 앱이므로 test_07 
+스킵
+2026-02-02 22:24:10 [INFO]   ✓ test_07_credits_display_updated: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_08_progress_indication: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_09_non_blocking_response: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_10_status_message_available: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_11_window_title_reflects_state: Pass
+ed
+2026-02-02 22:24:11 [INFO]   ✓ test_12_screenshot_capability: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_13_tooltips_bound_to_labels: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_14_app_loading_time: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_15_alt_g_admin_toggle: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_16_window_popup_center_alignment: Pa
+ssed
+2026-02-02 22:24:11 [INFO]   ✓ test_17_adaptive_ui_font_size: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_18_adaptive_ui_window_height: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_19_dpi_scaling_support: Passed
+2026-02-02 22:24:11 [INFO]   ✓ test_20_window_geometry_saved: Passed
+2026-02-02 22:24:11 [INFO] [korean_filename_normalizer] 무료 앱이므로 test_21 
+스킵
+2026-02-02 22:24:11 [INFO]   ✓ test_21_credits_display_comma_separator: 
+Passed
+2026-02-02 22:24:11 [INFO] 무료 앱 표시: 🎁 무료 앱 (무료 표시 여부: True)
+2026-02-02 22:24:11 [INFO]   ✓ test_22_free_app_credit_display: Passed
+2026-02-02 22:24:11 [INFO] [korean_filename_normalizer] 무료 앱 표시 정상: 🎁 무
+료 앱
+2026-02-02 22:24:11 [INFO]   ✓ test_23_credit_display_error_check: Passe
+d
+2026-02-02 22:24:11 [INFO]   [PASS] UI Suite: 23/23
+2026-02-02 22:24:11 [INFO] [TestClient] App terminated
+2026-02-02 22:24:11 [INFO] =============================================
+===============
+2026-02-02 22:24:11 [INFO]   Certification Result: FULL
+2026-02-02 22:24:11 [INFO]   Tests: 134/135 passed
+2026-02-02 22:24:11 [INFO]   Duration: 5.7s
+2026-02-02 22:24:11 [INFO] =============================================
+===============
+2026-02-02 22:24:11 [INFO] =============================================
+===============
+2026-02-02 22:24:11 [INFO]   WF-ACT Certification: qrcode_generator
+2026-02-02 22:24:11 [INFO]   Target Level: FULL
+2026-02-02 22:24:11 [INFO] =============================================
+===============
+2026-02-02 22:24:11 [INFO] [TestClient] Dev mode: running D:\drive_files
+\10.worksfree\10.rpa\50.data\qrcode_generator\ui_main.py
+2026-02-02 22:24:11 [INFO] [TestClient] Launched QR Code Generator (PID:
+ 13448)
+2026-02-02 22:24:16 [INFO] [TestClient] Server ready
+2026-02-02 22:24:16 [INFO] 
+[Suite] Deployment Suite
+2026-02-02 22:24:16 [INFO]   배포 파일 및 환경 설정 인증 테스트 (BAT 파일, DEV/RELEASE 환
+경)
+2026-02-02 22:24:16 [INFO] ----------------------------------------
+2026-02-02 22:24:16 [INFO]   ✓ test_01_setup_worksfree_bat_exists: Passe
+d
+2026-02-02 22:24:16 [INFO]   ✓ test_02_shortcut_bat_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_03_app_reset_bat_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_04_wf_reset_all_bat_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_05_uninstall_bat_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_06_sync_registration_bat_exists: Pas
+sed
+2026-02-02 22:24:16 [INFO]   ✓ test_07_wf_rpa_config_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_08_google_sheets_section_exists: Pas
+sed
+2026-02-02 22:24:16 [INFO]   ✓ test_09_sheet_id_release_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_10_sheet_id_dev_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_11_credentials_file_release_exists: 
+Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_12_credentials_file_dev_exists: Pass
+ed
+2026-02-02 22:24:16 [INFO]   ✓ test_13_release_credentials_file_exists: 
+Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_14_dev_credentials_file_exists: Pass
+ed
+2026-02-02 22:24:16 [INFO]   ✓ test_15_sheet_ids_are_different: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_16_credentials_files_are_different: 
+Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_17_setup_bat_has_korean_encoding: Pa
+ssed
+2026-02-02 22:24:16 [INFO]   ✓ test_18_no_duplicate_shortcut_bat: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_19_email_settings_exist: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_20_app_policy_files_exist: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_21_app_settings_files_exist: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_22_user_manual_pdf_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_23_app_icon_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_24_spec_file_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_25_build_script_exists: Passed
+2026-02-02 22:24:16 [INFO]   [PASS] Deployment Suite: 25/25
+2026-02-02 22:24:16 [INFO] 
+[Suite] Package Integrity Suite
+2026-02-02 22:24:16 [INFO]   배포 패키지 완전성 인증 테스트 (exe 내부 파일, 크리덴셜, 버전 정보)
+2026-02-02 22:24:16 [INFO] ----------------------------------------
+2026-02-02 22:24:16 [WARNING] [PackageIntegrity] Skipping - only runs in
+ EXE mode
+2026-02-02 22:24:16 [INFO]   ✓ test_01_internal_directory_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_02_wf_rpa_bundle_dir_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_03_bundle_settings_json_exists: Pass
+ed
+2026-02-02 22:24:16 [INFO]   ✓ test_04_bundle_version_info_exists: Passe
+d
+2026-02-02 22:24:16 [INFO]   ✓ test_05_release_credential_file_exists: P
+assed
+2026-02-02 22:24:16 [INFO]   ✓ test_06_dev_credential_file_exists: Passe
+d
+2026-02-02 22:24:16 [INFO]   ✓ test_07_release_credential_valid_json: Pa
+ssed
+2026-02-02 22:24:16 [INFO]   ✓ test_08_bundle_config_file_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_09_bundle_config_sheet_ids: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_10_nsis_installer_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_11_google_sheets_config_consistency:
+ Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_12_credential_environment_separation
+: Passed
+2026-02-02 22:24:16 [INFO]   [PASS] Package Integrity Suite: 12/12
+2026-02-02 22:24:16 [INFO] 
+[Suite] Execution Environment Suite
+2026-02-02 22:24:16 [INFO]   실행 환경 인증 테스트 (싱글 인스턴스, 설정 폴더 참조)
+2026-02-02 22:24:16 [INFO] ----------------------------------------
+2026-02-02 22:24:16 [INFO]   ✓ test_01_config_folder_location: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_02_config_files_exist: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_03_user_home_initialized: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_04_wf_rpa_config_accessible: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_05_credentials_accessible: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_06_config_reload_works: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_07_multiple_config_reads: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_08_dev_exe_mode_detection: Passed
+2026-02-02 22:24:16 [INFO]   [PASS] Execution Environment Suite: 8/8
+2026-02-02 22:24:16 [INFO] 
+[Suite] Config Suite
+2026-02-02 22:24:16 [INFO]   설정 관리 인증 테스트 (policy.json, settings.json 로드
+ 및 검증)
+2026-02-02 22:24:16 [INFO] ----------------------------------------
+2026-02-02 22:24:16 [INFO] 📋 무료 앱 정책 검증: trial=-1, per_work=0
+2026-02-02 22:24:16 [INFO] ✅ 무료 앱 정책 확인: trial_credits=-1, credit_per_wo
+rk=0
+2026-02-02 22:24:16 [INFO]   ✓ test_01_initial_deployment_policy: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_02_get_policy: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_03_policy_has_identity: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_04_policy_has_credit_info: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_05_get_settings: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_06_settings_has_version: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_07_policy_trial_credits: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_08_policy_display_name: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_09_config_consistency: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_10_wf_rpa_config_exists: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_11_email_settings_exist: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_12_google_sheets_config: Passed
+2026-02-02 22:24:16 [INFO]   ✓ test_13_credentials_available: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_14_google_sheets_connectivity: Passe
+d
+2026-02-02 22:24:17 [INFO]   ✓ test_15_config_reload: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_16_version_format_valid: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_17_log_directory_structure: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_18_version_minimum_requirement: Pass
+ed
+2026-02-02 22:24:17 [INFO]   ✓ test_19_version_display_format: Passed
+2026-02-02 22:24:17 [INFO] 📋 무료 앱 체험판 검증: trial_credits=-1 (무료 앱은 스킵)
+2026-02-02 22:24:17 [INFO]   ✓ test_20_trial_credits_formula: Passed
+2026-02-02 22:24:17 [INFO]   [PASS] Config Suite: 20/20
+2026-02-02 22:24:17 [INFO] 
+[Suite] Security Suite
+2026-02-02 22:24:17 [INFO]   보안 인증 테스트 (자격증명 하드코딩, 민감파일 관리)
+2026-02-02 22:24:17 [INFO] ----------------------------------------
+2026-02-02 22:24:17 [INFO]   ✓ test_01_no_hardcoded_passwords: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_02_no_private_keys_in_source: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_03_gitignore_has_sensitive_patterns:
+ Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_04_no_env_files_in_app: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_05_credentials_in_config_not_source:
+ Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_06_no_debug_credentials: Passed
+2026-02-02 22:24:17 [INFO]   [PASS] Security Suite: 6/6
+2026-02-02 22:24:17 [INFO] 
+[Suite] Registration Suite
+2026-02-02 22:24:17 [INFO]   등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화
+)
+2026-02-02 22:24:17 [INFO] ----------------------------------------
+2026-02-02 22:24:17 [INFO]   ✓ test_01_get_registration_status: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_02_status_has_required_fields: Passe
+d
+2026-02-02 22:24:17 [INFO]   ✓ test_03_unregistered_state_detected: Pass
+ed
+2026-02-02 22:24:17 [INFO]   ✓ test_04_register_with_email: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_05_registered_email_stored: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_06_duplicate_registration_handled: P
+assed
+2026-02-02 22:24:17 [INFO]   ✓ test_07_invalid_email_rejected: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_08_registration_timestamp: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_09_clear_registration: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_10_registration_persists: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_11_registration_with_trial_credits: 
+Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_12_hardware_id_stored: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_13_sync_registration_to_server: Pass
+ed
+2026-02-02 22:24:17 [INFO]   ✓ test_14_registration_version_tracked: Pas
+sed
+2026-02-02 22:24:17 [INFO] [qrcode_generator] 무료 앱이므로 test_15 스킵
+2026-02-02 22:24:17 [INFO]   ✓ test_15_unregistered_limited_functionalit
+y: Passed
+2026-02-02 22:24:17 [INFO]   [PASS] Registration Suite: 15/15
+2026-02-02 22:24:17 [INFO] 
+[Suite] Credit Suite
+2026-02-02 22:24:17 [INFO]   크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)
+2026-02-02 22:24:17 [INFO] ----------------------------------------
+2026-02-02 22:24:17 [INFO] [qrcode_generator] 무료 앱이므로 Credit Suite 스킵
+2026-02-02 22:24:17 [INFO]   [SKIP] Suite skipped
+2026-02-02 22:24:17 [INFO]   [PASS] Credit Suite: 0/0
+2026-02-02 22:24:17 [INFO] 
+[Suite] State Suite
+2026-02-02 22:24:17 [INFO]   상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)
+2026-02-02 22:24:17 [INFO] ----------------------------------------
+2026-02-02 22:24:17 [INFO]   ✓ test_01_get_state: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_02_state_has_required_fields: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_03_state_consistency: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_04_save_settings: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_05_load_settings: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_06_settings_persistence: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_07_session_id_exists: Passed
+2026-02-02 22:24:17 [INFO]   ✓ test_08_last_activity_tracked: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_09_work_progress_saved: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_10_state_after_error: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_11_concurrent_state_access: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_12_state_size_reasonable: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_13_cross_app_mutex: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_14_memory_usage_reasonable: Passed
+2026-02-02 22:24:18 [INFO]   [PASS] State Suite: 14/14
+2026-02-02 22:24:18 [INFO] 
+[Suite] Recovery Suite
+2026-02-02 22:24:18 [INFO]   오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)
+2026-02-02 22:24:18 [INFO] ----------------------------------------
+2026-02-02 22:24:18 [INFO]   ✓ test_01_invalid_command_handled: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_02_null_argument_handled: Passed
+2026-02-02 22:24:18 [INFO] [qrcode_generator] 무료 앱이므로 test_03 스킵
+2026-02-02 22:24:18 [INFO]   ✓ test_03_negative_credits_handled: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_04_empty_string_handled: Passed
+2026-02-02 22:24:18 [INFO] [qrcode_generator] 무료 앱이므로 test_05 스킵
+2026-02-02 22:24:18 [INFO]   ✓ test_05_state_preserved_after_error: Pass
+ed
+2026-02-02 22:24:18 [INFO]   ✓ test_06_rapid_error_recovery: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_07_work_with_invalid_file_count: Pas
+sed
+2026-02-02 22:24:18 [INFO]   ✓ test_08_large_number_handled: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_09_timeout_handling: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_10_unicode_handling: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_11_special_characters_handled: Passe
+d
+2026-02-02 22:24:18 [INFO] [qrcode_generator] 무료 앱이므로 test_12 스킵
+2026-02-02 22:24:18 [INFO]   ✓ test_12_partial_work_recovery: Passed
+2026-02-02 22:24:18 [INFO]   [PASS] Recovery Suite: 12/12
+2026-02-02 22:24:18 [INFO] 
+[Suite] UI Suite
+2026-02-02 22:24:18 [INFO]   UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)
+2026-02-02 22:24:18 [INFO] ----------------------------------------
+2026-02-02 22:24:18 [INFO]   ✓ test_01_get_ui_state: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_02_app_responsive: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_03_multiple_rapid_calls: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_04_button_states: Passed
+2026-02-02 22:24:18 [INFO] [qrcode_generator] 무료 앱이므로 test_05 스킵
+2026-02-02 22:24:18 [INFO]   ✓ test_05_work_button_disabled_when_no_cred
+its: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_06_work_button_enabled_when_credits_
+available: Passed
+2026-02-02 22:24:18 [INFO] [qrcode_generator] 무료 앱이므로 test_07 스킵
+2026-02-02 22:24:18 [INFO]   ✓ test_07_credits_display_updated: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_08_progress_indication: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_09_non_blocking_response: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_10_status_message_available: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_11_window_title_reflects_state: Pass
+ed
+2026-02-02 22:24:18 [INFO]   ✓ test_12_screenshot_capability: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_13_tooltips_bound_to_labels: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_14_app_loading_time: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_15_alt_g_admin_toggle: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_16_window_popup_center_alignment: Pa
+ssed
+2026-02-02 22:24:18 [INFO]   ✓ test_17_adaptive_ui_font_size: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_18_adaptive_ui_window_height: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_19_dpi_scaling_support: Passed
+2026-02-02 22:24:18 [INFO]   ✓ test_20_window_geometry_saved: Passed
+2026-02-02 22:24:18 [INFO] [qrcode_generator] 무료 앱이므로 test_21 스킵
+2026-02-02 22:24:18 [INFO]   ✓ test_21_credits_display_comma_separator: 
+Passed
+2026-02-02 22:24:18 [INFO] 무료 앱 표시: 🎁 무료 앱 (무료 표시 여부: True)
+2026-02-02 22:24:18 [INFO]   ✓ test_22_free_app_credit_display: Passed
+2026-02-02 22:24:18 [INFO] [qrcode_generator] 무료 앱 표시 정상: 🎁 무료 앱
+2026-02-02 22:24:18 [INFO]   ✓ test_23_credit_display_error_check: Passe
+d
+2026-02-02 22:24:18 [INFO]   [PASS] UI Suite: 23/23
+2026-02-02 22:24:19 [INFO] [TestClient] App terminated
+2026-02-02 22:24:19 [INFO] =============================================
+===============
+2026-02-02 22:24:19 [INFO]   Certification Result: FULL
+2026-02-02 22:24:19 [INFO]   Tests: 135/135 passed
+2026-02-02 22:24:19 [INFO]   Duration: 7.4s
+2026-02-02 22:24:19 [INFO] =============================================
+===============
+
+======================================================================
+  WF-ACT - WF-RPA App Certification Toolkit
+======================================================================
+  Mode: DEV (Source Code)
+  Target Level: FULL
+  Apps: bom_exporter, dwg_batch_print, attribute_reset, dwg_classifier, conversion_verifier, korean_filename_normalizer, qrcode_generator
+  Output: D:\drive_files\10.worksfree\10.rpa\90.tests\ui_lifecycle_test\test_results\certification_20260202_222321_dev
+======================================================================
+
+
+######################################################################
+  Certifying: bom_exporter
+######################################################################
+
+
+######################################################################
+  Certifying: dwg_batch_print
+######################################################################
+
+
+######################################################################
+  Certifying: attribute_reset
+######################################################################
+
+
+######################################################################
+  Certifying: dwg_classifier
+######################################################################
+
+
+######################################################################
+  Certifying: conversion_verifier
+######################################################################
+
+
+######################################################################
+  Certifying: korean_filename_normalizer
+######################################################################
+
+
+######################################################################
+  Certifying: qrcode_generator
+######################################################################
+
+
+  📊 Unified report: D:\drive_files\10.worksfree\10.rpa\90.tests\ui_lifecycle_test\test_results\certification_20260202_222321_dev\index.html
+
+======================================================================
+  CERTIFICATION SUMMARY
+======================================================================
+
+  ❌ bom_exporter
+     Level: NONE
+     Tests: 157/161 passed
+     Duration: 10.7s
+     Failed tests:
+       - test_23_end_to_end_credit_sync: credit_data.json이 생성되지 않았습니다 (무료 앱일 수 있음)
+       - test_24_google_sheets_write_verification: wf_googlesheets_manager를 임포트할 수 없습니다
+       - test_26_e2e_credit_sync_flow: credit_data.json 파일이 없습니다: C:\Users\USER\.wf_rpa\bom_exporter\credit_data.json
+       - test_27_google_sheets_sync_actual: Google Sheets 동기화 테스트 실패: [Errno 2] No such file or directory: 'C:\\Users\\USER\\.wf_rpa\\bom_exporter\\credit_data.json'
+
+  ❌ dwg_batch_print
+     Level: NONE
+     Tests: 157/161 passed
+     Duration: 10.6s
+     Failed tests:
+       - test_23_end_to_end_credit_sync: credit_data.json이 생성되지 않았습니다 (무료 앱일 수 있음)
+       - test_24_google_sheets_write_verification: wf_googlesheets_manager를 임포트할 수 없습니다
+       - test_26_e2e_credit_sync_flow: credit_data.json 파일이 없습니다: C:\Users\USER\.wf_rpa\dwg_batch_print\credit_data.json
+       - test_27_google_sheets_sync_actual: Google Sheets 동기화 테스트 실패: [Errno 2] No such file or directory: 'C:\\Users\\USER\\.wf_rpa\\dwg_batch_print\\credit_data.json'
+
+  ❌ attribute_reset
+     Level: NONE
+     Tests: 145/161 passed
+     Duration: 7.2s
+     Failed tests:
+       - test_11_registration_with_trial_credits: 체험판 크레딧 부여: 예상 20000, 실제 0
+       - test_02_set_credits: 크레딧 설정 실패: 0 != 5000
+       - test_03_credit_deduction_single: 크레딧 차감 오류: 1000 - 200 = 800, 실제: 0
+       - test_04_insufficient_credits_blocked: 차단된 작업은 크레딧을 변경하면 안됨
+       - test_06_credit_deduction_multiple: 다중 파일 크레딧 차감 오류: 3개 파일, 예상: 1400, 실제: 0
+       ... and 11 more
+
+  ❌ dwg_classifier
+     Level: NONE
+     Tests: 157/161 passed
+     Duration: 10.5s
+     Failed tests:
+       - test_23_end_to_end_credit_sync: credit_data.json이 생성되지 않았습니다 (무료 앱일 수 있음)
+       - test_24_google_sheets_write_verification: wf_googlesheets_manager를 임포트할 수 없습니다
+       - test_26_e2e_credit_sync_flow: credit_data.json 파일이 없습니다: C:\Users\USER\.wf_rpa\dwg_classifier\credit_data.json
+       - test_27_google_sheets_sync_actual: Google Sheets 동기화 테스트 실패: [Errno 2] No such file or directory: 'C:\\Users\\USER\\.wf_rpa\\dwg_classifier\\credit_data.json'
+
+  🥇 conversion_verifier
+     Level: FULL
+     Tests: 134/135 passed
+     Duration: 5.7s
+
+  🥇 korean_filename_normalizer
+     Level: FULL
+     Tests: 134/135 passed
+     Duration: 5.7s
+
+  🥇 qrcode_generator
+     Level: FULL
+     Tests: 135/135 passed
+     Duration: 7.4s
+
+======================================================================
+  Results saved to: D:\drive_files\10.worksfree\10.rpa\90.tests\ui_lifecycle_test\test_results\certification_20260202_222321_dev
+======================================================================
+
+  🌐 Opening results in browser: D:\drive_files\10.worksfree\10.rpa\90.tests\ui_lifecycle_test\test_results\certification_20260202_222321_dev\index.html

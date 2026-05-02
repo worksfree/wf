@@ -1,0 +1,44 @@
+{
+  "runtime_config": {
+    "run_mode": "dev",
+    "full_version": "v0.7.4.0",
+    "build_count": 40,
+    "ui_scale": 1.0,
+    "language": "ko",
+    "last_updated": "2026-04-29 18:56:20"
+  },
+  "ui_config": {
+    "last_url": "worksfree.com",
+    "topmost": true,
+    "window_width": 760,
+    "window_height": 200,
+    "window_geometry_override": "",
+    "admin_window_height": 300,
+    "settings_window_geometry": "991x972+1814+475"
+  },
+  "logging_config": {
+    "log_level": "INFO",
+    "max_log_size_mb": 10,
+    "rotate_logs": true
+  },
+  "qrcode_settings": {
+    "output_folder": "D:/drive_files/10.worksfree/10.rpa/50.data/qrcode_generator",
+    "title_text": "homepage",
+    "subtitle_text": "scan me",
+    "qr_version": 1,
+    "error_correction": "L",
+    "box_size": 25,
+    "border": 4,
+    "fill_color": "#000000",
+    "back_color": "#FFFFFF",
+    "title_color": "#333333",
+    "subtitle_color": "#666666",
+    "output_filename": "qrcode_output.png",
+    "font_size_title": 48,
+    "font_size_subtitle": 40
+  },
+  "test_config": {
+    "test_key": "test_value_1770102895.4801424",
+    "persistence_test": "persist_test_1770102895"
+  }
+}

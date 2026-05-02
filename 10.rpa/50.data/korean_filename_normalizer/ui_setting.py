@@ -454,36 +454,6 @@ def create_settings_window(parent, config, icon_path=None):
     skip_btn.pack(anchor="w")
     _bind_tooltip(skip_btn, "기존 파일은 유지하고 처리를 건너뜁니다.")
 
-    # 로그 레벨 설정
-    log_level_frame = tk.Frame(app_frame)
-    log_level_frame.grid(row=4, column=0, columnspan=3, sticky="w", pady=4)
-    log_level_label = tk.Label(log_level_frame, text="로그 레벨", font=("맑은 고딕", ui_settings["font_size"]))
-    log_level_label.pack(side="left", padx=(0, 5))
-    _bind_tooltip(log_level_label, "로그 상세 정도: DEBUG(모든 정보) > INFO > WARNING > ERROR(오류만)")
-
-    # 전역 설정에서 로그 레벨 가져오기
-    log_level_default = "DEBUG"
-    try:
-        config_file = Path.home() / ".wf_rpa" / "wf_rpa_config.json"
-        if config_file.exists():
-            with open(config_file, "r", encoding="utf-8") as f:
-                global_config = json.load(f)
-                system_settings = global_config.get("system_settings", {})
-                log_level_default = system_settings.get("log_level", "DEBUG")
-    except Exception:
-        pass
-
-    log_level_var = tk.StringVar(value=log_level_default)
-    log_level_combo = ttk.Combobox(
-        log_level_frame,
-        textvariable=log_level_var,
-        values=["DEBUG", "INFO", "WARNING", "ERROR"],
-        state="readonly",
-        width=12,
-    )
-    log_level_combo.pack(side="left")
-    _bind_tooltip(log_level_combo, "상세 정보를 많이 기록(DEBUG) 또는 오류만 기록(ERROR)합니다.")
-
     # 버튼 프레임
     btn_frame = tk.Frame(main_frame)
     btn_frame.pack(side="bottom", pady=(20, 15), fill="x")
@@ -500,33 +470,6 @@ def create_settings_window(parent, config, icon_path=None):
         try:
             config.update_config(settings_update)
             if config.save_settings():
-                # 전역 설정에 로그 레벨 저장
-                try:
-                    config_file = Path.home() / ".wf_rpa" / "wf_rpa_config.json"
-                    if config_file.exists():
-                        with open(config_file, "r", encoding="utf-8") as f:
-                            global_config = json.load(f)
-                        
-                        if "system_settings" not in global_config:
-                            global_config["system_settings"] = {}
-                        
-                        global_config["system_settings"]["log_level"] = log_level_var.get()
-                        
-                        with open(config_file, "w", encoding="utf-8") as f:
-                            json.dump(global_config, f, ensure_ascii=False, indent=2)
-                        
-                        # 로그 레벨 즉시 적용
-                        log_level_str = log_level_var.get()
-                        log_level_map = {
-                            "DEBUG": logging.DEBUG,
-                            "INFO": logging.INFO,
-                            "WARNING": logging.WARNING,
-                            "ERROR": logging.ERROR,
-                        }
-                        # Note: logger 인스턴스가 없으므로 적용은 다음 실행 시 적용됨
-                except Exception as e:
-                    print(f"⚠️ 로그 레벨 저장 실패: {e}")
-                
                 messagebox.showinfo("저장 완료", "설정이 저장되었습니다.", parent=win)
                 win.grab_release()
                 win.destroy()

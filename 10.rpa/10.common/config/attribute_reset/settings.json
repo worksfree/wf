@@ -1,0 +1,35 @@
+{
+  "solidworks": {
+    "program_path": "C:/Program Files/SOLIDWORKS Corp/SOLIDWORKS/SLDWORKS.exe",
+    "application_title": "SOLIDWORKS"
+  },
+  "runtime_config": {
+    "run_mode": "dev",
+    "short_sleep": 0.2,
+    "mid_sleep": 1.0,
+    "long_sleep": 5.0,
+    "confidence": 0.9,
+    "full_version": "v0.7.5.0",
+    "build_count": 50,
+    "ui_scale": 1.0,
+    "language": "ko",
+    "last_updated": "2026-01-25 00:00:00"
+  },
+  "ui_config": {
+    "topmost": true,
+    "last_selected_excel": "",
+    "window_geometry_override": "",
+    "window_width": 580,
+    "window_height": 320,
+    "admin_window_height": 300
+  },
+  "logging_config": {
+    "log_level": "INFO",
+    "max_log_size_mb": 10,
+    "rotate_logs": true
+  },
+  "test_config": {
+    "test_key": "test_value_1770102867.3273149",
+    "persistence_test": "persist_test_1770102867"
+  }
+}

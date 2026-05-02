@@ -42,10 +42,10 @@ class Config:
         import sys
         is_frozen = getattr(sys, 'frozen', False)
 
-        if is_frozen or self.run_mode == "release":
-            self.app_config_dir = self.user_home / ".wf_rpa" / "dwg_classifier"
+        if self.run_mode == "dev":
+            self.app_config_dir = common_config_dir / "dwg_classifier"
         else:
-            self.app_config_dir = common_config_dir / "dwg_classifier"        
+            self.app_config_dir = self.user_home / ".wf_rpa" / "dwg_classifier"        
         # PyInstaller frozen 환경에서 번들 리소스 경로 저장
         if is_frozen:
             self.bundle_dir = Path(getattr(sys, '_MEIPASS', self.base_dir))
@@ -172,9 +172,9 @@ class Config:
                     "auto_scroll": True,
                     "show_progress": True,
                     "topmost": True,
+                    "window_geometry_override": "",
                     "window_width": 580,
-                    "window_height": 320,
-                    "window_geometry_override": ""
+                    "window_height": 320
                 },
                 "logging_config": {
                     "log_level": "INFO",
@@ -269,6 +269,10 @@ class Config:
         self.ui_config = ui_config
         self.window_geometry_override = ui_config.get("window_geometry_override", "")
 
+        # 창 크기 (settings.json 우선, 없으면 코드 기본값)
+        self.window_width = ui_config.get("window_width", 580)  # dwg_classifier 기본 너비
+        self.window_height = ui_config.get("window_height", 320)  # dwg_classifier 기본 높이
+
         # Run Mode 처리: settings.json 값만 사용 (기본은 초기 런모드 유지)
         cfg_mode = str(app_config.get("run_mode", "")).strip().lower() if app_config else ""
         default_mode = getattr(self, "run_mode", "release")
@@ -301,13 +305,9 @@ class Config:
         self.auto_scroll = ui_config.get("auto_scroll", True)
         self.show_progress = ui_config.get("show_progress", True)
         self.confirm_operations = ui_config.get("confirm_operations", True)
-        self.window_width = ui_config.get("window_width")
-        self.window_height = ui_config.get("window_height")
         self.ui_theme = ui_config.get("ui_theme", "기본")
         self.font_size = ui_config.get("font_size", 10)
         self.topmost = ui_config.get("topmost", True)
-        # 선택적 창 위치/크기 오버라이드 (debug hotkey용)
-        self.window_geometry_override = ui_config.get("window_geometry_override", "")
 
         # 관리자 설정
         self.admin_mode = app_config.get("admin_mode", False)
@@ -406,6 +406,9 @@ class Config:
                     "font_size": self.font_size,
                     "topmost": self.topmost,
                     "window_geometry_override": self.window_geometry_override,
+                    "window_width": self.window_width,
+                    "window_height": self.window_height,
+                    "admin_window_height": self.admin_window_height,
                 }
             )
             data["ui_config"] = ui_config

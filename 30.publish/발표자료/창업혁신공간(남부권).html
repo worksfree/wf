@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웍스프리 발표자료</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+        .presentation {
+            width: 1600px;
+            height: 900px;
+            display: flex;
+            flex-direction: column;
+        }
+        .slide {
+            width: 1600px;
+            height: 900px;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .slide.active {
+            display: flex;
+        }
+        .slide-content {
+            width: 100%;
+            height: 100%;
+            padding: 45px 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .slide-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .slide-1 .slide-content {
+            justify-content: center;
+            align-items: center;
+        }
+        .slide-2, .slide-3, .slide-4 {
+            background: white;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .title-main {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+        .slide-1 .title-main {
+            text-align: center;
+            width: 100%;
+            font-size: 50px;
+            margin-bottom: 25px;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.25);
+            border: 2px solid rgba(255,255,255,0.6);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            border: none;
+        }
+        .subtitle-main {
+            font-size: 24px;
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .slide-1 .subtitle-main {
+            color: rgba(255,255,255,0.95);
+            font-size: 22px;
+        }
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            width: 100%;
+            margin-top: 30px;
+        }
+        .company-grid.slide-1 {
+            margin-top: 35px;
+        }
+        .info-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .slide-1 .info-card {
+            background: rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .info-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.85;
+            margin-bottom: 10px;
+        }
+        .info-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .slide-1 .info-value {
+            font-size: 20px;
+        }
+        .certification-box {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .certification-badge {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .certification-detail {
+            font-size: 16px;
+            line-height: 1.8;
+            opacity: 0.95;
+        }
+        .content-section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 18px;
+            border-left: 6px solid #667eea;
+            padding-left: 18px;
+        }
+        .timer {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            letter-spacing: 0.5px;
+        }
+        .problem-solution {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 18px;
+        }
+        .box {
+            padding: 18px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .problem-box {
+            background: #fff5f5;
+            border-left-color: #e74c3c;
+        }
+        .solution-box {
+            background: #f0f9ff;
+            border-left-color: #667eea;
+        }
+        .box-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: #1a1a1a;
+        }
+        .box-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #444;
+        }
+        .box-content p {
+            margin-bottom: 10px;
+        }
+        .highlight {
+            background: #fffacd;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+        .highlight.green {
+            color: #27ae60;
+            background: #f0fff4;
+        }
+        .feature-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        .feature-list li {
+            margin-bottom: 18px;
+            padding-left: 35px;
+            position: relative;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #444;
+        }
+        .feature-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-size: 24px;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 14px;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            padding: 18px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .comparison-table th {
+            background: #f8f9fa;
+            font-weight: 700;
+            color: #1a1a1a;
+            font-size: 15px;
+        }
+        .comparison-table td {
+            color: #555;
+            font-size: 14px;
+        }
+        .ours {
+            background: #f0f9ff;
+            font-weight: 600;
+            color: #667eea;
+        }
+        .roadmap {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin: 20px 0;
+        }
+        .roadmap-item {
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 8px;
+            text-align: center;
+            border-top: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .roadmap-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+        .roadmap-year {
+            font-size: 22px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .roadmap-content {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #555;
+        }
+        .roadmap-content strong {
+            display: block;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+            font-size: 15px;
+        }
+        .roadmap-content p {
+            font-size: 13px;
+            margin: 8px 0;
+        }
+        .market-highlight {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+        .market-highlight ul {
+            margin-left: 25px;
+            line-height: 1.9;
+        }
+        .market-highlight li {
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: #444;
+        }
+        .note-box {
+            background: #fff9e6;
+            border-left: 5px solid #f39c12;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        .note-box strong {
+            color: #e67e22;
+        }
+        .note-box p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .slide-footer {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1000;
+        }
+        .btn {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #764ba2;
+        }
+        .slide-counter {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+        }
+        .badge-market {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .insight-box {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            border: 2px dashed #667eea;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        .insight-title {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        .insight-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #555;
+        }
+        .insight-content p {
+            margin-bottom: 10px;
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            .slide {
+                display: flex;
+                page-break-after: always;
+                box-shadow: none;
+                margin-bottom: 0;
+                border: 1px solid #ddd;
+            }
+            .controls, .slide-counter {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- SLIDE 1: 기업 개요 -->
+        <div class="slide active slide-1">
+            <div class="slide-content">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div class="certification-box" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); margin-bottom: 20px;">
+                        <div class="certification-badge">✓ 창진원 예비창업패키지</div>
+                        <div class="certification-detail">
+                            2단계 선정 및 진행 중 | 정부지원 55,000,000원
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <div class="title-main">웍스프리</div>
+                    <div class="subtitle-main">제조 설계자의 생산성을 20% 이상<br/>향상시키는 RPA 솔루션</div>
+                </div>
+
+                <div class="company-grid slide-1">
+                    <div class="info-card">
+                        <div class="info-label">대표자</div>
+                        <div class="info-value">이인성</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">경력</div>
+                        <div class="info-value">SW 21년 + 제조 5년</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">사업장</div>
+                        <div class="info-value">경기도 하남시</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">목표</div>
+                        <div class="info-value">글로벌 RPA 마켓</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 40px;">
+                    <div class="badge" style="margin: 0 auto;">
+                        Slide 1 / 4 — 1분 (기업 개요)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: 아이템 개요 -->
+        <div class="slide slide-2">
+            <div class="slide-content">
+                <div class="timer">⏱ 1분 - 아이템 개요</div>
+                
+                <div class="content-section">
+                    <div class="section-title">문제 상황: 제조 설계의 병목</div>
+                    <div class="problem-solution">
+                        <div class="box problem-box">
+                            <div class="box-title">❌ 현재 상황</div>
+                            <div class="box-content">
+                                <p><strong>대규모 장비 프로젝트 기준</strong></p>
+                                <p>• 총 제작기간: 12개월</p>
+                                <p>• 설계기간: <span class="highlight">4개월 (33%)</span></p>
+                                <p>• 도면출도: <span class="highlight">1개월 (25%)</span></p>
+                                <p style="margin-top: 12px;"><strong>2,000개+ 어셈블리</strong>에서 반복적인 업무</p>
+                            </div>
+                        </div>
+                        <div class="box solution-box">
+                            <div class="box-title">✅ RPA 적용 후</div>
+                            <div class="box-content">
+                                <p><strong>생산성 향상</strong></p>
+                                <p style="font-size: 20px; font-weight: 700; color: #667eea; margin: 15px 0;">20~30% 효율 증대</p>
+                                <p>• 설계기간: <span class="highlight green">3개월</span>로 단축</p>
+                                <p>• 휴먼에러 감소</p>
+                                <p>• 설계자 역량 집중</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-title">솔루션: 3가지 특화 RPA 앱</div>
+                    <ul class="feature-list">
+                        <li><strong>BOM to Excel RPA</strong> — 어셈블리에서 BOM을 자동으로 엑셀 추출</li>
+                        <li><strong>도면 속성 정리 RPA</strong> — 8만여 개 라이브러리 도면 속성 자동 수정 (14MM → 1MM)</li>
+                        <li><strong>도면 출력 RPA</strong> — 2D 도면(DWG) 자동 일괄 출력</li>
+                    </ul>
+                </div>
+
+                <div class="slide-footer">Slide 2 / 4</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: 차별성 및 시장성 -->
+        <div class="slide slide-3">
+            <div class="slide-content">
+                <div class="timer">⏱ 1분 - 차별성 & 시장성</div>
+
+                <div class="content-section">
+                    <div class="section-title">우리만의 차별성</div>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>구분</th>
+                            <th style="background: #f0f9ff; color: #667eea;">웍스프리</th>
+                            <th>경쟁사 RPA</th>
+                        </tr>
+                        <tr>
+                            <td><strong>타겟</strong></td>
+                            <td class="ours">제조 중소기업 설계자</td>
+                            <td>대기업 전사 시스템</td>
+                        </tr>
+                        <tr>
+                            <td><strong>특징</strong></td>
+                            <td class="ours">특정 병목 자동화<br/>배울 필요 없는 단순 앱</td>
+                            <td>범용 플랫폼<br/>높은 학습곡선</td>
+                        </tr>
+                        <tr>
+                            <td><strong>진출 시장</strong></td>
+                            <td class="ours">글로벌 스탠다드 사용자</td>
+                            <td>특정 지역 중심</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="insight-box">
+                    <div class="insight-title">🌍 글로벌 확장 전략으로 변경</div>
+                    <div class="insight-content">
+                        <p><strong>국내 커뮤니티 소통 결과:</strong> 주로 학생들의 학습 활용, 고숙련 현업 담당자 부재</p>
+                        <p><strong>새로운 기회 발견:</strong> 솔리드웍스 스탠다드 에디션의 <span style="background: #fffacd; padding: 2px 6px; border-radius: 3px;"><strong>글로벌 사용자</strong></span>를 타겟으로 다국어 버전 설계 중</p>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <div style="margin-bottom: 15px;"><strong>⚠ 개발 진행 상황 업데이트</strong></div>
+                    <p>• 기간제 체험판 운영 중 발견된 이슈 → <strong>크레딧 방식</strong>으로 변경 진행 중</p>
+                    <p>• 이에 따른 개발 일정 조정 예정</p>
+                    <p style="margin-top: 15px; font-size: 14px; color: #777;">※ 더 안정적인 운영 모델 확보로 사용자 경험 개선</p>
+                </div>
+
+                <div class="slide-footer">Slide 3 / 4</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: 향후 계획 -->
+        <div class="slide slide-4">
+            <div class="slide-content">
+                <div class="timer">⏱ 1분 - 향후 계획 & 목표</div>
+
+                <div class="content-section">
+                    <div class="section-title">4단계 성장 로드맵</div>
+                    <div class="roadmap">
+                        <div class="roadmap-item">
+                            <div class="roadmap-year">2025년</div>
+                            <div class="roadmap-content">
+                                <strong>기반 구축</strong>
+                                <p>✓ 3가지 RPA 앱</p>
+                                <p>✓ 다국어 버전 설계</p>
+                                <p>✓ 크레딧 방식 라이센스</p>
+                                <p>✓ 앱스토어 프로토</p>
+                            </div>
+                        </div>
+                        <div class="roadmap-item">
+                            <div class="roadmap-year">2026년</div>
+                            <div class="roadmap-content">
+                                <strong>확장 및 런칭</strong>
+                                <p>✓ RPA 앱 6종 개발</p>
+                                <p>✓ 글로벌 앱스토어 런칭</p>
+                                <p>✓ 다국어 지원</p>
+                                <p>✓ 온라인 결제 연동</p>
+                            </div>
+                        </div>
+                        <div class="roadmap-item">
+                            <div class="roadmap-year">2027년</div>
+                            <div class="roadmap-content">
+                                <strong>컨텐츠 확산</strong>
+                                <p>✓ 3D 모델 라이브러리</p>
+                                <p>✓ 설계 템플릿</p>
+                                <p>✓ 사용자 커뮤니티</p>
+                                <p>✓ 크라우드 소싱</p>
+                            </div>
+                        </div>
+                        <div class="roadmap-item">
+                            <div class="roadmap-year">2028년</div>
+                            <div class="roadmap-content">
+                                <strong>마켓 플랫폼</strong>
+                                <p>✓ RPA 컨텐츠 마켓</p>
+                                <p>✓ 설계 템플릿 거래</p>
+                                <p>✓ 개발자 생태계</p>
+                                <p>✓ B2B2C 모델</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-title">핵심 마케팅 채널</div>
+                    <div class="market-highlight">
+                        <ul>
+                            <li><span class="badge-market">국내</span>솔리드웍스 한국 공식 사용자모임 (9만명 등록, 2만명 활성)</li>
+                            <li><span class="badge-market">국내</span>솔리드웍스 리셀러 ㈜솔코 (2천개 고객사)</li>
+                            <li><span class="badge-market">글로벌</span>솔리드웍스 스탠다드 에디션 글로벌 사용자 커뮤니티</li>
+                            <li><span class="badge-market">글로벌</span>CAD 소프트웨어 국제 파트너십</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="slide-footer">Slide 4 / 4 — 마지막 1분: 제품 시연</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="previousSlide()">← 이전</button>
+        <button class="btn" onclick="nextSlide()">다음 →</button>
+    </div>
+    <div class="slide-counter"><span id="current">1</span> / 4</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[n].classList.add('active');
+            document.getElementById('current').textContent = n + 1;
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

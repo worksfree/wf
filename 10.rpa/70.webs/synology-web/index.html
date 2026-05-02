@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFC 기업 종합 컨설팅 진단</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+:root{
+  --bg:#f4f3ef;--surface:#fff;--border:#e0ddd4;--border2:#c8c5b8;
+  --text:#18180f;--muted:#6a6860;--hint:#a09e96;
+  --blue-bg:#e8f0fb;--blue:#1655a0;--blue-dark:#0d3d7a;
+  --green-bg:#e5f3e8;--green:#256830;
+  --amber-bg:#fdf2db;--amber:#8a5800;
+  --red-bg:#fceaea;--red:#9c1f1f;
+  --purple-bg:#eeedfc;--purple:#3d35a0;
+  --gray-bg:#eeecea;--gray:#545248;
+  --teal-bg:#e2f5f0;--teal:#0f6e56;
+  --r:10px;--rl:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100}
+.logo{font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--text);display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;background:var(--blue);border-radius:50%}
+.hdr-r{font-size:12px;color:var(--hint);font-weight:500}
+
+.page{max-width:740px;margin:0 auto;padding:28px 18px 72px}
+
+.prog-wrap{margin-bottom:22px}
+.prog-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--hint);font-weight:500;margin-bottom:7px}
+.prog-track{height:3px;background:var(--border);border-radius:2px}
+.prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+.breadcrumb{display:flex;flex-wrap:wrap;gap:4px;min-height:24px;margin-bottom:18px;align-items:center}
+.crumb{font-size:11px;background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:2px 9px;border-radius:20px;white-space:nowrap}
+.crumb-sep{color:var(--hint);font-size:12px}
+
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:26px 28px;animation:fu .22s ease}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.q-step{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--blue);text-transform:uppercase;margin-bottom:9px}
+.q-text{font-size:17px;font-weight:700;line-height:1.5;margin-bottom:6px;letter-spacing:-.3px}
+.q-sub{font-size:12.5px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.options{display:flex;flex-direction:column;gap:7px}
+.opt{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 16px;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:400;color:var(--text);text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:border-color .12s,background .12s,transform .08s;line-height:1.5}
+.opt:hover{border-color:var(--blue);background:var(--blue-bg);transform:translateX(3px)}
+.opt:active{transform:translateX(2px) scale(.99)}
+.opt-l{flex:1}
+.opt-main{font-weight:500}
+.opt-sub{font-size:12px;color:var(--hint);margin-top:2px}
+.opt-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.opt-arr{color:var(--hint);font-size:16px;flex-shrink:0;transition:transform .12s}
+.opt:hover .opt-arr{transform:translateX(2px);color:var(--blue)}
+
+.tag-blue{background:var(--blue-bg);color:var(--blue)}
+.tag-green{background:var(--green-bg);color:var(--green)}
+.tag-amber{background:var(--amber-bg);color:var(--amber)}
+.tag-red{background:var(--red-bg);color:var(--red)}
+.tag-purple{background:var(--purple-bg);color:var(--purple)}
+.tag-gray{background:var(--gray-bg);color:var(--gray)}
+.tag-teal{background:var(--teal-bg);color:var(--teal)}
+
+.back-btn{background:none;border:none;font-family:inherit;font-size:12.5px;color:var(--hint);cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;margin-bottom:14px;transition:color .12s}
+.back-btn:hover{color:var(--text)}
+
+/* ── RESULT ── */
+.result-wrap{animation:fu .3s ease}
+.r-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:26px 28px;margin-bottom:14px}
+.r-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.r-badge{font-size:11px;font-weight:700;letter-spacing:.4px;padding:4px 12px;border-radius:20px;margin-bottom:10px;display:inline-block}
+.r-title{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:5px}
+.r-desc{font-size:13px;color:var(--muted);line-height:1.65}
+.risk-score{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;min-width:130px;text-align:center;flex-shrink:0}
+.risk-label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--hint);text-transform:uppercase;margin-bottom:5px}
+.risk-val{font-size:22px;font-weight:700;letter-spacing:-.3px}
+.risk-sub{font-size:11px;color:var(--hint);margin-top:2px}
+.flags{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.flag{font-size:11px;background:var(--bg);border:1px solid var(--border);color:var(--muted);padding:2px 10px;border-radius:20px}
+
+/* ── 절세 포인트 섹션 ── */
+.section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
+.section-hd{padding:13px 22px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.section-hd-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.section-hd-title{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.section-hd-count{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:auto}
+
+.tax-item{padding:14px 22px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start}
+.tax-item:last-child{border-bottom:none}
+.tax-pri{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700}
+.tax-body{flex:1}
+.tax-title{font-size:13.5px;font-weight:700;margin-bottom:3px}
+.tax-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+.tax-link{font-size:12px;font-weight:700;margin-top:5px;padding:3px 0;display:inline-block}
+
+.risk-item{padding:13px 22px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
+.risk-item:last-child{border-bottom:none}
+.risk-dot{width:8px;height:8px;border-radius:50%;margin-top:7px;flex-shrink:0}
+.risk-text{font-size:13px;color:var(--muted);line-height:1.6}
+.risk-text strong{color:var(--text);font-weight:600}
+
+.phase{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;gap:14px}
+.phase:last-child{border-bottom:none}
+.ph-num{width:30px;height:30px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ph-body{flex:1}
+.ph-tag{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.ph-title{font-size:14.5px;font-weight:700;margin-bottom:10px;letter-spacing:-.2px}
+.ph-items{display:flex;flex-direction:column;gap:6px}
+.ph-item{font-size:13px;color:var(--muted);display:flex;gap:7px;align-items:flex-start;line-height:1.6}
+.ph-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);margin-top:8px;flex-shrink:0}
+
+.alert{border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px;display:flex;gap:10px;align-items:flex-start;border:1px solid;line-height:1.6}
+.alert-amber{background:var(--amber-bg);border-color:#d4a040;color:var(--amber)}
+.alert-red{background:var(--red-bg);border-color:#d48080;color:var(--red)}
+.alert-blue{background:var(--blue-bg);border-color:#8ab0e0;color:var(--blue)}
+.alert-icon{flex-shrink:0;margin-top:1px;font-size:15px}
+
+.action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.btn-p{flex:1;min-width:160px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);padding:13px 20px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:background .12s}
+.btn-p:hover{background:var(--blue-dark)}
+.btn-g{background:var(--surface);color:var(--muted);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 20px;font-family:inherit;font-size:14px;cursor:pointer;transition:border-color .12s,color .12s;white-space:nowrap}
+.btn-g:hover{border-color:var(--border2);color:var(--text)}
+
+@media print{header,.no-print{display:none!important}.q-card,.r-hero,.section,.alert{page-break-inside:avoid}}
+@media(max-width:500px){.page{padding:18px 12px 56px}.q-card{padding:18px 16px}.q-text{font-size:15px}.r-title{font-size:17px}.phase{padding:14px 16px}.action-row{flex-direction:column}.btn-p{min-width:unset}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><div class="logo-dot"></div>GFC · 기업 종합 컨설팅 진단</div>
+  <div class="hdr-r" id="hdr-r"></div>
+</header>
+<div class="page">
+  <div class="prog-wrap">
+    <div class="prog-meta"><span id="prog-lbl">진단 시작</span><span id="prog-pct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="breadcrumb" id="bc"></div>
+  <div id="view"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   진단 질문 정의
+   skip(c): 수집된 데이터 기준으로 이 질문 건너뛸지 여부
+═══════════════════════════════════════════════════ */
+const QS = [
+  {
+    id:'bizType', step:'기업 유형',
+    q:'사업자 형태를 선택해주세요',
+    sub:'법인 또는 개인사업자 여부에 따라 진단 경로가 달라집니다',
+    opts:[
+      {t:'개인사업자',sub:'프리랜서·1인 사업자 포함',tag:null,d:{bizType:'indiv'}},
+      {t:'법인',sub:'주식회사·유한회사 등 법인등기 존재',tag:null,d:{bizType:'corp'}},
+    ]
+  },
+  {
+    id:'industry', step:'업종',
+    skip:c=>c.bizType!=='corp',
+    q:'주요 업종은 무엇입니까?',
+    sub:'업종별 위험율과 법인세 적용 여부, 리스크 구조가 다릅니다',
+    opts:[
+      {t:'제조업 / 건설업',sub:'산업재해 위험율 높음, 재해보장 중점',tag:'고위험',d:{ind:'mfg',indRisk:'high',indLabel:'제조·건설'}},
+      {t:'도소매 / 유통',sub:'재고·물류 리스크, 중간 위험율',tag:'중위험',d:{ind:'trade',indRisk:'mid',indLabel:'도소매·유통'}},
+      {t:'IT / 소프트웨어 / 컨설팅',sub:'Key Person 의존도 높음, 낮은 물리적 위험',tag:'저위험',d:{ind:'it',indRisk:'low',indLabel:'IT·서비스'}},
+      {t:'의료 / 요양 / 병원',sub:'비영리 법인세 없음 — 절세 포인트 상이',tag:'세무 특수',d:{ind:'medical',indRisk:'mid',indLabel:'의료·요양'}},
+      {t:'요식업 / 숙박 / 서비스',sub:'현금 매출 비중 높음, 가수금 발생 주의',tag:'중위험',d:{ind:'food',indRisk:'mid',indLabel:'요식·숙박'}},
+      {t:'기타 (부동산·금융·기타)',sub:null,tag:null,d:{ind:'other',indRisk:'low',indLabel:'기타'}},
+    ]
+  },
+  {
+    id:'bizAge', step:'업력',
+    q:'사업 운영 기간은 얼마나 됩니까?',
+    sub:'법인의 경우 업력이 비상장주식 가치평가 방식을 결정합니다',
+    opts:[
+      {t:'2년 미만',sub:'신설 — 비상장주식 액면가 구간 (절호의 분산 타이밍)',tag:'신설',d:{ageKey:'new',ageLabel:'2년 미만'}},
+      {t:'2년 ~ 4년',sub:'성장기 — 4년차부터 순이익 가치평가 전환 임박',tag:'성장기',d:{ageKey:'grow',ageLabel:'2~4년'}},
+      {t:'5년 ~ 10년',sub:'안정기 — 이익잉여금 누적, 승계 전략 가동 필요',tag:'안정기',d:{ageKey:'stable',ageLabel:'5~10년'}},
+      {t:'10년 이상',sub:'성숙기 — 승계·상속세 리스크 본격 점검 시점',tag:'성숙기',d:{ageKey:'mature',ageLabel:'10년 이상'}},
+    ]
+  },
+  {
+    id:'revenue', step:'매출 규모',
+    q:'최근 1년 연간 매출 규모는?',
+    sub:'매출 구간에 따라 컨설팅 그룹(A·B·C)이 분류됩니다',
+    opts:[
+      {t:'7.5억 미만',sub:null,tag:null,d:{rev:'tiny',revLabel:'7.5억 미만',revGroup:''}},
+      {t:'7.5억 ~ 30억',sub:'성실신고 의무 대상',tag:'성실신고',d:{rev:'small',revLabel:'7.5~30억',revGroup:'A'}},
+      {t:'30억 ~ 80억',sub:'A그룹 — 소규모·중소법인',tag:'A그룹',d:{rev:'mid',revLabel:'30~80억',revGroup:'A'}},
+      {t:'80억 ~ 200억',sub:'B그룹 — 중소법인',tag:'B그룹',d:{rev:'large',revLabel:'80~200억',revGroup:'B'}},
+      {t:'200억 이상',sub:'C그룹 — 중견법인',tag:'C그룹',d:{rev:'xlarge',revLabel:'200억 이상',revGroup:'C'}},
+    ]
+  },
+  {
+    id:'employees', step:'임직원 수',
+    skip:c=>c.bizType!=='corp',
+    q:'현재 임직원(직원+임원) 수는?',
+    sub:null,
+    opts:[
+      {t:'5인 미만',sub:null,tag:null,d:{emp:'tiny',empLabel:'5인 미만'}},
+      {t:'5인 ~ 20인',sub:null,tag:null,d:{emp:'small',empLabel:'5~20인'}},
+      {t:'20인 ~ 100인',sub:null,tag:null,d:{emp:'mid',empLabel:'20~100인'}},
+      {t:'100인 이상',sub:null,tag:null,d:{emp:'large',empLabel:'100인 이상'}},
+    ]
+  },
+  {
+    id:'ceoStake', step:'대표 지분',
+    skip:c=>c.bizType!=='corp',
+    q:'대표이사의 법인 지분율은?',
+    sub:'지분 구조는 상속세·증여세 리스크와 승계 전략의 핵심 변수입니다',
+    opts:[
+      {t:'100% (대표 단독 소유)',sub:'상속세 리스크 최고, 승계 플랜 긴급',tag:'단독 소유',d:{ceoStake:'100',stakeLabel:'100%'}},
+      {t:'50% 초과 ~ 99%',sub:'지배주주, 특수관계인 지분 분산 여부 확인 필요',tag:'지배주주',d:{ceoStake:'major',stakeLabel:'50%초과'}},
+      {t:'50% 이하',sub:'공동대표 / 외부투자 구조',tag:'공동 보유',d:{ceoStake:'minor',stakeLabel:'50%이하'}},
+    ]
+  },
+  {
+    id:'relatedStake', step:'특수관계인 지분',
+    skip:c=>c.bizType!=='corp'||c.ceoStake==='minor',
+    q:'특수관계인(배우자·자녀·부모)의 지분 보유 현황은?',
+    sub:'특수관계인과 대표 지분 합계가 30% 이상이면 "특정법인" 해당 — 별도 승계 전략 적용',
+    opts:[
+      {t:'없음 — 대표만 보유',sub:'향후 증여·분산 계획 수립 필요',tag:'미분산',d:{related:'none',relatedLabel:'미분산'}},
+      {t:'배우자/자녀에게 일부 분산',sub:'특수관계인 포함 지분 합계 확인 필요',tag:'일부 분산',d:{related:'partial',relatedLabel:'일부분산'}},
+      {t:'승계 목적으로 자녀 법인(특정법인) 설립',sub:'특정법인 활용 — 과세 리스크 별도 점검 필요',tag:'특정법인',d:{related:'specific',relatedLabel:'특정법인'}},
+      {t:'이미 승계·증여 완료',sub:null,tag:'완료',d:{related:'done',relatedLabel:'승계완료'}},
+    ]
+  },
+  {
+    id:'retainedEarnings', step:'이익잉여금',
+    skip:c=>c.bizType!=='corp',
+    q:'법인의 누적 이익잉여금 규모는?',
+    sub:'이익잉여금이 과다하면 배당소득세 이슈와 주식가치 상승으로 이어집니다',
+    opts:[
+      {t:'3억 미만',sub:null,tag:null,d:{re:'low',reLabel:'3억 미만'}},
+      {t:'3억 ~ 20억',sub:'배당 설계 또는 보험 출구 검토 구간',tag:'주의',d:{re:'mid',reLabel:'3~20억'}},
+      {t:'20억 ~ 100억',sub:'이익잉여금 과다 — 절세 출구전략 시급',tag:'위험',d:{re:'high',reLabel:'20~100억'}},
+      {t:'100억 초과',sub:'주식가치 급등 — 상속세 최대 리스크 구간',tag:'긴급',d:{re:'vhigh',reLabel:'100억 초과'}},
+    ]
+  },
+  {
+    id:'financialRisk', step:'재무 리스크',
+    q:'가수금 또는 가지급금이 있습니까?',
+    sub:'가수금 = 대표가 법인에 빌려준 돈 (99% 확률 매출누락). 가지급금 = 대표가 법인 돈을 사적 사용',
+    opts:[
+      {t:'없음',sub:null,tag:null,d:{fr:'none',frLabel:'없음'}},
+      {t:'가지급금만 있음',sub:'대표의 법인 자금 사적 사용 — 이자 과세 이슈',tag:'주의',d:{fr:'payable',frLabel:'가지급금'}},
+      {t:'가수금만 있음',sub:'매출 누락 가능성 99% — 세무조사 대응 긴급',tag:'위험',d:{fr:'receivable',frLabel:'가수금'}},
+      {t:'양쪽 모두 있음',sub:'복합 재무 리스크 — 즉시 상계처리 필요',tag:'긴급',d:{fr:'both',frLabel:'양쪽 다'}},
+    ]
+  },
+  {
+    id:'corpTax', step:'법인세',
+    skip:c=>c.bizType!=='corp'||c.ind==='medical',
+    q:'연간 법인세 납부 수준은?',
+    sub:'법인세 부담이 클수록 경영인정기보험 비용처리를 통한 절세 효과가 극대화됩니다',
+    opts:[
+      {t:'납부 없음 (적자 또는 세액공제)',sub:null,tag:null,d:{tax:'none',taxLabel:'없음'}},
+      {t:'1천만원 미만',sub:null,tag:null,d:{tax:'low',taxLabel:'1천만원 미만'}},
+      {t:'1천만원 ~ 5천만원',sub:'경영인정기 비용처리 연간 절감 효과 220만~1,100만원',tag:'절세 기회',d:{tax:'mid',taxLabel:'1천~5천만원'}},
+      {t:'5천만원 이상',sub:'경영인정기 풀 활용 시 절세 효과 최대 — 최우선 과제',tag:'절세 최우선',d:{tax:'high',taxLabel:'5천만원 이상'}},
+    ]
+  },
+  {
+    id:'ceoAge', step:'대표 연령',
+    q:'대표이사의 연령대는?',
+    sub:'연령에 따라 보험 가입 가능 기간과 보험료 수준이 달라집니다',
+    opts:[
+      {t:'40세 미만',sub:'가입 기간 충분, 보험료 유리',tag:null,d:{age:'young',ageLabel:'40세 미만'}},
+      {t:'40 ~ 55세',sub:'최적의 경영인정기 가입 구간',tag:'최적 구간',d:{age:'mid',ageLabel:'40~55세'}},
+      {t:'55 ~ 65세',sub:'가입 시급, 보험료 상승 — 빠른 결정 필요',tag:'시급',d:{age:'senior',ageLabel:'55~65세'}},
+      {t:'65세 이상',sub:'일부 상품 가입 제한 — 대안 플랜 필요',tag:'제한적',d:{age:'elder',ageLabel:'65세 이상'}},
+    ]
+  },
+  {
+    id:'succession', step:'승계 계획',
+    skip:c=>c.bizType!=='corp',
+    q:'가업 승계 또는 주식 이전 계획은?',
+    sub:'승계 플랜 없이 대표 사망 시 상속세 납부 재원이 없어 법인 존속이 위협받을 수 있습니다',
+    opts:[
+      {t:'계획 없음 / 미정',sub:'상속세 리스크 최고 — 즉시 플랜 수립 필요',tag:'긴급',d:{succ:'none',succLabel:'미정'}},
+      {t:'자녀에게 승계 예정',sub:'주식 가치 낮은 시점에 증여/분산 검토 필요',tag:'승계 예정',d:{succ:'child',succLabel:'자녀 승계'}},
+      {t:'제3자 매각 (M&A) 고려',sub:'기업 가치 극대화 전략 + 오너 출구 플랜',tag:'매각 검토',d:{succ:'sale',succLabel:'매각 검토'}},
+      {t:'이미 승계 준비 중',sub:'기존 플랜 점검 및 보완',tag:'진행 중',d:{succ:'wip',succLabel:'진행 중'}},
+    ]
+  },
+  {
+    id:'groupIns', step:'단체보험',
+    q:'현재 임직원 단체보험 가입 현황은?',
+    sub:null,
+    opts:[
+      {t:'전혀 없음',sub:'미가입 — 신규 설계 대상',tag:'신규',d:{gi:'none',giLabel:'미가입'}},
+      {t:'일부 가입 (보장 미흡)',sub:'보장 분석 후 업그레이드 설계 대상',tag:'비교 분석',d:{gi:'partial',giLabel:'일부가입'}},
+      {t:'단체보험 완비',sub:'경영인 보험 및 추가 법인보험 검토 대상',tag:'추가 컨설팅',d:{gi:'full',giLabel:'완비'}},
+    ]
+  },
+];
+
+/* ═══════════════════════════════════════════════════
+   앱 상태
+═══════════════════════════════════════════════════ */
+let history = []; // {qIdx, optIdx, answer}
+let C = {};       // collected data
+
+function visibleQuestions() {
+  return QS.map((q,i)=>({...q,_idx:i})).filter(q=>!q.skip||!q.skip(C));
+}
+
+function currentVQIdx() { return history.length; }
+
+/* ═══════════════════════════════════════════════════
+   렌더
+═══════════════════════════════════════════════════ */
+function render() {
+  const vqs = visibleQuestions();
+  const pos = history.length;
+  updateProgress(pos, vqs.length);
+  updateBc();
+
+  if (pos >= vqs.length) { renderResult(); return; }
+
+  const q = vqs[pos];
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    ${history.length>0?`<button class="back-btn no-print" onclick="goBack()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 3L5 8L10 13"/></svg>
+      이전 항목으로
+    </button>`:''}
+    <div class="q-card">
+      <div class="q-step">체크포인트 ${pos+1} / ${vqs.length} &nbsp;—&nbsp; ${q.step}</div>
+      <div class="q-text">${q.q}</div>
+      ${q.sub?`<div class="q-sub">${q.sub}</div>`:''}
+      <div class="options">
+        ${q.opts.map((o,i)=>`
+          <button class="opt" onclick="selectOpt(${pos},${i})">
+            <div class="opt-l">
+              <div class="opt-main">${o.t}</div>
+              ${o.sub?`<div class="opt-sub">${o.sub}</div>`:''}
+            </div>
+            ${o.tag?`<span class="opt-tag tag-${tagColor(o.tag)}">${o.tag}</span>`:`<span class="opt-arr">›</span>`}
+          </button>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function tagColor(tag) {
+  const m = {'고위험':'red','중위험':'amber','저위험':'green','세무 특수':'teal','신설':'green','성장기':'blue','안정기':'purple','성숙기':'purple','성실신고':'amber','A그룹':'blue','B그룹':'amber','C그룹':'purple','단독 소유':'red','지배주주':'amber','공동 보유':'green','미분산':'red','일부 분산':'amber','특정법인':'purple','완료':'green','신규':'blue','비교 분석':'amber','추가 컨설팅':'teal','주의':'amber','위험':'red','긴급':'red','절세 기회':'teal','절세 최우선':'green','최적 구간':'green','시급':'amber','제한적':'red','승계 예정':'blue','매각 검토':'purple','진행 중':'teal'};
+  return m[tag]||'gray';
+}
+
+function updateProgress(pos, total) {
+  const pct = total===0?0:Math.round((pos/total)*100);
+  document.getElementById('prog-fill').style.width = (pos>=total?100:pct)+'%';
+  document.getElementById('prog-pct').textContent = (pos>=total?100:pct)+'%';
+  document.getElementById('prog-lbl').textContent = pos>=total?'진단 완료':`항목 ${pos+1} / ${total}`;
+  document.getElementById('hdr-r').textContent = pos>=total?'결과 확인':`${pos+1}/${total}`;
+}
+
+function updateBc() {
+  document.getElementById('bc').innerHTML = history.map((h,i)=>
+    `<span class="crumb">${h.answer}</span>${i<history.length-1?'<span class="crumb-sep">›</span>':''}`
+  ).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   액션
+═══════════════════════════════════════════════════ */
+function selectOpt(vqPos, optIdx) {
+  const vqs = visibleQuestions();
+  const q = vqs[vqPos];
+  const o = q.opts[optIdx];
+  history.push({qIdx:q._idx, optIdx, answer:o.t});
+  Object.assign(C, o.d||{});
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goBack() {
+  if (!history.length) return;
+  const last = history.pop();
+  // 마지막 선택의 데이터 키 제거 후 재계산
+  C = {};
+  history.forEach(h=>{
+    const q = QS[h.qIdx];
+    Object.assign(C, q.opts[h.optIdx].d||{});
+  });
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function restart() { history=[]; C={}; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* ═══════════════════════════════════════════════════
+   결과 생성 엔진
+═══════════════════════════════════════════════════ */
+function buildResult() {
+  const isIndiv = C.bizType === 'indiv';
+  const isMedical = C.ind === 'medical';
+  const isHighRisk = C.indRisk === 'high';
+  const isNew = C.ageKey === 'new';
+  const isGrow = C.ageKey === 'grow';
+  const isMature = ['stable','mature'].includes(C.ageKey);
+  const reHigh = ['high','vhigh'].includes(C.re);
+  const reVhigh = C.re === 'vhigh';
+  const frIssue = C.fr && C.fr !== 'none';
+  const frBoth = C.fr === 'both';
+  const frReceivable = C.fr === 'receivable' || frBoth;
+  const frPayable = C.fr === 'payable' || frBoth;
+  const taxHigh = ['mid','high'].includes(C.tax);
+  const stake100 = C.ceoStake === '100';
+  const stakeHigh = ['100','major'].includes(C.ceoStake);
+  const relatedNone = C.related === 'none' || (!C.related && C.bizType==='corp');
+  const succNone = C.succ === 'none';
+  const succChild = C.succ === 'child';
+  const succSale = C.succ === 'sale';
+  const revHigh = ['large','xlarge'].includes(C.rev);
+  const revLow = C.rev === 'tiny' || C.rev === 'small';
+  const ageSenior = ['senior','elder'].includes(C.age);
+  const giNone = C.gi === 'none';
+  const giPartial = C.gi === 'partial';
+  const ageLabel = C.ageLabel||'';
+
+  /* ── 그룹 결정 ── */
+  let group, groupLabel, accentColor, badgeClass;
+  if (isIndiv) {
+    if (C.rev==='tiny') { group='indiv-low'; groupLabel='개인사업자 · 일반'; accentColor='#545248'; badgeClass='tag-gray'; }
+    else if (C.rev==='small') { group='indiv-mid'; groupLabel='개인사업자 · 성실신고'; accentColor='#8a5800'; badgeClass='tag-amber'; }
+    else { group='indiv-high'; groupLabel='개인사업자 · 법인전환 긴급'; accentColor='#9c1f1f'; badgeClass='tag-red'; }
+  } else if (revHigh) {
+    group = C.rev==='xlarge' ? 'C' : 'B';
+    groupLabel = group==='C' ? 'C그룹 · 중견법인 (200억+)' : 'B그룹 · 중소법인 (80~200억)';
+    accentColor = group==='C' ? '#3d35a0' : '#8a5800';
+    badgeClass = group==='C' ? 'tag-purple' : 'tag-amber';
+  } else {
+    group = 'A';
+    groupLabel = 'A그룹 · 소규모법인';
+    accentColor = '#1655a0';
+    badgeClass = 'tag-blue';
+  }
+
+  /* ── 리스크 점수 계산 ── */
+  let riskScore = 0;
+  if (frBoth) riskScore+=3;
+  else if (frIssue) riskScore+=2;
+  if (reVhigh) riskScore+=3;
+  else if (reHigh) riskScore+=2;
+  if (stake100 && succNone) riskScore+=3;
+  else if (stakeHigh && succNone) riskScore+=2;
+  if (isHighRisk && giNone) riskScore+=2;
+  if (ageSenior && succNone) riskScore+=1;
+  if (isNew && relatedNone) riskScore+=1;
+
+  let riskLevel, riskColor;
+  if (riskScore>=7) { riskLevel='위험'; riskColor='#9c1f1f'; }
+  else if (riskScore>=4) { riskLevel='주의'; riskColor='#8a5800'; }
+  else { riskLevel='양호'; riskColor='#256830'; }
+
+  /* ── 절세 포인트 발굴 ── */
+  const taxPoints = [];
+
+  if (frReceivable) taxPoints.push({
+    pri:'긴급', priC:'#fceaea', priTC:'#9c1f1f',
+    title:'가수금 — 매출 누락 리스크 (99% 확률)',
+    desc:'가수금 잔액이 있는 기업은 99% 확률로 매출 누락입니다. 국세청 조사 시 전액 과세 대상. 가지급금과 상계처리로 리스크 해소가 가능합니다.',
+    link:'→ 가지급금·가수금 상계처리 플랜 즉시 수립'
+  });
+
+  if (frPayable && !frReceivable) taxPoints.push({
+    pri:'주의', priC:'#fdf2db', priTC:'#8a5800',
+    title:'가지급금 — 이자 과세 및 배당 간주 위험',
+    desc:'대표가 법인 자금을 사적 사용 시 연 4.6% 이자를 법인에 납부해야 하며, 미납 시 증여세 과세. 적절한 상계처리가 필요합니다.',
+    link:'→ 가지급금 이자 계산 및 상계 구조 설계'
+  });
+
+  if (!isIndiv && isNew) taxPoints.push({
+    pri:'기회', priC:'#e2f5f0', priTC:'#0f6e56',
+    title:'비상장주식 액면가 구간 — 증여·분산 절호의 타이밍',
+    desc:'법인 설립 3년 이내는 비상장주식을 자산가치(액면가)로 평가합니다. 4년차부터 순이익 가치로 전환되어 주식가치가 급등합니다. 지금이 가족에게 주식을 나눠줄 최적의 시점입니다.',
+    link:'→ 자녀·배우자 지분 분산 즉시 실행 (증여세 최소화)'
+  });
+
+  if (!isIndiv && isGrow) taxPoints.push({
+    pri:'주의', priC:'#fdf2db', priTC:'#8a5800',
+    title:'주식가치 전환 임박 — 4년차 가치평가 방식 변경',
+    desc:'4년차부터 비상장주식 가치평가에 순이익이 반영되기 시작합니다. 매출이 성장 중이라면 주식가치가 빠르게 상승하여 향후 증여세 부담이 크게 늘어납니다.',
+    link:'→ 지분 분산 플랜 수립 지금 착수'
+  });
+
+  if (!isIndiv && reHigh) taxPoints.push({
+    pri:'긴급', priC:'#fceaea', priTC:'#9c1f1f',
+    title:'이익잉여금 과다 — 주식가치 폭등 · 상속세 폭탄 예고',
+    desc:`이익잉여금 ${C.reLabel||''}은 비상장주식 가치를 직접 올립니다. 대표 사망 시 해당 주식 전체에 상속세(최대 50%)가 부과됩니다. 배당·경영인정기·임원 퇴직금 등 출구전략이 시급합니다.`,
+    link:'→ 이익잉여금 출구전략 3가지 시나리오 비교 분석'
+  });
+
+  if (!isIndiv && !isMedical && taxHigh) taxPoints.push({
+    pri:'기회', priC:'#e5f3e8', priTC:'#256830',
+    title:`경영인정기보험 비용처리 — 법인세 ${C.taxLabel||''} 절감`,
+    desc:'경영인정기보험 보험료 전액을 법인 비용으로 처리 가능. 법인세율 22% 적용 시 보험료의 22%가 절세됩니다. 15년차 이후 환급률 100% 도달 — 사실상 무비용으로 보장을 받는 구조입니다.',
+    link:'→ 경영인정기 1안·2안 비교 설계 제시'
+  });
+
+  if (isMedical) taxPoints.push({
+    pri:'안내', priC:'#e8f0fb', priTC:'#1655a0',
+    title:'의료·요양 업종 — 법인세 없음, 절세 포인트 상이',
+    desc:'병원·요양시설은 비영리법인으로 법인세를 납부하지 않아 경영인정기 비용처리 절세 효과가 없습니다. 대신 대표 개인 소득세 절감, 퇴직금 플랜, 상속세 재원 마련에 집중해야 합니다.',
+    link:'→ 의료업 특화 절세 플랜 (퇴직금·상속세 중심)'
+  });
+
+  if (!isIndiv && stake100 && relatedNone && !['done','wip'].includes(C.succ)) taxPoints.push({
+    pri:'긴급', priC:'#fceaea', priTC:'#9c1f1f',
+    title:'지분 100% 대표 단독 — 상속세 최대 리스크',
+    desc:'대표 단독 지분 100%는 법인 전체가 상속세 대상입니다. 기업가치가 높을수록 상속세 납부 재원 부족으로 법인 자체가 위협받을 수 있습니다. 자녀·배우자 증여 또는 특정법인 설립을 통한 분산이 필요합니다.',
+    link:'→ 특정법인 설립을 통한 지분 분산 검토'
+  });
+
+  if (!isIndiv && succSale) taxPoints.push({
+    pri:'전략', priC:'#eeedfc', priTC:'#3d35a0',
+    title:'M&A 매각 준비 — 기업가치 극대화 전략',
+    desc:'매각 전 이익잉여금 정리, 가지급금 해소, 법인 재무구조 정상화가 기업 가치를 높입니다. 오너 출구 전략(퇴직금 극대화, 상속세 재원 마련)도 병행이 필요합니다.',
+    link:'→ 매각 전 밸류업 컨설팅 로드맵'
+  });
+
+  if (isIndiv && !revLow) taxPoints.push({
+    pri:'긴급', priC:'#fceaea', priTC:'#9c1f1f',
+    title:'개인사업자 법인전환 — 세부담 절감 즉시 분석 필요',
+    desc:`성실신고 의무 대상 또는 고매출 개인사업자는 법인전환 시 소득세(최대 49.5%) → 법인세(22%)로 전환 가능. 3년 이내 법인은 액면가 주식 유지로 향후 증여세도 최소화됩니다.`,
+    link:'→ 개인 vs 법인 세부담 비교 시뮬레이션'
+  });
+
+  /* ── 리스크 항목 ── */
+  const riskItems = [];
+  if (isHighRisk && (giNone||giPartial)) riskItems.push({lv:'red',text:`<strong>산업재해 리스크</strong> — ${C.indLabel||''}업종은 위험율이 높습니다. 단체 재해보장보험이 없거나 미흡한 경우 중대재해처벌법 적용 시 법인 존속 위기로 이어질 수 있습니다.`});
+  if (frReceivable) riskItems.push({lv:'red',text:'<strong>매출 누락 리스크</strong> — 가수금 잔액은 세무조사 시 매출 누락으로 간주될 가능성이 매우 높습니다. 전액 추징 시 기업 존속에 심각한 위협이 됩니다.'});
+  if (stake100 && succNone && isMature) riskItems.push({lv:'red',text:'<strong>상속세 무방비 상태</strong> — 지분 100%에 승계 계획 없이 대표 사망 시 법인 전체가 상속세 대상이 됩니다. 상속세 납부 재원 부재로 법인 청산 위기.'});
+  if (ageSenior && giNone) riskItems.push({lv:'amber',text:`<strong>Key Person 리스크</strong> — 대표(${C.ageLabel||''})가 핵심 인물인 상황에서 보험이 없는 경우, 대표 유고 시 기업 운영 자금 확보가 불가합니다.`});
+  if (reVhigh && relatedNone) riskItems.push({lv:'amber',text:'<strong>이익잉여금 과다 + 지분 미분산</strong> — 주식가치 급등 상태에서 지분이 한 명에게 집중된 구조는 상속세 리스크가 극대화됩니다.'});
+  if (C.ind==='food' && frReceivable) riskItems.push({lv:'amber',text:'<strong>요식업 현금 매출 누락 위험</strong> — 현금 매출 비중이 높은 업종에서 가수금이 있다면 매출 누락 가능성이 더욱 높습니다.'});
+  if (!isIndiv && giNone && !riskItems.find(r=>r.text.includes('단체'))) riskItems.push({lv:'amber',text:'<strong>임직원 보장 공백</strong> — 단체보험 미가입 상태로 업무 중 사고 발생 시 회사 직접 배상 리스크가 있습니다.'});
+
+  /* ── 로드맵 Phase 구성 ── */
+  const phase1Items = [];
+  const phase2Items = [];
+  const phase3Items = [];
+
+  // Phase 1: 절세 즉시 실행 (1~3개월)
+  if (frIssue) phase1Items.push('가수금·가지급금 상계처리 플랜 수립 (세무사·법무사 공동 진행)');
+  if (!isIndiv && isNew && relatedNone) phase1Items.push('비상장주식 액면가 구간 내 자녀/배우자 증여 실행 (3년 이내 최적 타이밍)');
+  if (!isIndiv && !isMedical && taxHigh) phase1Items.push('경영인정기보험 비용처리 구조 설계 — 1안·2안 보험료 시뮬레이션 제시');
+  if (isIndiv && !revLow) phase1Items.push('개인 vs 법인 세부담 비교 시뮬레이션 작성 후 법인전환 착수');
+  if (!isIndiv && isMedical) phase1Items.push('대표 개인 소득세 절감 플랜 (퇴직금 사전 설계, 연금 보험 구조)');
+  if (phase1Items.length === 0) phase1Items.push('재무제표 기반 절세 포인트 전수 점검 (한신평 신용조회 포함)');
+  phase1Items.push('단체보험 현황 전면 점검 — 보장분석 보고서 제작 (비교설계 포함)');
+
+  // Phase 2: 보험 연계 (2~6개월)
+  if (!isIndiv && !isMedical && taxHigh) phase2Items.push('경영인정기보험 계약 — 비용처리 후 실질 납입 부담 = (보험료 × 78%) 구조 확정');
+  if (isHighRisk || giNone) phase2Items.push(`단체 재해보장보험 신규 설계 (${C.empLabel||''}규모 맞춤, 인당 5~10만원 설계)`);
+  if (giPartial) phase2Items.push('기가입 단체보험 비교분석 — 삼성생명 등 경쟁사 대비 합리성 점검 후 업그레이드 설계');
+  if (reHigh || (stake100 && isMature)) phase2Items.push('이익잉여금 출구전략: 임원 퇴직금 사전 설계 + 법인 종신보험 상속세 재원 마련');
+  if (ageSenior) phase2Items.push(`대표이사(${C.ageLabel||''}) 긴급 Key Person 보험 가입 — 연령 상승 전 빠른 실행`);
+  if (!phase2Items.find(i=>i.includes('단체'))) phase2Items.push('임직원 복지 단체보험 패키지 설계 (재해+건강 분리 설계, 월별 분산 계약으로 할인 적용)');
+
+  // Phase 3: 장기 플랜 (6~24개월)
+  if (!isIndiv && stakeHigh && succNone) phase3Items.push('특정법인 활용 가업승계 플랜 수립 — 자녀 법인 설립 후 저가 양도 구조 검토');
+  if (succChild) phase3Items.push('자녀 법인(특정법인) 설립 + 가업승계 로드맵 수립 (5천만원 증여세 면제 한도 활용)');
+  if (succSale) phase3Items.push('M&A 전 기업 가치 극대화 — 재무구조 정상화, 이익잉여금 출구, 대표 퇴직금 최대화');
+  if (!isIndiv && reHigh) phase3Items.push('이익잉여금 장기 출구전략 확정 — 배당·퇴직금·보험 3가지 시나리오 연간 실행');
+  phase3Items.push('연간 컨설팅 리뷰 체계 구축 — 매출 변화 시 그룹 재분류 및 전략 업데이트');
+  if (!isIndiv) phase3Items.push('추가 법인보험 포트폴리오 — 화재·배상책임·기업휴지 종합 점검');
+
+  return { group, groupLabel, accentColor, badgeClass, riskLevel, riskColor, riskScore, taxPoints, riskItems, phase1Items, phase2Items, phase3Items };
+}
+
+/* ═══════════════════════════════════════════════════
+   결과 렌더
+═══════════════════════════════════════════════════ */
+function renderResult() {
+  const R = buildResult();
+  const view = document.getElementById('view');
+
+  const flagsHtml = Object.entries({
+    '사업자':C.bizType==='indiv'?'개인사업자':'법인',
+    '업종':C.indLabel,'업력':C.ageLabel,'매출':C.revLabel,
+    '임직원':C.empLabel,'지분':C.stakeLabel,'이익잉여금':C.reLabel,
+    '재무리스크':C.frLabel,'법인세':C.taxLabel,'대표연령':C.ageLabel,
+    '승계':C.succLabel,'단체보험':C.giLabel
+  }).filter(([,v])=>v).map(([k,v])=>`<span class="flag">${k}: ${v}</span>`).join('');
+
+  const taxPointsHtml = R.taxPoints.map(p=>`
+    <div class="tax-item">
+      <div class="tax-pri" style="background:${p.priC};color:${p.priTC}">${p.pri}</div>
+      <div class="tax-body">
+        <div class="tax-title">${p.title}</div>
+        <div class="tax-desc">${p.desc}</div>
+        <div class="tax-link" style="color:${R.accentColor}">${p.link}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const riskItemsHtml = R.riskItems.map(r=>`
+    <div class="risk-item">
+      <div class="risk-dot" style="background:${r.lv==='red'?'#e24b4a':'#ba7517'}"></div>
+      <div class="risk-text">${r.text}</div>
+    </div>
+  `).join('');
+
+  const phaseColor = (n)=>[['#e8f0fb','#1655a0'],['#e5f3e8','#256830'],['#eeedfc','#3d35a0']][n-1];
+  const phaseLabel = ['즉시 절세 실행','보험 연계 설계','장기 플랜'];
+
+  function phaseHtml(n, items) {
+    const [bg,tc] = phaseColor(n);
+    return `<div class="phase">
+      <div class="ph-num" style="background:${bg};color:${tc}">${n}</div>
+      <div class="ph-body">
+        <div class="ph-tag" style="color:${tc}">${['1~3개월 내','2~6개월','6~24개월'][n-1]}</div>
+        <div class="ph-title">${phaseLabel[n-1]}</div>
+        <div class="ph-items">${items.map(i=>`<div class="ph-item"><div class="ph-dot"></div><span>${i}</span></div>`).join('')}</div>
+      </div>
+    </div>`;
+  }
+
+  view.innerHTML = `
+    <div class="result-wrap">
+      <button class="back-btn no-print" onclick="goBack()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 3L5 8L10 13"/></svg>
+        이전 항목으로
+      </button>
+
+      <div class="r-hero">
+        <div class="r-top">
+          <div>
+            <div class="r-badge ${R.badgeClass}">${R.groupLabel}</div>
+            <div class="r-title">기업 종합 컨설팅 진단 완료</div>
+            <div class="r-desc">발굴된 절세 포인트 <strong>${R.taxPoints.length}개</strong> · 리스크 항목 <strong>${R.riskItems.length}개</strong><br>아래 로드맵 순서대로 절세 먼저 실행 후 보험으로 연계하세요.</div>
+          </div>
+          <div class="risk-score">
+            <div class="risk-label">종합 리스크</div>
+            <div class="risk-val" style="color:${R.riskColor}">${R.riskLevel}</div>
+            <div class="risk-sub">점수 ${R.riskScore}/12</div>
+          </div>
+        </div>
+        <div class="flags">${flagsHtml}</div>
+      </div>
+
+      ${R.taxPoints.length ? `
+      <div class="section">
+        <div class="section-hd">
+          <div class="section-hd-icon" style="background:#e5f3e8;color:#256830">$</div>
+          <div class="section-hd-title" style="color:#256830">발굴된 절세 포인트</div>
+          <div class="section-hd-count tag-green">${R.taxPoints.length}개 발견</div>
+        </div>
+        ${taxPointsHtml}
+      </div>` : ''}
+
+      ${R.riskItems.length ? `
+      <div class="section">
+        <div class="section-hd">
+          <div class="section-hd-icon" style="background:#fceaea;color:#9c1f1f">!</div>
+          <div class="section-hd-title" style="color:#9c1f1f">리스크 진단 결과</div>
+          <div class="section-hd-count tag-red">${R.riskItems.length}건 주의</div>
+        </div>
+        ${riskItemsHtml}
+      </div>` : ''}
+
+      <div class="section">
+        <div class="section-hd">
+          <div class="section-hd-icon" style="background:${R.badgeClass.includes('blue')?'#e8f0fb':R.badgeClass.includes('amber')?'#fdf2db':'#eeedfc'};color:${R.accentColor}">→</div>
+          <div class="section-hd-title" style="color:${R.accentColor}">맞춤형 컨설팅 로드맵</div>
+        </div>
+        ${phaseHtml(1, R.phase1Items)}
+        ${phaseHtml(2, R.phase2Items)}
+        ${phaseHtml(3, R.phase3Items)}
+      </div>
+
+      <div class="action-row no-print">
+        <button class="btn-p" onclick="window.print()">📄 결과 인쇄 / PDF 저장</button>
+        <button class="btn-g" onclick="restart()">↺ 처음부터 다시</button>
+      </div>
+    </div>`;
+}
+
+/* ── 초기 진입 ── */
+render();
+</script>
+</body>
+</html>

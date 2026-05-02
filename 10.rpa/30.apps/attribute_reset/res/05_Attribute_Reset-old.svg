@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E88E5"/>
+      <stop offset="100%" style="stop-color:#0D47A1"/>
+    </linearGradient>
+    <linearGradient id="partGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#E3F2FD"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0D47A1" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+  
+  <!-- 3D Part representation -->
+  <g transform="translate(100, 80)">
+    <!-- Property panel -->
+    <rect x="0" y="0" width="200" height="280" rx="16" fill="url(#partGrad)"/>
+    
+    <!-- Header -->
+    <rect x="0" y="0" width="200" height="50" rx="16" fill="#1565C0"/>
+    <rect x="0" y="35" width="200" height="15" fill="#1565C0"/>
+    <text x="100" y="35" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">속성</text>
+    
+    <!-- Property rows with strikethrough (messy/old) -->
+    <g opacity="0.5">
+      <rect x="20" y="70" width="160" height="30" rx="6" fill="#FFCDD2"/>
+      <line x1="25" y1="85" x2="175" y2="85" stroke="#C62828" stroke-width="2"/>
+      <text x="30" y="90" font-family="Arial, sans-serif" font-size="14" fill="#C62828">이름: 부품_v2_최종</text>
+    </g>
+    
+    <g opacity="0.5">
+      <rect x="20" y="110" width="160" height="30" rx="6" fill="#FFCDD2"/>
+      <line x1="25" y1="125" x2="175" y2="125" stroke="#C62828" stroke-width="2"/>
+      <text x="30" y="130" font-family="Arial, sans-serif" font-size="14" fill="#C62828">재질: ???</text>
+    </g>
+    
+    <g opacity="0.5">
+      <rect x="20" y="150" width="160" height="30" rx="6" fill="#FFCDD2"/>
+      <line x1="25" y1="165" x2="175" y2="165" stroke="#C62828" stroke-width="2"/>
+      <text x="30" y="170" font-family="Arial, sans-serif" font-size="14" fill="#C62828">버전: 1.0.3.2</text>
+    </g>
+    
+    <!-- Clean properties (new) -->
+    <rect x="20" y="195" width="160" height="30" rx="6" fill="#C8E6C9"/>
+    <text x="30" y="215" font-family="Arial, sans-serif" font-size="14" fill="#2E7D32">이름: </text>
+    
+    <rect x="20" y="235" width="160" height="30" rx="6" fill="#C8E6C9"/>
+    <text x="30" y="255" font-family="Arial, sans-serif" font-size="14" fill="#2E7D32">재질: </text>
+  </g>
+  
+  <!-- Reset/Refresh circular arrow -->
+  <g transform="translate(280, 200)">
+    <circle cx="80" cy="80" r="90" fill="#FFFFFF"/>
+    <circle cx="80" cy="80" r="70" fill="none" stroke="#1565C0"
+     stroke-width="16" stroke-dasharray="250 190"
+     stroke-linecap="round"
+     transform="rotate(-20 80 80)"/>
+    <!-- Arrow head -->
+    <polygon points="135,27 155,47 125,52" fill="#1565C0"/>
+  </g>
+  
+  <!-- Sparkle effects -->
+  <g fill="#FFFFFF" opacity="0.8">
+    <polygon points="420,100 425,115 440,115 428,125 433,140 420,130 407,140 412,125 400,115 415,115"/>
+    <polygon points="440,380 443,390 453,390 445,397 448,407 440,400 432,407 435,397 427,390 437,390" transform="scale(0.8)"/>
+  </g>
+</svg>

@@ -1,0 +1,28 @@
+﻿{
+  "runtime_config": {
+    "run_mode": "dev",
+    "language": "ko",
+    "ui_scale": 1.0,
+    "full_version": "v0.8.4.6",
+    "build_count": 146,
+    "last_updated": "2026-01-25 00:00:00"
+  },
+  "ui_config": {
+    "topmost": true,
+    "auto_scroll": true,
+    "last_selected_folder": "D:/drive_files/10.worksfree/10.rpa/50.data/conversion_verifier/test",
+    "window_geometry_override": "",
+    "window_width": 580,
+    "window_height": 200,
+    "admin_window_height": 300
+  },
+  "logging_config": {
+    "log_level": "DEBUG",
+    "max_log_size_mb": 10,
+    "rotate_logs": true
+  },
+  "test_config": {
+    "test_key": "test_value_1770091748.7997766",
+    "persistence_test": "persist_test_1770091748"
+  }
+}

@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="900"
+     viewBox="0 0 520 900"
+     font-family="'Malgun Gothic','Apple SD Gothic Neo',sans-serif">
+
+  <defs>
+    <marker id="arr-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#DC2626"/>
+    </marker>
+    <marker id="arr-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!--
+    레벨별 y좌표 (균등 간격 127px):
+    ①: y=60   ②: y=187   ③④: y=314   ⑤⑥: y=441   ⑦: y=568   ⑧: y=695   ⑨: y=822
+    x: 좌=130, 중=260, 우=390
+  -->
+
+  <rect width="520" height="900" fill="white"/>
+
+  <!-- ── 화살표 ── -->
+
+  <!-- A: ①→② 임계 수직 -->
+  <line x1="260" y1="92" x2="260" y2="155" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="243" y="128" text-anchor="end" font-size="14" font-weight="bold" fill="#DC2626">A 15</text>
+
+  <!-- B: ②→③ 비임계 대각 -->
+  <line x1="238" y1="207" x2="152" y2="282" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arr-gray)"/>
+  <text x="172" y="238" text-anchor="end" font-size="13" fill="#6B7280">B 10</text>
+
+  <!-- D: ②→④ 임계 대각 -->
+  <line x1="282" y1="207" x2="368" y2="282" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="348" y="238" text-anchor="start" font-size="13" fill="#DC2626">D 13</text>
+
+  <!-- C: ③→⑤ 비임계 수직 -->
+  <line x1="130" y1="346" x2="130" y2="409" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arr-gray)"/>
+  <text x="113" y="383" text-anchor="end" font-size="13" fill="#6B7280">C 30</text>
+
+  <!-- E: ④→⑥ 임계 수직 -->
+  <line x1="390" y1="346" x2="390" y2="409" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="407" y="383" text-anchor="start" font-size="13" fill="#DC2626">E 20</text>
+
+  <!-- F: ⑤→⑦ 비임계 대각 -->
+  <line x1="152" y1="461" x2="238" y2="536" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arr-gray)"/>
+  <text x="172" y="493" text-anchor="end" font-size="13" fill="#6B7280">F 13</text>
+
+  <!-- G: ⑥→⑦ 임계 대각 -->
+  <line x1="368" y1="461" x2="282" y2="536" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="348" y="493" text-anchor="start" font-size="13" fill="#DC2626">G 22</text>
+
+  <!-- H: ⑦→⑧ 임계 수직 -->
+  <line x1="260" y1="600" x2="260" y2="663" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="243" y="637" text-anchor="end" font-size="13" fill="#DC2626">H 18</text>
+
+  <!-- I: ⑧→⑨ 임계 수직 -->
+  <line x1="260" y1="727" x2="260" y2="790" stroke="#DC2626" stroke-width="2.5" marker-end="url(#arr-red)"/>
+  <text x="243" y="764" text-anchor="end" font-size="13" fill="#DC2626">I 20</text>
+
+  <!-- ── 노드 ── -->
+
+  <!-- ① 시작 y=60 -->
+  <circle cx="260" cy="60" r="32" fill="#FEF08A" stroke="#EAB308" stroke-width="3"/>
+  <text x="260" y="56" text-anchor="middle" font-size="16" font-weight="bold" fill="#78350F">①</text>
+  <text x="260" y="73" text-anchor="middle" font-size="12" fill="#78350F">시작</text>
+
+  <!-- ② y=187 -->
+  <circle cx="260" cy="187" r="32" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="260" y="194" text-anchor="middle" font-size="20" font-weight="bold" fill="#14532D">②</text>
+
+  <!-- ③ y=314 x=130 -->
+  <circle cx="130" cy="314" r="32" fill="#DDD6FE" stroke="#7C3AED" stroke-width="2.5"/>
+  <text x="130" y="321" text-anchor="middle" font-size="20" font-weight="bold" fill="#4C1D95">③</text>
+
+  <!-- ④ y=314 x=390 -->
+  <circle cx="390" cy="314" r="32" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="390" y="321" text-anchor="middle" font-size="20" font-weight="bold" fill="#14532D">④</text>
+
+  <!-- ⑤ y=441 x=130 -->
+  <circle cx="130" cy="441" r="32" fill="#DDD6FE" stroke="#7C3AED" stroke-width="2.5"/>
+  <text x="130" y="448" text-anchor="middle" font-size="20" font-weight="bold" fill="#4C1D95">⑤</text>
+
+  <!-- ⑥ y=441 x=390 -->
+  <circle cx="390" cy="441" r="32" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="390" y="448" text-anchor="middle" font-size="20" font-weight="bold" fill="#14532D">⑥</text>
+
+  <!-- ⑦ y=568 -->
+  <circle cx="260" cy="568" r="32" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="260" y="575" text-anchor="middle" font-size="20" font-weight="bold" fill="#14532D">⑦</text>
+
+  <!-- ⑧ y=695 -->
+  <circle cx="260" cy="695" r="32" fill="#BBF7D0" stroke="#16A34A" stroke-width="3"/>
+  <text x="260" y="702" text-anchor="middle" font-size="20" font-weight="bold" fill="#14532D">⑧</text>
+
+  <!-- ⑨ 종료 y=822 -->
+  <circle cx="260" cy="822" r="32" fill="#FEF08A" stroke="#EAB308" stroke-width="3"/>
+  <text x="260" y="818" text-anchor="middle" font-size="16" font-weight="bold" fill="#78350F">⑨</text>
+  <text x="260" y="835" text-anchor="middle" font-size="12" fill="#78350F">종료</text>
+
+  <!-- ── 범례 ── -->
+  <circle cx="25" cy="876" r="8" fill="#FEF08A" stroke="#EAB308" stroke-width="1.5"/>
+  <text x="39" y="881" font-size="11" fill="#555">시작/종료</text>
+  <circle cx="120" cy="876" r="8" fill="#BBF7D0" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="134" y="881" font-size="11" fill="#555">임계경로</text>
+  <circle cx="210" cy="876" r="8" fill="#DDD6FE" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="224" y="881" font-size="11" fill="#555">비임계</text>
+  <line x1="295" y1="876" x2="320" y2="876" stroke="#DC2626" stroke-width="2" marker-end="url(#arr-red)"/>
+  <text x="330" y="881" font-size="11" fill="#DC2626">임계(108일)</text>
+  <line x1="415" y1="876" x2="440" y2="876" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arr-gray)"/>
+  <text x="450" y="881" font-size="11" fill="#6B7280">비임계</text>
+
+</svg>

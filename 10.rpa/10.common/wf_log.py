@@ -71,7 +71,7 @@ class GlobalLoggerManager:
                     cls._instance = super().__new__(cls)
         return cls._instance
 
-    def get_logger(self, app_name, console_level=logging.INFO):
+    def get_logger(self, app_name, console_level=logging.DEBUG):
         """
         앱별 로거 반환 (싱글톤)
         Args:
@@ -182,7 +182,7 @@ class GlobalLoggerManager:
 _logger_manager = GlobalLoggerManager()
 
 
-def get_app_logger(app_name, console_level=logging.INFO):
+def get_app_logger(app_name, console_level=logging.DEBUG):
     """
     앱별 글로벌 싱글톤 로거 반환
     Args:
@@ -202,7 +202,7 @@ def set_logger(filepath=None, level=logging.DEBUG, file_extension="txt"):
     return logger, None
 
 
-def get_logger(name="default", filepath=None, level=logging.INFO, file_extension="txt"):
+def get_logger(name="default", filepath=None, level=logging.DEBUG, file_extension="txt"):
     """기존 호환성을 위한 함수 (deprecated)"""
     return get_app_logger(name, console_level=level)
 

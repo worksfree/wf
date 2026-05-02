@@ -1,0 +1,14 @@
+{
+  "app_name": "dwg_batch_print",
+  "app_version": "dwg_batch_print_v1.0.0_portable",
+  "level": "NONE",
+  "passed": false,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "duration": 11.175671,
+  "start_time": "2026-02-03T09:51:15.617035",
+  "end_time": "2026-02-03T09:51:26.792706",
+  "error": "Failed to launch dwg_batch_print in test mode",
+  "suites": []
+}

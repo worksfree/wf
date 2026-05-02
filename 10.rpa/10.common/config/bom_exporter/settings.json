@@ -1,0 +1,36 @@
+{
+  "solidworks": {
+    "program_path": "C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe"
+  },
+  "runtime_config": {
+    "run_mode": "dev",
+    "restart_count": 20,
+    "auto_restart": true,
+    "speed_mode": "normal",
+    "base_wait_time": 60,
+    "seconds_per_10mb": 60,
+    "include_thumbnail": true,
+    "ui_scale": 1.0,
+    "full_version": "v0.9.5.1",
+    "build_count": 251,
+    "last_updated": "2026-04-29 18:49:31",
+    "language": "ko"
+  },
+  "ui_config": {
+    "topmost": true,
+    "last_selected_folder": "D:/test_data/assy_samples/sample61",
+    "window_geometry_override": "",
+    "window_width": 580,
+    "window_height": 200,
+    "admin_window_height": 300
+  },
+  "logging_config": {
+    "log_level": "INFO",
+    "max_log_size_mb": 10,
+    "rotate_logs": true
+  },
+  "test_config": {
+    "test_key": "test_value_1770102719.1883056",
+    "persistence_test": "persist_test_1770102719"
+  }
+}

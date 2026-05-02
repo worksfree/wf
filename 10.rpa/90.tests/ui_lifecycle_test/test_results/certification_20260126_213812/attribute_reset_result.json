@@ -1,0 +1,14 @@
+{
+  "app_name": "attribute_reset",
+  "app_version": "",
+  "level": "NONE",
+  "passed": false,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "duration": 15.693707,
+  "start_time": "2026-01-26T21:38:12.263963",
+  "end_time": "2026-01-26T21:38:27.957670",
+  "error": "Failed to launch app in test mode",
+  "suites": []
+}

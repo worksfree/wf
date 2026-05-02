@@ -1,0 +1,20 @@
+{
+  "title":               "QR Code Generator {ver}",
+  "run_button":          "Generate QR",
+  "preview_button":      "Preview",
+  "url_label":           "Enter URL",
+  "generating":          "Generating...",
+  "done_label":          "Done",
+  "fail_label":          "Failed",
+  "preview_placeholder": "QR code will appear here",
+  "preview_fail":        "Preview\nload failed",
+  "output_folder":       "Output Folder",
+  "title_text":          "Title Text",
+  "subtitle_text":       "Subtitle Text",
+  "output_filename":     "Output Filename",
+  "version":             "QR Version",
+  "error_correction":    "Error Correction",
+  "module_size":         "Module Size",
+  "border":              "Border",
+  "settings_section":    "QR Code Settings"
+}

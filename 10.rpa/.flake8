@@ -1,0 +1,44 @@
+[flake8]
+# 최대 줄 길이
+max-line-length = 120
+
+# 복잡도 제한 (Cyclomatic Complexity)
+max-complexity = 15
+
+# 제외할 디렉토리
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    *.egg-info,
+    .venv,
+    venv,
+    backup,
+    test_temp_policy_sync
+
+# 무시할 에러 코드 (점진적 개선을 위해)
+# W293: 빈 줄에 공백 - 자동 포매터로 수정 예정
+# E701, E702: 한 줄 여러 구문 - 리팩토링 시 수정 예정
+ignore =
+    # 임시로 무시 (향후 수정 예정)
+
+# 경고만 표시할 에러 코드
+# (빌드 실패시키지 않음)
+# W291: 줄 끝 공백
+# W292: 파일 끝 줄바꿈 없음
+
+# 파일별 특정 규칙 무시
+per-file-ignores =
+    # __init__.py: F401 (임포트만 있는 경우)
+    __init__.py:F401
+    # 테스트 파일: 복잡도 제한 완화
+    test_*.py:C901
+
+# 통계 표시
+statistics = True
+count = True
+
+# 형식 지정
+format = default
+show-source = False

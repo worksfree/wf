@@ -1,0 +1,14 @@
+{
+  "app_name": "qrcode_generator",
+  "app_version": "qrcode_generator_v0.7.1.1_portable",
+  "level": "NONE",
+  "passed": false,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "duration": 11.59972,
+  "start_time": "2026-01-28T09:10:53.709771",
+  "end_time": "2026-01-28T09:11:05.309491",
+  "error": "Failed to launch app in test mode",
+  "suites": []
+}

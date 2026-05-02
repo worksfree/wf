@@ -48,10 +48,10 @@ class Config:
         import sys
         is_frozen = getattr(sys, 'frozen', False)
 
-        if is_frozen or self.run_mode == "release":
-            self.app_config_dir = self.user_home / ".wf_rpa" / APP_NAME
-        else:
+        if self.run_mode == "dev":
             self.app_config_dir = common_config_dir / APP_NAME
+        else:
+            self.app_config_dir = self.user_home / ".wf_rpa" / APP_NAME
         self.app_config_dir.mkdir(parents=True, exist_ok=True)
 
         # Files
@@ -78,7 +78,7 @@ class Config:
 
         # Logger
         if wflog:
-            self._logger = wflog.get_app_logger(APP_NAME, console_level=logging.INFO)
+            self._logger = wflog.get_app_logger(APP_NAME, console_level=logging.DEBUG)
         else:
             lg = logging.getLogger(APP_NAME)
             if not lg.handlers:
@@ -202,9 +202,9 @@ class Config:
                 },
                 "ui_config": {
                     "last_selected_folder": "",
+                    "window_geometry_override": "",
                     "window_width": 580,
-                    "window_height": 230,
-                    "window_geometry_override": ""
+                    "window_height": 200
                 },
                 "logging_config": {
                     "log_level": "INFO",
@@ -261,8 +261,10 @@ class Config:
 
         # 창 크기/geometry 오버라이드 캐시
         self.window_geometry_override = self.ui_config.get("window_geometry_override", "")
-        self.window_width = self.ui_config.get("window_width")
-        self.window_height = self.ui_config.get("window_height")
+
+        # 창 크기 (settings.json 우선, 없으면 코드 기본값)
+        self.window_width = self.ui_config.get("window_width", 580)  # conversion_verifier 기본 너비
+        self.window_height = self.ui_config.get("window_height", 200)  # conversion_verifier 기본 높이
 
     def get_app_config(self) -> dict:
         return dict(self.app_config)

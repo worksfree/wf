@@ -1,0 +1,69 @@
+{
+  "app": "dc",
+  "run_number": 1,
+  "start_time": "2026-01-25T23:53:46.831729",
+  "end_time": "2026-01-25T23:54:53.115688",
+  "duration": 66.283959,
+  "passed": false,
+  "phases": {
+    "init": {
+      "passed": true,
+      "message": "Initialized"
+    },
+    "launch_unreg": {
+      "passed": false,
+      "message": "Launch failed"
+    },
+    "registration": {
+      "passed": false,
+      "message": "Register window not found"
+    },
+    "check_credits": {
+      "passed": true,
+      "message": "Credits: 10"
+    },
+    "work_1": {
+      "passed": true,
+      "message": "Work done, credits: 9"
+    },
+    "work_2": {
+      "passed": true,
+      "message": "Work done, credits: 8"
+    },
+    "exhaust": {
+      "passed": true,
+      "message": "Credits exhausted (0)"
+    },
+    "insufficient": {
+      "passed": true,
+      "message": "Work blocked (no dialog)"
+    },
+    "purchase": {
+      "passed": true,
+      "message": "Purchased 50 credits"
+    },
+    "work_after_purchase": {
+      "passed": true,
+      "message": "Work successful, credits: 49"
+    },
+    "final_check": {
+      "passed": true,
+      "message": "Final state captured"
+    },
+    "cleanup": {
+      "passed": true,
+      "message": "State restored"
+    }
+  },
+  "screenshots": [
+    "test_results\\e2e\\20260125_235204\\dc_05_credits_initial_235423.png",
+    "test_results\\e2e\\20260125_235204\\dc_06_after_work_1_235427.png",
+    "test_results\\e2e\\20260125_235204\\dc_07_after_work_2_235431.png",
+    "test_results\\e2e\\20260125_235204\\dc_08_credits_zero_235434.png",
+    "test_results\\e2e\\20260125_235204\\dc_09_insufficient_state_235443.png",
+    "test_results\\e2e\\20260125_235204\\dc_10_after_purchase_235445.png",
+    "test_results\\e2e\\20260125_235204\\dc_11_work_after_purchase_235448.png",
+    "test_results\\e2e\\20260125_235204\\dc_12_settings_final_235450.png"
+  ],
+  "error": ""
+}

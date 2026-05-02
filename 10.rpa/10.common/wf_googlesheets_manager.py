@@ -40,9 +40,26 @@ from datetime import datetime, timezone
 from typing import Dict, Optional, Any
 from pathlib import Path
 
-# 🔧 자동 환경 감지: 개발 환경은 DEV, 배포(번들) 환경은 RELEASE 시트 사용
+# 🔧 자동 환경 감지: DEMO/RELEASE는 RELEASE 시트, DEV만 DEV 시트 사용
 def _get_active_sheet_mode() -> str:
-    """실행 환경에 따라 시트 모드 결정"""
+    """실행 환경에 따라 시트 모드 결정
+    
+    - DEMO 모드: RELEASE 시트 사용 (demo와 release 일관성)
+    - RELEASE 번들: RELEASE 시트 사용
+    - DEV 스크립트: DEV 시트 사용
+    """
+    # DEMO 모드 확인 (설정 파일에서 run_mode 읽기)
+    try:
+        config_file = Path.home() / ".wf_rpa" / "wf_rpa_config.json"
+        if config_file.exists():
+            with open(config_file, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                is_demo = config.get("is_demo", False)
+                if is_demo:
+                    return "RELEASE"  # DEMO도 RELEASE 시트 사용
+    except Exception:
+        pass
+    
     # PyInstaller로 번들된 실행파일인지 확인
     is_bundled = getattr(sys, "frozen", False) or hasattr(sys, "_MEIPASS")
     return "RELEASE" if is_bundled else "DEV"
@@ -1625,6 +1642,7 @@ get_client = get_sheets_manager
 # 중앙화된 시트 설정 제공자 (외부 모듈에서 직접 접근용)
 def get_sheets_config() -> Dict[str, Any]:
     """Google Sheets 사용을 위한 공통 설정을 wf_rpa_config.json에서 반환합니다.
+    google_sheets 섹션이 없으면 자동으로 추가합니다.
 
     Returns:
         Dict: {
@@ -1636,7 +1654,6 @@ def get_sheets_config() -> Dict[str, Any]:
     
     Raises:
         FileNotFoundError: wf_rpa_config.json 파일이 없는 경우
-        KeyError: google_sheets 섹션이 없는 경우
     """
     config_file = Path.home() / ".wf_rpa" / "wf_rpa_config.json"
     
@@ -1649,11 +1666,27 @@ def get_sheets_config() -> Dict[str, Any]:
     with open(config_file, 'r', encoding='utf-8') as f:
         config = json.load(f)
     
+    # google_sheets 섹션이 없으면 자동으로 추가
     if "google_sheets" not in config:
-        raise KeyError(
-            f"google_sheets 섹션이 {config_file}에 없습니다.\n"
-            "설정 파일을 업데이트하세요."
-        )
+        logger.warning("⚠️ google_sheets 섹션이 없어 기본값으로 생성합니다.")
+        config["google_sheets"] = {
+            "sheet_id_release": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
+            "sheet_id_dev": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
+            "credentials_file_release": "worksfree-b33a6b8f366b.json",
+            "credentials_file_dev": "silver-argon-445712-a0-7092493258f3.json",
+            "sheet_name_registrations": "registrations",
+            "scope": [
+                "https://spreadsheets.google.com/feeds",
+                "https://www.googleapis.com/auth/drive"
+            ]
+        }
+        # 업데이트된 config를 파일에 저장
+        try:
+            with open(config_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
+            logger.info(f"✅ google_sheets 섹션이 설정 파일에 추가되었습니다: {config_file}")
+        except Exception as e:
+            logger.warning(f"⚠️ 설정 파일 저장 실패: {e}")
     
     gs_config = config["google_sheets"]
     
@@ -1805,7 +1838,7 @@ def _create_default_wf_rpa_config(config_file: Path):
             "admin_email_sheet_name": "email_settings"
         },
         "app_settings": {"language": "ko"},
-        "system_settings": {"auto_update": True, "send_usage_stats": False, "log_level": "INFO"},
+        "system_settings": {"auto_update": True, "send_usage_stats": False, "log_level": "DEBUG"},
         "google_sheets": {
             "sheet_id_release": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",
             "sheet_id_dev": "1bUqpV1vSGwsVeWav-6enZUzaKBTJdxX5eZ737lNh6Ww",

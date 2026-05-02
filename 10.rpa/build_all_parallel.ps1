@@ -26,10 +26,10 @@ $Apps = @(
         Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\build_bom_exporter.ps1'
     },
     @{ 
-        Name = 'DWG Batch Print';
-        ShortName = 'dp';
-        ExeName = 'dwg_batch_print.exe';
-        Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\build_dwg_batch_print.ps1'
+        Name = 'Batch Print';
+        ShortName = 'bp';
+        ExeName = 'batch_print.exe';
+        Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\batch_print\build_batch_print.ps1'
     },
     @{ 
         Name = 'Attribute Reset';
@@ -155,7 +155,7 @@ while ($Jobs.Count -gt $Completed.Count) {
             # Map ShortName to actual file name patterns
             $FilePatterns = @{
                 'be'  = 'bom_exporter'
-                'dp'  = 'dwg_batch_print'
+                'bp'  = 'batch_print'
                 'ar'  = 'attribute_reset'
                 'dc'  = 'dwg_classifier'
                 'cv'  = 'conversion_verifier'
@@ -328,7 +328,7 @@ $ErrorActionPreference = 'Stop'
 # App metadata
 $Apps = @(
     @{ Name = 'Bom Exporter'; ShortName = 'be'; ExeName = 'bom_exporter.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\build_bom_exporter.ps1' },
-    @{ Name = 'DWG Batch Print'; ShortName = 'dp'; ExeName = 'dwg_batch_print.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\build_dwg_batch_print.ps1' },
+    @{ Name = 'DWG Batch Print'; ShortName = 'dp'; ExeName = 'batch_print.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\batch_print\build_batch_print.ps1' },
     @{ Name = 'Attribute Reset'; ShortName = 'ar'; ExeName = 'attribute_reset.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\attribute_reset\build_attribute_reset.ps1' },
     @{ Name = 'DWG Classifier'; ShortName = 'dc'; ExeName = 'dwg_classifier.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\dwg_classifier\build_dwg_classifier.ps1' },
     @{ Name = 'Conversion Verifier'; ShortName = 'cv'; ExeName = 'conversion_verifier.exe'; Script = 'D:\drive_files\10.worksfree\10.rpa\50.data\conversion_verifier\build_conversion_verifier.ps1' },

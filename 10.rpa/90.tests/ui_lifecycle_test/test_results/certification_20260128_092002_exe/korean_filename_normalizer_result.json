@@ -1,0 +1,14 @@
+{
+  "app_name": "korean_filename_normalizer",
+  "app_version": "korean_filename_normalizer_v0.8.3.4_portable",
+  "level": "NONE",
+  "passed": false,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "duration": 12.733283,
+  "start_time": "2026-01-28T09:21:08.560421",
+  "end_time": "2026-01-28T09:21:21.293704",
+  "error": "Failed to launch app in test mode",
+  "suites": []
+}

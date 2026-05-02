@@ -1,0 +1,14 @@
+{
+  "app_name": "dwg_classifier",
+  "app_version": "dwg_classifier_v0.8.6.4_portable",
+  "level": "NONE",
+  "passed": false,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "duration": 12.336786,
+  "start_time": "2026-01-28T08:30:59.958425",
+  "end_time": "2026-01-28T08:31:12.295211",
+  "error": "Failed to launch app in test mode",
+  "suites": []
+}

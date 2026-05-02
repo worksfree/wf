@@ -1,0 +1,216 @@
+{
+  "timestamp": "20260127_181428",
+  "apps": [
+    {
+      "app_name": "bom_exporter",
+      "total": 29,
+      "passed": 29,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "bat_setup_worksfree.bat",
+          "description": "메인 설정 스크립트 (setup_worksfree.bat)",
+          "level": "BASIC",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "bat_바로가기_생성.bat",
+          "description": "바로가기 생성 (바로가기_생성.bat)",
+          "level": "BASIC",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "bat_앱_설정_초기화.bat",
+          "description": "앱 설정 초기화 (앱_설정_초기화.bat)",
+          "level": "BASIC",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "bat_wf_전체_초기화.bat",
+          "description": "WF 전체 초기화 (wf_전체_초기화.bat)",
+          "level": "BASIC",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "bat_제거.bat",
+          "description": "앱 제거 (제거.bat)",
+          "level": "BASIC",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "bat_등록정보_동기화.bat",
+          "description": "등록정보 동기화 (등록정보_동기화.bat)",
+          "level": "BASIC",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "bat_no_duplicate",
+          "description": "중복 바로가기 스크립트 제거",
+          "level": "FULL",
+          "passed": true,
+          "message": "제거됨"
+        },
+        {
+          "name": "config_exists",
+          "description": "wf_rpa_config.json 존재",
+          "level": "STANDARD",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "config_parse",
+          "description": "설정 파일 파싱",
+          "level": "STANDARD",
+          "passed": true,
+          "message": "JSON 파싱 성공"
+        },
+        {
+          "name": "config_google_sheets",
+          "description": "google_sheets 섹션",
+          "level": "STANDARD",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "config_email_settings",
+          "description": "email_settings 섹션",
+          "level": "STANDARD",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "env_sheet_id_release",
+          "description": "sheet_id_release 설정",
+          "level": "STANDARD",
+          "passed": true,
+          "message": "설정됨: 1yK-0CCfPXdjqEYw05BL..."
+        },
+        {
+          "name": "env_sheet_id_dev",
+          "description": "sheet_id_dev 설정",
+          "level": "STANDARD",
+          "passed": true,
+          "message": "설정됨: 1bUqpV1vSGwsVeWav-6e..."
+        },
+        {
+          "name": "env_cred_release",
+          "description": "credentials_file_release 설정",
+          "level": "STANDARD",
+          "passed": true,
+          "message": "설정됨: worksfree-b33a6b8f366b.json"
+        },
+        {
+          "name": "env_cred_dev",
+          "description": "credentials_file_dev 설정",
+          "level": "STANDARD",
+          "passed": true,
+          "message": "설정됨: silver-argon-445712-a0-7092493258f3.json"
+        },
+        {
+          "name": "env_sheet_ids_different",
+          "description": "DEV/RELEASE 시트 ID 분리",
+          "level": "FULL",
+          "passed": true,
+          "message": "분리됨"
+        },
+        {
+          "name": "env_creds_different",
+          "description": "DEV/RELEASE 크리덴셜 분리",
+          "level": "FULL",
+          "passed": true,
+          "message": "분리됨"
+        },
+        {
+          "name": "app_policy",
+          "description": "bom_exporter/policy.json",
+          "level": "FULL",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "app_policy_name",
+          "description": "policy.json app_name 일치",
+          "level": "FULL",
+          "passed": true,
+          "message": "일치: bom_exporter"
+        },
+        {
+          "name": "app_settings",
+          "description": "bom_exporter/settings.json",
+          "level": "FULL",
+          "passed": true,
+          "message": "존재함"
+        },
+        {
+          "name": "cred_release_exists",
+          "description": "RELEASE 크리덴셜 파일",
+          "level": "FULL",
+          "passed": true,
+          "message": "존재함: worksfree-b33a6b8f366b.json"
+        },
+        {
+          "name": "cred_dev_exists",
+          "description": "DEV 크리덴셜 파일",
+          "level": "FULL",
+          "passed": true,
+          "message": "존재함: silver-argon-445712-a0-7092493258f3.json"
+        },
+        {
+          "name": "gs_conn_import",
+          "description": "gspread 모듈 임포트",
+          "level": "CONNECTIVITY",
+          "passed": true,
+          "message": "gspread, google.oauth2 로드 성공"
+        },
+        {
+          "name": "gs_conn_dev_auth",
+          "description": "DEV 인증",
+          "level": "CONNECTIVITY",
+          "passed": true,
+          "message": "서비스 계정 인증 성공"
+        },
+        {
+          "name": "gs_conn_dev_open",
+          "description": "DEV 시트 접근",
+          "level": "CONNECTIVITY",
+          "passed": true,
+          "message": "시트 열기 성공: Automation_App_Release_Management-Test"
+        },
+        {
+          "name": "gs_conn_dev_read",
+          "description": "DEV 워크시트 읽기",
+          "level": "CONNECTIVITY",
+          "passed": true,
+          "message": "워크시트 6개: registrations, credit_usage_log, credit_sync, credit_purchase_log, admin_config"
+        },
+        {
+          "name": "gs_conn_release_auth",
+          "description": "RELEASE 인증",
+          "level": "CONNECTIVITY",
+          "passed": true,
+          "message": "서비스 계정 인증 성공"
+        },
+        {
+          "name": "gs_conn_release_open",
+          "description": "RELEASE 시트 접근",
+          "level": "CONNECTIVITY",
+          "passed": true,
+          "message": "시트 열기 성공: WF-RPA-Release_Management"
+        },
+        {
+          "name": "gs_conn_release_read",
+          "description": "RELEASE 워크시트 읽기",
+          "level": "CONNECTIVITY",
+          "passed": true,
+          "message": "워크시트 1개: registrations"
+        }
+      ]
+    }
+  ]
+}

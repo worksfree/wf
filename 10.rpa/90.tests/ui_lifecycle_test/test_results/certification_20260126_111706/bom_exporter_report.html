@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WF-ACT Certification Report - bom_exporter</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --gray: #6b7280;
+            --light: #f3f4f6;
+            --dark: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--light);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header-left .subtitle {
+            color: var(--gray);
+        }
+
+        .badge {
+            text-align: center;
+            padding: 20px 30px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #DC354522, #DC354544);
+            border: 2px solid #DC3545;
+        }
+
+        .badge-icon {
+            font-size: 48px;
+            display: block;
+        }
+
+        .badge-level {
+            font-size: 18px;
+            font-weight: bold;
+            color: #DC3545;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 8px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .summary-value.success { color: var(--success); }
+        .summary-value.danger { color: var(--danger); }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .suite {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .suite.failed {
+            border-left: 4px solid var(--danger);
+        }
+
+        .suite.passed {
+            border-left: 4px solid var(--success);
+        }
+
+        .suite-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .suite-header h3 {
+            font-size: 18px;
+        }
+
+        .suite-stats {
+            background: var(--light);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .suite-desc {
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .tests-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tests-table th {
+            text-align: left;
+            padding: 10px;
+            background: var(--light);
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--gray);
+        }
+
+        .tests-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .test-row.passed { }
+        .test-row.failed { background: #fef2f2; }
+        .test-row.skipped { opacity: 0.6; }
+        .test-row.error { background: #fffbeb; }
+
+        .test-icon {
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .test-row.passed .test-icon { color: var(--success); }
+        .test-row.failed .test-icon { color: var(--danger); }
+        .test-row.skipped .test-icon { color: var(--gray); }
+        .test-row.error .test-icon { color: var(--warning); }
+
+        .test-name {
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .test-desc {
+            font-size: 13px;
+        }
+
+        .test-level {
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        .test-duration {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .test-message {
+            font-size: 12px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--gray);
+            font-size: 12px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>WF-ACT Certification Report</h1>
+                <div class="subtitle">
+                    bom_exporter | bom_exporter_v0.9.9.8_portable
+                </div>
+            </div>
+            <div class="badge">
+                <span class="badge-icon">❌</span>
+                <span class="badge-level">NONE</span>
+            </div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-value">0</div>
+                    <div class="summary-label">Total Tests</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value success">0</div>
+                    <div class="summary-label">Passed</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value danger">0</div>
+                    <div class="summary-label">Failed</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">15.7s</div>
+                    <div class="summary-label">Duration</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">11:17:06</div>
+                    <div class="summary-label">Started</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">11:17:22</div>
+                    <div class="summary-label">Finished</div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="footer">
+            <p>Generated by WF-ACT (WF-RPA App Certification Toolkit)</p>
+            <p>2026-01-26 11:17:22</p>
+        </div>
+    </div>
+</body>
+</html>

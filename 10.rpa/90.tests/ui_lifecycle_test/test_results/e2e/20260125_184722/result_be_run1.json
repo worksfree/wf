@@ -1,0 +1,67 @@
+{
+  "app": "be",
+  "run_number": 1,
+  "start_time": "2026-01-25T18:47:22.285244",
+  "end_time": "2026-01-25T18:48:02.133974",
+  "duration": 39.84873,
+  "passed": false,
+  "phases": {
+    "init": {
+      "passed": false,
+      "message": "[Errno 13] Permission denied: 'C:\\\\Users\\\\USER\\\\.wf_rpa\\\\bom_exporter\\\\policy.json'"
+    },
+    "launch_unreg": {
+      "passed": false,
+      "message": "Launch failed"
+    },
+    "registration": {
+      "passed": false,
+      "message": "Register window not found"
+    },
+    "check_credits": {
+      "passed": true,
+      "message": "Credits: 10"
+    },
+    "work_1": {
+      "passed": false,
+      "message": "[Errno 13] Permission denied: 'C:\\\\Users\\\\USER\\\\.wf_rpa\\\\bom_exporter\\\\credit_history.json'"
+    },
+    "work_2": {
+      "passed": false,
+      "message": "[Errno 13] Permission denied: 'C:\\\\Users\\\\USER\\\\.wf_rpa\\\\bom_exporter\\\\credit_history.json'"
+    },
+    "exhaust": {
+      "passed": false,
+      "message": "[Errno 13] Permission denied: 'C:\\\\Users\\\\USER\\\\.wf_rpa\\\\bom_exporter\\\\credit_history.json'"
+    },
+    "insufficient": {
+      "passed": true,
+      "message": "Work blocked (no dialog)"
+    },
+    "purchase": {
+      "passed": false,
+      "message": "[Errno 13] Permission denied: 'C:\\\\Users\\\\USER\\\\.wf_rpa\\\\bom_exporter\\\\credit_history.json'"
+    },
+    "work_after": {
+      "passed": false,
+      "message": "[Errno 13] Permission denied: 'C:\\\\Users\\\\USER\\\\.wf_rpa\\\\bom_exporter\\\\credit_history.json'"
+    },
+    "final_check": {
+      "passed": true,
+      "message": "Final state captured"
+    },
+    "cleanup": {
+      "passed": false,
+      "message": "[Errno 13] Permission denied: 'C:\\\\Users\\\\USER\\\\.wf_rpa\\\\bom_exporter\\\\credit_history.json'"
+    }
+  },
+  "screenshots": [
+    "test_results\\e2e\\20260125_184722\\be_05_credits_initial_184740.png",
+    "test_results\\e2e\\20260125_184722\\be_06_after_work_1_184744.png",
+    "test_results\\e2e\\20260125_184722\\be_07_after_work_2_184748.png",
+    "test_results\\e2e\\20260125_184722\\be_09_insufficient_state_184756.png",
+    "test_results\\e2e\\20260125_184722\\be_11_work_after_purchase_184759.png",
+    "test_results\\e2e\\20260125_184722\\be_12_settings_final_184801.png"
+  ],
+  "error": ""
+}

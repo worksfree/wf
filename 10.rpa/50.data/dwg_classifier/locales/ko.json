@@ -1,0 +1,12 @@
+{
+  "title":            "DWG 파일 분류 도구 {ver}",
+  "run_button":       "분류시작",
+  "complete_msg":     "파일 분류 작업이 완료되었습니다.",
+  "part_col":         "도번 컬럼명",
+  "class_col":        "가공분류 컬럼명",
+  "sheet_name":       "엑셀 시트명",
+  "output_path":      "결과 저장 경로",
+  "file_mode":        "파일 작업 모드",
+  "col_hint":         "💡 엑셀 파일에 아래 컬럼명이 있어야 합니다.\n   컬럼명이 다르면 설정에서 수정 후 작업하세요.",
+  "col_error_title":  "엑셀 컬럼 오류"
+}

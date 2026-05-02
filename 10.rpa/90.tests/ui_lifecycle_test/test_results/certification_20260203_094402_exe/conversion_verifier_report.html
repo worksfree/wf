@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WF-ACT Certification Report - conversion_verifier</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --gray: #6b7280;
+            --light: #f3f4f6;
+            --dark: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--light);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header-left .subtitle {
+            color: var(--gray);
+        }
+
+        .badge {
+            text-align: center;
+            padding: 20px 30px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #C0C0C022, #C0C0C044);
+            border: 2px solid #C0C0C0;
+        }
+
+        .badge-icon {
+            font-size: 48px;
+            display: block;
+        }
+
+        .badge-level {
+            font-size: 18px;
+            font-weight: bold;
+            color: #C0C0C0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 8px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .summary-value.success { color: var(--success); }
+        .summary-value.danger { color: var(--danger); }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .suite {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .suite.failed {
+            border-left: 4px solid var(--danger);
+        }
+
+        .suite.passed {
+            border-left: 4px solid var(--success);
+        }
+
+        .suite-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .suite-header h3 {
+            font-size: 18px;
+        }
+
+        .suite-stats {
+            background: var(--light);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .suite-desc {
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .tests-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tests-table th {
+            text-align: left;
+            padding: 10px;
+            background: var(--light);
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--gray);
+        }
+
+        .tests-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .test-row.passed { }
+        .test-row.failed { background: #fef2f2; }
+        .test-row.skipped { opacity: 0.6; }
+        .test-row.error { background: #fffbeb; }
+
+        .test-icon {
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .test-row.passed .test-icon { color: var(--success); }
+        .test-row.failed .test-icon { color: var(--danger); }
+        .test-row.skipped .test-icon { color: var(--gray); }
+        .test-row.error .test-icon { color: var(--warning); }
+
+        .test-name {
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .test-desc {
+            font-size: 13px;
+        }
+
+        .test-level {
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        .test-duration {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .test-message {
+            font-size: 12px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--gray);
+            font-size: 12px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>WF-ACT Certification Report</h1>
+                <div class="subtitle">
+                    conversion_verifier | conversion_verifier_v0.8.4.5_portable
+                </div>
+            </div>
+            <div class="badge">
+                <span class="badge-icon">🥈</span>
+                <span class="badge-level">STANDARD</span>
+            </div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-value">135</div>
+                    <div class="summary-label">Total Tests</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value success">134</div>
+                    <div class="summary-label">Passed</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value danger">1</div>
+                    <div class="summary-label">Failed</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">11.2s</div>
+                    <div class="summary-label">Duration</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">09:44:53</div>
+                    <div class="summary-label">Started</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">09:45:05</div>
+                    <div class="summary-label">Finished</div>
+                </div>
+            </div>
+        </div>
+
+        
+            <div class="suite passed">
+                <div class="suite-header">
+                    <h3>Deployment Suite</h3>
+                    <span class="suite-stats">25/25 passed</span>
+                </div>
+                <p class="suite-desc">배포 파일 및 환경 설정 인증 테스트 (BAT 파일, DEV/RELEASE 환경)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_01_setup_worksfree_bat_exists</td>
+                    <td class="test-desc">setup_worksfree.bat 파일 존재 확인 (메인 설정 스크립트)</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_02_shortcut_bat_exists</td>
+                    <td class="test-desc">바로가기_생성.bat 파일 존재 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_03_app_reset_bat_exists</td>
+                    <td class="test-desc">앱_설정_초기화.bat 파일 존재 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_04_wf_reset_all_bat_exists</td>
+                    <td class="test-desc">wf_전체_초기화.bat 파일 존재 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_05_uninstall_bat_exists</td>
+                    <td class="test-desc">제거.bat 파일 존재 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_06_sync_registration_bat_exists</td>
+                    <td class="test-desc">등록정보_동기화.bat 파일 존재 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_07_wf_rpa_config_exists</td>
+                    <td class="test-desc">wf_rpa_config.json 파일 존재 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_08_google_sheets_section_exists</td>
+                    <td class="test-desc">wf_rpa_config.json에 google_sheets 섹션 존재 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_09_sheet_id_release_exists</td>
+                    <td class="test-desc">google_sheets.sheet_id_release 설정 존재 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_10_sheet_id_dev_exists</td>
+                    <td class="test-desc">google_sheets.sheet_id_dev 설정 존재 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_11_credentials_file_release_exists</td>
+                    <td class="test-desc">google_sheets.credentials_file_release 설정 존재 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_12_credentials_file_dev_exists</td>
+                    <td class="test-desc">google_sheets.credentials_file_dev 설정 존재 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_13_release_credentials_file_exists</td>
+                    <td class="test-desc">RELEASE 크리덴셜 파일 실제 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_14_dev_credentials_file_exists</td>
+                    <td class="test-desc">DEV 크리덴셜 파일 실제 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_15_sheet_ids_are_different</td>
+                    <td class="test-desc">DEV와 RELEASE 시트 ID가 다른지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_16_credentials_files_are_different</td>
+                    <td class="test-desc">DEV와 RELEASE 크리덴셜 파일이 다른지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_17_setup_bat_has_korean_encoding</td>
+                    <td class="test-desc">setup_worksfree.bat에 한글 인코딩 설정(chcp 65001) 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_18_no_duplicate_shortcut_bat</td>
+                    <td class="test-desc">중복 바로가기 스크립트(create_desktop_shortcut.bat) 제거 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_19_email_settings_exist</td>
+                    <td class="test-desc">wf_rpa_config.json에 email_settings 섹션 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_20_app_policy_files_exist</td>
+                    <td class="test-desc">현재 앱의 policy.json 파일 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_21_app_settings_files_exist</td>
+                    <td class="test-desc">현재 앱의 settings.json 파일 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_22_user_manual_pdf_exists</td>
+                    <td class="test-desc">앱의 사용자 매뉴얼 PDF 파일 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_23_app_icon_exists</td>
+                    <td class="test-desc">앱의 아이콘 파일 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_24_spec_file_exists</td>
+                    <td class="test-desc">앱의 PyInstaller spec 파일 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_25_build_script_exists</td>
+                    <td class="test-desc">앱의 빌드 스크립트(build_*.ps1) 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="suite failed">
+                <div class="suite-header">
+                    <h3>Package Integrity Suite</h3>
+                    <span class="suite-stats">11/12 passed</span>
+                </div>
+                <p class="suite-desc">배포 패키지 완전성 인증 테스트 (exe 내부 파일, 크리덴셜, 버전 정보)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_01_internal_directory_exists</td>
+                    <td class="test-desc">_internal 디렉토리 존재 확인 (PyInstaller 번들)</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_02_wf_rpa_bundle_dir_exists</td>
+                    <td class="test-desc">_internal/.wf_rpa 번들 설정 디렉토리 존재 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_03_bundle_settings_json_exists</td>
+                    <td class="test-desc">_internal/.wf_rpa/{app}/settings.json 존재 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_04_bundle_version_info_exists</td>
+                    <td class="test-desc">번들 settings.json에 full_version 정보 존재 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_05_release_credential_file_exists</td>
+                    <td class="test-desc">RELEASE 크리덴셜 파일 번들 포함 확인 (worksfree-*.json, 숨김 파일)</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_06_dev_credential_file_exists</td>
+                    <td class="test-desc">DEV 크리덴셜 파일 번들 포함 확인 (silver-argon-*.json, 권장: 숨김)</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_07_release_credential_valid_json</td>
+                    <td class="test-desc">RELEASE 크리덴셜 파일 JSON 유효성 검증</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_08_bundle_config_file_exists</td>
+                    <td class="test-desc">번들 wf_rpa_config.json 존재 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_09_bundle_config_sheet_ids</td>
+                    <td class="test-desc">번들 config에 sheet_id_release/dev 설정 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row failed">
+                    <td class="test-icon">✗</td>
+                    <td class="test-name">test_10_nsis_installer_exists</td>
+                    <td class="test-desc">NSIS 설치 파일 존재 확인 ({app}_installer.exe)</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">NSIS 설치 파일이 없습니다: D:\release\candidates\conversion_verifier_v0.8.4.5\conversion_verifier_installer.exe</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_11_google_sheets_config_consistency</td>
+                    <td class="test-desc">번들 config와 크리덴셜 파일의 project_id 일치 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_12_credential_environment_separation</td>
+                    <td class="test-desc">DEV/RELEASE 크리덴셜 분리 확인 (다른 project_id)</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="suite passed">
+                <div class="suite-header">
+                    <h3>Execution Environment Suite</h3>
+                    <span class="suite-stats">8/8 passed</span>
+                </div>
+                <p class="suite-desc">실행 환경 인증 테스트 (싱글 인스턴스, 설정 폴더 참조)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_01_config_folder_location</td>
+                    <td class="test-desc">설정 폴더 참조 위치 확인 (DEV: 프로젝트, EXE: 사용자 홈)</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_02_config_files_exist</td>
+                    <td class="test-desc">설정 파일 존재 확인 (해당 모드의 폴더에)</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_03_user_home_initialized</td>
+                    <td class="test-desc">사용자 홈 폴더 초기화 확인 (EXE 모드만)</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_04_wf_rpa_config_accessible</td>
+                    <td class="test-desc">wf_rpa_config.json 접근 가능 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_05_credentials_accessible</td>
+                    <td class="test-desc">크리덴셜 파일 접근 가능 확인 (Google Sheets 연결용)</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_06_config_reload_works</td>
+                    <td class="test-desc">설정 재로드 기능 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.05s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_07_multiple_config_reads</td>
+                    <td class="test-desc">설정 파일 여러 번 읽기 (동시성 테스트)</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.05s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_08_dev_exe_mode_detection</td>
+                    <td class="test-desc">DEV/EXE 모드 자동 감지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="suite passed">
+                <div class="suite-header">
+                    <h3>Config Suite</h3>
+                    <span class="suite-stats">20/20 passed</span>
+                </div>
+                <p class="suite-desc">설정 관리 인증 테스트 (policy.json, settings.json 로드 및 검증)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_01_initial_deployment_policy</td>
+                    <td class="test-desc">초기 배포 형상 검증 (BASIC_RULES.md Part 2.1 크레딧 정책 준수)</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_02_get_policy</td>
+                    <td class="test-desc">정책(policy) 조회가 정상 동작하는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_03_policy_has_identity</td>
+                    <td class="test-desc">정책에 앱 식별 정보가 있는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_04_policy_has_credit_info</td>
+                    <td class="test-desc">정책에 크레딧 정보가 있는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_05_get_settings</td>
+                    <td class="test-desc">설정(settings) 조회가 정상 동작하는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_06_settings_has_version</td>
+                    <td class="test-desc">설정에 버전 정보가 있는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_07_policy_trial_credits</td>
+                    <td class="test-desc">정책의 체험판 크레딧 정보 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_08_policy_display_name</td>
+                    <td class="test-desc">정책의 표시 이름 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_09_config_consistency</td>
+                    <td class="test-desc">설정과 정책의 일관성 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_10_wf_rpa_config_exists</td>
+                    <td class="test-desc">wf_rpa_config.json 로드 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_11_email_settings_exist</td>
+                    <td class="test-desc">이메일 설정이 존재하는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_12_google_sheets_config</td>
+                    <td class="test-desc">Google Sheets 설정이 존재하는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_13_credentials_available</td>
+                    <td class="test-desc">인증 정보 파일 존재 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_14_google_sheets_connectivity</td>
+                    <td class="test-desc">Google Sheets API 연결성 확인 (재시도 로직 포함)</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">1.11s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_15_config_reload</td>
+                    <td class="test-desc">설정 리로드 기능 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_16_version_format_valid</td>
+                    <td class="test-desc">버전 형식이 유효한지 확인 (v0.0.0.0 형식)</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_17_log_directory_structure</td>
+                    <td class="test-desc">로그 디렉토리 구조 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_18_version_minimum_requirement</td>
+                    <td class="test-desc">버전이 최소 0.7.0.0 이상인지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_19_version_display_format</td>
+                    <td class="test-desc">메인창 2자리, 설정/관리자 4자리 버전 표기 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_20_trial_credits_formula</td>
+                    <td class="test-desc">체험판 크레딧이 100건 작업 기준인지 확인 (trial = credit_per_work × 100)</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="suite passed">
+                <div class="suite-header">
+                    <h3>Security Suite</h3>
+                    <span class="suite-stats">6/6 passed</span>
+                </div>
+                <p class="suite-desc">보안 인증 테스트 (자격증명 하드코딩, 민감파일 관리)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_01_no_hardcoded_passwords</td>
+                    <td class="test-desc">소스코드에 하드코딩된 비밀번호가 없는지 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_02_no_private_keys_in_source</td>
+                    <td class="test-desc">소스코드에 개인키가 포함되지 않았는지 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_03_gitignore_has_sensitive_patterns</td>
+                    <td class="test-desc">.gitignore에 민감 파일 패턴이 있는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_04_no_env_files_in_app</td>
+                    <td class="test-desc">앱 폴더에 .env 파일이 없는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_05_credentials_in_config_not_source</td>
+                    <td class="test-desc">자격증명 파일이 config 폴더에 있는지 확인 (소스 폴더 아님)</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_06_no_debug_credentials</td>
+                    <td class="test-desc">디버그용 자격증명이 남아있지 않은지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="suite passed">
+                <div class="suite-header">
+                    <h3>Registration Suite</h3>
+                    <span class="suite-stats">15/15 passed</span>
+                </div>
+                <p class="suite-desc">등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_01_get_registration_status</td>
+                    <td class="test-desc">등록 상태 조회가 정상 동작하는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_02_status_has_required_fields</td>
+                    <td class="test-desc">등록 상태에 필수 필드가 있는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_03_unregistered_state_detected</td>
+                    <td class="test-desc">미등록 상태가 올바르게 감지되는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_04_register_with_email</td>
+                    <td class="test-desc">이메일 등록이 정상 동작하는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.04s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_05_registered_email_stored</td>
+                    <td class="test-desc">등록된 이메일이 저장되는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_06_duplicate_registration_handled</td>
+                    <td class="test-desc">중복 등록 시도 처리 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_07_invalid_email_rejected</td>
+                    <td class="test-desc">잘못된 이메일 형식이 거부되는지 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_08_registration_timestamp</td>
+                    <td class="test-desc">등록 시간이 기록되는지 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_09_clear_registration</td>
+                    <td class="test-desc">등록 해제가 정상 동작하는지 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.05s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_10_registration_persists</td>
+                    <td class="test-desc">등록 상태가 유지되는지 확인 (재시작 없이)</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_11_registration_with_trial_credits</td>
+                    <td class="test-desc">등록 시 체험판 크레딧이 부여되는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.05s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_12_hardware_id_stored</td>
+                    <td class="test-desc">하드웨어 ID가 등록 정보에 포함되는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_13_sync_registration_to_server</td>
+                    <td class="test-desc">등록 정보 서버 동기화 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_14_registration_version_tracked</td>
+                    <td class="test-desc">등록된 앱 버전이 기록되는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.04s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_15_unregistered_limited_functionality</td>
+                    <td class="test-desc">미등록 상태에서 기능 제한 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="suite passed">
+                <div class="suite-header">
+                    <h3>Credit Suite</h3>
+                    <span class="suite-stats">0/0 passed</span>
+                </div>
+                <p class="suite-desc">크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="suite passed">
+                <div class="suite-header">
+                    <h3>State Suite</h3>
+                    <span class="suite-stats">14/14 passed</span>
+                </div>
+                <p class="suite-desc">상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_01_get_state</td>
+                    <td class="test-desc">앱 상태 조회가 정상 동작하는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_02_state_has_required_fields</td>
+                    <td class="test-desc">상태에 필수 필드가 있는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_03_state_consistency</td>
+                    <td class="test-desc">상태가 일관성 있게 유지되는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.10s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_04_save_settings</td>
+                    <td class="test-desc">설정 저장 기능 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_05_load_settings</td>
+                    <td class="test-desc">설정 로드 기능 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_06_settings_persistence</td>
+                    <td class="test-desc">설정이 저장 후 로드되는지 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_07_session_id_exists</td>
+                    <td class="test-desc">세션 ID가 존재하는지 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_08_last_activity_tracked</td>
+                    <td class="test-desc">마지막 활동 시간이 추적되는지 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_09_work_progress_saved</td>
+                    <td class="test-desc">작업 진행 상태가 저장되는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_10_state_after_error</td>
+                    <td class="test-desc">오류 발생 후 상태 유지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.04s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_11_concurrent_state_access</td>
+                    <td class="test-desc">동시 상태 접근 시 일관성 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_12_state_size_reasonable</td>
+                    <td class="test-desc">상태 크기가 합리적인지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_13_cross_app_mutex</td>
+                    <td class="test-desc">동시 실행 방지(크로스앱 뮤텍스) 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_14_memory_usage_reasonable</td>
+                    <td class="test-desc">메모리 사용량이 합리적인지 확인 (< 500MB)</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="suite passed">
+                <div class="suite-header">
+                    <h3>Recovery Suite</h3>
+                    <span class="suite-stats">12/12 passed</span>
+                </div>
+                <p class="suite-desc">오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_01_invalid_command_handled</td>
+                    <td class="test-desc">잘못된 명령어 처리 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_02_null_argument_handled</td>
+                    <td class="test-desc">null 인자 처리 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_03_negative_credits_handled</td>
+                    <td class="test-desc">음수 크레딧 설정 처리 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_04_empty_string_handled</td>
+                    <td class="test-desc">빈 문자열 처리 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_05_state_preserved_after_error</td>
+                    <td class="test-desc">오류 발생 후 상태 유지 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_06_rapid_error_recovery</td>
+                    <td class="test-desc">연속 오류 후 복구 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.05s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_07_work_with_invalid_file_count</td>
+                    <td class="test-desc">잘못된 파일 수로 작업 시도</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.05s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_08_large_number_handled</td>
+                    <td class="test-desc">매우 큰 숫자 처리 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_09_timeout_handling</td>
+                    <td class="test-desc">타임아웃 처리 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_10_unicode_handling</td>
+                    <td class="test-desc">유니코드 문자 처리 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.04s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_11_special_characters_handled</td>
+                    <td class="test-desc">특수 문자 처리 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_12_partial_work_recovery</td>
+                    <td class="test-desc">부분 작업 실패 후 복구 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="suite passed">
+                <div class="suite-header">
+                    <h3>UI Suite</h3>
+                    <span class="suite-stats">23/23 passed</span>
+                </div>
+                <p class="suite-desc">UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)</p>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th width="30"></th>
+                            <th>Test</th>
+                            <th>Description</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_01_get_ui_state</td>
+                    <td class="test-desc">UI 상태 조회가 정상 동작하는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_02_app_responsive</td>
+                    <td class="test-desc">앱이 응답하는지 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_03_multiple_rapid_calls</td>
+                    <td class="test-desc">빠른 연속 호출 처리 확인</td>
+                    <td class="test-level">BASIC</td>
+                    <td class="test-duration">0.12s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_04_button_states</td>
+                    <td class="test-desc">버튼 상태 조회 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_05_work_button_disabled_when_no_credits</td>
+                    <td class="test-desc">크레딧 부족 시 작업 버튼 비활성화 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_06_work_button_enabled_when_credits_available</td>
+                    <td class="test-desc">크레딧 있을 때 작업 버튼 활성화 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.03s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_07_credits_display_updated</td>
+                    <td class="test-desc">크레딧 표시 업데이트 확인</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_08_progress_indication</td>
+                    <td class="test-desc">작업 진행률 표시 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_09_non_blocking_response</td>
+                    <td class="test-desc">UI가 블로킹되지 않는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_10_status_message_available</td>
+                    <td class="test-desc">상태 메시지 사용 가능 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_11_window_title_reflects_state</td>
+                    <td class="test-desc">창 제목이 상태를 반영하는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_12_screenshot_capability</td>
+                    <td class="test-desc">스크린샷 기능 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_13_tooltips_bound_to_labels</td>
+                    <td class="test-desc">라벨에 툴팁이 바인딩되어 있는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_14_app_loading_time</td>
+                    <td class="test-desc">앱 로딩 시간 확인 (< 3초 필수, < 1초 권장)</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.01s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_15_alt_g_admin_toggle</td>
+                    <td class="test-desc">Alt+G 키로 관리자 모드 토글 기능 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_16_window_popup_center_alignment</td>
+                    <td class="test-desc">메인창과 팝업/메시지박스의 중심 좌표 일치 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_17_adaptive_ui_font_size</td>
+                    <td class="test-desc">Adaptive UI: 폰트 크기가 시스템 타이틀바 폰트 이상인지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_18_adaptive_ui_window_height</td>
+                    <td class="test-desc">Adaptive UI: 창 높이가 BASIC_RULES 표준을 따르는지 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_19_dpi_scaling_support</td>
+                    <td class="test-desc">DPI 스케일링 지원 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_20_window_geometry_saved</td>
+                    <td class="test-desc">창 위치/크기 저장 기능 확인</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_21_credits_display_comma_separator</td>
+                    <td class="test-desc">크레딧 4자리 이상일 때 콤마(,) 자릿수 표시 확인 (예: 3800 → 3,800)</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_22_free_app_credit_display</td>
+                    <td class="test-desc">무료 앱(trial_credits=-1)은 "건당 XX" 텍스트가 없어야 함</td>
+                    <td class="test-level">FULL</td>
+                    <td class="test-duration">0.02s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                <tr class="test-row passed">
+                    <td class="test-icon">✓</td>
+                    <td class="test-name">test_23_credit_display_error_check</td>
+                    <td class="test-desc">설치 직후 크레딧 표시 정확성 검증 (배포물 필수)
+- 유료 앱: 체험판 크레딧이 정확히 표시되는지 확인 (BE:10,000, DC:5,000, AR:20,000, DBP:4,000)
+- 무료 앱: "무료" 또는 "Free" 표시
+- "오류" 문구가 표시되면 안 됨
+</td>
+                    <td class="test-level">STANDARD</td>
+                    <td class="test-duration">0.00s</td>
+                    <td class="test-message">Passed</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+            
+
+        <div class="footer">
+            <p>Generated by WF-ACT (WF-RPA App Certification Toolkit)</p>
+            <p>2026-02-03 09:45:28</p>
+        </div>
+    </div>
+</body>
+</html>

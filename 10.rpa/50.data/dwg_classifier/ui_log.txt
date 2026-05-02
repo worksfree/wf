@@ -1,0 +1,124 @@
+﻿python : 2026-02-03 12:33:26,028 - INFO - [wf_rpa.Dwg_Classifier] - ====
+= WorksFree Logger Initialized =====
+위치 줄:1 문자:92
++ ... $env:PYTHONUNBUFFERED=1 ; python ui_main.py 2>&1 > ui_log.txt ;& S
+tar ...
++                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026-02-03 12:3...itialize 
+   d =====:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-02-03 12:33:26,028 - INFO - [wf_rpa.Dwg_Classifier] - App: Dwg_Clas
+sifier
+2026-02-03 12:33:26,106 - INFO - [wf_rpa.Dwg_Classifier] - HW Fingerprin
+t: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CP
+U: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2
+] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+2026-02-03 12:33:26,106 - INFO - [wf_rpa.Dwg_Classifier] - [CONFIG] run_
+mode=dev, settings_file=D:\drive_files\10.worksfree\10.rpa\10.common\con
+fig\dwg_classifier\settings.json
+2026-02-03 12:33:26,106 - INFO - [wf_rpa.Dwg_Classifier] - 사용자 설정 로드 완료:
+ D:\drive_files\10.worksfree\10.rpa\10.common\config\dwg_classifier\sett
+ings.json
+2026-02-03 12:33:26,106 - DEBUG - [wf_rpa.Dwg_Classifier] - [새로 로드] 크레딧 
+정책 로드: {'icon_text': 'DC', 'description': 'DWG 파일 분류 도구', 'trial_credits
+': 5000, 'credit_per_work': 50, 'credit_type': 'per_file'}
+2026-02-03 12:33:26,106 - INFO - [wf_rpa.Dwg_Classifier] - 크레딧 정책 설정 적용:
+ ['icon_text', 'description', 'trial_credits', 'credit_per_work', 'credi
+t_type']
+2026-02-03 12:33:26,107 - INFO - [wf_rpa.dwg_classifier] - ===== WorksFr
+ee Logger Initialized =====
+2026-02-03 12:33:26,107 - INFO - [wf_rpa.dwg_classifier] - App: dwg_clas
+sifier
+2026-02-03 12:33:26,107 - INFO - [wf_rpa.dwg_classifier] - HW Fingerprin
+t: 78bbd2c0782d8fc5c4c9eadbe730d853c640d65092a15d4e0ef7d730f703579f | CP
+U: Intel(R) Core(TM) Ultra 9 285K [Intel64 Family 6 Model 198 Stepping 2
+] | MainBoard: /JVC98F4/CNFCW0055J00N2/
+12:33:26 - wf_creditmanager_simple - DEBUG - [DEV] 개발 환경 - 10.common/con
+fig 사용: D:\drive_files\10.worksfree\10.rpa\10.common\config
+12:33:26 - wf_creditmanager_simple - DEBUG - [DEV] 개발 모드 - 숨김 처리 생략: D:\
+drive_files\10.worksfree\10.rpa\10.common\config
+2026-02-03 12:33:26,203 - INFO - [wf_rpa.dwg_classifier] - [INIT_UI] win
+dow_width=580, original_window_height=320, window_height=320, adjusted_h
+eight=320
+2026-02-03 12:33:26,203 - INFO - [wf_rpa.dwg_classifier] - [INIT_UI] con
+fig.window_height=320, ui.window_height=320
+2026-02-03 12:33:26,203 - INFO - [wf_rpa.dwg_classifier] - [INIT_UI] fin
+al geometry: 580x320+1843+560
+2026-02-03 12:33:26,334 - INFO - [wf_rpa.dwg_classifier] - [INIT] Credit
+Manager 초기화 시작...
+12:33:26 - wf_creditmanager_simple - DEBUG - [DEV] 번들 정책 경로 확인: D:\drive
+_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\
+policy.json
+12:33:26 - wf_creditmanager_simple - DEBUG - ✅ 번들 정책 파일 존재: D:\drive_fil
+es\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\poli
+cy.json
+12:33:26 - wf_creditmanager_simple - DEBUG - ✅ 번들 정책 파싱 성공: dwg_classifi
+er
+12:33:26 - wf_creditmanager_simple - DEBUG - [DEV] 번들 정책 경로 확인: D:\drive
+_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\
+policy.json
+12:33:26 - wf_creditmanager_simple - DEBUG - ✅ 번들 정책 파일 존재: D:\drive_fil
+es\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\poli
+cy.json
+12:33:26 - wf_creditmanager_simple - DEBUG - ✅ 번들 정책 파싱 성공: dwg_classifi
+er
+12:33:26 - wf_creditmanager_simple - DEBUG - ✅ 번들 정책 로드: dwg_classifier
+12:33:26 - wf_creditmanager_simple - INFO - ✅ 번들 정책 로드 성공: trial_credits
+=5000, credit_per_work=50
+12:33:26 - wf_creditmanager_simple - INFO - ✅ 로컬 정책 발견 - 번들 정책 위에 덮어쓰기
+12:33:26 - wf_creditmanager_simple - INFO - 🔧 CreditManager 정책 로드 완료: a
+pp=dwg_classifier (short=dwg_classifier), trial_credits=5000, credit_per
+_work=50
+12:33:26 - wf_creditmanager_simple - DEBUG - [DEV] 개발 모드 - 앱 폴더 숨김 생략: D
+:\drive_files\10.worksfree\10.rpa\10.common\config\dwg_classifier
+12:33:26 - wf_creditmanager_simple - DEBUG - [DEV] 번들 정책 경로 확인: D:\drive
+_files\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\
+policy.json
+12:33:26 - wf_creditmanager_simple - DEBUG - ✅ 번들 정책 파일 존재: D:\drive_fil
+es\10.worksfree\10.rpa\50.data\dwg_classifier\config\dwg_classifier\poli
+cy.json
+12:33:26 - wf_creditmanager_simple - DEBUG - ✅ 번들 정책 파싱 성공: dwg_classifi
+er
+12:33:26 - wf_creditmanager_simple - DEBUG - ✅ 번들 정책 로드: dwg_classifier
+12:33:26 - wf_creditmanager_simple - DEBUG - [DEV] 개발 모드 - 정책 파일 숨김 생략: 
+D:\drive_files\10.worksfree\10.rpa\10.common\config\dwg_classifier\polic
+y.json
+12:33:26 - wf_googlesheets_manager - INFO - [DEBUG] 구글 시트 서비스 초기화 시작 (번들
+=False)
+12:33:26 - wf_googlesheets_manager - ERROR - ❌ 구글 시트 서비스 설정 중 예기치 않은 오류 
+발생: 'sheet_id_release'
+12:33:26 - wf_googlesheets_manager - ERROR - Traceback (most recent call
+ last):
+  File "D:\drive_files\10.worksfree\10.rpa\10.common\wf_googlesheets_man
+ager.py", line 721, in _setup_service
+    config = self._load_config()
+  File "D:\drive_files\10.worksfree\10.rpa\10.common\wf_googlesheets_man
+ager.py", line 1052, in _load_config
+    config = get_sheets_config()
+  File "D:\drive_files\10.worksfree\10.rpa\10.common\wf_googlesheets_man
+ager.py", line 1677, in get_sheets_config
+    "SHEET_ID_RELEASE": gs_config["sheet_id_release"],
+                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'sheet_id_release'
+
+12:33:26 - wf_googlesheets_manager - ERROR - ❌ 구글 시트 연결이 없어 app_policy를 
+로드할 수 없습니다.
+12:33:26 - wf_creditmanager_simple - WARNING - ⚠️ 정책 동기화 실패: Google Shee
+ts에 정책 데이터가 없습니다.
+12:33:26 - wf_creditmanager_simple - DEBUG - 🔄 앱 시작: credit_changed=Fal
+se, 동기화 생략
+2026-02-03 12:33:26,339 - INFO - [wf_rpa.dwg_classifier] - [INIT] Credit
+Manager 초기화 완료
+2026-02-03 12:33:26,434 - INFO - [wf_rpa.dwg_classifier] - 사용자 디렉토리 구조 생
+성 완료: C:\Users\USER\.wf_rpa
+12:33:26 - wf_googlesheets_manager - ERROR - ❌ 구글 시트 연결이 없어 app_policy를 
+로드할 수 없습니다.
+2026-02-03 12:33:26,650 - INFO - [wf_rpa.dwg_classifier] - 정책 동기화 결과: {'
+success': False, 'error': 'empty_policies', 'message': 'Google Sheets에 정
+책 데이터가 없습니다.'}
+2026-02-03 12:33:27,049 - INFO - [wf_rpa.dwg_classifier] - 🔄 동기화 불필요
+2026-02-03 12:34:16,481 - INFO - [wf_rpa.dwg_classifier] - 🚀 애플리케이션 종료.
+..
+2026-02-03 12:34:16,481 - INFO - [wf_rpa.dwg_classifier] - 🎉 애플리케이션 종료 
+완료

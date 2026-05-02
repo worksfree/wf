@@ -1,0 +1,16 @@
+{
+  "identity": {
+    "app_name": "qrcode_generator",
+    "short_name": "qr",
+    "display_name": "QR Code Generator"
+  },
+  "policy": {
+    "icon_text": "QR",
+    "description": "QR 코드 생성 자동화 앱 - 무료",
+    "trial_credits": -1,
+    "credit_per_work": 0,
+    "credit_type": "free"
+  },
+  "source": "bundled",
+  "last_updated": "2026-04-29T18:53:16.032"
+}

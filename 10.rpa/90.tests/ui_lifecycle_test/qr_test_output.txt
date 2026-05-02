@@ -1,0 +1,255 @@
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: DeploymentSuite
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: PackageIntegritySuite
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: ExecutionEnvironmentSuite
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: ConfigSuite
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: SecuritySuite
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: RegistrationSuite
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: CreditSuite
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: StateSuite
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: RecoverySuite
+2026-01-29 19:37:11 [INFO] [CertEngine] Registered suite: UISuite
+2026-01-29 19:37:11 [INFO] [qrcode_generator] EXE 紐⑤뱶: ?ъ슜?????대뜑 珥덇린??以?..
+2026-01-29 19:37:11 [INFO] [TestClient] Cleaned user home: C:\Users\HP\.wf_rpa
+2026-01-29 19:37:12 [INFO] ============================================================
+2026-01-29 19:37:12 [INFO]   WF-ACT Certification: qrcode_generator
+2026-01-29 19:37:12 [INFO]   Target Level: STANDARD
+2026-01-29 19:37:12 [INFO] ============================================================
+2026-01-29 19:37:12 [INFO] [TestClient] Launched QR Code Generator (PID: 6180)
+2026-01-29 19:37:14 [INFO] [TestClient] Server ready
+2026-01-29 19:37:14 [INFO] 
+[Suite] Deployment Suite
+2026-01-29 19:37:14 [INFO]   諛고룷 ?뚯씪 諛??섍꼍 ?ㅼ젙 ?몄쬆 ?뚯뒪??(BAT ?뚯씪, DEV/RELEASE ?섍꼍)
+2026-01-29 19:37:14 [INFO] ----------------------------------------
+2026-01-29 19:37:14 [INFO]   ??test_01_setup_worksfree_bat_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_02_shortcut_bat_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_03_app_reset_bat_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_04_wf_reset_all_bat_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_05_uninstall_bat_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_06_sync_registration_bat_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_07_wf_rpa_config_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_08_google_sheets_section_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_09_sheet_id_release_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_10_sheet_id_dev_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_11_credentials_file_release_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_12_credentials_file_dev_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_13_release_credentials_file_exists: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_14_dev_credentials_file_exists: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_15_sheet_ids_are_different: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_16_credentials_files_are_different: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_17_setup_bat_has_korean_encoding: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_18_no_duplicate_shortcut_bat: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_19_email_settings_exist: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_20_app_policy_files_exist: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_21_app_settings_files_exist: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_22_user_manual_pdf_exists: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_23_app_icon_exists: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_24_spec_file_exists: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_25_build_script_exists: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   [PASS] Deployment Suite: 12/25
+2026-01-29 19:37:14 [INFO] 
+[Suite] Package Integrity Suite
+2026-01-29 19:37:14 [INFO]   諛고룷 ?⑦궎吏 ?꾩쟾???몄쬆 ?뚯뒪??(exe ?대? ?뚯씪, ?щ━?댁뀥, 踰꾩쟾 ?뺣낫)
+2026-01-29 19:37:14 [INFO] ----------------------------------------
+2026-01-29 19:37:14 [INFO] [PackageIntegrity] Testing package: D:\release\candidates\qrcode_generator_v0.7.2.3\qrcode_generator_v0.7.2.3_portable
+2026-01-29 19:37:14 [INFO]   ??test_01_internal_directory_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_02_wf_rpa_bundle_dir_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_03_bundle_settings_json_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_04_bundle_version_info_exists: Passed
+2026-01-29 19:37:14 [WARNING] 蹂댁븞 沅뚯옣?ы빆: ?щ━?댁뀥 ?뚯씪???④? 泥섎━?섏꽭?? worksfree-b33a6b8f366b.json
+2026-01-29 19:37:14 [INFO]   ??test_05_release_credential_file_exists: Passed
+2026-01-29 19:37:14 [INFO] 沅뚯옣?ы빆: DEV ?щ━?댁뀥 ?뚯씪???④? 泥섎━ 沅뚯옣: silver-argon-445712-a0-7092493258f3.json
+2026-01-29 19:37:14 [INFO]   ??test_06_dev_credential_file_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_07_release_credential_valid_json: Passed
+2026-01-29 19:37:14 [INFO]   ??test_08_bundle_config_file_exists: Passed
+2026-01-29 19:37:14 [INFO]   ??test_09_bundle_config_sheet_ids: Passed
+2026-01-29 19:37:14 [INFO]   ??test_10_nsis_installer_exists: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_11_google_sheets_config_consistency: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   ??test_12_credential_environment_separation: Skipped (requires FULL)
+2026-01-29 19:37:14 [INFO]   [PASS] Package Integrity Suite: 9/12
+2026-01-29 19:37:14 [INFO] 
+[Suite] Execution Environment Suite
+2026-01-29 19:37:14 [INFO]   ?ㅽ뻾 ?섍꼍 ?몄쬆 ?뚯뒪??(?깃? ?몄뒪?댁뒪, ?ㅼ젙 ?대뜑 李몄“)
+2026-01-29 19:37:14 [INFO] ----------------------------------------
+2026-01-29 19:37:14 [INFO]   ??test_01_config_folder_location: Passed
+2026-01-29 19:37:14 [INFO]   ??test_02_config_files_exist: Passed
+2026-01-29 19:37:14 [INFO]   ??test_03_user_home_initialized: Passed
+2026-01-29 19:37:15 [INFO]   ??test_04_wf_rpa_config_accessible: Passed
+2026-01-29 19:37:15 [INFO]   ??test_05_credentials_accessible: Passed
+2026-01-29 19:37:15 [INFO]   ??test_06_config_reload_works: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_07_multiple_config_reads: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_08_dev_exe_mode_detection: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   [PASS] Execution Environment Suite: 5/8
+2026-01-29 19:37:15 [INFO] 
+[Suite] Config Suite
+2026-01-29 19:37:15 [INFO]   ?ㅼ젙 愿由??몄쬆 ?뚯뒪??(policy.json, settings.json 濡쒕뱶 諛?寃利?
+2026-01-29 19:37:15 [INFO] ----------------------------------------
+2026-01-29 19:37:15 [INFO] ?뱥 臾대즺 ???뺤콉 寃利? trial=-1, per_work=0
+2026-01-29 19:37:15 [INFO] ??臾대즺 ???뺤콉 ?뺤씤: trial_credits=-1, credit_per_work=0
+2026-01-29 19:37:15 [INFO]   ??test_01_initial_deployment_policy: Passed
+2026-01-29 19:37:15 [INFO]   ??test_02_get_policy: Passed
+2026-01-29 19:37:15 [INFO]   ??test_03_policy_has_identity: Passed
+2026-01-29 19:37:15 [INFO]   ??test_04_policy_has_credit_info: Passed
+2026-01-29 19:37:15 [INFO]   ??test_05_get_settings: Passed
+2026-01-29 19:37:15 [INFO]   ??test_06_settings_has_version: Passed
+2026-01-29 19:37:15 [INFO]   ??test_07_policy_trial_credits: Passed
+2026-01-29 19:37:15 [INFO]   ??test_08_policy_display_name: Passed
+2026-01-29 19:37:15 [INFO]   ??test_09_config_consistency: Passed
+2026-01-29 19:37:15 [INFO]   ??test_10_wf_rpa_config_exists: Passed
+2026-01-29 19:37:15 [INFO]   ??test_11_email_settings_exist: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_12_google_sheets_config: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_13_credentials_available: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_14_google_sheets_connectivity: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_15_config_reload: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_16_version_format_valid: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_17_log_directory_structure: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_18_version_minimum_requirement: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_19_version_display_format: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO] ?뱥 臾대즺 ??泥댄뿕??寃利? trial_credits=-1 (臾대즺 ?깆? ?ㅽ궢)
+2026-01-29 19:37:15 [INFO]   ??test_20_trial_credits_formula: Passed
+2026-01-29 19:37:15 [INFO]   [PASS] Config Suite: 11/20
+2026-01-29 19:37:15 [INFO] 
+[Suite] Security Suite
+2026-01-29 19:37:15 [INFO]   蹂댁븞 ?몄쬆 ?뚯뒪??(?먭꺽利앸챸 ?섎뱶肄붾뵫, 誘쇨컧?뚯씪 愿由?
+2026-01-29 19:37:15 [INFO] ----------------------------------------
+2026-01-29 19:37:15 [INFO]   ??test_01_no_hardcoded_passwords: Passed
+2026-01-29 19:37:15 [INFO]   ??test_02_no_private_keys_in_source: Passed
+2026-01-29 19:37:15 [INFO]   ??test_03_gitignore_has_sensitive_patterns: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_04_no_env_files_in_app: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_05_credentials_in_config_not_source: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   ??test_06_no_debug_credentials: Skipped (requires FULL)
+2026-01-29 19:37:15 [INFO]   [PASS] Security Suite: 2/6
+2026-01-29 19:37:15 [INFO] 
+[Suite] Registration Suite
+2026-01-29 19:37:15 [INFO]   ?깅줉 ?쇱씠?꾩궗?댄겢 ?몄쬆 ?뚯뒪??(誘몃벑濡??곹깭, ?깅줉 吏꾪뻾, 以묐났 諛⑹?, ?숆린??
+2026-01-29 19:37:15 [INFO] ----------------------------------------
+2026-01-29 19:37:15 [INFO]   ??test_01_get_registration_status: Passed
+2026-01-29 19:37:15 [INFO]   ??test_02_status_has_required_fields: Passed
+2026-01-29 19:37:15 [INFO]   ??test_03_unregistered_state_detected: Passed
+2026-01-29 19:37:20 [INFO]   ??test_04_register_with_email: Passed
+2026-01-29 19:37:20 [INFO]   ??test_05_registered_email_stored: Passed
+2026-01-29 19:37:20 [INFO]   ??test_06_duplicate_registration_handled: Passed
+2026-01-29 19:37:20 [INFO]   ??test_07_invalid_email_rejected: Passed
+2026-01-29 19:37:20 [INFO]   ??test_08_registration_timestamp: Passed
+2026-01-29 19:37:20 [INFO]   ??test_09_clear_registration: Passed
+2026-01-29 19:37:20 [INFO]   ??test_10_registration_persists: Passed
+2026-01-29 19:37:20 [INFO]   ??test_11_registration_with_trial_credits: Skipped (requires FULL)
+2026-01-29 19:37:20 [INFO]   ??test_12_hardware_id_stored: Skipped (requires FULL)
+2026-01-29 19:37:20 [INFO]   ??test_13_sync_registration_to_server: Skipped (requires FULL)
+2026-01-29 19:37:20 [INFO]   ??test_14_registration_version_tracked: Skipped (requires FULL)
+2026-01-29 19:37:20 [INFO]   ??test_15_unregistered_limited_functionality: Skipped (requires FULL)
+2026-01-29 19:37:20 [INFO]   [PASS] Registration Suite: 10/15
+2026-01-29 19:37:20 [INFO] 
+[Suite] Credit Suite
+2026-01-29 19:37:20 [INFO]   ?щ젅???쒖뒪???몄쬆 ?뚯뒪??(李④컧, 遺議?李⑤떒, ?묒뾽 以??뚯쭊, 援щℓ, ?ш컻)
+2026-01-29 19:37:20 [INFO] ----------------------------------------
+2026-01-29 19:37:20 [INFO] [qrcode_generator] 臾대즺 ?깆씠誘濡?Credit Suite ?ㅽ궢
+2026-01-29 19:37:20 [INFO]   [SKIP] Suite skipped
+2026-01-29 19:37:20 [INFO]   [PASS] Credit Suite: 0/0
+2026-01-29 19:37:20 [INFO] 
+[Suite] State Suite
+2026-01-29 19:37:20 [INFO]   ?곹깭 愿由??몄쬆 ?뚯뒪??(?곹깭 ?좎?, ?몄뀡 愿由? 蹂듦뎄, ?ㅼ젙 ???濡쒕뱶)
+2026-01-29 19:37:20 [INFO] ----------------------------------------
+2026-01-29 19:37:20 [INFO]   ??test_01_get_state: Passed
+2026-01-29 19:37:20 [INFO]   ??test_02_state_has_required_fields: Passed
+2026-01-29 19:37:21 [INFO]   ??test_03_state_consistency: Passed
+2026-01-29 19:37:21 [INFO]   ??test_04_save_settings: Passed
+2026-01-29 19:37:21 [INFO]   ??test_05_load_settings: Passed
+2026-01-29 19:37:21 [INFO]   ??test_06_settings_persistence: Passed
+2026-01-29 19:37:21 [INFO]   ??test_07_session_id_exists: Passed
+2026-01-29 19:37:21 [INFO]   ??test_08_last_activity_tracked: Passed
+2026-01-29 19:37:21 [INFO]   ??test_09_work_progress_saved: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_10_state_after_error: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_11_concurrent_state_access: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_12_state_size_reasonable: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_13_cross_app_mutex: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_14_memory_usage_reasonable: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   [PASS] State Suite: 8/14
+2026-01-29 19:37:21 [INFO] 
+[Suite] Recovery Suite
+2026-01-29 19:37:21 [INFO]   ?ㅻ쪟 蹂듦뎄 ?몄쬆 ?뚯뒪??(?섎せ???낅젰, ?ㅽ듃?뚰겕 ?ㅻ쪟, ?뚯씪 ?? ?곹깭 蹂듦뎄)
+2026-01-29 19:37:21 [INFO] ----------------------------------------
+2026-01-29 19:37:21 [INFO]   ??test_01_invalid_command_handled: Passed
+2026-01-29 19:37:21 [INFO]   ??test_02_null_argument_handled: Passed
+2026-01-29 19:37:21 [INFO] [qrcode_generator] 臾대즺 ?깆씠誘濡?test_03 ?ㅽ궢
+2026-01-29 19:37:21 [INFO]   ??test_03_negative_credits_handled: Passed
+2026-01-29 19:37:21 [INFO]   ??test_04_empty_string_handled: Passed
+2026-01-29 19:37:21 [INFO] [qrcode_generator] 臾대즺 ?깆씠誘濡?test_05 ?ㅽ궢
+2026-01-29 19:37:21 [INFO]   ??test_05_state_preserved_after_error: Passed
+2026-01-29 19:37:21 [INFO]   ??test_06_rapid_error_recovery: Passed
+2026-01-29 19:37:21 [INFO]   ??test_07_work_with_invalid_file_count: Passed
+2026-01-29 19:37:21 [INFO]   ??test_08_large_number_handled: Passed
+2026-01-29 19:37:21 [INFO]   ??test_09_timeout_handling: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_10_unicode_handling: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_11_special_characters_handled: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_12_partial_work_recovery: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   [PASS] Recovery Suite: 8/12
+2026-01-29 19:37:21 [INFO] 
+[Suite] UI Suite
+2026-01-29 19:37:21 [INFO]   UI ?묐떟???몄쬆 ?뚯뒪??(踰꾪듉 ?곹깭, 吏꾪뻾瑜? 釉붾줈???놁쓬)
+2026-01-29 19:37:21 [INFO] ----------------------------------------
+2026-01-29 19:37:21 [INFO]   ??test_01_get_ui_state: Passed
+2026-01-29 19:37:21 [INFO]   ??test_02_app_responsive: Passed
+2026-01-29 19:37:21 [INFO]   ??test_03_multiple_rapid_calls: Passed
+2026-01-29 19:37:21 [INFO]   ??test_04_button_states: Passed
+2026-01-29 19:37:21 [INFO] [qrcode_generator] 臾대즺 ?깆씠誘濡?test_05 ?ㅽ궢
+2026-01-29 19:37:21 [INFO]   ??test_05_work_button_disabled_when_no_credits: Passed
+2026-01-29 19:37:21 [INFO]   ??test_06_work_button_enabled_when_credits_available: Passed
+2026-01-29 19:37:21 [INFO] [qrcode_generator] 臾대즺 ?깆씠誘濡?test_07 ?ㅽ궢
+2026-01-29 19:37:21 [INFO]   ??test_07_credits_display_updated: Passed
+2026-01-29 19:37:21 [INFO]   ??test_08_progress_indication: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_09_non_blocking_response: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_10_status_message_available: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_11_window_title_reflects_state: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_12_screenshot_capability: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_13_tooltips_bound_to_labels: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_14_app_loading_time: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_15_alt_g_admin_toggle: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_16_window_popup_center_alignment: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_17_adaptive_ui_font_size: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_18_adaptive_ui_window_height: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_19_dpi_scaling_support: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_20_window_geometry_saved: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_21_credits_display_comma_separator: Skipped (requires FULL)
+2026-01-29 19:37:21 [INFO]   ??test_22_free_app_credit_display: Skipped (requires FULL)
+2026-01-29 19:37:21 [WARNING] [qrcode_generator] ?щ젅???쒖떆 ?뺤씤 遺덇? - UI ?몄텧 ?놁쓬
+2026-01-29 19:37:21 [INFO]   ??test_23_credit_display_error_check: Passed
+2026-01-29 19:37:21 [INFO]   [PASS] UI Suite: 8/23
+2026-01-29 19:37:22 [INFO] [TestClient] Waiting 2.0s for single-instance cleanup...
+2026-01-29 19:37:24 [INFO] [TestClient] App terminated
+2026-01-29 19:37:24 [INFO] ============================================================
+2026-01-29 19:37:24 [INFO]   Certification Result: FULL
+2026-01-29 19:37:24 [INFO]   Tests: 73/135 passed
+2026-01-29 19:37:24 [INFO]   Duration: 12.3s
+2026-01-29 19:37:24 [INFO] ============================================================
+
+======================================================================
+  WF-ACT - WF-RPA App Certification Toolkit
+======================================================================
+  Mode: EXE (Packaged)
+  Target Level: STANDARD
+  Apps: qrcode_generator
+  Output: D:\drive_files\10.worksfree\10.rpa\90.tests\ui_lifecycle_test\test_results\certification_20260129_193711_exe
+======================================================================
+
+
+######################################################################
+  Certifying: qrcode_generator
+######################################################################
+
+
+  ?뱤 Unified report: D:\drive_files\10.worksfree\10.rpa\90.tests\ui_lifecycle_test\test_results\certification_20260129_193711_exe\index.html
+
+======================================================================
+  CERTIFICATION SUMMARY
+======================================================================
+
+  ?쪍 qrcode_generator
+     Level: FULL
+     Tests: 73/135 passed
+     Duration: 12.3s
+
+======================================================================
+  Results saved to: D:\drive_files\10.worksfree\10.rpa\90.tests\ui_lifecycle_test\test_results\certification_20260129_193711_exe
+======================================================================
+
+  ?뙋 Opening results in browser: D:\drive_files\10.worksfree\10.rpa\90.tests\ui_lifecycle_test\test_results\certification_20260129_193711_exe\index.html

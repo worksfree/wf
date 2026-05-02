@@ -1,0 +1,15 @@
+{
+  "title":               "Ban Redirection {ver}",
+  "run_button":          "Apply DNS",
+  "primary_dns":         "Primary DNS",
+  "secondary_dns":       "Secondary DNS",
+  "admin_ok":            "Admin: ✓",
+  "admin_fail":          "Admin: ✗",
+  "interface_checking":  "Interfaces: checking...",
+  "interface_count":     "{n} interface(s)",
+  "log_section":         "Execution Log",
+  "complete_msg":        "DNS settings applied.\nPlease restart your browser.",
+  "fail_msg":            "Failed to apply DNS settings.",
+  "input_error_msg":     "Please enter both DNS addresses.",
+  "input_error_title":   "Input Error"
+}

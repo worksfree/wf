@@ -1,17 +1,17 @@
-Total: 1714.3ms
+Total: 4172.3ms
 [    0.0ms] Script start
-[   31.0ms] multiprocessing.freeze_support()
-[   31.0ms] sys.path setup complete
-[   52.5ms] import tkinter
-[   56.6ms] import tkinter.ttk, messagebox
-[   57.4ms] import datetime
-[   57.4ms] pyautogui deferred (lazy import)
-[   59.4ms] import filedialog, Path
-[   69.5ms] import logging, threading, json
-[   73.9ms] import wf_log
-[  807.1ms] import wf_register
-[  807.9ms] import wf_credit_manager
-[  808.0ms] Test mode: skipping single instance and cross-app checks
-[  815.8ms] Creating Tk root
-[ 1205.0ms] Creating ConversionVerifierApp
-[ 1714.3ms] Starting mainloop
+[    9.3ms] multiprocessing.freeze_support()
+[    9.3ms] sys.path setup complete
+[   20.3ms] import tkinter
+[   21.2ms] import tkinter.ttk, messagebox
+[   21.4ms] import datetime
+[   21.4ms] pyautogui deferred (lazy import)
+[   22.0ms] import filedialog, Path
+[   34.3ms] import logging, threading, json
+[   35.2ms] import wf_log
+[  198.1ms] import wf_register
+[  198.3ms] import wf_credit_manager
+[  198.3ms] Test mode: skipping single instance and cross-app checks
+[  201.9ms] Creating Tk root
+[  343.3ms] Creating ConversionVerifierApp
+[ 4172.3ms] Starting mainloop

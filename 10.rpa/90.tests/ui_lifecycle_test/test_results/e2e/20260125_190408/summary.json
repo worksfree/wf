@@ -1,0 +1,10 @@
+{
+  "total_tests": 1,
+  "passed": 0,
+  "failed": 1,
+  "duration": 67.465986,
+  "apps": [
+    "be"
+  ],
+  "repeat": 1
+}

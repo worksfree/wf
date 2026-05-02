@@ -1,0 +1,12 @@
+{
+  "title":                   "DWG Batch Print {ver}",
+  "run_button":              "Print DWG",
+  "complete_msg":            "Print job completed.",
+  "edrawings_path":          "eDrawings Path:",
+  "restart_interval":        "Restart interval (files):",
+  "print_wait":              "Print wait time (sec):",
+  "restart_wait":            "Restart wait time (sec):",
+  "failed_files_title":      "Failed Files",
+  "print_settings_section":  "Print Settings",
+  "general_settings_section": "General Settings"
+}

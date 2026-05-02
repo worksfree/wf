@@ -1,0 +1,16 @@
+{
+  "title":         "변환 확인 도구 {ver}",
+  "run_button":    "변환확인",
+  "complete_msg":  "변환 검증이 완료되었습니다.",
+  "src_format":    "원본 형식:",
+  "dst_format":    "⇒  결과 형식:",
+  "filter_all":    "전체",
+  "filter_ok":     "✅ 변환완료",
+  "filter_missing": "⚠️ 변환누락",
+  "col_no":        "번호",
+  "col_src":       "SLDDRW 파일",
+  "col_dst":       "DWG 파일",
+  "col_status":    "상태",
+  "col_size":      "크기",
+  "detail_title":  "📋 변환 결과 상세"
+}

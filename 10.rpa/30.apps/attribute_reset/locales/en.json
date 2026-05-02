@@ -1,0 +1,7 @@
+{
+  "title":         "Attribute Reset {ver}",
+  "run_button":    "Start",
+  "complete_msg":  "Attribute reset completed.",
+  "folder_dialog": "Select Folder with DWG Files",
+  "excel_dialog":  "Select Excel File"
+}

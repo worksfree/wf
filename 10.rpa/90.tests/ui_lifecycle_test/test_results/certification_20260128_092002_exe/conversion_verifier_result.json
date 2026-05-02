@@ -1,0 +1,14 @@
+{
+  "app_name": "conversion_verifier",
+  "app_version": "conversion_verifier_v0.8.2.8_portable",
+  "level": "NONE",
+  "passed": false,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "duration": 12.456405,
+  "start_time": "2026-01-28T09:20:56.093742",
+  "end_time": "2026-01-28T09:21:08.550147",
+  "error": "Failed to launch app in test mode",
+  "suites": []
+}

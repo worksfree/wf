@@ -1,0 +1,19 @@
+{
+  "title":              "Korean Filename Normalizer {ver}",
+  "run_button":         "Normalize",
+  "complete_msg":       "Filename normalization completed.",
+  "no_target":          "No decomposed Korean filenames found.",
+  "no_target_title":    "Info",
+  "no_target_msg":      "No decomposed Korean filenames found.",
+  "result_title":       "📋 Normalization Result",
+  "default_folder":     "Default Target Folder",
+  "output_location":    "Output Location",
+  "save_same":          "Save in original folder",
+  "save_new":           "Save in new folder",
+  "file_mode":          "File Operation Mode",
+  "rename_original":    "Rename original file",
+  "create_copy":        "Create normalized copy",
+  "conflict_mode":      "Filename conflict handling",
+  "conflict_overwrite": "Overwrite",
+  "conflict_skip":      "Skip"
+}

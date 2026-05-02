@@ -325,7 +325,7 @@ _log_startup("import app_setting_data")
 # from automation import BomAutomation
 _log_startup("automation.BomAutomation deferred (lazy import)")
 from ui_setting import create_settings_window, load_custom_settings, apply_custom_settings_to_config
-from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
+from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts, apply_equal_vertical_pack
 
 _log_startup("import ui_setting")
 
@@ -373,12 +373,8 @@ class BomGUIApplication:
 
         _log_startup("Master and directory initialized")
 
-        # 적응형 UI 설정 초기화
-        self.ui = get_adaptive_ui_settings()
-        _log_startup("Adaptive UI settings loaded")
-
-        # 로거 초기화
-        self.logger = get_app_logger("bom_exporter", console_level=logging.INFO)
+        # 로거 초기화 (config 로드 전에 필요)
+        self.logger = get_app_logger("bom_exporter", console_level=logging.DEBUG)
         self.app = None  # 호환성 유지
         self.paths = None  # 호환성 유지
         self.i18n = None  # 호환성 유지
@@ -406,6 +402,11 @@ class BomGUIApplication:
         # 설정 로더는 reload 플래그만 받으므로 인자 없이 호출
         self.config = get_config()
         _log_startup("Config loaded")
+
+        # 적응형 UI 설정 초기화 (config 로드 후 호출 - saved_ui 적용)
+        saved_ui = getattr(self.config, "ui_config", None)
+        self.ui = get_adaptive_ui_settings(saved_ui=saved_ui)
+        _log_startup("Adaptive UI settings loaded")
 
         # Alt+G 데모 핫키에서 적용할 창 위치/크기 오버라이드 (설정 파일만 사용)
         _config_geo_override = ""
@@ -461,8 +462,8 @@ class BomGUIApplication:
         self.log_scrollbar = None
         self.auto_scroll_var = None
         self.auto_scroll_checkbox = None
-        self.original_window_height = 160  # 1입력 앱 기본 높이
-        self.expanded_window_height = self.original_window_height + 300  # 관리자 모드: +300 고정
+        self.original_window_height = self.ui.get("window_height", getattr(self.config, "window_height", 200))
+        self.expanded_window_height = self.original_window_height + getattr(self.config, "admin_window_height", 300)  # 관리자 모드: settings.json에서 로드
 
         _log_startup("UI-related variables initialized")
         if self.demo_capture_enabled:
@@ -1145,7 +1146,7 @@ class BomGUIApplication:
 
         def worker():
             try:
-                result = self.wf_manager.refresh_policies_from_sheets()
+                result = self.credit_manager.refresh_policies_from_sheets()
                 self.logger.info(f"정책 동기화 결과: {result}")
                 # Re-init credit_per_work if needed (keep existing balances)
                 if result.get("success"):
@@ -1296,6 +1297,7 @@ class BomGUIApplication:
 
                 # 상태 관련
                 'get_state': self._test_get_state,
+                'get_ui_state': self._test_get_state,  # Alias for cert tests
                 'get_policy': self._test_get_policy,
                 'get_settings': self._test_get_settings,
                 'save_settings': self._test_save_settings,
@@ -1559,10 +1561,19 @@ class BomGUIApplication:
 
     def _test_get_state(self) -> dict:
         """앱 상태 반환"""
+        # 크레딧 표시 텍스트 가져오기
+        credits_display = None
+        try:
+            if hasattr(self, 'credit_label') and self.credit_label:
+                credits_display = self.credit_label.cget("text")
+        except Exception:
+            pass
+
         return {
             "is_registered": self.is_registered_user,
             "has_credit_manager": self.credit_manager is not None,
             "has_wf_manager": self.wf_manager is not None,
+            "credits_display": credits_display,
             "selected_path": self.SELECTED_PATH,
             "is_admin_mode": self.is_admin_mode,
             "run_mode": self.run_mode,
@@ -1783,9 +1794,9 @@ class BomGUIApplication:
         return True
 
     def init_ui(self):
-        # 설정 파일에서 기본/변경 값을 읽어 창 크기 결정 (코드 내 별도 기본값 없음)
-        window_width = self.ui.get("window_width", 580)
-        window_height = self.ui.get("window_height", 180)
+        # 생성자에서 이미 설정한 self.original_window_height 사용 (settings.json 우선)
+        window_width = self.config.window_width
+        window_height = self.original_window_height  # ← settings.json ui_config에서 먼저 로드됨
         adjusted_height = window_height
 
         # pyautogui lazy import - 화면 크기는 tkinter로 가져오기 (300ms 절약)
@@ -1816,9 +1827,8 @@ class BomGUIApplication:
         # 초기 Topmost 적용 (설정에서 로드)
         self.master.wm_attributes("-topmost", topmost_setting)
         self.master.resizable(True, True)  # 리사이즈 가능하게 유지
-        # Allow smaller resizing by capping the minimum height at half of the initial height (with a floor of 120)
-        min_height = max(120, int(adjusted_height / 2))
-        self.master.minsize(window_width, min_height)
+        # 최소 크기를 기본 크기로 설정
+        self.master.minsize(window_width, window_height)
         
         # 전역 폰트 설정 적용 (메인창 폰트 크기 일관성 보장)
         # 디버깅: 실제 font_size 값 확인
@@ -1981,6 +1991,9 @@ class BomGUIApplication:
             font=("맑은 고딕", self.ui["font_size"]),
         )
         self.exit_button.grid(row=0, column=3, padx=5, sticky="ew")
+
+        # 상하 등간 배치 (adaptive)
+        apply_equal_vertical_pack(main_frame)
 
         # 진행률 라벨에 툴팁 추가 (관리자 모드 접근을 위한 힌트)
         # 사용자 안내용 툴팁: 진척률 설명만 제공 (관리자 모드 언급 없음)

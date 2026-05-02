@@ -18,16 +18,37 @@ _STARTUP_FLUSHED = False
 
 def _detect_run_mode():
     """
-    실행 모드 감지 (환경변수 + sys.argv 기반 통일 방식)
-    - 1순위: WF_RPA_MODE 환경변수 (demo 모드 명시적 지정용)
-    - 2순위: .py 파일 직접 실행 → dev
-    - 3순위: 기본값 release (exe 실행)
+    실행 모드 감지 (BASIC_RULES 준수: settings.json 우선)
+    - 1순위: 10.common/config/{app}/settings.json의 runtime_config.run_mode
+    - 2순위: WF_RPA_MODE 환경변수
+    - 3순위: .py 파일 직접 실행 → dev
+    - 4순위: 기본값 release (exe 실행)
     """
+    # 1순위: settings.json 읽기 (BASIC_RULES 준수)
+    try:
+        import json
+        from pathlib import Path
+        app_root = Path(__file__).resolve().parent
+        settings_path = app_root.parents[1] / "10.common" / "config" / "conversion_verifier" / "settings.json"
+        if settings_path.exists():
+            with open(settings_path, "r", encoding="utf-8-sig") as f:
+                data = json.load(f) or {}
+            cfg_mode = str(data.get("runtime_config", {}).get("run_mode", "") or "").strip().lower()
+            if cfg_mode in ("dev", "demo", "release"):
+                return cfg_mode
+    except Exception:
+        pass
+    
+    # 2순위: 환경변수
     env_mode = (os.environ.get("WF_RPA_MODE") or "").strip().lower()
     if env_mode in ("dev", "demo", "release"):
         return env_mode
+    
+    # 3순위: .py 직접 실행
     if sys.argv[0].endswith(".py"):
         return "dev"
+    
+    # 4순위: 기본값
     return "release"
 
 
@@ -287,7 +308,7 @@ sys.path.insert(0, current_dir)
 
 # 앱 설정 로더
 from app_setting_data import get_config  # type: ignore
-from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts  # type: ignore
+from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts, apply_equal_vertical_pack  # type: ignore
 
 # 글로벌 로거 import
 from wf_log import get_app_logger  # type: ignore
@@ -395,8 +416,9 @@ class ConversionVerifierApp:
         self.admin_mode_start_time = None
         # 🚀 최적화: admin 비밀번호 lazy 로딩 (Google Sheets 호출 지연)
         self._admin_password = None  # lazy load
-        # Adaptive UI settings (font sizes, padding)
-        self.ui = get_adaptive_ui_settings()
+        # Adaptive UI settings (font sizes, padding) - config 로드 후 호출 - saved_ui 적용
+        saved_ui = getattr(self.config, "ui_config", None)
+        self.ui = get_adaptive_ui_settings(saved_ui=saved_ui)
 
         # 로그 프레임 관련 변수
         self.log_frame = None
@@ -407,8 +429,8 @@ class ConversionVerifierApp:
         self.text_log_handler = None
 
         # 창 크기 관련
-        self.original_window_height = 160  # 1입력 앱 기본 높이
-        self.expanded_window_height = self.original_window_height + 300  # 관리자 모드: +300 고정
+        self.original_window_height = self.ui.get("window_height", getattr(self.config, "window_height", 200))
+        self.expanded_window_height = self.original_window_height + getattr(self.config, "admin_window_height", 300)  # 관리자 모드: settings.json에서 로드
 
         # 사용자 등록 상태 초기 동기 확인 (플래그/reg_time_local)
         self.is_registered_user = False
@@ -775,7 +797,7 @@ class ConversionVerifierApp:
 
         def worker():
             try:
-                result = self.wf_manager.refresh_policies_from_sheets()
+                result = self.credit_manager.refresh_policies_from_sheets()
                 self.logger.info(f"정책 동기화 결과: {result}")
                 # Re-init credit_per_work if needed (keep existing balances)
                 if result.get("success"):
@@ -1072,6 +1094,7 @@ class ConversionVerifierApp:
 
                 # 상태 관련
                 'get_state': self._test_get_state,
+                'get_ui_state': self._test_get_state,  # Alias for cert tests
                 'get_policy': self._test_get_policy,
                 'get_settings': self._test_get_settings,
                 'save_settings': self._test_save_settings,
@@ -1316,10 +1339,19 @@ class ConversionVerifierApp:
 
     def _test_get_state(self) -> dict:
         """앱 상태 반환"""
+        # 크레딧 표시 텍스트 가져오기
+        credits_display = None
+        try:
+            if hasattr(self, 'credit_label') and self.credit_label:
+                credits_display = self.credit_label.cget("text")
+        except Exception:
+            pass
+
         return {
             "is_registered": self.is_registered_user,
             "has_credit_manager": self.credit_manager is not None,
             "has_wf_manager": self.wf_manager is not None,
+            "credits_display": credits_display,
             "selected_path": self.SELECTED_PATH,
             "is_admin_mode": self.is_admin_mode,
         }
@@ -1454,9 +1486,9 @@ class ConversionVerifierApp:
     # and migrates any legacy files as needed.
 
     def init_ui(self):
-        # 설정 파일에서 기본/변경 값을 읽어 창 크기 결정 (코드 내 별도 기본값 없음)
-        window_width = self.ui.get("window_width", 580)
-        window_height = self.ui.get("window_height", 180)
+        # app_setting_data.py에서 정의한 앱별 고정 창 크기 사용
+        window_width = self.config.window_width
+        window_height = self.original_window_height  # settings.json ui_config에서 먼저 로드됨
         adjusted_height = window_height
 
         self.width = self.master.winfo_screenwidth()
@@ -1483,7 +1515,8 @@ class ConversionVerifierApp:
             topmost_setting = True
         self.master.wm_attributes("-topmost", 1 if topmost_setting else 0)
         self.master.resizable(True, True)
-        self.master.minsize(window_width, max(120, adjusted_height))
+        # 최소 크기를 기본 크기로 설정
+        self.master.minsize(window_width, adjusted_height)
         
         # 전역 폰트 설정 적용 (메인창 폰트 크기 일관성 보장)
         apply_global_fonts(self.master, self.ui)
@@ -1645,6 +1678,9 @@ class ConversionVerifierApp:
             font=("맑은 고딕", self.ui["font_size"]),
         )
         self.exit_button.grid(row=0, column=3, padx=5, sticky="ew")
+        
+        # Apply adaptive equal vertical spacing
+        apply_equal_vertical_pack(main_frame)
 
         # 초기 데이터 상태 저장
         self.comparison_data = []

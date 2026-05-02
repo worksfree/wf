@@ -21,7 +21,7 @@ Write-Host "`n📸 스크린샷 저장 위치: $ScreenshotDir`n" -ForegroundColo
 # 각 앱 정보
 $apps = @(
     @{name="Bom Exporter"; exe="d:/drive_files/10.worksfree/10.rpa/30.apps/bom_exporter/dist/bom_exporter/bom_exporter.exe"},
-    @{name="DWG Batch Print"; exe="d:/drive_files/10.worksfree/10.rpa/30.apps/dwg_batch_print/dist/dwg_batch_print/dwg_batch_print.exe"},
+    @{name="Batch Print"; exe="d:/drive_files/10.worksfree/10.rpa/30.apps/batch_print/dist/batch_print/batch_print.exe"},
     @{name="DWG Classifier"; exe="d:/drive_files/10.worksfree/10.rpa/50.data/dwg_classifier/dist/dwg_classifier/dwg_classifier.exe"},
     @{name="Conversion Verifier"; exe="d:/drive_files/10.worksfree/10.rpa/50.data/conversion_verifier/dist/conversion_verifier/conversion_verifier.exe"},
     @{name="Korean Filename Normalizer"; exe="d:/drive_files/10.worksfree/10.rpa/50.data/korean_filename_normalizer/dist/korean_filename_normalizer/korean_filename_normalizer.exe"}

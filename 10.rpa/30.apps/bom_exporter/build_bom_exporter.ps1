@@ -20,7 +20,7 @@ Write-Host "[BUILD] Working directory: $ScriptDir" -ForegroundColor Cyan
 $AppName = 'bom_exporter'
 $AppDir = $ScriptDir
 $SpecFile = Join-Path $AppDir 'bom_exporter.spec'
-$Python = 'C:\Python313\python.exe'
+$Python = 'python'
 $PyInstallerArgs = @('-m','PyInstaller','--noconfirm','--log-level=ERROR', $SpecFile)
 $Candidates = 'D:\release\candidates'
 $script:VerifyScript = Join-Path $AppDir '..\..\scripts\verify_package_integrity.ps1'
@@ -59,8 +59,8 @@ function Build-Onedir{
     
     # PyInstaller 캐시 정리
     Clean-Tree "$env:LOCALAPPDATA\pyinstaller"
-    $p = Start-Process -FilePath $Python -ArgumentList $PyInstallerArgs -Wait -PassThru -NoNewWindow
-    if($p.ExitCode -ne 0){ throw "PyInstaller failed ($($p.ExitCode))" }
+    & $Python @PyInstallerArgs
+    if($LASTEXITCODE -ne 0){ throw "PyInstaller failed ($LASTEXITCODE)" }
     if(!(Test-Path "$AppDir\dist\$AppName")){ throw 'dist output missing' }
     return "$AppDir\dist\$AppName"
 }

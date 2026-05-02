@@ -1,0 +1,20 @@
+{
+  "title":               "QR 코드 생성기 {ver}",
+  "run_button":          "QR 생성",
+  "preview_button":      "미리보기",
+  "url_label":           "URL 입력",
+  "generating":          "생성 중...",
+  "done_label":          "생성 완료",
+  "fail_label":          "생성 실패",
+  "preview_placeholder": "QR 코드가 여기에 표시됩니다",
+  "preview_fail":        "미리보기\n로드 실패",
+  "output_folder":       "출력 폴더",
+  "title_text":          "제목 텍스트",
+  "subtitle_text":       "부제목 텍스트",
+  "output_filename":     "출력 파일명",
+  "version":             "QR 버전",
+  "error_correction":    "오류 정정",
+  "module_size":         "모듈 크기",
+  "border":              "테두리",
+  "settings_section":    "QR 코드 설정"
+}

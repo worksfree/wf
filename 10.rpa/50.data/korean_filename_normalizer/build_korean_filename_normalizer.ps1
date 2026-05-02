@@ -15,7 +15,7 @@ $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 $AppName = 'korean_filename_normalizer'
 $AppDir = 'D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer'
 $SpecFile = 'D:\drive_files\10.worksfree\10.rpa\50.data\korean_filename_normalizer\korean_filename_normalizer.spec'
-$Python = 'C:\Python313\python.exe'
+$Python = 'python'
 $PyInstallerArgs = @('-m','PyInstaller','--noconfirm','--log-level=ERROR', $SpecFile)
 $Candidates = 'D:\release\candidates'
 $script:VerifyScript = 'D:\drive_files\10.worksfree\10.rpa\scripts\verify_package_integrity.ps1'
@@ -48,8 +48,8 @@ function Build-Onedir{
         Clean-Tree "$env:LOCALAPPDATA\pyinstaller"
         
         # PyInstaller 실행
-        $p=Start-Process -FilePath $Python -ArgumentList $PyInstallerArgs -Wait -PassThru -NoNewWindow
-        if($p.ExitCode -ne 0){ throw "PyInstaller failed ($($p.ExitCode))" }
+        & $Python @PyInstallerArgs
+        if($LASTEXITCODE -ne 0){ throw "PyInstaller failed ($LASTEXITCODE)" }
         if(!(Test-Path "$AppDir\dist\$AppName")){ throw 'dist missing' }
         
         # 🔄 빌드 후 크레딧 및 사용자 정보 초기화 (포터블 버전에서는 불필요하므로 주석 처리)

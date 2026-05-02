@@ -1,0 +1,14 @@
+{
+  "policy": {
+    "icon_text": "DC",
+    "description": "DWG 파일 분류 도구",
+    "trial_credits": 25000,
+    "credit_per_work": 50,
+    "credit_type": "per_file"
+  },
+  "last_updated": "2026-02-03T12:30:00.000",
+  "source": "default",
+  "identity": {
+    "app_name": "dwg_classifier"
+  }
+}

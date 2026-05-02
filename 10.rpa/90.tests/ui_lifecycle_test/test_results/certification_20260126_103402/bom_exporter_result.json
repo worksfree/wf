@@ -1,0 +1,737 @@
+{
+  "app_name": "bom_exporter",
+  "app_version": "bom_exporter_v0.9.9.7_portable",
+  "level": "NONE",
+  "passed": false,
+  "total_tests": 82,
+  "passed_tests": 53,
+  "failed_tests": 24,
+  "duration": 16.726934,
+  "start_time": "2026-01-26T10:34:02.955903",
+  "end_time": "2026-01-26T10:34:19.682837",
+  "error": "",
+  "suites": [
+    {
+      "name": "Config Suite",
+      "description": "설정 관리 인증 테스트 (policy.json, settings.json 로드 및 검증)",
+      "total": 13,
+      "passed": 8,
+      "failed": 5,
+      "skipped": 0,
+      "duration": 0.107501,
+      "tests": [
+        {
+          "name": "test_01_get_policy",
+          "description": "정책(policy) 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.013300418853759766,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_policy_has_identity",
+          "description": "정책에 앱 식별 정보가 있는지 확인",
+          "result": "FAILED",
+          "duration": 0.0015993118286132812,
+          "message": "정책에 app_name이 있어야 함",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_policy_has_credit_info",
+          "description": "정책에 크레딧 정보가 있는지 확인",
+          "result": "FAILED",
+          "duration": 0.0014541149139404297,
+          "message": "정책에 credit_per_work가 있어야 함",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_get_settings",
+          "description": "설정(settings) 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.0013184547424316406,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_05_settings_has_version",
+          "description": "설정에 버전 정보가 있는지 확인",
+          "result": "FAILED",
+          "duration": 0.0014348030090332031,
+          "message": "설정에 버전 정보가 있어야 함",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_06_policy_trial_credits",
+          "description": "정책의 체험판 크레딧 정보 확인",
+          "result": "FAILED",
+          "duration": 0.0013723373413085938,
+          "message": "정책에 trial_credits가 있어야 함",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_policy_display_name",
+          "description": "정책의 표시 이름 확인",
+          "result": "FAILED",
+          "duration": 0.023869991302490234,
+          "message": "정책에 display_name이 있어야 함",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_config_consistency",
+          "description": "설정과 정책의 일관성 확인",
+          "result": "PASSED",
+          "duration": 0.0027959346771240234,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_wf_rpa_config_exists",
+          "description": "wf_rpa_config.json 로드 확인",
+          "result": "PASSED",
+          "duration": 0.010637760162353516,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_10_email_settings_exist",
+          "description": "이메일 설정이 존재하는지 확인",
+          "result": "PASSED",
+          "duration": 0.014700174331665039,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_11_google_sheets_config",
+          "description": "Google Sheets 설정이 존재하는지 확인",
+          "result": "PASSED",
+          "duration": 0.01608443260192871,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_credentials_available",
+          "description": "인증 정보 파일 존재 확인",
+          "result": "PASSED",
+          "duration": 0.014316797256469727,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_13_config_reload",
+          "description": "설정 리로드 기능 확인",
+          "result": "PASSED",
+          "duration": 0.0013349056243896484,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "Registration Suite",
+      "description": "등록 라이프사이클 인증 테스트 (미등록 상태, 등록 진행, 중복 방지, 동기화)",
+      "total": 15,
+      "passed": 8,
+      "failed": 6,
+      "skipped": 0,
+      "duration": 0.412216,
+      "tests": [
+        {
+          "name": "test_01_get_registration_status",
+          "description": "등록 상태 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.0021026134490966797,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_status_has_required_fields",
+          "description": "등록 상태에 필수 필드가 있는지 확인",
+          "result": "PASSED",
+          "duration": 0.0023822784423828125,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_unregistered_state_detected",
+          "description": "미등록 상태가 올바르게 감지되는지 확인",
+          "result": "FAILED",
+          "duration": 0.04037928581237793,
+          "message": "등록 해제 후 미등록 상태여야 함",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_register_with_email",
+          "description": "이메일 등록이 정상 동작하는지 확인",
+          "result": "FAILED",
+          "duration": 0.027369976043701172,
+          "message": "등록 실패: {'success': False, 'error': \"'WorksFreeManager' object has no attribute 'register'\"}",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_05_registered_email_stored",
+          "description": "등록된 이메일이 저장되는지 확인",
+          "result": "PASSED",
+          "duration": 0.017161846160888672,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_06_duplicate_registration_handled",
+          "description": "중복 등록 시도 처리 확인",
+          "result": "PASSED",
+          "duration": 0.06045079231262207,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_invalid_email_rejected",
+          "description": "잘못된 이메일 형식이 거부되는지 확인",
+          "result": "PASSED",
+          "duration": 0.07563042640686035,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_registration_timestamp",
+          "description": "등록 시간이 기록되는지 확인",
+          "result": "PASSED",
+          "duration": 0.029873371124267578,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_clear_registration",
+          "description": "등록 해제가 정상 동작하는지 확인",
+          "result": "FAILED",
+          "duration": 0.011212587356567383,
+          "message": "등록 해제 후 미등록 상태여야 함",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_10_registration_persists",
+          "description": "등록 상태가 유지되는지 확인 (재시작 없이)",
+          "result": "PASSED",
+          "duration": 0.021695613861083984,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_11_registration_with_trial_credits",
+          "description": "등록 시 체험판 크레딧이 부여되는지 확인",
+          "result": "FAILED",
+          "duration": 0.027955055236816406,
+          "message": "체험판 크레딧 부여: 예상 10000, 실제 0",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_hardware_id_stored",
+          "description": "하드웨어 ID가 등록 정보에 포함되는지 확인",
+          "result": "PASSED",
+          "duration": 0.013821601867675781,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_13_sync_registration_to_server",
+          "description": "등록 정보 서버 동기화 확인",
+          "result": "ERROR",
+          "duration": 0.01572728157043457,
+          "message": "Command failed: Unknown command: sync_registration",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_14_registration_version_tracked",
+          "description": "등록된 앱 버전이 기록되는지 확인",
+          "result": "FAILED",
+          "duration": 0.0057392120361328125,
+          "message": "등록 시 앱 버전이 기록되어야 함",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_15_unregistered_limited_functionality",
+          "description": "미등록 상태에서 기능 제한 확인",
+          "result": "FAILED",
+          "duration": 0.055217742919921875,
+          "message": "미등록 상태여야 함",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "Credit Suite",
+      "description": "크레딧 시스템 인증 테스트 (차감, 부족 차단, 작업 중 소진, 구매, 재개)",
+      "total": 18,
+      "passed": 6,
+      "failed": 11,
+      "skipped": 0,
+      "duration": 0.645884,
+      "tests": [
+        {
+          "name": "test_01_get_credits",
+          "description": "크레딧 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.014935970306396484,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_set_credits",
+          "description": "크레딧 설정이 정상 동작하는지 확인",
+          "result": "FAILED",
+          "duration": 0.030554533004760742,
+          "message": "크레딧 설정 실패: 0 != 5000",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_credit_deduction_single",
+          "description": "단일 작업 시 크레딧이 정책에 맞게 차감되는지 확인",
+          "result": "FAILED",
+          "duration": 0.03026604652404785,
+          "message": "크레딧 차감 오류: 500 - 100 = 400, 실제: 0",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_insufficient_credits_blocked",
+          "description": "크레딧 부족 시 작업이 차단되는지 확인",
+          "result": "FAILED",
+          "duration": 0.03222155570983887,
+          "message": "차단된 작업은 크레딧을 변경하면 안됨",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_05_zero_credits_blocked",
+          "description": "크레딧 0일 때 작업이 차단되는지 확인",
+          "result": "PASSED",
+          "duration": 0.02937769889831543,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_06_credit_deduction_multiple",
+          "description": "여러 파일 작업 시 크레딧이 정확히 차감되는지 확인",
+          "result": "FAILED",
+          "duration": 0.04543280601501465,
+          "message": "다중 파일 크레딧 차감 오류: 3개 파일, 예상: 700, 실제: 0",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_exact_credits_works",
+          "description": "크레딧이 정확히 작업 비용과 같을 때 작업 가능 확인",
+          "result": "PASSED",
+          "duration": 0.0304412841796875,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_one_short_blocked",
+          "description": "크레딧이 1 부족할 때 차단 확인",
+          "result": "PASSED",
+          "duration": 0.029968976974487305,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_mid_work_exhaustion",
+          "description": "작업 중 크레딧 소진 시 중단 및 상태 저장 확인",
+          "result": "FAILED",
+          "duration": 0.017119884490966797,
+          "message": "크레딧 소진 시 처리된 파일 수: 예상 2, 실제 0",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_10_purchase_credits",
+          "description": "크레딧 구매(추가) 기능 확인",
+          "result": "FAILED",
+          "duration": 0.044885873794555664,
+          "message": "크레딧 구매 후: 예상 1000, 실제 0",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_11_resume_after_purchase",
+          "description": "크레딧 구매 후 작업 재개 확인",
+          "result": "PASSED",
+          "duration": 0.03100442886352539,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_12_continuous_work_sequence",
+          "description": "연속 작업 시퀀스 테스트 (10개 파일 중 5번째에서 소진)",
+          "result": "FAILED",
+          "duration": 0.018291711807250977,
+          "message": "5개 파일만 처리되어야 함: 실제 0",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_13_resume_continuous_work",
+          "description": "중단된 연속 작업 재개 테스트",
+          "result": "FAILED",
+          "duration": 0.027569293975830078,
+          "message": "첫 번째 배치: 3개 처리되어야 함, 실제 0",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_14_negative_credits_prevented",
+          "description": "음수 크레딧 방지 확인",
+          "result": "PASSED",
+          "duration": 0.03016829490661621,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_15_large_credit_amount",
+          "description": "대용량 크레딧 처리 확인",
+          "result": "FAILED",
+          "duration": 0.029913902282714844,
+          "message": "대용량 크레딧 설정: 예상 999999999, 실제 0",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_16_credit_persistence_check",
+          "description": "크레딧 값이 일관성 있게 유지되는지 확인",
+          "result": "FAILED",
+          "duration": 0.004255056381225586,
+          "message": "크레딧 일관성 오류 (읽기 #1): 예상 12345, 실제 0",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_17_concurrent_credit_operations",
+          "description": "동시 크레딧 연산 테스트",
+          "result": "FAILED",
+          "duration": 0.1519167423248291,
+          "message": "연속 작업 후 크레딧: 예상 9000, 실제 0",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_18_trial_credits_initial",
+          "description": "체험판 크레딧 초기 지급 확인",
+          "result": "ERROR",
+          "duration": 0.0027599334716796875,
+          "message": "Command failed: Unknown command: get_trial_info",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "State Suite",
+      "description": "상태 관리 인증 테스트 (상태 유지, 세션 관리, 복구, 설정 저장/로드)",
+      "total": 12,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 0.230898,
+      "tests": [
+        {
+          "name": "test_01_get_state",
+          "description": "앱 상태 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.0012927055358886719,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_state_has_required_fields",
+          "description": "상태에 필수 필드가 있는지 확인",
+          "result": "PASSED",
+          "duration": 0.0014638900756835938,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_state_consistency",
+          "description": "상태가 일관성 있게 유지되는지 확인",
+          "result": "PASSED",
+          "duration": 0.10462212562561035,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_save_settings",
+          "description": "설정 저장 기능 확인",
+          "result": "ERROR",
+          "duration": 0.01357412338256836,
+          "message": "Command failed: Unknown command: save_settings",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_05_load_settings",
+          "description": "설정 로드 기능 확인",
+          "result": "ERROR",
+          "duration": 0.002936840057373047,
+          "message": "Command failed: Unknown command: load_settings",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_06_settings_persistence",
+          "description": "설정이 저장 후 로드되는지 확인",
+          "result": "ERROR",
+          "duration": 0.0021538734436035156,
+          "message": "Command failed: Unknown command: save_settings",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_session_id_exists",
+          "description": "세션 ID가 존재하는지 확인",
+          "result": "PASSED",
+          "duration": 0.0020148754119873047,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_last_activity_tracked",
+          "description": "마지막 활동 시간이 추적되는지 확인",
+          "result": "PASSED",
+          "duration": 0.0021369457244873047,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_work_progress_saved",
+          "description": "작업 진행 상태가 저장되는지 확인",
+          "result": "PASSED",
+          "duration": 0.03541207313537598,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_10_state_after_error",
+          "description": "오류 발생 후 상태 유지 확인",
+          "result": "PASSED",
+          "duration": 0.030616044998168945,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_11_concurrent_state_access",
+          "description": "동시 상태 접근 시 일관성 확인",
+          "result": "PASSED",
+          "duration": 0.015253305435180664,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_state_size_reasonable",
+          "description": "상태 크기가 합리적인지 확인",
+          "result": "PASSED",
+          "duration": 0.015119075775146484,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "Recovery Suite",
+      "description": "오류 복구 인증 테스트 (잘못된 입력, 네트워크 오류, 파일 락, 상태 복구)",
+      "total": 12,
+      "passed": 11,
+      "failed": 1,
+      "skipped": 0,
+      "duration": 0.394903,
+      "tests": [
+        {
+          "name": "test_01_invalid_command_handled",
+          "description": "잘못된 명령어 처리 확인",
+          "result": "PASSED",
+          "duration": 0.01481938362121582,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_null_argument_handled",
+          "description": "null 인자 처리 확인",
+          "result": "PASSED",
+          "duration": 0.002958536148071289,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_negative_credits_handled",
+          "description": "음수 크레딧 설정 처리 확인",
+          "result": "PASSED",
+          "duration": 0.027393817901611328,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_empty_string_handled",
+          "description": "빈 문자열 처리 확인",
+          "result": "PASSED",
+          "duration": 0.016894817352294922,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_05_state_preserved_after_error",
+          "description": "오류 발생 후 상태 유지 확인",
+          "result": "FAILED",
+          "duration": 0.004539966583251953,
+          "message": "오류 후에도 크레딧이 유지되어야 함",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_06_rapid_error_recovery",
+          "description": "연속 오류 후 복구 확인",
+          "result": "PASSED",
+          "duration": 0.08319640159606934,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_work_with_invalid_file_count",
+          "description": "잘못된 파일 수로 작업 시도",
+          "result": "PASSED",
+          "duration": 0.049587249755859375,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_large_number_handled",
+          "description": "매우 큰 숫자 처리 확인",
+          "result": "PASSED",
+          "duration": 0.01328587532043457,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_09_timeout_handling",
+          "description": "타임아웃 처리 확인",
+          "result": "PASSED",
+          "duration": 0.02846837043762207,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_10_unicode_handling",
+          "description": "유니코드 문자 처리 확인",
+          "result": "PASSED",
+          "duration": 0.01497793197631836,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_11_special_characters_handled",
+          "description": "특수 문자 처리 확인",
+          "result": "PASSED",
+          "duration": 0.02992105484008789,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_partial_work_recovery",
+          "description": "부분 작업 실패 후 복구 확인",
+          "result": "PASSED",
+          "duration": 0.07650446891784668,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "UI Suite",
+      "description": "UI 응답성 인증 테스트 (버튼 상태, 진행률, 블로킹 없음)",
+      "total": 12,
+      "passed": 11,
+      "failed": 1,
+      "skipped": 0,
+      "duration": 0.367066,
+      "tests": [
+        {
+          "name": "test_01_get_ui_state",
+          "description": "UI 상태 조회가 정상 동작하는지 확인",
+          "result": "PASSED",
+          "duration": 0.014458417892456055,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_02_app_responsive",
+          "description": "앱이 응답하는지 확인",
+          "result": "PASSED",
+          "duration": 0.01609349250793457,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_03_multiple_rapid_calls",
+          "description": "빠른 연속 호출 처리 확인",
+          "result": "PASSED",
+          "duration": 0.13654351234436035,
+          "message": "Passed",
+          "required_for": "BASIC"
+        },
+        {
+          "name": "test_04_button_states",
+          "description": "버튼 상태 조회 확인",
+          "result": "PASSED",
+          "duration": 0.01479792594909668,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_05_work_button_disabled_when_no_credits",
+          "description": "크레딧 부족 시 작업 버튼 비활성화 확인",
+          "result": "PASSED",
+          "duration": 0.03069162368774414,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_06_work_button_enabled_when_credits_available",
+          "description": "크레딧 있을 때 작업 버튼 활성화 확인",
+          "result": "PASSED",
+          "duration": 0.04377007484436035,
+          "message": "Passed",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_07_credits_display_updated",
+          "description": "크레딧 표시 업데이트 확인",
+          "result": "FAILED",
+          "duration": 0.047525644302368164,
+          "message": "크레딧 값 불일치",
+          "required_for": "STANDARD"
+        },
+        {
+          "name": "test_08_progress_indication",
+          "description": "작업 진행률 표시 확인",
+          "result": "PASSED",
+          "duration": 0.003867626190185547,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_09_non_blocking_response",
+          "description": "UI가 블로킹되지 않는지 확인",
+          "result": "PASSED",
+          "duration": 0.028816699981689453,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_10_status_message_available",
+          "description": "상태 메시지 사용 가능 확인",
+          "result": "PASSED",
+          "duration": 0.0018520355224609375,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_11_window_title_reflects_state",
+          "description": "창 제목이 상태를 반영하는지 확인",
+          "result": "PASSED",
+          "duration": 0.010969400405883789,
+          "message": "Passed",
+          "required_for": "FULL"
+        },
+        {
+          "name": "test_12_screenshot_capability",
+          "description": "스크린샷 기능 확인",
+          "result": "PASSED",
+          "duration": 0.014927148818969727,
+          "message": "Passed",
+          "required_for": "FULL"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "identity": {
+    "app_name": "korean_filename_normalizer",
+    "short_name": "kfn",
+    "display_name": "Korean Filename Normalizer"
+  },
+  "policy": {
+    "icon_text": "KFN",
+    "description": "자소분리된 한글 파일명을 다시 자소복원 앱 - 무료",
+    "trial_credits": -1,
+    "credit_per_work": 0,
+    "credit_type": "free"
+  },
+  "source": "bundled",
+  "last_updated": "2026-02-03T16:13:25.545"
+}

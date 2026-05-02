@@ -1,0 +1,17 @@
+{
+  "runtime_config": {
+    "run_mode": "dev",
+    "full_version": "v0.7.0.8",
+    "last_updated": "2026-04-22 20:24:28",
+    "build_count": 8
+  },
+  "app_config": {
+    "primary_dns": "8.8.8.8",
+    "secondary_dns": "8.8.4.4"
+  },
+  "ui_config": {
+    "window_height": 280,
+    "topmost": true,
+    "window_geometry_override": ""
+  }
+}

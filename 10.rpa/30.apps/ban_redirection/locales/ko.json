@@ -1,0 +1,15 @@
+{
+  "title":               "리다이렉션 차단 {ver}",
+  "run_button":          "DNS 적용",
+  "primary_dns":         "Primary DNS",
+  "secondary_dns":       "Secondary DNS",
+  "admin_ok":            "관리자 권한: ✓",
+  "admin_fail":          "관리자 권한: ✗",
+  "interface_checking":  "인터페이스: 확인 중...",
+  "interface_count":     "인터페이스: {n}개",
+  "log_section":         "실행 로그",
+  "complete_msg":        "DNS 설정이 완료되었습니다.\n브라우저를 재시작해주세요.",
+  "fail_msg":            "DNS 설정에 실패했습니다.",
+  "input_error_msg":     "DNS 주소를 모두 입력해주세요.",
+  "input_error_title":   "입력 오류"
+}

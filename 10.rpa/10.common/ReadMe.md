@@ -127,19 +127,21 @@ $env:WF_RPA_MODE = "demo"; python ui_main.py
 
 ### 3. 설정 파일 경로 우선순위
 
-**dev/demo 모드:**
+#### **DEV / DEMO 모드:**
 ```
-1순위: 10.common/config/{app_name}/settings.json
-2순위: {app_folder}/config/{app_name}/settings.json (fallback)
-```
-
-**release 모드:**
-```
-1순위: ~/.wf_rpa/{app_name}/settings.json (사용자 설정 우선)
-2순위: {MEIPASS}/.wf_rpa/{app_name}/settings.json (번들 fallback)
+1순위: 10.common/config/{app_name}/settings.json       ← 개발자 설정
+2순위: {app_folder}/config/{app_name}/settings.json    ← 폴백
 ```
 
-> **설계 의도**: release 모드에서 사용자 홈을 우선 읽어 사용자가 설정을 변경하면 반영되도록 함
+#### **RELEASE 모드:**
+```
+1순위: ~/.wf_rpa/{app_name}/settings.json              ← 사용자 설정 우선
+2순위: {MEIPASS}/.wf_rpa/{app_name}/settings.json      ← 번들 fallback
+```
+
+> **설계 의도**: 
+> - **DEV/DEMO**: 개발자가 프로젝트 내 설정 파일로 빠르게 테스트
+> - **RELEASE**: 사용자 홈의 설정을 우선 읽어 사용자 커스터마이제이션 반영
 
 ---
 

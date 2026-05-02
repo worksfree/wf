@@ -645,6 +645,8 @@ class WorksFreeManager:
         logger.debug(f"정책 병합 완료: {len(merged)}개의 고유한 앱 정책")
         return merged
 
+
+class CreditManager:
     def refresh_policies_from_sheets(self) -> Dict[str, Any]:
         """Google Sheets로부터 정책을 동기화합니다.
         동기화 결과는 전역 파일이 아니라 각 앱의 `~/.wf_rpa/{app}/policy.json`에 반영됩니다.
@@ -727,7 +729,7 @@ class WorksFreeManager:
                         merged.update(policy)
 
                     # 파일이 이미 존재하고 숨김 처리되어 있다면 임시로 숨김 해제
-                    if not self.is_dev_mode and policy_file.exists():
+                    if not self.wf_manager.is_dev_mode and policy_file.exists():
                         self._remove_hidden_attribute(policy_file)
 
                     # 저장
@@ -738,7 +740,7 @@ class WorksFreeManager:
                     with open(policy_file, "w", encoding="utf-8") as f:
                         json.dump(payload, f, ensure_ascii=False, indent=2)
 
-                    if not self.is_dev_mode:
+                    if not self.wf_manager.is_dev_mode:
                         self._set_hidden_attribute(policy_file)
 
                     updated += 1
@@ -784,8 +786,11 @@ class WorksFreeManager:
             if not email_config:
                 return {"success": False, "message": "이메일 설정을 시트에서 가져오지 못했습니다."}
 
-            # 현재 설정 로드 후 병합 저장
-            config = self.load_config()
+            # WorksFreeManager를 통해 설정 로드
+            if not hasattr(self, "wf_manager"):
+                return {"success": False, "message": "WorksFreeManager 인스턴스가 없습니다."}
+
+            config = self.wf_manager.load_config()
             es = (
                 config.get("email_settings", {})
                 if isinstance(config.get("email_settings"), dict)
@@ -820,7 +825,7 @@ class WorksFreeManager:
             es["enabled"] = True
             config["email_settings"] = es
 
-            self.save_config(config)
+            self.wf_manager.save_config(config)
             logger.info("✅ 이메일 설정 동기화 완료 (Sheets → 로컬)")
             logger.debug(
                 f"   email_from={es.get('email_from')} smtp={es.get('smtp_server')}:{es.get('smtp_port')}"
@@ -832,8 +837,6 @@ class WorksFreeManager:
             logger.warning(f"⚠️ 이메일 설정 동기화 실패: {e}")
             return {"success": False, "message": f"이메일 설정 동기화 실패: {e}"}
 
-
-class CreditManager:
     def pull_and_apply_purchases(self) -> Dict[str, Any]:
         """구글 시트에서 새로운 구매 이력을 가져와서 로컬 크레딧에 반영 (idempotent)"""
         with self.lock:
@@ -1313,6 +1316,16 @@ class CreditManager:
     def _sync_on_startup(self):
         """앱 시작 시: credit_changed=True이면 구글 시트와 동기화 시도"""
         try:
+            # 정책/이메일 동기화는 무료 앱 포함 항상 시도
+            try:
+                policy_result = self.refresh_policies_from_sheets()
+                if policy_result.get("success"):
+                    logger.info("✅ 정책 동기화 완료 (startup)")
+                else:
+                    logger.warning(f"⚠️ 정책 동기화 실패: {policy_result.get('message')}")
+            except Exception as e:
+                logger.warning(f"⚠️ 정책 동기화 중 오류 (startup): {e}")
+
             data = self._load_credit_data()
 
             # credit_changed가 False이면 동기화 불필요
@@ -1372,6 +1385,7 @@ class CreditManager:
                 "purchase_history": [],
                 "usage_history": [],
             }
+            
             self._save_credit_data(initial_data)
             logger.info(f"✅ 크레딧 초기화: remaining_trial={trial_amount}")
 

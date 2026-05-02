@@ -18,16 +18,37 @@ _STARTUP_FLUSHED = False
 
 def _detect_run_mode():
     """
-    실행 모드 감지 (환경변수 + sys.argv 기반 통일 방식)
-    - 1순위: WF_RPA_MODE 환경변수 (demo 모드 명시적 지정용)
-    - 2순위: .py 파일 직접 실행 → dev
-    - 3순위: 기본값 release (exe 실행)
+    실행 모드 감지 (BASIC_RULES 준수: settings.json 우선)
+    - 1순위: 10.common/config/{app}/settings.json의 runtime_config.run_mode
+    - 2순위: WF_RPA_MODE 환경변수
+    - 3순위: .py 파일 직접 실행 → dev
+    - 4순위: 기본값 release (exe 실행)
     """
+    # 1순위: settings.json 읽기 (BASIC_RULES 준수)
+    try:
+        import json
+        from pathlib import Path
+        app_root = Path(__file__).resolve().parent
+        settings_path = app_root.parents[1] / "10.common" / "config" / "korean_filename_normalizer" / "settings.json"
+        if settings_path.exists():
+            with open(settings_path, "r", encoding="utf-8-sig") as f:
+                data = json.load(f) or {}
+            cfg_mode = str(data.get("runtime_config", {}).get("run_mode", "") or "").strip().lower()
+            if cfg_mode in ("dev", "demo", "release"):
+                return cfg_mode
+    except Exception:
+        pass
+    
+    # 2순위: 환경변수
     env_mode = (os.environ.get("WF_RPA_MODE") or "").strip().lower()
     if env_mode in ("dev", "demo", "release"):
         return env_mode
+    
+    # 3순위: .py 직접 실행
     if sys.argv[0].endswith(".py"):
         return "dev"
+    
+    # 4순위: 기본값
     return "release"
 
 
@@ -293,7 +314,7 @@ from automation import FilenameProcessor
 
 _log_startup("import automation.FilenameProcessor")
 from ui_setting import create_settings_window
-from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts
+from wf_ui_adaptive import get_adaptive_ui_settings, apply_global_fonts, apply_equal_vertical_pack
 
 _log_startup("import ui_setting")
 
@@ -335,14 +356,15 @@ class KoreanFilenameNormalizerApp:
         # 아이콘 경로 저장 (등록창/설정창에서 사용)
         self.icon_path = self._find_icon_path()
 
-        # 적응형 UI 설정 초기화
-        self.ui = get_adaptive_ui_settings()
-
         # 앱 설정 로드
         self.config = get_config()
 
+        # 적응형 UI 설정 초기화 (config 로드 후 호출 - saved_ui 적용)
+        saved_ui = getattr(self.config, "ui_config", None)
+        self.ui = get_adaptive_ui_settings(saved_ui=saved_ui)
+
         # 로거 초기화
-        self.logger = get_app_logger("korean_filename_normalizer", console_level=logging.INFO)
+        self.logger = get_app_logger("korean_filename_normalizer", console_level=logging.DEBUG)
         self.app = None  # 호환성 유지
         self.paths = None  # 호환성 유지
         self.i18n = None  # 호환성 유지
@@ -440,8 +462,8 @@ class KoreanFilenameNormalizerApp:
 
     def _init_managers_and_ui(self):
         """wf_manager 초기화 후 호출되는 매니저 및 UI 초기화"""
-        self.original_window_height = 160  # 1입력 앱 기본 높이
-        self.expanded_window_height = self.original_window_height + 300  # 관리자 모드: +300 고정
+        self.original_window_height = self.ui.get("window_height", getattr(self.config, "window_height", 200))
+        self.expanded_window_height = self.original_window_height + getattr(self.config, "admin_window_height", 300)  # 관리자 모드: settings.json에서 로드
 
         # 사용자 등록 상태 Early 확인 (플래그/reg_time_local)
         self.is_registered_user = False
@@ -492,7 +514,7 @@ class KoreanFilenameNormalizerApp:
             pass
 
         # UI 생성 (빠르게 띄우고)
-        self.create_widgets()
+        self.init_ui()
 
         # 데모 모드 캡처 초기화
         if self.demo_capture_enabled:
@@ -697,7 +719,7 @@ class KoreanFilenameNormalizerApp:
 
         def worker():
             try:
-                result = self.wf_manager.refresh_policies_from_sheets()
+                result = self.credit_manager.refresh_policies_from_sheets()
                 self.logger.info(f"정책 동기화 결과: {result}")
                 # 정책 업데이트 성공 시 credit_per_work 갱신
                 if result.get("success"):
@@ -816,14 +838,11 @@ class KoreanFilenameNormalizerApp:
         widget.bind("<Enter>", on_enter)
         widget.bind("<Leave>", on_leave)
 
-    def create_widgets(self):
-        """위젯 생성 - BOM2Excel과 동일한 UI 구조"""
-        # 창 제목 설정
-        self.master.title(f"한글 파일명 복원 {APP_VERSION_DISPLAY}")
-
-        # BOM2Excel과 동일한 창 크기 및 위치 설정 (설정 파일 값을 그대로 사용)
-        window_width = self.ui.get("window_width", 580)
-        window_height = self.ui.get("window_height", 180)
+    def init_ui(self):
+        """창 초기화 - settings.json 우선 적용"""
+        # 생성자에서 이미 설정한 self.original_window_height 사용 (settings.json 우선)
+        window_width = self.config.window_width
+        window_height = self.original_window_height  # ← settings.json ui_config에서 먼저 로드됨
         adjusted_height = window_height
 
         # 화면 중앙 배치 (Tk 자체 기능 사용하여 외부 의존성 제거)
@@ -854,13 +873,17 @@ class KoreanFilenameNormalizerApp:
 
         # 개발 시에는 리사이즈 가능
         self.master.resizable(True, True)
-        self.master.minsize(window_width, max(120, adjusted_height))
+        # 최소 크기를 기본 크기로 설정
+        self.master.minsize(window_width, adjusted_height)
 
         # 최상위 설정 (설정 파일에서 추후 확장 가능)
         self.master.wm_attributes("-topmost", 1)
 
         # 전역 폰트 설정 적용 (메인창 폰트 크기 일관성 보장)
         apply_global_fonts(self.master, self.ui)
+
+        # 창 제목 설정
+        self.master.title(f"한글 파일명 복원 {APP_VERSION_DISPLAY}")
 
         # UI 요소 생성
         self.create_ui_elements()
@@ -872,6 +895,11 @@ class KoreanFilenameNormalizerApp:
         # 초기 크레딧 표시 업데이트
         self.update_credit_display()
         self.update_file_count_display()
+
+    def create_widgets(self):
+        """위젯 생성 - init_ui()로 이동됨 (하위 호환성 유지)"""
+        # 하위 호환성을 위해 남겨둠 (사용되지 않음)
+        pass
 
     def create_ui_elements(self):
         """BOM2Excel과 동일한 UI 요소 생성"""
@@ -1039,6 +1067,9 @@ class KoreanFilenameNormalizerApp:
             font=("맑은 고딕", self.ui["font_size"]),
         )
         self.exit_button.grid(row=0, column=3, padx=5, sticky="ew")
+        
+        # Apply adaptive equal vertical spacing
+        apply_equal_vertical_pack(main_frame)
 
         # 초기 크레딧 표시 업데이트
         self.update_credit_display()
@@ -1607,6 +1638,7 @@ class KoreanFilenameNormalizerApp:
                 'sync_registration': self._test_sync_registration,
                 'simulate_work': self._test_simulate_work,
                 'get_state': self._test_get_state,
+                'get_ui_state': self._test_get_state,  # Alias for cert tests
                 'get_policy': self._test_get_policy,
                 'get_settings': self._test_get_settings,
                 'save_settings': self._test_save_settings,
@@ -1749,7 +1781,21 @@ class KoreanFilenameNormalizerApp:
         return {"success": True, "processed_count": processed, "blocked": False, "remaining_credits": current}
 
     def _test_get_state(self) -> dict:
-        return {"is_registered": self.is_registered_user, "has_credit_manager": self.credit_manager is not None, "selected_path": self.SELECTED_PATH, "is_admin_mode": self.is_admin_mode}
+        # 크레딧 표시 텍스트 가져오기
+        credits_display = None
+        try:
+            if hasattr(self, 'credit_label') and self.credit_label:
+                credits_display = self.credit_label.cget("text")
+        except Exception:
+            pass
+
+        return {
+            "is_registered": self.is_registered_user,
+            "has_credit_manager": self.credit_manager is not None,
+            "selected_path": self.SELECTED_PATH,
+            "is_admin_mode": self.is_admin_mode,
+            "credits_display": credits_display
+        }
 
     def _test_get_policy(self) -> dict:
         p = dict(self.credit_manager.policy) if self.credit_manager else {}
@@ -2499,7 +2545,7 @@ class KoreanFilenameNormalizerApp:
         self.admin_mode_start_time = datetime.datetime.now()
 
         # 30분 후 자동 해제 타이머 설정
-        self.admin_mode_timer = self.master.after(30 * 60 * 1000, self._auto_exit_admin_mode)
+        self.admin_mode_timer = self.master.after(1800000, self._auto_exit_admin_mode)
 
         # 창 크기 확장
         current_geometry = self.master.geometry()

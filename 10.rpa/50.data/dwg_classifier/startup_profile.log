@@ -1,5 +1,5 @@
-Total: 898.1ms
+Total: 3721.9ms
 [    0.0ms] main() called
-[  353.6ms] DwgClassifierApp.__init__
-[  845.1ms] App init complete
-[  898.1ms] TestServer started
+[  147.4ms] DwgClassifierApp.__init__
+[  303.0ms] App init complete
+[ 3721.9ms] TestServer started

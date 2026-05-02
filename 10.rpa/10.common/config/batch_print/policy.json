@@ -1,0 +1,20 @@
+{
+  "identity": {
+    "app_name": "batch_print",
+    "short_name": "bp",
+    "display_name": "Batch Print"
+  },
+  "policy": {
+    "icon_text": "BP",
+    "description": "도면 대량 출력 자동화 앱",
+    "pricing_model": "trial_500works",
+    "trial_credits": 20000,
+    "credit_per_work": 40,
+    "auto_activate_trial": true,
+    "require_registration": false,
+    "max_installations": 1,
+    "hardware_based_activation": true
+  },
+  "source": "bundled",
+  "last_updated": "2026-04-29T18:52:20.916"
+}

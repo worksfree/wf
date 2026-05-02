@@ -1,0 +1,665 @@
+{
+  "remaining_trial": -1,
+  "remaining_purchased": 0,
+  "credit_changed": true,
+  "created_at": "2026-01-26T00:00:00.000",
+  "last_updated": "2026-04-29T18:56:20.997",
+  "purchase_history": [],
+  "usage_history": [
+    {
+      "timestamp": "2026-04-29T18:56:20.997",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-29T18:56:03.772",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-29T18:54:21.828",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-29T18:54:08.829",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-29T18:54:04.446",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-29T18:53:57.823",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-29T18:53:57.008",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-02-02T17:59:30.042",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-02-02T16:04:09.565",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-02-02T16:01:38.419",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-02-02T16:00:53.497",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 0,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": -1,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-28T08:13:06.566",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 1,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 3793,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-28T08:12:15.536",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 1,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 3794,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-28T08:11:51.790",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 1,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 3795,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-28T08:11:48.970",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 1,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 3796,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-28T08:11:48.146",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 1,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 3797,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-28T08:11:46.010",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 1,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 3798,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-28T08:10:00.803",
+      "amount": 1,
+      "description": "",
+      "deducted_from": {
+        "trial": 1,
+        "purchased": 0
+      },
+      "remaining_after": {
+        "trial": 3799,
+        "purchased": 0
+      }
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    },
+    {
+      "timestamp": "2000-01-01T00:00:00.000",
+      "credits_used": 0,
+      "operation": "wf_act_test_marker"
+    }
+  ],
+  "session_usage_amount": 7,
+  "session_file_count": 0,
+  "session_last_usage_ts": "2026-04-29T18:56:20.997",
+  "last_usage_amount": 4,
+  "last_usage_timestamp": "2026-02-02T17:59:30.042",
+  "usage_file_count": 0,
+  "usage_per_item_cost": 0,
+  "usage_description": "qrcode_generator 파일 처리 (0개)",
+  "suppress_usage_log": true,
+  "app_version": "v0.7.2.9",
+  "last_synced": "2026-02-02T19:16:20.088"
+}

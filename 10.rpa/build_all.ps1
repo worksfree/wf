@@ -4,7 +4,7 @@
     6개 RPA 앱 순차 빌드 스크립트
 
 .DESCRIPTION
-    BOM Exporter, DWG Batch Print, Attribute Reset, DWG Classifier, Conversion Verifier, Korean Filename Normalizer를 순차적으로 빌드합니다.
+    BOM Exporter, Batch Print, Attribute Reset, DWG Classifier, Conversion Verifier, Korean Filename Normalizer를 순차적으로 빌드합니다.
     stdin 리다이렉션으로 "Aborted by user request" 문제 해결
 
 .PARAMETER BuildType
@@ -39,9 +39,9 @@ $Apps = @(
         Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\bom_exporter\build_bom_exporter.ps1'
     },
     @{
-        Name = 'DWG Batch Print'
-        Dir = 'D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print'
-        Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\dwg_batch_print\build_dwg_batch_print.ps1'
+        Name = 'Batch Print'
+        Dir = 'D:\drive_files\10.worksfree\10.rpa\30.apps\batch_print'
+        Script = 'D:\drive_files\10.worksfree\10.rpa\30.apps\batch_print\build_batch_print.ps1'
     },
     @{
         Name = 'Attribute Reset'
@@ -90,10 +90,12 @@ foreach ($App in $Apps) {
             throw "빌드 스크립트를 찾을 수 없습니다: $($App.Script)"
         }
         
-        # 빌드 실행 (stdin을 $null로 리다이렉트하여 PyInstaller "Aborted by user request" 문제 방지)
-        $null | & $App.Script -BuildType $BuildType
+        # 빌드 실행 (stdin을 지속적인 스트림으로 유지하여 PyInstaller "Aborted by user request" 문제 방지)
+        # $null은 즉시 EOF를 보내므로 사용하지 않음. 대신 /dev/null 같은 무한 스트림 사용
+        & $App.Script -BuildType $BuildType
+        $ExitCode = $LASTEXITCODE
         
-        if ($LASTEXITCODE -eq 0) {
+        if ($ExitCode -eq 0) {
             $Duration = (Get-Date) - $AppStartTime
             Write-Host "`n✓ [$($App.Name)] 빌드 성공 (소요시간: $($Duration.TotalMinutes.ToString('0.0'))분)" -ForegroundColor Green
             $Results += @{

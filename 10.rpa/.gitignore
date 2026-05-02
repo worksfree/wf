@@ -1,0 +1,100 @@
+# Python 캐시
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 가상환경
+venv/
+env/
+ENV/
+.venv
+
+# 테스트 관련
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+.tox/
+
+# 로그
+logs/
+*.log
+startup_profile.log
+test_results.log
+
+# 빌드 아티팩트
+build/
+dist/
+*.spec
+*.exe
+*.msi
+
+# PyInstaller
+*.manifest
+*.spec
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 임시 파일
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+temp_*.ps1
+test_result.txt
+nul
+
+# scripts/ 폴더 임시 파일
+scripts/_*
+
+# 설정 파일 (민감 정보)
+*.json.bak
+*credentials*.json.bak
+.env
+.env.local
+
+# Google Cloud 자격증명 파일 (절대 업로드 금지)
+*silver-argon*.json
+*worksfree*.json
+10.common/credentials/*.json
+!10.common/credentials/*.json.template
+!10.common/credentials/README.md
+
+# OAuth 클라이언트 시크릿
+*client_secret*.json
+
+# 서비스 계정 키
+*service-account*.json
+*serviceaccount*.json
+
+# 사용자 데이터 (홈 디렉토리 설정은 제외)
+# Note: .wf_rpa 폴더는 사용자 홈에 있으므로 여기서 제외 불필요
+
+# 스크린샷 (대용량)
+screenshots/
+*.png
+*.jpg
+*.jpeg
+!res/*.png
+!res/*.jpg
+
+# 엑셀 임시 파일
+~$*.xlsx
+~$*.xls
+
+# 백업 폴더
+10.rpa.backup_*/

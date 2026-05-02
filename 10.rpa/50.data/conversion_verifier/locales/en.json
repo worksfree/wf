@@ -1,0 +1,16 @@
+{
+  "title":         "Conversion Verifier {ver}",
+  "run_button":    "Verify",
+  "complete_msg":  "Conversion verification completed.",
+  "src_format":    "Source format:",
+  "dst_format":    "⇒  Output format:",
+  "filter_all":    "All",
+  "filter_ok":     "✅ Converted",
+  "filter_missing": "⚠️ Missing",
+  "col_no":        "No.",
+  "col_src":       "SLDDRW File",
+  "col_dst":       "DWG File",
+  "col_status":    "Status",
+  "col_size":      "Size",
+  "detail_title":  "📋 Conversion Result Detail"
+}

@@ -575,7 +575,7 @@ class SettingsWindow:
         restart_entry = tk.Entry(restart_frame, textvariable=self.restart_count_var, width=15)
         restart_entry.pack(side="left")
 
-        # 세 번째 줄: 썸네일 포함 체크박스 + 로그 레벨 설정
+        # 세 번째 줄: 썸네일 포함 체크박스
         row3_frame = tk.Frame(settings_frame)
         row3_frame.pack(fill="x", pady=(0, 10))
 
@@ -594,30 +594,6 @@ class SettingsWindow:
         )
         _bind_tooltip(thumbnail_check, "BOM 엑셀 파일에 도면 썸네일 이미지 포함")
         thumbnail_check.pack(side="left")
-
-        # 로그 레벨 설정 (오른쪽)
-        log_level_frame = tk.Frame(row3_frame)
-        log_level_frame.pack(side="right")
-        log_level_label = tk.Label(log_level_frame, text="로그 레벨", font=("맑은 고딕", ui_settings["font_size"]))
-        log_level_label.pack(side="left", padx=(0, 5))
-        _bind_tooltip(log_level_label, "로그 상세 수준 (DEBUG: 모든 정보, ERROR: 오류만)")
-
-        log_level_default = "DEBUG"
-        try:
-            lvl = logging.getLevelName(self.logger.level) if self.logger else "DEBUG"
-            log_level_default = lvl if isinstance(lvl, str) else "DEBUG"
-        except Exception:
-            log_level_default = "DEBUG"
-
-        self.log_level_var = tk.StringVar(value=log_level_default)
-        log_level_combo = ttk.Combobox(
-            log_level_frame,
-            textvariable=self.log_level_var,
-            values=["DEBUG", "INFO", "WARNING", "ERROR"],
-            state="readonly",
-            width=12,
-        )
-        log_level_combo.pack(side="left")
 
         # 타임아웃 설정은 UI에서 제거 (설정 파일에서만 관리)
         # base_wait_time: 60초, seconds_per_10mb: 60초가 기본값으로 사용됨
@@ -775,36 +751,6 @@ class SettingsWindow:
             with open(settings_file, "w", encoding="utf-8") as f:
                 json.dump(settings_data, f, ensure_ascii=False, indent=2)
 
-            # 전역 설정에 로그 레벨 저장 (run_mode별 경로)
-            try:
-                config_file = _resolve_global_config_file()
-                global_config = {}
-                if config_file.exists():
-                    with open(config_file, "r", encoding="utf-8") as f:
-                        global_config = json.load(f) or {}
-                if "system_settings" not in global_config:
-                    global_config["system_settings"] = {}
-                global_config["system_settings"]["log_level"] = self.log_level_var.get()
-                config_file.parent.mkdir(parents=True, exist_ok=True)
-                with open(config_file, "w", encoding="utf-8") as f:
-                    json.dump(global_config, f, ensure_ascii=False, indent=2)
-                
-                # 로그 레벨 즉시 적용
-                log_level_str = self.log_level_var.get()
-                log_level_map = {
-                    "DEBUG": logging.DEBUG,
-                    "INFO": logging.INFO,
-                    "WARNING": logging.WARNING,
-                    "ERROR": logging.ERROR,
-                }
-                if log_level_str in log_level_map:
-                    self.logger.setLevel(log_level_map[log_level_str])
-                    for handler in self.logger.handlers:
-                        handler.setLevel(log_level_map[log_level_str])
-                    self.logger.info(f"✅ 로그 레벨 변경: {log_level_str}")
-            except Exception as e:
-                self.logger.warning(f"⚠️ 로그 레벨 저장 실패: {e}")
-
             # 기존 config 시스템도 업데이트 (호환성을 위해)
             if self.config:
                 self.config.program_path = app_path
@@ -860,17 +806,6 @@ class SettingsWindow:
 
                 # 타임아웃 설정 변경 알림 제거 (UI에서 숨김)
                 
-                # 로그 레벨 비교
-                try:
-                    config_file = _resolve_global_config_file()
-                    if config_file.exists():
-                        with open(config_file, "r", encoding="utf-8") as f:
-                            global_config = json.load(f) or {}
-                        old_log_level = global_config.get("system_settings", {}).get("log_level", "DEBUG")
-                        if self.log_level_var.get() != old_log_level:
-                            changed_settings.append(f"로그 레벨: {self.log_level_var.get()}")
-                except Exception:
-                    pass
             else:
                 # 첫 저장인 경우 현재 설정값들 표시
                 changed_settings.append(f"실행 경로: {Path(app_path).name}")
@@ -885,7 +820,6 @@ class SettingsWindow:
                 changed_settings.append(
                     f"속도: {speed_names.get(self.speed_var.get(), self.speed_var.get())}"
                 )
-                changed_settings.append(f"로그 레벨: {self.log_level_var.get()}")
                 # 타임아웃 설정은 UI에서 제거됨 (설정 파일에서만 관리)
 
             # 메시지 생성

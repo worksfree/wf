@@ -1,0 +1,37 @@
+{
+  "runtime_config": {
+    "run_mode": "dev",
+    "edrawings_path": "C:\\Program Files\\SOLIDWORKS Corp\\eDrawings\\eDrawings.exe",
+    "restart_count": 30,
+    "max_workers": 1,
+    "memory_limit_mb": 1024,
+    "admin_mode": false,
+    "ui_scale": 1.0,
+    "full_version": "v0.7.9.9",
+    "build_count": 99,
+    "language": "ko",
+    "last_updated": "2026-01-02 14:24:18"
+  },
+  "ui_config": {
+    "last_selected_folder": "",
+    "show_log": false,
+    "auto_scroll": true,
+    "show_progress": true,
+    "topmost": true,
+    "window_geometry_override": "",
+    "window_width": 580,
+    "window_height": 200,
+    "admin_window_height": 300
+  },
+  "logging_config": {
+    "log_level": "INFO",
+    "max_log_size_mb": 10,
+    "rotate_logs": true
+  },
+  "print_settings": {
+    "default_input_dir": "",
+    "wait_timeout": 300,
+    "restart_sleep": 5,
+    "final_sleep": 3
+  }
+}

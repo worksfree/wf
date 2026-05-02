@@ -1,0 +1,12 @@
+{
+  "title":                   "DWG 일괄 인쇄 {ver}",
+  "run_button":              "DWG 인쇄",
+  "complete_msg":            "인쇄 작업이 완료되었습니다.",
+  "edrawings_path":          "eDrawings 경로:",
+  "restart_interval":        "재시작 주기 (파일 개수):",
+  "print_wait":              "인쇄 대기 시간 (초):",
+  "restart_wait":            "재시작 대기 시간 (초):",
+  "failed_files_title":      "처리 실패 파일 목록",
+  "print_settings_section":  "인쇄 설정",
+  "general_settings_section": "일반 설정"
+}

@@ -1,0 +1,14 @@
+{
+  "identity": {
+    "app_name": "bom_exporter"
+  },
+  "policy": {
+    "icon_text": "BE",
+    "description": "BOM 엑셀 저장 자동화 앱",
+    "trial_credits": 50000,
+    "credit_per_work": 100,
+    "credit_type": "per_file"
+  },
+  "source": "bundled",
+  "last_updated": "2026-04-29T18:49:31.660"
+}

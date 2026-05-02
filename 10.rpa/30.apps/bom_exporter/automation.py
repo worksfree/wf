@@ -838,6 +838,24 @@ class BomAutomation:
         self._compute_work_dir(folder_path)
         self.logger.debug(f"작업 폴더: {self.WORK_DIR}")
 
+        # ===== 어셈블리 파일 필터링 조건 =====
+        # 기본 규칙 (우선):
+        #   1. 파일명이 '~'로 시작하지 않음 (임시파일 제외)
+        #   2. 파일명 길이 > 18자 (최소 길이 요구)
+        #   3. 파일명 16번째 문자부터 '-00' 포함 (버전 번호 확인)
+        #   4. 확장자가 '.slddrw' (SolidWorks 어셈블리 파일)
+        #
+        # 폴백 규칙 (기본 규칙 미충족 시):
+        #   1. 파일명이 '-00.slddrw'로 끝남 (간단한 버전 확인)
+        #   2. 파일명이 '~'로 시작하지 않음 (임시파일 제외)
+        #
+        # 매칭 예시:
+        #   ✅ A-B-C-D-E-F-00.slddrw      (길이 23, name[15:]='F-00.slddrw' → '-00' 포함)
+        #   ✅ PART_NAME_ASSEMBLY_00.slddrw (길이 27, name[15:]='MBLY_00.slddrw' → '-00' 없음, 폴백)
+        #   ❌ SHORT-00.slddrw            (길이 16, 요구 18 미달)
+        #   ❌ ~temp_assy-00.slddrw       ('~' 시작)
+        #   ✅ Product-Version-A-00.slddrw  (길이 25, name[15:]='rsion-A-00.slddrw' → '-00' 포함)
+
         # Check if there are any ~00.slddrw files in the folder
         try:
             folder_path_obj = Path(folder_path)
@@ -2533,7 +2551,7 @@ def parse_arguments():
 def main():
     """메인 함수 - Non-UI 모드 전용"""
     # 콘솔 모드 전용 로거 (간단한 print 스타일)
-    console_logger = wflog.get_app_logger("bom_exporter_console", console_level=logging.INFO)
+    console_logger = wflog.get_app_logger("bom_exporter_console", console_level=logging.DEBUG)
     console_logger.info("Bom Exporter Automation - Non-UI Mode")
 
     args = parse_arguments()
