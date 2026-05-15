@@ -24,9 +24,9 @@
     /* ── Topbar ── */
     .topbar { display:flex; align-items:center; padding:12px 20px; background:var(--panel); border-bottom:1px solid var(--border); gap:10px; }
     .topbar-title { flex:1; }
-    .topbar-title h1 { font-size:15px; font-weight:600; }
-    .topbar-title .sub { font-size:11px; color:var(--sub); margin-top:1px; }
-    .icon-btn { background:none; border:1px solid var(--border); color:var(--sub); border-radius:6px; padding:5px 10px; font-size:12px; cursor:pointer; font-family:inherit; }
+    .topbar-title h1 { font-size:16px; font-weight:600; }
+    .topbar-title .sub { font-size:12px; color:var(--sub); margin-top:1px; }
+    .icon-btn { background:none; border:1px solid var(--border); color:var(--sub); border-radius:6px; padding:5px 10px; font-size:13px; cursor:pointer; font-family:inherit; }
     .icon-btn:hover { background:var(--border); color:var(--text); }
     .lang-active { color:var(--accent) !important; border-color:var(--accent) !important; }
 
@@ -42,7 +42,7 @@
       color:var(--text); padding:7px 10px; font-size:13px; font-family:inherit;
     }
     .field-row input:focus { outline:none; border-color:var(--accent); }
-    .btn-primary { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:7px 18px; font-size:13px; font-family:inherit; cursor:pointer; font-weight:500; }
+    .btn-primary { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:7px 18px; font-size:14px; font-family:inherit; cursor:pointer; font-weight:500; }
     .btn-primary:hover { opacity:.85; }
     .settings-note { font-size:11px; color:var(--sub); margin-top:10px; line-height:1.7; }
     .settings-note code { background:rgba(255,255,255,.07); padding:1px 5px; border-radius:3px; font-size:11px; }
@@ -53,20 +53,20 @@
     .search-row { display:flex; gap:8px; }
     .search-input {
       flex:1; background:var(--panel); border:1px solid var(--border); border-radius:8px;
-      color:var(--text); padding:10px 16px; font-size:14px; font-family:inherit;
+      color:var(--text); padding:10px 16px; font-size:15px; font-family:inherit;
     }
     .search-input:focus { outline:none; border-color:var(--accent); }
-    .btn-search { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 22px; font-size:14px; font-family:inherit; cursor:pointer; font-weight:500; white-space:nowrap; }
+    .btn-search { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 22px; font-size:15px; font-family:inherit; cursor:pointer; font-weight:500; white-space:nowrap; }
     .btn-search:hover { opacity:.85; }
     .btn-search:disabled { opacity:.45; cursor:default; }
     .recent-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:10px; min-height:24px; }
     .recent-label { font-size:11px; color:var(--sub); }
-    .recent-chip { background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:2px 10px; font-size:12px; cursor:pointer; color:var(--sub); }
+    .recent-chip { background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:2px 10px; font-size:13px; cursor:pointer; color:var(--sub); }
     .recent-chip:hover { color:var(--text); border-color:var(--accent); }
 
     /* ── Results ── */
     .results-wrap { padding:16px 20px 40px; max-width:800px; }
-    .results-meta { font-size:12px; color:var(--sub); margin-bottom:12px; }
+    .results-meta { font-size:13px; color:var(--sub); margin-bottom:12px; }
     .result-list { display:flex; flex-direction:column; gap:8px; }
 
     /* ── Corp card ── */
@@ -75,8 +75,8 @@
     .corp-card.selected { border-color:var(--accent); background:#192640; }
     .card-top { display:flex; align-items:flex-start; gap:10px; margin-bottom:7px; }
     .card-names { flex:1; }
-    .corp-name { font-size:15px; font-weight:600; }
-    .corp-eng  { font-size:11px; color:var(--sub); margin-top:2px; }
+    .corp-name { font-size:16px; font-weight:600; }
+    .corp-eng  { font-size:12px; color:var(--sub); margin-top:2px; }
     .cls-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; white-space:nowrap; flex-shrink:0; margin-top:2px; }
     .cls-Y { background:rgba(245,158,11,.15); color:#f59e0b; }
     .cls-K { background:rgba(16,185,129,.15); color:#10b981; }
@@ -86,7 +86,7 @@
 
     /* ── Mode tabs ── */
     .mode-tabs { display:flex; border-bottom:1px solid var(--border); padding:0 20px; background:var(--bg); }
-    .mode-tab { background:none; border:none; border-bottom:2px solid transparent; color:var(--sub); padding:10px 16px; font-size:13px; font-family:inherit; cursor:pointer; font-weight:500; margin-bottom:-1px; transition:color .15s; }
+    .mode-tab { background:none; border:none; border-bottom:2px solid transparent; color:var(--sub); padding:10px 16px; font-size:15px; font-family:inherit; cursor:pointer; font-weight:500; margin-bottom:-1px; transition:color .15s; }
     .mode-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
     .mode-tab:hover:not(.active) { color:var(--text); }
 
@@ -98,7 +98,7 @@
     .drop-msg  { font-size:14px; font-weight:500; margin-bottom:3px; }
     .drop-sub  { font-size:12px; color:var(--sub); }
     .drop-file { font-size:12px; color:var(--success); margin-top:6px; font-weight:500; }
-    .bulk-textarea { width:100%; background:var(--panel); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:10px 14px; font-size:13px; font-family:inherit; resize:vertical; min-height:72px; margin-bottom:12px; }
+    .bulk-textarea { width:100%; background:var(--panel); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:10px 14px; font-size:14px; font-family:inherit; resize:vertical; min-height:72px; margin-bottom:12px; }
     .bulk-textarea:focus { outline:none; border-color:var(--accent); }
     .bulk-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
     .bulk-count { font-size:12px; color:var(--sub); }
@@ -107,7 +107,7 @@
     .progress-wrap { margin-bottom:14px; }
     .progress-bar  { background:var(--border); border-radius:4px; height:5px; overflow:hidden; margin-bottom:5px; }
     .progress-fill { background:var(--accent); height:100%; border-radius:4px; transition:width .25s; width:0%; }
-    .progress-info { font-size:12px; color:var(--sub); }
+    .progress-info { font-size:13px; color:var(--sub); }
 
     /* ── Bulk results table ── */
     .bulk-table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:8px; }
@@ -121,11 +121,22 @@
     .bs-miss { background:rgba(245,158,11,.15);  color:#f59e0b; }
     .bs-err  { background:rgba(239,68,68,.15);   color:#ef4444; }
     .bs-pend { background:rgba(148,163,184,.1);  color:#94a3b8; }
-    .btn-dl-csv { background:var(--success); color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:12px; font-family:inherit; cursor:pointer; font-weight:500; }
+    .btn-dl-csv { background:var(--success); color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:13px; font-family:inherit; cursor:pointer; font-weight:500; }
     .btn-dl-csv:hover { opacity:.85; }
-    .btn-stop { background:none; border:1px solid var(--danger); color:var(--danger); border-radius:6px; padding:6px 14px; font-size:12px; font-family:inherit; cursor:pointer; }
+    .btn-stop { background:none; border:1px solid var(--danger); color:var(--danger); border-radius:6px; padding:6px 14px; font-size:13px; font-family:inherit; cursor:pointer; }
     .bulk-result-actions { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
-    .bulk-result-meta { font-size:12px; color:var(--sub); }
+    .bulk-result-meta { font-size:13px; color:var(--sub); }
+    .btn-sel-dl { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:13px; font-family:inherit; cursor:pointer; font-weight:500; display:none; }
+    .btn-sel-dl:disabled { opacity:.6; cursor:default; }
+    .btn-fs-row { background:none; border:1px solid var(--border); color:var(--sub); border-radius:4px; padding:2px 8px; font-size:12px; cursor:pointer; font-family:inherit; transition:all .15s; white-space:nowrap; }
+    .btn-fs-row:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .bulk-table td.chk-cell, .bulk-table th.chk-cell { width:32px; text-align:center; padding:7px 4px; }
+    .bulk-table td.act-cell, .bulk-table th.act-cell { width:56px; text-align:center; padding:5px 4px; }
+    .bulk-fs-bar { display:none; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:8px 14px; margin-bottom:10px; align-items:center; gap:8px; flex-wrap:wrap; }
+    .bulk-fs-bar.show { display:flex; }
+    .bulk-fs-bar-label { font-size:12px; color:var(--sub); font-weight:600; white-space:nowrap; }
+    .bulk-fs-sel { background:var(--panel); border:1px solid var(--border); border-radius:6px; color:var(--text); padding:4px 8px; font-size:12px; font-family:inherit; cursor:pointer; }
+    .dl-progress-wrap { display:none; margin-top:10px; }
 
     .card-meta { display:flex; flex-wrap:wrap; gap:4px 18px; font-size:12px; }
     .card-meta-item { display:flex; gap:4px; }
@@ -151,7 +162,7 @@
     .page-info { font-size:12px; color:var(--sub); }
 
     /* ── States ── */
-    .state-box { padding:48px 20px; text-align:center; color:var(--sub); font-size:14px; }
+    .state-box { padding:48px 20px; text-align:center; color:var(--sub); font-size:15px; }
     .state-icon { font-size:36px; margin-bottom:10px; }
     .state-err { color:var(--danger); }
     .spinner { display:inline-block; width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:8px; }
@@ -278,7 +289,7 @@
 <!-- MODE TABS -->
 <div class="mode-tabs">
   <button class="mode-tab active" id="tab-single" onclick="switchMode('single')">단건 조회</button>
-  <button class="mode-tab" id="tab-bulk" onclick="switchMode('bulk')">CSV 대량조회</button>
+  <button class="mode-tab" id="tab-bulk" onclick="switchMode('bulk')">다건조회</button>
 </div>
 
 <!-- BULK MODE -->
@@ -305,6 +316,24 @@
     <div class="progress-wrap" id="bulk-progress" style="display:none">
       <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
       <div class="progress-info" id="progress-info"></div>
+    </div>
+    <div class="bulk-fs-bar" id="bulk-fs-bar">
+      <span class="bulk-fs-bar-label" id="bulk-fs-bar-label">재무제표 옵션:</span>
+      <select class="bulk-fs-sel" id="bulk-fs-year"></select>
+      <select class="bulk-fs-sel" id="bulk-fs-reprt">
+        <option value="11011">사업보고서 (연간)</option>
+        <option value="11012">반기보고서</option>
+        <option value="11013">1분기보고서</option>
+        <option value="11014">3분기보고서</option>
+      </select>
+      <select class="bulk-fs-sel" id="bulk-fs-div">
+        <option value="CFS">연결재무제표</option>
+        <option value="OFS">개별재무제표</option>
+      </select>
+    </div>
+    <div class="dl-progress-wrap" id="dl-progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="dl-progress-fill"></div></div>
+      <div class="progress-info" id="dl-progress-info"></div>
     </div>
     <div id="bulk-results"></div>
   </div>
@@ -367,6 +396,7 @@
 </div>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 /* ── I18N ── */
 const I18N = {
@@ -406,7 +436,7 @@ const I18N = {
     fs_sce_note:'※ 각 행은 자본 구성요소별(자본금·이익잉여금 등) 변동액입니다',
     dash:'-',
     preview_detail_tip:'로그인 후 상세 정보를 확인할 수 있습니다.',
-    tab_single:'단건 조회', tab_bulk:'CSV 대량조회',
+    tab_single:'단건 조회', tab_bulk:'다건조회',
     drop_msg:'CSV 파일을 드래그하거나 클릭하여 업로드',
     drop_sub:'또는 아래에 직접 입력 (회사명·종목코드, 줄바꿈 구분)',
     bulk_ph:'삼성전자\n카카오\n005930\n...',
@@ -419,6 +449,13 @@ const I18N = {
     th_ceo:'대표자', th_bizno:'사업자번호', th_induty:'업종',
     th_stock:'종목코드', th_cls:'상장구분', th_adres:'주소', th_status:'상태',
     bs_ok:'완료', bs_miss:'미매칭', bs_err:'오류', bs_pend:'대기',
+    btn_sel_dl:'📊 선택 Excel 다운로드',
+    bulk_sel_count:'({n}건 선택)',
+    bulk_dl_fs_label:'재무제표 옵션:',
+    bulk_dl_progress:'{done} / {total} 재무제표 조회 중…',
+    bulk_dl_done:'완료 {ok}건 · 실패 {fail}건 — ZIP 다운로드 시작',
+    bulk_dl_limit:'100건 초과 시 처음 100건만 처리됩니다.',
+    btn_fs_row:'📊',
   },
   en: {
     tb_title:'DART Corporate Disclosure', tb_sub:'Korea Financial Supervisory Service',
@@ -456,7 +493,7 @@ const I18N = {
     fs_sce_note:'※ Each row shows changes per equity component (capital, retained earnings, etc.)',
     dash:'-',
     preview_detail_tip:'Log in to view company details.',
-    tab_single:'Single Search', tab_bulk:'Bulk CSV',
+    tab_single:'Single Search', tab_bulk:'Bulk Search',
     drop_msg:'Drag & drop CSV or click to upload',
     drop_sub:'Or enter directly below (company name or ticker, one per line)',
     bulk_ph:'Samsung Electronics\nKakao\n005930\n...',
@@ -469,6 +506,13 @@ const I18N = {
     th_ceo:'CEO', th_bizno:'Business No.', th_induty:'Industry',
     th_stock:'Ticker', th_cls:'Listed', th_adres:'Address', th_status:'Status',
     bs_ok:'OK', bs_miss:'Not Found', bs_err:'Error', bs_pend:'Pending',
+    btn_sel_dl:'📊 Download Excel',
+    bulk_sel_count:'({n} selected)',
+    bulk_dl_fs_label:'FS Options:',
+    bulk_dl_progress:'Fetching {done} / {total}…',
+    bulk_dl_done:'{ok} done · {fail} failed — Downloading ZIP',
+    bulk_dl_limit:'Over 100 selected. Only first 100 will be processed.',
+    btn_fs_row:'📊',
   },
 };
 
@@ -914,21 +958,27 @@ async function processOne(row, idx) {
 /* ── Bulk table render ── */
 function renderBulkTable(rows, done = false) {
   const wrap = document.getElementById('bulk-results');
-  const dlBtn = done
-    ? `<button class="btn-dl-csv" onclick="downloadResultCsv()">${t('btn_dl')}</button>`
-    : '';
   const ok   = rows.filter(r=>r.status==='ok').length;
   const pend = rows.filter(r=>r.status==='pend').length;
-  const meta = done ? t('bulk_done').replace('{ok}',ok).replace('{miss}',rows.filter(r=>r.status==='miss').length).replace('{err}',rows.filter(r=>r.status==='err').length)
-                    : `${ok} / ${rows.length - pend} ${t('results_count')}`;
+  const meta = done
+    ? t('bulk_done').replace('{ok}',ok).replace('{miss}',rows.filter(r=>r.status==='miss').length).replace('{err}',rows.filter(r=>r.status==='err').length)
+    : `${ok} / ${rows.length - pend} ${t('results_count')}`;
+
+  const dlCsvBtn  = done ? `<button class="btn-dl-csv" onclick="downloadResultCsv()">${t('btn_dl')}</button>` : '';
+  const selDlBtn  = done && ok > 0
+    ? `<button class="btn-sel-dl" id="btn-sel-dl" onclick="downloadBulkExcel()">${t('btn_sel_dl')} <span id="sel-count-badge">${t('bulk_sel_count').replace('{n}','0')}</span></button>`
+    : '';
+
   wrap.innerHTML = `
     <div class="bulk-result-actions">
-      ${dlBtn}
+      ${dlCsvBtn}
+      ${selDlBtn}
       <span class="bulk-result-meta">${meta}</span>
     </div>
     <div class="bulk-table-wrap">
       <table class="bulk-table">
         <thead><tr>
+          <th class="chk-cell"><input type="checkbox" id="chk-all" ${done && ok>0 ? '' : 'disabled'} onchange="toggleSelectAll(this)"></th>
           <th>#</th>
           <th>${t('th_input')}</th>
           <th>${t('th_found')}</th>
@@ -939,12 +989,18 @@ function renderBulkTable(rows, done = false) {
           <th>${t('th_cls')}</th>
           <th>${t('th_adres')}</th>
           <th>${t('th_status')}</th>
+          <th class="act-cell">재무</th>
         </tr></thead>
         <tbody>
           ${rows.map((r, i) => buildBulkRow(r, i)).join('')}
         </tbody>
       </table>
     </div>`;
+
+  if (done && ok > 0) {
+    document.getElementById('bulk-fs-bar').classList.add('show');
+    initBulkFsYear();
+  }
 }
 
 function buildBulkRow(r, i) {
@@ -953,7 +1009,12 @@ function buildBulkRow(r, i) {
   const clsLabel = d.corp_cls ? t('cls_'+d.corp_cls) : '';
   const bsCls = { ok:'bs-ok', miss:'bs-miss', err:'bs-err', pend:'bs-pend' }[r.status] || 'bs-pend';
   const bsLbl = t('bs_'+r.status) || r.status;
+  const isOk  = r.status === 'ok';
+  const fsBtn = isOk
+    ? `<button class="btn-fs-row" title="재무제표 조회" onclick="openFinSheet('${d.corp_code}','${(d.corp_name||'').replace(/'/g,"\\'")}','${d.acc_mt||''}')">${t('btn_fs_row')}</button>`
+    : '—';
   return `<tr>
+    <td class="chk-cell"><input type="checkbox" class="row-chk" data-corp-code="${d.corp_code||''}" data-corp-name="${(d.corp_name||'').replace(/"/g,'&quot;')}" data-acc-mt="${d.acc_mt||''}" ${isOk?'':'disabled'} onchange="updateSelCount()"></td>
     <td style="color:var(--sub)">${i+1}</td>
     <td title="${input}">${input}${r.memo?` <span style="color:var(--sub);font-size:10px">${r.memo}</span>`:''}</td>
     <td title="${d.corp_name||''}">${d.corp_name||'—'}</td>
@@ -964,7 +1025,117 @@ function buildBulkRow(r, i) {
     <td>${clsLabel||'—'}</td>
     <td title="${d.adres||''}">${d.adres||'—'}</td>
     <td><span class="bs ${bsCls}">${bsLbl}</span></td>
+    <td class="act-cell">${fsBtn}</td>
   </tr>`;
+}
+
+/* ── 체크박스 제어 ── */
+function toggleSelectAll(chk) {
+  document.querySelectorAll('.row-chk:not(:disabled)').forEach(cb => { cb.checked = chk.checked; });
+  updateSelCount();
+}
+
+function updateSelCount() {
+  const n = document.querySelectorAll('.row-chk:checked').length;
+  const badge = document.getElementById('sel-count-badge');
+  if (badge) badge.textContent = t('bulk_sel_count').replace('{n}', n);
+  const btn = document.getElementById('btn-sel-dl');
+  if (btn) btn.style.display = n > 0 ? '' : 'none';
+  const chkAll = document.getElementById('chk-all');
+  if (chkAll) {
+    const total = document.querySelectorAll('.row-chk:not(:disabled)').length;
+    chkAll.indeterminate = n > 0 && n < total;
+    chkAll.checked = n > 0 && n === total;
+  }
+}
+
+function getSelectedRows() {
+  return [...document.querySelectorAll('.row-chk:checked')].map(cb => ({
+    corp_code: cb.dataset.corpCode,
+    corp_name: cb.dataset.corpName,
+    acc_mt:    cb.dataset.accMt,
+  }));
+}
+
+/* ── Bulk FS year 초기화 ── */
+function initBulkFsYear() {
+  const sel = document.getElementById('bulk-fs-year');
+  if (!sel || sel.options.length > 0) return;
+  const latest = new Date().getFullYear() - 1;
+  for (let y = latest; y >= latest - 4; y--) {
+    const opt = document.createElement('option');
+    opt.value = String(y); opt.textContent = String(y);
+    sel.appendChild(opt);
+  }
+}
+
+/* ── Bulk Excel 다운로드 (ZIP) ── */
+async function downloadBulkExcel() {
+  const selected = getSelectedRows().filter(r => r.corp_code);
+  if (!selected.length) return;
+
+  const LIMIT = 100;
+  const toProcess = selected.slice(0, LIMIT);
+  if (selected.length > LIMIT) alert(t('bulk_dl_limit'));
+
+  const year  = document.getElementById('bulk-fs-year')?.value  || String(new Date().getFullYear() - 1);
+  const reprt = document.getElementById('bulk-fs-reprt')?.value || '11011';
+  const fsDiv = document.getElementById('bulk-fs-div')?.value   || 'CFS';
+
+  const btn = document.getElementById('btn-sel-dl');
+  if (btn) btn.disabled = true;
+
+  const progWrap = document.getElementById('dl-progress-wrap');
+  const progFill = document.getElementById('dl-progress-fill');
+  const progInfo = document.getElementById('dl-progress-info');
+  if (progWrap) progWrap.style.display = '';
+
+  const zip = new JSZip();
+  let done = 0, ok = 0;
+
+  for (const row of toProcess) {
+    if (progFill) progFill.style.width = (done / toProcess.length * 100) + '%';
+    if (progInfo) progInfo.textContent = t('bulk_dl_progress').replace('{done}', done).replace('{total}', toProcess.length);
+    try {
+      const wb = await buildCorpExcelWb(row.corp_code, row.corp_name, year, reprt, fsDiv);
+      if (wb) {
+        const data = XLSX.write(wb, { bookType:'xlsx', type:'array' });
+        const safe = row.corp_name.replace(/[\\/:*?"<>|]/g, '_');
+        zip.file(`fs_${safe}_${year}.xlsx`, data);
+        ok++;
+      }
+    } catch(e) { /* skip */ }
+    done++;
+  }
+
+  if (progFill) progFill.style.width = '100%';
+  if (progInfo) progInfo.textContent = t('bulk_dl_done').replace('{ok}',ok).replace('{fail}',done-ok);
+
+  if (ok > 0) {
+    const blob = await zip.generateAsync({ type:'blob' });
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: `dart_fs_${year}_${new Date().toISOString().slice(0,10)}.zip`,
+    });
+    a.click();
+  }
+
+  if (btn) btn.disabled = false;
+}
+
+/* ── 기업 재무제표 Excel 워크북 생성 (DART API 호출) ── */
+async function buildCorpExcelWb(corpCode, corpName, year, reprt, fsDiv) {
+  const proxy = getProxy();
+  const url   = new URL(proxy);
+  url.searchParams.set('ep',         'fnlttSinglAcntAll.json');
+  url.searchParams.set('corp_code',  corpCode);
+  url.searchParams.set('bsns_year',  year);
+  url.searchParams.set('reprt_code', reprt);
+  url.searchParams.set('fs_div',     fsDiv);
+  const resp = await fetch(url.toString());
+  const data = await resp.json();
+  if (data.status !== '000' || !data.list?.length) return null;
+  return buildFinExcelWb(data.list, corpName, year, fsDiv);
 }
 
 /* ── CSV export ── */
@@ -1172,21 +1343,25 @@ function fmtFsAmount(raw) {
 function downloadFinSheetExcel() {
   if (!_fsData?.list?.length) return;
   const { list, year, fsDiv } = _fsData;
+  const wb   = buildFinExcelWb(list, _fsCorpName, year, fsDiv);
+  const safe = _fsCorpName.replace(/[\\/:*?"<>|]/g, '_');
+  XLSX.writeFile(wb, `fs_${safe}_${year}_${fsDiv}.xlsx`);
+}
 
-  const first   = list[0];
-  const colCur  = first.thstrm_nm      || year + ' 당기';
-  const colPrev = first.frmtrm_nm      || (parseInt(year) - 1) + ' 전기';
-  const colPP   = first.bfefrmtrm_nm   || (parseInt(year) - 2) + ' 전전기';
-  const hasPP   = list.some(r => r.bfefrmtrm_amount && r.bfefrmtrm_amount.trim() !== '' && r.bfefrmtrm_amount.trim() !== '-');
+/* ── Excel 워크북 조립 (단건·대량 공통) ── */
+function buildFinExcelWb(list, corpName, year, fsDiv) {
+  const first    = list[0];
+  const colCur   = first.thstrm_nm      || year + ' 당기';
+  const colPrev  = first.frmtrm_nm      || (parseInt(year) - 1) + ' 전기';
+  const colPP    = first.bfefrmtrm_nm   || (parseInt(year) - 2) + ' 전전기';
+  const hasPP    = list.some(r => r.bfefrmtrm_amount && r.bfefrmtrm_amount.trim() !== '' && r.bfefrmtrm_amount.trim() !== '-');
   const currency = first.currency || 'KRW';
   const unitNote = currency === 'KRW' ? '(단위: 백만원)' : `(Unit: ${currency})`;
   const fsDivNm  = fsDiv === 'CFS' ? '연결재무제표' : '별도재무제표';
-  const safe     = _fsCorpName.replace(/[\\/:*?"<>|]/g, '_');
 
-  const ORDER = ['BS', 'IS', 'CIS', 'CF', 'SCE'];
+  const ORDER   = ['BS', 'IS', 'CIS', 'CF', 'SCE'];
   const SHEET_NM = { BS:'재무상태표', IS:'손익계산서', CIS:'포괄손익계산서', CF:'현금흐름표', SCE:'자본변동표' };
 
-  // sj_div별 그룹화
   const groups = {};
   for (const r of list) {
     if (!groups[r.sj_div]) groups[r.sj_div] = { nm: r.sj_nm, rows: [] };
@@ -1196,9 +1371,9 @@ function downloadFinSheetExcel() {
 
   const wb = XLSX.utils.book_new();
 
-  // ── 시트 1: 안내 (공통 첫 번째 시트)
+  // ── 시트 1: 📌 안내
   const noteRows = [
-    [`${_fsCorpName} 재무제표  |  ${year}년  ${fsDivNm}  ${unitNote}`],
+    [`${corpName} 재무제표  |  ${year}년  ${fsDivNm}  ${unitNote}`],
     [''],
     ['■ 시트 구성'],
     ...divs.map(d => [`    ${SHEET_NM[d] || d}  (${d})`]),
@@ -1215,85 +1390,57 @@ function downloadFinSheetExcel() {
   noteWs['!cols'] = [{ wch: 70 }];
   XLSX.utils.book_append_sheet(wb, noteWs, '📌 안내');
 
-  // ── 시트 2~N: BS / IS / CIS / CF (플랫 테이블)
+  // ── BS / IS / CIS / CF 플랫 테이블
   for (const div of divs.filter(d => d !== 'SCE')) {
     const grp = groups[div];
     const hdr = ['계정과목ID', '계정과목', colCur, colPrev];
     if (hasPP) hdr.push(colPP);
-
     const dataRows = [hdr];
     for (const r of grp.rows) {
-      const row = [
-        r.account_id || '',
-        cleanXbrlLabel(r.account_nm.trim()),
-        parseFsAmount(r.thstrm_amount),
-        parseFsAmount(r.frmtrm_amount),
-      ];
+      const row = [r.account_id || '', cleanXbrlLabel(r.account_nm.trim()), parseFsAmount(r.thstrm_amount), parseFsAmount(r.frmtrm_amount)];
       if (hasPP) row.push(parseFsAmount(r.bfefrmtrm_amount));
       dataRows.push(row);
     }
-
     const ws = XLSX.utils.aoa_to_sheet(dataRows);
     ws['!cols'] = [{ wch: 18 }, { wch: 30 }, { wch: 16 }, { wch: 16 }, ...(hasPP ? [{ wch: 16 }] : [])];
     XLSX.utils.book_append_sheet(wb, ws, SHEET_NM[div] || div);
   }
 
-  // ── 자본변동표 시트: 행렬(피벗) 형태
+  // ── SCE 행렬 피벗
   if (groups['SCE']) {
     const sceRows = groups['SCE'].rows;
-
-    // 행 순서: account_nm 고유값 (등장 순서 유지)
     const txTypes = [], txSeen = new Set();
-    for (const r of sceRows) {
-      const nm = cleanXbrlLabel(r.account_nm.trim());
-      if (!txSeen.has(nm)) { txTypes.push(nm); txSeen.add(nm); }
-    }
-
-    // 열 순서: account_detail 고유값 (등장 순서 유지, "자본|" 접두사 제거)
+    for (const r of sceRows) { const nm = cleanXbrlLabel(r.account_nm.trim()); if (!txSeen.has(nm)) { txTypes.push(nm); txSeen.add(nm); } }
     const eqCols = [], eqSeen = new Set();
     for (const r of sceRows) {
-      const raw    = cleanXbrlLabel((r.account_detail || '').trim());
-      const label  = (raw && raw !== '-') ? raw.replace(/^자본\s*\|?\s*/, '') : '합계';
-      if (!eqSeen.has(label)) { eqCols.push(label); eqSeen.add(label); }
+      const raw = cleanXbrlLabel((r.account_detail || '').trim());
+      const lbl = (raw && raw !== '-') ? raw.replace(/^자본\s*\|?\s*/, '') : '합계';
+      if (!eqSeen.has(lbl)) { eqCols.push(lbl); eqSeen.add(lbl); }
     }
-
-    // 당기: 행×열 → 금액 맵
     const mapCur = {}, mapPrev = {}, mapPP = {};
     for (const r of sceRows) {
-      const nm    = cleanXbrlLabel(r.account_nm.trim());
-      const raw   = cleanXbrlLabel((r.account_detail || '').trim());
-      const label = (raw && raw !== '-') ? raw.replace(/^자본\s*\|?\s*/, '') : '합계';
-      const key   = `${nm}||${label}`;
+      const nm  = cleanXbrlLabel(r.account_nm.trim());
+      const raw = cleanXbrlLabel((r.account_detail || '').trim());
+      const lbl = (raw && raw !== '-') ? raw.replace(/^자본\s*\|?\s*/, '') : '합계';
+      const key = `${nm}||${lbl}`;
       mapCur[key]  = parseFsAmount(r.thstrm_amount);
       mapPrev[key] = parseFsAmount(r.frmtrm_amount);
       if (hasPP) mapPP[key] = parseFsAmount(r.bfefrmtrm_amount);
     }
-
-    // 행렬 조립 — 당기 테이블
-    const buildMatrix = (map, periodLabel) => {
+    const buildMatrix = (map, lbl) => {
       const hdr = ['구분', ...eqCols];
-      const tbl = [[''], [`[ ${periodLabel} ]`], hdr];
-      for (const tx of txTypes) {
-        const row = [tx];
-        for (const eq of eqCols) row.push(map[`${tx}||${eq}`] ?? '');
-        tbl.push(row);
-      }
+      const tbl = [[''], [`[ ${lbl} ]`], hdr];
+      for (const tx of txTypes) { const row = [tx]; for (const eq of eqCols) row.push(map[`${tx}||${eq}`] ?? ''); tbl.push(row); }
       return tbl;
     };
-
-    const matrix = [
-      ...buildMatrix(mapCur,  colCur),
-      [''],
-      ...buildMatrix(mapPrev, colPrev),
-    ];
+    const matrix = [...buildMatrix(mapCur, colCur), [''], ...buildMatrix(mapPrev, colPrev)];
     if (hasPP) matrix.push([''], ...buildMatrix(mapPP, colPP));
-
     const sceWs = XLSX.utils.aoa_to_sheet(matrix);
     sceWs['!cols'] = [{ wch: 26 }, ...eqCols.map(() => ({ wch: 14 }))];
     XLSX.utils.book_append_sheet(wb, sceWs, '자본변동표');
   }
 
-  XLSX.writeFile(wb, `fs_${safe}_${year}_${fsDiv}.xlsx`);
+  return wb;
 }
 
 /* ── 금액 문자열 → 숫자 (Excel용) ── */
