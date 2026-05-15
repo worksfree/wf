@@ -360,12 +360,13 @@
       <div class="state-box" id="fs-init-msg">조회 옵션을 선택 후 [조회]를 누르세요.</div>
     </div>
     <div class="fs-actions" id="fs-actions">
-      <button class="btn-dl-csv" onclick="downloadFinSheetCsv()">📥 <span id="fs-dl-label">CSV 다운로드</span></button>
+      <button class="btn-dl-csv" onclick="downloadFinSheetExcel()">📥 <span id="fs-dl-label">Excel 다운로드</span></button>
       <span class="fs-unit-note" id="fs-unit-note"></span>
     </div>
   </div>
 </div>
 
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
 /* ── I18N ── */
 const I18N = {
@@ -400,7 +401,7 @@ const I18N = {
     fs_empty:'조회된 재무제표가 없습니다. 보고서 종류 또는 연결/개별 구분을 바꿔 다시 시도하세요.',
     fs_unit_krw:'단위: 백만원 (KRW)',
     fs_account:'계정과목',
-    fs_dl_csv:'CSV 다운로드',
+    fs_dl_csv:'Excel 다운로드',
     fs_sj:{ BS:'재무상태표', IS:'손익계산서', CIS:'포괄손익계산서', CF:'현금흐름표', SCE:'자본변동표' },
     fs_sce_note:'※ 각 행은 자본 구성요소별(자본금·이익잉여금 등) 변동액입니다',
     dash:'-',
@@ -450,7 +451,7 @@ const I18N = {
     fs_empty:'No data found. Try a different report type or CFS/OFS setting.',
     fs_unit_krw:'Unit: KRW millions',
     fs_account:'Account',
-    fs_dl_csv:'Download CSV',
+    fs_dl_csv:'Download Excel',
     fs_sj:{ BS:'Balance Sheet', IS:'Income Statement', CIS:'Comprehensive Income', CF:'Cash Flow', SCE:'Changes in Equity' },
     fs_sce_note:'※ Each row shows changes per equity component (capital, retained earnings, etc.)',
     dash:'-',
@@ -992,7 +993,7 @@ function downloadResultCsv() {
 /* ═══════════════════════════════════════
    재무제표 조회 (Financial Statements)
 ═══════════════════════════════════════ */
-let _fsData     = null;  // 마지막 조회 결과 (CSV 다운로드용)
+let _fsData     = null;  // 마지막 조회 결과 (Excel 다운로드용)
 let _fsCorpName = '';
 
 /* ── 상세 패널의 버튼 → 현재 detail 데이터로 모달 열기 ── */
@@ -1167,45 +1168,139 @@ function fmtFsAmount(raw) {
     : abs;
 }
 
-/* ── CSV 다운로드 ── */
-function downloadFinSheetCsv() {
+/* ── Excel 다운로드 (SheetJS) ── */
+function downloadFinSheetExcel() {
   if (!_fsData?.list?.length) return;
   const { list, year, fsDiv } = _fsData;
+
   const first   = list[0];
-  const colCur  = first.thstrm_nm  || year + '_당기';
-  const colPrev = first.frmtrm_nm  || (parseInt(year)-1) + '_전기';
-  const colPP   = first.bfefrmtrm_nm || (parseInt(year)-2) + '_전전기';
+  const colCur  = first.thstrm_nm      || year + ' 당기';
+  const colPrev = first.frmtrm_nm      || (parseInt(year) - 1) + ' 전기';
+  const colPP   = first.bfefrmtrm_nm   || (parseInt(year) - 2) + ' 전전기';
+  const hasPP   = list.some(r => r.bfefrmtrm_amount && r.bfefrmtrm_amount.trim() !== '' && r.bfefrmtrm_amount.trim() !== '-');
+  const currency = first.currency || 'KRW';
+  const unitNote = currency === 'KRW' ? '(단위: 백만원)' : `(Unit: ${currency})`;
+  const fsDivNm  = fsDiv === 'CFS' ? '연결재무제표' : '별도재무제표';
+  const safe     = _fsCorpName.replace(/[\\/:*?"<>|]/g, '_');
 
-  const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const headers = [
-    lang === 'ko' ? '재무제표구분' : 'FS Div',
-    lang === 'ko' ? '재무제표명'   : 'FS Name',
-    lang === 'ko' ? '계정과목ID'   : 'Account ID',
-    lang === 'ko' ? '계정과목'     : 'Account',
-    lang === 'ko' ? '구성항목'     : 'Detail',   // account_detail (SCE 자본구성요소 등)
-    colCur, colPrev, colPP,
-    lang === 'ko' ? '통화' : 'Currency',
+  const ORDER = ['BS', 'IS', 'CIS', 'CF', 'SCE'];
+  const SHEET_NM = { BS:'재무상태표', IS:'손익계산서', CIS:'포괄손익계산서', CF:'현금흐름표', SCE:'자본변동표' };
+
+  // sj_div별 그룹화
+  const groups = {};
+  for (const r of list) {
+    if (!groups[r.sj_div]) groups[r.sj_div] = { nm: r.sj_nm, rows: [] };
+    groups[r.sj_div].rows.push(r);
+  }
+  const divs = [...ORDER.filter(d => groups[d]), ...Object.keys(groups).filter(d => !ORDER.includes(d))];
+
+  const wb = XLSX.utils.book_new();
+
+  // ── 시트 1: 안내 (공통 첫 번째 시트)
+  const noteRows = [
+    [`${_fsCorpName} 재무제표  |  ${year}년  ${fsDivNm}  ${unitNote}`],
+    [''],
+    ['■ 시트 구성'],
+    ...divs.map(d => [`    ${SHEET_NM[d] || d}  (${d})`]),
+    [''],
+    ['■ 자본변동표(SCE) 안내'],
+    ['    행 = 거래유형 (배당, 유상증자, 당기순이익 등)'],
+    ['    열 = 자본구성요소 (자본금, 이익잉여금, 총계 등)'],
+    ['    같은 거래가 여러 자본항목에 영향을 미치므로 행렬 형태로 표시됩니다.'],
+    [''],
+    ['■ 출처: DART 금융감독원 전자공시시스템 (opendart.fss.or.kr)'],
+    [`■ 조회일: ${new Date().toLocaleDateString('ko-KR')}`],
   ];
+  const noteWs = XLSX.utils.aoa_to_sheet(noteRows);
+  noteWs['!cols'] = [{ wch: 70 }];
+  XLSX.utils.book_append_sheet(wb, noteWs, '📌 안내');
 
-  const rows = list.map(r => {
-    const detail = (r.account_detail || '').trim();
-    return [
-      r.sj_div, r.sj_nm, r.account_id || '', r.account_nm,
-      detail !== '-' ? detail : '',
-      r.thstrm_amount || '', r.frmtrm_amount || '', r.bfefrmtrm_amount || '',
-      r.currency || 'KRW',
-    ].map(esc).join(',');
-  });
+  // ── 시트 2~N: BS / IS / CIS / CF (플랫 테이블)
+  for (const div of divs.filter(d => d !== 'SCE')) {
+    const grp = groups[div];
+    const hdr = ['계정과목ID', '계정과목', colCur, colPrev];
+    if (hasPP) hdr.push(colPP);
 
-  const bom  = '﻿';
-  const csv  = bom + headers.map(esc).join(',') + '\n' + rows.join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-  const safe = _fsCorpName.replace(/[\\/:*?"<>|]/g, '_');
-  const a    = Object.assign(document.createElement('a'), {
-    href:     URL.createObjectURL(blob),
-    download: `fs_${safe}_${year}_${fsDiv}.csv`,
-  });
-  a.click();
+    const dataRows = [hdr];
+    for (const r of grp.rows) {
+      const row = [
+        r.account_id || '',
+        cleanXbrlLabel(r.account_nm.trim()),
+        parseFsAmount(r.thstrm_amount),
+        parseFsAmount(r.frmtrm_amount),
+      ];
+      if (hasPP) row.push(parseFsAmount(r.bfefrmtrm_amount));
+      dataRows.push(row);
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(dataRows);
+    ws['!cols'] = [{ wch: 18 }, { wch: 30 }, { wch: 16 }, { wch: 16 }, ...(hasPP ? [{ wch: 16 }] : [])];
+    XLSX.utils.book_append_sheet(wb, ws, SHEET_NM[div] || div);
+  }
+
+  // ── 자본변동표 시트: 행렬(피벗) 형태
+  if (groups['SCE']) {
+    const sceRows = groups['SCE'].rows;
+
+    // 행 순서: account_nm 고유값 (등장 순서 유지)
+    const txTypes = [], txSeen = new Set();
+    for (const r of sceRows) {
+      const nm = cleanXbrlLabel(r.account_nm.trim());
+      if (!txSeen.has(nm)) { txTypes.push(nm); txSeen.add(nm); }
+    }
+
+    // 열 순서: account_detail 고유값 (등장 순서 유지, "자본|" 접두사 제거)
+    const eqCols = [], eqSeen = new Set();
+    for (const r of sceRows) {
+      const raw    = cleanXbrlLabel((r.account_detail || '').trim());
+      const label  = (raw && raw !== '-') ? raw.replace(/^자본\s*\|?\s*/, '') : '합계';
+      if (!eqSeen.has(label)) { eqCols.push(label); eqSeen.add(label); }
+    }
+
+    // 당기: 행×열 → 금액 맵
+    const mapCur = {}, mapPrev = {}, mapPP = {};
+    for (const r of sceRows) {
+      const nm    = cleanXbrlLabel(r.account_nm.trim());
+      const raw   = cleanXbrlLabel((r.account_detail || '').trim());
+      const label = (raw && raw !== '-') ? raw.replace(/^자본\s*\|?\s*/, '') : '합계';
+      const key   = `${nm}||${label}`;
+      mapCur[key]  = parseFsAmount(r.thstrm_amount);
+      mapPrev[key] = parseFsAmount(r.frmtrm_amount);
+      if (hasPP) mapPP[key] = parseFsAmount(r.bfefrmtrm_amount);
+    }
+
+    // 행렬 조립 — 당기 테이블
+    const buildMatrix = (map, periodLabel) => {
+      const hdr = ['구분', ...eqCols];
+      const tbl = [[''], [`[ ${periodLabel} ]`], hdr];
+      for (const tx of txTypes) {
+        const row = [tx];
+        for (const eq of eqCols) row.push(map[`${tx}||${eq}`] ?? '');
+        tbl.push(row);
+      }
+      return tbl;
+    };
+
+    const matrix = [
+      ...buildMatrix(mapCur,  colCur),
+      [''],
+      ...buildMatrix(mapPrev, colPrev),
+    ];
+    if (hasPP) matrix.push([''], ...buildMatrix(mapPP, colPP));
+
+    const sceWs = XLSX.utils.aoa_to_sheet(matrix);
+    sceWs['!cols'] = [{ wch: 26 }, ...eqCols.map(() => ({ wch: 14 }))];
+    XLSX.utils.book_append_sheet(wb, sceWs, '자본변동표');
+  }
+
+  XLSX.writeFile(wb, `fs_${safe}_${year}_${fsDiv}.xlsx`);
+}
+
+/* ── 금액 문자열 → 숫자 (Excel용) ── */
+function parseFsAmount(raw) {
+  if (!raw || raw.trim() === '' || raw.trim() === '-') return '';
+  const n = parseInt(String(raw).replace(/,/g, ''), 10);
+  return isNaN(n) ? raw : n;
 }
 
 /* ── Init ── */
