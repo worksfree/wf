@@ -1,3 +1,7 @@
 name = "dart-api-worker"
 main = "worker.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-01-01"
+
+# 시크릿 키는 아래 명령으로 설정 (여기에 직접 쓰지 말 것):
+#   npx wrangler secret put DART_API_KEY
+# DART_API_KEY: opendart.fss.or.kr 발급 API 키 (미설정 시 기본 키 사용)

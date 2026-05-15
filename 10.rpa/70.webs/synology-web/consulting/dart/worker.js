@@ -2,6 +2,13 @@ const ALLOWED_ORIGIN = '*';
 const DART_API_KEY_DEFAULT = 'e294b0073fed80d6bd91699c93926f8832e39d90';
 const CACHE_KEY = 'https://dart-corp-index/v3';
 
+// Worker가 직접 프록시할 수 있는 DART API 엔드포인트 허용 목록
+const PROXY_EPS = new Set([
+  'company.json',
+  'fnlttSinglAcntAll.json',  // 단일회사 전체 재무제표
+  'fnlttSinglAcnt.json',     // 단일회사 주요 재무제표
+]);
+
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
@@ -32,17 +39,22 @@ async function handleRequest(request) {
     return resolveAndFetch(params, apiKey);
   }
 
+  // 허용되지 않은 엔드포인트 차단
+  if (!PROXY_EPS.has(ep)) {
+    return jsonResp({ status: 'ERR', message: `지원하지 않는 엔드포인트: ${ep}` }, 400);
+  }
+
   const hasCorpName = params.has('corp_name');
   const hasCorpCode = params.has('corp_code');
 
-  // 회사명 검색 → corpCode.xml 인덱스 기반
-  if (hasCorpName && !hasCorpCode) {
+  // 회사명 검색 → corpCode.xml 인덱스 기반 (company.json 전용)
+  if (ep === 'company.json' && hasCorpName && !hasCorpCode) {
     return searchByName(params, apiKey);
   }
 
-  // corp_code → 기업 상세 조회
+  // 직접 프록시: ep 파라미터를 DART API 경로로 사용
   params.delete('stock_code'); // DART API 미지원 파라미터 제거
-  const dartUrl = `https://opendart.fss.or.kr/api/company.json?${params}`;
+  const dartUrl = `https://opendart.fss.or.kr/api/${ep}?${params}`;
   try {
     const resp = await fetch(dartUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
     return new Response(await resp.text(), {
