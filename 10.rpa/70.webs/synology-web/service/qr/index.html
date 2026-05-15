@@ -1,0 +1,819 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>QR 코드 생성기 — WorksFree v0.7.0.1</title>
+<meta id="meta-desc" name="description" content="URL 또는 텍스트를 입력하고 파라미터를 설정한 후 QR을 생성하세요.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:#0f1117; --panel:#1c2333; --border:#2a3347;
+  --accent:#3b82f6; --accent2:#06b6d4; --success:#10b981;
+  --text:#e2e8f0; --muted:#64748b; --hover:#243049; --radius:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'IBM Plex Sans KR',sans-serif;
+  background:var(--bg); color:var(--text); font-size:18px;
+  min-height:100vh; padding:24px 28px;
+  padding-bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 24px));
+}
+
+.page-title{font-size:20px;font-weight:600;margin-bottom:4px;}
+.page-desc{font-size:17px;color:var(--muted);margin-bottom:24px;}
+
+.qr-layout{
+  display:grid;
+  grid-template-columns:320px 1fr;
+  gap:18px; align-items:start;
+}
+@media(max-width:720px){.qr-layout{grid-template-columns:1fr;}}
+
+.panel{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); padding:18px;
+}
+.panel-title{
+  font-size:15px; font-weight:600; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.08em;
+  margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--border);
+}
+.form-group{margin-bottom:13px;}
+.form-group label{display:block;font-size:16px;font-weight:500;color:#94a3b8;margin-bottom:5px;}
+.form-group input[type="url"],
+.form-group input[type="text"],
+.form-group select{
+  width:100%; background:var(--bg); border:1px solid var(--border);
+  border-radius:6px; color:var(--text); padding:8px 10px;
+  font-size:17px; font-family:inherit; outline:none; transition:border-color .2s;
+}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent);}
+.form-group input[type="range"]{width:100%;accent-color:var(--accent);cursor:pointer;}
+.range-row{display:flex;align-items:center;gap:8px;}
+.range-val{font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--accent2);min-width:36px;text-align:right;}
+.color-row{display:flex;gap:8px;}
+.color-item{flex:1;}
+.color-item label{display:block;font-size:15px;color:var(--muted);margin-bottom:4px;}
+.color-pair{
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:6px; padding:4px 8px;
+}
+.color-pair input[type="color"]{width:22px;height:22px;border:none;background:none;cursor:pointer;padding:0;}
+.color-pair input[type="text"]{
+  background:none;border:none;color:var(--text);
+  font-family:'IBM Plex Mono',monospace;font-size:16px;width:66px;outline:none;padding:0;
+}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;}
+.toggle{position:relative;display:inline-block;width:34px;height:18px;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:18px;cursor:pointer;transition:.2s;}
+.toggle-slider:before{content:'';position:absolute;width:12px;height:12px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s;}
+.toggle input:checked+.toggle-slider{background:var(--accent);}
+.toggle input:checked+.toggle-slider:before{transform:translateX(16px);}
+
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;padding:10px;border:none;border-radius:6px;
+  font-size:17px;font-weight:600;font-family:inherit;cursor:pointer;
+  transition:opacity .15s,transform .1s;
+}
+.btn:hover{opacity:.88;} .btn:active{transform:scale(.98);}
+.btn-primary{background:var(--accent);color:white;}
+.btn-success{background:var(--success);color:white;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-outline:hover{border-color:var(--accent);color:#93c5fd;background:var(--hover);}
+.btn-sm{padding:7px 14px;width:auto;font-size:16px;}
+.btn-group{display:flex;gap:8px;}
+
+/* ── Mode tabs ── */
+.mode-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;gap:0;}
+.mode-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:9px 18px;font-size:16px;font-family:inherit;cursor:pointer;font-weight:500;margin-bottom:-1px;transition:color .15s;}
+.mode-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.mode-tab:hover:not(.active){color:var(--text);}
+
+/* ── Bulk panel ── */
+.bulk-layout{max-width:900px;}
+.dropzone{border:2px dashed var(--border);border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:10px;}
+.dropzone:hover,.dropzone.drag-over{border-color:var(--accent);background:rgba(59,130,246,.04);}
+.drop-icon{font-size:30px;margin-bottom:6px;}
+.drop-msg{font-size:16px;font-weight:500;margin-bottom:3px;}
+.drop-sub{font-size:14px;color:var(--muted);}
+.drop-file{font-size:13px;color:var(--success);margin-top:6px;font-weight:500;}
+.bulk-textarea{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 14px;font-size:15px;font-family:inherit;resize:vertical;min-height:80px;margin-bottom:12px;outline:none;}
+.bulk-textarea:focus{border-color:var(--accent);}
+.bulk-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.bulk-count{font-size:13px;color:var(--muted);}
+.btn-stop{background:none;border:1px solid #ef4444;color:#ef4444;border-radius:6px;padding:7px 16px;font-size:15px;font-family:inherit;cursor:pointer;}
+.btn-dl-zip{background:var(--success);color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:15px;font-family:inherit;cursor:pointer;font-weight:600;}
+.btn-dl-zip:hover{opacity:.85;}
+
+/* ── Progress ── */
+.bulk-progress{margin-bottom:14px;display:none;}
+.progress-bar{background:var(--border);border-radius:4px;height:5px;overflow:hidden;margin-bottom:5px;}
+.progress-fill{background:var(--accent);height:100%;border-radius:4px;transition:width .2s;width:0%;}
+.progress-info{font-size:13px;color:var(--muted);}
+
+/* ── Thumbnail grid ── */
+.bulk-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;}
+.bulk-card{width:96px;text-align:center;}
+.bulk-card-img{width:96px;height:96px;border-radius:6px;border:1px solid var(--border);background:var(--panel);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+.bulk-card-img img{width:100%;height:100%;object-fit:contain;}
+.bulk-card-spin{font-size:18px;color:var(--muted);animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.bulk-card-err{font-size:22px;color:#ef4444;}
+.bulk-card-name{font-size:10px;color:var(--muted);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:96px;}
+.bulk-card-ok::after{content:'✓';position:absolute;bottom:3px;right:5px;font-size:11px;color:var(--success);font-weight:700;}
+.bulk-result-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.bulk-result-meta{font-size:13px;color:var(--muted);}
+
+/* 프리뷰 */
+.preview-panel{display:flex;flex-direction:column;gap:14px;}
+.preview-box{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;
+  min-height:320px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.preview-empty{text-align:center;color:var(--muted);}
+.preview-empty .icon{font-size:42px;margin-bottom:10px;opacity:.25;}
+.preview-empty p{font-size:17px;}
+#qr-preview-wrapper{display:none;flex-direction:column;align-items:center;gap:0;border-radius:6px;}
+#qr-top-label{font-size:17px;font-weight:600;margin-bottom:4px;text-align:center;}
+#qr-canvas-area{display:inline-block;border-radius:0;}
+#qr-bottom-label{font-size:16px;margin-top:4px;text-align:center;font-family:'IBM Plex Mono',monospace;}
+
+.preview-actions{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;}
+.preview-meta{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--muted);margin-bottom:12px;line-height:1.8;}
+.preview-meta span{color:var(--accent2);}
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:15px;padding:3px 8px;border-radius:20px;margin-left:8px;}
+.badge-ready{background:#052e16;color:#34d399;border:1px solid #064e3b;}
+.badge-wait{background:#1c1917;color:var(--muted);border:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<!-- MODE TABS -->
+<div class="mode-tabs">
+  <button class="mode-tab active" id="tab-single" onclick="switchQrMode('single')">단건 생성</button>
+  <button class="mode-tab" id="tab-bulk" onclick="switchQrMode('bulk')">CSV 대량생성</button>
+</div>
+
+<!-- BULK MODE -->
+<div id="mode-bulk" style="display:none">
+  <div class="bulk-layout">
+    <div class="dropzone" id="dropzone"
+         onclick="document.getElementById('bulk-file').click()"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="onBulkFileDrop(event)">
+      <input type="file" id="bulk-file" accept=".csv,.txt" style="display:none" onchange="onBulkFileSelect(event)">
+      <div class="drop-icon">📄</div>
+      <div class="drop-msg" id="drop-msg">CSV 파일을 드래그하거나 클릭하여 업로드</div>
+      <div class="drop-sub" id="drop-sub">또는 아래에 URL을 줄바꿈으로 구분해서 입력</div>
+      <div class="drop-file" id="drop-file"></div>
+    </div>
+    <textarea class="bulk-textarea" id="bulk-textarea" rows="4"></textarea>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px;" id="lbl-bulk-inherit">현재 단건 설정 (크기·색상·라벨) 상속</div>
+    <div class="bulk-actions">
+      <button class="btn btn-primary btn-sm" id="btn-bulk-start" onclick="startBulk()">생성 시작</button>
+      <button class="btn btn-outline btn-sm" id="btn-bulk-tmpl" onclick="downloadBulkTemplate()">템플릿 다운로드</button>
+      <span class="bulk-count" id="bulk-count"></span>
+      <button class="btn-stop" id="btn-bulk-stop" onclick="stopBulk()" style="display:none">중지</button>
+    </div>
+    <div class="bulk-progress" id="bulk-progress">
+      <div class="progress-bar"><div class="progress-fill" id="bulk-progress-fill"></div></div>
+      <div class="progress-info" id="bulk-progress-info"></div>
+    </div>
+    <div id="bulk-result-wrap" style="display:none">
+      <div class="bulk-result-bar">
+        <button class="btn-dl-zip" id="btn-bulk-dl" onclick="downloadBulkZip()">ZIP 다운로드</button>
+        <span class="bulk-result-meta" id="bulk-result-meta"></span>
+      </div>
+      <div class="bulk-grid" id="bulk-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SINGLE MODE -->
+<div id="mode-single">
+
+<div class="page-title"><span id="lbl-page-title">QR 코드 생성기</span> <span id="qr-status-badge" class="status-badge badge-wait">⬤ <span id="lbl-status-text">대기중</span></span></div>
+<div class="page-desc" id="lbl-page-desc">URL 또는 텍스트를 입력하고 파라미터를 설정한 후 QR을 생성하세요.</div>
+
+<div class="qr-layout">
+  <!-- 설정 패널 -->
+  <div>
+    <div class="panel">
+      <div class="panel-title" id="lbl-panel-basic">입력 · 기본 설정</div>
+      <div class="form-group">
+        <label id="lbl-url-text">URL / 텍스트 *</label>
+        <input type="url" id="qrInput" placeholder="https://example.com" oninput="onInputChange()">
+      </div>
+      <div class="form-group">
+        <label id="lbl-qr-size">QR 크기</label>
+        <div class="range-row">
+          <input type="range" id="qrSize" min="64" max="400" value="200" oninput="updateRange('qrSize','sizeVal');onInputChange()">
+          <span class="range-val" id="sizeVal">200px</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label id="lbl-ec-level">오류 정정 수준</label>
+        <select id="qrLevel" onchange="onInputChange()">
+          <option value="L" id="opt-L">L — 7% 복구 (단순 환경)</option>
+          <option value="M" selected id="opt-M">M — 15% 복구 (일반)</option>
+          <option value="Q" id="opt-Q">Q — 25% 복구 (로고 삽입 예정)</option>
+          <option value="H" id="opt-H">H — 30% 복구 (열악한 환경)</option>
+        </select>
+      </div>
+      <div class="divider"></div>
+      <div class="panel-title" id="lbl-panel-color">색상 설정</div>
+      <div class="color-row">
+        <div class="color-item">
+          <label id="lbl-fg-color">전경색</label>
+          <div class="color-pair">
+            <input type="color" id="fgColor" value="#000000" oninput="syncColor('fgColor','fgHex');onInputChange()">
+            <input type="text"  id="fgHex"   value="#000000" maxlength="7" oninput="syncHex('fgHex','fgColor');onInputChange()">
+          </div>
+        </div>
+        <div class="color-item">
+          <label id="lbl-bg-color">배경색</label>
+          <div class="color-pair">
+            <input type="color" id="bgColor" value="#ffffff" oninput="syncColor('bgColor','bgHex');onInputChange()">
+            <input type="text"  id="bgHex"   value="#ffffff" maxlength="7" oninput="syncHex('bgHex','bgColor');onInputChange()">
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="panel-title" id="lbl-panel-label">라벨 설정</div>
+      <div class="form-group">
+        <label id="lbl-top-label">상단 라벨 (선택)</label>
+        <input type="text" id="labelTop" placeholder="예: WorksFree" oninput="onInputChange()">
+      </div>
+      <div class="form-group">
+        <label id="lbl-bot-label">하단 라벨 (비우면 URL 자동)</label>
+        <input type="text" id="labelBot" placeholder="예: scan me" oninput="onInputChange()">
+      </div>
+      <div class="form-group">
+        <label id="lbl-label-color">라벨 색상</label>
+        <div class="color-pair" style="width:fit-content">
+          <input type="color" id="lblColor" value="#000000" oninput="syncColor('lblColor','lblHex');onInputChange()">
+          <input type="text"  id="lblHex"   value="#000000" maxlength="7" oninput="syncHex('lblHex','lblColor');onInputChange()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label id="lbl-label-size">라벨 폰트 크기</label>
+        <div class="range-row">
+          <input type="range" id="lblSize" min="9" max="24" value="13" oninput="updateRange('lblSize','lblSizeVal');onInputChange()">
+          <span class="range-val" id="lblSizeVal">13px</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label id="lbl-margin">여백 (Quiet Zone)</label>
+        <div class="range-row">
+          <input type="range" id="qrMargin" min="0" max="40" value="12" oninput="updateRange('qrMargin','marginVal');onInputChange()">
+          <span class="range-val" id="marginVal">12px</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="form-group">
+        <div class="toggle-row">
+          <label style="margin:0" id="lbl-auto-gen">실시간 자동 생성</label>
+          <label class="toggle">
+            <input type="checkbox" id="autoGen" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-generate" onclick="generateQR()">⚡ QR 생성</button>
+    </div>
+  </div>
+
+  <!-- 프리뷰 -->
+  <div class="preview-panel">
+    <div class="panel">
+      <div class="panel-title" id="lbl-panel-preview">미리보기</div>
+      <div class="preview-box">
+        <div class="preview-empty" id="previewEmpty">
+          <div class="icon">▣</div>
+          <p id="lbl-preview-empty">URL을 입력하면<br>QR 코드가 여기에 표시됩니다</p>
+        </div>
+        <div id="qr-preview-wrapper">
+          <div id="qr-top-label"></div>
+          <div id="qr-canvas-area"><div id="qr-output"></div></div>
+          <div id="qr-bottom-label"></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-actions">
+      <div class="panel-title" id="lbl-panel-download">다운로드</div>
+      <div class="preview-meta" id="previewMeta"><span id="lbl-status-prefix">상태:</span> <span id="lbl-meta-status">대기중</span></div>
+      <div class="btn-group">
+        <button class="btn btn-success btn-sm" onclick="downloadQR('png')" id="btnPng" disabled>⬇ <span id="lbl-btn-png">PNG 저장</span></button>
+        <button class="btn btn-outline btn-sm" onclick="downloadQR('jpg')" id="btnJpg" disabled>⬇ <span id="lbl-btn-jpg">JPG 저장</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /mode-single -->
+
+<script>
+let qrInstance=null, qrReady=false, debounceTimer=null;
+let lang = localStorage.getItem('wf_lang') || 'ko';
+
+const I18N = {
+  ko: {
+    pageTitle: 'QR 코드 생성기',
+    pageDesc: 'URL 또는 텍스트를 입력하고 파라미터를 설정한 후 QR을 생성하세요.',
+    statusWait: '대기중',
+    statusReady: '생성완료',
+    panelBasic: '입력 · 기본 설정',
+    labelUrlText: 'URL / 텍스트 *',
+    labelQrSize: 'QR 크기',
+    labelEcLevel: '오류 정정 수준',
+    optL: 'L — 7% 복구 (단순 환경)',
+    optM: 'M — 15% 복구 (일반)',
+    optQ: 'Q — 25% 복구 (로고 삽입 예정)',
+    optH: 'H — 30% 복구 (열악한 환경)',
+    panelColor: '색상 설정',
+    labelFgColor: '전경색',
+    labelBgColor: '배경색',
+    panelLabel: '라벨 설정',
+    labelTopLabel: '상단 라벨 (선택)',
+    placeholderTop: '예: WorksFree',
+    labelBotLabel: '하단 라벨 (비우면 URL 자동)',
+    placeholderBot: '예: scan me',
+    labelLabelColor: '라벨 색상',
+    labelLabelSize: '라벨 폰트 크기',
+    labelMargin: '여백 (Quiet Zone)',
+    labelAutoGen: '실시간 자동 생성',
+    btnGenerate: '⚡ QR 생성',
+    panelPreview: '미리보기',
+    previewEmpty: 'URL을 입력하면<br>QR 코드가 여기에 표시됩니다',
+    panelDownload: '다운로드',
+    statusPrefix: '상태:',
+    metaStatusWait: '대기중',
+    btnPng: 'PNG 저장',
+    btnJpg: 'JPG 저장',
+    metaSize: '크기',
+    metaEC: '오류정정',
+    metaMargin: '여백',
+    metaFg: '전경',
+    metaBg: '배경',
+    tabSingle:'단건 생성', tabBulk:'CSV 대량생성',
+    dropMsg:'CSV 파일을 드래그하거나 클릭하여 업로드',
+    dropSub:'또는 아래에 URL을 줄바꿈으로 구분해서 입력',
+    bulkPh:'https://worksfree.co.kr\nhttps://portal.worksfree.kr\nhttps://...',
+    btnStart:'생성 시작', btnStop:'중지', btnTmpl:'템플릿 다운로드', btnDlZip:'ZIP 다운로드',
+    bulkPreview:'로그인 후 대량 생성을 이용할 수 있습니다.',
+    bulkRows:'{n}건 입력됨',
+    bulkProcessing:'{done} / {total} 생성 중…',
+    bulkDone:'완료 {ok}건 · 오류 {err}건',
+    bulkInherit:'현재 단건 설정 (크기·색상·라벨) 상속',
+  },
+  en: {
+    pageTitle: 'QR Code Generator',
+    pageDesc: 'Enter a URL or text, configure parameters, then generate your QR code.',
+    statusWait: 'Waiting',
+    statusReady: 'Generated',
+    panelBasic: 'Input · Basic Settings',
+    labelUrlText: 'URL / Text *',
+    labelQrSize: 'QR Size',
+    labelEcLevel: 'Error Correction Level',
+    optL: 'L — 7% recovery (simple env)',
+    optM: 'M — 15% recovery (standard)',
+    optQ: 'Q — 25% recovery (logo overlay)',
+    optH: 'H — 30% recovery (harsh env)',
+    panelColor: 'Color Settings',
+    labelFgColor: 'Foreground',
+    labelBgColor: 'Background',
+    panelLabel: 'Label Settings',
+    labelTopLabel: 'Top Label (optional)',
+    placeholderTop: 'e.g. WorksFree',
+    labelBotLabel: 'Bottom Label (blank = auto URL)',
+    placeholderBot: 'e.g. scan me',
+    labelLabelColor: 'Label Color',
+    labelLabelSize: 'Label Font Size',
+    labelMargin: 'Quiet Zone Margin',
+    labelAutoGen: 'Auto-generate (live)',
+    btnGenerate: '⚡ Generate QR',
+    panelPreview: 'Preview',
+    previewEmpty: 'Enter a URL to display<br>the QR code here',
+    panelDownload: 'Download',
+    statusPrefix: 'Status:',
+    metaStatusWait: 'Waiting',
+    btnPng: 'Save PNG',
+    btnJpg: 'Save JPG',
+    metaSize: 'Size',
+    metaEC: 'EC Level',
+    metaMargin: 'Margin',
+    metaFg: 'Foreground',
+    metaBg: 'Background',
+    tabSingle:'Single', tabBulk:'Bulk CSV',
+    dropMsg:'Drag & drop CSV or click to upload',
+    dropSub:'Or enter URLs below, one per line',
+    bulkPh:'https://worksfree.co.kr\nhttps://portal.worksfree.kr\nhttps://...',
+    btnStart:'Generate', btnStop:'Stop', btnTmpl:'Download Template', btnDlZip:'Download ZIP',
+    bulkPreview:'Please log in to use bulk generation.',
+    bulkRows:'{n} rows entered',
+    bulkProcessing:'{done} / {total} generating…',
+    bulkDone:'Done: {ok} · Errors: {err}',
+    bulkInherit:'Inherit current settings (size, colors, labels)',
+  }
+};
+
+function applyLang(l) {
+  lang = l;
+  document.documentElement.lang = l;
+  localStorage.setItem('wf_lang', l);
+  const t = I18N[l] || I18N.ko;
+
+  document.getElementById('lbl-page-title').textContent = t.pageTitle;
+  document.getElementById('lbl-page-desc').textContent = t.pageDesc;
+  document.getElementById('lbl-status-text').textContent = qrReady ? t.statusReady : t.statusWait;
+  document.getElementById('lbl-panel-basic').textContent = t.panelBasic;
+  document.getElementById('lbl-url-text').textContent = t.labelUrlText;
+  document.getElementById('lbl-qr-size').textContent = t.labelQrSize;
+  document.getElementById('lbl-ec-level').textContent = t.labelEcLevel;
+  document.getElementById('opt-L').textContent = t.optL;
+  document.getElementById('opt-M').textContent = t.optM;
+  document.getElementById('opt-Q').textContent = t.optQ;
+  document.getElementById('opt-H').textContent = t.optH;
+  document.getElementById('lbl-panel-color').textContent = t.panelColor;
+  document.getElementById('lbl-fg-color').textContent = t.labelFgColor;
+  document.getElementById('lbl-bg-color').textContent = t.labelBgColor;
+  document.getElementById('lbl-panel-label').textContent = t.panelLabel;
+  document.getElementById('lbl-top-label').textContent = t.labelTopLabel;
+  document.getElementById('labelTop').placeholder = t.placeholderTop;
+  document.getElementById('lbl-bot-label').textContent = t.labelBotLabel;
+  document.getElementById('labelBot').placeholder = t.placeholderBot;
+  document.getElementById('lbl-label-color').textContent = t.labelLabelColor;
+  document.getElementById('lbl-label-size').textContent = t.labelLabelSize;
+  document.getElementById('lbl-margin').textContent = t.labelMargin;
+  document.getElementById('lbl-auto-gen').textContent = t.labelAutoGen;
+  document.getElementById('btn-generate').innerHTML = t.btnGenerate;
+  document.getElementById('lbl-panel-preview').textContent = t.panelPreview;
+  document.getElementById('lbl-preview-empty').innerHTML = t.previewEmpty;
+  document.getElementById('lbl-panel-download').textContent = t.panelDownload;
+  document.getElementById('lbl-status-prefix').textContent = t.statusPrefix;
+  if (!qrReady) document.getElementById('lbl-meta-status').textContent = t.metaStatusWait;
+  document.getElementById('lbl-btn-png').textContent = t.btnPng;
+  document.getElementById('lbl-btn-jpg').textContent = t.btnJpg;
+  document.getElementById('tab-single').textContent  = t.tabSingle;
+  document.getElementById('tab-bulk').textContent    = t.tabBulk;
+  document.getElementById('drop-msg').textContent    = t.dropMsg;
+  document.getElementById('drop-sub').textContent    = t.dropSub;
+  document.getElementById('bulk-textarea').placeholder = t.bulkPh;
+  document.getElementById('btn-bulk-start').textContent = t.btnStart;
+  document.getElementById('btn-bulk-stop').textContent  = t.btnStop;
+  document.getElementById('btn-bulk-tmpl').textContent  = t.btnTmpl;
+  const dlBtn = document.getElementById('btn-bulk-dl');
+  if (dlBtn) dlBtn.textContent = t.btnDlZip;
+  document.getElementById('lbl-bulk-inherit').textContent = t.bulkInherit;
+}
+
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'wf_lang') applyLang(e.data.lang);
+});
+
+function updateRange(rid,vid){
+  document.getElementById(vid).textContent=document.getElementById(rid).value+'px';
+}
+function syncColor(cid,hid){document.getElementById(hid).value=document.getElementById(cid).value;}
+function syncHex(hid,cid){const v=document.getElementById(hid).value;if(/^#[0-9a-fA-F]{6}$/.test(v))document.getElementById(cid).value=v;}
+function onInputChange(){
+  if(!document.getElementById('autoGen').checked)return;
+  clearTimeout(debounceTimer);debounceTimer=setTimeout(generateQR,400);
+}
+
+function generateQR(){
+  const text=document.getElementById('qrInput').value.trim();if(!text)return;
+  const size=parseInt(document.getElementById('qrSize').value);
+  const level=document.getElementById('qrLevel').value;
+  const fgColor=document.getElementById('fgHex').value||'#000000';
+  const bgColor=document.getElementById('bgHex').value||'#ffffff';
+  const topLabel=document.getElementById('labelTop').value.trim();
+  const botLabel=document.getElementById('labelBot').value.trim()||text;
+  const lblColor=document.getElementById('lblHex').value||'#000000';
+  const lblSize=document.getElementById('lblSize').value;
+  const margin=parseInt(document.getElementById('qrMargin').value);
+  const t=I18N[lang]||I18N.ko;
+
+  const out=document.getElementById('qr-output');
+  out.innerHTML='';
+  if(qrInstance){try{qrInstance.clear();}catch(e){}qrInstance=null;}
+
+  // wrapper 전체를 QR 배경색+여백으로 감싸서 라벨도 같은 배경 위에 올라오게 함
+  const wrapper=document.getElementById('qr-preview-wrapper');
+  wrapper.style.background=bgColor;
+  wrapper.style.padding=margin+'px';
+
+  const ca=document.getElementById('qr-canvas-area');
+  ca.style.background='transparent';
+  ca.style.padding='0';
+
+  const topEl=document.getElementById('qr-top-label');
+  topEl.style.display=topLabel?'block':'none';
+  topEl.textContent=topLabel; topEl.style.color=lblColor;
+  topEl.style.fontSize=lblSize+'px'; topEl.style.fontWeight='600';
+  topEl.style.marginBottom='6px';
+
+  const botEl=document.getElementById('qr-bottom-label');
+  botEl.textContent=botLabel; botEl.style.color=lblColor;
+  botEl.style.fontSize=Math.max(10,parseInt(lblSize)-2)+'px';
+  botEl.style.marginTop='6px';
+
+  qrInstance=new QRCode(out,{
+    text,width:size,height:size,
+    colorDark:fgColor,colorLight:bgColor,
+    correctLevel:QRCode.CorrectLevel[level]
+  });
+
+  document.getElementById('previewEmpty').style.display='none';
+  wrapper.style.display='flex';
+  qrReady=true;
+  document.getElementById('qr-status-badge').className='status-badge badge-ready';
+  document.getElementById('lbl-status-text').textContent=t.statusReady;
+  document.getElementById('btnPng').disabled=false;
+  document.getElementById('btnJpg').disabled=false;
+  document.getElementById('previewMeta').innerHTML=
+    `${t.metaSize}: <span>${size}×${size}px</span> &nbsp; ${t.metaEC}: <span>${level}</span> &nbsp; ${t.metaMargin}: <span>${margin}px</span><br>`+
+    `${t.metaFg}: <span>${fgColor}</span> &nbsp; ${t.metaBg}: <span>${bgColor}</span>`;
+}
+
+function downloadQR(fmt){
+  if(!qrReady)return;
+  html2canvas(document.getElementById('qr-preview-wrapper'),{backgroundColor:null,scale:2}).then(canvas=>{
+    let dataUrl;
+    if(fmt==='jpg'){
+      const c2=document.createElement('canvas');
+      c2.width=canvas.width;c2.height=canvas.height;
+      const ctx=c2.getContext('2d');
+      ctx.fillStyle=document.getElementById('bgHex').value||'#ffffff';
+      ctx.fillRect(0,0,c2.width,c2.height);ctx.drawImage(canvas,0,0);
+      dataUrl=c2.toDataURL('image/jpeg',0.95);
+    }else{dataUrl=canvas.toDataURL('image/png');}
+    const a=document.createElement('a');
+    const name=(document.getElementById('qrInput').value.replace(/https?:\/\//,'').split('/')[0]||'qr').replace(/[^a-zA-Z0-9_\-]/g,'_');
+    a.download=`qr_${name}.${fmt}`;a.href=dataUrl;a.click();
+  });
+}
+
+// ── Bulk QR state ──────────────────────────────────────────────────────────
+let bulkRunning = false, bulkStop = false, bulkZip = null, bulkResults = [];
+
+function switchQrMode(mode) {
+  document.getElementById('tab-single').classList.toggle('active', mode === 'single');
+  document.getElementById('tab-bulk').classList.toggle('active',   mode === 'bulk');
+  document.getElementById('mode-single').style.display = mode === 'single' ? 'block' : 'none';
+  document.getElementById('mode-bulk').style.display   = mode === 'bulk'   ? 'block' : 'none';
+}
+
+// ── File drag / drop
+function onBulkFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) readBulkFile(file);
+}
+function onBulkFileSelect(e) { if (e.target.files[0]) readBulkFile(e.target.files[0]); }
+function readBulkFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('bulk-textarea').value = ev.target.result;
+    document.getElementById('drop-file').textContent = file.name;
+    updateBulkCount();
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ── CSV helpers
+function parseCsvLine(line) {
+  const result = []; let cur = '', inQ = false;
+  for (const c of line) {
+    if (c === '"') inQ = !inQ;
+    else if (c === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+    else cur += c;
+  }
+  result.push(cur.trim()); return result;
+}
+function csvVal(parts, i) { return (parts[i] !== undefined && parts[i] !== '') ? parts[i] : undefined; }
+
+function parseBulkInput(raw) {
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+  if (!lines.length) return [];
+  const isHeader = lines[0].toLowerCase().startsWith('url');
+  const rows = [];
+  for (let i = isHeader ? 1 : 0; i < lines.length; i++) {
+    const line = lines[i]; if (!line) continue;
+    let row;
+    if (line.includes(',')) {
+      const p = parseCsvLine(line);
+      row = { url:p[0], labelTop:csvVal(p,1), labelBot:csvVal(p,2),
+              size:csvVal(p,3), fg:csvVal(p,4), bg:csvVal(p,5),
+              lblColor:csvVal(p,6), lblSize:csvVal(p,7), level:csvVal(p,8) };
+    } else {
+      row = { url: line };
+    }
+    if (row.url) rows.push(row);
+  }
+  return rows;
+}
+
+function updateBulkCount() {
+  const rows = parseBulkInput(document.getElementById('bulk-textarea').value);
+  const t = I18N[lang] || I18N.ko;
+  document.getElementById('bulk-count').textContent =
+    rows.length > 0 ? t.bulkRows.replace('{n}', rows.length) : '';
+}
+
+// ── Template download
+function downloadBulkTemplate() {
+  const bom  = '﻿';
+  const body = 'url,label_top,label_bot,size,fg_color,bg_color,lbl_color,lbl_size,level\n' +
+               'https://worksfree.co.kr,WorksFree,,200,#000000,#ffffff,#000000,13,M\n' +
+               'https://portal.worksfree.kr,포털 로그인,,200,#000000,#ffffff,#000000,13,M\n';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([bom + body], {type:'text/csv;charset=utf-8;'}));
+  a.download = 'qr_bulk_template.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+// ── Effective option resolution (CSV field → fallback to single-mode form)
+function getEffectiveOpts(row) {
+  const f = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  return {
+    size:     parseInt(row.size     || f('qrSize')   || 200),
+    level:    row.level             || f('qrLevel')  || 'M',
+    fg:       row.fg               || f('fgHex')    || '#000000',
+    bg:       row.bg               || f('bgHex')    || '#ffffff',
+    labelTop: row.labelTop !== undefined ? row.labelTop : f('labelTop').trim(),
+    labelBot: row.labelBot !== undefined ? row.labelBot : f('labelBot').trim(),
+    lblColor: row.lblColor         || f('lblHex')   || '#000000',
+    lblSize:  parseInt(row.lblSize || f('lblSize')  || 13),
+    margin:   parseInt(f('qrMargin') || 12),
+  };
+}
+
+function canvasToBlob(canvas) {
+  return new Promise(res => canvas.toBlob(res, 'image/png'));
+}
+
+function sanitizeFilename(url) {
+  return (url.replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9._\-]/g, '_') || 'qr').slice(0, 40);
+}
+
+// ── Render single QR to canvas (~20ms, no html2canvas)
+async function renderSingleQR(row) {
+  if (!row.url) throw new Error('Empty URL');
+  const opts = getEffectiveOpts(row);
+  const margin = opts.margin;
+  const topH   = opts.labelTop ? Math.ceil(opts.lblSize * 1.6 + 4) : 0;
+  const botFsz = Math.max(10, opts.lblSize - 2);
+  const botH   = Math.ceil(botFsz * 1.6 + 4);
+  const totalW = opts.size + margin * 2;
+  const totalH = margin + topH + opts.size + botH + margin;
+
+  const tmp = document.createElement('div');
+  tmp.style.cssText = 'position:fixed;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0;overflow:hidden;';
+  document.body.appendChild(tmp);
+  try {
+    new QRCode(tmp, {
+      text: row.url, width: opts.size, height: opts.size,
+      colorDark: opts.fg, colorLight: opts.bg,
+      correctLevel: QRCode.CorrectLevel[opts.level] || QRCode.CorrectLevel.M
+    });
+    const qrCanvas = tmp.querySelector('canvas');
+    if (!qrCanvas) throw new Error('QR canvas unavailable');
+
+    const canvas = document.createElement('canvas');
+    canvas.width = totalW; canvas.height = totalH;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = opts.bg;
+    ctx.fillRect(0, 0, totalW, totalH);
+
+    // Top label
+    if (opts.labelTop) {
+      ctx.fillStyle = opts.lblColor;
+      ctx.font = `600 ${opts.lblSize}px sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(opts.labelTop, totalW / 2, margin + topH / 2, totalW - margin * 2);
+    }
+
+    // QR image
+    ctx.drawImage(qrCanvas, margin, margin + topH, opts.size, opts.size);
+
+    // Bottom label
+    const botText = opts.labelBot || row.url;
+    ctx.fillStyle = opts.lblColor;
+    ctx.font = `${botFsz}px monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(botText, totalW / 2, margin + topH + opts.size + botH / 2 + 2, totalW - margin * 2);
+
+    const dataUrl = canvas.toDataURL('image/png');
+    const blob    = await canvasToBlob(canvas);
+    return { dataUrl, blob };
+  } finally {
+    document.body.removeChild(tmp);
+  }
+}
+
+// ── Bulk generation
+async function startBulk() {
+  const raw = document.getElementById('bulk-textarea').value.trim();
+  if (!raw) return;
+  const rows = parseBulkInput(raw);
+  if (!rows.length) return;
+
+  bulkRunning = true; bulkStop = false;
+  bulkZip     = new JSZip();
+  bulkResults = rows.map(r => ({ ...r, status: 'pending', dataUrl: null }));
+
+  // Init grid
+  const grid = document.getElementById('bulk-grid');
+  grid.innerHTML = '';
+  bulkResults.forEach((r, i) => {
+    const card   = document.createElement('div'); card.className = 'bulk-card'; card.id = `bc-${i}`;
+    const imgBox = document.createElement('div'); imgBox.className = 'bulk-card-img';
+    imgBox.innerHTML = '<span class="bulk-card-spin">⟳</span>';
+    const lbl = document.createElement('div'); lbl.className = 'bulk-card-name';
+    lbl.textContent = r.url.replace(/https?:\/\//, '').slice(0, 18);
+    card.append(imgBox, lbl); grid.appendChild(card);
+  });
+
+  document.getElementById('bulk-result-wrap').style.display = 'block';
+  document.getElementById('bulk-progress').style.display    = 'block';
+  document.getElementById('btn-bulk-start').disabled        = true;
+  document.getElementById('btn-bulk-stop').style.display    = 'inline-block';
+  document.getElementById('btn-bulk-dl').disabled           = true;
+
+  const t = I18N[lang] || I18N.ko;
+  let ok = 0, err = 0;
+  const total = rows.length;
+
+  for (let i = 0; i < total; i++) {
+    if (bulkStop) break;
+    const row    = bulkResults[i];
+    const imgBox = document.querySelector(`#bc-${i} .bulk-card-img`);
+
+    try {
+      const { dataUrl, blob } = await renderSingleQR(row);
+      row.status = 'ok'; row.dataUrl = dataUrl;
+      imgBox.innerHTML = ''; imgBox.classList.add('bulk-card-ok');
+      const img = document.createElement('img'); img.src = dataUrl;
+      imgBox.appendChild(img);
+      bulkZip.file(sanitizeFilename(row.url) + `_${String(i + 1).padStart(3, '0')}.png`, blob);
+      ok++;
+    } catch (e) {
+      row.status = 'err';
+      imgBox.innerHTML = '<span class="bulk-card-err">✕</span>';
+      err++;
+    }
+
+    const pct = Math.round((i + 1) / total * 100);
+    document.getElementById('bulk-progress-fill').style.width = pct + '%';
+    document.getElementById('bulk-progress-info').textContent =
+      t.bulkProcessing.replace('{done}', i + 1).replace('{total}', total);
+
+    if ((i + 1) % 10 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+
+  bulkRunning = false;
+  document.getElementById('btn-bulk-start').disabled     = false;
+  document.getElementById('btn-bulk-stop').style.display = 'none';
+  document.getElementById('btn-bulk-dl').disabled        = false;
+  const summary = t.bulkDone.replace('{ok}', ok).replace('{err}', err);
+  document.getElementById('bulk-result-meta').textContent  = summary;
+  document.getElementById('bulk-progress-info').textContent = summary;
+}
+
+function stopBulk() { bulkStop = true; }
+
+async function downloadBulkZip() {
+  if (!bulkZip) return;
+  const btn = document.getElementById('btn-bulk-dl');
+  const t   = I18N[lang] || I18N.ko;
+  btn.disabled = true; btn.textContent = '⏳';
+  const blob = await bulkZip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `qrcodes_${new Date().toISOString().slice(0, 10)}.zip`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  btn.disabled = false; btn.textContent = t.btnDlZip;
+}
+
+// ── Initialise language on load
+document.getElementById('bulk-textarea').addEventListener('input', updateBulkCount);
+applyLang(lang);
+</script>
+</body>
+</html>

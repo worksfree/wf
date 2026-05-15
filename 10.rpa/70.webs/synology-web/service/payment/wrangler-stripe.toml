@@ -1,0 +1,6 @@
+name            = "stripe-session"
+main            = "stripe-session.js"
+compatibility_date = "2025-01-01"
+
+# 시크릿 키는 아래 명령으로 별도 설정:
+#   wrangler secret put STRIPE_SECRET_KEY --config wrangler-stripe.toml

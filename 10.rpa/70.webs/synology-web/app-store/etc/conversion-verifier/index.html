@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversion Verifier — WorksFree</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:      #0f1117;
+  --panel:   #1c2333;
+  --panel2:  #141922;
+  --border:  #2a3347;
+  --accent:  #3b82f6;
+  --accent2: #06b6d4;
+  --success: #10b981;
+  --warn:    #f59e0b;
+  --danger:  #ef4444;
+  --text:    #e2e8f0;
+  --muted:   #64748b;
+  --hover:   #243049;
+  --radius:  8px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'IBM Plex Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 20px 28px 24px;
+  font-size: 16px;
+}
+
+/* ── 헤더 ────────────────────────────── */
+.page-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 16px;
+}
+.app-icon {
+  width: 52px; height: 52px;
+  background: #0c1f18; border: 1px solid #065f46;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0;
+}
+.page-title { font-size: 22px; font-weight: 600; margin-bottom: 3px; }
+.page-desc  { font-size: 15px; color: var(--muted); }
+
+/* ── 브라우저 안내 ─────────────────── */
+#browser-warn {
+  display: none;
+  background: #431407; border: 1px solid #9a3412;
+  border-radius: var(--radius);
+  padding: 12px 16px; font-size: 15px; color: #fdba74;
+  margin-bottom: 16px;
+}
+.browser-note {
+  display: flex; align-items: center; gap: 8px;
+  background: #0c1f18; border: 1px solid #1e3a2a;
+  border-radius: var(--radius);
+  padding: 10px 14px; font-size: 14px; color: #6ee7b7;
+  margin-bottom: 20px;
+}
+.browser-note-icon { font-size: 16px; flex-shrink: 0; }
+
+/* ── 레이아웃 ─────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+@media(max-width:760px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+/* ── 패널 공통 ───────────────────── */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.panel-title {
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .08em;
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── 컨트롤 패널 ─────────────────── */
+.ctrl-section { margin-bottom: 18px; }
+.ctrl-label {
+  font-size: 14px; color: #94a3b8; font-weight: 500;
+  margin-bottom: 8px; display: block;
+}
+
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; padding: 10px 14px;
+  border: none; border-radius: 6px;
+  font-size: 15px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: opacity .15s, transform .1s;
+}
+.btn:hover  { opacity: .88; }
+.btn:active { transform: scale(.98); }
+.btn:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--accent);  color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-outline {
+  background: transparent; border: 1px solid var(--border); color: var(--text);
+}
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); color: #93c5fd; background: var(--hover); }
+.btn-warn { background: var(--warn); color: #1a1000; }
+.btn + .btn { margin-top: 8px; }
+
+.picked-path {
+  font-size: 13px; color: var(--muted); margin-top: 8px;
+  font-family: 'IBM Plex Mono', monospace; word-break: break-all;
+}
+
+/* 확장자 입력 */
+.ext-row {
+  display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+}
+.ext-label {
+  font-size: 13px; color: var(--muted); width: 62px; flex-shrink: 0;
+}
+.ext-input {
+  width: 90px; background: var(--panel2); border: 1px solid var(--border);
+  border-radius: 5px; color: var(--text); font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px; padding: 5px 10px; outline: none; transition: border-color .15s;
+}
+.ext-input:focus { border-color: var(--accent); }
+.ext-dot {
+  font-size: 15px; color: var(--muted); font-family: 'IBM Plex Mono', monospace;
+}
+
+/* 토글 */
+.toggle-row {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 10px;
+}
+.toggle-row span { font-size: 14px; color: #94a3b8; }
+.toggle { position: relative; display: inline-block; width: 34px; height: 18px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; inset: 0; background: var(--border);
+  border-radius: 18px; cursor: pointer; transition: .2s;
+}
+.slider:before {
+  content: ''; position: absolute;
+  width: 12px; height: 12px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: .2s;
+}
+.toggle input:checked + .slider { background: var(--accent); }
+.toggle input:checked + .slider:before { transform: translateX(16px); }
+
+/* 통계 카드 */
+.stat-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 16px;
+}
+.stat-box {
+  background: var(--panel2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 12px; text-align: center;
+}
+.stat-num { font-size: 22px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+.stat-lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.num-total  { color: var(--text); }
+.num-ok     { color: var(--success); }
+.num-miss   { color: var(--danger); }
+
+/* 진행 */
+.progress-wrap { margin-bottom: 14px; display: none; }
+.progress-wrap.show { display: block; }
+.progress-text {
+  font-size: 13px; color: var(--muted); margin-bottom: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.progress-track {
+  height: 4px; background: var(--border);
+  border-radius: 2px; overflow: hidden;
+}
+.progress-indeterminate {
+  height: 100%; width: 40%; background: var(--accent);
+  border-radius: 2px;
+  animation: slide 1.2s ease-in-out infinite;
+}
+@keyframes slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* ── 결과 패널 ───────────────────── */
+.result-panel { display: flex; flex-direction: column; gap: 12px; }
+
+/* 안내 카드 */
+.guide-card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 52px 32px;
+  text-align: center; color: var(--muted);
+}
+.guide-icon {
+  font-size: 40px; margin-bottom: 16px; opacity: .25;
+}
+.guide-title { font-size: 17px; color: var(--text); margin-bottom: 8px; font-weight: 500; }
+.guide-desc  { font-size: 14px; line-height: 1.8; }
+.guide-step  {
+  display: flex; gap: 10px; align-items: flex-start;
+  text-align: left; margin-top: 20px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.step-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent); color: white;
+  font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.step-text { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+
+/* 결과 테이블 박스 */
+.table-wrap {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.table-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  background: var(--panel2); gap: 10px; flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.filter-btns { display: flex; gap: 6px; }
+.filter-btn {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--muted); border-radius: 20px;
+  padding: 3px 12px; font-size: 13px; font-weight: 600;
+  font-family: inherit; cursor: pointer; transition: all .15s;
+}
+.filter-btn.active-all    { border-color: var(--accent2); color: var(--accent2); background: rgba(6,182,212,.1); }
+.filter-btn.active-ok     { border-color: var(--success); color: var(--success); background: rgba(16,185,129,.1); }
+.filter-btn.active-miss   { border-color: var(--danger);  color: var(--danger);  background: rgba(239,68,68,.1); }
+.table-info { font-size: 13px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+
+.file-table { width: 100%; border-collapse: collapse; }
+.file-table th {
+  padding: 8px 12px; text-align: left;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .06em;
+  background: var(--panel2); border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  position: sticky; top: 0; z-index: 1;
+}
+.file-table th.sortable { cursor: pointer; user-select: none; }
+.file-table th.sortable:hover { color: var(--text); }
+.file-table th.sort-asc  .sort-icon::after { content: ' ▲'; color: var(--accent2); }
+.file-table th.sort-desc .sort-icon::after { content: ' ▼'; color: var(--accent2); }
+.file-table td {
+  padding: 9px 12px; font-size: 14px;
+  border-bottom: 1px solid #1e2a3a; vertical-align: middle;
+}
+.file-table tr:last-child td { border-bottom: none; }
+.file-table tr:hover td { background: rgba(36,48,73,.4); }
+.file-table tr.row-miss td { background: rgba(239,68,68,.04); }
+
+.col-num  { width: 48px; text-align: center; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+.col-status { width: 60px; text-align: center; }
+.col-file { font-family: 'IBM Plex Mono', monospace; word-break: break-all; }
+.col-cad, .col-dwg { width: 100px; text-align: center; }
+.col-path { font-size: 13px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.status-ok   { color: var(--success); font-size: 16px; }
+.status-miss { color: var(--danger);  font-size: 16px; }
+.badge-ok    { background: rgba(16,185,129,.15); color: var(--success); border-radius: 4px; padding: 1px 8px; font-size: 13px; font-weight: 600; }
+.badge-miss  { background: rgba(239,68,68,.15);  color: var(--danger);  border-radius: 4px; padding: 1px 8px; font-size: 13px; font-weight: 600; }
+
+.table-scroll { overflow-y: auto; }
+
+.empty-row td { text-align: center; padding: 32px; color: var(--muted); font-size: 15px; }
+
+/* 결과 배너 */
+.result-banner {
+  display: none;
+  padding: 12px 16px; font-size: 14px;
+  align-items: center; gap: 10px;
+  border-bottom: 1px solid transparent;
+}
+.result-banner.show { display: flex; }
+.result-banner.ok   { background: #052e16; border-bottom-color: #065f46; color: #6ee7b7; }
+.result-banner.warn { background: #431407; border-bottom-color: #9a3412; color: #fdba74; }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="page-header">
+  <div class="app-icon">✔</div>
+  <div>
+    <div class="page-title">Conversion Verifier</div>
+    <div class="page-desc">캐드 파일 → 도면 파일 변환 누락 검증 · 설치 불필요</div>
+  </div>
+</div>
+
+<!-- 브라우저 안내 -->
+<div class="browser-note">
+  <span class="browser-note-icon">ℹ</span>
+  <span>이 도구는 <strong>Chrome 또는 Edge (최신 버전)</strong>에서만 동작합니다. Safari·Firefox는 지원하지 않습니다.</span>
+</div>
+<div id="browser-warn">
+  ⚠️ 이 도구는 Chrome 또는 Edge(최신 버전)가 필요합니다. 현재 브라우저는 폴더 접근 API를 지원하지 않습니다.
+</div>
+
+<div class="layout">
+
+  <!-- ── 컨트롤 패널 ── -->
+  <div class="panel">
+    <div class="panel-title">설정</div>
+
+    <!-- 폴더 선택 -->
+    <div class="ctrl-section">
+      <span class="ctrl-label">검증 대상 폴더</span>
+      <button class="btn btn-primary" id="btnPick">📂 폴더 선택</button>
+      <div class="picked-path" id="pickedPath"></div>
+    </div>
+
+    <!-- 확장자 설정 -->
+    <div class="ctrl-section">
+      <span class="ctrl-label">확장자 설정</span>
+      <div class="ext-row">
+        <span class="ext-label">원본 (캐드)</span>
+        <span class="ext-dot">.</span>
+        <input class="ext-input" id="extSrc" type="text" value="slddrw" spellcheck="false" placeholder="slddrw">
+      </div>
+      <div class="ext-row">
+        <span class="ext-label">변환 (도면)</span>
+        <span class="ext-dot">.</span>
+        <input class="ext-input" id="extDst" type="text" value="dwg" spellcheck="false" placeholder="dwg">
+      </div>
+    </div>
+
+    <!-- 옵션 -->
+    <div class="ctrl-section">
+      <span class="ctrl-label">옵션</span>
+      <div class="toggle-row">
+        <span>하위 폴더 포함 (재귀)</span>
+        <label class="toggle">
+          <input type="checkbox" id="chkRecursive">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 통계 -->
+    <div class="stat-grid" id="statGrid" style="display:none">
+      <div class="stat-box" style="grid-column:span 2">
+        <div class="stat-num num-total" id="statTotal">0</div>
+        <div class="stat-lbl">캐드 파일 총계</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num num-ok" id="statOk">0</div>
+        <div class="stat-lbl">도면 파일 있음</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num num-miss" id="statMiss">0</div>
+        <div class="stat-lbl">도면 파일 없음</div>
+      </div>
+    </div>
+
+    <!-- 진행 -->
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-text" id="progressText">스캔 중...</div>
+      <div class="progress-track"><div class="progress-indeterminate"></div></div>
+    </div>
+
+    <!-- 버튼 -->
+    <div class="ctrl-section">
+      <button class="btn btn-success" id="btnScan" disabled>🔍 스캔 시작</button>
+      <button class="btn btn-warn"    id="btnCsv"  disabled>⬇ CSV 내보내기</button>
+      <button class="btn btn-outline" id="btnReset">↺ 초기화</button>
+    </div>
+  </div>
+
+  <!-- ── 결과 패널 ── -->
+  <div class="result-panel">
+
+    <!-- 안내 카드 -->
+    <div class="guide-card" id="guideCard">
+      <div class="guide-icon">📂</div>
+      <div class="guide-title">폴더를 선택하면 검증을 시작합니다</div>
+      <div class="guide-desc">
+        같은 폴더 안에 캐드 파일(.slddrw)과<br>
+        대응하는 도면 파일(.dwg)이 있는지 확인합니다.
+      </div>
+      <div class="guide-step">
+        <div class="step-num">1</div>
+        <div class="step-text">왼쪽에서 <strong>폴더 선택</strong> — 캐드·도면 파일이 들어 있는 폴더를 고릅니다.</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>스캔 시작</strong> — 캐드 파일을 기준으로 도면 파일 존재 여부를 검증합니다.</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>CSV 내보내기</strong> — 결과를 Excel로 저장할 수 있습니다.</div>
+      </div>
+    </div>
+
+    <!-- 결과 테이블 -->
+    <div class="table-wrap" id="tableWrap" style="display:none">
+      <div class="table-toolbar">
+        <div class="filter-btns">
+          <button class="filter-btn active-all" id="fAll"  onclick="setFilter('all')">전체</button>
+          <button class="filter-btn"            id="fOk"   onclick="setFilter('ok')">✅ 정상</button>
+          <button class="filter-btn"            id="fMiss" onclick="setFilter('miss')">❌ 누락</button>
+        </div>
+        <span class="table-info" id="tableInfo"></span>
+      </div>
+      <!-- 결과 배너 — 테이블 상단에 노출 -->
+      <div class="result-banner" id="resultBanner"></div>
+      <div class="table-scroll">
+        <table class="file-table">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th class="col-status">상태</th>
+              <th class="sortable" id="thName" onclick="setSort('name')"><span class="sort-icon">파일명</span></th>
+              <th class="col-cad">캐드 파일</th>
+              <th class="col-dwg sortable" id="thDwg" onclick="setSort('dwg')"><span class="sort-icon">도면 파일</span></th>
+              <th class="sortable" id="thPath" style="display:none" onclick="setSort('path')"><span class="sort-icon">경로</span></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ── 상태 ── */
+let dirHandle   = null;
+let allResults  = [];
+let curFilter   = 'all';
+let isRecursive = false;
+let scanning    = false;
+let extSrc      = 'slddrw';
+let extDst      = 'dwg';
+let sortCol     = null;   // null | 'name' | 'dwg' | 'path'
+let sortDir     = 'asc';  // 'asc' | 'desc'
+
+/* ── DOM ── */
+const btnPick      = document.getElementById('btnPick');
+const btnScan      = document.getElementById('btnScan');
+const btnCsv       = document.getElementById('btnCsv');
+const btnReset     = document.getElementById('btnReset');
+const pickedPath   = document.getElementById('pickedPath');
+const chkRecursive = document.getElementById('chkRecursive');
+const statGrid     = document.getElementById('statGrid');
+const progressWrap = document.getElementById('progressWrap');
+const progressText = document.getElementById('progressText');
+const guideCard    = document.getElementById('guideCard');
+const tableWrap    = document.getElementById('tableWrap');
+const tbody        = document.getElementById('tbody');
+const tableInfo    = document.getElementById('tableInfo');
+const resultBanner = document.getElementById('resultBanner');
+const thPath       = document.getElementById('thPath');
+const inputExtSrc  = document.getElementById('extSrc');
+const inputExtDst  = document.getElementById('extDst');
+
+/* ── 브라우저 호환 체크 ── */
+if (!window.showDirectoryPicker) {
+  document.getElementById('browser-warn').style.display = 'block';
+  btnPick.disabled = true;
+}
+
+/* ── 이벤트 ── */
+btnPick.addEventListener('click', pickFolder);
+btnScan.addEventListener('click', doScan);
+btnCsv .addEventListener('click', exportCSV);
+btnReset.addEventListener('click', reset);
+chkRecursive.addEventListener('change', () => { isRecursive = chkRecursive.checked; });
+inputExtSrc.addEventListener('input', () => { extSrc = inputExtSrc.value.trim().replace(/^\.+/, '').toLowerCase() || 'slddrw'; });
+inputExtDst.addEventListener('input', () => { extDst = inputExtDst.value.trim().replace(/^\.+/, '').toLowerCase() || 'dwg'; });
+
+/* ── 폴더 선택 ── */
+async function pickFolder() {
+  try {
+    dirHandle = await window.showDirectoryPicker({ mode: 'read' });
+    pickedPath.textContent = dirHandle.name;
+    btnScan.disabled = false;
+    resetResults();
+  } catch(e) {
+    if (e.name !== 'AbortError') console.error(e);
+  }
+}
+
+/* ── 스캔 ── */
+async function doScan() {
+  if (!dirHandle || scanning) return;
+  scanning = true;
+  btnScan.disabled = true;
+  btnCsv.disabled  = true;
+  progressWrap.classList.add('show');
+  guideCard.style.display  = 'none';
+  tableWrap.style.display  = 'none';
+  resultBanner.classList.remove('show');
+  statGrid.style.display   = 'none';
+  allResults = [];
+
+  try {
+    await scanDir(dirHandle, '');
+  } catch(e) {
+    console.error('스캔 오류:', e);
+  }
+
+  scanning = false;
+  progressWrap.classList.remove('show');
+  btnScan.disabled = false;
+
+  updateStats();
+  renderTable(curFilter);
+  showBanner();
+
+  if (allResults.length > 0) btnCsv.disabled = false;
+}
+
+/* ── 재귀 스캔 ── */
+async function scanDir(dh, path) {
+  const fileSet = new Set();
+  const slddrwList = [];
+  const subdirs = [];
+
+  const srcExt = '.' + extSrc;
+  const dstExt = '.' + extDst;
+
+  for await (const [name, handle] of dh.entries()) {
+    if (handle.kind === 'file') {
+      fileSet.add(name.toLowerCase());
+      if (name.toLowerCase().endsWith(srcExt)) {
+        slddrwList.push(name);
+      }
+    } else if (handle.kind === 'directory' && isRecursive) {
+      subdirs.push([name, handle]);
+    }
+  }
+
+  progressText.textContent = `스캔 중... 캐드 파일 ${allResults.length + slddrwList.length}개 발견`;
+
+  for (const name of slddrwList) {
+    const base      = name.slice(0, name.toLowerCase().lastIndexOf(srcExt));
+    const dwgExists = fileSet.has(base.toLowerCase() + dstExt);
+    allResults.push({ name: base, path, dwgExists });
+  }
+
+  for (const [name, handle] of subdirs) {
+    await scanDir(handle, path ? `${path}\\${name}` : name);
+  }
+}
+
+/* ── 통계 업데이트 ── */
+function updateStats() {
+  const total = allResults.length;
+  const ok    = allResults.filter(r => r.dwgExists).length;
+  const miss  = total - ok;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statOk').textContent    = ok;
+  document.getElementById('statMiss').textContent  = miss;
+  statGrid.style.display = total > 0 ? 'grid' : 'none';
+  // 필터 버튼 카운트 업데이트
+  document.getElementById('fAll') .textContent = `전체 (${total})`;
+  document.getElementById('fOk')  .textContent = `✅ 정상 (${ok})`;
+  document.getElementById('fMiss').textContent = `❌ 누락 (${miss})`;
+}
+
+/* ── 테이블 렌더 ── */
+function renderTable(filter = 'all') {
+  curFilter = filter;
+
+  const base     = filter === 'ok'   ? allResults.filter(r =>  r.dwgExists)
+                 : filter === 'miss' ? allResults.filter(r => !r.dwgExists)
+                 : allResults;
+  const filtered = getSorted(base);
+
+  // 경로 컬럼 표시 여부
+  const showPath = isRecursive;
+  thPath.style.display = showPath ? '' : 'none';
+  updateSortHeaders();
+
+  const colSpan = showPath ? 6 : 5;
+  tableInfo.textContent = `${filtered.length.toLocaleString()}개 표시`;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="empty-row">해당 항목이 없습니다</td></tr>`;
+  } else {
+    tbody.innerHTML = filtered.map((r, i) => `
+      <tr class="${r.dwgExists ? '' : 'row-miss'}">
+        <td class="col-num">${i + 1}</td>
+        <td class="col-status">${r.dwgExists
+          ? '<span class="status-ok">✅</span>'
+          : '<span class="status-miss">❌</span>'}</td>
+        <td class="col-file">${escHtml(r.name)}</td>
+        <td class="col-cad"><span class="badge-ok">있음</span></td>
+        <td class="col-dwg">${r.dwgExists
+          ? '<span class="badge-ok">있음</span>'
+          : '<span class="badge-miss">없음</span>'}</td>
+        ${showPath ? `<td class="col-path" title="${escHtml(r.path)}">${escHtml(r.path || '루트')}</td>` : ''}
+      </tr>`).join('');
+  }
+
+  // 필터 버튼 활성 스타일
+  ['fAll','fOk','fMiss'].forEach(id => {
+    document.getElementById(id).className = 'filter-btn';
+  });
+  const activeMap = { all:'fAll', ok:'fOk', miss:'fMiss' };
+  const activeClass = { all:'active-all', ok:'active-ok', miss:'active-miss' };
+  document.getElementById(activeMap[filter]).classList.add(activeClass[filter]);
+
+  tableWrap.style.display = 'block';
+  guideCard.style.display = 'none';
+  fitScrollHeight();
+}
+
+function setFilter(f) { renderTable(f); }
+
+/* ── 정렬 ── */
+function setSort(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = 'asc';
+  }
+  renderTable(curFilter);
+}
+
+function getSorted(arr) {
+  if (!sortCol) return arr;
+  return [...arr].sort((a, b) => {
+    let av, bv;
+    if      (sortCol === 'name') { av = a.name.toLowerCase(); bv = b.name.toLowerCase(); }
+    else if (sortCol === 'dwg')  { av = a.dwgExists ? 1 : 0;  bv = b.dwgExists ? 1 : 0; }
+    else if (sortCol === 'path') { av = (a.path || '').toLowerCase(); bv = (b.path || '').toLowerCase(); }
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ?  1 : -1;
+    return 0;
+  });
+}
+
+function updateSortHeaders() {
+  ['thName', 'thDwg', 'thPath'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('sort-asc', 'sort-desc');
+    const colMap = { thName: 'name', thDwg: 'dwg', thPath: 'path' };
+    if (sortCol === colMap[id]) el.classList.add('sort-' + sortDir);
+  });
+}
+
+/* ── 스크롤 높이 동적 계산 ── */
+function fitScrollHeight() {
+  const scroll = document.querySelector('.table-scroll');
+  if (!scroll) return;
+  // tableWrap 상단 위치 + toolbar + banner 높이를 실측해서 남은 공간 할당
+  const wrap    = document.getElementById('tableWrap');
+  const toolbar = wrap.querySelector('.table-toolbar');
+  const banner  = document.getElementById('resultBanner');
+  const wrapTop = wrap.getBoundingClientRect().top;
+  const toolbarH = toolbar.offsetHeight;
+  const bannerH  = banner.classList.contains('show') ? banner.offsetHeight : 0;
+  const paddingBottom = 24;
+  scroll.style.maxHeight = (window.innerHeight - wrapTop - toolbarH - bannerH - paddingBottom) + 'px';
+}
+window.addEventListener('resize', () => {
+  if (document.getElementById('tableWrap').style.display !== 'none') fitScrollHeight();
+});
+
+/* ── 결과 배너 ── */
+function showBanner() {
+  const total = allResults.length;
+  const miss  = allResults.filter(r => !r.dwgExists).length;
+
+  if (total === 0) {
+    resultBanner.className = 'result-banner warn show';
+    resultBanner.textContent = '⚠️ 캐드 파일(.slddrw)이 없습니다. 올바른 폴더를 선택했는지 확인하세요.';
+  } else if (miss === 0) {
+    resultBanner.className = 'result-banner ok show';
+    resultBanner.textContent = `✅ 모든 캐드 파일(${total}개)에 대응하는 도면 파일이 존재합니다.`;
+  } else {
+    resultBanner.className = 'result-banner warn show';
+    resultBanner.textContent = `⚠️ 도면 파일 누락 ${miss}개 발견 — 총 ${total}개 캐드 파일 중 ${miss}개의 도면 파일이 없습니다.`;
+  }
+  fitScrollHeight();
+}
+
+/* ── CSV 내보내기 ── */
+function exportCSV() {
+  if (!allResults.length) return;
+
+  const showPath = isRecursive;
+  const header = showPath
+    ? ['상태', '파일명', '경로', '캐드 파일', '도면 파일']
+    : ['상태', '파일명', '캐드 파일', '도면 파일'];
+
+  const rows = allResults.map(r => {
+    const row = [
+      r.dwgExists ? '정상' : '누락',
+      r.name,
+      ...(showPath ? [r.path || '루트'] : []),
+      '있음',
+      r.dwgExists ? '있음' : '없음',
+    ];
+    return row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',');
+  });
+
+  const csv = '﻿' + [header.map(c=>`"${c}"`).join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `변환검증결과_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ── 초기화 ── */
+function reset() {
+  dirHandle   = null;
+  allResults  = [];
+  curFilter   = 'all';
+  isRecursive = false;
+  extSrc      = 'slddrw';
+  extDst      = 'dwg';
+  sortCol     = null;
+  sortDir     = 'asc';
+  chkRecursive.checked    = false;
+  inputExtSrc.value       = 'slddrw';
+  inputExtDst.value       = 'dwg';
+  pickedPath.textContent  = '';
+  btnScan.disabled = true;
+  btnCsv.disabled  = true;
+  statGrid.style.display  = 'none';
+  tableWrap.style.display = 'none';
+  guideCard.style.display = 'block';
+  resultBanner.classList.remove('show');
+  document.getElementById('fAll') .textContent = '전체';
+  document.getElementById('fOk')  .textContent = '✅ 정상';
+  document.getElementById('fMiss').textContent = '❌ 누락';
+}
+
+function resetResults() {
+  allResults = [];
+  curFilter  = 'all';
+  statGrid.style.display  = 'none';
+  tableWrap.style.display = 'none';
+  guideCard.style.display = 'block';
+  resultBanner.classList.remove('show');
+  document.getElementById('fAll') .textContent = '전체';
+  document.getElementById('fOk')  .textContent = '✅ 정상';
+  document.getElementById('fMiss').textContent = '❌ 누락';
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

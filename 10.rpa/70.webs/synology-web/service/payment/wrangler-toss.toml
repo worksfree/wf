@@ -1,0 +1,6 @@
+name            = "toss-verify"
+main            = "toss-verify.js"
+compatibility_date = "2025-01-01"
+
+# 시크릿 키는 아래 명령으로 별도 설정 (여기에 직접 쓰지 말 것):
+#   wrangler secret put TOSS_SECRET_KEY --config wrangler-toss.toml

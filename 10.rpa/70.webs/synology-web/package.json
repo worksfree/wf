@@ -1,0 +1,22 @@
+{
+  "name": "worksfree-hub-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test":           "playwright test --project=mock",
+    "test:headed":    "playwright test --project=mock --headed",
+    "test:ui":        "playwright test --ui",
+    "test:report":    "playwright show-report",
+    "test:smoke":     "playwright test tests/smoke.spec.js --project=mock",
+    "test:debug":     "playwright test --debug --project=mock",
+    "test:realdb":    "cross-env PLAYWRIGHT_PROJECT=realdb playwright test --project=realdb",
+    "test:all":       "npm run test && npm run test:realdb"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@supabase/supabase-js": "^2.43.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "serve": "^14.2.3"
+  }
+}

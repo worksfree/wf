@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DWG Batch Print — WorksFree</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{--bg:#0f1117;--panel:#1c2333;--border:#2a3347;--accent:#3b82f6;--accent2:#06b6d4;--success:#10b981;--text:#e2e8f0;--muted:#64748b;--radius:8px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:28px 32px;}
+.header{display:flex;align-items:flex-start;gap:18px;margin-bottom:28px;}
+.app-icon{width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;}
+.app-info .app-name{font-size:22px;font-weight:600;margin-bottom:4px;}
+.app-info .app-sub{font-size:17px;color:var(--muted);}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:15px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:8px;}
+.badge-sw{background:#0c2340;color:#60a5fa;border:1px solid #1e40af;}
+.badge-free{background:#052e16;color:#34d399;border:1px solid #065f46;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.panel-title{font-size:15px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.feature-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.feature-list li{display:flex;gap:8px;font-size:17px;line-height:1.5;}
+.feature-list li::before{content:'✦';color:var(--accent2);flex-shrink:0;margin-top:1px;}
+.spec-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:17px;}
+.spec-row:last-child{border-bottom:none;}
+.spec-key{color:var(--muted);}
+.spec-val{font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--accent2);}
+.download-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.dl-info .dl-title{font-size:18px;font-weight:600;margin-bottom:3px;}
+.dl-info .dl-meta{font-size:16px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.dl-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:white;border:none;border-radius:6px;padding:11px 22px;font-size:17px;font-weight:600;font-family:inherit;cursor:pointer;text-decoration:none;white-space:nowrap;transition:opacity .15s;}
+.dl-btn:hover{opacity:.88;}
+.dl-btn.coming{background:var(--border);color:var(--muted);cursor:default;}
+.notice{background:#0c1f18;border:1px solid #065f46;border-radius:6px;padding:12px 16px;font-size:16px;color:#6ee7b7;margin-top:16px;line-height:1.7;}
+@media(max-width:680px){.grid{grid-template-columns:1fr;}.download-box{flex-direction:column;align-items:flex-start;}}
+html[lang="en"] .ko { display: none; }
+html[lang="en"] .en { display: inline; }
+.en { display: none; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="app-icon" style="background:#1c1917">🖨</div>
+  <div class="app-info">
+    <div class="app-name"><span class="ko">도면 출력 자동화</span><span class="en">DWG Batch Print</span></div>
+    <div class="app-sub">
+      <span class="ko">AutoCAD DWG 파일 일괄 인쇄 자동화 도구</span>
+      <span class="en">Batch print automation tool for AutoCAD DWG files</span>
+    </div>
+    <div>
+      <span class="badge badge-sw">AutoCAD</span>
+      <span class="badge badge-free">
+        <span class="ko">무료 배포</span><span class="en">Free</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="panel">
+    <div class="panel-title">
+      <span class="ko">주요 기능</span><span class="en">Features</span>
+    </div>
+    <ul class="feature-list">
+      <li><span class="ko">폴더 단위로 DWG 파일 일괄 선택 및 인쇄</span><span class="en">Batch select and print DWG files by folder</span></li>
+      <li><span class="ko">용지 크기·여백·축척 일괄 설정</span><span class="en">Batch set paper size, margins, and scale</span></li>
+      <li><span class="ko">PDF 변환 출력 지원 (프린터 불필요)</span><span class="en">PDF output support (no printer required)</span></li>
+      <li><span class="ko">레이어 가시성 설정 유지 인쇄</span><span class="en">Print with preserved layer visibility settings</span></li>
+      <li><span class="ko">인쇄 결과 로그 및 오류 파일 자동 분류</span><span class="en">Auto-log print results and classify error files</span></li>
+    </ul>
+  </div>
+  <div class="panel">
+    <div class="panel-title">
+      <span class="ko">시스템 요구사항</span><span class="en">Requirements</span>
+    </div>
+    <div class="spec-row"><span class="spec-key">OS</span><span class="spec-val">Windows 10/11 x64</span></div>
+    <div class="spec-row"><span class="spec-key">AutoCAD</span><span class="spec-val"><span class="ko">2018 이상</span><span class="en">2018+</span></span></div>
+    <div class="spec-row"><span class="spec-key"><span class="ko">런타임</span><span class="en">Runtime</span></span><span class="spec-val"><span class="ko">Python 내장</span><span class="en">Built-in Python</span></span></div>
+    <div class="spec-row"><span class="spec-key"><span class="ko">설치 공간</span><span class="en">Install Size</span></span><span class="spec-val">~42 MB</span></div>
+  </div>
+</div>
+
+<div class="download-box">
+  <div class="dl-info">
+    <div class="dl-title">
+      <span class="ko">DWG Batch Print 설치 파일</span>
+      <span class="en">DWG Batch Print Installer</span>
+    </div>
+    <div class="dl-meta">WorksFree_DWGBatchPrint_Setup.exe · ~42 MB</div>
+  </div>
+  <a class="dl-btn coming" href="#">
+    <span class="ko">준비중</span><span class="en">Coming Soon</span>
+  </a>
+</div>
+<div class="notice">
+  <span class="ko">✦ 영구 라이선스로 무료 배포됩니다. 설치 후 별도 인증 없이 즉시 사용 가능합니다.<br>✦ 문의: contact@worksfree.co.kr</span>
+  <span class="en">✦ Distributed free with a permanent license. Ready to use immediately after installation with no activation required.<br>✦ Contact: contact@worksfree.co.kr</span>
+</div>
+<script>
+(function(){
+  function applyLang(l){document.documentElement.lang=l;}
+  applyLang(localStorage.getItem('wf_lang')||'ko');
+  window.addEventListener('message',function(e){
+    if(e.data&&e.data.type==='wf_lang'&&(e.data.lang==='ko'||e.data.lang==='en'))applyLang(e.data.lang);
+  });
+})();
+</script>
+</body>
+</html>

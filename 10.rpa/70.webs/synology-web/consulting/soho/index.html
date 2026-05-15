@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소상공인·자영업자 정부지원 — WorksFree</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#0f1117;--panel:#1c2333;--panel2:#212d40;--border:#2a3347;
+  --text:#e2e8f0;--muted:#64748b;--radius:8px;
+  --finance:#f59e0b;--employ:#10b981;--manage:#3b82f6;--crisis:#ef4444;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;}
+
+/* ── topbar ── */
+.topbar{position:sticky;top:0;z-index:100;background:var(--panel);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.topbar-title{font-size:15px;font-weight:600;flex:1;white-space:nowrap;}
+.topbar-sub{font-size:11px;color:var(--muted);}
+.topbar-updated{font-size:11px;color:var(--muted);white-space:nowrap;}
+
+/* ── intro banner ── */
+.intro{background:#131c2f;border-bottom:1px solid var(--border);padding:14px 20px;display:flex;gap:20px;flex-wrap:wrap;}
+.intro-box{flex:1;min-width:200px;}
+.intro-box-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.intro-row{display:flex;gap:6px;align-items:baseline;margin-bottom:3px;font-size:13px;}
+.intro-label{font-weight:600;color:var(--text);min-width:90px;}
+.intro-val{color:var(--muted);}
+.intro-note{font-size:12px;color:var(--muted);padding:8px 12px;background:#0d1623;border-radius:6px;border-left:3px solid #f59e0b;margin-top:8px;}
+
+/* ── filters ── */
+.filters{background:var(--panel);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:0;flex-wrap:wrap;}
+.filter-tab{padding:10px 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;white-space:nowrap;}
+.filter-tab:hover{color:var(--text);}
+.filter-tab.active{color:var(--text);border-bottom-color:currentColor;}
+.filter-tab[data-cat="all"].active{color:#e2e8f0;}
+.filter-tab[data-cat="finance"].active{color:var(--finance);}
+.filter-tab[data-cat="employ"].active{color:var(--employ);}
+.filter-tab[data-cat="manage"].active{color:var(--manage);}
+.filter-tab[data-cat="crisis"].active{color:var(--crisis);}
+.filter-count{font-size:11px;opacity:.6;margin-left:3px;}
+
+/* ── content grid ── */
+.content{padding:20px;max-width:960px;margin:0 auto;}
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px;}
+
+/* ── program card ── */
+.prog-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;}
+.prog-card.hidden{display:none;}
+.card-accent{height:3px;}
+.card-accent-finance{background:var(--finance);}
+.card-accent-employ{background:var(--employ);}
+.card-accent-manage{background:var(--manage);}
+.card-accent-crisis{background:var(--crisis);}
+.card-top{padding:14px 16px 10px;}
+.card-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;letter-spacing:.03em;}
+.badge-finance{background:#2a1d00;color:#fcd34d;}
+.badge-employ{background:#0a2a1f;color:#6ee7b7;}
+.badge-manage{background:#0f1e3d;color:#93c5fd;}
+.badge-crisis{background:#2d1515;color:#fca5a5;}
+.badge-all{background:#1e2d40;color:#94a3b8;}
+.badge-soho{background:#1e2d40;color:#94a3b8;}
+.badge-emp{background:#1e2d40;color:#94a3b8;}
+.card-title{font-size:15px;font-weight:600;margin-bottom:3px;line-height:1.4;}
+.card-org{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.card-desc{font-size:13px;color:var(--text);opacity:.85;line-height:1.5;}
+
+/* ── card detail ── */
+.card-detail{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .2s;}
+.prog-card.open .card-detail{max-height:600px;padding-bottom:4px;}
+.detail-table{width:100%;border-collapse:collapse;margin-top:10px;}
+.detail-table tr{border-top:1px solid var(--border);}
+.detail-table td{padding:7px 4px;vertical-align:top;font-size:13px;}
+.detail-table td:first-child{color:var(--muted);white-space:nowrap;padding-right:12px;width:80px;}
+
+/* ── card footer ── */
+.card-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;margin-top:auto;}
+.btn-toggle{flex:1;background:transparent;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;gap:4px;}
+.btn-toggle:hover{color:var(--text);}
+.chevron{font-size:10px;transition:transform .2s;}
+.prog-card.open .chevron{transform:rotate(180deg);}
+.btn-site{font-size:12px;padding:4px 12px;border-radius:5px;background:transparent;color:var(--muted);border:1px solid var(--border);cursor:pointer;text-decoration:none;font-family:inherit;white-space:nowrap;}
+.btn-site:hover{color:var(--text);border-color:#4a5568;}
+
+/* ── empty state ── */
+.empty{text-align:center;padding:40px;color:var(--muted);display:none;}
+.empty.show{display:block;}
+
+/* ── preview restrictions ── */
+.filter-tab.disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
+.preview-tip { font-size:11px; color:#f59e0b; display:none; white-space:nowrap; padding:0 4px; }
+.preview-tip.show { display:inline; }
+
+/* ── print ── */
+@media print{
+  .topbar,.filters{position:static;}
+  body{background:#fff;color:#111;}
+  .prog-card{background:#f9f9f9;border-color:#ddd;break-inside:avoid;page-break-inside:avoid;}
+  .card-detail{max-height:none!important;padding-bottom:10px!important;}
+  .btn-toggle,.btn-site{display:none;}
+}
+
+/* ── responsive ── */
+@media(max-width:600px){
+  .prog-grid{grid-template-columns:1fr;}
+  .intro{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title" id="top-title">소상공인·자영업자 정부지원 사업</div>
+    <div class="topbar-sub" id="top-sub">소상공인시장진흥공단, 고용노동부 등 주요 지원 사업 안내</div>
+  </div>
+  <span class="topbar-updated" id="top-updated">2025년 기준 · 최신 공고 확인 필요</span>
+</div>
+
+<div class="intro">
+  <div class="intro-box">
+    <div class="intro-box-title" id="intro-self-title">자영업자</div>
+    <div class="intro-row"><span class="intro-label" id="il-def">정의</span><span class="intro-val" id="iv-self-def">사업자등록 후 스스로 사업을 운영하는 모든 사람</span></div>
+    <div class="intro-row"><span class="intro-label" id="il-size">규모 기준</span><span class="intro-val" id="iv-self-size">제한 없음 (1인 포함)</span></div>
+    <div class="intro-row"><span class="intro-label" id="il-law">관련 법령</span><span class="intro-val" id="iv-self-law">부가가치세법, 소득세법</span></div>
+  </div>
+  <div class="intro-box">
+    <div class="intro-box-title" id="intro-soho-title">소상공인</div>
+    <div class="intro-row"><span class="intro-label">정의</span><span class="intro-val" id="iv-soho-def">소상공인기본법상 소규모 사업체 경영자</span></div>
+    <div class="intro-row"><span class="intro-label">규모 기준</span><span class="intro-val" id="iv-soho-size">상시근로자 5인 미만 (제조·건설·운수 10인 미만)</span></div>
+    <div class="intro-row"><span class="intro-label">관련 법령</span><span class="intro-val" id="iv-soho-law">소상공인기본법</span></div>
+  </div>
+  <div class="intro-note" id="intro-note">
+    💡 자영업자의 대부분(약 90%)이 소상공인 기준을 충족합니다. 이 페이지의 지원 사업은 각 카드의 <strong>대상 배지</strong>로 적용 범위를 확인하세요.
+  </div>
+</div>
+
+<div class="filters" id="filters">
+  <div class="filter-tab active" data-cat="all" onclick="filterCat('all')"><span id="ft-all">전체</span> <span class="filter-count" id="fc-all"></span></div>
+  <div class="filter-tab" data-cat="finance" onclick="filterCat('finance')" style="color:var(--finance)"><span id="ft-finance">💰 금융지원</span> <span class="filter-count" id="fc-finance"></span></div>
+  <div class="filter-tab" data-cat="employ" onclick="filterCat('employ')" style="color:var(--employ)"><span id="ft-employ">👷 고용·보험</span> <span class="filter-count" id="fc-employ"></span></div>
+  <div class="filter-tab" data-cat="manage" onclick="filterCat('manage')" style="color:var(--manage)"><span id="ft-manage">📈 경영·판로</span> <span class="filter-count" id="fc-manage"></span></div>
+  <div class="filter-tab" data-cat="crisis" onclick="filterCat('crisis')" style="color:var(--crisis)"><span id="ft-crisis">🆘 위기·폐업</span> <span class="filter-count" id="fc-crisis"></span></div>
+</div>
+
+<div class="content">
+  <div class="prog-grid" id="prog-grid"></div>
+  <div class="empty" id="empty-msg">해당 조건의 지원 사업이 없습니다.</div>
+</div>
+
+<script>
+// ── 다국어 ──
+let lang = 'ko';
+const IS_PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
+
+const I18N = {
+  ko:{
+    top_title:   '소상공인·자영업자 정부지원 사업',
+    top_sub:     '소상공인시장진흥공단, 고용노동부 등 주요 지원 사업 안내',
+    top_updated: '2025년 기준 · 최신 공고 확인 필요',
+    intro_self:  '자영업자',
+    intro_soho:  '소상공인',
+    il_def:      '정의',
+    il_size:     '규모 기준',
+    il_law:      '관련 법령',
+    iv_self_def: '사업자등록 후 스스로 사업을 운영하는 모든 사람',
+    iv_self_size:'제한 없음 (1인 포함)',
+    iv_self_law: '부가가치세법, 소득세법',
+    iv_soho_def: '소상공인기본법상 소규모 사업체 경영자',
+    iv_soho_size:'상시근로자 5인 미만 (제조·건설·운수 10인 미만)',
+    iv_soho_law: '소상공인기본법',
+    intro_note:  '💡 자영업자의 대부분(약 90%)이 소상공인 기준을 충족합니다. 이 페이지의 지원 사업은 각 카드의 <strong>대상 배지</strong>로 적용 범위를 확인하세요.',
+    ft_all:      '전체',
+    ft_finance:  '💰 금융지원',
+    ft_employ:   '👷 고용·보험',
+    ft_manage:   '📈 경영·판로',
+    ft_crisis:   '🆘 위기·폐업',
+    lb_org:      '주관 기관',
+    lb_target:   '지원 대상',
+    lb_content:  '지원 내용',
+    lb_amount:   '지원 규모',
+    lb_how:      '신청 방법',
+    lb_contact:  '문의',
+    btn_detail:  '상세 보기',
+    btn_close:   '접기',
+    btn_site:    '공식 사이트 →',
+    tg_all:      '모든 사업자',
+    tg_soho:     '소상공인',
+    tg_emp:      '근로자 있는 사업장',
+    cat_finance: '금융지원',
+    cat_employ:  '고용·보험',
+    cat_manage:  '경영·판로',
+    cat_crisis:  '위기·폐업',
+    empty:       '해당 조건의 지원 사업이 없습니다.',
+    preview_detail_tip: '로그인 후 상세 내용을 볼 수 있습니다.',
+  },
+  en:{
+    top_title:   'Govt Support: SOHO & Self-Employed',
+    top_sub:     'Programs from SEMAS, MOEL and other agencies',
+    top_updated: 'As of 2025 · Verify latest announcements',
+    intro_self:  'Self-Employed',
+    intro_soho:  'Small Business (SOHO)',
+    il_def:      'Definition',
+    il_size:     'Size',
+    il_law:      'Law',
+    iv_self_def: 'Any registered sole proprietor running their own business',
+    iv_self_size:'No limit (including sole operators)',
+    iv_self_law: 'VAT Act, Income Tax Act',
+    iv_soho_def: 'Micro-enterprise owner under Small Enterprise Basic Act',
+    iv_soho_size:'<5 FTE (<10 in manufacturing, construction, transport)',
+    iv_soho_law: 'Small Enterprise & Market Service Act',
+    intro_note:  '💡 ~90% of self-employed persons qualify as SOHO. Check the <strong>target badge</strong> on each card for eligibility.',
+    ft_all:      'All',
+    ft_finance:  '💰 Finance',
+    ft_employ:   '👷 Employment',
+    ft_manage:   '📈 Management',
+    ft_crisis:   '🆘 Crisis & Exit',
+    lb_org:      'Agency',
+    lb_target:   'Eligible',
+    lb_content:  'Benefits',
+    lb_amount:   'Amount',
+    lb_how:      'How to Apply',
+    lb_contact:  'Contact',
+    btn_detail:  'Details',
+    btn_close:   'Collapse',
+    btn_site:    'Official Site →',
+    tg_all:      'All businesses',
+    tg_soho:     'SOHO (<5 employees)',
+    tg_emp:      'Businesses with employees',
+    cat_finance: 'Finance',
+    cat_employ:  'Employment',
+    cat_manage:  'Management',
+    cat_crisis:  'Crisis & Exit',
+    empty:       'No programs found for this category.',
+    preview_detail_tip: 'Log in to view details.',
+  }
+};
+
+function t(k){ return I18N[lang][k] || I18N.ko[k] || k; }
+
+// ── 지원 사업 데이터 ──
+const PROGRAMS = [
+  // ── 금융지원 ──
+  {
+    id:'policy-loan', cat:'finance', target:'soho',
+    ko:{
+      title:   '소상공인 정책자금 융자',
+      org:     '소상공인시장진흥공단 (소진공)',
+      desc:    '창업·성장·경영안정·재도약을 위한 저금리 정책자금',
+      content: '창업기반지원자금, 성장촉진자금, 경영안정자금, 재도약자금 — 연 2~3%대 우대금리',
+      target_desc:'소상공인 (상시근로자 5인 미만, 제조·건설·운수 등 10인 미만)',
+      amount:  '업체당 최대 1억 원 (목적별 상이)',
+      how:     '소진공 지역 센터 방문 또는 소상공인 정책자금 포털 온라인 신청',
+      contact: '소상공인시장진흥공단 ☎ 1357',
+    },
+    en:{
+      title:   'SOHO Policy Loan',
+      org:     'SEMAS (Small Enterprise & Market Service)',
+      desc:    'Low-interest loans for startup, growth, stability and recovery',
+      content: 'Startup, growth, stability, and restart funds — 2–3% preferential rate',
+      target_desc:'Small businesses with <5 FTE (<10 in manufacturing/construction)',
+      amount:  'Up to KRW 100M per business',
+      how:     'Visit local SEMAS branch or apply online at the policy loan portal',
+      contact: 'SEMAS ☎ 1357',
+    },
+    url:'https://www.semas.or.kr',
+  },
+  {
+    id:'guarantee', cat:'finance', target:'all',
+    ko:{
+      title:   '소상공인 신용보증부 대출',
+      org:     '신용보증재단중앙회 · 시중은행',
+      desc:    '담보 없이 신용보증으로 대출받을 수 있는 보증 지원',
+      content: '지역 신용보증재단이 보증 제공 → 은행에서 대출. 운전·시설자금 모두 가능',
+      target_desc:'자영업자·소상공인 (신용등급·매출 기준 충족)',
+      amount:  '보증 한도 내 (지역·신용도별 상이, 통상 수천만 원)',
+      how:     '가까운 지역 신용보증재단 방문 신청',
+      contact: '신용보증재단중앙회 ☎ 1588-7365',
+    },
+    en:{
+      title:   'SOHO Guaranteed Loan',
+      org:     'Korea Federation of Credit Guarantee Foundations',
+      desc:    'Loan support backed by credit guarantee — no collateral required',
+      content: 'Regional credit guarantee foundation provides guarantee; bank issues loan',
+      target_desc:'Self-employed and small business owners (credit/revenue criteria)',
+      amount:  'Within guarantee limit (varies by region and credit rating)',
+      how:     'Apply at your regional credit guarantee foundation',
+      contact: 'KFCGF ☎ 1588-7365',
+    },
+    url:'https://www.koreg.or.kr',
+  },
+  {
+    id:'yellow-umbrella', cat:'finance', target:'all',
+    ko:{
+      title:   '노란우산공제',
+      org:     '소상공인시장진흥공단',
+      desc:    '폐업·노령·사망 등 위기 시 공제금 지급 + 소득공제 혜택',
+      content: '월 5만~100만 원 납입 → 폐업·사망·노령 시 목돈 지급. 연 최대 500만 원 소득공제(사업소득 4,000만 원 이하 기준)',
+      target_desc:'사업자등록증 보유 자영업자·소상공인 모두',
+      amount:  '납입액+이자(복리). 소득공제 연 최대 500만 원',
+      how:     '소진공 지역 센터, 상공회의소, 금융기관 창구 또는 온라인 신청',
+      contact: '노란우산 ☎ 1666-9988',
+    },
+    en:{
+      title:   'Yellow Umbrella Mutual Aid',
+      org:     'SEMAS',
+      desc:    'Lump-sum payment on business closure, retirement, or death + tax deduction',
+      content: 'Monthly contribution KRW 50K–1M → payout on closure/death/retirement. Up to KRW 5M annual tax deduction',
+      target_desc:'All registered self-employed and small business owners',
+      amount:  'Contributions + compound interest; up to KRW 5M tax deduction/year',
+      how:     'SEMAS branch, Chamber of Commerce, bank counter, or online',
+      contact: 'Yellow Umbrella ☎ 1666-9988',
+    },
+    url:'https://www.8899.or.kr',
+  },
+  {
+    id:'sunshine-loan', cat:'finance', target:'all',
+    ko:{
+      title:   '햇살론15 (서민 소상공인 지원)',
+      org:     '서민금융진흥원 · 저축은행·신협 등',
+      desc:    '저신용·저소득 소상공인을 위한 최저금리 생계·사업 대출',
+      content: '연 소득 3,500만 원 이하 또는 신용점수 하위 20% 해당자에게 연 15.9% 이내 대출',
+      target_desc:'저신용 자영업자·소상공인 (소득·신용 기준 충족 시)',
+      amount:  '최대 700만 원',
+      how:     '저축은행·신협·농협 방문 또는 서민금융진흥원 온라인 신청',
+      contact: '서민금융콜센터 ☎ 1397',
+    },
+    en:{
+      title:   'Sunshine Loan 15',
+      org:     'Korea Inclusive Finance Agency',
+      desc:    'Low-rate loan for low-income or low-credit self-employed',
+      content: 'Up to 15.9% p.a. for income <KRW 35M or bottom 20% credit score',
+      target_desc:'Low-credit/low-income self-employed and small business owners',
+      amount:  'Up to KRW 7M',
+      how:     'Apply at savings bank, credit union, Nonghyup, or online',
+      contact: '☎ 1397',
+    },
+    url:'https://www.kinfa.or.kr',
+  },
+
+  // ── 고용·보험 ──
+  {
+    id:'durunuri', cat:'employ', target:'emp',
+    ko:{
+      title:   '두루누리 사회보험 지원',
+      org:     '고용노동부',
+      desc:    '10인 미만 소규모 사업장의 고용보험·국민연금 보험료를 국가가 지원',
+      content: '근로자 1인당 고용보험 + 국민연금 보험료의 최대 80% 지원 (신규가입자 기준)',
+      target_desc:'근로자 10인 미만 사업장의 사업주·근로자 (월보수 270만 원 미만)',
+      amount:  '보험료의 최대 80% (소규모일수록 지원율 높음)',
+      how:     '가까운 근로복지공단 지사 방문 또는 두루누리 포털 신청',
+      contact: '근로복지공단 ☎ 1588-0075',
+    },
+    en:{
+      title:   'Durunuri Social Insurance Support',
+      org:     'Ministry of Employment and Labor',
+      desc:    'Government covers up to 80% of social insurance premiums for small workplaces',
+      content: 'Up to 80% of employment insurance + national pension premiums per worker (new enrollees)',
+      target_desc:'Businesses with <10 workers; workers earning <KRW 2.7M/month',
+      amount:  'Up to 80% of premiums',
+      how:     'Apply at Korea Workers\' Compensation & Welfare Service or Durunuri portal',
+      contact: 'KWCWS ☎ 1588-0075',
+    },
+    url:'https://www.moel.go.kr',
+  },
+  {
+    id:'youth-job', cat:'employ', target:'emp',
+    ko:{
+      title:   '청년 일자리 도약 장려금',
+      org:     '고용노동부',
+      desc:    '청년(15~34세)을 신규 채용한 중소·소상공인 사업주에게 인건비 지원',
+      content: '취업애로 청년 채용 후 6개월 이상 유지 시 최대 월 60만 원 지원 (최대 1년)',
+      target_desc:'5인 이상 중소기업 (일부 5인 미만 특례 적용)',
+      amount:  '월 최대 60만 원 × 최대 12개월 = 최대 720만 원',
+      how:     '고용센터 방문 또는 고용보험 홈페이지 신청',
+      contact: '고용노동부 ☎ 1350',
+    },
+    en:{
+      title:   'Youth Job Leap Incentive',
+      org:     'Ministry of Employment and Labor',
+      desc:    'Wage subsidy for small businesses hiring youth (15–34 yrs)',
+      content: 'Up to KRW 600K/month for ≥6 months after hiring disadvantaged youth (max 1 year)',
+      target_desc:'SMEs with 5+ employees (some exceptions for <5)',
+      amount:  'Up to KRW 600K/month × 12 months = KRW 7.2M',
+      how:     'Apply at local Employment Center or Employment Insurance website',
+      contact: 'MOEL ☎ 1350',
+    },
+    url:'https://www.moel.go.kr',
+  },
+  {
+    id:'employment-incentive', cat:'employ', target:'emp',
+    ko:{
+      title:   '고용촉진 장려금',
+      org:     '고용노동부',
+      desc:    '장기실업자·고령자·장애인 등 취업취약계층 채용 시 인건비 지원',
+      content: '취업취약계층을 고용하고 6개월 이상 유지 시 지원. 근로자 유형별 지원액 상이',
+      target_desc:'취업취약계층을 신규 채용한 사업주',
+      amount:  '월 최대 60만 원 × 최대 12개월',
+      how:     '가까운 고용센터 방문 또는 고용보험 홈페이지 신청',
+      contact: '고용노동부 고용센터 ☎ 1350',
+    },
+    en:{
+      title:   'Employment Promotion Incentive',
+      org:     'Ministry of Employment and Labor',
+      desc:    'Wage support for hiring vulnerable job-seekers (long-term unemployed, elderly, disabled)',
+      content: 'Support upon hiring and retaining eligible workers for ≥6 months',
+      target_desc:'Employers who newly hire disadvantaged workers',
+      amount:  'Up to KRW 600K/month × 12 months',
+      how:     'Apply at local Employment Center or Employment Insurance website',
+      contact: 'MOEL ☎ 1350',
+    },
+    url:'https://www.moel.go.kr',
+  },
+
+  // ── 경영·판로 ──
+  {
+    id:'consulting', cat:'manage', target:'soho',
+    ko:{
+      title:   '소상공인 경영컨설팅 지원',
+      org:     '소상공인시장진흥공단',
+      desc:    '세무·마케팅·경영개선·SNS 등 전문가 컨설팅을 저비용 또는 무료로 제공',
+      content: '①현장컨설팅(전문가 방문) ②원격컨설팅 ③집단컨설팅. 세무·노무·마케팅·IT·인테리어 등',
+      target_desc:'소상공인 (사업자등록증 보유)',
+      amount:  '자부담 10% 이내 (대부분 무료)',
+      how:     '소진공 지역 센터 또는 소상공인마당 홈페이지 신청',
+      contact: '소진공 ☎ 1357',
+    },
+    en:{
+      title:   'SOHO Management Consulting',
+      org:     'SEMAS',
+      desc:    'Low-cost or free expert consulting in accounting, marketing, operations and more',
+      content: '①On-site consulting ②Remote consulting ③Group sessions — tax, HR, marketing, IT, design',
+      target_desc:'Small business owners (business registration required)',
+      amount:  'Free or <10% co-payment',
+      how:     'Apply at local SEMAS center or Sobiz portal',
+      contact: 'SEMAS ☎ 1357',
+    },
+    url:'https://www.semas.or.kr',
+  },
+  {
+    id:'online-market', cat:'manage', target:'soho',
+    ko:{
+      title:   '온라인 판로 개척 지원',
+      org:     '소상공인시장진흥공단 · 중소벤처기업부',
+      desc:    '스마트스토어·쿠팡·11번가 등 온라인 플랫폼 입점·운영 비용 지원',
+      content: '온라인 플랫폼 입점 수수료·광고비 지원, 제품 사진 촬영, 상세페이지 제작, 교육 제공',
+      target_desc:'온라인 판로 확대를 희망하는 소상공인',
+      amount:  '사업별 상이 (통상 100만~500만 원 상당 지원)',
+      how:     '소진공 지역센터 또는 소상공인마당 홈페이지에서 공고 확인 후 신청',
+      contact: '소진공 ☎ 1357',
+    },
+    en:{
+      title:   'Online Market Channel Support',
+      org:     'SEMAS / Ministry of SMEs and Startups',
+      desc:    'Subsidies for listing on Naver Smart Store, Coupang, 11st and other platforms',
+      content: 'Platform listing fees, ad costs, product photography, detail page production, training',
+      target_desc:'SOHO seeking to expand online sales channels',
+      amount:  'KRW 1M–5M equivalent support per program',
+      how:     'Check announcements at local SEMAS center or Sobiz portal',
+      contact: 'SEMAS ☎ 1357',
+    },
+    url:'https://www.semas.or.kr',
+  },
+  {
+    id:'smart-shop', cat:'manage', target:'soho',
+    ko:{
+      title:   '스마트상점 기술보급 사업',
+      org:     '소상공인시장진흥공단',
+      desc:    'AI·IoT 기반 스마트 기술 도입 비용의 일부를 국가가 지원',
+      content: '키오스크, 스마트오더, AI CCTV, 자동화 POS 등 스마트 기술 도입. 자부담 30~50%',
+      target_desc:'스마트 기술 도입을 희망하는 소상공인',
+      amount:  '최대 2,000만 원 (자부담 30~50%)',
+      how:     '소진공 스마트상점 공고 확인 후 온라인 신청 (경쟁 방식)',
+      contact: '소진공 ☎ 1357',
+    },
+    en:{
+      title:   'Smart Store Technology Support',
+      org:     'SEMAS',
+      desc:    'Government co-funds AI/IoT technology adoption for small stores',
+      content: 'Kiosks, smart ordering, AI CCTV, automated POS — 30–50% self-payment',
+      target_desc:'SOHO seeking to adopt smart technology',
+      amount:  'Up to KRW 20M (30–50% co-payment)',
+      how:     'Check SEMAS smart store announcement, then apply online (competitive)',
+      contact: 'SEMAS ☎ 1357',
+    },
+    url:'https://www.semas.or.kr',
+  },
+  {
+    id:'education', cat:'manage', target:'all',
+    ko:{
+      title:   '소상공인 교육훈련 지원',
+      org:     '소상공인시장진흥공단 · 지역 소상공인지원센터',
+      desc:    '경영·마케팅·디지털 전환 등 다양한 교육과정 무료 제공',
+      content: 'SNS 마케팅, 온라인 쇼핑몰 운영, 세무회계 기초, 사업계획서 작성, 점포 운영 개선 등',
+      target_desc:'소상공인 및 예비창업자 (자영업자 포함)',
+      amount:  '무료 (온·오프라인)',
+      how:     '소상공인마당 교육 메뉴 또는 지역 소상공인지원센터 접수',
+      contact: '소진공 ☎ 1357',
+    },
+    en:{
+      title:   'SOHO Training & Education',
+      org:     'SEMAS / Regional SOHO Support Centers',
+      desc:    'Free courses in management, marketing, digital transformation and more',
+      content: 'SNS marketing, online store operations, basic accounting, business planning, store improvement',
+      target_desc:'Current and prospective small business owners',
+      amount:  'Free (online and offline)',
+      how:     'Register via Sobiz education menu or local SOHO support center',
+      contact: 'SEMAS ☎ 1357',
+    },
+    url:'https://www.semas.or.kr',
+  },
+
+  // ── 위기·폐업 ──
+  {
+    id:'hope-return', cat:'crisis', target:'soho',
+    ko:{
+      title:   '희망리턴패키지',
+      org:     '소상공인시장진흥공단',
+      desc:    '폐업 전·후 소상공인의 사업 정리 비용 지원 + 재취업·재창업 연계',
+      content: '①점포 철거비 지원(최대 250만 원) ②법률·세무 자문(무료) ③폐업 절차 컨설팅 ④재취업·재창업 연계 교육',
+      target_desc:'폐업 예정 또는 폐업 후 3년 이내 소상공인',
+      amount:  '점포 철거비 최대 250만 원 + 무료 컨설팅',
+      how:     '소진공 지역 센터 방문 또는 희망리턴 홈페이지 신청',
+      contact: '소진공 ☎ 1357',
+    },
+    en:{
+      title:   'Hope Return Package',
+      org:     'SEMAS',
+      desc:    'Support for business closure costs and job/restart transition assistance',
+      content: '①Store demolition subsidy (up to KRW 2.5M) ②Free legal/tax advice ③Closure consultation ④Reemployment/restart education',
+      target_desc:'SOHO planning to close or closed within 3 years',
+      amount:  'Up to KRW 2.5M for demolition + free consulting',
+      how:     'Visit local SEMAS center or apply at the Hope Return website',
+      contact: 'SEMAS ☎ 1357',
+    },
+    url:'https://www.hopeturn.kr',
+  },
+  {
+    id:'restart', cat:'crisis', target:'soho',
+    ko:{
+      title:   '재창업 패키지 (재도전 성공 패키지)',
+      org:     '소상공인시장진흥공단 · 중소벤처기업부',
+      desc:    '폐업 경험자가 다시 창업에 도전할 수 있도록 교육·자금·멘토링 지원',
+      content: '①재창업 교육 ②사업계획서 작성 지원 ③전문가 멘토링 ④최대 1,000만 원 사업화 지원금',
+      target_desc:'폐업 후 재창업을 준비하는 소상공인·자영업자',
+      amount:  '사업화 지원금 최대 1,000만 원 + 교육비 무료',
+      how:     '소진공 공고 확인 후 온라인 신청 (경쟁 선발)',
+      contact: '소진공 ☎ 1357',
+    },
+    en:{
+      title:   'Restart Package (Re-challenge Success Package)',
+      org:     'SEMAS / Ministry of SMEs and Startups',
+      desc:    'Education, funding and mentoring for former business owners starting fresh',
+      content: '①Re-startup training ②Business plan support ③Expert mentoring ④Up to KRW 10M startup fund',
+      target_desc:'Former SOHO owners restarting a new business',
+      amount:  'Up to KRW 10M commercialization grant + free training',
+      how:     'Check SEMAS announcement, then apply online (competitive selection)',
+      contact: 'SEMAS ☎ 1357',
+    },
+    url:'https://www.semas.or.kr',
+  },
+  {
+    id:'emergency-fund', cat:'crisis', target:'soho',
+    ko:{
+      title:   '긴급경영안정자금',
+      org:     '소상공인시장진흥공단',
+      desc:    '재해·사고·감염병 등 불가항력적 위기로 경영이 어려운 소상공인에게 긴급 자금 지원',
+      content: '자연재해(홍수·화재 등), 감염병 확산, 주변 공사 등 외부 요인으로 매출이 급감한 경우 지원',
+      target_desc:'재난·사고·외부 요인으로 경영난에 처한 소상공인',
+      amount:  '업체당 최대 1,000만 원 (연 2%대 저금리)',
+      how:     '소진공 지역 센터 방문 또는 온라인 신청 (재해 발생 후 빠른 신청 권장)',
+      contact: '소진공 ☎ 1357',
+    },
+    en:{
+      title:   'Emergency Business Stability Fund',
+      org:     'SEMAS',
+      desc:    'Emergency low-rate loan for SOHO hit by disasters, accidents, or infectious disease',
+      content: 'Natural disasters (flood, fire), epidemic spread, nearby construction causing revenue loss',
+      target_desc:'SOHO in financial difficulty due to external crisis',
+      amount:  'Up to KRW 10M per business (approx. 2% p.a.)',
+      how:     'Apply at local SEMAS center or online as soon as possible after incident',
+      contact: 'SEMAS ☎ 1357',
+    },
+    url:'https://www.semas.or.kr',
+  },
+];
+
+// ── 렌더링 ──
+let currentCat = 'all';
+
+function t(k){ return (I18N[lang]||I18N.ko)[k] || I18N.ko[k] || k; }
+
+const CAT_BADGE = {finance:'badge-finance',employ:'badge-employ',manage:'badge-manage',crisis:'badge-crisis'};
+const TG_BADGE  = {all:'badge-all',soho:'badge-soho',emp:'badge-emp'};
+const CAT_ACCENT= {finance:'card-accent-finance',employ:'card-accent-employ',manage:'card-accent-manage',crisis:'card-accent-crisis'};
+
+function catLabel(cat){ return t('cat_'+cat); }
+function tgLabel(tg){   return t('tg_'+tg); }
+
+function buildCard(prog){
+  const d = prog[lang] || prog.ko;
+  const catBadge = CAT_BADGE[prog.cat] || '';
+  const tgBadge  = TG_BADGE[prog.target] || '';
+  const accentCls= CAT_ACCENT[prog.cat] || '';
+  return `
+  <div class="prog-card" id="card-${prog.id}" data-cat="${prog.cat}">
+    <div class="card-accent ${accentCls}"></div>
+    <div class="card-top">
+      <div class="card-badges">
+        <span class="badge ${catBadge}">${catLabel(prog.cat)}</span>
+        <span class="badge ${tgBadge}">${tgLabel(prog.target)}</span>
+      </div>
+      <div class="card-title">${d.title}</div>
+      <div class="card-org">${d.org}</div>
+      <div class="card-desc">${d.desc}</div>
+    </div>
+    <div class="card-detail">
+      <table class="detail-table">
+        <tr><td>${t('lb_content')}</td><td>${d.content}</td></tr>
+        <tr><td>${t('lb_target')}</td><td>${d.target_desc}</td></tr>
+        <tr><td>${t('lb_amount')}</td><td>${d.amount}</td></tr>
+        <tr><td>${t('lb_how')}</td><td>${d.how}</td></tr>
+        <tr><td>${t('lb_contact')}</td><td>${d.contact}</td></tr>
+      </table>
+    </div>
+    <div class="card-footer">
+      <button class="btn-toggle" onclick="toggleCard('${prog.id}')">
+        <span class="btn-detail-text">${t('btn_detail')}</span>
+        <span class="chevron">▼</span>
+      </button>
+      ${IS_PREVIEW ? `<span class="preview-tip" id="pt-${prog.id}">🔒 ${t('preview_detail_tip')}</span>` : ''}
+      ${prog.url ? `<a class="btn-site" href="${prog.url}" target="_blank" rel="noopener">${t('btn_site')}</a>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderCards(){
+  const grid = document.getElementById('prog-grid');
+  grid.innerHTML = PROGRAMS.map(buildCard).join('');
+  updateCounts();
+  filterCat(currentCat, false);
+}
+
+function toggleCard(id){
+  if(IS_PREVIEW){
+    const tip = document.getElementById('pt-'+id);
+    if(tip){ tip.classList.add('show'); clearTimeout(tip._t); tip._t = setTimeout(()=>tip.classList.remove('show'), 2200); }
+    return;
+  }
+  const card = document.getElementById('card-'+id);
+  const isOpen = card.classList.toggle('open');
+  const btnText = card.querySelector('.btn-detail-text');
+  if(btnText) btnText.textContent = isOpen ? t('btn_close') : t('btn_detail');
+}
+
+function filterCat(cat, scroll){
+  currentCat = cat;
+  document.querySelectorAll('.filter-tab').forEach(tab=>{
+    tab.classList.toggle('active', tab.dataset.cat === cat);
+  });
+  let visible = 0;
+  PROGRAMS.forEach(prog=>{
+    const card = document.getElementById('card-'+prog.id);
+    if(!card) return;
+    const show = (cat === 'all' || prog.cat === cat);
+    card.classList.toggle('hidden', !show);
+    if(show) visible++;
+  });
+  const empty = document.getElementById('empty-msg');
+  if(empty) empty.classList.toggle('show', visible === 0);
+}
+
+function updateCounts(){
+  const cats = ['all','finance','employ','manage','crisis'];
+  cats.forEach(cat=>{
+    const el = document.getElementById('fc-'+cat);
+    if(!el) return;
+    const cnt = cat==='all' ? PROGRAMS.length : PROGRAMS.filter(p=>p.cat===cat).length;
+    el.textContent = `(${cnt})`;
+  });
+}
+
+// ── 다국어 적용 ──
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.getElementById('top-title').textContent  = t('top_title');
+  document.getElementById('top-sub').textContent    = t('top_sub');
+  document.getElementById('top-updated').textContent= t('top_updated');
+  document.getElementById('intro-self-title').textContent = t('intro_self');
+  document.getElementById('intro-soho-title').textContent = t('intro_soho');
+  document.getElementById('il-def').textContent     = t('il_def');
+  document.getElementById('il-size').textContent    = t('il_size');
+  document.getElementById('il-law').textContent     = t('il_law');
+  document.getElementById('iv-self-def').textContent  = t('iv_self_def');
+  document.getElementById('iv-self-size').textContent = t('iv_self_size');
+  document.getElementById('iv-self-law').textContent  = t('iv_self_law');
+  document.getElementById('iv-soho-def').textContent  = t('iv_soho_def');
+  document.getElementById('iv-soho-size').textContent = t('iv_soho_size');
+  document.getElementById('iv-soho-law').textContent  = t('iv_soho_law');
+  document.getElementById('intro-note').innerHTML   = t('intro_note');
+  document.getElementById('ft-all').textContent     = t('ft_all');
+  document.getElementById('ft-finance').textContent = t('ft_finance');
+  document.getElementById('ft-employ').textContent  = t('ft_employ');
+  document.getElementById('ft-manage').textContent  = t('ft_manage');
+  document.getElementById('ft-crisis').textContent  = t('ft_crisis');
+  document.getElementById('empty-msg').textContent  = t('empty');
+  // 카드 재렌더
+  renderCards();
+}
+
+function setLang(l){
+  if(l !== 'ko' && l !== 'en') return;
+  lang = l;
+  applyLang();
+}
+
+// ── 부모 iframe 언어 수신 ──
+window.addEventListener('message', function(e){
+  if(e.data && e.data.type === 'wf_lang') setLang(e.data.lang);
+});
+
+// ── 초기화 ──
+renderCards();
+applyLang();
+if(IS_PREVIEW){
+  document.querySelectorAll('.filter-tab:not([data-cat="all"])').forEach(el=>el.classList.add('disabled'));
+}
+</script>
+</body>
+</html>

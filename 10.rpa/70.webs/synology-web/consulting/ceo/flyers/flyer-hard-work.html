@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>GFC 기업컨설팅 전단지 양면</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#d0cfc9;
+  display:flex; flex-direction:column;
+  align-items:center;
+  padding:32px 20px;
+  gap:20px;
+  font-family:'Noto Sans KR', sans-serif;
+}
+
+/* ═══════════════════════════════════
+   공통 A4 설정
+═══════════════════════════════════ */
+.a4 {
+  width:794px;
+  min-height:1123px;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+/* 페이지 구분 레이블 */
+.page-label {
+  text-align:center;
+  font-size:11px;
+  color:#888;
+  letter-spacing:3px;
+  font-weight:500;
+  margin-bottom:8px;
+}
+
+/* ═══════════════════════════════════
+   앞면 — 따뜻한 크림/네이비 에디토리얼
+═══════════════════════════════════ */
+#front {
+  background:#f6f1e8;
+}
+
+/* 상단 네이비 헤더 */
+.front-header {
+  background:#1c2d4f;
+  padding:18px 52px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.front-header .logo-area {
+  display:flex; align-items:center; gap:14px;
+}
+.logo-mark {
+  width:36px; height:36px;
+  border:2px solid #c8922a;
+  display:flex; align-items:center; justify-content:center;
+}
+.logo-mark span {
+  font-size:13px; font-weight:700; color:#c8922a;
+  font-family:'IBM Plex Mono', monospace;
+}
+.logo-text {
+  font-size:12px; color:rgba(255,255,255,0.7); letter-spacing:3px;
+  font-weight:400;
+}
+.front-header .header-right {
+  font-size:10px; color:rgba(255,255,255,0.35); letter-spacing:2px;
+}
+
+/* 앞면 히어로 */
+.front-hero {
+  padding:52px 52px 36px;
+  border-bottom:1px solid rgba(28,45,79,0.12);
+  position:relative;
+}
+.front-hero::after {
+  content:'';
+  position:absolute;
+  right:0; top:0;
+  width:180px; height:100%;
+  background:linear-gradient(to left, rgba(200,146,42,0.06), transparent);
+  pointer-events:none;
+}
+
+.eyebrow {
+  display:flex; align-items:center; gap:12px; margin-bottom:24px;
+}
+.eyebrow .dash { width:28px; height:1px; background:#c8922a; }
+.eyebrow span {
+  font-size:11px; color:#c8922a; font-weight:700; letter-spacing:3px;
+}
+
+.front-title {
+  font-family:'Noto Serif KR', serif;
+  font-size:44px; font-weight:900;
+  color:#1c2d4f; line-height:1.2; letter-spacing:-1px;
+  margin-bottom:18px;
+}
+.front-title .underline {
+  position:relative; display:inline;
+}
+.front-title .underline::after {
+  content:'';
+  position:absolute; bottom:2px; left:0; right:0;
+  height:5px; background:rgba(200,146,42,0.3);
+}
+
+.front-subtitle {
+  font-size:15.5px; color:#4a5568; line-height:1.75;
+  font-weight:400; max-width:500px;
+}
+
+/* 공감 질문 카드들 */
+.questions-section {
+  padding:36px 52px;
+}
+.qs-label {
+  font-size:10px; letter-spacing:3px; color:#c8922a; font-weight:700;
+  margin-bottom:20px;
+}
+.q-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:14px;
+}
+.q-card {
+  background:#fff;
+  border:1px solid rgba(28,45,79,0.08);
+  padding:20px 22px;
+  position:relative;
+  transition:all 0.2s;
+}
+.q-card::before {
+  content:'Q';
+  position:absolute; top:16px; right:18px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:28px; font-weight:600;
+  color:rgba(200,146,42,0.12);
+}
+.q-card .q-icon { font-size:22px; margin-bottom:10px; }
+.q-card .q-text {
+  font-size:14px; color:#1c2d4f; line-height:1.65;
+  font-weight:500;
+}
+.q-card .q-sub {
+  font-size:11.5px; color:#888; margin-top:6px; line-height:1.5;
+}
+
+/* 중간 강조 문구 */
+.mid-emphasis {
+  margin:0 52px;
+  background:#1c2d4f;
+  padding:26px 32px;
+  display:flex; gap:20px; align-items:center;
+}
+.mid-emphasis .me-icon {
+  font-size:36px; flex-shrink:0;
+}
+.mid-emphasis .me-text p {
+  font-family:'Noto Serif KR', serif;
+  font-size:17px; font-weight:700; color:#fff; line-height:1.6;
+}
+.mid-emphasis .me-text span {
+  font-size:12px; color:rgba(255,255,255,0.5); margin-top:4px; display:block;
+}
+
+/* 3가지 핵심 고민 */
+.concerns-section {
+  padding:32px 52px;
+  flex:1;
+}
+.concerns-label {
+  font-size:10px; letter-spacing:3px; color:#888; font-weight:700;
+  margin-bottom:20px; display:flex; align-items:center; gap:10px;
+}
+.concerns-label::before { content:''; width:20px; height:1px; background:#888; }
+
+.concern-list { display:flex; flex-direction:column; gap:0; }
+.concern-row {
+  display:flex; align-items:flex-start; gap:0;
+  border-bottom:1px solid rgba(28,45,79,0.08);
+  padding:16px 0;
+}
+.concern-row:first-child { border-top:1px solid rgba(28,45,79,0.08); }
+.c-num {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px; color:#c8922a; font-weight:600;
+  letter-spacing:1px; width:36px; flex-shrink:0; padding-top:2px;
+}
+.c-content .c-title {
+  font-size:14.5px; font-weight:700; color:#1c2d4f; margin-bottom:3px;
+}
+.c-content .c-desc {
+  font-size:12px; color:#666; line-height:1.6;
+}
+
+/* 앞면 하단 CTA */
+.front-cta {
+  background:#c8922a;
+  padding:22px 52px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.front-cta .fc-text p {
+  font-size:12px; color:rgba(255,255,255,0.75); margin-bottom:3px;
+}
+.front-cta .fc-text strong {
+  font-size:18px; color:#fff; font-weight:700;
+  font-family:'Noto Serif KR', serif;
+}
+.front-cta .fc-arrow {
+  display:flex; align-items:center; gap:8px;
+  font-size:13px; color:#fff; font-weight:700; letter-spacing:1px;
+}
+.front-cta .fc-arrow .arr {
+  width:36px; height:36px; border:1.5px solid rgba(255,255,255,0.6);
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px;
+}
+
+.front-footer {
+  background:#f0ead8;
+  padding:12px 52px;
+  display:flex; justify-content:space-between; align-items:center;
+  border-top:1px solid rgba(28,45,79,0.1);
+}
+.front-footer span {
+  font-size:10px; color:rgba(28,45,79,0.35); letter-spacing:1px;
+}
+
+/* ═══════════════════════════════════
+   뒷면 — 깔끔한 솔루션 구조 설명
+═══════════════════════════════════ */
+#back {
+  background:#f9f9f7;
+}
+
+.back-header {
+  background:#1c2d4f;
+  padding:18px 52px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.back-header .bh-left {
+  display:flex; align-items:center; gap:14px;
+}
+.back-header .bh-logo { /* same as front */ }
+.back-header span {
+  font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:2px;
+}
+
+/* 뒷면 히어로 */
+.back-hero {
+  padding:40px 52px 28px;
+  background:#fff;
+  border-bottom:2px solid #1c2d4f;
+}
+.back-eyebrow {
+  display:flex; align-items:center; gap:10px; margin-bottom:16px;
+}
+.back-eyebrow .tag {
+  background:#1c2d4f; color:#c8922a;
+  padding:4px 12px; font-size:10px; font-weight:700; letter-spacing:2px;
+}
+.back-eyebrow .sub {
+  font-size:11px; color:#888; letter-spacing:1px;
+}
+.back-title {
+  font-family:'Noto Serif KR', serif;
+  font-size:36px; font-weight:900; color:#1c2d4f; line-height:1.25;
+  margin-bottom:10px;
+}
+.back-title em { color:#c8922a; font-style:normal; }
+.back-desc {
+  font-size:13.5px; color:#555; line-height:1.7;
+}
+
+/* 핵심 로직 플로우 */
+.logic-flow {
+  padding:32px 52px;
+  background:#fff;
+  margin:0;
+  border-bottom:1px solid rgba(0,0,0,0.07);
+}
+.lf-title {
+  font-size:10px; letter-spacing:3px; color:#c8922a; font-weight:700;
+  margin-bottom:22px;
+}
+
+/* 플로우 스텝 */
+.flow-steps {
+  display:flex; flex-direction:column; gap:0;
+}
+.flow-step {
+  display:flex; gap:20px; align-items:flex-start;
+  padding:16px 0;
+  border-bottom:1px dashed rgba(0,0,0,0.1);
+  position:relative;
+}
+.flow-step:last-child { border-bottom:none; }
+
+.step-left {
+  flex-shrink:0; width:48px;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.step-circle {
+  width:40px; height:40px;
+  border:2px solid #1c2d4f;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:13px; font-weight:600; color:#1c2d4f;
+}
+.step-circle.gold { border-color:#c8922a; color:#c8922a; }
+.step-line {
+  width:1px; height:24px; background:rgba(0,0,0,0.12);
+}
+
+.step-content .sc-tag {
+  font-size:10px; font-weight:700; letter-spacing:2px; color:#888; margin-bottom:4px;
+}
+.step-content .sc-title {
+  font-size:15px; font-weight:700; color:#1c2d4f; margin-bottom:5px;
+}
+.step-content .sc-desc {
+  font-size:12.5px; color:#555; line-height:1.65;
+}
+
+/* 계산 예시 박스 */
+.calc-box {
+  background:#1c2d4f;
+  margin:24px 0 0;
+  padding:20px 24px;
+}
+.calc-box .cb-title {
+  font-size:10px; letter-spacing:2px; color:#c8922a; font-weight:700;
+  margin-bottom:14px;
+}
+.calc-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.calc-row:last-child { border-bottom:none; }
+.calc-row .cr-label { font-size:12px; color:rgba(255,255,255,0.55); }
+.calc-row .cr-val { font-size:14px; font-weight:700; color:#fff;
+  font-family:'IBM Plex Mono', monospace; }
+.calc-row .cr-val.gold { color:#c8922a; }
+.calc-row .cr-val.green { color:#6fcf97; }
+.calc-note {
+  margin-top:12px; font-size:11px; color:rgba(255,255,255,0.35); line-height:1.6;
+}
+
+/* 세금 투명성 박스 */
+.tax-box {
+  margin:24px 52px 0;
+  background:#fff3cd;
+  border:1px solid #e6c04a;
+  border-left:3px solid #c8922a;
+  padding:16px 20px;
+}
+.tax-box .tb-title {
+  font-size:11px; font-weight:700; color:#7a5c00; letter-spacing:1px;
+  margin-bottom:6px; display:flex; align-items:center; gap:8px;
+}
+.tax-box .tb-title::before { content:'⚠'; font-size:13px; }
+.tax-box .tb-text {
+  font-size:12px; color:#5a4200; line-height:1.65;
+}
+
+/* 중대재해 간략 연결 */
+.risk-connect {
+  padding:24px 52px;
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;
+}
+.rc-title {
+  grid-column:1/-1;
+  font-size:10px; letter-spacing:3px; color:#888; font-weight:700; margin-bottom:4px;
+}
+.rc-item {
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.08);
+  border-top:2px solid #1c2d4f;
+  padding:14px 16px;
+}
+.rc-item .ri-label { font-size:10px; color:#c8922a; font-weight:700; letter-spacing:1px; margin-bottom:4px; }
+.rc-item .ri-title { font-size:13px; font-weight:700; color:#1c2d4f; margin-bottom:3px; }
+.rc-item .ri-desc { font-size:11px; color:#777; line-height:1.5; }
+
+/* 뒷면 CTA */
+.back-cta {
+  margin:20px 52px;
+  display:flex; gap:0;
+  border:1.5px solid #1c2d4f;
+}
+.bc-left {
+  flex:1; padding:20px 24px;
+}
+.bc-left .bcl-q { font-size:12px; color:#888; margin-bottom:5px; }
+.bc-left .bcl-main {
+  font-size:19px; font-weight:700; color:#1c2d4f;
+  font-family:'Noto Serif KR', serif; line-height:1.4;
+}
+.bc-left .bcl-sub { font-size:11.5px; color:#888; margin-top:6px; line-height:1.6; }
+.bc-right {
+  background:#1c2d4f; min-width:180px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:20px; gap:8px;
+}
+.bc-right .br-top { font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:2px; }
+.bc-right .br-num {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:20px; font-weight:600; color:#c8922a;
+}
+.bc-right .br-action {
+  font-size:11px; color:rgba(255,255,255,0.6); letter-spacing:1px;
+}
+
+/* 뒷면 footer */
+.back-footer {
+  margin-top:auto;
+  background:#f0ead8;
+  padding:12px 52px;
+  border-top:1px solid rgba(28,45,79,0.1);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.back-footer span { font-size:10px; color:rgba(28,45,79,0.35); letter-spacing:1px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ 앞면 ═══ -->
+<div class="page-label">▲ 앞면 (FRONT)</div>
+<div class="a4" id="front">
+
+  <div class="front-header">
+    <div class="logo-area">
+      <div class="logo-mark"><span>GFC</span></div>
+      <span class="logo-text">기업 재무 컨설팅</span>
+    </div>
+    <span class="header-right">CORPORATE FINANCIAL CONSULTING</span>
+  </div>
+
+  <div class="front-hero">
+    <div class="eyebrow">
+      <div class="dash"></div>
+      <span>제조기업 대표님께 드리는 질문</span>
+    </div>
+    <div class="front-title">
+      열심히 달려왔는데,<br>
+      <span class="underline">남는 게 없다</span>는 느낌,<br>
+      혹시 드신 적 있으십니까?
+    </div>
+    <div class="front-subtitle">
+      매출은 늘었는데 세금도 늘고, 직원 관리는 더 어려워지고,<br>
+      회사 돈이 내 돈 같지 않은 이 구조—<br>
+      사실 설계의 문제입니다.
+    </div>
+  </div>
+
+  <!-- 공감 질문 카드 -->
+  <div class="questions-section">
+    <div class="qs-label">이 중 하나라도 해당되신다면 읽어보세요</div>
+    <div class="q-grid">
+      <div class="q-card">
+        <div class="q-icon">💸</div>
+        <div class="q-text">세금을 너무 많이 내고 있는 것 같은데, 줄일 방법이 있는지 모르겠다.</div>
+        <div class="q-sub">법인세·소득세 이중 부담, 매년 반복</div>
+      </div>
+      <div class="q-card">
+        <div class="q-icon">🏭</div>
+        <div class="q-text">현장에서 사고 한 번 나면 나까지 형사처벌 받을 수 있다는 게 불안하다.</div>
+        <div class="q-sub">중대재해처벌법 시행 3년, 기소 121건</div>
+      </div>
+      <div class="q-card">
+        <div class="q-icon">📊</div>
+        <div class="q-text">회사는 잘 되는데 정작 내 개인 자산으로 쌓이는 게 없다. 법인 돈을 어떻게 가져가야 하나.</div>
+        <div class="q-sub">법인 유보금, 배당·급여 모두 과세</div>
+      </div>
+      <div class="q-card">
+        <div class="q-icon">🔄</div>
+        <div class="q-text">나중에 은퇴하거나 자녀에게 물려줄 때 세금이 얼마나 나올지 생각하면 막막하다.</div>
+        <div class="q-sub">가업승계·상속 설계, 빠를수록 유리</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 중간 강조 -->
+  <div class="mid-emphasis">
+    <div class="me-icon">💡</div>
+    <div class="me-text">
+      <p>이 네 가지 고민, 사실 서로 연결되어 있고<br>동시에 해결하는 구조가 존재합니다.</p>
+      <span>절세로 만들어진 재원으로 리스크를 막고, 그 돈을 합법적으로 대표님께 돌려드립니다.</span>
+    </div>
+  </div>
+
+  <!-- 핵심 고민 리스트 -->
+  <div class="concerns-section">
+    <div class="concerns-label">GFC가 주목하는 중소 제조기업 대표의 3대 과제</div>
+    <div class="concern-list">
+      <div class="concern-row">
+        <div class="c-num">01</div>
+        <div class="c-content">
+          <div class="c-title">법인세·소득세 절세 구조 설계</div>
+          <div class="c-desc">현재 납부 세금에서 합법적으로 줄일 수 있는 포인트를 먼저 진단합니다. 대부분의 기업은 20~40%의 절세 여지가 있습니다.</div>
+        </div>
+      </div>
+      <div class="concern-row">
+        <div class="c-num">02</div>
+        <div class="c-content">
+          <div class="c-title">중대재해·사고 리스크 차단</div>
+          <div class="c-desc">사고 한 번에 형사처벌·배상·법률비용이 한꺼번에 옵니다. 절세 재원으로 리스크를 차단하는 구조를 만듭니다.</div>
+        </div>
+      </div>
+      <div class="concern-row">
+        <div class="c-num">03</div>
+        <div class="c-content">
+          <div class="c-title">법인 자금의 대표 소득 환수</div>
+          <div class="c-desc">회사 돈을 대표님 개인 자산으로 전환하는 합법적 방법을 설계합니다. 퇴직소득 구조 활용 시 세금을 크게 줄일 수 있습니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="front-cta">
+    <div class="fc-text">
+      <p>먼저 진단부터 시작합니다 — 비용 없음</p>
+      <strong>30분 무료 기업 재무진단 신청</strong>
+    </div>
+    <div class="fc-arrow">
+      <div class="arr">→</div>
+      <span>뒷면에서 구체적인<br>설계 내용을 확인하세요</span>
+    </div>
+  </div>
+
+  <div class="front-footer">
+    <span>GFC · 기업 재무 컨설팅</span>
+    <span>앞면 — 본 자료는 정보 제공 목적으로 제작되었습니다</span>
+  </div>
+
+</div>
+
+<!-- ═══ 뒷면 ═══ -->
+<div class="page-label">▼ 뒷면 (BACK)</div>
+<div class="a4" id="back">
+
+  <div class="back-header">
+    <div class="bh-left">
+      <div class="logo-mark" style="width:30px;height:30px;"><span style="font-size:11px;">GFC</span></div>
+      <span style="font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:2px;">기업 재무 컨설팅</span>
+    </div>
+    <span style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:2px;">SOLUTION OVERVIEW</span>
+  </div>
+
+  <!-- 뒷면 히어로 -->
+  <div class="back-hero">
+    <div class="back-eyebrow">
+      <div class="tag">GFC 핵심 솔루션</div>
+      <span class="sub">실제 적용 사례 기반</span>
+    </div>
+    <div class="back-title">
+      세금을 줄여 그 돈으로<br>
+      리스크를 막고 <em>대표님 통장에 돌려드립니다</em>
+    </div>
+    <div class="back-desc">
+      많은 기업이 내고 있는 세금 중 일부는 합법적으로 줄일 수 있습니다.<br>
+      그 절세 재원으로 법인 단체보험을 설계하면 — 비용은 그대로이고, 리스크는 차단되며,<br>
+      7년 후 환급금은 대표님의 퇴직소득으로 전환할 수 있습니다.
+    </div>
+  </div>
+
+  <!-- 논리 플로우 -->
+  <div class="logic-flow">
+    <div class="lf-title">GFC 3단계 설계 논리</div>
+    <div class="flow-steps">
+
+      <div class="flow-step">
+        <div class="step-left">
+          <div class="step-circle">01</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="sc-tag">STEP 1 — 절세 진단</div>
+          <div class="sc-title">현재 세금에서 절세 포인트를 찾는다</div>
+          <div class="sc-desc">
+            기업 재무제표와 납세 현황을 분석해 불필요하게 새고 있는 세금을 찾습니다.<br>
+            <strong>예시:</strong> 월 법인세·소득세 합계 800만 원 → 절세 구조 도입 후 500만 원<br>
+            → <strong style="color:#1c2d4f">절세액 월 300만 원 확보</strong>
+          </div>
+
+          <!-- 계산 박스 -->
+          <div class="calc-box">
+            <div class="cb-title">계산 예시 — 월 기준</div>
+            <div class="calc-row">
+              <span class="cr-label">기존 월 납부 세금</span>
+              <span class="cr-val">800만원</span>
+            </div>
+            <div class="calc-row">
+              <span class="cr-label">절세 구조 적용 후</span>
+              <span class="cr-val">500만원</span>
+            </div>
+            <div class="calc-row">
+              <span class="cr-label">절세액 (확보 재원)</span>
+              <span class="cr-val gold">▼ 300만원</span>
+            </div>
+            <div class="calc-row">
+              <span class="cr-label">실질 월 비용 (세금 + 보험)</span>
+              <span class="cr-val green">= 800만원 동일</span>
+            </div>
+            <div class="calc-note">
+              ※ 절세로 줄어든 300만원을 보험료로 전환 → 대표님의 월 총 지출은 변하지 않습니다.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-left">
+          <div class="step-circle">02</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="sc-tag">STEP 2 — 법인 단체보험 설계</div>
+          <div class="sc-title">절세 재원으로 리스크를 차단한다</div>
+          <div class="sc-desc">
+            절세액(월 300만 원)을 재원으로 법인 명의 단체보험을 가입합니다.<br>
+            중대재해 배상, 형사 방어 비용, 경영인 부재 시 기업 연속성을 동시에 보장합니다.<br><br>
+            <strong>보험 구조:</strong> 법인 계약자 · 대표 피보험자 · 법인 수익자 (초기 설정)<br>
+            → 환급율 7년차 기준 약 90% → <strong style="color:#1c2d4f">300만 원 中 270만 원은 돌려받는 구조</strong><br>
+            → 월 실질 순비용 약 <strong style="color:#c8922a">30만 원</strong>으로 리스크 전체 차단
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-left">
+          <div class="step-circle gold">03</div>
+        </div>
+        <div class="step-content">
+          <div class="sc-tag">STEP 3 — 대표 소득 환수</div>
+          <div class="sc-title">7년 후 환급금을 대표님의 자산으로 전환한다</div>
+          <div class="sc-desc">
+            7년 후 환급 시점에 계약자·수익자를 <strong>법인 → 대표님 개인</strong>으로 승계하면,<br>
+            환급금은 <strong style="color:#1c2d4f">퇴직소득</strong>으로 분류됩니다.<br><br>
+            퇴직소득은 일반 근로소득보다 세율이 낮고, 장기근속 공제를 받을수록 실질 세부담이 줄어드는<br>
+            가장 합법적이고 효율적인 법인자금 개인 전환 방법입니다.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 세금 주의사항 -->
+  <div class="tax-box">
+    <div class="tb-title">세금 관련 투명한 안내</div>
+    <div class="tb-text">
+      환급금 수령 시 <strong>퇴직소득세가 부과</strong>됩니다 (일반 소득세보다 낮은 세율 적용).
+      재직 중 수익자만 변경해 수령할 경우 근로소득세 또는 증여세 이슈가 발생할 수 있어,
+      반드시 퇴직 시 계약 승계 구조로 설계해야 합니다.
+      GFC는 세무사·법무사와 협업하여 <strong>가장 세부담이 낮은 합법 구조</strong>를 설계해 드립니다.
+    </div>
+  </div>
+
+  <!-- 중대재해 3가지 연결 -->
+  <div class="risk-connect">
+    <div class="rc-title">법인 단체보험이 동시에 해결하는 3가지</div>
+    <div class="rc-item">
+      <div class="ri-label">RISK 01</div>
+      <div class="ri-title">중대재해 배상</div>
+      <div class="ri-desc">사고 발생 시 징벌적 손해배상 최대 5배까지 보장</div>
+    </div>
+    <div class="rc-item">
+      <div class="ri-label">RISK 02</div>
+      <div class="ri-title">형사 법률비용</div>
+      <div class="ri-desc">대표이사 형사소송 변호사 비용 수천만 원 보장</div>
+    </div>
+    <div class="rc-item">
+      <div class="ri-label">ASSET</div>
+      <div class="ri-title">대표 소득 환수</div>
+      <div class="ri-desc">7년 후 환급금을 퇴직소득 구조로 합법 전환</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="back-cta">
+    <div class="bc-left">
+      <div class="bcl-q">지금 귀사의 절세 여지가 궁금하신가요?</div>
+      <div class="bcl-main">30분 무료 진단으로<br>시작하세요</div>
+      <div class="bcl-sub">
+        재무제표 없이도 간단한 현황 파악만으로 가능합니다.<br>
+        진단 후 맞지 않으면 상품 제안 없이 마무리합니다.
+      </div>
+    </div>
+    <div class="bc-right">
+      <span class="br-top">상담 문의</span>
+      <span class="br-num">010-0000-0000</span>
+      <span class="br-action">전화 또는 문자로 연락주세요</span>
+    </div>
+  </div>
+
+  <div class="back-footer">
+    <span>GFC · 기업 재무 컨설팅</span>
+    <span>뒷면 · 본 자료는 일반적 정보 제공 목적이며 개인별 상황에 따라 결과가 다를 수 있습니다. 세무·법률 전문가 상담을 병행하시기 바랍니다.</span>
+  </div>
+
+</div>
+
+</body>
+</html>

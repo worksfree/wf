@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(\"C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Python\\\\pythoncore-3.14-64\\\\python.exe\" -c:*)",
-      "Read(//d/drive_files/10.worksfree/30.publish/cmc/**)"
+      "Read(//d/drive_files/10.worksfree/30.publish/cmc/**)",
+      "PowerShell(Get-ChildItem \"d:\\\\drive_files\\\\10.worksfree\\\\10.rpa\\\\70.webs\\\\synology-web\" | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem \"d:\\\\drive_files\\\\10.worksfree\\\\10.rpa\\\\70.webs\\\\synology-web\\\\app-store\" -Recurse | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem \"d:\\\\drive_files\\\\10.worksfree\\\\10.rpa\\\\70.webs\\\\synology-web\\\\service\" | ForEach-Object { $_.Name })"
     ]
   }
 }

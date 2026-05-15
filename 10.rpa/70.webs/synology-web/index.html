@@ -1,687 +1,2772 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GFC 기업 종합 컨설팅 진단</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>WorksFree Hub</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.tosspayments.com/v1/payment"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
-:root{
-  --bg:#f4f3ef;--surface:#fff;--border:#e0ddd4;--border2:#c8c5b8;
-  --text:#18180f;--muted:#6a6860;--hint:#a09e96;
-  --blue-bg:#e8f0fb;--blue:#1655a0;--blue-dark:#0d3d7a;
-  --green-bg:#e5f3e8;--green:#256830;
-  --amber-bg:#fdf2db;--amber:#8a5800;
-  --red-bg:#fceaea;--red:#9c1f1f;
-  --purple-bg:#eeedfc;--purple:#3d35a0;
-  --gray-bg:#eeecea;--gray:#545248;
-  --teal-bg:#e2f5f0;--teal:#0f6e56;
-  --r:10px;--rl:16px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100}
-.logo{font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--text);display:flex;align-items:center;gap:8px}
-.logo-dot{width:8px;height:8px;background:var(--blue);border-radius:50%}
-.hdr-r{font-size:12px;color:var(--hint);font-weight:500}
+  :root {
+    --bg:      #0f1117;
+    --sidebar: #161b27;
+    --panel:   #1c2333;
+    --border:  #2a3347;
+    --accent:  #3b82f6;
+    --accent2: #06b6d4;
+    --success: #10b981;
+    --warn:    #f59e0b;
+    --text:    #e2e8f0;
+    --muted:   #64748b;
+    --hover:   #243049;
+    --active:  #1e3a5f;
+    --radius:  8px;
+  }
 
-.page{max-width:740px;margin:0 auto;padding:28px 18px 72px}
+  * { margin:0; padding:0; box-sizing:border-box; }
 
-.prog-wrap{margin-bottom:22px}
-.prog-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--hint);font-weight:500;margin-bottom:7px}
-.prog-track{height:3px;background:var(--border);border-radius:2px}
-.prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+  body {
+    font-family: 'IBM Plex Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    height: 100vh;       /* fallback: dvh 미지원 브라우저 */
+    height: 100dvh;      /* 모바일 Chrome 주소바 표시/숨김에 따라 동적으로 맞춤 */
+    overflow: hidden;
+    font-size: 16px;
+    /* iOS home indicator + Android gesture nav 처리 */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 
-.breadcrumb{display:flex;flex-wrap:wrap;gap:4px;min-height:24px;margin-bottom:18px;align-items:center}
-.crumb{font-size:11px;background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:2px 9px;border-radius:20px;white-space:nowrap}
-.crumb-sep{color:var(--hint);font-size:12px}
+  /* env()가 0인 기기(Android 3-버튼 nav 등)에서 최소 여백 보장 */
+  @media (max-width: 1024px) and (pointer: coarse) {
+    body { padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px); }
+  }
 
-.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:26px 28px;animation:fu .22s ease}
-@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-.q-step{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--blue);text-transform:uppercase;margin-bottom:9px}
-.q-text{font-size:17px;font-weight:700;line-height:1.5;margin-bottom:6px;letter-spacing:-.3px}
-.q-sub{font-size:12.5px;color:var(--muted);margin-bottom:20px;line-height:1.6}
-.options{display:flex;flex-direction:column;gap:7px}
-.opt{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 16px;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:400;color:var(--text);text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:border-color .12s,background .12s,transform .08s;line-height:1.5}
-.opt:hover{border-color:var(--blue);background:var(--blue-bg);transform:translateX(3px)}
-.opt:active{transform:translateX(2px) scale(.99)}
-.opt-l{flex:1}
-.opt-main{font-weight:500}
-.opt-sub{font-size:12px;color:var(--hint);margin-top:2px}
-.opt-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.opt-arr{color:var(--hint);font-size:16px;flex-shrink:0;transition:transform .12s}
-.opt:hover .opt-arr{transform:translateX(2px);color:var(--blue)}
+  /* ── SIDEBAR ─────────────────────── */
+  #sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform .25s ease;
+    z-index: 100;
+  }
 
-.tag-blue{background:var(--blue-bg);color:var(--blue)}
-.tag-green{background:var(--green-bg);color:var(--green)}
-.tag-amber{background:var(--amber-bg);color:var(--amber)}
-.tag-red{background:var(--red-bg);color:var(--red)}
-.tag-purple{background:var(--purple-bg);color:var(--purple)}
-.tag-gray{background:var(--gray-bg);color:var(--gray)}
-.tag-teal{background:var(--teal-bg);color:var(--teal)}
+  /* 모바일 오버레이 */
+  #sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 99;
+  }
+  #sidebar-overlay.show { display: block; }
 
-.back-btn{background:none;border:none;font-family:inherit;font-size:12.5px;color:var(--hint);cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;margin-bottom:14px;transition:color .12s}
-.back-btn:hover{color:var(--text)}
+  /* 햄버거 버튼 */
+  #sidebar-toggle {
+    display: none;
+    background: none; border: none;
+    color: var(--text); font-size: 18px;
+    cursor: pointer; line-height: 1;
+    padding: 4px 8px; margin-right: 6px;
+    border-radius: 4px;
+    transition: background .15s;
+    flex-shrink: 0;
+  }
+  #sidebar-toggle:hover { background: var(--hover); }
 
-/* ── RESULT ── */
-.result-wrap{animation:fu .3s ease}
-.r-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:26px 28px;margin-bottom:14px}
-.r-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
-.r-badge{font-size:11px;font-weight:700;letter-spacing:.4px;padding:4px 12px;border-radius:20px;margin-bottom:10px;display:inline-block}
-.r-title{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:5px}
-.r-desc{font-size:13px;color:var(--muted);line-height:1.65}
-.risk-score{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;min-width:130px;text-align:center;flex-shrink:0}
-.risk-label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--hint);text-transform:uppercase;margin-bottom:5px}
-.risk-val{font-size:22px;font-weight:700;letter-spacing:-.3px}
-.risk-sub{font-size:11px;color:var(--hint);margin-top:2px}
-.flags{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
-.flag{font-size:11px;background:var(--bg);border:1px solid var(--border);color:var(--muted);padding:2px 10px;border-radius:20px}
+  /* ── 모바일 (≤ 600px) ─────────────── */
+  @media (max-width: 600px) {
+    #sidebar {
+      position: fixed; top: 0; left: 0;
+      height: 100vh; height: 100dvh;
+      width: min(280px, 80vw);
+      min-width: unset;
+      transform: translateX(-100%);
+    }
+    #sidebar.open { transform: translateX(0); }
+    #sidebar-toggle { display: block; }
+  }
 
-/* ── 절세 포인트 섹션 ── */
-.section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
-.section-hd{padding:13px 22px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.section-hd-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-.section-hd-title{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-.section-hd-count{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:auto}
+  /* ── 태블릿 (601px ~ 900px) ──────── */
+  @media (min-width: 601px) and (max-width: 900px) {
+    #sidebar { width: 200px; min-width: 200px; }
+  }
 
-.tax-item{padding:14px 22px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start}
-.tax-item:last-child{border-bottom:none}
-.tax-pri{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700}
-.tax-body{flex:1}
-.tax-title{font-size:13.5px;font-weight:700;margin-bottom:3px}
-.tax-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
-.tax-link{font-size:12px;font-weight:700;margin-top:5px;padding:3px 0;display:inline-block}
+  .sidebar-header {
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--accent2);
+    letter-spacing: .05em;
+    margin-bottom: 8px;
+  }
 
-.risk-item{padding:13px 22px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
-.risk-item:last-child{border-bottom:none}
-.risk-dot{width:8px;height:8px;border-radius:50%;margin-top:7px;flex-shrink:0}
-.risk-text{font-size:13px;color:var(--muted);line-height:1.6}
-.risk-text strong{color:var(--text);font-weight:600}
+  /* 역할 배지 */
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: .03em;
+  }
+  .role-gfc  { background:#0c2340; color:#60a5fa; border:1px solid #1e40af; }
+  .role-open { background:#0c1f18; color:#34d399; border:1px solid #065f46; }
+  .role-dot  { width:6px; height:6px; border-radius:50%; }
+  .role-gfc  .role-dot  { background:#60a5fa; }
+  .role-open .role-dot  { background:#34d399; }
 
-.phase{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;gap:14px}
-.phase:last-child{border-bottom:none}
-.ph-num{width:30px;height:30px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.ph-body{flex:1}
-.ph-tag{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
-.ph-title{font-size:14.5px;font-weight:700;margin-bottom:10px;letter-spacing:-.2px}
-.ph-items{display:flex;flex-direction:column;gap:6px}
-.ph-item{font-size:13px;color:var(--muted);display:flex;gap:7px;align-items:flex-start;line-height:1.6}
-.ph-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);margin-top:8px;flex-shrink:0}
+  /* 트리 */
+  .tree-scroll {
+    flex:1; overflow-y:auto; padding:8px 0;
+  }
+  .tree-scroll::-webkit-scrollbar { width:4px; }
+  .tree-scroll::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 
-.alert{border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px;display:flex;gap:10px;align-items:flex-start;border:1px solid;line-height:1.6}
-.alert-amber{background:var(--amber-bg);border-color:#d4a040;color:var(--amber)}
-.alert-red{background:var(--red-bg);border-color:#d48080;color:var(--red)}
-.alert-blue{background:var(--blue-bg);border-color:#8ab0e0;color:var(--blue)}
-.alert-icon{flex-shrink:0;margin-top:1px;font-size:15px}
+  .tree-node { user-select:none; }
 
-.action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
-.btn-p{flex:1;min-width:160px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);padding:13px 20px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:background .12s}
-.btn-p:hover{background:var(--blue-dark)}
-.btn-g{background:var(--surface);color:var(--muted);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 20px;font-family:inherit;font-size:14px;cursor:pointer;transition:border-color .12s,color .12s;white-space:nowrap}
-.btn-g:hover{border-color:var(--border2);color:var(--text)}
+  /* ── 툴팁 (JS 방식 — overflow:hidden 우회) ── */
+  #wf-tooltip {
+    position: fixed;
+    background: #1e2d45;
+    color: #93c5fd;
+    border: 1px solid #2a4070;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  #wf-tooltip.show { opacity: 1; }
 
-@media print{header,.no-print{display:none!important}.q-card,.r-hero,.section,.alert{page-break-inside:avoid}}
-@media(max-width:500px){.page{padding:18px 12px 56px}.q-card{padding:18px 16px}.q-text{font-size:15px}.r-title{font-size:17px}.phase{padding:14px 16px}.action-row{flex-direction:column}.btn-p{min-width:unset}}
+  .tree-label {
+    display:flex; align-items:center; gap:7px;
+    padding:7px 14px; cursor:pointer;
+    transition:background .15s; white-space:nowrap; overflow:hidden;
+  }
+  .tree-label:hover { background:var(--hover); }
+  .tree-label.active {
+    background:var(--active); color:#93c5fd;
+    border-right:2px solid var(--accent);
+  }
+
+  /* 뎁스별 indent */
+  .d0 > .tree-label {
+    padding-left:14px; font-weight:700; font-size:15px;
+    color:#94a3b8;
+    background:#0c1018;
+    border-top:1px solid #1e2a3a;
+    margin-top:4px;
+    letter-spacing:.04em;
+    cursor:default;
+  }
+  .d0:first-child > .tree-label { border-top:none; margin-top:0; }
+  .d0 > .tree-label:hover { background:#0c1018; }
+  .d1 > .tree-label { padding-left:26px; font-weight:500; font-size:15px; }
+  .d2 > .tree-label { padding-left:44px; font-size:15px; color:#94a3b8; }
+  .d2 > .tree-label.active { color:#93c5fd; }
+
+  /* GFC 전용 메뉴 강조 */
+  .d2.gfc-item > .tree-label {
+    color:#60a5fa;
+  }
+  .d2.gfc-item > .tree-label::before {
+    content:'🔒';
+    font-size:12px;
+    margin-right:2px;
+  }
+  .d2.gfc-item > .tree-label.active { color:#93c5fd; }
+
+  .tree-icon  { font-size:14px; flex-shrink:0; width:16px; text-align:center; }
+  .tree-caret { font-size:12px; color:var(--muted); margin-left:auto; flex-shrink:0; transition:transform .2s; }
+  .tree-caret.open { transform:rotate(90deg); }
+
+  .tree-children { overflow:hidden; max-height:0; transition:max-height .25s ease; }
+  .tree-children.open { max-height:600px; }
+
+  .sidebar-footer {
+    padding:12px 14px;
+    border-top:1px solid var(--border);
+    font-size:13px; color:var(--muted);
+    font-family:'IBM Plex Mono', monospace;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .footer-token {
+    font-size:12px; color:#334155;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  /* ── MAIN ────────────────────────── */
+  #main {
+    flex:1; overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+
+  /* 접근 거부 오버레이 */
+  #access-denied {
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(10,12,20,.92);
+    z-index:999;
+    align-items:center; justify-content:center;
+  }
+  #access-denied.show { display:flex; }
+  .denied-box {
+    background:var(--panel);
+    border:1px solid #7f1d1d;
+    border-radius:12px;
+    padding:36px 40px;
+    text-align:center;
+    max-width:360px;
+  }
+  .denied-icon { font-size:40px; margin-bottom:14px; }
+  .denied-title { font-size:18px; font-weight:700; color:#fca5a5; margin-bottom:8px; }
+  .denied-desc { font-size:15px; color:var(--muted); line-height:1.7; }
+
+  /* ── 브레드크럼 상단바 ──────────────── */
+  #topbar {
+    height: 38px;
+    min-height: 38px;
+    border-bottom: 1px solid var(--border);
+    background: var(--sidebar);
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    gap: 0;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .badge-lang-row { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; }
+  .lang-toggle { display: flex; gap: 4px; }
+  .lang-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); border-radius: 4px;
+    padding: 2px 8px; font-size: 12px; font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    cursor: pointer; transition: all .15s; line-height: 1.6;
+  }
+  .lang-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .lang-btn:not(.active):hover { border-color: var(--accent2); color: var(--accent2); }
+  .bc-home {
+    display: flex; align-items: center; gap: 4px;
+    color: var(--accent2); cursor: pointer;
+    padding: 3px 6px; border-radius: 4px;
+    transition: background .15s, color .15s;
+    font-weight: 500;
+  }
+  .bc-home:hover { background: var(--hover); color: var(--text); }
+  .bc-sep {
+    color: var(--border);
+    margin: 0 4px;
+    font-size: 13px;
+  }
+  .bc-seg {
+    color: var(--muted);
+    padding: 3px 4px;
+  }
+  .bc-cur {
+    color: var(--text);
+    font-weight: 600;
+    padding: 3px 4px;
+  }
+
+  /* iframe 컨테이너 */
+  #frame-container {
+    flex:1; position:relative;
+  }
+  #frame-container iframe {
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    border:none;
+  }
+
+  /* ── 미리보기 모드 상단 배너 ────────────────────────── */
+  #preview-overlay {
+    display:none; position:absolute;
+    top:0; left:0; right:0; z-index:5;
+    background:linear-gradient(135deg,#1e3a5f 0%,#1e1b4b 100%);
+    border-bottom:1px solid rgba(99,102,241,.4);
+    box-shadow:0 4px 24px rgba(0,0,0,.35);
+    padding:10px 16px;
+    align-items:center; justify-content:space-between; gap:12px;
+    flex-wrap:wrap;
+  }
+  #preview-overlay.show { display:flex; animation:pvFadeIn .2s ease; }
+  @keyframes pvFadeIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+  .preview-card {
+    display:flex; align-items:center; gap:8px; flex:1; min-width:0;
+  }
+  .preview-icon  { font-size:18px; flex-shrink:0; }
+  .preview-title { font-size:13px; font-weight:700; color:#e2e8f0; white-space:nowrap; }
+  .preview-desc  { font-size:12px; color:#94a3b8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .preview-login-btn {
+    background:#4f46e5; color:#fff; border:none;
+    border-radius:7px; padding:7px 16px;
+    font-size:12px; font-weight:700; cursor:pointer;
+    font-family:inherit; white-space:nowrap; flex-shrink:0;
+    transition:background .15s;
+  }
+  .preview-login-btn:hover { background:#4338ca; }
+  .preview-back-btn {
+    background:transparent; color:#64748b; border:none;
+    padding:6px 10px; font-size:12px; cursor:pointer;
+    font-family:inherit; flex-shrink:0; transition:color .15s;
+  }
+  .preview-back-btn:hover { color:#94a3b8; }
+
+  /* 홈 화면 */
+  #home-screen {
+    flex:1; padding:32px 36px; overflow-y:auto;
+  }
+  .home-title  { font-size:22px; font-weight:600; margin-bottom:4px; }
+  .home-desc   { font-size:15px; color:var(--muted); margin-bottom:28px; }
+
+  .dash-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(170px,1fr));
+    gap:12px;
+  }
+  .dash-card {
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); padding:18px 16px;
+    cursor:pointer; transition:border-color .2s, background .2s;
+    position:relative;
+  }
+  .dash-card:hover { border-color:var(--accent); background:var(--hover); }
+  .dash-card.gfc-card { border-color:#1e40af; }
+  .dash-card.gfc-card:hover { border-color:#3b82f6; }
+  .card-icon      { font-size:24px; margin-bottom:10px; }
+  .card-icon.text { font-size:14px; font-family:'IBM Plex Mono',monospace;
+                    line-height:1.5; color:var(--accent2); letter-spacing:.02em; }
+  .card-title { font-size:15px; font-weight:600; margin-bottom:3px; }
+  .card-desc  { font-size:13px; color:var(--muted); }
+  .card-lock  {
+    position:absolute; top:10px; right:10px;
+    font-size:12px; background:#0c2340; color:#60a5fa;
+    border:1px solid #1e40af; border-radius:10px;
+    padding:2px 7px; font-weight:600;
+  }
+  .card-member {
+    position:absolute; top:10px; right:10px;
+    font-size:12px; background:#1c1200; color:#f59e0b;
+    border:1px solid #78350f; border-radius:10px;
+    padding:2px 7px; font-weight:600;
+  }
+  .card-consultant {
+    position:absolute; top:10px; right:10px;
+    font-size:12px; background:#0a1f1a; color:#34d399;
+    border:1px solid #065f46; border-radius:10px;
+    padding:2px 7px; font-weight:600;
+  }
+  .tree-gfc-tag {
+    font-size:11px; background:#1e1b4b; color:#a5b4fc;
+    border:1px solid #4338ca; border-radius:10px;
+    padding:1px 7px; margin-left:auto; flex-shrink:0;
+  }
+  .tree-consultant-tag {
+    font-size:11px; background:#0a1f1a; color:#34d399;
+    border:1px solid #065f46; border-radius:10px;
+    padding:1px 7px; margin-left:auto; flex-shrink:0;
+  }
+  .tree-member-tag {
+    font-size:11px; background:#1c1200; color:#f59e0b;
+    border:1px solid #78350f; border-radius:10px;
+    padding:1px 7px; margin-left:auto; flex-shrink:0;
+  }
+
+  /* ── 유저 위젯 (사이드바 상단) ──────────────────── */
+  .user-widget { position:relative; }
+
+  .login-btn {
+    background:none; border:1px solid var(--border);
+    border-radius:6px; color:var(--muted);
+    font-family:inherit; font-size:12px;
+    padding:4px 12px; cursor:pointer;
+    transition:color .15s, border-color .15s;
+  }
+  .login-btn:hover { color:var(--text); border-color:var(--accent); }
+
+  .user-pill {
+    display:flex; align-items:center; gap:6px;
+    cursor:pointer; padding:3px 8px; border-radius:6px;
+    transition:background .15s;
+  }
+  .user-pill:hover { background:var(--hover); }
+  .user-avatar {
+    width:22px; height:22px; border-radius:50%; object-fit:cover;
+  }
+  .user-initials {
+    width:22px; height:22px; border-radius:50%;
+    background:var(--accent); color:#fff;
+    font-size:11px; font-weight:600;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .user-name {
+    font-size:12px; color:var(--text);
+    max-width:90px; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap;
+  }
+  .user-caret { font-size:10px; color:var(--muted); }
+
+  .user-dropdown {
+    position:absolute; top:calc(100% + 4px); left:0;
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); overflow:hidden;
+    z-index:200; min-width:170px;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);
+  }
+  .user-dropdown-email {
+    font-size:11px; color:var(--muted);
+    padding:8px 12px; border-bottom:1px solid var(--border);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .user-dropdown-btn {
+    display:block; width:100%; background:none; border:none;
+    color:var(--text); font-family:inherit; font-size:13px;
+    padding:10px 12px; text-align:left; cursor:pointer;
+    transition:background .15s;
+  }
+  .user-dropdown-btn:hover { background:var(--hover); }
+  .user-balance {
+    padding:8px 12px; font-size:12px; font-weight:600;
+    color:var(--accent); border-bottom:1px solid var(--border);
+    letter-spacing:.01em;
+  }
+
+  /* ── 로그인 모달 ─────────────────────────────────── */
+  #auth-modal {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.65); z-index:300;
+    align-items:center; justify-content:center;
+  }
+  #auth-modal.show { display:flex; }
+  .auth-box {
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:14px; padding:32px 28px;
+    width:min(320px, 90vw); position:relative; text-align:center;
+  }
+  .auth-close {
+    position:absolute; top:12px; right:14px;
+    background:none; border:none; color:var(--muted);
+    font-size:16px; cursor:pointer; padding:4px 6px;
+    border-radius:4px; transition:color .15s, background .15s;
+    line-height:1;
+  }
+  .auth-close:hover { color:var(--text); background:var(--hover); }
+  .auth-title { font-size:17px; font-weight:600; margin-bottom:8px; }
+  .auth-desc  { font-size:13px; color:var(--muted); margin-bottom:24px; line-height:1.6; }
+
+  .btn-oauth {
+    display:flex; align-items:center; justify-content:center;
+    gap:10px; width:100%; padding:11px 16px;
+    border-radius:8px; font-family:inherit;
+    font-size:14px; font-weight:500; cursor:pointer;
+    transition:filter .15s; margin-bottom:10px;
+  }
+  .btn-oauth:last-of-type { margin-bottom:0; }
+  .btn-oauth:hover { filter:brightness(1.08); }
+  .btn-google { background:#fff; color:#3c4043; border:1px solid #dadce0; }
+  .btn-kakao  { background:#fee500; color:#191919; border:none; }
+  .oauth-icon { width:18px; height:18px; flex-shrink:0; }
+
+  /* ── 로그인 탭 ───────────────────────────────── */
+  .auth-tabs {
+    display:flex; border-bottom:1px solid var(--border);
+    margin:0 -28px 20px; padding:0 28px;
+  }
+  .auth-tab {
+    flex:1; padding:9px 4px; font-size:13px; font-weight:500;
+    cursor:pointer; background:none; border:none;
+    color:var(--muted); border-bottom:2px solid transparent;
+    transition:color .15s, border-color .15s; font-family:inherit;
+  }
+  .auth-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .auth-panel { display:none; }
+  .auth-panel.show { display:block; }
+
+  /* ── 이메일 폼 ───────────────────────────────── */
+  .auth-input {
+    width:100%; padding:10px 12px; border:1px solid var(--border);
+    border-radius:8px; background:var(--bg); color:var(--text);
+    font-size:14px; font-family:inherit; margin-bottom:10px;
+    box-sizing:border-box; transition:border-color .15s;
+  }
+  .auth-input:focus { outline:none; border-color:var(--accent); }
+  .auth-input::placeholder { color:var(--muted); }
+  .auth-btn-email {
+    width:100%; padding:11px; border:none; border-radius:8px;
+    background:var(--accent); color:#fff; font-size:14px; font-weight:600;
+    cursor:pointer; font-family:inherit; transition:filter .15s; margin-top:2px;
+  }
+  .auth-btn-email:hover { filter:brightness(1.1); }
+  .auth-btn-email:disabled { opacity:.5; cursor:not-allowed; filter:none; }
+  .auth-switch {
+    font-size:12px; color:var(--muted); margin-top:14px; text-align:center;
+  }
+  .auth-switch span { color:var(--accent); cursor:pointer; text-decoration:underline; }
+  .auth-msg {
+    font-size:12px; margin-top:8px; padding:8px 10px;
+    border-radius:6px; display:none; text-align:left; line-height:1.5;
+  }
+  .auth-msg.ok  { background:#d1fae5; color:#065f46; display:block; }
+  .auth-msg.err { background:#fee2e2; color:#991b1b; display:block; }
+  .otp-info {
+    font-size:13px; color:var(--muted); text-align:center;
+    margin-bottom:14px; line-height:1.6;
+  }
+  .otp-info b { color:var(--text); }
+  .magic-link-icon {
+    font-size:40px; text-align:center; margin:8px 0 12px;
+  }
+
+  /* ── 개인정보 동의 모달 ──────────────────────────── */
+  #consent-modal {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.72); z-index:400;
+    align-items:center; justify-content:center;
+    padding:16px;
+  }
+  #consent-modal.show { display:flex; }
+
+  .consent-box {
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:14px; width:min(560px,100%);
+    max-height:90vh; display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  .consent-hdr {
+    padding:22px 24px 16px;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .consent-hdr-top {
+    display:flex; align-items:center; gap:10px; margin-bottom:4px;
+  }
+  .consent-badge {
+    font-size:11px; font-weight:600; background:#0c2340;
+    color:#60a5fa; border:1px solid #1e40af;
+    border-radius:10px; padding:2px 9px;
+  }
+  .consent-title { font-size:18px; font-weight:600; }
+  .consent-sub   { font-size:13px; color:var(--muted); margin-top:4px; }
+
+  .consent-scroll {
+    flex:1; overflow-y:auto; padding:20px 24px;
+    scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+  }
+
+  /* 동의 섹션 */
+  .consent-section {
+    border:1px solid var(--border); border-radius:var(--radius);
+    margin-bottom:10px; overflow:hidden;
+  }
+  .consent-section-hdr {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px; cursor:pointer;
+    background:var(--surface); transition:background .15s;
+    user-select:none;
+  }
+  .consent-section-hdr:hover { background:var(--hover); }
+  .consent-section-hdr-left {
+    display:flex; align-items:center; gap:10px;
+  }
+  .consent-required {
+    font-size:11px; font-weight:700; padding:2px 7px;
+    border-radius:10px; white-space:nowrap;
+  }
+  .req-mark  { background:#0c1a30; color:#60a5fa; border:1px solid #1e40af; }
+  .opt-mark  { background:#1c2333; color:#64748b; border:1px solid #334155; }
+  .consent-section-title { font-size:13px; font-weight:600; }
+  .consent-toggle { font-size:11px; color:var(--muted); }
+
+  .consent-detail {
+    display:none; padding:12px 14px;
+    border-top:1px solid var(--border);
+    background:#161b27;
+  }
+  .consent-detail.open { display:block; }
+  .consent-table {
+    width:100%; border-collapse:collapse; font-size:12px;
+  }
+  .consent-table th {
+    text-align:left; color:var(--muted);
+    padding:5px 8px; font-weight:500;
+    border-bottom:1px solid var(--border);
+    width:25%; white-space:nowrap;
+  }
+  .consent-table td {
+    padding:5px 8px; color:#94a3b8;
+    border-bottom:1px solid #1e293b;
+    line-height:1.5;
+  }
+  .consent-table tr:last-child th,
+  .consent-table tr:last-child td { border-bottom:none; }
+  .consent-note {
+    font-size:11px; color:#475569; margin-top:8px;
+    padding:6px 8px; background:#0f1117; border-radius:4px;
+  }
+
+  /* 전체 동의 + 체크박스 */
+  .consent-checks { padding:0 24px 4px; flex-shrink:0; }
+  .check-all-wrap {
+    display:flex; align-items:center; gap:10px;
+    padding:14px 0 12px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:10px;
+  }
+  .check-all-label {
+    font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .check-item-wrap {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:6px 0; cursor:pointer;
+  }
+  .check-item-wrap input[type=checkbox] {
+    margin-top:2px; width:16px; height:16px;
+    accent-color:var(--accent); cursor:pointer; flex-shrink:0;
+  }
+  .check-item-text { font-size:13px; line-height:1.4; }
+  .check-req  { color:#60a5fa; font-weight:600; margin-right:4px; }
+  .check-opt  { color:#64748b; font-weight:600; margin-right:4px; }
+
+  .consent-footer {
+    padding:14px 24px 20px; border-top:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .consent-agree-btn {
+    width:100%; padding:13px;
+    background:var(--accent); color:#fff;
+    border:none; border-radius:var(--radius);
+    font-family:inherit; font-size:15px; font-weight:600;
+    cursor:pointer; transition:background .15s;
+  }
+  .consent-agree-btn:hover   { background:#2563eb; }
+  .consent-agree-btn:disabled { opacity:.4; cursor:default; }
+  .consent-logout-btn {
+    display:block; width:100%; margin-top:10px;
+    background:none; border:none;
+    font-family:inherit; font-size:13px;
+    color:var(--muted); cursor:pointer;
+    text-decoration:underline; text-align:center;
+  }
+  .consent-logout-btn:hover { color:var(--text); }
+
+  /* ── 개발자 테스트 툴바 ──────────────────────────── */
+  #dev-toolbar {
+    display:none; position:fixed;
+    bottom:12px; right:12px; z-index:500;
+    background:#0f172a; border:1px solid #3b82f6;
+    border-radius:10px; padding:10px 12px;
+    font-size:12px; color:#60a5fa;
+    box-shadow:0 4px 20px rgba(59,130,246,.25);
+    min-width:200px;
+  }
+  #dev-toolbar.show { display:block; }
+  #dev-toolbar.collapsed { min-width:0; padding:5px 10px; }
+  #dev-toolbar.collapsed .dev-body { display:none; }
+  .dev-title {
+    font-size:11px; font-weight:700; letter-spacing:.06em;
+    color:#93c5fd; margin-bottom:8px; text-transform:uppercase;
+    cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+    user-select:none; white-space:nowrap;
+    background:rgba(59,130,246,0.15); border-radius:6px;
+    padding:5px 8px; margin:-5px -8px 8px;
+    border:1px solid rgba(59,130,246,0.3);
+    transition:background .15s;
+  }
+  .dev-title:hover { background:rgba(59,130,246,0.28); }
+  #dev-toolbar.collapsed .dev-title { margin-bottom:0; }
+  .dev-title-caret {
+    font-size:11px; font-weight:800;
+    background:#1d4ed8; color:#fff;
+    border-radius:4px; padding:1px 7px;
+    border:1px solid #3b82f6; margin-left:10px;
+  }
+  .dev-btn {
+    display:block; width:100%; background:#1e3a5f;
+    border:1px solid #2563eb; border-radius:5px;
+    color:#93c5fd; font-family:inherit; font-size:12px;
+    padding:5px 10px; cursor:pointer; text-align:left;
+    margin-bottom:5px; transition:background .1s;
+  }
+  .dev-btn:last-child { margin-bottom:0; }
+  .dev-btn:hover  { background:#1d4ed8; color:#fff; }
+  .dev-btn.danger { border-color:#991b1b; background:#1a0a0a; color:#fca5a5; }
+  .dev-btn.danger:hover { background:#7f1d1d; }
+  .dev-status {
+    font-size:11px; color:#475569; margin-bottom:8px;
+    padding:4px 6px; background:#0f1117; border-radius:4px;
+  }
+
+  /* ── 크레딧 내역 모달 ─────────────────────── */
+  #ch-modal {
+    display:none; position:fixed; inset:0; z-index:410;
+    background:rgba(0,0,0,.75); align-items:center; justify-content:center;
+  }
+  #ch-modal.show { display:flex; }
+  .ch-box {
+    background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    width:420px; max-width:95vw; max-height:80vh;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .ch-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px 12px; border-bottom:1px solid var(--border);
+  }
+  .ch-title { font-size:16px; font-weight:700; }
+  .ch-close {
+    background:none; border:none; color:var(--muted); font-size:20px;
+    cursor:pointer; line-height:1; padding:0 4px;
+  }
+  .ch-close:hover { color:var(--text); }
+  .ch-summary {
+    padding:10px 18px; font-size:12px; color:var(--muted);
+    border-bottom:1px solid var(--border);
+    display:flex; gap:16px;
+  }
+  .ch-summary span { font-weight:600; color:var(--accent); }
+  .ch-list { overflow-y:auto; flex:1; }
+  .ch-row {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 18px; border-bottom:1px solid #1a1f2e;
+    font-size:13px;
+  }
+  .ch-row:last-child { border-bottom:none; }
+  .ch-icon { font-size:16px; flex-shrink:0; }
+  .ch-info { flex:1; min-width:0; }
+  .ch-reason { font-weight:600; font-size:12px; }
+  .ch-note { color:var(--muted); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ch-date { color:var(--muted); font-size:11px; }
+  .ch-delta { font-weight:700; font-size:14px; flex-shrink:0; text-align:right; }
+  .ch-delta.plus  { color:#34d399; }
+  .ch-delta.minus { color:#f87171; }
+  .ch-empty { padding:32px; text-align:center; color:var(--muted); font-size:14px; }
+  .ch-loading { padding:24px; text-align:center; color:var(--muted); font-size:13px; }
+  .user-balance { cursor:pointer; }
+  .user-balance:hover { color:var(--text); }
+
+  /* ── 크레딧 구매 모달 ─────────────────────── */
+  #credit-modal {
+    display:none; position:fixed; inset:0; z-index:400;
+    background:rgba(0,0,0,.7); align-items:center; justify-content:center;
+  }
+  #credit-modal.show { display:flex; }
+  .credit-box {
+    background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:28px 24px; width:min(480px,95vw); max-height:90vh;
+    overflow-y:auto; box-shadow:0 8px 40px rgba(0,0,0,.5); position:relative;
+  }
+  .credit-close {
+    position:absolute; top:12px; right:14px; background:none; border:none;
+    color:var(--muted); font-size:16px; cursor:pointer; padding:4px 6px;
+    border-radius:4px; transition:color .15s, background .15s; line-height:1;
+  }
+  .credit-close:hover { color:var(--text); background:var(--hover); }
+  .credit-title { font-size:17px; font-weight:700; margin-bottom:4px; }
+  .credit-sub   { font-size:13px; color:var(--muted); margin-bottom:20px; }
+  .credit-pkg-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px;
+  }
+  @media (max-width:400px) { .credit-pkg-grid { grid-template-columns:1fr; } }
+  .credit-pkg {
+    border:1.5px solid var(--border); border-radius:10px; padding:16px 10px 12px;
+    text-align:center; cursor:pointer; position:relative;
+    transition:border-color .15s, background .15s;
+  }
+  .credit-pkg:hover    { border-color:var(--accent); background:rgba(59,130,246,.07); }
+  .credit-pkg.selected { border-color:var(--accent); background:rgba(59,130,246,.13); }
+  .credit-pkg-badge {
+    position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+    background:var(--accent); color:#fff; font-size:10px; font-weight:700;
+    padding:2px 9px; border-radius:10px; white-space:nowrap;
+  }
+  .credit-pkg-amount { font-size:24px; font-weight:800; color:var(--accent); }
+  .credit-pkg-unit   { font-size:11px; color:var(--muted); margin-bottom:8px; }
+  .credit-pkg-kr     { font-size:14px; font-weight:600; }
+  .credit-pkg-usd    { font-size:11px; color:var(--muted); margin-top:2px; }
+  .credit-pay-btns   { display:flex; flex-direction:column; gap:10px; }
+  .credit-pay-btn {
+    width:100%; padding:12px; border-radius:8px; border:none;
+    font-family:inherit; font-size:14px; font-weight:700; cursor:pointer;
+    transition:opacity .15s;
+  }
+  .credit-pay-btn:hover    { opacity:.88; }
+  .credit-pay-btn:disabled { opacity:.38; cursor:not-allowed; }
+  .credit-pay-btn.toss   { background:#1b64da; color:#fff; }
+  .credit-pay-btn.stripe { background:#635bff; color:#fff; }
+  .credit-result {
+    display:none; margin-top:14px; padding:10px 14px; border-radius:8px;
+    font-size:13px; text-align:center;
+  }
+  .credit-result.ok  { background:rgba(16,185,129,.12); color:#10b981; display:block; }
+  .credit-result.err { background:rgba(239,68,68,.1);  color:#ef4444;  display:block; }
+  .credit-note {
+    font-size:11px; color:var(--muted); margin-top:14px; line-height:1.6;
+  }
+  /* ── 토스트 알림 ─────────────────────── */
+  #wf-toast {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    padding:10px 22px; border-radius:8px; font-size:13px; font-weight:600;
+    z-index:900; pointer-events:none; white-space:nowrap;
+    box-shadow:0 4px 16px rgba(0,0,0,.4); opacity:0;
+    transition:opacity .3s;
+  }
+  #wf-toast.show { opacity:1; }
 </style>
 </head>
 <body>
-<header>
-  <div class="logo"><div class="logo-dot"></div>GFC · 기업 종합 컨설팅 진단</div>
-  <div class="hdr-r" id="hdr-r"></div>
-</header>
-<div class="page">
-  <div class="prog-wrap">
-    <div class="prog-meta"><span id="prog-lbl">진단 시작</span><span id="prog-pct">0%</span></div>
-    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+
+<!-- 접근 거부 모달 -->
+<div id="access-denied">
+  <div class="denied-box">
+    <div class="denied-icon">🔒</div>
+    <div class="denied-title" id="denied-title">접근 권한 없음</div>
+    <div class="denied-desc"  id="denied-desc">이 메뉴는 GFC 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.</div>
   </div>
-  <div class="breadcrumb" id="bc"></div>
-  <div id="view"></div>
+</div>
+
+<!-- 로그인 모달 -->
+<div id="auth-modal" onclick="if(event.target===this)closeAuthModal()">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuthModal()">✕</button>
+    <div class="auth-title" id="auth-modal-title">WorksFree에 로그인</div>
+    <div class="auth-desc"  id="auth-modal-desc">회원 전용 콘텐츠에 접근하려면<br>로그인이 필요합니다.</div>
+
+    <!-- 탭 -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="auth-tab-social" onclick="switchAuthTab('social')">소셜 로그인</button>
+      <button class="auth-tab"        id="auth-tab-email"  onclick="switchAuthTab('email')">이메일</button>
+    </div>
+
+    <!-- 소셜 로그인 패널 -->
+    <div class="auth-panel show" id="auth-panel-social">
+      <button class="btn-oauth btn-google" onclick="signInWithGoogle()">
+        <svg class="oauth-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        <span id="auth-btn-google">Google로 계속하기</span>
+      </button>
+      <button class="btn-oauth btn-kakao" onclick="signInWithKakao()">
+        <svg class="oauth-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.7 1.696 5.08 4.255 6.47L5.2 21l4.896-2.6c.61.083 1.234.127 1.904.127 5.523 0 10-3.477 10-7.727C22 6.477 17.523 3 12 3z" fill="#191919"/>
+        </svg>
+        <span id="auth-btn-kakao">카카오로 계속하기</span>
+      </button>
+    </div>
+
+    <!-- 이메일 패널 -->
+    <div class="auth-panel" id="auth-panel-email">
+      <!-- 로그인 폼 -->
+      <div id="email-login-form">
+        <input class="auth-input" id="el-email" type="email" placeholder="이메일" autocomplete="email">
+        <input class="auth-input" id="el-pw"    type="password" placeholder="비밀번호" autocomplete="current-password">
+        <div class="auth-msg" id="el-msg"></div>
+        <button class="auth-btn-email" id="el-login-btn" onclick="doEmailLogin()">로그인</button>
+        <div class="auth-switch" id="el-no-acct">계정이 없으신가요? <span onclick="toggleEmailMode(true)">회원가입</span></div>
+      </div>
+      <!-- 회원가입 폼 — Step 1: 정보 입력 -->
+      <div id="email-signup-form" style="display:none">
+        <div id="signup-step1">
+          <input class="auth-input" id="es-name"  type="text"     placeholder="이름 (선택)" autocomplete="name">
+          <input class="auth-input" id="es-email" type="email"    placeholder="이메일" autocomplete="email">
+          <input class="auth-input" id="es-pw"    type="password" placeholder="비밀번호 (8자 이상)" autocomplete="new-password">
+          <input class="auth-input" id="es-pw2"   type="password" placeholder="비밀번호 확인" autocomplete="new-password">
+          <div class="auth-msg" id="es-msg"></div>
+          <button class="auth-btn-email" id="es-send-btn" onclick="sendSignupOtp(event)">인증 메일 받기</button>
+          <div class="auth-switch" id="es-have-acct">이미 계정이 있으신가요? <span onclick="toggleEmailMode(false)">로그인</span></div>
+        </div>
+        <!-- Step 2: 매직 링크 대기 -->
+        <div id="signup-step2" style="display:none">
+          <div class="otp-info" id="otp-info-text"></div>
+          <div class="magic-link-icon">📧</div>
+          <div class="auth-msg ok" id="es-otp-msg" style="display:block;text-align:center">
+            이메일의 <b>링크를 클릭</b>하면<br>자동으로 가입이 완료됩니다.
+          </div>
+          <div class="auth-switch" style="margin-top:16px">
+            <span id="es-change-email" onclick="backToSignupStep1()">← 이메일 변경</span>
+            &nbsp;·&nbsp;
+            <span id="es-resend-link" onclick="resendSignupOtp()">링크 재발송</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 개인정보 동의 모달 -->
+<div id="consent-modal">
+  <div class="consent-box">
+
+    <div class="consent-hdr">
+      <div class="consent-hdr-top">
+        <span class="consent-badge">신규 회원</span>
+        <span class="consent-title">WorksFree 서비스 이용 동의</span>
+      </div>
+      <div class="consent-sub">서비스 이용을 위해 아래 내용을 확인하고 동의해 주세요.</div>
+    </div>
+
+    <div class="consent-scroll" id="consentScroll">
+
+      <!-- ① 회원 관리 -->
+      <div class="consent-section">
+        <div class="consent-section-hdr" onclick="toggleDetail('d1')">
+          <div class="consent-section-hdr-left">
+            <span class="consent-required req-mark">필수</span>
+            <span class="consent-section-title">개인정보 수집·이용 — 회원 관리</span>
+          </div>
+          <span class="consent-toggle" id="dt1">펼치기 ▾</span>
+        </div>
+        <div class="consent-detail" id="d1">
+          <table class="consent-table">
+            <tr><th>수집 항목</th><td>이메일 주소, 이름, 프로필 사진 (소셜 로그인 제공자로부터 수신)</td></tr>
+            <tr><th>수집 목적</th><td>회원 식별 및 본인 확인, 서비스 접근 권한 관리, 고객 문의 대응</td></tr>
+            <tr><th>보유 기간</th><td>회원 탈퇴 시까지 (탈퇴 즉시 파기)</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ② RPA 앱 실행 데이터 -->
+      <div class="consent-section">
+        <div class="consent-section-hdr" onclick="toggleDetail('d2')">
+          <div class="consent-section-hdr-left">
+            <span class="consent-required req-mark">필수</span>
+            <span class="consent-section-title">개인정보 수집·이용 — RPA 앱 실행 데이터</span>
+          </div>
+          <span class="consent-toggle" id="dt2">펼치기 ▾</span>
+        </div>
+        <div class="consent-detail" id="d2">
+          <table class="consent-table">
+            <tr><th>수집 항목</th><td>
+              앱 실행 결과 (처리 건수, 성공/실패 통계, 오류 코드 및 메시지)<br>
+              앱 실행 로그 (실행 일시, 처리 소요 시간, 앱 버전, 실행 환경 OS)<br>
+              이메일 기반 결과 보고서 (작업 완료 시 자동 전송되는 요약 데이터)
+            </td></tr>
+            <tr><th>수집 목적</th><td>서비스 품질 개선, 오류 원인 분석, 사용량 통계 및 앱 최적화</td></tr>
+            <tr><th>보유 기간</th><td>수집일로부터 1년 (또는 탈퇴 시 중 빠른 날)</td></tr>
+          </table>
+          <div class="consent-note">
+            ※ 처리 대상 파일의 내용(도면 데이터, BOM 내용 등)은 수집하지 않습니다.
+            실행 결과 수치 및 앱 동작 로그만 수집됩니다.
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ 크레딧 결제 -->
+      <div class="consent-section">
+        <div class="consent-section-hdr" onclick="toggleDetail('d3')">
+          <div class="consent-section-hdr-left">
+            <span class="consent-required req-mark">필수</span>
+            <span class="consent-section-title">개인정보 수집·이용 — 크레딧 결제 정보</span>
+          </div>
+          <span class="consent-toggle" id="dt3">펼치기 ▾</span>
+        </div>
+        <div class="consent-detail" id="d3">
+          <table class="consent-table">
+            <tr><th>수집 항목</th><td>
+              크레딧 구매 내역 (상품명, 결제 금액, 결제 일시, 주문 번호)<br>
+              크레딧 사용 이력 (앱명, 차감 크레딧 수, 사용 일시, 잔여 크레딧)<br>
+              환불 처리 내역 (환불 사유, 처리 일시)
+            </td></tr>
+            <tr><th>수집 목적</th><td>크레딧 잔액 관리, 결제·사용 내역 제공, 환불 처리, 이용 요금 분쟁 해결</td></tr>
+            <tr><th>보유 기간</th><td>전자상거래법에 따라 결제 완료일로부터 <strong>5년</strong></td></tr>
+          </table>
+          <div class="consent-note">
+            ※ 카드번호, 계좌번호 등 결제 수단 상세 정보는 PG사(토스페이먼츠 등)에서 처리하며,
+            WorksFree는 해당 정보를 저장하지 않습니다.
+          </div>
+        </div>
+      </div>
+
+      <!-- ④ 마케팅 (선택) -->
+      <div class="consent-section">
+        <div class="consent-section-hdr" onclick="toggleDetail('d4')">
+          <div class="consent-section-hdr-left">
+            <span class="consent-required opt-mark">선택</span>
+            <span class="consent-section-title">마케팅 정보 수신 동의</span>
+          </div>
+          <span class="consent-toggle" id="dt4">펼치기 ▾</span>
+        </div>
+        <div class="consent-detail" id="d4">
+          <table class="consent-table">
+            <tr><th>수신 내용</th><td>신규 RPA 앱 출시 안내, 업데이트 소식, 이벤트 및 프로모션</td></tr>
+            <tr><th>수신 채널</th><td>이메일</td></tr>
+            <tr><th>보유 기간</th><td>동의 철회 시까지 (마이페이지에서 언제든지 철회 가능)</td></tr>
+          </table>
+          <div class="consent-note">
+            ※ 동의하지 않아도 기본 서비스 이용에 제한이 없습니다.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /consent-scroll -->
+
+    <!-- 체크박스 -->
+    <div class="consent-checks">
+      <div class="check-all-wrap">
+        <input type="checkbox" id="chkAll" onchange="toggleAllConsent(this.checked)">
+        <label class="check-all-label" for="chkAll">전체 동의 (필수 + 선택 포함)</label>
+      </div>
+      <label class="check-item-wrap" for="chk1">
+        <input type="checkbox" id="chk1" onchange="updateConsentBtn()">
+        <span class="check-item-text"><span class="check-req">[필수]</span>개인정보 수집·이용 동의 (회원 관리)</span>
+      </label>
+      <label class="check-item-wrap" for="chk2">
+        <input type="checkbox" id="chk2" onchange="updateConsentBtn()">
+        <span class="check-item-text"><span class="check-req">[필수]</span>개인정보 수집·이용 동의 (RPA 앱 실행 데이터)</span>
+      </label>
+      <label class="check-item-wrap" for="chk3">
+        <input type="checkbox" id="chk3" onchange="updateConsentBtn()">
+        <span class="check-item-text"><span class="check-req">[필수]</span>개인정보 수집·이용 동의 (크레딧 결제 정보)</span>
+      </label>
+      <label class="check-item-wrap" for="chk4">
+        <input type="checkbox" id="chk4" onchange="updateConsentBtn()">
+        <span class="check-item-text"><span class="check-opt">[선택]</span>마케팅 정보 수신 동의</span>
+      </label>
+    </div>
+
+    <div class="consent-footer">
+      <button class="consent-agree-btn" id="consentAgreeBtn" disabled onclick="handleConsent()">
+        동의하고 시작하기
+      </button>
+      <button class="consent-logout-btn" onclick="cancelConsent()">
+        동의하지 않고 로그아웃
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- 관리자 비밀번호 입력 모달 (dev 전용) -->
+<div id="dev-pw-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.65);align-items:center;justify-content:center;">
+  <div style="background:#0f172a;border:1px solid #3b82f6;border-radius:12px;padding:18px 20px;min-width:270px;box-shadow:0 8px 32px rgba(59,130,246,.3);font-family:inherit;">
+    <div style="font-size:12px;font-weight:700;color:#93c5fd;margin-bottom:12px;letter-spacing:.04em;">🔐 관리자 비밀번호</div>
+    <input id="dev-pw-input" type="password" autocomplete="off" placeholder="비밀번호 입력"
+      style="width:100%;padding:8px 10px;border:1px solid #2563eb;border-radius:6px;background:#0c1524;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit;box-sizing:border-box;"
+      onkeydown="if(event.key==='Enter')devPwConfirm();else if(event.key==='Escape')devPwCancel();">
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button onclick="devPwCancel()" style="flex:1;padding:7px;border:1px solid #334155;border-radius:6px;background:#1e293b;color:#94a3b8;font-size:12px;cursor:pointer;font-family:inherit;">취소</button>
+      <button onclick="devPwConfirm()" style="flex:2;padding:7px;border:none;border-radius:6px;background:#1d4ed8;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 개발자 테스트 툴바 (?dev=1 또는 localStorage.wf_dev=1 로 활성화) -->
+<div id="dev-toolbar">
+  <div class="dev-title" onclick="devToggleCollapse()" title="클릭하여 접기/펼치기">
+    🛠 Dev / Test Mode
+    <span class="dev-title-caret" id="dev-title-caret">▲ 접기</span>
+  </div>
+  <div class="dev-body">
+    <div class="dev-status" id="dev-status">비로그인</div>
+    <button class="dev-btn" id="dev-btn-user" onclick="devLogin('general')">▶ 사용자 로그인 (부분 표시)</button>
+    <button class="dev-btn" id="dev-btn-admin" onclick="devLogin('gfc')" style="border-color:#7c3aed;color:#c4b5fd">▶ 관리자 로그인 (전체 표시)</button>
+    <button class="dev-btn" onclick="devShowConsent()">📋 동의 모달 보기</button>
+    <button class="dev-btn danger" onclick="devResetConsent()">↺ 동의 초기화</button>
+    <button class="dev-btn danger" onclick="devLogout()">✕ 테스트 로그아웃</button>
+  </div>
+</div>
+
+<!-- 크레딧 내역 모달 -->
+<div id="ch-modal" onclick="if(event.target===this)closeCreditHistory()">
+  <div class="ch-box">
+    <div class="ch-header">
+      <span class="ch-title" id="ch-title-el">크레딧 내역</span>
+      <button class="ch-close" onclick="closeCreditHistory()">✕</button>
+    </div>
+    <div class="ch-summary" id="ch-summary"></div>
+    <div class="ch-list" id="ch-list"><div class="ch-loading" id="ch-loading">내역 로딩 중…</div></div>
+  </div>
+</div>
+
+<!-- 크레딧 구매 모달 -->
+<div id="credit-modal" onclick="if(event.target===this)closeCreditModal()">
+  <div class="credit-box">
+    <button class="credit-close" onclick="closeCreditModal()">✕</button>
+    <div class="credit-title" id="credit-modal-title">크레딧 구매</div>
+    <div class="credit-sub"   id="credit-modal-sub">앱 이용에 사용되는 크레딧을 충전합니다.</div>
+    <div class="credit-pkg-grid" id="credit-pkg-grid"><!-- JS 렌더 --></div>
+    <div class="credit-pay-btns">
+      <button class="credit-pay-btn toss"   id="credit-btn-toss"   onclick="purchaseWithToss()"   disabled>🇰🇷 Toss Payments (국내)</button>
+      <button class="credit-pay-btn stripe" id="credit-btn-stripe" onclick="purchaseWithStripe()" disabled>🌍 Stripe (해외 카드)</button>
+    </div>
+    <div class="credit-result" id="credit-result"></div>
+    <div class="credit-note"   id="credit-note">
+      ※ 카드번호 등 결제 수단 정보는 PG사(Toss Payments / Stripe)에서 처리하며, WorksFree는 보관하지 않습니다.<br>
+      ※ 구매 크레딧은 환불 정책에 따라 처리됩니다.
+    </div>
+  </div>
+</div>
+
+<!-- 토스트 알림 -->
+<div id="wf-toast"></div>
+
+<!-- 모바일 사이드바 오버레이 -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- 사이드바 -->
+<div id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">◈ WorksFree Hub</div>
+    <div class="badge-lang-row">
+      <div id="user-widget-wrap" class="user-widget"></div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btnKo" onclick="setLang('ko')">KO</button>
+        <button class="lang-btn"        id="btnEn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+  <div class="tree-scroll" id="treeRoot"></div>
+  <div class="sidebar-footer">
+    <span id="footer-ver"></span>
+    <span class="footer-token" id="footer-token"></span>
+  </div>
+</div>
+
+<!-- 메인 -->
+<div id="main">
+
+  <!-- 브레드크럼 상단바 -->
+  <div id="topbar">
+    <button id="sidebar-toggle" onclick="toggleSidebar()" aria-label="메뉴">☰</button>
+    <span class="bc-home" onclick="showHome()">⌂ <span id="bc-home-text">홈</span></span>
+    <span id="bc-trail"></span>
+  </div>
+
+  <!-- 홈 화면 -->
+  <div id="home-screen">
+    <div class="home-title">대시보드</div>
+    <div class="home-desc" id="home-desc">도구를 선택하여 작업을 시작하세요.</div>
+    <div class="dash-grid" id="dashGrid"></div>
+  </div>
+  <!-- iframe 영역 (콘텐츠 로드 시 표시) -->
+  <div id="frame-container" style="display:none;">
+    <iframe id="contentFrame" title="콘텐츠"></iframe>
+    <div id="preview-overlay">
+      <div class="preview-card">
+        <div class="preview-icon">👁</div>
+        <div>
+          <div class="preview-title" id="overlay-title">미리보기 모드</div>
+          <div class="preview-desc"  id="overlay-desc">이 기능을 직접 사용하려면 로그인이 필요합니다.</div>
+        </div>
+      </div>
+      <button class="preview-login-btn" id="overlay-btn" onclick="openAuthModal()">로그인 / 회원가입</button>
+      <button class="preview-back-btn"  id="overlay-back" onclick="showHome()">✕</button>
+    </div>
+  </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════
-   진단 질문 정의
-   skip(c): 수집된 데이터 기준으로 이 질문 건너뛸지 여부
-═══════════════════════════════════════════════════ */
-const QS = [
+/* ── 툴팁 엔진 ── */
+(function() {
+  const tip = document.createElement('div');
+  tip.id = 'wf-tooltip';
+  document.body.appendChild(tip);
+
+  document.addEventListener('mouseover', e => {
+    const el = e.target.closest('[data-tooltip]');
+    if (!el) return;
+    tip.textContent = el.dataset.tooltip;
+    tip.classList.add('show');
+  });
+  document.addEventListener('mouseout', e => {
+    if (!e.target.closest('[data-tooltip]')) return;
+    tip.classList.remove('show');
+  });
+  document.addEventListener('mousemove', e => {
+    if (!tip.classList.contains('show')) return;
+    const x = e.clientX + 14;
+    const y = e.clientY - tip.offsetHeight / 2;
+    // 오른쪽 화면 경계 초과 시 왼쪽에 표시
+    const maxX = window.innerWidth - tip.offsetWidth - 8;
+    tip.style.left = Math.min(x, maxX) + 'px';
+    tip.style.top  = Math.max(4, y) + 'px';
+  });
+})();
+
+/* ── 모바일 사이드바 토글 ── */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+/* ════════════════════════════════════════════
+   1. 역할(Role) 판별
+   ────────────────────────────────────────────
+   URL 파라미터 ?role=<TOKEN> 을 읽어서
+   GFC 전용 콘텐츠 표시 여부 결정.
+
+   토큰은 여기서 관리 — 바꾸고 싶으면 이 값만 수정
+════════════════════════════════════════════ */
+/* ── 언어 설정 ── */
+let lang = localStorage.getItem('wf_lang') || 'ko';
+
+const HUB_I18N = {
+  ko: {
+    home:          '홈',
+    badge_gfc:     'GFC 전용 접속',
+    badge_open:    '일반 접속',
+    denied_title:  '접근 권한 없음',
+    denied_desc:   '이 메뉴는 GFC 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.',
+    dashboard:     '대시보드',
+    home_desc_gfc: 'GFC 전용 도구 포함 전체 메뉴에 접근 가능합니다.',
+    home_desc_open:'공용 도구에 접근 가능합니다. GFC 전용 콘텐츠는 제공되지 않습니다.',
+    tooltip_gfc:   'GFC 파트너 전용 메뉴입니다',
+    tooltip_coming:'준비 중인 메뉴입니다',
+    coming_tag:    '준비중',
+    card_lock:       'GFC 전용',
+    member_tag:      '회원전용',
+    consultant_tag:  '컨설팅 전용',
+    tooltip_consultant: '경영지도사 / GFC 파트너 전용 서비스입니다',
+    denied_consultant_title: '컨설팅 서비스 전용',
+    denied_consultant_desc:  '이 서비스는 경영지도사 및 GFC 파트너 전용입니다.<br>WorksFree에 문의하시면 컨설팅 서비스를 이용하실 수 있습니다.',
+    login_btn:       '로그인',
+    auth_title:      'WorksFree에 로그인',
+    auth_desc:       '회원 전용 콘텐츠에 접근하려면<br>로그인이 필요합니다.',
+    auth_google:     'Google로 계속하기',
+    auth_kakao:      '카카오로 계속하기',
+    tooltip_member:  '로그인이 필요한 콘텐츠입니다',
+    logout_btn:      '로그아웃',
+    // 이메일 탭
+    auth_tab_social:         '소셜 로그인',
+    auth_tab_email:          '이메일',
+    auth_email_ph:           '이메일',
+    auth_pw_ph:              '비밀번호',
+    auth_login_btn:          '로그인',
+    auth_login_loading:      '로그인 중...',
+    auth_no_account:         '계정이 없으신가요?',
+    auth_to_signup:          '회원가입',
+    auth_name_ph:            '이름 (선택)',
+    auth_new_pw_ph:          '비밀번호 (8자 이상)',
+    auth_confirm_pw_ph:      '비밀번호 확인',
+    auth_send_magic:         '인증 메일 받기',
+    auth_sending:            '발송 중...',
+    auth_have_account:       '이미 계정이 있으신가요?',
+    auth_to_login:           '로그인',
+    auth_magic_msg:          '이메일의 <b>링크를 클릭</b>하면<br>자동으로 가입이 완료됩니다.',
+    auth_change_email:       '← 이메일 변경',
+    auth_resend_link:        '링크 재발송',
+    auth_sent_to:            '위 주소로 인증 메일을 발송했습니다.',
+    auth_err_email_req:      '이메일을 입력하세요.',
+    auth_err_pw_short:       '비밀번호는 8자 이상이어야 합니다.',
+    auth_err_pw_mismatch:    '비밀번호가 일치하지 않습니다.',
+    auth_err_email_pw_req:   '이메일과 비밀번호를 입력하세요.',
+    auth_err_unconfirmed:    '이메일 인증이 필요합니다. 받은편지함을 확인하세요.',
+    auth_resend_confirm_lnk: '인증 메일 재발송',
+    auth_err_invalid_login:  '이메일 또는 비밀번호가 틀렸습니다.',
+    auth_resend_ok:          '인증 메일을 재발송했습니다. 받은편지함을 확인하세요.',
+    auth_magic_resend_ok:    '인증 메일을 재발송했습니다.',
+    dev_login_user:          '▶ 사용자 로그인 (부분 표시)',
+    dev_login_admin:         '▶ 관리자 로그인 (전체 표시)',
+    overlay_title:           '미리보기 모드',
+    overlay_desc:            '이 기능을 직접 사용하려면 WorksFree 회원 로그인이 필요합니다.',
+    overlay_btn:             '로그인 / 회원가입',
+    overlay_back:            '홈으로 돌아가기',
+    // 크레딧 구매
+    credit_buy_btn:          '크레딧 구매',
+    credit_modal_title:      '크레딧 구매',
+    credit_modal_sub:        '앱 이용에 사용되는 크레딧을 충전합니다.',
+    credit_unit:             '크레딧',
+    credit_popular:          '인기',
+    credit_btn_toss:         '🇰🇷 Toss Payments (국내)',
+    credit_btn_stripe:       '🌍 Stripe (해외 카드)',
+    credit_btn_paying:       '결제 진행 중...',
+    credit_btn_redirecting:  '이동 중...',
+    credit_note:             '※ 카드번호 등 결제 수단 정보는 PG사(Toss Payments / Stripe)에서 처리하며, WorksFree는 보관하지 않습니다.\n※ 구매 크레딧은 환불 정책에 따라 처리됩니다.',
+    credit_ok:               '크레딧이 충전됐습니다!',
+    credit_fail:             '결제가 취소됐습니다.',
+    credit_sdk_err:          '결제 SDK 로드 실패. 페이지를 새로고침 후 다시 시도하세요.',
+    credit_verify_err:       '결제 확인 오류: ',
+    credit_balance:          '크레딧 잔액',
+    credit_balance_loading:  '💎 잔액 로딩 중…',
+    credit_balance_tpl:      '💎 {n} 크레딧',
+    ch_title:                '크레딧 내역',
+    ch_total_charged:        '총 충전',
+    ch_total_used:           '총 사용',
+    ch_balance:              '잔액',
+    ch_empty:                '크레딧 내역이 없습니다.',
+    ch_loading:              '내역 로딩 중…',
+    ch_reason_purchase:      '충전 (결제)',
+    ch_reason_use_app:       '앱 사용',
+    ch_reason_admin_grant:   '지급 (관리자)',
+    ch_reason_refund:        '환불',
+  },
+  en: {
+    home:          'Home',
+    badge_gfc:     'GFC Partner Access',
+    badge_open:    'General Access',
+    denied_title:  'Access Denied',
+    denied_desc:   'This menu is for GFC partners only.<br>Please use the correct link or<br>contact your account manager.',
+    dashboard:     'Dashboard',
+    home_desc_gfc: 'You have access to all menus including GFC-exclusive tools.',
+    home_desc_open:'You have access to public tools. GFC-exclusive content is not available.',
+    tooltip_gfc:   'GFC Partner exclusive menu',
+    tooltip_coming:'This menu is coming soon',
+    coming_tag:    'Coming Soon',
+    card_lock:       'GFC Only',
+    member_tag:      'Member Only',
+    consultant_tag:  'Consultant Only',
+    tooltip_consultant: 'For Consultants / GFC Partners only',
+    denied_consultant_title: 'Consultant Service',
+    denied_consultant_desc:  'This service is for consultants and GFC partners only.<br>Contact WorksFree to learn about consulting services.',
+    login_btn:       'Sign In',
+    auth_title:      'Sign in to WorksFree',
+    auth_desc:       'Login required to access<br>member-only content.',
+    auth_google:     'Continue with Google',
+    auth_kakao:      'Continue with Kakao',
+    tooltip_member:  'Login required',
+    logout_btn:      'Sign Out',
+    // Email tab
+    auth_tab_social:         'Social Login',
+    auth_tab_email:          'Email',
+    auth_email_ph:           'Email',
+    auth_pw_ph:              'Password',
+    auth_login_btn:          'Sign In',
+    auth_login_loading:      'Signing in...',
+    auth_no_account:         "Don't have an account?",
+    auth_to_signup:          'Sign Up',
+    auth_name_ph:            'Name (optional)',
+    auth_new_pw_ph:          'Password (8+ characters)',
+    auth_confirm_pw_ph:      'Confirm Password',
+    auth_send_magic:         'Send Verification Email',
+    auth_sending:            'Sending...',
+    auth_have_account:       'Already have an account?',
+    auth_to_login:           'Sign In',
+    auth_magic_msg:          'Click the <b>link in your email</b><br>to complete registration.',
+    auth_change_email:       '← Change Email',
+    auth_resend_link:        'Resend Link',
+    auth_sent_to:            'A verification email has been sent to the above address.',
+    auth_err_email_req:      'Please enter your email.',
+    auth_err_pw_short:       'Password must be at least 8 characters.',
+    auth_err_pw_mismatch:    'Passwords do not match.',
+    auth_err_email_pw_req:   'Please enter your email and password.',
+    auth_err_unconfirmed:    'Email verification required. Please check your inbox.',
+    auth_resend_confirm_lnk: 'Resend verification email',
+    auth_err_invalid_login:  'Invalid email or password.',
+    auth_resend_ok:          'Verification email sent. Please check your inbox.',
+    auth_magic_resend_ok:    'Verification email resent.',
+    dev_login_user:          '▶ User Login (partial view)',
+    dev_login_admin:         '▶ Admin Login (full view)',
+    overlay_title:           'Preview Mode',
+    overlay_desc:            'Sign in to your WorksFree account to use this feature.',
+    overlay_btn:             'Sign In / Sign Up',
+    overlay_back:            'Back to Home',
+    // Credits
+    credit_buy_btn:          'Buy Credits',
+    credit_modal_title:      'Buy Credits',
+    credit_modal_sub:        'Top up credits used for WorksFree app services.',
+    credit_unit:             'credits',
+    credit_popular:          'Popular',
+    credit_btn_toss:         '🇰🇷 Toss Payments (Korea)',
+    credit_btn_stripe:       '🌍 Stripe (International)',
+    credit_btn_paying:       'Processing...',
+    credit_btn_redirecting:  'Redirecting...',
+    credit_note:             '※ Payment details are handled by Toss Payments / Stripe. WorksFree does not store card information.\n※ Purchased credits are subject to our refund policy.',
+    credit_ok:               'Credits added successfully!',
+    credit_fail:             'Payment cancelled.',
+    credit_sdk_err:          'Payment SDK failed to load. Please refresh and try again.',
+    credit_verify_err:       'Payment verification error: ',
+    credit_balance:          'Credit Balance',
+    credit_balance_loading:  '💎 Loading…',
+    credit_balance_tpl:      '💎 {n} credits',
+    ch_title:                'Credit History',
+    ch_total_charged:        'Total Charged',
+    ch_total_used:           'Total Used',
+    ch_balance:              'Balance',
+    ch_empty:                'No credit history yet.',
+    ch_loading:              'Loading history…',
+    ch_reason_purchase:      'Charged (Payment)',
+    ch_reason_use_app:       'App Usage',
+    ch_reason_admin_grant:   'Granted (Admin)',
+    ch_reason_refund:        'Refund',
+  }
+};
+
+function t(key) { return HUB_I18N[lang][key] || HUB_I18N.ko[key]; }
+function getLabel(label) {
+  if (typeof label === 'object') return label[lang] || label.ko;
+  return label;
+}
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('wf_lang', l);
+  document.documentElement.lang = l;
+  document.getElementById('btnKo').classList.toggle('active', l === 'ko');
+  document.getElementById('btnEn').classList.toggle('active', l === 'en');
+  applyHubLang();
+  // 현재 iframe에 언어 변경 전파
+  const iframe = document.getElementById('contentFrame');
+  if (iframe && iframe.src && iframe.contentWindow) {
+    iframe.contentWindow.postMessage({ type: 'wf_lang', lang: l }, '*');
+  }
+}
+
+let currentPath = [];
+let currentLabel = '';
+
+function applyHubLang() {
+  // 언어 버튼 상태
+  document.getElementById('btnKo').classList.toggle('active', lang === 'ko');
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  // 브레드크럼 홈 텍스트
+  document.getElementById('bc-home-text').textContent = t('home');
+  // 유저 위젯 (로그인 버튼 ↔ 유저 이름 — 언어 변경 시 텍스트 갱신)
+  updateAuthUI();
+  // 로그인 모달 텍스트
+  const aTitle = document.getElementById('auth-modal-title');
+  const aDesc  = document.getElementById('auth-modal-desc');
+  const aGoogle= document.getElementById('auth-btn-google');
+  const aKakao = document.getElementById('auth-btn-kakao');
+  if (aTitle)  aTitle.textContent  = t('auth_title');
+  if (aDesc)   aDesc.innerHTML     = t('auth_desc');
+  if (aGoogle) aGoogle.textContent = t('auth_google');
+  if (aKakao)  aKakao.textContent  = t('auth_kakao');
+  // 이메일 탭 — 탭 버튼
+  const elTabSocial   = document.getElementById('auth-tab-social');
+  const elTabEmail    = document.getElementById('auth-tab-email');
+  if (elTabSocial)  elTabSocial.textContent  = t('auth_tab_social');
+  if (elTabEmail)   elTabEmail.textContent   = t('auth_tab_email');
+  // 이메일 탭 — 로그인 폼
+  const elEmailPh  = document.getElementById('el-email');
+  const elPwPh     = document.getElementById('el-pw');
+  const elLoginBtn = document.getElementById('el-login-btn');
+  const elNoAcct   = document.getElementById('el-no-acct');
+  if (elEmailPh)  elEmailPh.placeholder  = t('auth_email_ph');
+  if (elPwPh)     elPwPh.placeholder     = t('auth_pw_ph');
+  if (elLoginBtn) elLoginBtn.textContent = t('auth_login_btn');
+  if (elNoAcct)   elNoAcct.innerHTML     = t('auth_no_account') + ' <span onclick="toggleEmailMode(true)">' + t('auth_to_signup') + '</span>';
+  // 이메일 탭 — 회원가입 폼
+  const elNamePh      = document.getElementById('es-name');
+  const elSEmailPh    = document.getElementById('es-email');
+  const elNewPwPh     = document.getElementById('es-pw');
+  const elCfmPwPh     = document.getElementById('es-pw2');
+  const elSendBtn     = document.getElementById('es-send-btn');
+  const elHaveAcct    = document.getElementById('es-have-acct');
+  if (elNamePh)    elNamePh.placeholder    = t('auth_name_ph');
+  if (elSEmailPh)  elSEmailPh.placeholder  = t('auth_email_ph');
+  if (elNewPwPh)   elNewPwPh.placeholder   = t('auth_new_pw_ph');
+  if (elCfmPwPh)   elCfmPwPh.placeholder   = t('auth_confirm_pw_ph');
+  if (elSendBtn)   elSendBtn.textContent   = t('auth_send_magic');
+  if (elHaveAcct)  elHaveAcct.innerHTML    = t('auth_have_account') + ' <span onclick="toggleEmailMode(false)">' + t('auth_to_login') + '</span>';
+  // 이메일 탭 — Step2 매직 링크 대기 화면
+  const elMagicMsg    = document.getElementById('es-otp-msg');
+  const elChangeEmail = document.getElementById('es-change-email');
+  const elResendLink  = document.getElementById('es-resend-link');
+  if (elMagicMsg && elMagicMsg.classList.contains('ok')) elMagicMsg.innerHTML = t('auth_magic_msg');
+  if (elChangeEmail)  elChangeEmail.textContent = t('auth_change_email');
+  if (elResendLink)   elResendLink.textContent  = t('auth_resend_link');
+  // 접근 거부 모달
+  document.getElementById('denied-title').textContent = t('denied_title');
+  document.getElementById('denied-desc').innerHTML    = t('denied_desc');
+  // 크레딧 내역 모달 타이틀
+  const elChTitle = document.getElementById('ch-title-el');
+  if (elChTitle) elChTitle.textContent = t('ch_title');
+  // 홈 화면
+  document.getElementById('home-screen').querySelector('.home-title').textContent = t('dashboard');
+  document.getElementById('home-desc').textContent = IS_GFC ? t('home_desc_gfc') : t('home_desc_open');
+  // 트리 재빌드
+  const treeRoot = document.getElementById('treeRoot');
+  treeRoot.innerHTML = '';
+  activeLabel = null;
+  treeRoot.appendChild(buildTree(TREE));
+  // 대시보드 카드 재렌더 (홈 화면일 때)
+  if (document.getElementById('home-screen').style.display !== 'none') {
+    renderDashCards();
+  }
+  // 브레드크럼 재렌더
+  if (currentLabel) setBreadcrumb(currentPath, currentLabel);
+  // dev 툴바 버튼
+  const elDevUser  = document.getElementById('dev-btn-user');
+  const elDevAdmin = document.getElementById('dev-btn-admin');
+  if (elDevUser)  elDevUser.textContent  = t('dev_login_user');
+  if (elDevAdmin) elDevAdmin.textContent = t('dev_login_admin');
+  // 미리보기 오버레이
+  const elOvTitle = document.getElementById('overlay-title');
+  const elOvDesc  = document.getElementById('overlay-desc');
+  const elOvBtn   = document.getElementById('overlay-btn');
+  const elOvBack  = document.getElementById('overlay-back');
+  if (elOvTitle) elOvTitle.textContent = t('overlay_title');
+  if (elOvDesc)  elOvDesc.textContent  = t('overlay_desc');
+  if (elOvBtn)   elOvBtn.textContent   = t('overlay_btn');
+  if (elOvBack)  elOvBack.textContent  = t('overlay_back');
+  // 크레딧 모달
+  const elCreditTitle  = document.getElementById('credit-modal-title');
+  const elCreditSub    = document.getElementById('credit-modal-sub');
+  const elCreditToss   = document.getElementById('credit-btn-toss');
+  const elCreditStripe = document.getElementById('credit-btn-stripe');
+  const elCreditNote   = document.getElementById('credit-note');
+  if (elCreditTitle)  elCreditTitle.textContent  = t('credit_modal_title');
+  if (elCreditSub)    elCreditSub.textContent    = t('credit_modal_sub');
+  if (elCreditToss && !elCreditToss.disabled)   elCreditToss.textContent   = t('credit_btn_toss');
+  if (elCreditStripe && !elCreditStripe.disabled) elCreditStripe.textContent = t('credit_btn_stripe');
+  if (elCreditNote)   elCreditNote.textContent   = t('credit_note');
+  // 크레딧 패키지 그리드 재렌더 (열려 있을 때만)
+  if (document.getElementById('credit-modal')?.classList.contains('show')) renderCreditPkgs();
+}
+
+const HUB_VERSION = '0.7.1.4';             // deploy.ps1이 자동 증가
+const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 이 값만 GFC 동료에게 공유
+
+const params   = new URLSearchParams(location.search);
+const roleToken = params.get('role') || '';
+const IS_GFC   = true; // roleToken === GFC_TOKEN;  ← 테스트 중 권한 해제
+
+/* ─ 역할 배지 — applyHubLang에서 렌더됨 ─ */
+const badgeWrap = document.getElementById('role-badge-wrap');
+
+/* 버전 · 연도 표시 */
+document.getElementById('footer-ver').textContent =
+  `v${HUB_VERSION} · WorksFree ${new Date().getFullYear()}`;
+
+/* footer에 현재 토큰 힌트 표시 (디버그용, 운영 시 제거 가능) */
+if (IS_GFC) {
+  document.getElementById('footer-token').textContent = `token: ${roleToken}`;
+}
+
+/* ════════════════════════════════════════════
+   2. 메뉴 트리 데이터
+   ────────────────────────────────────────────
+   gfcOnly: true  → IS_GFC 일 때만 표시
+   iframe  : 경로 → 클릭 시 iframe에 로드
+════════════════════════════════════════════ */
+const TREE = [
+  { label:{ko:'홈', en:'Home'}, icon:'⌂', action: showHome },
   {
-    id:'bizType', step:'기업 유형',
-    q:'사업자 형태를 선택해주세요',
-    sub:'법인 또는 개인사업자 여부에 따라 진단 경로가 달라집니다',
-    opts:[
-      {t:'개인사업자',sub:'프리랜서·1인 사업자 포함',tag:null,d:{bizType:'indiv'}},
-      {t:'법인',sub:'주식회사·유한회사 등 법인등기 존재',tag:null,d:{bizType:'corp'}},
+    label:{ko:'서비스', en:'Services'}, icon:'🛠', children:[
+      { label:{ko:'QR 생성기',           en:'QR Generator'},       icon:'✦', iframe:'service/qr/index.html' },
+      { label:{ko:'파일명 자소복원',        en:'Korean Normalizer'},   icon:'✦', iframe:'service/normalizer/index.html' },
+      { label:{ko:'변환 결과 검증',        en:'Conversion Verifier'}, icon:'✦', iframe:'service/conversion-verifier/index.html' },
+      { label:{ko:'앱 요청 게시판',        en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
     ]
   },
   {
-    id:'industry', step:'업종',
-    skip:c=>c.bizType!=='corp',
-    q:'주요 업종은 무엇입니까?',
-    sub:'업종별 위험율과 법인세 적용 여부, 리스크 구조가 다릅니다',
-    opts:[
-      {t:'제조업 / 건설업',sub:'산업재해 위험율 높음, 재해보장 중점',tag:'고위험',d:{ind:'mfg',indRisk:'high',indLabel:'제조·건설'}},
-      {t:'도소매 / 유통',sub:'재고·물류 리스크, 중간 위험율',tag:'중위험',d:{ind:'trade',indRisk:'mid',indLabel:'도소매·유통'}},
-      {t:'IT / 소프트웨어 / 컨설팅',sub:'Key Person 의존도 높음, 낮은 물리적 위험',tag:'저위험',d:{ind:'it',indRisk:'low',indLabel:'IT·서비스'}},
-      {t:'의료 / 요양 / 병원',sub:'비영리 법인세 없음 — 절세 포인트 상이',tag:'세무 특수',d:{ind:'medical',indRisk:'mid',indLabel:'의료·요양'}},
-      {t:'요식업 / 숙박 / 서비스',sub:'현금 매출 비중 높음, 가수금 발생 주의',tag:'중위험',d:{ind:'food',indRisk:'mid',indLabel:'요식·숙박'}},
-      {t:'기타 (부동산·금융·기타)',sub:null,tag:null,d:{ind:'other',indRisk:'low',indLabel:'기타'}},
+    label:{ko:'컨설팅', en:'Consulting (KR)'}, icon:'◈', consultantTag:true, children:[
+      { label:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'}, icon:'✦', iframe:'consulting/soho/index.html', consultantOnly:true },
+      { label:{ko:'기업공시 조회',  en:'DART Disclosure'},     icon:'✦', iframe:'consulting/dart/index.html', consultantOnly:true },
+      { label:{ko:'ESG 자가진단',  en:'ESG Assessment'},      icon:'✦', iframe:'consulting/esg/index.html', consultantOnly:true },
+      { label:{ko:'중대재해처벌법', en:'Serious Accident Act'}, icon:'✦', iframe:'consulting/jdh/index.html', consultantOnly:true },
+      { label:{ko:'현장클리닉 관리', en:'Field Clinic'},        icon:'✦', iframe:'consulting/g1/index.html',  consultantOnly:true },
+      { label:{ko:'예비창업패키지', en:'Pre-Startup Package'}, icon:'🚀', iframe:'consulting/prebiz/index.html', consultantOnly:true },
+      { label:{ko:'경영종합진단',   en:'Financial Plan'},      icon:'✦', iframe:'consulting/gfc/index.html', roleOnly:'gfc', gfcTag:true },
+      { label:{ko:'CEO 플랜',      en:'CEO Plan'},            icon:'✦', iframe:'consulting/ceo/index.html', roleOnly:'gfc', gfcTag:true },
     ]
   },
   {
-    id:'bizAge', step:'업력',
-    q:'사업 운영 기간은 얼마나 됩니까?',
-    sub:'법인의 경우 업력이 비상장주식 가치평가 방식을 결정합니다',
-    opts:[
-      {t:'2년 미만',sub:'신설 — 비상장주식 액면가 구간 (절호의 분산 타이밍)',tag:'신설',d:{ageKey:'new',ageLabel:'2년 미만'}},
-      {t:'2년 ~ 4년',sub:'성장기 — 4년차부터 순이익 가치평가 전환 임박',tag:'성장기',d:{ageKey:'grow',ageLabel:'2~4년'}},
-      {t:'5년 ~ 10년',sub:'안정기 — 이익잉여금 누적, 승계 전략 가동 필요',tag:'안정기',d:{ageKey:'stable',ageLabel:'5~10년'}},
-      {t:'10년 이상',sub:'성숙기 — 승계·상속세 리스크 본격 점검 시점',tag:'성숙기',d:{ageKey:'mature',ageLabel:'10년 이상'}},
-    ]
-  },
-  {
-    id:'revenue', step:'매출 규모',
-    q:'최근 1년 연간 매출 규모는?',
-    sub:'매출 구간에 따라 컨설팅 그룹(A·B·C)이 분류됩니다',
-    opts:[
-      {t:'7.5억 미만',sub:null,tag:null,d:{rev:'tiny',revLabel:'7.5억 미만',revGroup:''}},
-      {t:'7.5억 ~ 30억',sub:'성실신고 의무 대상',tag:'성실신고',d:{rev:'small',revLabel:'7.5~30억',revGroup:'A'}},
-      {t:'30억 ~ 80억',sub:'A그룹 — 소규모·중소법인',tag:'A그룹',d:{rev:'mid',revLabel:'30~80억',revGroup:'A'}},
-      {t:'80억 ~ 200억',sub:'B그룹 — 중소법인',tag:'B그룹',d:{rev:'large',revLabel:'80~200억',revGroup:'B'}},
-      {t:'200억 이상',sub:'C그룹 — 중견법인',tag:'C그룹',d:{rev:'xlarge',revLabel:'200억 이상',revGroup:'C'}},
-    ]
-  },
-  {
-    id:'employees', step:'임직원 수',
-    skip:c=>c.bizType!=='corp',
-    q:'현재 임직원(직원+임원) 수는?',
-    sub:null,
-    opts:[
-      {t:'5인 미만',sub:null,tag:null,d:{emp:'tiny',empLabel:'5인 미만'}},
-      {t:'5인 ~ 20인',sub:null,tag:null,d:{emp:'small',empLabel:'5~20인'}},
-      {t:'20인 ~ 100인',sub:null,tag:null,d:{emp:'mid',empLabel:'20~100인'}},
-      {t:'100인 이상',sub:null,tag:null,d:{emp:'large',empLabel:'100인 이상'}},
-    ]
-  },
-  {
-    id:'ceoStake', step:'대표 지분',
-    skip:c=>c.bizType!=='corp',
-    q:'대표이사의 법인 지분율은?',
-    sub:'지분 구조는 상속세·증여세 리스크와 승계 전략의 핵심 변수입니다',
-    opts:[
-      {t:'100% (대표 단독 소유)',sub:'상속세 리스크 최고, 승계 플랜 긴급',tag:'단독 소유',d:{ceoStake:'100',stakeLabel:'100%'}},
-      {t:'50% 초과 ~ 99%',sub:'지배주주, 특수관계인 지분 분산 여부 확인 필요',tag:'지배주주',d:{ceoStake:'major',stakeLabel:'50%초과'}},
-      {t:'50% 이하',sub:'공동대표 / 외부투자 구조',tag:'공동 보유',d:{ceoStake:'minor',stakeLabel:'50%이하'}},
-    ]
-  },
-  {
-    id:'relatedStake', step:'특수관계인 지분',
-    skip:c=>c.bizType!=='corp'||c.ceoStake==='minor',
-    q:'특수관계인(배우자·자녀·부모)의 지분 보유 현황은?',
-    sub:'특수관계인과 대표 지분 합계가 30% 이상이면 "특정법인" 해당 — 별도 승계 전략 적용',
-    opts:[
-      {t:'없음 — 대표만 보유',sub:'향후 증여·분산 계획 수립 필요',tag:'미분산',d:{related:'none',relatedLabel:'미분산'}},
-      {t:'배우자/자녀에게 일부 분산',sub:'특수관계인 포함 지분 합계 확인 필요',tag:'일부 분산',d:{related:'partial',relatedLabel:'일부분산'}},
-      {t:'승계 목적으로 자녀 법인(특정법인) 설립',sub:'특정법인 활용 — 과세 리스크 별도 점검 필요',tag:'특정법인',d:{related:'specific',relatedLabel:'특정법인'}},
-      {t:'이미 승계·증여 완료',sub:null,tag:'완료',d:{related:'done',relatedLabel:'승계완료'}},
-    ]
-  },
-  {
-    id:'retainedEarnings', step:'이익잉여금',
-    skip:c=>c.bizType!=='corp',
-    q:'법인의 누적 이익잉여금 규모는?',
-    sub:'이익잉여금이 과다하면 배당소득세 이슈와 주식가치 상승으로 이어집니다',
-    opts:[
-      {t:'3억 미만',sub:null,tag:null,d:{re:'low',reLabel:'3억 미만'}},
-      {t:'3억 ~ 20억',sub:'배당 설계 또는 보험 출구 검토 구간',tag:'주의',d:{re:'mid',reLabel:'3~20억'}},
-      {t:'20억 ~ 100억',sub:'이익잉여금 과다 — 절세 출구전략 시급',tag:'위험',d:{re:'high',reLabel:'20~100억'}},
-      {t:'100억 초과',sub:'주식가치 급등 — 상속세 최대 리스크 구간',tag:'긴급',d:{re:'vhigh',reLabel:'100억 초과'}},
-    ]
-  },
-  {
-    id:'financialRisk', step:'재무 리스크',
-    q:'가수금 또는 가지급금이 있습니까?',
-    sub:'가수금 = 대표가 법인에 빌려준 돈 (99% 확률 매출누락). 가지급금 = 대표가 법인 돈을 사적 사용',
-    opts:[
-      {t:'없음',sub:null,tag:null,d:{fr:'none',frLabel:'없음'}},
-      {t:'가지급금만 있음',sub:'대표의 법인 자금 사적 사용 — 이자 과세 이슈',tag:'주의',d:{fr:'payable',frLabel:'가지급금'}},
-      {t:'가수금만 있음',sub:'매출 누락 가능성 99% — 세무조사 대응 긴급',tag:'위험',d:{fr:'receivable',frLabel:'가수금'}},
-      {t:'양쪽 모두 있음',sub:'복합 재무 리스크 — 즉시 상계처리 필요',tag:'긴급',d:{fr:'both',frLabel:'양쪽 다'}},
-    ]
-  },
-  {
-    id:'corpTax', step:'법인세',
-    skip:c=>c.bizType!=='corp'||c.ind==='medical',
-    q:'연간 법인세 납부 수준은?',
-    sub:'법인세 부담이 클수록 경영인정기보험 비용처리를 통한 절세 효과가 극대화됩니다',
-    opts:[
-      {t:'납부 없음 (적자 또는 세액공제)',sub:null,tag:null,d:{tax:'none',taxLabel:'없음'}},
-      {t:'1천만원 미만',sub:null,tag:null,d:{tax:'low',taxLabel:'1천만원 미만'}},
-      {t:'1천만원 ~ 5천만원',sub:'경영인정기 비용처리 연간 절감 효과 220만~1,100만원',tag:'절세 기회',d:{tax:'mid',taxLabel:'1천~5천만원'}},
-      {t:'5천만원 이상',sub:'경영인정기 풀 활용 시 절세 효과 최대 — 최우선 과제',tag:'절세 최우선',d:{tax:'high',taxLabel:'5천만원 이상'}},
-    ]
-  },
-  {
-    id:'ceoAge', step:'대표 연령',
-    q:'대표이사의 연령대는?',
-    sub:'연령에 따라 보험 가입 가능 기간과 보험료 수준이 달라집니다',
-    opts:[
-      {t:'40세 미만',sub:'가입 기간 충분, 보험료 유리',tag:null,d:{age:'young',ageLabel:'40세 미만'}},
-      {t:'40 ~ 55세',sub:'최적의 경영인정기 가입 구간',tag:'최적 구간',d:{age:'mid',ageLabel:'40~55세'}},
-      {t:'55 ~ 65세',sub:'가입 시급, 보험료 상승 — 빠른 결정 필요',tag:'시급',d:{age:'senior',ageLabel:'55~65세'}},
-      {t:'65세 이상',sub:'일부 상품 가입 제한 — 대안 플랜 필요',tag:'제한적',d:{age:'elder',ageLabel:'65세 이상'}},
-    ]
-  },
-  {
-    id:'succession', step:'승계 계획',
-    skip:c=>c.bizType!=='corp',
-    q:'가업 승계 또는 주식 이전 계획은?',
-    sub:'승계 플랜 없이 대표 사망 시 상속세 납부 재원이 없어 법인 존속이 위협받을 수 있습니다',
-    opts:[
-      {t:'계획 없음 / 미정',sub:'상속세 리스크 최고 — 즉시 플랜 수립 필요',tag:'긴급',d:{succ:'none',succLabel:'미정'}},
-      {t:'자녀에게 승계 예정',sub:'주식 가치 낮은 시점에 증여/분산 검토 필요',tag:'승계 예정',d:{succ:'child',succLabel:'자녀 승계'}},
-      {t:'제3자 매각 (M&A) 고려',sub:'기업 가치 극대화 전략 + 오너 출구 플랜',tag:'매각 검토',d:{succ:'sale',succLabel:'매각 검토'}},
-      {t:'이미 승계 준비 중',sub:'기존 플랜 점검 및 보완',tag:'진행 중',d:{succ:'wip',succLabel:'진행 중'}},
-    ]
-  },
-  {
-    id:'groupIns', step:'단체보험',
-    q:'현재 임직원 단체보험 가입 현황은?',
-    sub:null,
-    opts:[
-      {t:'전혀 없음',sub:'미가입 — 신규 설계 대상',tag:'신규',d:{gi:'none',giLabel:'미가입'}},
-      {t:'일부 가입 (보장 미흡)',sub:'보장 분석 후 업그레이드 설계 대상',tag:'비교 분석',d:{gi:'partial',giLabel:'일부가입'}},
-      {t:'단체보험 완비',sub:'경영인 보험 및 추가 법인보험 검토 대상',tag:'추가 컨설팅',d:{gi:'full',giLabel:'완비'}},
+    label:{ko:'앱스토어', en:'App Store'}, icon:'📦', memberTag:true, children:[
+      {
+        label:{ko:'솔리드웍스', en:'SolidWorks'}, icon:'⚙', children:[
+          { label:{ko:'BOM 추출',          en:'BOM Exporter'},    icon:'✦', iframe:'app-store/solidworks/bom-exporter/index.html' },
+          { label:{ko:'속성 초기화',      en:'Attribute Reset'}, icon:'✦', iframe:'app-store/solidworks/attribute-reset/index.html' },
+        ]
+      },
+      {
+        label:{ko:'기타', en:'Others'}, icon:'◎', children:[
+          { label:{ko:'도면 출력 자동화', en:'DWG Batch Print'}, icon:'✦', iframe:'app-store/etc/dwg-batch-print/index.html' },
+        ]
+      },
+      {
+        label:{ko:'웹 자동화', en:'Web Automation'}, icon:'🌐', children:[
+          { label:{ko:'Naver Blog Commenter', en:'Naver Blog Commenter'}, icon:'✦', iframe:'app-store/web/naver-blog-commenter/index.html' },
+        ]
+      },
     ]
   },
 ];
 
-/* ═══════════════════════════════════════════════════
-   앱 상태
-═══════════════════════════════════════════════════ */
-let history = []; // {qIdx, optIdx, answer}
-let C = {};       // collected data
+/* 대시보드 카드 */
+const DASH_CARDS = [
+  { icon:'▣',
+    title:{ko:'QR 생성기',          en:'QR Generator'},
+    desc: {ko:'URL→QR 즉시 생성·다운로드',          en:'Generate & download QR from URL'},
+    iframe:'service/qr/index.html', gfcOnly:false },
+  { icon:'ㅇㅝㄱㅅㅡ -> 웍스',
+    title:{ko:'파일명 자소복원',        en:'Korean Normalizer'},
+    desc: {ko:'한글 파일명 자소분리 일괄 복원',      en:'Batch restore decomposed Korean filenames'},
+    iframe:'service/normalizer/index.html', gfcOnly:false },
+  { icon:'✔',
+    title:{ko:'변환 결과 검증',        en:'Conversion Verifier'},
+    desc: {ko:'변환 전·후 파일 쌍 검증',             en:'Verify source/target conversion pairs'},
+    iframe:'service/conversion-verifier/index.html', gfcOnly:false },
+  { icon:'🏪',
+    title:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'},
+    desc: {ko:'정부 지원 사업 한눈에 보기',           en:'Government support programs at a glance'},
+    iframe:'consulting/soho/index.html', consultantOnly:true },
+  { icon:'📊',
+    title:{ko:'기업공시 조회',          en:'DART Disclosure'},
+    desc: {ko:'DART 기업 공시 정보 조회·분석',        en:'Search & analyze DART corporate disclosures'},
+    iframe:'consulting/dart/index.html', consultantOnly:true },
+  { icon:'♻',
+    title:{ko:'ESG 자가진단',        en:'ESG Assessment'},
+    desc: {ko:'환경·사회·지배구조 수준 점검',        en:'Assess ESG readiness level'},
+    iframe:'consulting/esg/index.html', consultantOnly:true },
+  { icon:'⚖',
+    title:{ko:'중대재해처벌법',      en:'Serious Accident Act'},
+    desc: {ko:'기업 의무·리스크 자가진단',           en:'Corporate obligations & risk self-check'},
+    iframe:'consulting/jdh/index.html', consultantOnly:true },
+  { icon:'🏥',
+    title:{ko:'현장클리닉 관리',       en:'Field Clinic'},
+    desc: {ko:'수진기업 현장클리닉 진행현황 관리',    en:'Manage field clinic client progress'},
+    iframe:'consulting/g1/index.html', consultantOnly:true },
+  { icon:'🚀',
+    title:{ko:'예비창업패키지',        en:'Pre-Startup Package'},
+    desc: {ko:'정부 지원 최대 1억원 · 창업 교육·멘토링 패키지', en:'Up to ₩100M gov\'t fund · education & mentoring'},
+    iframe:'consulting/prebiz/index.html', consultantOnly:true },
+  { icon:'◈',
+    title:{ko:'경영종합진단',         en:'Financial Plan'},
+    desc: {ko:'기업 경영 종합 컨설팅 진단',           en:'Comprehensive business consulting diagnosis'},
+    iframe:'consulting/gfc/index.html', roleOnly:'gfc', gfcTag:true },
+  { icon:'◉',
+    title:{ko:'CEO 플랜',            en:'CEO Plan'},
+    desc: {ko:'법인 컨설팅 종합 플랜',               en:'Corporate consulting comprehensive plan'},
+    iframe:'consulting/ceo/index.html', roleOnly:'gfc', gfcTag:true },
+  { icon:'📋',
+    title:{ko:'앱 요청 게시판',         en:'App Request Board'},
+    desc: {ko:'원하는 자동화 앱을 요청하세요',        en:'Request an automation app you need'},
+    iframe:'board/index.html', gfcOnly:false },
+  { icon:'⚙',
+    title:{ko:'BOM 추출',             en:'BOM Exporter'},
+    desc: {ko:'SolidWorks BOM 자동 추출·변환',       en:'Auto extract & convert SolidWorks BOM'},
+    iframe:'app-store/solidworks/bom-exporter/index.html', gfcOnly:false },
+  { icon:'🔄',
+    title:{ko:'속성 초기화',           en:'Attribute Reset'},
+    desc: {ko:'SolidWorks 속성 일괄 초기화',         en:'Batch reset SolidWorks attributes'},
+    iframe:'app-store/solidworks/attribute-reset/index.html', gfcOnly:false },
+  { icon:'💬',
+    title:{ko:'Naver Blog Commenter', en:'Naver Blog Commenter'},
+    desc: {ko:'네이버 블로그 자동 공감·댓글 RPA',   en:'Naver blog auto like & comment RPA'},
+    iframe:'app-store/web/naver-blog-commenter/index.html', gfcOnly:false },
+];
 
-function visibleQuestions() {
-  return QS.map((q,i)=>({...q,_idx:i})).filter(q=>!q.skip||!q.skip(C));
-}
+/* ════════════════════════════════════════════
+   3. 트리 렌더
+════════════════════════════════════════════ */
+let activeLabel = null;
 
-function currentVQIdx() { return history.length; }
+// consultant 또는 gfc 역할이면 true
+const canConsult = () => userRole === 'consultant' || userRole === 'gfc';
 
-/* ═══════════════════════════════════════════════════
-   렌더
-═══════════════════════════════════════════════════ */
-function render() {
-  const vqs = visibleQuestions();
-  const pos = history.length;
-  updateProgress(pos, vqs.length);
-  updateBc();
+function buildTree(nodes, depth=0, path=[]) {
+  const wrap = document.createElement('div');
 
-  if (pos >= vqs.length) { renderResult(); return; }
+  nodes.forEach(node => {
+    // roleOnly: 지정 역할이 아니면 트리에서 완전히 숨김 (GFC 전용 보험 항목 등)
+    if (node.roleOnly && userRole !== node.roleOnly) return;
 
-  const q = vqs[pos];
-  const view = document.getElementById('view');
-  view.innerHTML = `
-    ${history.length>0?`<button class="back-btn no-print" onclick="goBack()">
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 3L5 8L10 13"/></svg>
-      이전 항목으로
-    </button>`:''}
-    <div class="q-card">
-      <div class="q-step">체크포인트 ${pos+1} / ${vqs.length} &nbsp;—&nbsp; ${q.step}</div>
-      <div class="q-text">${q.q}</div>
-      ${q.sub?`<div class="q-sub">${q.sub}</div>`:''}
-      <div class="options">
-        ${q.opts.map((o,i)=>`
-          <button class="opt" onclick="selectOpt(${pos},${i})">
-            <div class="opt-l">
-              <div class="opt-main">${o.t}</div>
-              ${o.sub?`<div class="opt-sub">${o.sub}</div>`:''}
-            </div>
-            ${o.tag?`<span class="opt-tag tag-${tagColor(o.tag)}">${o.tag}</span>`:`<span class="opt-arr">›</span>`}
-          </button>
-        `).join('')}
-      </div>
-    </div>`;
-}
+    const isGfcItem = !!node.gfcOnly;
 
-function tagColor(tag) {
-  const m = {'고위험':'red','중위험':'amber','저위험':'green','세무 특수':'teal','신설':'green','성장기':'blue','안정기':'purple','성숙기':'purple','성실신고':'amber','A그룹':'blue','B그룹':'amber','C그룹':'purple','단독 소유':'red','지배주주':'amber','공동 보유':'green','미분산':'red','일부 분산':'amber','특정법인':'purple','완료':'green','신규':'blue','비교 분석':'amber','추가 컨설팅':'teal','주의':'amber','위험':'red','긴급':'red','절세 기회':'teal','절세 최우선':'green','최적 구간':'green','시급':'amber','제한적':'red','승계 예정':'blue','매각 검토':'purple','진행 중':'teal'};
-  return m[tag]||'gray';
-}
+    const nodeEl = document.createElement('div');
+    nodeEl.className = `tree-node d${depth}${isGfcItem ? ' gfc-item' : ''}`;
 
-function updateProgress(pos, total) {
-  const pct = total===0?0:Math.round((pos/total)*100);
-  document.getElementById('prog-fill').style.width = (pos>=total?100:pct)+'%';
-  document.getElementById('prog-pct').textContent = (pos>=total?100:pct)+'%';
-  document.getElementById('prog-lbl').textContent = pos>=total?'진단 완료':`항목 ${pos+1} / ${total}`;
-  document.getElementById('hdr-r').textContent = pos>=total?'결과 확인':`${pos+1}/${total}`;
-}
+    const labelEl = document.createElement('div');
+    labelEl.className = 'tree-label';
 
-function updateBc() {
-  document.getElementById('bc').innerHTML = history.map((h,i)=>
-    `<span class="crumb">${h.answer}</span>${i<history.length-1?'<span class="crumb-sep">›</span>':''}`
-  ).join('');
-}
+    const iconEl = document.createElement('span');
+    iconEl.className = 'tree-icon';
+    iconEl.textContent = node.icon || '';
+    labelEl.appendChild(iconEl);
 
-/* ═══════════════════════════════════════════════════
-   액션
-═══════════════════════════════════════════════════ */
-function selectOpt(vqPos, optIdx) {
-  const vqs = visibleQuestions();
-  const q = vqs[vqPos];
-  const o = q.opts[optIdx];
-  history.push({qIdx:q._idx, optIdx, answer:o.t});
-  Object.assign(C, o.d||{});
-  render();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+    const textEl = document.createElement('span');
+    textEl.textContent = getLabel(node.label);
+    labelEl.appendChild(textEl);
 
-function goBack() {
-  if (!history.length) return;
-  const last = history.pop();
-  // 마지막 선택의 데이터 키 제거 후 재계산
-  C = {};
-  history.forEach(h=>{
-    const q = QS[h.qIdx];
-    Object.assign(C, q.opts[h.optIdx].d||{});
+    if (node.children && node.children.length) {
+      const caret = document.createElement('span');
+      caret.className = 'tree-caret';
+      caret.textContent = '▶';
+      labelEl.appendChild(caret);
+
+      // 현재 노드 이름을 path에 추가해서 자식에게 전달
+      const children = buildTree(node.children, depth+1, [...path, node.label]);
+      children.classList.add('tree-children');
+      if (depth === 0) { caret.classList.add('open'); children.classList.add('open'); }
+
+      labelEl.addEventListener('click', () => {
+        const open = children.classList.toggle('open');
+        caret.classList.toggle('open', open);
+      });
+
+      // 부모 노드 뱃지 — consultantTag / memberTag
+      if (node.consultantTag) {
+        const tag = document.createElement('span');
+        tag.className = 'tree-consultant-tag';
+        tag.textContent = t('consultant_tag');
+        tag.style.marginLeft = 'auto';
+        labelEl.appendChild(tag);
+      } else if (node.memberTag) {
+        const tag = document.createElement('span');
+        tag.className = 'tree-member-tag';
+        tag.textContent = t('member_tag');
+        tag.style.marginLeft = 'auto';
+        labelEl.appendChild(tag);
+      }
+
+      nodeEl.appendChild(labelEl);
+      nodeEl.appendChild(children);
+
+    } else {
+      labelEl.style.cursor = node.coming ? 'default' : 'pointer';
+      if (node.coming) {
+        const tag = document.createElement('span');
+        tag.style.cssText = 'font-size:12px;background:#1c2333;color:#475569;border:1px solid #334155;border-radius:10px;padding:1px 7px;margin-left:auto;';
+        tag.textContent = t('coming_tag');
+        labelEl.appendChild(tag);
+      }
+      // 리프 노드: memberOnly는 클릭 차단용으로만 사용, 시각 태그 제거
+      if (node.gfcTag) {
+        const tag = document.createElement('span');
+        tag.className = 'tree-gfc-tag';
+        tag.textContent = t('card_lock');
+        labelEl.appendChild(tag);
+      }
+
+      if (node.gfcOnly && !IS_GFC) {
+        labelEl.dataset.tooltip = t('tooltip_gfc');
+        labelEl.style.cursor = 'not-allowed';
+      }
+      if (node.consultantOnly && authUser && !canConsult()) {
+        labelEl.dataset.tooltip = t('tooltip_consultant');
+      }
+      if ((node.memberOnly || node.consultantOnly) && !authUser) {
+        labelEl.dataset.tooltip = t('tooltip_member');
+      }
+      if (node.coming) {
+        labelEl.dataset.tooltip = t('tooltip_coming');
+      }
+
+      labelEl.addEventListener('click', () => {
+        if (node.coming) return;
+        if (node.action) { node.action(); setActive(labelEl); return; }
+        if (node.gfcOnly && !IS_GFC) { showDenied(); return; }
+        if (node.consultantOnly) {
+          if (!authUser) { loadIframePreview(node.iframe, path, node.label); setActive(labelEl); return; }
+          if (!canConsult()) { showDenied('denied_consultant_title', 'denied_consultant_desc'); return; }
+        }
+        if (node.memberOnly && !authUser) {
+          loadIframePreview(node.iframe, path, node.label);
+          setActive(labelEl);
+          return;
+        }
+        if (node.iframe) {
+          loadIframe(node.iframe, path, node.label);
+          setActive(labelEl);
+        }
+      });
+
+      nodeEl.appendChild(labelEl);
+    }
+
+    wrap.appendChild(nodeEl);
   });
-  render();
-  window.scrollTo({top:0,behavior:'smooth'});
+  return wrap;
 }
 
-function restart() { history=[]; C={}; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function setActive(el) {
+  if (activeLabel) activeLabel.classList.remove('active');
+  el.classList.add('active');
+  activeLabel = el;
+}
 
-/* ═══════════════════════════════════════════════════
-   결과 생성 엔진
-═══════════════════════════════════════════════════ */
-function buildResult() {
-  const isIndiv = C.bizType === 'indiv';
-  const isMedical = C.ind === 'medical';
-  const isHighRisk = C.indRisk === 'high';
-  const isNew = C.ageKey === 'new';
-  const isGrow = C.ageKey === 'grow';
-  const isMature = ['stable','mature'].includes(C.ageKey);
-  const reHigh = ['high','vhigh'].includes(C.re);
-  const reVhigh = C.re === 'vhigh';
-  const frIssue = C.fr && C.fr !== 'none';
-  const frBoth = C.fr === 'both';
-  const frReceivable = C.fr === 'receivable' || frBoth;
-  const frPayable = C.fr === 'payable' || frBoth;
-  const taxHigh = ['mid','high'].includes(C.tax);
-  const stake100 = C.ceoStake === '100';
-  const stakeHigh = ['100','major'].includes(C.ceoStake);
-  const relatedNone = C.related === 'none' || (!C.related && C.bizType==='corp');
-  const succNone = C.succ === 'none';
-  const succChild = C.succ === 'child';
-  const succSale = C.succ === 'sale';
-  const revHigh = ['large','xlarge'].includes(C.rev);
-  const revLow = C.rev === 'tiny' || C.rev === 'small';
-  const ageSenior = ['senior','elder'].includes(C.age);
-  const giNone = C.gi === 'none';
-  const giPartial = C.gi === 'partial';
-  const ageLabel = C.ageLabel||'';
+/* ════════════════════════════════════════════
+   4. 대시보드 카드 렌더
+════════════════════════════════════════════ */
+const dashGrid = document.getElementById('dashGrid');
 
-  /* ── 그룹 결정 ── */
-  let group, groupLabel, accentColor, badgeClass;
-  if (isIndiv) {
-    if (C.rev==='tiny') { group='indiv-low'; groupLabel='개인사업자 · 일반'; accentColor='#545248'; badgeClass='tag-gray'; }
-    else if (C.rev==='small') { group='indiv-mid'; groupLabel='개인사업자 · 성실신고'; accentColor='#8a5800'; badgeClass='tag-amber'; }
-    else { group='indiv-high'; groupLabel='개인사업자 · 법인전환 긴급'; accentColor='#9c1f1f'; badgeClass='tag-red'; }
-  } else if (revHigh) {
-    group = C.rev==='xlarge' ? 'C' : 'B';
-    groupLabel = group==='C' ? 'C그룹 · 중견법인 (200억+)' : 'B그룹 · 중소법인 (80~200억)';
-    accentColor = group==='C' ? '#3d35a0' : '#8a5800';
-    badgeClass = group==='C' ? 'tag-purple' : 'tag-amber';
+function renderDashCards() {
+  dashGrid.innerHTML = '';
+  DASH_CARDS.forEach(card => {
+    if (card.gfcOnly && !IS_GFC) return;
+    if (card.roleOnly && userRole !== card.roleOnly) return;
+    const titleStr = getLabel(card.title);
+    const descStr  = getLabel(card.desc);
+    const el = document.createElement('div');
+    el.className = `dash-card${card.gfcOnly ? ' gfc-card' : ''}`;
+    const chipHtml = card.memberOnly
+      ? `<div class="card-member">${t('member_tag')}</div>`
+      : card.consultantOnly
+        ? `<div class="card-consultant">${t('consultant_tag')}</div>`
+        : (card.gfcOnly || card.gfcTag)
+          ? `<div class="card-lock">${t('card_lock')}</div>`
+          : '';
+    el.innerHTML = `
+      <div class="card-icon${card.icon.length > 2 ? ' text' : ''}">${card.icon}</div>
+      <div class="card-title">${titleStr}</div>
+      <div class="card-desc">${descStr}</div>
+      ${chipHtml}
+    `;
+    el.onclick = () => {
+      if (card.memberOnly && !authUser) { loadIframePreview(card.iframe, [], card.title); return; }
+      if (card.consultantOnly) {
+        if (!authUser) { loadIframePreview(card.iframe, [], card.title); return; }
+        if (!canConsult()) { showDenied('denied_consultant_title', 'denied_consultant_desc'); return; }
+      }
+      loadIframe(card.iframe, [], card.title);
+    };
+    dashGrid.appendChild(el);
+  });
+}
+
+/* ════════════════════════════════════════════
+   5. 라우팅 함수
+════════════════════════════════════════════ */
+
+/* 브레드크럼 업데이트
+   path  = ['도구', 'QR 코드']  (부모 경로)
+   label = 'QR 생성기'           (현재 페이지) */
+function setBreadcrumb(path, label) {
+  const trail = document.getElementById('bc-trail');
+  let html = '';
+  path.forEach(seg => {
+    html += `<span class="bc-sep">›</span><span class="bc-seg">${getLabel(seg)}</span>`;
+  });
+  html += `<span class="bc-sep">›</span><span class="bc-cur">${getLabel(label)}</span>`;
+  trail.innerHTML = html;
+}
+
+function showPreviewOverlay() {
+  document.getElementById('preview-overlay').classList.add('show');
+}
+function hidePreviewOverlay() {
+  document.getElementById('preview-overlay').classList.remove('show');
+}
+let previewBaseSrc = null;
+function loadIframePreview(src, path=[], label='') {
+  previewBaseSrc = src;
+  const previewSrc = src.includes('?') ? src + '&preview=1' : src + '?preview=1';
+  loadIframe(previewSrc, path, label);
+  showPreviewOverlay();
+}
+
+function loadIframe(src, path=[], label='') {
+  closeSidebar();
+  currentPath  = path;
+  currentLabel = label;
+  document.getElementById('home-screen').style.display = 'none';
+  const fc = document.getElementById('frame-container');
+  fc.style.display = 'block';
+  const iframe = document.getElementById('contentFrame');
+  iframe.src = src;
+  setBreadcrumb(path, label);
+  // 로드 후 현재 언어·역할 전파
+  iframe.onload = () => {
+    if (iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type:'wf_lang', lang }, '*');
+      iframe.contentWindow.postMessage({ type:'wf_role', role: userRole }, '*');
+    }
+  };
+  // 브라우저 히스토리에 상태 기록 → 뒤로가기 시 showHome()으로 처리
+  history.pushState({ wfhub: true }, '', location.href);
+}
+
+function showHome() {
+  previewBaseSrc = null;
+  hidePreviewOverlay();
+  document.getElementById('home-screen').style.display = 'block';
+  document.getElementById('frame-container').style.display = 'none';
+  document.getElementById('contentFrame').src = '';
+  document.getElementById('bc-trail').innerHTML = '';
+  if (activeLabel) { activeLabel.classList.remove('active'); activeLabel = null; }
+}
+
+// 브라우저 뒤로가기 → iframe 공백 방지: 항상 홈으로 복귀
+window.addEventListener('popstate', () => showHome());
+
+function showDenied(titleKey='denied_title', descKey='denied_desc') {
+  const overlay = document.getElementById('access-denied');
+  document.getElementById('denied-title').textContent = t(titleKey);
+  document.getElementById('denied-desc').innerHTML    = t(descKey);
+  overlay.classList.add('show');
+  const delay = titleKey === 'denied_title' ? 3000 : 4000;
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    document.getElementById('denied-title').textContent = t('denied_title');
+    document.getElementById('denied-desc').innerHTML    = t('denied_desc');
+  }, delay);
+}
+
+/* ════════════════════════════════════════════
+   6. 인증 & 동의 시스템
+   ────────────────────────────────────────────
+   Supabase 설정 전: ?dev=1 또는 localStorage.wf_dev='1' 로
+   테스트 모드 활성화 → 소셜 로그인 없이 전체 플로우 확인 가능.
+
+   Supabase 설정 후:
+   ① supabase.com → 새 프로젝트 생성
+   ② Settings → API → Project URL / anon public key → 아래에 입력
+   ③ Authentication → Providers → Google / Kakao 활성화
+   ④ Authentication → URL Configuration:
+      Site URL:      https://portal.worksfree.co.kr
+      Redirect URLs: https://portal.worksfree.co.kr
+                     https://staging.worksfree.co.kr
+                     https://test.worksfree.co.kr
+   ⑤ SQL Editor에서 profiles 테이블 생성:
+      CREATE TABLE profiles (
+        id              uuid REFERENCES auth.users PRIMARY KEY,
+        agreed_at       timestamptz,
+        marketing_agreed boolean DEFAULT false,
+        role            text DEFAULT 'member',
+        created_at      timestamptz DEFAULT now()
+      );
+      ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+      CREATE POLICY "본인만 조회·수정"
+        ON profiles FOR ALL USING (auth.uid() = id);
+════════════════════════════════════════════ */
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co'; // ← 교체
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';                 // ← 교체
+
+let _sb       = null;
+let authUser  = null;  // 현재 로그인 사용자 (null = 비로그인)
+let _sbReady  = false; // Supabase 초기화 성공 여부
+let userRole  = 'general'; // 사용자 역할: ceo | staff | consultant | gfc | general
+
+/* ── Supabase 초기화 (설정 완료 시 자동 활성화) ── */
+try {
+  if (!SUPABASE_URL.includes('YOUR_PROJECT_ID')) {
+    _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { autoRefreshToken:true, persistSession:true, detectSessionInUrl:true }
+    });
+    _sbReady = true;
+
+    _sb.auth.onAuthStateChange(async (_event, session) => {
+      const user = session?.user || null;
+      await handleAuthStateChange(user);
+    });
+  }
+} catch(e) {
+  console.warn('[WorksFree] Supabase 초기화 실패:', e.message);
+}
+
+/* ── 매직 링크 가입 중 임시 보관 (리다이렉트 후에도 유지되도록 sessionStorage 사용) ── */
+let _otpEmail = '';
+function _setPending(pw, name) {
+  sessionStorage.setItem('wf_signup_pw',   pw);
+  sessionStorage.setItem('wf_signup_name', name);
+}
+function _getPendingPw()   { return sessionStorage.getItem('wf_signup_pw')   || ''; }
+function _getPendingName() { return sessionStorage.getItem('wf_signup_name') || ''; }
+function _clearPending()   { sessionStorage.removeItem('wf_signup_pw'); sessionStorage.removeItem('wf_signup_name'); }
+
+/* ── 인증 상태 변경 공통 핸들러 ── */
+async function handleAuthStateChange(user) {
+  authUser = user;
+  closeAuthModal();
+
+  if (!user) userRole = 'general';
+
+  if (user) {
+    // 매직 링크 가입 직후: 비밀번호·이름 설정
+    const _ppw = _getPendingPw();
+    if (_ppw) {
+      const upd = { password: _ppw };
+      const _pname = _getPendingName();
+      if (_pname) upd.data = { full_name: _pname };
+      await _sb.auth.updateUser(upd);
+      _clearPending();
+    }
+    const agreed = await checkConsent(user.id);
+    if (!agreed) {
+      showConsentModal();
+    } else {
+      onAuthComplete();
+    }
   } else {
-    group = 'A';
-    groupLabel = 'A그룹 · 소규모법인';
-    accentColor = '#1655a0';
-    badgeClass = 'tag-blue';
+    onAuthComplete();
   }
-
-  /* ── 리스크 점수 계산 ── */
-  let riskScore = 0;
-  if (frBoth) riskScore+=3;
-  else if (frIssue) riskScore+=2;
-  if (reVhigh) riskScore+=3;
-  else if (reHigh) riskScore+=2;
-  if (stake100 && succNone) riskScore+=3;
-  else if (stakeHigh && succNone) riskScore+=2;
-  if (isHighRisk && giNone) riskScore+=2;
-  if (ageSenior && succNone) riskScore+=1;
-  if (isNew && relatedNone) riskScore+=1;
-
-  let riskLevel, riskColor;
-  if (riskScore>=7) { riskLevel='위험'; riskColor='#9c1f1f'; }
-  else if (riskScore>=4) { riskLevel='주의'; riskColor='#8a5800'; }
-  else { riskLevel='양호'; riskColor='#256830'; }
-
-  /* ── 절세 포인트 발굴 ── */
-  const taxPoints = [];
-
-  if (frReceivable) taxPoints.push({
-    pri:'긴급', priC:'#fceaea', priTC:'#9c1f1f',
-    title:'가수금 — 매출 누락 리스크 (99% 확률)',
-    desc:'가수금 잔액이 있는 기업은 99% 확률로 매출 누락입니다. 국세청 조사 시 전액 과세 대상. 가지급금과 상계처리로 리스크 해소가 가능합니다.',
-    link:'→ 가지급금·가수금 상계처리 플랜 즉시 수립'
-  });
-
-  if (frPayable && !frReceivable) taxPoints.push({
-    pri:'주의', priC:'#fdf2db', priTC:'#8a5800',
-    title:'가지급금 — 이자 과세 및 배당 간주 위험',
-    desc:'대표가 법인 자금을 사적 사용 시 연 4.6% 이자를 법인에 납부해야 하며, 미납 시 증여세 과세. 적절한 상계처리가 필요합니다.',
-    link:'→ 가지급금 이자 계산 및 상계 구조 설계'
-  });
-
-  if (!isIndiv && isNew) taxPoints.push({
-    pri:'기회', priC:'#e2f5f0', priTC:'#0f6e56',
-    title:'비상장주식 액면가 구간 — 증여·분산 절호의 타이밍',
-    desc:'법인 설립 3년 이내는 비상장주식을 자산가치(액면가)로 평가합니다. 4년차부터 순이익 가치로 전환되어 주식가치가 급등합니다. 지금이 가족에게 주식을 나눠줄 최적의 시점입니다.',
-    link:'→ 자녀·배우자 지분 분산 즉시 실행 (증여세 최소화)'
-  });
-
-  if (!isIndiv && isGrow) taxPoints.push({
-    pri:'주의', priC:'#fdf2db', priTC:'#8a5800',
-    title:'주식가치 전환 임박 — 4년차 가치평가 방식 변경',
-    desc:'4년차부터 비상장주식 가치평가에 순이익이 반영되기 시작합니다. 매출이 성장 중이라면 주식가치가 빠르게 상승하여 향후 증여세 부담이 크게 늘어납니다.',
-    link:'→ 지분 분산 플랜 수립 지금 착수'
-  });
-
-  if (!isIndiv && reHigh) taxPoints.push({
-    pri:'긴급', priC:'#fceaea', priTC:'#9c1f1f',
-    title:'이익잉여금 과다 — 주식가치 폭등 · 상속세 폭탄 예고',
-    desc:`이익잉여금 ${C.reLabel||''}은 비상장주식 가치를 직접 올립니다. 대표 사망 시 해당 주식 전체에 상속세(최대 50%)가 부과됩니다. 배당·경영인정기·임원 퇴직금 등 출구전략이 시급합니다.`,
-    link:'→ 이익잉여금 출구전략 3가지 시나리오 비교 분석'
-  });
-
-  if (!isIndiv && !isMedical && taxHigh) taxPoints.push({
-    pri:'기회', priC:'#e5f3e8', priTC:'#256830',
-    title:`경영인정기보험 비용처리 — 법인세 ${C.taxLabel||''} 절감`,
-    desc:'경영인정기보험 보험료 전액을 법인 비용으로 처리 가능. 법인세율 22% 적용 시 보험료의 22%가 절세됩니다. 15년차 이후 환급률 100% 도달 — 사실상 무비용으로 보장을 받는 구조입니다.',
-    link:'→ 경영인정기 1안·2안 비교 설계 제시'
-  });
-
-  if (isMedical) taxPoints.push({
-    pri:'안내', priC:'#e8f0fb', priTC:'#1655a0',
-    title:'의료·요양 업종 — 법인세 없음, 절세 포인트 상이',
-    desc:'병원·요양시설은 비영리법인으로 법인세를 납부하지 않아 경영인정기 비용처리 절세 효과가 없습니다. 대신 대표 개인 소득세 절감, 퇴직금 플랜, 상속세 재원 마련에 집중해야 합니다.',
-    link:'→ 의료업 특화 절세 플랜 (퇴직금·상속세 중심)'
-  });
-
-  if (!isIndiv && stake100 && relatedNone && !['done','wip'].includes(C.succ)) taxPoints.push({
-    pri:'긴급', priC:'#fceaea', priTC:'#9c1f1f',
-    title:'지분 100% 대표 단독 — 상속세 최대 리스크',
-    desc:'대표 단독 지분 100%는 법인 전체가 상속세 대상입니다. 기업가치가 높을수록 상속세 납부 재원 부족으로 법인 자체가 위협받을 수 있습니다. 자녀·배우자 증여 또는 특정법인 설립을 통한 분산이 필요합니다.',
-    link:'→ 특정법인 설립을 통한 지분 분산 검토'
-  });
-
-  if (!isIndiv && succSale) taxPoints.push({
-    pri:'전략', priC:'#eeedfc', priTC:'#3d35a0',
-    title:'M&A 매각 준비 — 기업가치 극대화 전략',
-    desc:'매각 전 이익잉여금 정리, 가지급금 해소, 법인 재무구조 정상화가 기업 가치를 높입니다. 오너 출구 전략(퇴직금 극대화, 상속세 재원 마련)도 병행이 필요합니다.',
-    link:'→ 매각 전 밸류업 컨설팅 로드맵'
-  });
-
-  if (isIndiv && !revLow) taxPoints.push({
-    pri:'긴급', priC:'#fceaea', priTC:'#9c1f1f',
-    title:'개인사업자 법인전환 — 세부담 절감 즉시 분석 필요',
-    desc:`성실신고 의무 대상 또는 고매출 개인사업자는 법인전환 시 소득세(최대 49.5%) → 법인세(22%)로 전환 가능. 3년 이내 법인은 액면가 주식 유지로 향후 증여세도 최소화됩니다.`,
-    link:'→ 개인 vs 법인 세부담 비교 시뮬레이션'
-  });
-
-  /* ── 리스크 항목 ── */
-  const riskItems = [];
-  if (isHighRisk && (giNone||giPartial)) riskItems.push({lv:'red',text:`<strong>산업재해 리스크</strong> — ${C.indLabel||''}업종은 위험율이 높습니다. 단체 재해보장보험이 없거나 미흡한 경우 중대재해처벌법 적용 시 법인 존속 위기로 이어질 수 있습니다.`});
-  if (frReceivable) riskItems.push({lv:'red',text:'<strong>매출 누락 리스크</strong> — 가수금 잔액은 세무조사 시 매출 누락으로 간주될 가능성이 매우 높습니다. 전액 추징 시 기업 존속에 심각한 위협이 됩니다.'});
-  if (stake100 && succNone && isMature) riskItems.push({lv:'red',text:'<strong>상속세 무방비 상태</strong> — 지분 100%에 승계 계획 없이 대표 사망 시 법인 전체가 상속세 대상이 됩니다. 상속세 납부 재원 부재로 법인 청산 위기.'});
-  if (ageSenior && giNone) riskItems.push({lv:'amber',text:`<strong>Key Person 리스크</strong> — 대표(${C.ageLabel||''})가 핵심 인물인 상황에서 보험이 없는 경우, 대표 유고 시 기업 운영 자금 확보가 불가합니다.`});
-  if (reVhigh && relatedNone) riskItems.push({lv:'amber',text:'<strong>이익잉여금 과다 + 지분 미분산</strong> — 주식가치 급등 상태에서 지분이 한 명에게 집중된 구조는 상속세 리스크가 극대화됩니다.'});
-  if (C.ind==='food' && frReceivable) riskItems.push({lv:'amber',text:'<strong>요식업 현금 매출 누락 위험</strong> — 현금 매출 비중이 높은 업종에서 가수금이 있다면 매출 누락 가능성이 더욱 높습니다.'});
-  if (!isIndiv && giNone && !riskItems.find(r=>r.text.includes('단체'))) riskItems.push({lv:'amber',text:'<strong>임직원 보장 공백</strong> — 단체보험 미가입 상태로 업무 중 사고 발생 시 회사 직접 배상 리스크가 있습니다.'});
-
-  /* ── 로드맵 Phase 구성 ── */
-  const phase1Items = [];
-  const phase2Items = [];
-  const phase3Items = [];
-
-  // Phase 1: 절세 즉시 실행 (1~3개월)
-  if (frIssue) phase1Items.push('가수금·가지급금 상계처리 플랜 수립 (세무사·법무사 공동 진행)');
-  if (!isIndiv && isNew && relatedNone) phase1Items.push('비상장주식 액면가 구간 내 자녀/배우자 증여 실행 (3년 이내 최적 타이밍)');
-  if (!isIndiv && !isMedical && taxHigh) phase1Items.push('경영인정기보험 비용처리 구조 설계 — 1안·2안 보험료 시뮬레이션 제시');
-  if (isIndiv && !revLow) phase1Items.push('개인 vs 법인 세부담 비교 시뮬레이션 작성 후 법인전환 착수');
-  if (!isIndiv && isMedical) phase1Items.push('대표 개인 소득세 절감 플랜 (퇴직금 사전 설계, 연금 보험 구조)');
-  if (phase1Items.length === 0) phase1Items.push('재무제표 기반 절세 포인트 전수 점검 (한신평 신용조회 포함)');
-  phase1Items.push('단체보험 현황 전면 점검 — 보장분석 보고서 제작 (비교설계 포함)');
-
-  // Phase 2: 보험 연계 (2~6개월)
-  if (!isIndiv && !isMedical && taxHigh) phase2Items.push('경영인정기보험 계약 — 비용처리 후 실질 납입 부담 = (보험료 × 78%) 구조 확정');
-  if (isHighRisk || giNone) phase2Items.push(`단체 재해보장보험 신규 설계 (${C.empLabel||''}규모 맞춤, 인당 5~10만원 설계)`);
-  if (giPartial) phase2Items.push('기가입 단체보험 비교분석 — 삼성생명 등 경쟁사 대비 합리성 점검 후 업그레이드 설계');
-  if (reHigh || (stake100 && isMature)) phase2Items.push('이익잉여금 출구전략: 임원 퇴직금 사전 설계 + 법인 종신보험 상속세 재원 마련');
-  if (ageSenior) phase2Items.push(`대표이사(${C.ageLabel||''}) 긴급 Key Person 보험 가입 — 연령 상승 전 빠른 실행`);
-  if (!phase2Items.find(i=>i.includes('단체'))) phase2Items.push('임직원 복지 단체보험 패키지 설계 (재해+건강 분리 설계, 월별 분산 계약으로 할인 적용)');
-
-  // Phase 3: 장기 플랜 (6~24개월)
-  if (!isIndiv && stakeHigh && succNone) phase3Items.push('특정법인 활용 가업승계 플랜 수립 — 자녀 법인 설립 후 저가 양도 구조 검토');
-  if (succChild) phase3Items.push('자녀 법인(특정법인) 설립 + 가업승계 로드맵 수립 (5천만원 증여세 면제 한도 활용)');
-  if (succSale) phase3Items.push('M&A 전 기업 가치 극대화 — 재무구조 정상화, 이익잉여금 출구, 대표 퇴직금 최대화');
-  if (!isIndiv && reHigh) phase3Items.push('이익잉여금 장기 출구전략 확정 — 배당·퇴직금·보험 3가지 시나리오 연간 실행');
-  phase3Items.push('연간 컨설팅 리뷰 체계 구축 — 매출 변화 시 그룹 재분류 및 전략 업데이트');
-  if (!isIndiv) phase3Items.push('추가 법인보험 포트폴리오 — 화재·배상책임·기업휴지 종합 점검');
-
-  return { group, groupLabel, accentColor, badgeClass, riskLevel, riskColor, riskScore, taxPoints, riskItems, phase1Items, phase2Items, phase3Items };
 }
 
-/* ═══════════════════════════════════════════════════
-   결과 렌더
-═══════════════════════════════════════════════════ */
-function renderResult() {
-  const R = buildResult();
-  const view = document.getElementById('view');
-
-  const flagsHtml = Object.entries({
-    '사업자':C.bizType==='indiv'?'개인사업자':'법인',
-    '업종':C.indLabel,'업력':C.ageLabel,'매출':C.revLabel,
-    '임직원':C.empLabel,'지분':C.stakeLabel,'이익잉여금':C.reLabel,
-    '재무리스크':C.frLabel,'법인세':C.taxLabel,'대표연령':C.ageLabel,
-    '승계':C.succLabel,'단체보험':C.giLabel
-  }).filter(([,v])=>v).map(([k,v])=>`<span class="flag">${k}: ${v}</span>`).join('');
-
-  const taxPointsHtml = R.taxPoints.map(p=>`
-    <div class="tax-item">
-      <div class="tax-pri" style="background:${p.priC};color:${p.priTC}">${p.pri}</div>
-      <div class="tax-body">
-        <div class="tax-title">${p.title}</div>
-        <div class="tax-desc">${p.desc}</div>
-        <div class="tax-link" style="color:${R.accentColor}">${p.link}</div>
-      </div>
-    </div>
-  `).join('');
-
-  const riskItemsHtml = R.riskItems.map(r=>`
-    <div class="risk-item">
-      <div class="risk-dot" style="background:${r.lv==='red'?'#e24b4a':'#ba7517'}"></div>
-      <div class="risk-text">${r.text}</div>
-    </div>
-  `).join('');
-
-  const phaseColor = (n)=>[['#e8f0fb','#1655a0'],['#e5f3e8','#256830'],['#eeedfc','#3d35a0']][n-1];
-  const phaseLabel = ['즉시 절세 실행','보험 연계 설계','장기 플랜'];
-
-  function phaseHtml(n, items) {
-    const [bg,tc] = phaseColor(n);
-    return `<div class="phase">
-      <div class="ph-num" style="background:${bg};color:${tc}">${n}</div>
-      <div class="ph-body">
-        <div class="ph-tag" style="color:${tc}">${['1~3개월 내','2~6개월','6~24개월'][n-1]}</div>
-        <div class="ph-title">${phaseLabel[n-1]}</div>
-        <div class="ph-items">${items.map(i=>`<div class="ph-item"><div class="ph-dot"></div><span>${i}</span></div>`).join('')}</div>
-      </div>
-    </div>`;
+function onAuthComplete() {
+  hidePreviewOverlay();
+  updateAuthUI();
+  refreshTreeAndCards();
+  updateDevStatus();
+  loadCreditBalance();   // 드롭다운 크레딧 잔액 갱신
+  initPaymentResult(); // 결제 리다이렉트 파라미터 처리
+  if (previewBaseSrc) {
+    const src = previewBaseSrc;
+    previewBaseSrc = null;
+    loadIframe(src, currentPath, currentLabel);
   }
-
-  view.innerHTML = `
-    <div class="result-wrap">
-      <button class="back-btn no-print" onclick="goBack()">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 3L5 8L10 13"/></svg>
-        이전 항목으로
-      </button>
-
-      <div class="r-hero">
-        <div class="r-top">
-          <div>
-            <div class="r-badge ${R.badgeClass}">${R.groupLabel}</div>
-            <div class="r-title">기업 종합 컨설팅 진단 완료</div>
-            <div class="r-desc">발굴된 절세 포인트 <strong>${R.taxPoints.length}개</strong> · 리스크 항목 <strong>${R.riskItems.length}개</strong><br>아래 로드맵 순서대로 절세 먼저 실행 후 보험으로 연계하세요.</div>
-          </div>
-          <div class="risk-score">
-            <div class="risk-label">종합 리스크</div>
-            <div class="risk-val" style="color:${R.riskColor}">${R.riskLevel}</div>
-            <div class="risk-sub">점수 ${R.riskScore}/12</div>
-          </div>
-        </div>
-        <div class="flags">${flagsHtml}</div>
-      </div>
-
-      ${R.taxPoints.length ? `
-      <div class="section">
-        <div class="section-hd">
-          <div class="section-hd-icon" style="background:#e5f3e8;color:#256830">$</div>
-          <div class="section-hd-title" style="color:#256830">발굴된 절세 포인트</div>
-          <div class="section-hd-count tag-green">${R.taxPoints.length}개 발견</div>
-        </div>
-        ${taxPointsHtml}
-      </div>` : ''}
-
-      ${R.riskItems.length ? `
-      <div class="section">
-        <div class="section-hd">
-          <div class="section-hd-icon" style="background:#fceaea;color:#9c1f1f">!</div>
-          <div class="section-hd-title" style="color:#9c1f1f">리스크 진단 결과</div>
-          <div class="section-hd-count tag-red">${R.riskItems.length}건 주의</div>
-        </div>
-        ${riskItemsHtml}
-      </div>` : ''}
-
-      <div class="section">
-        <div class="section-hd">
-          <div class="section-hd-icon" style="background:${R.badgeClass.includes('blue')?'#e8f0fb':R.badgeClass.includes('amber')?'#fdf2db':'#eeedfc'};color:${R.accentColor}">→</div>
-          <div class="section-hd-title" style="color:${R.accentColor}">맞춤형 컨설팅 로드맵</div>
-        </div>
-        ${phaseHtml(1, R.phase1Items)}
-        ${phaseHtml(2, R.phase2Items)}
-        ${phaseHtml(3, R.phase3Items)}
-      </div>
-
-      <div class="action-row no-print">
-        <button class="btn-p" onclick="window.print()">📄 결과 인쇄 / PDF 저장</button>
-        <button class="btn-g" onclick="restart()">↺ 처음부터 다시</button>
-      </div>
-    </div>`;
 }
 
-/* ── 초기 진입 ── */
-render();
+function refreshTreeAndCards() {
+  const treeRoot = document.getElementById('treeRoot');
+  treeRoot.innerHTML = '';
+  activeLabel = null;
+  treeRoot.appendChild(buildTree(TREE));
+  if (document.getElementById('home-screen').style.display !== 'none') renderDashCards();
+}
+
+/* ════════════════════════════════════════════
+   동의 확인·저장 — Supabase 연동 분리
+   (설정 전: localStorage 폴백)
+════════════════════════════════════════════ */
+async function checkConsent(userId) {
+  if (_sbReady && _sb) {
+    const { data } = await _sb.from('profiles')
+      .select('agreed_at, role').eq('id', userId).maybeSingle();
+    if (data?.role) userRole = data.role;
+    return !!(data?.agreed_at);
+  }
+  /* localStorage 폴백 (테스트 모드·Supabase 미설정 시) */
+  return !!localStorage.getItem('wf_agreed_' + userId);
+}
+
+async function saveConsent(userId, marketingAgreed) {
+  if (_sbReady && _sb) {
+    await _sb.from('profiles').upsert({
+      id:               userId,
+      agreed_at:        new Date().toISOString(),
+      marketing_agreed: marketingAgreed,
+    });
+    return;
+  }
+  /* localStorage 폴백 */
+  localStorage.setItem('wf_agreed_' + userId, JSON.stringify({
+    agreed_at: new Date().toISOString(),
+    marketing: marketingAgreed
+  }));
+}
+
+/* ════════════════════════════════════════════
+   소셜 로그인
+════════════════════════════════════════════ */
+async function signInWithGoogle() {
+  if (!_sbReady) { alert('Supabase 설정 후 이용 가능합니다. (?dev=1 로 테스트)'); return; }
+  await _sb.auth.signInWithOAuth({
+    provider: 'google',
+    options:  { redirectTo: location.origin + location.pathname }
+  });
+}
+
+async function signInWithKakao() {
+  if (!_sbReady) { alert('Supabase 설정 후 이용 가능합니다. (?dev=1 로 테스트)'); return; }
+  await _sb.auth.signInWithOAuth({
+    provider: 'kakao',
+    options:  { redirectTo: location.origin + location.pathname }
+  });
+}
+
+async function signOut() {
+  closeUserDropdown();
+  if (_sbReady && _sb) await _sb.auth.signOut();
+  await handleAuthStateChange(null);
+}
+
+/* ════════════════════════════════════════════
+   이메일 로그인 / 회원가입
+════════════════════════════════════════════ */
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) =>
+    t.classList.toggle('active', (tab==='social' ? i===0 : i===1)));
+  document.getElementById('auth-panel-social').classList.toggle('show', tab==='social');
+  document.getElementById('auth-panel-email').classList.toggle('show',  tab==='email');
+}
+
+function toggleEmailMode(isSignup) {
+  document.getElementById('email-login-form').style.display  = isSignup ? 'none'  : 'block';
+  document.getElementById('email-signup-form').style.display = isSignup ? 'block' : 'none';
+  clearAuthMsg('el-msg'); clearAuthMsg('es-msg'); clearAuthMsg('es-otp-msg');
+  if (isSignup) {
+    document.getElementById('signup-step1').style.display = 'block';
+    document.getElementById('signup-step2').style.display = 'none';
+    _clearPending(); _otpEmail = '';
+  }
+}
+
+function setAuthMsg(id, type, text, extraHtml = '') {
+  const el = document.getElementById(id);
+  el.className = 'auth-msg ' + type;
+  el.innerHTML = text + extraHtml;
+}
+
+async function doEmailLogin() {
+  if (!_sbReady) { alert('Supabase 설정 후 이용 가능합니다.'); return; }
+  const email = document.getElementById('el-email').value.trim();
+  const pw    = document.getElementById('el-pw').value;
+  if (!email || !pw) { setAuthMsg('el-msg','err', t('auth_err_email_pw_req')); return; }
+
+  const btn = event.currentTarget;
+  btn.disabled = true; btn.textContent = t('auth_login_loading');
+  const { error } = await _sb.auth.signInWithPassword({ email, password: pw });
+  btn.disabled = false; btn.textContent = t('auth_login_btn');
+
+  if (error) {
+    if (error.message.includes('Email not confirmed')) {
+      setAuthMsg('el-msg', 'err',
+        t('auth_err_unconfirmed') + ' ',
+        `<span style="text-decoration:underline;cursor:pointer" onclick="resendConfirmEmail('${email}')">${t('auth_resend_confirm_lnk')}</span>`
+      );
+    } else if (error.message.includes('Invalid login')) {
+      setAuthMsg('el-msg', 'err', t('auth_err_invalid_login'));
+    } else {
+      setAuthMsg('el-msg', 'err', error.message);
+    }
+  }
+}
+
+async function resendConfirmEmail(email) {
+  if (!_sbReady) return;
+  const { error } = await _sb.auth.resend({ type: 'signup', email });
+  if (error) {
+    setAuthMsg('el-msg', 'err', error.message);
+  } else {
+    setAuthMsg('el-msg', 'ok', t('auth_resend_ok'));
+  }
+}
+
+function clearAuthMsg(id) {
+  const el = document.getElementById(id); if (el) el.className = 'auth-msg';
+}
+
+/* ── 회원가입 Step1: 인증 메일 발송 ── */
+async function sendSignupOtp(e) {
+  if (!_sbReady) { alert('Supabase 설정 후 이용 가능합니다.'); return; }
+  const name  = document.getElementById('es-name').value.trim();
+  const email = document.getElementById('es-email').value.trim();
+  const pw    = document.getElementById('es-pw').value;
+  const pw2   = document.getElementById('es-pw2').value;
+
+  if (!email)        { setAuthMsg('es-msg','err', t('auth_err_email_req')); return; }
+  if (pw.length < 8) { setAuthMsg('es-msg','err', t('auth_err_pw_short')); return; }
+  if (pw !== pw2)    { setAuthMsg('es-msg','err', t('auth_err_pw_mismatch')); return; }
+
+  const btn = e.currentTarget;
+  btn.disabled = true; btn.textContent = t('auth_sending');
+  const { error } = await _sb.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: true,
+      data: { full_name: name || email.split('@')[0] },
+      emailRedirectTo: location.origin + location.pathname
+    }
+  });
+  btn.disabled = false; btn.textContent = t('auth_send_magic');
+
+  if (error) {
+    setAuthMsg('es-msg', 'err', error.message); return;
+  }
+
+  // 임시 저장 후 Step2로 전환
+  _otpEmail = email;
+  _setPending(pw, name);
+  document.getElementById('otp-info-text').innerHTML =
+    `<b>${email}</b><br>${t('auth_sent_to')}`;
+  document.getElementById('signup-step1').style.display = 'none';
+  document.getElementById('signup-step2').style.display = 'block';
+}
+
+/* ── Step2 → Step1 돌아가기 ── */
+function backToSignupStep1() {
+  _clearPending(); _otpEmail = '';
+  document.getElementById('signup-step1').style.display = 'block';
+  document.getElementById('signup-step2').style.display = 'none';
+  clearAuthMsg('es-msg');
+}
+
+/* ── 인증번호 재발송 ── */
+async function resendSignupOtp() {
+  if (!_otpEmail) return;
+  const { error } = await _sb.auth.signInWithOtp({
+    email: _otpEmail,
+    options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname }
+  });
+  if (error) {
+    setAuthMsg('es-otp-msg', 'err', error.message);
+  } else {
+    setAuthMsg('es-otp-msg', 'ok', t('auth_magic_resend_ok'));
+  }
+}
+
+/* ════════════════════════════════════════════
+   로그인 모달
+════════════════════════════════════════════ */
+function openAuthModal() {
+  document.getElementById('auth-modal').classList.add('show');
+  switchAuthTab('social');
+  toggleEmailMode(false);
+  ['el-email','el-pw','es-name','es-email','es-pw','es-pw2'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+}
+function closeAuthModal() { document.getElementById('auth-modal').classList.remove('show'); }
+
+/* ════════════════════════════════════════════
+   개인정보 동의 모달
+════════════════════════════════════════════ */
+function showConsentModal() {
+  const modal = document.getElementById('consent-modal');
+  modal.classList.add('show');
+
+  if (IS_DEV) {
+    // 테스트 모드: 전체 동의 자동 체크
+    toggleAllConsent(true);
+
+    // Enter → 동의하고 시작하기 버튼 자동 클릭
+    function _devEnter(e) {
+      if (e.key !== 'Enter') return;
+      const btn = document.getElementById('consentAgreeBtn');
+      if (btn && !btn.disabled) btn.click();
+    }
+    modal._devEnter = _devEnter;
+    document.addEventListener('keydown', _devEnter);
+  }
+
+  updateConsentBtn();
+}
+function hideConsentModal() {
+  const modal = document.getElementById('consent-modal');
+  modal.classList.remove('show');
+  if (modal._devEnter) {
+    document.removeEventListener('keydown', modal._devEnter);
+    delete modal._devEnter;
+  }
+}
+
+function toggleDetail(id) {
+  const el = document.getElementById(id);
+  const isOpen = el.classList.toggle('open');
+  const num = id.replace('d','');
+  const toggle = document.getElementById('dt' + num);
+  if (toggle) toggle.textContent = isOpen ? '접기 ▴' : '펼치기 ▾';
+}
+
+function toggleAllConsent(checked) {
+  ['chk1','chk2','chk3','chk4'].forEach(id => {
+    document.getElementById(id).checked = checked;
+  });
+  updateConsentBtn();
+}
+
+function updateConsentBtn() {
+  const required = ['chk1','chk2','chk3'].every(id => document.getElementById(id).checked);
+  document.getElementById('consentAgreeBtn').disabled = !required;
+  /* 전체 동의 체크박스 동기화 */
+  const all = ['chk1','chk2','chk3','chk4'].every(id => document.getElementById(id).checked);
+  document.getElementById('chkAll').checked = all;
+}
+
+async function handleConsent() {
+  if (!authUser) return;
+  const marketing = document.getElementById('chk4').checked;
+  await saveConsent(authUser.id, marketing);
+  hideConsentModal();
+  onAuthComplete();
+}
+
+async function cancelConsent() {
+  hideConsentModal();
+  await signOut();
+}
+
+/* ════════════════════════════════════════════
+   유저 위젯 (사이드바)
+════════════════════════════════════════════ */
+function updateAuthUI() {
+  const wrap = document.getElementById('user-widget-wrap');
+  if (!wrap) return;
+  if (authUser) {
+    const name    = authUser.user_metadata?.full_name
+                 || authUser.user_metadata?.name
+                 || authUser.email?.split('@')[0] || '회원';
+    const avatar  = authUser.user_metadata?.avatar_url
+                 || authUser.user_metadata?.picture || '';
+    const initials = [...name].find(c => /\S/.test(c))?.toUpperCase() || '?';
+    wrap.innerHTML = `
+      <div class="user-pill" onclick="toggleUserDropdown(event)">
+        ${avatar
+          ? `<img src="${avatar}" class="user-avatar" alt="">`
+          : `<span class="user-initials">${initials}</span>`}
+        <span class="user-name">${name}</span>
+        <span class="user-caret">▾</span>
+      </div>
+      <div class="user-dropdown" id="userDropdown" style="display:none">
+        <div class="user-dropdown-email">${authUser.email || ''}</div>
+        <div class="user-balance" id="userBalance" onclick="closeUserDropdown();openCreditHistory()" title="${t('ch_title')}">💎 —</div>
+        <button class="user-dropdown-btn" onclick="closeCreditModal();closeUserDropdown();openCreditModal()">${t('credit_buy_btn')}</button>
+        <button class="user-dropdown-btn" onclick="signOut()">${t('logout_btn')}</button>
+      </div>`;
+  } else {
+    wrap.innerHTML = `<button class="login-btn" onclick="openAuthModal()">${t('login_btn')}</button>`;
+  }
+}
+
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('userDropdown');
+  if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+function closeUserDropdown() {
+  const dd = document.getElementById('userDropdown');
+  if (dd) dd.style.display = 'none';
+}
+document.addEventListener('click', closeUserDropdown);
+
+/* ════════════════════════════════════════════
+   개발자 테스트 모드
+   URL: ?dev=1  또는  localStorage.wf_dev = '1'
+════════════════════════════════════════════ */
+const IS_DEV = new URLSearchParams(location.search).get('dev') === '1'
+            || localStorage.getItem('wf_dev') === '1';
+
+const DEV_USER = {
+  id: 'dev-test-user-001',
+  email: 'test@worksfree.co.kr',
+  user_metadata: { full_name: '테스트 회원', avatar_url: '' }
+};
+const DEV_USER_GFC = {
+  id: 'dev-test-user-gfc',
+  email: 'gfc@worksfree.co.kr',
+  user_metadata: { full_name: 'GFC 테스터', avatar_url: '' }
+};
+
+if (IS_DEV) {
+  localStorage.setItem('wf_dev', '1');
+  const _tb = document.getElementById('dev-toolbar');
+  _tb.classList.add('show');
+  if (localStorage.getItem('wf_dev_collapsed') === '1') {
+    _tb.classList.add('collapsed');
+    const _caret = document.getElementById('dev-title-caret');
+    if (_caret) _caret.textContent = '▼ 열기';
+  }
+}
+
+function devToggleCollapse() {
+  const tb    = document.getElementById('dev-toolbar');
+  const caret = document.getElementById('dev-title-caret');
+  const now   = tb.classList.toggle('collapsed');
+  if (caret) caret.textContent = now ? '▼ 열기' : '▲ 접기';
+  localStorage.setItem('wf_dev_collapsed', now ? '1' : '0');
+}
+
+let _devPwResolve = null;
+function devPromptPw() {
+  return new Promise(resolve => {
+    _devPwResolve = resolve;
+    document.getElementById('dev-pw-input').value = 'Tank@003412';
+    document.getElementById('dev-pw-modal').style.display = 'flex';
+    setTimeout(() => { const el = document.getElementById('dev-pw-input'); el.focus(); el.select(); }, 50);
+  });
+}
+function devPwConfirm() {
+  const pw = document.getElementById('dev-pw-input').value;
+  document.getElementById('dev-pw-modal').style.display = 'none';
+  if (_devPwResolve) { _devPwResolve(pw); _devPwResolve = null; }
+}
+function devPwCancel() {
+  document.getElementById('dev-pw-modal').style.display = 'none';
+  if (_devPwResolve) { _devPwResolve(null); _devPwResolve = null; }
+}
+
+function updateDevStatus() {
+  const el = document.getElementById('dev-status');
+  if (!el) return;
+  if (authUser) {
+    const agreed = localStorage.getItem('wf_agreed_' + authUser.id);
+    el.textContent = `로그인: ${authUser.email} [${userRole}] ${agreed ? '✅' : '⏳'}`;
+  } else {
+    el.textContent = '비로그인';
+  }
+}
+
+async function devLogin(role = 'general') {
+  // 관리자 로그인: 비밀번호 확인 + 잠금 처리
+  if (role === 'gfc') {
+    const LOCK_KEY     = 'wf_dev_admin_lock';
+    const ATTEMPT_KEY  = 'wf_dev_admin_attempts';
+    const MAX_ATTEMPTS = 3;
+    const LOCK_MS      = 5 * 60 * 1000; // 5분
+
+    const lockUntil = parseInt(localStorage.getItem(LOCK_KEY) || '0');
+    if (Date.now() < lockUntil) {
+      const remain = Math.ceil((lockUntil - Date.now()) / 1000);
+      const m = Math.floor(remain / 60), s = remain % 60;
+      alert(`🔒 관리자 잠금 중 — ${m}분 ${s}초 후 다시 시도하세요.`);
+      return;
+    }
+
+    const pw = await devPromptPw();
+    if (pw === null) return; // 취소
+
+    if (pw !== 'Tank@003412') {
+      const attempts = parseInt(localStorage.getItem(ATTEMPT_KEY) || '0') + 1;
+      localStorage.setItem(ATTEMPT_KEY, attempts);
+      if (attempts >= MAX_ATTEMPTS) {
+        localStorage.setItem(LOCK_KEY, Date.now() + LOCK_MS);
+        localStorage.removeItem(ATTEMPT_KEY);
+        alert(`❌ 비밀번호 ${MAX_ATTEMPTS}회 오류 — 5분간 잠금됩니다.`);
+      } else {
+        alert(`❌ 비밀번호 오류 (${attempts}/${MAX_ATTEMPTS}회)`);
+      }
+      return;
+    }
+    // 성공 시 시도 횟수 초기화
+    localStorage.removeItem(ATTEMPT_KEY);
+    localStorage.removeItem(LOCK_KEY);
+  }
+
+  // 자동 동의 (모달 생략)
+  const user = role === 'gfc' ? DEV_USER_GFC : DEV_USER;
+  localStorage.setItem('wf_agreed_' + user.id, JSON.stringify({
+    agreed_at: new Date().toISOString(), marketing: false
+  }));
+
+  userRole = role;
+  await handleAuthStateChange(user);
+}
+
+function devShowConsent() {
+  if (!authUser) { authUser = DEV_USER; userRole = 'general'; }
+  showConsentModal();
+  updateDevStatus();
+}
+
+function devResetConsent() {
+  const id = (authUser || DEV_USER).id;
+  localStorage.removeItem('wf_agreed_' + id);
+  updateDevStatus();
+  alert('동의 기록이 초기화됐습니다. 다시 로그인하면 동의 모달이 표시됩니다.');
+}
+
+async function devLogout() {
+  await handleAuthStateChange(null);
+}
+
+/* ════════════════════════════════════════════
+   크레딧 구매 & 결제
+════════════════════════════════════════════ */
+
+// 크레딧 패키지 정의
+const CREDIT_PKGS = [
+  { id:'basic',    credits:50,  krw:5500,  usd:4.99,  label:{ko:'베이직',   en:'Basic'}    },
+  { id:'standard', credits:150, krw:14000, usd:12.99, label:{ko:'스탠다드', en:'Standard'}, popular:true },
+  { id:'pro',      credits:500, krw:39000, usd:34.99, label:{ko:'프로',     en:'Pro'}      },
+];
+
+// ── Worker URL (배포 후 실제 URL로 교체) ──────────────────────────
+// Cloudflare → Workers & Pages → 각 워커 URL 확인
+const TOSS_VERIFY_URL    = 'https://toss-verify.worksfree.workers.dev';
+const STRIPE_SESSION_URL = 'https://stripe-session.worksfree.workers.dev';
+// ── Toss Payments 클라이언트 키 ───────────────────────────────────
+// Toss 대시보드 → 개발 → API 키 → 테스트 클라이언트 키
+const TOSS_CLIENT_KEY = 'test_ck_YOUR_TOSS_CLIENT_KEY';
+
+let _selectedPkg = null;
+
+function openCreditModal() {
+  if (!authUser) { openAuthModal(); return; }
+  _selectedPkg = null;
+  renderCreditPkgs();
+  _updateCreditPayBtns();
+  document.getElementById('credit-result').className = 'credit-result';
+  document.getElementById('credit-modal').classList.add('show');
+}
+function closeCreditModal() {
+  document.getElementById('credit-modal').classList.remove('show');
+}
+
+function renderCreditPkgs() {
+  const grid = document.getElementById('credit-pkg-grid');
+  if (!grid) return;
+  grid.innerHTML = CREDIT_PKGS.map((pkg, i) => {
+    const name    = pkg.label[lang] || pkg.label.ko;
+    const unit    = t('credit_unit');
+    const popular = t('credit_popular');
+    return `
+      <div class="credit-pkg" onclick="selectCreditPkg(${i})" id="credit-pkg-${i}">
+        ${pkg.popular ? `<div class="credit-pkg-badge">${popular}</div>` : ''}
+        <div class="credit-pkg-amount">${pkg.credits}</div>
+        <div class="credit-pkg-unit">${unit}</div>
+        <div class="credit-pkg-kr">₩${pkg.krw.toLocaleString()}</div>
+        <div class="credit-pkg-usd">$${pkg.usd}</div>
+      </div>`;
+  }).join('');
+}
+
+function selectCreditPkg(i) {
+  _selectedPkg = CREDIT_PKGS[i];
+  document.querySelectorAll('.credit-pkg').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+  });
+  _updateCreditPayBtns();
+}
+
+function _updateCreditPayBtns() {
+  const on = !!_selectedPkg;
+  const tossBtn   = document.getElementById('credit-btn-toss');
+  const stripeBtn = document.getElementById('credit-btn-stripe');
+  if (tossBtn)   { tossBtn.disabled   = !on; if (on) tossBtn.textContent   = t('credit_btn_toss'); }
+  if (stripeBtn) { stripeBtn.disabled = !on; if (on) stripeBtn.textContent = t('credit_btn_stripe'); }
+}
+
+async function purchaseWithToss() {
+  if (!_selectedPkg || !authUser) return;
+  const pkg      = _selectedPkg;
+  const orderId  = 'wf_' + Date.now() + '_' + authUser.id.slice(0, 8);
+  const origin   = location.origin + location.pathname;
+  const successUrl = origin + '?payment=toss_ok&orderId=' + orderId
+                   + '&credits=' + pkg.credits + '&amount=' + pkg.krw;
+  const failUrl    = origin + '?payment=toss_fail';
+
+  let tossPayments;
+  try {
+    tossPayments = window.TossPayments(TOSS_CLIENT_KEY);
+  } catch {
+    _setCreditResult('err', t('credit_sdk_err'));
+    return;
+  }
+
+  try {
+    await tossPayments.requestPayment('카드', {
+      amount:       pkg.krw,
+      orderId,
+      orderName:    `WorksFree ${pkg.credits}${t('credit_unit')}`,
+      customerName: authUser.user_metadata?.full_name || authUser.email,
+      successUrl,
+      failUrl,
+    });
+  } catch (e) {
+    if (e.code !== 'USER_CANCEL') _setCreditResult('err', e.message);
+  }
+}
+
+async function purchaseWithStripe() {
+  if (!_selectedPkg || !authUser) return;
+  const pkg     = _selectedPkg;
+  const btn     = document.getElementById('credit-btn-stripe');
+  const origin  = location.origin + location.pathname;
+  btn.disabled  = true;
+  btn.textContent = t('credit_btn_redirecting');
+
+  try {
+    const res = await fetch(STRIPE_SESSION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        credits:    pkg.credits,
+        amountUsd:  pkg.usd,
+        userId:     authUser.id,
+        userEmail:  authUser.email,
+        successUrl: origin + '?payment=stripe_ok&credits=' + pkg.credits,
+        cancelUrl:  origin + '?payment=stripe_cancel',
+      }),
+    });
+    const data = await res.json();
+    if (data.url) { location.href = data.url; return; }
+    throw new Error(data.error || 'Session creation failed');
+  } catch (e) {
+    _setCreditResult('err', e.message);
+    btn.disabled = false;
+    btn.textContent = t('credit_btn_stripe');
+  }
+}
+
+function _setCreditResult(type, msg) {
+  const el = document.getElementById('credit-result');
+  if (!el) return;
+  el.textContent = msg;
+  el.className   = 'credit-result ' + type;
+}
+
+/* 결제 리다이렉트 파라미터 처리 — onAuthComplete() 에서 호출 */
+async function initPaymentResult() {
+  const p       = new URLSearchParams(location.search);
+  const payment = p.get('payment');
+  if (!payment) return;
+  history.replaceState({}, '', location.pathname); // 파라미터 즉시 제거
+
+  if (payment === 'toss_ok') {
+    const orderId    = p.get('orderId');
+    const paymentKey = p.get('paymentKey');
+    const amount     = parseInt(p.get('amount')  || '0');
+    const credits    = parseInt(p.get('credits') || '0');
+    await _handleTossSuccess(orderId, paymentKey, amount, credits);
+  } else if (payment === 'toss_fail') {
+    showToast(t('credit_fail'), 'warn');
+  } else if (payment === 'stripe_ok') {
+    const sessionId = p.get('session_id');
+    const credits   = parseInt(p.get('credits') || '0');
+    await _handleStripeSuccess(sessionId, credits);
+  } else if (payment === 'stripe_cancel') {
+    showToast(t('credit_fail'), 'warn');
+  }
+}
+
+async function _handleTossSuccess(orderId, paymentKey, amount, credits) {
+  try {
+    const res  = await fetch(TOSS_VERIFY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId, paymentKey, amount }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || '검증 실패');
+    await _recordPurchase(orderId, 'toss', amount, 0, credits);
+    showToast(`✅ ${credits}${t('credit_unit')} ${t('credit_ok')}`, 'ok');
+    loadCreditBalance();
+  } catch (e) {
+    showToast(t('credit_verify_err') + e.message, 'err');
+  }
+}
+
+async function _handleStripeSuccess(sessionId, credits) {
+  try {
+    const res  = await fetch(STRIPE_SESSION_URL + '/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || '검증 실패');
+    await _recordPurchase(sessionId, 'stripe', 0, data.amountUsd || 0, credits);
+    showToast(`✅ ${credits}${t('credit_unit')} ${t('credit_ok')}`, 'ok');
+    loadCreditBalance();
+  } catch (e) {
+    showToast(t('credit_verify_err') + e.message, 'err');
+  }
+}
+
+/* ── 크레딧 잔액 로드 + 드롭다운 표시 ── */
+async function loadCreditBalance() {
+  const el = document.getElementById('userBalance');
+  if (!el) return;
+  if (!_sbReady || !_sb || !authUser) { el.textContent = '💎 —'; return; }
+  el.textContent = t('credit_balance_loading');
+  const { data } = await _sb
+    .from('credit_balance')
+    .select('balance')
+    .eq('user_id', authUser.id)
+    .maybeSingle();
+  const bal = data?.balance ?? 0;
+  el.textContent = t('credit_balance_tpl').replace('{n}', bal.toLocaleString());
+}
+
+/* ── 크레딧 내역 모달 ── */
+const REASON_MAP = {
+  purchase:    { icon:'💳', key:'ch_reason_purchase' },
+  use_app:     { icon:'⚡', key:'ch_reason_use_app' },
+  admin_grant: { icon:'🎁', key:'ch_reason_admin_grant' },
+  refund:      { icon:'↩️', key:'ch_reason_refund' },
+};
+
+function openCreditHistory() {
+  if (!authUser) return;
+  document.getElementById('ch-modal').classList.add('show');
+  loadCreditHistory();
+}
+function closeCreditHistory() {
+  document.getElementById('ch-modal').classList.remove('show');
+}
+
+async function loadCreditHistory() {
+  const list    = document.getElementById('ch-list');
+  const summary = document.getElementById('ch-summary');
+  list.innerHTML    = `<div class="ch-loading">${t('ch_loading')}</div>`;
+  summary.innerHTML = '';
+
+  if (!_sbReady || !_sb || !authUser) return;
+
+  // 잔액 요약
+  const { data: bal } = await _sb
+    .from('credit_balance')
+    .select('balance, total_charged, total_used')
+    .eq('user_id', authUser.id)
+    .maybeSingle();
+
+  if (bal) {
+    summary.innerHTML = `
+      <div>${t('ch_total_charged')}: <span>+${bal.total_charged.toLocaleString()}</span></div>
+      <div>${t('ch_total_used')}: <span>-${bal.total_used.toLocaleString()}</span></div>
+      <div>${t('ch_balance')}: <span>${bal.balance.toLocaleString()}</span></div>`;
+  }
+
+  // 최근 100건 내역
+  const { data: rows } = await _sb
+    .from('credits')
+    .select('delta, reason, note, app_id, created_at')
+    .eq('user_id', authUser.id)
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (!rows || rows.length === 0) {
+    list.innerHTML = `<div class="ch-empty">${t('ch_empty')}</div>`;
+    return;
+  }
+
+  list.innerHTML = rows.map(r => {
+    const m       = REASON_MAP[r.reason] || { icon:'•', key:'ch_reason_use_app' };
+    const dateStr = new Date(r.created_at).toLocaleDateString(lang === 'ko' ? 'ko-KR' : 'en-US',
+      { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    const note    = r.note || r.app_id || '';
+    const plus    = r.delta > 0;
+    return `
+      <div class="ch-row">
+        <span class="ch-icon">${m.icon}</span>
+        <div class="ch-info">
+          <div class="ch-reason">${t(m.key)}</div>
+          ${note ? `<div class="ch-note">${note}</div>` : ''}
+        </div>
+        <div>
+          <div class="ch-delta ${plus ? 'plus' : 'minus'}">${plus ? '+' : ''}${r.delta.toLocaleString()}</div>
+          <div class="ch-date">${dateStr}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function _recordPurchase(orderId, pg, krw, usd, credits) {
+  if (!authUser || !_sb) return;
+  await _sb.from('payments').insert({
+    user_id: authUser.id, order_id: orderId, pg,
+    amount_krw: krw, amount_usd: usd, credits, status: 'paid',
+  });
+  await _sb.from('credits').insert({
+    user_id: authUser.id, delta: credits,
+    reason: 'purchase', ref_order_id: orderId,
+  });
+}
+
+/* 토스트 알림 */
+let _toastTimer;
+function showToast(msg, type = 'ok') {
+  const el = document.getElementById('wf-toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.background = type === 'ok' ? '#10b981' : type === 'warn' ? '#f59e0b' : '#ef4444';
+  el.style.color = '#fff';
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { el.classList.remove('show'); }, 3500);
+}
+
+/* ════════════════════════════════════════════
+   7. 초기 렌더
+════════════════════════════════════════════ */
+applyHubLang();
+updateDevStatus();
 </script>
 </body>
 </html>

@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>중대재해처벌법 진단 — WorksFree</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#0f1117;--panel:#1c2333;--panel2:#212d40;--border:#2a3347;
+  --text:#e2e8f0;--muted:#64748b;--accent:#3b82f6;
+  --red:#ef4444;--amber:#f59e0b;--green:#10b981;--purple:#a855f7;
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── top header ── */
+.topbar{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--panel);
+  display:flex;align-items:center;gap:14px;}
+.topbar .icon{font-size:28px;}
+.topbar h1{font-size:17px;font-weight:600;}
+.topbar .sub{font-size:13px;color:var(--muted);}
+
+/* ── progress ── */
+.progress-wrap{padding:14px 24px 0;background:var(--panel);border-bottom:1px solid var(--border);}
+.progress-top{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s;}
+.breadcrumbs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:10px;min-height:28px;}
+.crumb{font-size:11px;padding:3px 8px;border-radius:8px;background:var(--panel2);
+  border:1px solid var(--border);color:var(--muted);}
+.crumb b{color:var(--text);}
+
+/* ── wizard body ── */
+.wizard{max-width:680px;margin:0 auto;padding:28px 24px;}
+.q-num{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent);margin-bottom:6px;}
+.q-text{font-size:18px;font-weight:600;line-height:1.4;margin-bottom:6px;}
+.q-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.q-law{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;
+  background:#0c1a30;border:1px solid #1e3a5f;color:#60a5fa;margin-bottom:18px;}
+
+/* ── option cards ── */
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:var(--radius);
+  border:1px solid var(--border);background:var(--panel);cursor:pointer;transition:.15s;text-align:left;
+  width:100%;font-family:inherit;}
+.opt:hover{border-color:var(--accent);background:var(--panel2);}
+.opt.selected{border-color:var(--accent);background:#0c1a30;}
+.opt .opt-icon{font-size:20px;min-width:28px;text-align:center;margin-top:1px;}
+.opt .opt-body .opt-label{font-size:14px;font-weight:600;margin-bottom:2px;}
+.opt .opt-body .opt-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.opt .opt-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;margin-left:auto;flex-shrink:0;align-self:flex-start;margin-top:2px;}
+.badge-high{background:#2d1515;color:#f87171;}
+.badge-mid{background:#2d1f08;color:#fbbf24;}
+.badge-low{background:#0d2620;color:#34d399;}
+
+/* multi-select */
+.multi-opts{display:flex;flex-direction:column;gap:8px;}
+.m-opt{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:var(--radius);
+  border:1px solid var(--border);background:var(--panel);cursor:pointer;transition:.15s;}
+.m-opt:hover{border-color:var(--accent);}
+.m-opt.active{border-color:var(--accent);background:#0c1a30;}
+.m-chk{width:18px;height:18px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;
+  margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:11px;transition:.15s;}
+.m-opt.active .m-chk{background:var(--accent);border-color:var(--accent);}
+.m-opt .m-label{font-size:14px;font-weight:500;margin-bottom:2px;}
+.m-opt .m-desc{font-size:12px;color:var(--muted);}
+.multi-actions{display:flex;align-items:center;gap:12px;margin-top:16px;}
+.btn-next{padding:12px 28px;background:var(--accent);color:#fff;border:none;border-radius:8px;
+  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-next:disabled{opacity:.4;cursor:default;}
+.btn-back{padding:10px 18px;background:transparent;color:var(--muted);border:1px solid var(--border);
+  border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;}
+.btn-back:hover{color:var(--text);border-color:var(--text);}
+.sel-count{font-size:12px;color:var(--muted);}
+
+/* ── back button at top ── */
+.back-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+.back-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;
+  display:flex;align-items:center;gap:4px;padding:0;font-family:inherit;}
+.back-btn:hover{color:var(--text);}
+
+/* ── result ── */
+.result{max-width:760px;margin:0 auto;padding:24px;}
+
+/* applicability banner */
+.apply-banner{border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;border:1px solid;}
+.apply-banner.full{background:#0c1520;border-color:#1e40af;color:#93c5fd;}
+.apply-banner.extended{background:#1a1200;border-color:#92400e;color:#fcd34d;}
+.apply-banner.exempt{background:#0d2620;border-color:#065f46;color:#6ee7b7;}
+.apply-banner .apply-tag{font-size:11px;font-weight:700;letter-spacing:.08em;margin-bottom:6px;}
+.apply-banner .apply-title{font-size:20px;font-weight:700;margin-bottom:4px;}
+.apply-banner .apply-desc{font-size:13px;opacity:.85;line-height:1.6;}
+
+/* risk score */
+.score-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
+.score-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;text-align:center;}
+.score-card .s-val{font-size:36px;font-weight:700;line-height:1;}
+.score-card .s-lbl{font-size:12px;color:var(--muted);margin-top:4px;}
+.score-card .s-sub{font-size:11px;margin-top:6px;padding:3px 10px;border-radius:8px;display:inline-block;}
+.risk-critical .s-val{color:var(--red);}
+.risk-critical .s-sub{background:#2d1515;color:#f87171;}
+.risk-warn .s-val{color:var(--amber);}
+.risk-warn .s-sub{background:#2d1f08;color:#fbbf24;}
+.risk-ok .s-val{color:var(--green);}
+.risk-ok .s-sub{background:#0d2620;color:#34d399;}
+
+/* obligations */
+.section{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:16px;overflow:hidden;}
+.section-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;
+  align-items:center;gap:8px;}
+.section-head h3{font-size:14px;font-weight:600;}
+.section-head .cnt{font-size:11px;padding:2px 8px;border-radius:8px;margin-left:auto;}
+.cnt-red{background:#2d1515;color:#f87171;}
+.cnt-amber{background:#2d1f08;color:#fbbf24;}
+.cnt-green{background:#0d2620;color:#34d399;}
+.obl-row{display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #1a2235;}
+.obl-row:last-child{border-bottom:none;}
+.obl-status{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;flex-shrink:0;margin-top:1px;}
+.st-ok{background:#0d2620;color:#34d399;}
+.st-warn{background:#2d1f08;color:#fbbf24;}
+.st-fail{background:#2d1515;color:#f87171;}
+.st-na{background:#1f2937;color:#6b7280;}
+.obl-body .obl-title{font-size:13px;font-weight:500;}
+.obl-body .obl-note{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5;}
+
+/* roadmap */
+.roadmap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.phase{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.phase-head{font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;}
+.phase-title{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text);}
+.phase-items{display:flex;flex-direction:column;gap:7px;}
+.phase-item{font-size:12px;display:flex;align-items:flex-start;gap:7px;line-height:1.5;color:var(--muted);}
+.phase-item::before{content:'→';flex-shrink:0;margin-top:1px;}
+.ph1 .phase-head{color:var(--red);}
+.ph1 .phase-item{color:#e2e8f0;}
+.ph2 .phase-head{color:var(--amber);}
+.ph3 .phase-head{color:var(--green);}
+
+/* insurance section */
+.ins-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.ins-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px;}
+.ins-card .ins-tag{font-size:10px;font-weight:600;letter-spacing:.05em;color:var(--muted);margin-bottom:4px;}
+.ins-card .ins-name{font-size:13px;font-weight:600;margin-bottom:4px;}
+.ins-card .ins-why{font-size:12px;color:var(--muted);line-height:1.5;}
+.ins-card .ins-urgency{font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;margin-top:8px;display:inline-block;}
+.urg-high{background:#2d1515;color:#f87171;}
+.urg-mid{background:#2d1f08;color:#fbbf24;}
+
+/* actions */
+.result-actions{display:flex;gap:10px;padding:16px 0;flex-wrap:wrap;}
+.btn-print{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;
+  font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-restart{padding:10px 20px;background:transparent;color:var(--muted);border:1px solid var(--border);
+  border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;}
+.btn-restart:hover{color:var(--text);border-color:var(--text);}
+
+.alert-box{background:#2d1515;border:1px solid #7f1d1d;border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;}
+.alert-box .al-icon{font-size:20px;flex-shrink:0;}
+.alert-box .al-body .al-title{font-size:13px;font-weight:600;color:#f87171;margin-bottom:4px;}
+.alert-box .al-body .al-text{font-size:12px;color:#fca5a5;line-height:1.6;}
+
+/* ── print ── */
+@media print{
+  body{background:#fff;color:#111;}
+  .topbar{background:#fff;border-color:#ddd;color:#111;}
+  .topbar .sub{color:#666;}
+  .progress-wrap,.btn-print,.btn-restart,.btn-back,.wizard,.back-row{display:none;}
+  .result{padding:0;}
+  .apply-banner.full{background:#dbeafe;border-color:#2563eb;color:#1e40af;}
+  .apply-banner.extended{background:#fef9c3;border-color:#d97706;color:#92400e;}
+  .apply-banner.exempt{background:#d1fae5;border-color:#059669;color:#065f46;}
+  .section,.phase,.score-card,.ins-card{background:#fff;border-color:#ccc;break-inside:avoid;}
+  .section-head{border-color:#ddd;background:#f5f5f5;}
+  .obl-row{border-color:#e5e7eb;}
+  .obl-body .obl-title,.phase-title{color:#111;}
+  .obl-body .obl-note,.phase-item,.ins-card .ins-why{color:#555;}
+  .section-head h3,.ins-card .ins-name{color:#111;}
+  .score-card .s-lbl,.ins-card .ins-tag{color:#555;}
+  .roadmap{grid-template-columns:repeat(3,1fr);}
+  .ins-grid{grid-template-columns:1fr 1fr;}
+  .result-actions{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="icon">⚖</div>
+  <div>
+    <h1>중대재해처벌법 컨설팅 진단</h1>
+    <div class="sub">법 적용 여부 · 의무 이행 현황 · 위험도 · 맞춤 로드맵</div>
+  </div>
+</div>
+
+<div class="progress-wrap" id="progress-wrap">
+  <div class="progress-top">
+    <span id="prog-label">진단 시작</span>
+    <span id="prog-pct">0%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="breadcrumbs" id="breadcrumbs"></div>
+</div>
+
+<div id="quiz-area"></div>
+<div id="result-area" style="display:none"></div>
+
+<script>
+// ── DATA ──
+const STEPS = [
+  {
+    id:'industry',
+    q:'사업장의 주요 업종은 무엇입니까?',
+    sub:'업종에 따라 위험요인 기준, 특별 규정 적용 여부, 파견허용 여부가 달라집니다.',
+    law:'중대재해처벌법 시행령 [별표 1] · 산업안전보건법 적용 범위',
+    opts:[
+      {k:'mfg', icon:'🏭', label:'제조업', desc:'금속·화학·식품·전자·섬유 등 물건을 생산하는 사업', risk:'high'},
+      {k:'con', icon:'🏗', label:'건설업', desc:'건축·토목·설비 시공 현장 (공사금액 기준 별도 적용)', risk:'high'},
+      {k:'logi', icon:'🚛', label:'운수·물류업', desc:'화물운송, 여객, 창고, 배송·물류센터 등', risk:'high'},
+      {k:'med', icon:'🏥', label:'의료·요양·복지', desc:'병원, 요양원, 요양병원, 복지시설, 어린이집 등', risk:'mid'},
+      {k:'svc', icon:'🛍', label:'서비스·판매·음식업', desc:'도소매, 숙박, 음식업, 개인·기업 서비스 등', risk:'mid'},
+      {k:'it', icon:'💻', label:'IT·전문직·금융', desc:'소프트웨어, 컨설팅, 금융, 법률, 교육 서비스 등', risk:'low'},
+      {k:'other', icon:'📋', label:'기타 업종', desc:'위 업종에 해당하지 않는 경우', risk:'mid'},
+    ]
+  },
+  {
+    id:'headcount',
+    q:'상시근로자는 몇 명입니까?',
+    sub:'상시근로자 수는 법 적용 여부 및 의무 수준을 결정하는 핵심 기준입니다. 파견·수급인 근로자 포함 여부는 다음 단계에서 확인합니다.',
+    law:'중대재해처벌법 제2조 · 시행령 제2조 (상시근로자 산정 방법)',
+    opts:[
+      {k:'u5', icon:'👤', label:'5인 미만', desc:'중대재해처벌법 적용 제외 (산업안전보건법은 적용됨)'},
+      {k:'5to49', icon:'👥', label:'5인 ~ 49인', desc:'2024년 1월 27일부터 확대 적용 (소규모 사업장 포함)'},
+      {k:'50to299', icon:'🏢', label:'50인 ~ 299인', desc:'2022년 1월 27일부터 적용 (기본 완전 적용 대상)'},
+      {k:'300to499', icon:'🏬', label:'300인 ~ 499인', desc:'완전 적용 대상 · 안전보건 관리체계 수준 상향 필요'},
+      {k:'o500', icon:'🏦', label:'500인 이상', desc:'전담 안전보건 조직 설치 의무 포함 (최고 수준 의무)'},
+    ]
+  },
+  {
+    id:'conAmt',
+    q:'건설 공사금액(도급금액)은 얼마입니까?',
+    skip: c => c.industry !== 'con',
+    sub:'건설업은 상시근로자 수 외에 공사금액 기준으로도 법 적용 여부가 결정됩니다.',
+    law:'중대재해처벌법 부칙 제1조 (건설업 시행일) · 건설산업기본법',
+    opts:[
+      {k:'u1', icon:'🔧', label:'1억원 미만', desc:'현행 기준 법 미적용 (소규모 건설 현장)'},
+      {k:'1to50', icon:'🏚', label:'1억원 ~ 50억원 미만', desc:'2024년 1월 27일 확대적용 대상 (중소 건설 현장)'},
+      {k:'50to120', icon:'🏗', label:'50억원 ~ 120억원 미만', desc:'2022년 1월 27일부터 적용 대상'},
+      {k:'o120', icon:'🏙', label:'120억원 이상', desc:'완전 적용 (PQ 500억 이상급 포함)'},
+    ]
+  },
+  {
+    id:'dispatch',
+    q:'파견근로자 또는 도급·하청업체 근로자가 있습니까?',
+    sub:'파견근로자는 사용사업주의 상시근로자 수에 포함될 수 있으며, 도급·수급인 근로자에 대해서도 도급인에게 안전보건 의무가 부과됩니다.',
+    law:'중대재해처벌법 제5조(도급 등 관계에서의 안전보건 확보) · 파견근로자 보호법',
+    opts:[
+      {k:'none', icon:'✓', label:'없음 (직접 고용만)', desc:'모든 근로자가 직접 고용 상태이며 도급·파견 없음'},
+      {k:'dispatch', icon:'🔄', label:'파견근로자 있음', desc:'파견법에 따른 파견근로자를 사용 중 (파견업체 근로자)'},
+      {k:'sub', icon:'🤝', label:'도급·하청업체 있음', desc:'구내 도급, 용역, 위탁 업체 근로자가 사업장 내 작업'},
+      {k:'both', icon:'⚡', label:'파견·도급 모두 있음', desc:'파견근로자와 도급업체 근로자 모두 활용'},
+    ]
+  },
+  {
+    id:'dispatchType',
+    q:'파견근로를 활용하는 업무 분야는 어디입니까?',
+    skip: c => !['dispatch','both'].includes(c.dispatch),
+    sub:'파견법상 파견이 금지된 업종·업무에 파견근로자를 사용하면 파견사업주·사용사업주 모두 형사처벌 대상이 됩니다.',
+    law:'파견근로자 보호 등에 관한 법률 제5조 [별표 1] 파견 허용 업무',
+    opts:[
+      {k:'allowed', icon:'✅', label:'파견 허용 업종·업무', desc:'전문직·사무직 (IT개발, 연구, 법률, 경영지원, 번역 등)'},
+      {k:'restricted', icon:'🚫', label:'파견 금지 업종·업무 포함', desc:'건설현장 작업, 하역업무, 선원, 유해위험 업무 등 금지 업종'},
+      {k:'mixed', icon:'⚠', label:'허용·금지 혼재 (확인 필요)', desc:'일부 업무는 허용이나 일부는 금지 여부 불명확'},
+      {k:'unknown', icon:'❓', label:'파견법 허용 여부 불확실', desc:'어떤 업무에 파견이 가능한지 정확히 모름'},
+    ]
+  },
+  {
+    id:'foreigner',
+    q:'외국인 근로자가 있습니까?',
+    sub:'외국인 근로자도 내국인과 동일한 근로기준법·중대재해처벌법 보호를 받습니다. 언어·문화 장벽으로 인한 안전사고 위험이 높아 별도 관리가 필요합니다.',
+    law:'외국인근로자의 고용 등에 관한 법률 · 출입국관리법 · 2026년 고용노동부 외국인 사업장 집중 근로감독 시행',
+    opts:[
+      {k:'none', icon:'—', label:'없음', desc:'외국인 근로자 없음'},
+      {k:'e9', icon:'🏭', label:'E-9 비전문취업', desc:'고용허가제 외국인 (제조·농축산·건설·어업·서비스 등 허가업종)'},
+      {k:'h2', icon:'🤝', label:'H-2 방문취업', desc:'재외동포 방문취업 비자 (내국인에 준하는 취업 허용)'},
+      {k:'pro', icon:'💼', label:'전문인력 (E-1~E-7)', desc:'교수, 연구원, 기술자 등 전문직 비자 외국인'},
+      {k:'multi', icon:'🌏', label:'복수 체류자격 혼재', desc:'E-9·H-2·전문인력 등 다양한 체류자격 혼재'},
+    ]
+  },
+  {
+    id:'safetyMgr',
+    q:'안전관리자를 선임하고 있습니까?',
+    skip: c => c.headcount === 'u5',
+    sub:'산업안전보건법 제17조에 따라 업종·규모별로 안전관리자 선임 의무가 있으며, 경영책임자 의무사항(시행령 제4조 제5항)과 연계됩니다.',
+    law:'산업안전보건법 제17조 · 중대재해처벌법 시행령 제4조 제5항',
+    opts:[
+      {k:'full', icon:'✅', label:'전담 안전관리자 선임', desc:'안전 업무만 전담하는 상시 직원 (법정 자격 보유)'},
+      {k:'concurrent', icon:'⚡', label:'겸직 안전관리자 선임', desc:'다른 업무와 겸직 중인 안전관리자 (법적으로 일부 허용)'},
+      {k:'outsourced', icon:'🏢', label:'외부 전문기관 위탁', desc:'안전관리 전문기관에 업무 위탁 (50인 미만 등 허용)'},
+      {k:'noObl', icon:'—', label:'선임 의무 없음 (소규모)', desc:'업종·규모상 법적 선임 의무 미해당'},
+      {k:'none', icon:'🚫', label:'미선임 (의무 위반)', desc:'선임 의무가 있으나 선임하지 않은 상태 → 즉시 시정 필요'},
+    ]
+  },
+  {
+    id:'healthMgr',
+    q:'보건관리자를 선임하고 있습니까?',
+    skip: c => c.headcount === 'u5',
+    sub:'산업안전보건법 제22조에 따른 보건관리자 선임 현황을 확인합니다. 500인 이상 또는 특정 업종은 전담 선임이 필요합니다.',
+    law:'산업안전보건법 제22조 · 시행령 [별표 5]',
+    opts:[
+      {k:'full', icon:'✅', label:'전담 보건관리자 선임', desc:'간호사·의사·산업보건지도사 등 전담 보건관리자'},
+      {k:'outsourced', icon:'🏢', label:'외부 전문기관 위탁', desc:'보건관리 전문기관에 위탁 (소규모 사업장 허용)'},
+      {k:'noObl', icon:'—', label:'선임 의무 없음', desc:'50인 미만 등 현행 법상 의무 미해당'},
+      {k:'none', icon:'🚫', label:'미선임 (의무 위반)', desc:'의무 대상이나 선임하지 않은 상태 → 즉시 시정 필요'},
+    ]
+  },
+  {
+    id:'riskAssess',
+    q:'위험성 평가를 실시하고 있습니까?',
+    skip: c => c.headcount === 'u5',
+    sub:'사업장의 유해·위험요인을 파악하고 위험성 감소 대책을 수립하는 법적 의무사항입니다. 경영책임자의 의무이행 핵심 증거가 됩니다.',
+    law:'중대재해처벌법 시행령 제4조 제3항 · 산업안전보건법 제36조',
+    opts:[
+      {k:'regular', icon:'✅', label:'정기적으로 실시', desc:'연 1회 이상 계획적으로 실시하고 결과·개선조치 기록 보관'},
+      {k:'partial', icon:'⚡', label:'일부만 실시 (형식적)', desc:'일부 작업·부서에만 실시하거나 기록이 형식적'},
+      {k:'none', icon:'🚫', label:'미실시 (위반)', desc:'실시한 적 없거나 기록 없음 → 사고 시 경영책임자 처벌 가중'},
+    ]
+  },
+  {
+    id:'training',
+    q:'법정 안전보건 교육을 실시하고 있습니까?',
+    skip: c => c.headcount === 'u5',
+    sub:'정기교육·채용 시 교육·특별교육·관리감독자 교육 등 법정 교육의 이행 여부입니다. 외국인 근로자는 모국어 교육이 권고됩니다.',
+    law:'산업안전보건법 제29조 · 시행규칙 [별표 4~6] 법정 교육 시간',
+    opts:[
+      {k:'full', icon:'✅', label:'전부 이행', desc:'모든 법정 안전보건 교육 실시 및 교육일지 보관 완비'},
+      {k:'partial', icon:'⚡', label:'일부만 이행', desc:'일부 교육 누락, 시간 부족, 출석부 미비 등'},
+      {k:'none', icon:'🚫', label:'미이행 (위반)', desc:'법정 교육 거의 실시 않거나 기록 없음 → 과태료 대상'},
+    ]
+  },
+  {
+    id:'hazards',
+    q:'사업장의 주요 위험요인을 모두 선택하세요.',
+    multi: true,
+    sub:'해당하는 항목을 모두 선택한 후 [선택 완료]를 눌러주세요. 위험요인이 많을수록 위험도가 높아지고 의무사항도 늘어납니다.',
+    law:'산업안전보건법 [별표 1] 유해·위험요인 · 중대재해처벌법 시행령 제4조',
+    opts:[
+      {k:'chem', label:'화학물질·유해물질 취급', desc:'MSDS 대상 물질, 발암물질, 유기용제, 산·알칼리 등'},
+      {k:'height', label:'고소 작업 (2m 이상)', desc:'비계, 사다리, 지붕, 고소작업대 등 추락 위험'},
+      {k:'machinery', label:'중기계·크레인·프레스 사용', desc:'방호장치 필요 기계류, 리프트, 지게차 등'},
+      {k:'confined', label:'밀폐공간 작업', desc:'탱크, 맨홀, 지하실, 수조 등 산소결핍 위험'},
+      {k:'fire', label:'화재·폭발·가스 위험', desc:'인화성 물질, LPG/LNG, 분진 폭발 위험'},
+      {k:'musculo', label:'근골격계 부담작업', desc:'반복동작, 중량물 취급, 장시간 정적 자세'},
+      {k:'elec', label:'감전·전기 위험', desc:'고압 전기 작업, 전기설비 취급, 아크 용접'},
+      {k:'noise', label:'소음·진동 노출', desc:'85dB 이상 소음, 국소진동 기계 사용'},
+      {k:'none', label:'특별 위험요인 없음', desc:'일반 사무, 저위험 판매·서비스 등'},
+    ]
+  },
+  {
+    id:'accidentHistory',
+    q:'최근 3년간 산업재해 발생 이력이 있습니까?',
+    sub:'재해 이력은 근로감독·수사 시 핵심 검토 사항입니다. 중대재해처벌법 위반 여부의 직접적 증거가 될 수 있습니다.',
+    law:'산업안전보건법 제57조(산업재해 기록·보고) · 중대재해처벌법 제6조·제10조',
+    opts:[
+      {k:'none', icon:'✅', label:'재해 없음', desc:'최근 3년간 업무상 재해 발생한 적 없음'},
+      {k:'minor', icon:'🟡', label:'경상해만 있음', desc:'4일 미만 요양 또는 불휴재해 수준 (산재 처리 여부와 무관)'},
+      {k:'serious', icon:'🔶', label:'중상해 있음', desc:'6개월 이상 치료 필요 부상·직업병 발생 이력'},
+      {k:'fatal', icon:'🔴', label:'사망사고 있음', desc:'업무상 사망재해 발생 이력 (현행법상 중대산업재해)'},
+    ]
+  },
+  {
+    id:'subMgmt',
+    q:'도급·하청업체와의 안전보건 관리는 어떻게 하고 있습니까?',
+    skip: c => !['sub','both'].includes(c.dispatch),
+    sub:'도급인(원청)은 수급인·도급업체 근로자가 사업장 내에서 작업할 때 이들의 안전보건에 대해 법적 의무를 집니다.',
+    law:'중대재해처벌법 제5조 · 산업안전보건법 제63조(도급인의 안전보건조치)',
+    opts:[
+      {k:'managed', icon:'✅', label:'기준·절차 마련 및 이행', desc:'도급 안전보건 기준 문서화·협의체 운영·현장 점검 실시'},
+      {k:'partial', icon:'⚡', label:'일부만 관리', desc:'일부 업체에만 기준 적용하거나 형식적 운영'},
+      {k:'none', icon:'🚫', label:'별도 관리 없음', desc:'도급업체 안전보건을 수급인 자율에 전적으로 맡김'},
+    ]
+  },
+  {
+    id:'budget',
+    q:'안전보건 예산을 별도로 편성·집행하고 있습니까?',
+    skip: c => c.headcount === 'u5',
+    sub:'경영책임자는 재해예방에 필요한 안전보건 인력·시설·장비 구비를 위한 예산을 편성하고 집행해야 합니다 (시행령 제4조 제4항).',
+    law:'중대재해처벌법 시행령 제4조 제4항 (안전보건에 필요한 예산 편성 및 집행)',
+    opts:[
+      {k:'full', icon:'✅', label:'편성 및 집행 (기록 보관)', desc:'연간 안전보건 예산 계획·집행 기록 완비'},
+      {k:'allocated', icon:'⚡', label:'편성만 됨 (집행 기록 미비)', desc:'예산 항목은 있으나 실제 집행 증빙 부족'},
+      {k:'none', icon:'🚫', label:'안전보건 전용 예산 없음', desc:'안전 관련 지출이 있어도 별도 항목으로 관리 안 함'},
+    ]
+  },
+  {
+    id:'manual',
+    q:'중대산업재해 발생 시 대응 매뉴얼이 있습니까?',
+    skip: c => c.headcount === 'u5',
+    sub:'재해 발생 직후의 신고·현장보존·수사 대응·피해자 지원 절차를 사전에 정해두지 않으면 골든타임을 놓쳐 상황이 악화됩니다.',
+    law:'중대재해처벌법 시행령 제4조 제8항 (매뉴얼 마련 및 반기 1회 점검)',
+    opts:[
+      {k:'current', icon:'✅', label:'있고 최신화됨', desc:'매뉴얼 존재하고 최근 6개월 내 검토·업데이트 완료'},
+      {k:'old', icon:'⚡', label:'있으나 오래됨', desc:'작성된 것은 있으나 최근 1년 이상 검토하지 않음'},
+      {k:'none', icon:'🚫', label:'없음', desc:'발생 시 어떻게 대응할지 절차가 정해지지 않음'},
+    ]
+  },
+];
+
+// ── STATE ──
+let currentStep = 0;
+let answers = {}; // {id: value}
+let multiSel = []; // for multi-select step
+let userRole = 'general'; // ceo | staff | consultant | gfc | general
+const IS_PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
+
+window.addEventListener('message', e => {
+  if (e.data?.type === 'wf_role') userRole = e.data.role || 'general';
+});
+
+const isInsRole = () => ['ceo', 'gfc'].includes(userRole);
+
+function visibleSteps(){
+  return STEPS.filter(s => !s.skip || !s.skip(answers));
+}
+
+function getStep(idx){ return visibleSteps()[idx]; }
+function totalSteps(){ return visibleSteps().length; }
+
+// ── RENDER WIZARD ──
+function showPreviewGate(){
+  const steps = visibleSteps();
+  const maxStep = Math.ceil(steps.length / 3);
+  document.getElementById('quiz-area').innerHTML = `
+    <div class="wizard" style="text-align:center;padding:40px 24px;">
+      <div style="font-size:36px;margin-bottom:16px;">🔒</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:8px;">미리보기 한도 도달</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">${maxStep} / ${steps.length} 단계 미리보기 완료<br>나머지 진단은 로그인 후 이용 가능합니다.</div>
+      <button class="back-btn" onclick="currentStep=0;answers={};renderStep()">◀ 처음부터 다시</button>
+    </div>`;
+}
+
+function renderStep(){
+  const steps = visibleSteps();
+  if(currentStep >= steps.length){ showResult(); return; }
+  if(IS_PREVIEW && currentStep >= Math.ceil(steps.length / 3)){ showPreviewGate(); return; }
+  const step = steps[currentStep];
+  const pct = Math.round(currentStep / steps.length * 100);
+
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-label').textContent = `${currentStep + 1} / ${steps.length} 단계`;
+
+  // breadcrumbs
+  const bc = document.getElementById('breadcrumbs');
+  bc.innerHTML = Object.entries(answers).map(([k, v]) => {
+    const s = STEPS.find(x => x.id === k);
+    if(!s) return '';
+    const lbl = Array.isArray(v)
+      ? v.map(vk => (s.opts.find(o=>o.k===vk)||{label:vk}).label).join('·')
+      : (s.opts.find(o=>o.k===v)||{label:v}).label;
+    return `<span class="crumb"><b>${shortLabel(k)}</b> ${lbl}</span>`;
+  }).join('');
+
+  const area = document.getElementById('quiz-area');
+  if(step.multi){
+    multiSel = answers[step.id] ? [...answers[step.id]] : [];
+    area.innerHTML = `
+      <div class="wizard">
+        ${currentStep > 0 ? `<div class="back-row"><button class="back-btn" onclick="goBack()">◀ 이전</button></div>` : ''}
+        <div class="q-num">질문 ${currentStep + 1}</div>
+        <div class="q-text">${step.q}</div>
+        <div class="q-sub">${step.sub}</div>
+        ${step.law ? `<div class="q-law">📋 ${step.law}</div>` : ''}
+        <div class="multi-opts" id="mopts"></div>
+        <div class="multi-actions">
+          <button class="btn-next" id="multi-next" onclick="commitMulti()">선택 완료 →</button>
+          <span class="sel-count" id="sel-cnt">0개 선택됨</span>
+        </div>
+      </div>`;
+    renderMultiOpts(step);
+  } else {
+    area.innerHTML = `
+      <div class="wizard">
+        ${currentStep > 0 ? `<div class="back-row"><button class="back-btn" onclick="goBack()">◀ 이전</button></div>` : ''}
+        <div class="q-num">질문 ${currentStep + 1}</div>
+        <div class="q-text">${step.q}</div>
+        <div class="q-sub">${step.sub}</div>
+        ${step.law ? `<div class="q-law">📋 ${step.law}</div>` : ''}
+        <div class="opts">${step.opts.map(opt => `
+          <button class="opt${answers[step.id]===opt.k?' selected':''}" onclick="pick('${step.id}','${opt.k}')">
+            ${opt.icon?`<span class="opt-icon">${opt.icon}</span>`:''}
+            <span class="opt-body">
+              <span class="opt-label">${opt.label}</span>
+              <span class="opt-desc">${opt.desc}</span>
+            </span>
+            ${opt.risk?`<span class="opt-badge badge-${opt.risk}">${{high:'고위험',mid:'중위험',low:'저위험'}[opt.risk]}</span>`:''}
+          </button>`).join('')}
+        </div>
+      </div>`;
+  }
+}
+
+function renderMultiOpts(step){
+  const wrap = document.getElementById('mopts');
+  if(!wrap) return;
+  wrap.innerHTML = step.opts.map(o => `
+    <div class="m-opt${multiSel.includes(o.k)?' active':''}" onclick="toggleMulti('${o.k}','${step.id}')">
+      <div class="m-chk">${multiSel.includes(o.k)?'✓':''}</div>
+      <div>
+        <div class="m-label">${o.label}</div>
+        <div class="m-desc">${o.desc}</div>
+      </div>
+    </div>`).join('');
+  const cnt = document.getElementById('sel-cnt');
+  if(cnt) cnt.textContent = multiSel.length + '개 선택됨';
+}
+
+function toggleMulti(k, stepId){
+  const step = STEPS.find(s=>s.id===stepId);
+  if(k==='none'){
+    multiSel = multiSel.includes('none') ? [] : ['none'];
+  } else {
+    multiSel = multiSel.filter(x=>x!=='none');
+    const idx = multiSel.indexOf(k);
+    if(idx >= 0) multiSel.splice(idx,1);
+    else multiSel.push(k);
+  }
+  renderMultiOpts(step);
+}
+
+function commitMulti(){
+  const steps = visibleSteps();
+  const step = steps[currentStep];
+  answers[step.id] = [...multiSel];
+  currentStep++;
+  renderStep();
+}
+
+function pick(stepId, optKey){
+  answers[stepId] = optKey;
+  currentStep++;
+  renderStep();
+}
+
+function goBack(){
+  if(currentStep > 0){
+    const steps = visibleSteps();
+    const prevStepId = steps[currentStep-1].id;
+    delete answers[prevStepId];
+    currentStep--;
+    renderStep();
+  }
+}
+
+function shortLabel(id){
+  return {industry:'업종',headcount:'규모',conAmt:'공사액',dispatch:'파견/도급',
+    dispatchType:'파견유형',foreigner:'외국인',safetyMgr:'안전관리자',healthMgr:'보건관리자',
+    riskAssess:'위험성평가',training:'안전교육',hazards:'위험요인',accidentHistory:'재해이력',
+    subMgmt:'도급관리',budget:'예산',manual:'매뉴얼'}[id]||id;
+}
+
+// ── RESULT ──
+function showResult(){
+  document.getElementById('quiz-area').style.display='none';
+  document.getElementById('progress-wrap').style.display='none';
+  document.getElementById('result-area').style.display='block';
+  document.getElementById('result-area').innerHTML = buildReport();
+}
+
+function buildReport(){
+  const C = answers;
+  const hz = C.hazards || [];
+
+  // --- applicability ---
+  let appl = 'full';
+  if(C.headcount === 'u5') appl = 'exempt';
+  else if(C.headcount === '5to49') appl = 'extended';
+  if(C.industry === 'con' && C.conAmt){
+    if(C.conAmt === 'u1') appl = 'exempt';
+    else if(C.conAmt === '1to50') appl = 'extended';
+  }
+
+  const applInfo = {
+    full:     {tag:'완전 적용 사업장', title:'중대재해처벌법 완전 적용 대상', color:'full',
+      desc:'2022년 1월 27일부터 완전 적용됩니다. 경영책임자(대표이사 등)는 법정 의무 불이행 시 사망사고 발생 시 1년 이상 징역 또는 10억원 이하 벌금에 처해질 수 있습니다.'},
+    extended: {tag:'확대 적용 사업장', title:'중대재해처벌법 확대 적용 대상 (2024.01.27~)', color:'extended',
+      desc:'2024년 1월 27일부터 적용됩니다. 소규모 사업장도 경영책임자 처벌 대상이 됩니다. 의무 이행 수준은 대규모 사업장과 동일하므로 즉시 대비가 필요합니다.'},
+    exempt:   {tag:'현행 법 미적용', title:'현재 중대재해처벌법 직접 적용 제외', color:'exempt',
+      desc:'현재 직접 적용 대상이 아닙니다. 그러나 산업안전보건법은 5인 미만 사업장에도 일부 적용되며, 향후 법 개정 시 적용 대상이 될 수 있습니다. 선제적 안전관리를 권고드립니다.'},
+  };
+  const ai = applInfo[appl];
+
+  // --- risk score ---
+  let score = 0;
+  if(appl === 'full') score += 2;
+  else if(appl === 'extended') score += 1;
+
+  const highRisk = ['mfg','con','logi'].includes(C.industry);
+  if(highRisk) score += 1;
+  if(C.dispatchType === 'restricted') score += 1.5;
+  if(C.dispatchType === 'unknown' || C.dispatchType === 'mixed') score += 0.5;
+  if(['e9','h2','multi'].includes(C.foreigner)) score += 0.5;
+  if(C.safetyMgr === 'none') score += 2.5;
+  else if(C.safetyMgr === 'concurrent') score += 0.5;
+  if(C.healthMgr === 'none') score += 1;
+  if(C.riskAssess === 'none') score += 2;
+  else if(C.riskAssess === 'partial') score += 1;
+  if(C.training === 'none') score += 1.5;
+  else if(C.training === 'partial') score += 0.5;
+  const hzCnt = hz.filter(h=>h!=='none').length;
+  score += Math.min(hzCnt * 0.4, 2);
+  if(C.accidentHistory === 'fatal') score += 3;
+  else if(C.accidentHistory === 'serious') score += 2;
+  else if(C.accidentHistory === 'minor') score += 0.5;
+  if(C.manual === 'none') score += 0.5;
+  else if(C.manual === 'old') score += 0.2;
+  if(C.budget === 'none') score += 1;
+  else if(C.budget === 'allocated') score += 0.3;
+  if(C.subMgmt === 'none') score += 1;
+  else if(C.subMgmt === 'partial') score += 0.3;
+
+  score = Math.min(Math.round(score * 10) / 10, 10);
+
+  const riskClass = score >= 7 ? 'risk-critical' : score >= 4 ? 'risk-warn' : 'risk-ok';
+  const riskLabel = score >= 7 ? '위험' : score >= 4 ? '주의' : '양호';
+
+  // --- fine risk ---
+  const fineRisk = appl === 'exempt' ? 0 :
+    (C.accidentHistory === 'fatal' ? 50 : C.accidentHistory === 'serious' ? 10 : 0);
+
+  // --- obligations checklist ---
+  const oblRows = [];
+  const addObl = (status, title, note) => oblRows.push({status, title, note});
+
+  if(appl !== 'exempt'){
+    // 1. 방침
+    addObl('warn','안전보건 목표 및 경영방침 수립','경영책임자 명의의 문서화된 방침 필요 (시행령 제4조 제1항)');
+    // 2. 전담조직
+    if(C.headcount === 'o500'){
+      addObl('warn','전담 안전보건 조직 설치 (500인 이상 필수)','상시근로자 500인 이상 사업장은 전담 안전보건 부서 설치 의무 (시행령 제4조 제2항)');
+    } else {
+      addObl('ok','전담 안전보건 조직 (500인 미만 의무 없음)','해당 없음 — 내부 안전보건 관리 체계 구축 권고');
+    }
+    // 3. 위험성 평가
+    if(C.riskAssess === 'regular') addObl('ok','유해·위험요인 확인·개선 절차 (위험성 평가)','정기적 실시 확인됨 → 개선조치 기록 보관 철저히 유지');
+    else if(C.riskAssess === 'partial') addObl('warn','유해·위험요인 확인·개선 절차 (위험성 평가)','일부만 실시 중 → 전 사업장 대상 정기 실시 및 기록 보완 필요');
+    else if(C.riskAssess === 'none') addObl('fail','유해·위험요인 확인·개선 절차 (위험성 평가)','미실시 → 중대재해 발생 시 경영책임자 처벌 가중 사유. 즉시 실시 필요');
+    // 4. 예산
+    if(C.budget === 'full') addObl('ok','안전보건 예산 편성 및 집행','편성·집행 기록 완비 확인됨');
+    else if(C.budget === 'allocated') addObl('warn','안전보건 예산 편성 및 집행','편성은 됐으나 집행 증빙 보완 필요 (시행령 제4조 제4항)');
+    else addObl('fail','안전보건 예산 편성 및 집행','전용 예산 미편성 → 시행령 제4조 제4항 위반. 즉시 편성 및 집행 기록 마련');
+    // 5. 안전관리자
+    if(C.safetyMgr === 'full') addObl('ok','안전관리자 선임 (법정 자격자)','전담 선임 완료');
+    else if(['concurrent','outsourced','noObl'].includes(C.safetyMgr)) addObl('warn','안전관리자 선임·배치','선임됐으나 실질적 업무 수행 여부 점검 필요 (시행령 제4조 제5항)');
+    else addObl('fail','안전관리자 선임 (법정 자격자)','미선임 → 산업안전보건법 제17조 위반 및 중대재해처벌법 시행령 제4조 제5항 미이행');
+    // 6. 보건관리자
+    if(C.healthMgr === 'full') addObl('ok','보건관리자 선임','전담 선임 완료');
+    else if(['outsourced','noObl'].includes(C.healthMgr)) addObl('warn','보건관리자 선임','위탁·의무 없음 — 50인 이상 사업장은 의무 재확인 필요');
+    else addObl('fail','보건관리자 선임','미선임 → 산업안전보건법 제22조 위반. 즉시 선임 또는 전문기관 위탁');
+    // 7. 교육
+    if(C.training === 'full') addObl('ok','법정 안전보건 교육 이행','전체 이행 확인됨 → 교육일지·서명부 보관 유지');
+    else if(C.training === 'partial') addObl('warn','법정 안전보건 교육 이행','일부 누락 → 정기교육·특별교육 계획 수립 및 이행 강화');
+    else addObl('fail','법정 안전보건 교육 이행','미이행 → 과태료 대상. 채용 시 교육부터 즉시 시작 필요');
+    // 8. 의견청취
+    addObl('warn','종사자 안전보건 의견 청취 절차 마련','안전보건 회의, 건의함, 정기 면담 등 절차 문서화 필요 (시행령 제4조 제7항)');
+    // 9. 매뉴얼
+    if(C.manual === 'current') addObl('ok','중대재해 발생 시 대응 매뉴얼','최신화됨 → 반기 1회 이상 점검 유지');
+    else if(C.manual === 'old') addObl('warn','중대재해 발생 시 대응 매뉴얼','있으나 업데이트 필요 → 즉시 검토·갱신 및 반기 1회 점검 일정 수립');
+    else addObl('fail','중대재해 발생 시 대응 매뉴얼','없음 → 사고 발생 시 대응 지연으로 상황 악화. 즉시 수립 필요 (시행령 제4조 제8항)');
+    // 10. 도급
+    if(['sub','both'].includes(C.dispatch)){
+      if(C.subMgmt === 'managed') addObl('ok','도급·용역·위탁 안전보건 기준 마련 및 이행','기준·절차 마련 및 이행 확인됨');
+      else if(C.subMgmt === 'partial') addObl('warn','도급·용역·위탁 안전보건 기준 마련 및 이행','일부만 적용 → 전체 수급인 대상 기준 통일 필요 (시행령 제4조 제9항)');
+      else addObl('fail','도급·용역·위탁 안전보건 기준 마련 및 이행','관리 없음 → 도급인(원청) 법적 의무 위반. 즉시 안전보건 협의체 구성 필요');
+    }
+    // 파견 금지 업종
+    if(C.dispatchType === 'restricted') addObl('fail','파견 금지 업종·업무 파견 사용 여부','파견법 금지 업종에서 파견 사용 시 형사처벌 (2년 이하 징역 or 2천만원 이하 벌금). 즉시 법적 검토 필요');
+    else if(C.dispatchType === 'unknown') addObl('warn','파견 허용 업종·업무 적합성 확인','파견 허용 여부 불확실 → 법률 전문가 자문을 통한 적합성 확인 필요');
+    // 외국인
+    if(['e9','h2','multi'].includes(C.foreigner)){
+      addObl('warn','외국인 근로자 안전보건 교육 (모국어 제공)','2026년 외국인 고용 사업장 집중 근로감독 시행 예고 — 모국어 안전 교육자료 준비 필요');
+    }
+  }
+
+  // --- roadmap ---
+  const phase1 = [], phase2 = [], phase3 = [];
+
+  if(appl !== 'exempt'){
+    if(!['full','concurrent','outsourced'].includes(C.safetyMgr)) phase1.push('안전관리자 즉시 선임 (법정 자격자 확보)');
+    if(C.riskAssess !== 'regular') phase1.push('전 사업장 위험성 평가 실시 및 기록 보관');
+    if(C.manual !== 'current') phase1.push('중대재해 발생 시 대응 매뉴얼 즉시 수립');
+    if(C.budget === 'none') phase1.push('안전보건 전용 예산 항목 편성 및 집행 기록 체계 마련');
+    if(C.dispatchType === 'restricted') phase1.push('파견 금지 업종 즉시 법적 검토 및 시정');
+    phase1.push('경영책임자 명의 안전보건 방침·목표 공문 수립');
+
+    if(C.healthMgr === 'none') phase2.push('보건관리자 선임 또는 전문기관 위탁 계약');
+    if(C.training !== 'full') phase2.push('법정 안전보건 교육 계획 수립 및 교육일지 체계 구축');
+    phase2.push('종사자 안전보건 의견 청취 절차 마련 (안전보건 회의 등)');
+    if(['sub','both'].includes(C.dispatch)) phase2.push('도급업체 대상 안전보건 협의체 구성 및 기준 통일');
+    if(['e9','h2','multi'].includes(C.foreigner)) phase2.push('외국인 근로자 모국어 안전교육 자료 제작 및 교육 실시');
+    if(C.headcount === 'o500') phase2.push('전담 안전보건 조직(부서) 신설 및 인원 배치');
+    phase2.push('반기별 위험성 평가·매뉴얼 점검 일정 수립');
+
+    phase3.push('안전보건경영시스템(ISO 45001 등) 도입 검토');
+    phase3.push(isInsRole()
+      ? '산재보험 외 단체상해보험·근재보험 가입으로 민사 배상 리스크 완충'
+      : '민사 배상 리스크 대비 재무적 리스크 이전(Transfer) 전략 수립');
+    phase3.push(isInsRole()
+      ? '경영책임자·임원 배상책임보험(D&O) 검토'
+      : '경영책임자 개인 법률·배상 리스크에 대한 잔여리스크 재무적 담보 방안 검토');
+    if(fineRisk > 0) phase3.push(isInsRole()
+      ? '법인 벌금 대비 기업배상책임보험 검토'
+      : '법인 벌금 리스크에 대한 리스크 파이낸싱(Risk Financing) 방안 검토');
+    phase3.push('외부 안전보건 전문기관 연간 컨설팅 계약 체결');
+    phase3.push('안전보건 KPI 도입 및 경영진 성과 연동');
+  } else {
+    phase1.push('산업안전보건법 기본 의무 이행 현황 점검');
+    phase1.push('근로자 안전보건 교육 실시 (법 미적용이나 모범 운영 필요)');
+    phase2.push('향후 적용 확대 대비 자체 점검 체크리스트 마련');
+    phase2.push(isInsRole()
+      ? '단체보험·산재보험 적정 보장 수준 검토'
+      : '잔여리스크 재무적 담보 수준 적정성 검토');
+    phase3.push('사업 확장 시 중대재해처벌법 적용 여부 재진단');
+  }
+
+  // --- insurance ---
+  const ins = [];
+  if(appl !== 'exempt'){
+    ins.push(isInsRole()
+      ? {tag:'필수 권고', name:'단체상해보험 / 근재보험', urgency:'high',
+          why:'산재보험은 법인세 비용이나 민사 손해배상(위자료, 일실수익)은 별도입니다. 단체상해보험·근재보험으로 민사 배상 리스크를 완충합니다.'}
+      : {tag:'재무적 완충 전략', name:'재무적 리스크 이전(Transfer) — 민사 배상 대비', urgency:'high',
+          why:'산재보험 외 민사 손해배상(위자료, 일실수익)에 대비한 재무적 리스크 이전 전략이 필요합니다. 잔여리스크 재무적 담보 방안을 검토하십시오.'});
+    ins.push(isInsRole()
+      ? {tag:'경영책임자 보호', name:'임원배상책임보험 (D&O Insurance)', urgency:'high',
+          why:'중대재해 발생 시 경영책임자 개인에게 부과되는 벌금·법률 비용에 대한 대비. 경영진 개인 재산 보전.'}
+      : {tag:'경영책임자 리스크', name:'경영책임자 법적 리스크 재무적 담보 방안', urgency:'high',
+          why:'중대재해 발생 시 경영책임자 개인에게 부과되는 벌금·법률 비용에 대한 리스크 파이낸싱(Risk Financing) 방안을 검토하십시오.'});
+    if(fineRisk > 0 || appl === 'full'){
+      ins.push(isInsRole()
+        ? {tag:'법인 벌금 대비', name:'기업배상책임보험', urgency:'high',
+            why:`법인은 최대 ${fineRisk > 0 ? '50억원' : '10억원'} 벌금 부과 가능. 기업배상책임보험으로 법인 재무 리스크 완충.`}
+        : {tag:'법인 리스크', name:'법인 벌금 리스크 파이낸싱(Risk Financing) 방안', urgency:'high',
+            why:`법인은 최대 ${fineRisk > 0 ? '50억원' : '10억원'} 벌금 부과 가능. 리스크 파이낸싱을 통한 법인 재무 안정화 방안을 검토하십시오.`});
+    }
+    ins.push({tag:'종업원 복지', name:'종업원 재해 보상 재원 마련', urgency:'mid',
+      why:'근로자 재해 시 유족 위로금·치료비를 회사가 신속 지급할 수 있어 노사 신뢰 구축 및 민사 분쟁 예방에 효과적입니다.'});
+    if(['e9','h2','multi'].includes(C.foreigner)){
+      ins.push({tag:'외국인 근로자 전용', name:'외국인 근로자 의료비 재원 확보', urgency:'mid',
+        why:'E-9·H-2 비자 외국인 근로자는 의료비 접근성 취약. 회사가 실손보장 재원을 확보하면 법적 리스크를 완화할 수 있습니다.'});
+    }
+  }
+
+  // --- penalty table ---
+  const fail = oblRows.filter(r=>r.status==='fail').length;
+  const warn = oblRows.filter(r=>r.status==='warn').length;
+  const ok = oblRows.filter(r=>r.status==='ok').length;
+
+  // --- build HTML ---
+  return `<div class="result">
+    <div class="apply-banner ${ai.color}">
+      <div class="apply-tag">● ${ai.tag}</div>
+      <div class="apply-title">${ai.title}</div>
+      <div class="apply-desc">${ai.desc}</div>
+    </div>
+
+    ${appl !== 'exempt' && C.accidentHistory === 'fatal' ? `
+    <div class="alert-box">
+      <div class="al-icon">🔴</div>
+      <div class="al-body">
+        <div class="al-title">사망사고 이력 확인 — 즉각 법률 검토 필요</div>
+        <div class="al-text">사망사고가 발생한 사실이 있으며 중대재해처벌법 완전 적용 대상 사업장입니다. 경영책임자는 <b>1년 이상 징역 또는 10억원 이하 벌금</b>, 법인은 <b>50억원 이하 벌금</b> 대상이 될 수 있습니다. 즉시 노동법 전문 변호사 자문과 함께 의무 이행 상태를 점검해야 합니다.</div>
+      </div>
+    </div>` : ''}
+    ${appl !== 'exempt' && C.accidentHistory === 'serious' ? `
+    <div class="alert-box">
+      <div class="al-icon">🔶</div>
+      <div class="al-body">
+        <div class="al-title">중상해 이력 확인 — 의무 이행 즉시 점검 권고</div>
+        <div class="al-text">6개월 이상 치료가 필요한 부상 사고 이력이 있습니다. 동종 사고가 재발하면 경영책임자는 <b>7년 이하 징역 또는 1억원 이하 벌금</b> 대상입니다. 재발 방지 대책과 법적 의무 이행 여부를 즉시 점검하십시오.</div>
+      </div>
+    </div>` : ''}
+
+    <div class="score-row">
+      <div class="score-card ${riskClass}">
+        <div class="s-val">${score.toFixed(1)}<span style="font-size:16px">/10</span></div>
+        <div class="s-lbl">경영책임자 처벌 위험도</div>
+        <div class="s-sub">${riskLabel}</div>
+      </div>
+      <div class="score-card">
+        <div class="s-val" style="color:var(--red);font-size:24px">${fail > 0 ? fail + '건' : '—'}</div>
+        <div class="s-lbl">즉시 시정 필요 항목</div>
+        <div class="s-sub" style="background:#2d1515;color:#f87171">${fail > 0 ? '위반 사항' : '없음'}</div>
+      </div>
+      <div class="score-card">
+        <div class="s-val" style="color:var(--amber);font-size:24px">${warn > 0 ? warn + '건' : '—'}</div>
+        <div class="s-lbl">보완 권고 항목</div>
+        <div class="s-sub" style="background:#2d1f08;color:#fbbf24">${warn > 0 ? '개선 필요' : '없음'}</div>
+      </div>
+    </div>
+
+    ${oblRows.length > 0 ? `
+    <div class="section">
+      <div class="section-head">
+        <h3>경영책임자 법정 의무 이행 현황</h3>
+        <span class="cnt ${fail>0?'cnt-red':warn>0?'cnt-amber':'cnt-green'}">${fail}건 위반 · ${warn}건 보완 · ${ok}건 이행</span>
+      </div>
+      ${oblRows.map(r=>`
+        <div class="obl-row">
+          <div class="obl-status ${r.status==='ok'?'st-ok':r.status==='warn'?'st-warn':r.status==='fail'?'st-fail':'st-na'}">${r.status==='ok'?'✓':r.status==='warn'?'!':r.status==='fail'?'✗':'—'}</div>
+          <div class="obl-body">
+            <div class="obl-title">${r.title}</div>
+            <div class="obl-note">${r.note}</div>
+          </div>
+        </div>`).join('')}
+    </div>` : ''}
+
+    <div class="section">
+      <div class="section-head"><h3>컨설팅 로드맵 (3단계)</h3></div>
+      <div style="padding:16px">
+        <div class="roadmap">
+          <div class="phase ph1">
+            <div class="phase-head">PHASE 1 · 즉시~1개월</div>
+            <div class="phase-title">긴급 의무 이행</div>
+            <div class="phase-items">${phase1.map(i=>`<div class="phase-item">${i}</div>`).join('')}</div>
+          </div>
+          <div class="phase ph2">
+            <div class="phase-head">PHASE 2 · 1~3개월</div>
+            <div class="phase-title">체계 구축</div>
+            <div class="phase-items">${phase2.map(i=>`<div class="phase-item">${i}</div>`).join('')}</div>
+          </div>
+          <div class="phase ph3">
+            <div class="phase-head">PHASE 3 · 3~12개월</div>
+            <div class="phase-title">고도화·리스크 완충</div>
+            <div class="phase-items">${phase3.map(i=>`<div class="phase-item">${i}</div>`).join('')}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    ${ins.length > 0 ? `
+    <div class="section">
+      <div class="section-head"><h3>${isInsRole() ? '리스크 완충 솔루션 — 보험 연계' : '재무적 리스크 이전 전략 — 잔여리스크 재무적 담보 방안'}</h3></div>
+      <div style="padding:16px">
+        <div class="ins-grid">
+          ${ins.map(c=>`
+          <div class="ins-card">
+            <div class="ins-tag">${c.tag}</div>
+            <div class="ins-name">${c.name}</div>
+            <div class="ins-why">${c.why}</div>
+            <div class="ins-urgency ${c.urgency==='high'?'urg-high':'urg-mid'}">${c.urgency==='high'?'즉시 검토':'권고'}</div>
+          </div>`).join('')}
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">${isInsRole()
+          ? '※ 산재보험은 법적 의무보험이나 민사 손해배상(위자료·일실수익)과 형사 법률 비용은 별도 보장이 필요합니다.'
+          : '※ 산업재해에 따른 민사 손해배상(위자료·일실수익)과 형사 법률 비용은 산재보험 외 별도의 재무적 담보 방안이 필요합니다.'}</p>
+      </div>
+    </div>` : ''}
+
+    <div class="result-actions">
+      <button class="btn-print" onclick="window.print()">🖨 보고서 인쇄 / PDF 저장</button>
+      <button class="btn-restart" onclick="restart()">↺ 처음부터 다시</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);padding-bottom:24px">
+      본 진단 결과는 입력 정보에 기반한 일반적 안내이며 법률 자문이 아닙니다. 구체적 법적 판단은 노동법 전문 변호사 또는 산업안전보건 전문기관의 자문을 받으시기 바랍니다.
+    </p>
+  </div>`;
+}
+
+function restart(){
+  currentStep = 0;
+  answers = {};
+  multiSel = [];
+  document.getElementById('quiz-area').style.display='block';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('result-area').style.display='none';
+  renderStep();
+}
+
+// ── INIT ──
+renderStep();
+</script>
+</body>
+</html>

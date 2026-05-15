@@ -1,0 +1,11 @@
+﻿url,label_top,label_bot,size,fg_color,bg_color,lbl_color,lbl_size,level
+https://worksfree.co.kr,WorksFree,,200,#000000,#ffffff,#000000,13,M
+https://portal.worksfree.kr,포털 로그인,,200,#1d4ed8,#ffffff,#1d4ed8,13,M
+https://www.naver.com,NAVER 홈,,200,#03c75a,#ffffff,#03c75a,13,M
+https://www.google.com,Google,,200,#4285f4,#ffffff,#333333,12,H
+https://kakao.com,Kakao,,150,#fee500,#3c1e1e,#3c1e1e,12,Q
+https://github.com,GitHub,,200,#24292e,#ffffff,#ffffff,12,M
+https://youtube.com,YouTube,,300,#ff0000,#ffffff,#ff0000,14,L
+https://very-long-url-that-tests-qr-density-limit.example.com/path/to/resource?param1=value1&param2=value2,긴URL 테스트,,250,#000000,#ffffff,#000000,11,H
+잘못된URL아님,오류처리,,200,#000000,#ffffff,#000000,13,M
+https://worksfree.co.kr,라벨만 다름,하단 라벨도 있음,200,#7c3aed,#ede9fe,#7c3aed,13,M

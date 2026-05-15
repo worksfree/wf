@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>DART 기업공시 조회</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #0f1117;
+      --panel:   #1c2333;
+      --border:  #2d3748;
+      --text:    #e2e8f0;
+      --sub:     #94a3b8;
+      --accent:  #3b82f6;
+      --success: #10b981;
+      --warn:    #f59e0b;
+      --danger:  #ef4444;
+    }
+    body { font-family:'IBM Plex Sans KR',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    /* ── Topbar ── */
+    .topbar { display:flex; align-items:center; padding:12px 20px; background:var(--panel); border-bottom:1px solid var(--border); gap:10px; }
+    .topbar-title { flex:1; }
+    .topbar-title h1 { font-size:15px; font-weight:600; }
+    .topbar-title .sub { font-size:11px; color:var(--sub); margin-top:1px; }
+    .icon-btn { background:none; border:1px solid var(--border); color:var(--sub); border-radius:6px; padding:5px 10px; font-size:12px; cursor:pointer; font-family:inherit; }
+    .icon-btn:hover { background:var(--border); color:var(--text); }
+    .lang-active { color:var(--accent) !important; border-color:var(--accent) !important; }
+
+    /* ── Settings panel ── */
+    .settings-panel { background:var(--panel); border-bottom:1px solid var(--border); padding:16px 20px; display:none; }
+    .settings-panel.open { display:block; }
+    .settings-title { font-size:11px; font-weight:600; color:var(--sub); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+    .field-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .field-row label { font-size:12px; color:var(--sub); width:110px; flex-shrink:0; }
+    .field-row input {
+      flex:1; max-width:480px;
+      background:var(--bg); border:1px solid var(--border); border-radius:6px;
+      color:var(--text); padding:7px 10px; font-size:13px; font-family:inherit;
+    }
+    .field-row input:focus { outline:none; border-color:var(--accent); }
+    .btn-primary { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:7px 18px; font-size:13px; font-family:inherit; cursor:pointer; font-weight:500; }
+    .btn-primary:hover { opacity:.85; }
+    .settings-note { font-size:11px; color:var(--sub); margin-top:10px; line-height:1.7; }
+    .settings-note code { background:rgba(255,255,255,.07); padding:1px 5px; border-radius:3px; font-size:11px; }
+    .settings-note a { color:var(--accent); text-decoration:none; }
+
+    /* ── Search ── */
+    .search-wrap { padding:24px 20px 0; max-width:800px; }
+    .search-row { display:flex; gap:8px; }
+    .search-input {
+      flex:1; background:var(--panel); border:1px solid var(--border); border-radius:8px;
+      color:var(--text); padding:10px 16px; font-size:14px; font-family:inherit;
+    }
+    .search-input:focus { outline:none; border-color:var(--accent); }
+    .btn-search { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 22px; font-size:14px; font-family:inherit; cursor:pointer; font-weight:500; white-space:nowrap; }
+    .btn-search:hover { opacity:.85; }
+    .btn-search:disabled { opacity:.45; cursor:default; }
+    .recent-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:10px; min-height:24px; }
+    .recent-label { font-size:11px; color:var(--sub); }
+    .recent-chip { background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:2px 10px; font-size:12px; cursor:pointer; color:var(--sub); }
+    .recent-chip:hover { color:var(--text); border-color:var(--accent); }
+
+    /* ── Results ── */
+    .results-wrap { padding:16px 20px 40px; max-width:800px; }
+    .results-meta { font-size:12px; color:var(--sub); margin-bottom:12px; }
+    .result-list { display:flex; flex-direction:column; gap:8px; }
+
+    /* ── Corp card ── */
+    .corp-card { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 16px; cursor:pointer; transition:border-color .15s; }
+    .corp-card:hover { border-color:var(--accent); }
+    .corp-card.selected { border-color:var(--accent); background:#192640; }
+    .card-top { display:flex; align-items:flex-start; gap:10px; margin-bottom:7px; }
+    .card-names { flex:1; }
+    .corp-name { font-size:15px; font-weight:600; }
+    .corp-eng  { font-size:11px; color:var(--sub); margin-top:2px; }
+    .cls-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; white-space:nowrap; flex-shrink:0; margin-top:2px; }
+    .cls-Y { background:rgba(245,158,11,.15); color:#f59e0b; }
+    .cls-K { background:rgba(16,185,129,.15); color:#10b981; }
+    .cls-N { background:rgba(99,102,241,.15); color:#818cf8; }
+    .cls-E { background:rgba(148,163,184,.1); color:#94a3b8; }
+    .cls-L { background:rgba(59,130,246,.12); color:#60a5fa; }
+
+    /* ── Mode tabs ── */
+    .mode-tabs { display:flex; border-bottom:1px solid var(--border); padding:0 20px; background:var(--bg); }
+    .mode-tab { background:none; border:none; border-bottom:2px solid transparent; color:var(--sub); padding:10px 16px; font-size:13px; font-family:inherit; cursor:pointer; font-weight:500; margin-bottom:-1px; transition:color .15s; }
+    .mode-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+    .mode-tab:hover:not(.active) { color:var(--text); }
+
+    /* ── Bulk panel ── */
+    .bulk-wrap { padding:20px 20px 40px; max-width:960px; }
+    .dropzone { border:2px dashed var(--border); border-radius:10px; padding:28px 20px; text-align:center; cursor:pointer; transition:border-color .15s,background .15s; margin-bottom:10px; }
+    .dropzone.drag-over,.dropzone:hover { border-color:var(--accent); background:rgba(59,130,246,.04); }
+    .drop-icon { font-size:28px; margin-bottom:6px; }
+    .drop-msg  { font-size:14px; font-weight:500; margin-bottom:3px; }
+    .drop-sub  { font-size:12px; color:var(--sub); }
+    .drop-file { font-size:12px; color:var(--success); margin-top:6px; font-weight:500; }
+    .bulk-textarea { width:100%; background:var(--panel); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:10px 14px; font-size:13px; font-family:inherit; resize:vertical; min-height:72px; margin-bottom:12px; }
+    .bulk-textarea:focus { outline:none; border-color:var(--accent); }
+    .bulk-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+    .bulk-count { font-size:12px; color:var(--sub); }
+
+    /* ── Progress ── */
+    .progress-wrap { margin-bottom:14px; }
+    .progress-bar  { background:var(--border); border-radius:4px; height:5px; overflow:hidden; margin-bottom:5px; }
+    .progress-fill { background:var(--accent); height:100%; border-radius:4px; transition:width .25s; width:0%; }
+    .progress-info { font-size:12px; color:var(--sub); }
+
+    /* ── Bulk results table ── */
+    .bulk-table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:8px; }
+    .bulk-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .bulk-table th { background:var(--panel); color:var(--sub); font-weight:600; padding:8px 10px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
+    .bulk-table td { padding:7px 10px; border-bottom:1px solid rgba(45,55,72,.5); vertical-align:top; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .bulk-table tr:last-child td { border-bottom:none; }
+    .bulk-table tr:hover td { background:rgba(255,255,255,.02); }
+    .bs { display:inline-block; font-size:10px; font-weight:700; padding:2px 6px; border-radius:3px; }
+    .bs-ok   { background:rgba(16,185,129,.15);  color:#10b981; }
+    .bs-miss { background:rgba(245,158,11,.15);  color:#f59e0b; }
+    .bs-err  { background:rgba(239,68,68,.15);   color:#ef4444; }
+    .bs-pend { background:rgba(148,163,184,.1);  color:#94a3b8; }
+    .btn-dl-csv { background:var(--success); color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:12px; font-family:inherit; cursor:pointer; font-weight:500; }
+    .btn-dl-csv:hover { opacity:.85; }
+    .btn-stop { background:none; border:1px solid var(--danger); color:var(--danger); border-radius:6px; padding:6px 14px; font-size:12px; font-family:inherit; cursor:pointer; }
+    .bulk-result-actions { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+    .bulk-result-meta { font-size:12px; color:var(--sub); }
+
+    .card-meta { display:flex; flex-wrap:wrap; gap:4px 18px; font-size:12px; }
+    .card-meta-item { display:flex; gap:4px; }
+    .mk { color:var(--sub); }
+    .mv { color:var(--text); }
+
+    /* ── Detail panel ── */
+    .detail-panel { background:#111927; border-top:1px solid var(--border); margin-top:12px; border-radius:8px; padding:18px; }
+    .detail-head { font-size:13px; font-weight:600; color:var(--sub); text-transform:uppercase; letter-spacing:.05em; margin-bottom:14px; }
+    .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 24px; }
+    @media(max-width:500px){ .detail-grid { grid-template-columns:1fr; } }
+    .detail-row .dk { font-size:11px; color:var(--sub); margin-bottom:2px; }
+    .detail-row .dv { font-size:13px; word-break:break-all; }
+    .detail-row .dv a { color:var(--accent); text-decoration:none; }
+    .detail-row .dv a:hover { text-decoration:underline; }
+    .btn-coming { margin-top:16px; background:none; border:1px dashed var(--border); color:var(--sub); border-radius:6px; padding:7px 14px; font-size:12px; font-family:inherit; cursor:default; }
+
+    /* ── Pagination ── */
+    .pagination { display:flex; align-items:center; gap:8px; margin-top:16px; }
+    .page-btn { background:var(--panel); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:5px 14px; font-size:13px; font-family:inherit; cursor:pointer; }
+    .page-btn:hover:not(:disabled) { border-color:var(--accent); color:var(--accent); }
+    .page-btn:disabled { opacity:.35; cursor:default; }
+    .page-info { font-size:12px; color:var(--sub); }
+
+    /* ── States ── */
+    .state-box { padding:48px 20px; text-align:center; color:var(--sub); font-size:14px; }
+    .state-icon { font-size:36px; margin-bottom:10px; }
+    .state-err { color:var(--danger); }
+    .spinner { display:inline-block; width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:8px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .inline-spinner { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-title">
+    <h1 id="tb-title">DART 기업공시 조회</h1>
+    <div class="sub" id="tb-sub">금융감독원 전자공시시스템</div>
+  </div>
+  <button class="icon-btn" onclick="toggleSettings()">⚙ <span id="lbl-settings">설정</span></button>
+  <button class="icon-btn" id="btn-ko" onclick="setLang('ko')">KO</button>
+  <button class="icon-btn" id="btn-en" onclick="setLang('en')">EN</button>
+</div>
+
+<!-- SETTINGS -->
+<div class="settings-panel" id="settings-panel">
+  <div class="settings-title" id="lbl-settings-ttl">API 설정</div>
+  <div class="field-row">
+    <label id="lbl-proxy">Worker URL</label>
+    <input type="url" id="inp-proxy" placeholder="https://dart-api-worker.insung-lee.workers.dev">
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+    <div style="width:110px"></div>
+    <button class="btn-primary" id="btn-save" onclick="saveSettings()">저장</button>
+  </div>
+  <div class="settings-note" id="settings-note"></div>
+</div>
+
+<!-- MODE TABS -->
+<div class="mode-tabs">
+  <button class="mode-tab active" id="tab-single" onclick="switchMode('single')">단건 조회</button>
+  <button class="mode-tab" id="tab-bulk" onclick="switchMode('bulk')">CSV 대량조회</button>
+</div>
+
+<!-- BULK MODE -->
+<div id="mode-bulk" style="display:none">
+  <div class="bulk-wrap">
+    <div class="dropzone" id="dropzone"
+         onclick="document.getElementById('csv-file').click()"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="onFileDrop(event)">
+      <input type="file" id="csv-file" accept=".csv,.txt" style="display:none" onchange="onFileSelect(event)">
+      <div class="drop-icon">📄</div>
+      <div class="drop-msg" id="drop-msg">CSV 파일을 드래그하거나 클릭하여 업로드</div>
+      <div class="drop-sub" id="drop-sub">또는 아래에 직접 입력</div>
+      <div class="drop-file" id="drop-file"></div>
+    </div>
+    <textarea class="bulk-textarea" id="bulk-textarea" rows="4"></textarea>
+    <div class="bulk-actions">
+      <button class="btn-primary" id="btn-start" onclick="startBulk()">조회 시작</button>
+      <button class="icon-btn" id="btn-tmpl" onclick="downloadTemplate()">템플릿 다운로드</button>
+      <span class="bulk-count" id="bulk-count"></span>
+      <button class="btn-stop" id="btn-stop" onclick="stopBulk()" style="display:none">중지</button>
+    </div>
+    <div class="progress-wrap" id="bulk-progress" style="display:none">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-info" id="progress-info"></div>
+    </div>
+    <div id="bulk-results"></div>
+  </div>
+</div>
+
+<!-- SINGLE MODE -->
+<div id="mode-single">
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <div class="search-row">
+    <input type="text" class="search-input" id="inp-search" onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="btn-search" id="btn-search" onclick="doSearch()">조회</button>
+  </div>
+  <div class="recent-row" id="recent-row"></div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-wrap" id="results-wrap">
+  <div class="state-box" id="init-state">
+    <div class="state-icon">🔍</div>
+    <div id="init-msg">회사명을 입력하고 조회 버튼을 누르세요.</div>
+  </div>
+</div>
+
+</div><!-- /mode-single -->
+
+<script>
+/* ── I18N ── */
+const I18N = {
+  ko: {
+    tb_title:'DART 기업공시 조회', tb_sub:'금융감독원 전자공시시스템',
+    settings:'설정', settings_ttl:'API 설정', lbl_proxy:'Worker URL',
+    save:'저장', saved:'저장됨',
+    note:'기본 Worker URL이 내장되어 있습니다. 직접 배포한 URL로 덮어쓸 수 있습니다.<br>Worker 코드: <code>consulting/dart/worker.js</code> &nbsp;|&nbsp; API 키: <a href="https://opendart.fss.or.kr" target="_blank">opendart.fss.or.kr</a>',
+    search_ph:'회사명 입력 (예: 삼성전자, 현대자동차)',
+    search_btn:'조회', searching:'조회 중…',
+    init_msg:'회사명을 입력하고 조회 버튼을 누르세요.',
+    no_proxy:'Worker URL이 설정되지 않았습니다. 상단 [설정]에서 입력하세요.',
+    no_result:'검색 결과가 없습니다.',
+    err_net:'네트워크 오류가 발생했습니다.',
+    results_count:'건 검색됨',
+    prev:'이전', next:'다음',
+    recent_lbl:'최근:',
+    cls_Y:'유가증권(KOSPI)', cls_K:'코스닥(KOSDAQ)', cls_N:'코넥스', cls_E:'기타(비상장)', cls_L:'상장사',
+    k_corp_code:'고유번호', k_stock:'종목코드', k_ceo:'대표자',
+    k_bizno:'사업자번호', k_induty:'업종', k_est:'설립일',
+    k_acc:'결산월', k_adres:'주소', k_hm:'홈페이지', k_phone:'대표전화',
+    detail_ttl:'기업 상세정보',
+    btn_fin:'재무제표 조회 — Phase 2에서 추가 예정',
+    dash:'-',
+    preview_detail_tip:'로그인 후 상세 정보를 확인할 수 있습니다.',
+    tab_single:'단건 조회', tab_bulk:'CSV 대량조회',
+    drop_msg:'CSV 파일을 드래그하거나 클릭하여 업로드',
+    drop_sub:'또는 아래에 직접 입력 (회사명·종목코드, 줄바꿈 구분)',
+    bulk_ph:'삼성전자\n카카오\n005930\n...',
+    btn_start:'조회 시작', btn_stop:'중지', btn_tmpl:'템플릿 다운로드', btn_dl:'CSV 다운로드',
+    bulk_preview:'로그인 후 대량 조회를 이용할 수 있습니다.',
+    bulk_rows:'{n}건 입력됨',
+    bulk_processing:'{done} / {total} 처리 중…',
+    bulk_done:'{ok}건 완료 · {miss}건 미매칭 · {err}건 오류',
+    th_input:'입력', th_found:'조회 회사명', th_corp_code:'고유번호',
+    th_ceo:'대표자', th_bizno:'사업자번호', th_induty:'업종',
+    th_stock:'종목코드', th_cls:'상장구분', th_adres:'주소', th_status:'상태',
+    bs_ok:'완료', bs_miss:'미매칭', bs_err:'오류', bs_pend:'대기',
+  },
+  en: {
+    tb_title:'DART Corporate Disclosure', tb_sub:'Korea Financial Supervisory Service',
+    settings:'Settings', settings_ttl:'API Settings', lbl_proxy:'Worker URL',
+    save:'Save', saved:'Saved',
+    note:'A default Worker URL is pre-configured. You can override it with your own deployed Worker URL.<br>Code: <code>consulting/dart/worker.js</code> &nbsp;|&nbsp; API key: <a href="https://opendart.fss.or.kr" target="_blank">opendart.fss.or.kr</a>',
+    search_ph:'Company name (e.g. Samsung Electronics)',
+    search_btn:'Search', searching:'Searching…',
+    init_msg:'Enter a company name and press Search.',
+    no_proxy:'Worker URL is not configured. Enter it in [Settings].',
+    no_result:'No results found.',
+    err_net:'A network error occurred.',
+    results_count:'results found',
+    prev:'Prev', next:'Next',
+    recent_lbl:'Recent:',
+    cls_Y:'KOSPI', cls_K:'KOSDAQ', cls_N:'KONEX', cls_E:'Other (Unlisted)', cls_L:'Listed',
+    k_corp_code:'Corp Code', k_stock:'Ticker', k_ceo:'CEO',
+    k_bizno:'Business No.', k_induty:'Industry', k_est:'Founded',
+    k_acc:'Fiscal Month', k_adres:'Address', k_hm:'Website', k_phone:'Phone',
+    detail_ttl:'Company Details',
+    btn_fin:'Financial Statements — Coming in Phase 2',
+    dash:'-',
+    preview_detail_tip:'Log in to view company details.',
+    tab_single:'Single Search', tab_bulk:'Bulk CSV',
+    drop_msg:'Drag & drop CSV or click to upload',
+    drop_sub:'Or enter directly below (company name or ticker, one per line)',
+    bulk_ph:'Samsung Electronics\nKakao\n005930\n...',
+    btn_start:'Start', btn_stop:'Stop', btn_tmpl:'Download Template', btn_dl:'Download CSV',
+    bulk_preview:'Please log in to use bulk inquiry.',
+    bulk_rows:'{n} rows entered',
+    bulk_processing:'{done} / {total} processing…',
+    bulk_done:'{ok} OK · {miss} not found · {err} error',
+    th_input:'Input', th_found:'Company', th_corp_code:'Corp Code',
+    th_ceo:'CEO', th_bizno:'Business No.', th_induty:'Industry',
+    th_stock:'Ticker', th_cls:'Listed', th_adres:'Address', th_status:'Status',
+    bs_ok:'OK', bs_miss:'Not Found', bs_err:'Error', bs_pend:'Pending',
+  },
+};
+
+let lang = localStorage.getItem('wf_dart_lang') || 'ko';
+const IS_PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
+function t(k){ return I18N[lang][k] ?? I18N.ko[k] ?? k; }
+
+function setLang(l){
+  lang = l;
+  localStorage.setItem('wf_dart_lang', l);
+  applyLang();
+}
+window.addEventListener('message', e => { if(e.data?.type==='wf_lang') setLang(e.data.lang); });
+
+function applyLang(){
+  document.getElementById('tb-title').textContent    = t('tb_title');
+  document.getElementById('tb-sub').textContent      = t('tb_sub');
+  document.getElementById('lbl-settings').textContent = t('settings');
+  document.getElementById('lbl-settings-ttl').textContent = t('settings_ttl');
+  document.getElementById('lbl-proxy').textContent   = t('lbl_proxy');
+  document.getElementById('btn-save').textContent    = t('save');
+  document.getElementById('settings-note').innerHTML = t('note');
+  document.getElementById('inp-search').placeholder  = t('search_ph');
+  document.getElementById('btn-search').textContent  = t('search_btn');
+  document.getElementById('init-msg').textContent    = t('init_msg');
+  document.getElementById('btn-ko').classList.toggle('lang-active', lang==='ko');
+  document.getElementById('btn-en').classList.toggle('lang-active', lang==='en');
+  document.getElementById('tab-single').textContent    = t('tab_single');
+  document.getElementById('tab-bulk').textContent      = t('tab_bulk');
+  document.getElementById('drop-msg').textContent      = t('drop_msg');
+  document.getElementById('drop-sub').textContent      = t('drop_sub');
+  document.getElementById('bulk-textarea').placeholder = t('bulk_ph');
+  document.getElementById('btn-start').textContent     = t('btn_start');
+  document.getElementById('btn-tmpl').textContent      = t('btn_tmpl');
+  document.getElementById('btn-stop').textContent      = t('btn_stop');
+  renderRecent();
+  if(state.results.length) renderResults(state.results, state.page, state.total, state.query);
+  if(typeof bulkState!=='undefined' && bulkState.rows.length) renderBulkTable(bulkState.rows);
+}
+
+/* ── Settings ── */
+const DEFAULT_PROXY = 'https://dart-api-worker.worksfree.workers.dev';
+function getProxy(){ return localStorage.getItem('dart_proxy_url') || DEFAULT_PROXY; }
+
+function toggleSettings(){
+  document.getElementById('settings-panel').classList.toggle('open');
+}
+function saveSettings(){
+  const v = document.getElementById('inp-proxy').value.trim();
+  if(v && v !== DEFAULT_PROXY){
+    localStorage.setItem('dart_proxy_url', v);
+  } else {
+    localStorage.removeItem('dart_proxy_url');
+    document.getElementById('inp-proxy').value = DEFAULT_PROXY;
+  }
+  const btn = document.getElementById('btn-save');
+  btn.textContent = t('saved');
+  setTimeout(() => btn.textContent = t('save'), 1500);
+}
+function loadSettings(){
+  document.getElementById('inp-proxy').value = getProxy();
+}
+
+/* ── Recent searches ── */
+function getRecent(){ try{ return JSON.parse(localStorage.getItem('dart_recent')||'[]'); }catch{ return []; } }
+function pushRecent(q){
+  let r = getRecent().filter(x=>x!==q);
+  r.unshift(q);
+  localStorage.setItem('dart_recent', JSON.stringify(r.slice(0,5)));
+  renderRecent();
+}
+function renderRecent(){
+  const r = getRecent();
+  const el = document.getElementById('recent-row');
+  if(!r.length){ el.innerHTML=''; return; }
+  el.innerHTML = `<span class="recent-label">${t('recent_lbl')}</span>` +
+    r.map(q=>`<span class="recent-chip" onclick="pickRecent('${q.replace(/'/g,"\\'")}')">${q}</span>`).join('');
+}
+function pickRecent(q){ document.getElementById('inp-search').value=q; doSearch(); }
+
+/* ── DART API ── */
+async function dartCall(ep, params){
+  const proxy = getProxy();
+  if(!proxy){ showError(t('no_proxy')); return null; }
+  const url = new URL(proxy);
+  url.searchParams.set('ep', ep);
+  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, String(v)));
+  const resp = await fetch(url.toString());
+  if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return resp.json();
+}
+
+/* ── Industry code mapping (KSIC first letter) ── */
+const INDUTY = {
+  ko:{ A:'농업·임업·어업', B:'광업', C:'제조업', D:'전기·가스', E:'수도·환경',
+       F:'건설업', G:'도·소매업', H:'운수·창고업', I:'숙박·음식점업', J:'정보통신업',
+       K:'금융·보험업', L:'부동산업', M:'전문·과학기술', N:'사업지원서비스',
+       O:'공공행정', P:'교육서비스', Q:'보건·사회복지', R:'예술·스포츠', S:'기타서비스' },
+  en:{ A:'Agriculture', B:'Mining', C:'Manufacturing', D:'Electricity/Gas', E:'Water/Environment',
+       F:'Construction', G:'Wholesale/Retail', H:'Transport/Storage', I:'Accommodation/Food',
+       J:'IT/Telecom', K:'Finance/Insurance', L:'Real Estate', M:'Professional/Scientific',
+       N:'Business Support', O:'Public Admin', P:'Education', Q:'Healthcare', R:'Arts/Sports', S:'Other Services' },
+};
+function indutyName(code){
+  if(!code||!code.trim()) return t('dash');
+  const sector = (INDUTY[lang]||INDUTY.ko)[code[0].toUpperCase()];
+  return sector ? `${sector} (${code})` : code;
+}
+function fmtDate(d){ return (d&&d.length>=8) ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : (d||t('dash')); }
+function fmtBizno(n){ return (n&&n.length>=10) ? `${n.slice(0,3)}-${n.slice(3,5)}-${n.slice(5)}` : (n||t('dash')); }
+function fmtAccMt(m){ return m ? (lang==='ko' ? `${m}월` : `Month ${m}`) : t('dash'); }
+function fmtHm(url){ if(!url||!url.trim()) return t('dash'); const href=url.startsWith('http')?url:'http://'+url; return `<a href="${href}" target="_blank">${url}</a>`; }
+
+/* ── App state ── */
+const state = { query:'', page:1, total:0, results:[], selectedIdx:null, detailData:null };
+
+/* ── Search ── */
+function doSearch(page){
+  const q = document.getElementById('inp-search').value.trim();
+  if(!q) return;
+  state.query = q;
+  state.page  = page || 1;
+  state.selectedIdx = null;
+  state.detailData  = null;
+  runSearch(q, state.page);
+}
+async function runSearch(q, page){
+  const wrap = document.getElementById('results-wrap');
+  wrap.innerHTML = `<div class="state-box"><span class="spinner"></span>${t('searching')}</div>`;
+  try{
+    const data = await dartCall('company.json', { corp_name:q, page_no:page, page_count:10 });
+    if(!data) return;
+    if(data.status !== '000'){ showError(data.message||t('err_net')); return; }
+    pushRecent(q);
+    state.total   = parseInt(data.total_count)||0;
+    state.results = data.list || [];
+    renderResults(state.results, page, state.total, q);
+  }catch(e){
+    showError(`${t('err_net')} (${e.message})`);
+  }
+}
+
+/* ── Render results ── */
+function renderResults(list, page, total, q){
+  const wrap = document.getElementById('results-wrap');
+  if(!list||!list.length){
+    wrap.innerHTML = `<div class="state-box"><div class="state-icon">🔎</div><div>${t('no_result')}</div></div>`;
+    return;
+  }
+  const totalPages = Math.ceil(total/10);
+  let html = `<div class="results-meta">"${q}" — ${total.toLocaleString()} ${t('results_count')}</div><div class="result-list">`;
+  list.forEach((c,i) => { html += buildCard(c,i); });
+  html += `</div>`;
+  if(totalPages>1){
+    html += `<div class="pagination">
+      <button class="page-btn" onclick="doSearch(${page-1})" ${page<=1?'disabled':''}>${t('prev')}</button>
+      <span class="page-info">${page} / ${totalPages}</span>
+      <button class="page-btn" onclick="doSearch(${page+1})" ${page>=totalPages?'disabled':''}>${t('next')}</button>
+    </div>`;
+  }
+  wrap.innerHTML = html;
+  // Re-select if language changed while detail was open
+  if(state.selectedIdx !== null){
+    document.getElementById(`card-${state.selectedIdx}`)?.classList.add('selected');
+    if(state.detailData) document.getElementById(`det-${state.selectedIdx}`).innerHTML = buildDetail(state.detailData);
+  }
+}
+
+function buildCard(c, i){
+  const cls = c.corp_cls || (c.stock_code?.trim() ? 'L' : 'E');
+  return `<div class="corp-card" id="card-${i}" onclick="selectCard(${i})">
+    <div class="card-top">
+      <div class="card-names">
+        <div class="corp-name">${c.corp_name||t('dash')}</div>
+        ${c.corp_eng_name ? `<div class="corp-eng">${c.corp_eng_name}</div>` : ''}
+      </div>
+      <span class="cls-badge cls-${cls}">${t('cls_'+cls)}</span>
+    </div>
+    <div class="card-meta">
+      <span class="card-meta-item"><span class="mk">${t('k_induty')}</span><span class="mv">${indutyName(c.induty_code)}</span></span>
+      ${c.bizr_no?`<span class="card-meta-item"><span class="mk">${t('k_bizno')}</span><span class="mv">${fmtBizno(c.bizr_no)}</span></span>`:''}
+      ${c.est_dt?`<span class="card-meta-item"><span class="mk">${t('k_est')}</span><span class="mv">${fmtDate(c.est_dt)}</span></span>`:''}
+      ${c.stock_code&&c.stock_code.trim()?`<span class="card-meta-item"><span class="mk">${t('k_stock')}</span><span class="mv">${c.stock_code}</span></span>`:''}
+    </div>
+    <div id="det-${i}"></div>
+  </div>`;
+}
+
+/* ── Card select / detail ── */
+function selectCard(i){
+  if(state.selectedIdx===i){
+    document.getElementById(`card-${i}`).classList.remove('selected');
+    document.getElementById(`det-${i}`).innerHTML = '';
+    state.selectedIdx = null; state.detailData = null;
+    return;
+  }
+  if(state.selectedIdx!==null){
+    document.getElementById(`card-${state.selectedIdx}`)?.classList.remove('selected');
+    document.getElementById(`det-${state.selectedIdx}`).innerHTML = '';
+  }
+  state.selectedIdx = i;
+  state.detailData = null;
+  document.getElementById(`card-${i}`).classList.add('selected');
+  if(IS_PREVIEW){
+    document.getElementById(`det-${i}`).innerHTML =
+      `<div class="detail-panel" style="text-align:center;padding:16px;color:var(--warn);">🔒 ${t('preview_detail_tip')}</div>`;
+    return;
+  }
+  fetchDetail(i, state.results[i].corp_code);
+}
+
+async function fetchDetail(i, corpCode){
+  const det = document.getElementById(`det-${i}`);
+  det.innerHTML = `<div class="detail-panel" style="text-align:center;padding:16px;"><span class="inline-spinner"></span></div>`;
+  try{
+    const data = await dartCall('company.json', { corp_code:corpCode });
+    if(!data||data.status!=='000'){
+      det.innerHTML = `<div class="detail-panel"><span style="color:var(--danger)">${data?.message||t('err_net')}</span></div>`;
+      return;
+    }
+    state.detailData = data;
+    det.innerHTML = buildDetail(data);
+    if(data.corp_cls){
+      const badge = document.getElementById(`card-${i}`)?.querySelector('.cls-badge');
+      if(badge){ badge.className=`cls-badge cls-${data.corp_cls}`; badge.textContent=t('cls_'+data.corp_cls); }
+    }
+  }catch(e){
+    det.innerHTML = `<div class="detail-panel"><span style="color:var(--danger)">${t('err_net')}</span></div>`;
+  }
+}
+
+function buildDetail(d){
+  const rows = [
+    [t('k_corp_code'), d.corp_code],
+    [t('k_ceo'),       d.ceo_nm||t('dash')],
+    [t('k_bizno'),     fmtBizno(d.bizr_no)],
+    [t('k_induty'),    indutyName(d.induty_code)],
+    [t('k_est'),       fmtDate(d.est_dt)],
+    [t('k_acc'),       fmtAccMt(d.acc_mt)],
+    [t('k_adres'),     d.adres||t('dash')],
+    [t('k_phone'),     d.phn_no||t('dash')],
+    [t('k_hm'),        fmtHm(d.hm_url)],
+    [t('k_stock'),     d.stock_code&&d.stock_code.trim() ? d.stock_code : t('dash')],
+  ];
+  return `<div class="detail-panel">
+    <div class="detail-head">${t('detail_ttl')}: ${d.corp_name}</div>
+    <div class="detail-grid">
+      ${rows.map(([k,v])=>`<div class="detail-row"><div class="dk">${k}</div><div class="dv">${v}</div></div>`).join('')}
+    </div>
+    <button class="btn-coming" onclick="event.stopPropagation()">${t('btn_fin')}</button>
+  </div>`;
+}
+
+function showError(msg){
+  document.getElementById('results-wrap').innerHTML =
+    `<div class="state-box state-err"><div class="state-icon">⚠</div><div>${msg}</div></div>`;
+}
+
+/* ═══════════════════════════════════════
+   대량 조회 (Bulk CSV)
+═══════════════════════════════════════ */
+let currentMode = 'single';
+let bulkAbort   = false;
+const bulkState = { rows: [], total: 0 };
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('mode-single').style.display = mode === 'single' ? '' : 'none';
+  document.getElementById('mode-bulk').style.display   = mode === 'bulk'   ? '' : 'none';
+  document.getElementById('tab-single').classList.toggle('active', mode === 'single');
+  document.getElementById('tab-bulk').classList.toggle('active', mode === 'bulk');
+}
+
+/* ── File handling ── */
+function onFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) readFile(file);
+}
+function onFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) readFile(file);
+  e.target.value = '';
+}
+function readFile(file) {
+  document.getElementById('drop-file').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('bulk-textarea').value = ev.target.result;
+    updateBulkCount();
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+/* ── CSV parser ── */
+function parseCsvLine(line) {
+  const result = []; let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { inQ = !inQ; }
+    else if (line[i] === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+    else { cur += line[i]; }
+  }
+  result.push(cur.trim());
+  return result;
+}
+
+function parseBulkInput(raw) {
+  const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+  if (!lines.length) return [];
+  const first = lines[0].toLowerCase().replace(/['"()]/g, '');
+  const isCSV = lines[0].includes(',');
+  let hasHeader = false, colName = 0, colStock = 1, colMemo = 2, dataStart = 0;
+  if (isCSV && (first.includes('corp_name') || first.includes('회사명') ||
+                first.includes('stock_code') || first.includes('종목코드'))) {
+    hasHeader = true; dataStart = 1;
+    const cols = parseCsvLine(lines[0]).map(c => c.toLowerCase().replace(/['"()\s]/g, ''));
+    const fn = (a,b) => { const i = cols.findIndex(c=>c.includes(a)||c.includes(b)); return i>=0?i:-1; };
+    colName  = fn('corp_name','회사명');  if (colName  < 0) colName  = 0;
+    colStock = fn('stock_code','종목코드'); if (colStock < 0) colStock = 1;
+    colMemo  = fn('memo','메모');          if (colMemo  < 0) colMemo  = 2;
+  }
+  return lines.slice(dataStart).map(line => {
+    if (isCSV) {
+      const c = parseCsvLine(line);
+      return { corp_name: c[colName]||'', stock_code: c[colStock]||'', memo: c[colMemo]||'', status:'pend', result:null };
+    }
+    const cleaned = line.replace(/"/g,'').trim();
+    const isStock = /^\d{6}$/.test(cleaned);
+    return { corp_name: isStock?'':cleaned, stock_code: isStock?cleaned:'', memo:'', status:'pend', result:null };
+  }).filter(r => r.corp_name || r.stock_code);
+}
+
+function updateBulkCount() {
+  const rows = parseBulkInput(document.getElementById('bulk-textarea').value);
+  const msg  = rows.length ? t('bulk_rows').replace('{n}', rows.length) : '';
+  document.getElementById('bulk-count').textContent = msg;
+}
+
+/* ── Template download ── */
+function downloadTemplate() {
+  const bom = '﻿';
+  const body = lang === 'ko'
+    ? 'corp_name(회사명),stock_code(종목코드),memo(메모)\n삼성전자,005930,예시\n카카오,,\n,035720,\n'
+    : 'corp_name,stock_code,memo\nSamsung Electronics,005930,example\nKakao,,\n,035720,\n';
+  const blob = new Blob([bom + body], { type:'text/csv;charset=utf-8' });
+  const a = Object.assign(document.createElement('a'), { href:URL.createObjectURL(blob), download:'dart_bulk_template.csv' });
+  a.click();
+}
+
+/* ── Bulk processing ── */
+const CHUNK = 5;
+
+async function startBulk() {
+  if (IS_PREVIEW) {
+    document.getElementById('bulk-results').innerHTML =
+      `<div class="state-box"><div class="state-icon">🔒</div><div>${t('bulk_preview')}</div></div>`;
+    return;
+  }
+  const raw = document.getElementById('bulk-textarea').value;
+  const rows = parseBulkInput(raw);
+  if (!rows.length) return;
+
+  bulkAbort = false;
+  bulkState.rows  = rows.map(r => ({...r, status:'pend', result:null}));
+  bulkState.total = rows.length;
+
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('btn-stop').style.display = '';
+  document.getElementById('bulk-progress').style.display = '';
+  document.getElementById('progress-fill').style.width = '0%';
+  renderBulkTable(bulkState.rows);
+
+  let done = 0;
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    if (bulkAbort) break;
+    const chunk = bulkState.rows.slice(i, i + CHUNK);
+    await Promise.all(chunk.map((row, j) => processOne(row, i + j)));
+    done = Math.min(i + CHUNK, rows.length);
+    const pct = Math.round(done / rows.length * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-info').textContent =
+      t('bulk_processing').replace('{done}', done).replace('{total}', rows.length);
+    renderBulkTable(bulkState.rows);
+  }
+
+  const ok   = bulkState.rows.filter(r => r.status === 'ok').length;
+  const miss = bulkState.rows.filter(r => r.status === 'miss').length;
+  const err  = bulkState.rows.filter(r => r.status === 'err').length;
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-info').textContent =
+    t('bulk_done').replace('{ok}',ok).replace('{miss}',miss).replace('{err}',err);
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-stop').style.display = 'none';
+  renderBulkTable(bulkState.rows, true);
+}
+
+function stopBulk() {
+  bulkAbort = true;
+  document.getElementById('btn-stop').style.display = 'none';
+  document.getElementById('btn-start').disabled = false;
+}
+
+async function processOne(row, idx) {
+  try {
+    const params = {};
+    if (row.stock_code) params.stock_code = row.stock_code;
+    else                params.corp_name  = row.corp_name;
+    const data = await dartCall('corp_info.json', params);
+    if (!data || data.status !== '000') {
+      row.status = 'err'; return;
+    }
+    if (!data.corp_code) { row.status = 'miss'; return; }
+    row.status = 'ok';
+    row.result = data;
+  } catch(e) {
+    row.status = 'err';
+  }
+}
+
+/* ── Bulk table render ── */
+function renderBulkTable(rows, done = false) {
+  const wrap = document.getElementById('bulk-results');
+  const dlBtn = done
+    ? `<button class="btn-dl-csv" onclick="downloadResultCsv()">${t('btn_dl')}</button>`
+    : '';
+  const ok   = rows.filter(r=>r.status==='ok').length;
+  const pend = rows.filter(r=>r.status==='pend').length;
+  const meta = done ? t('bulk_done').replace('{ok}',ok).replace('{miss}',rows.filter(r=>r.status==='miss').length).replace('{err}',rows.filter(r=>r.status==='err').length)
+                    : `${ok} / ${rows.length - pend} ${t('results_count')}`;
+  wrap.innerHTML = `
+    <div class="bulk-result-actions">
+      ${dlBtn}
+      <span class="bulk-result-meta">${meta}</span>
+    </div>
+    <div class="bulk-table-wrap">
+      <table class="bulk-table">
+        <thead><tr>
+          <th>#</th>
+          <th>${t('th_input')}</th>
+          <th>${t('th_found')}</th>
+          <th>${t('th_corp_code')}</th>
+          <th>${t('th_ceo')}</th>
+          <th>${t('th_induty')}</th>
+          <th>${t('th_stock')}</th>
+          <th>${t('th_cls')}</th>
+          <th>${t('th_adres')}</th>
+          <th>${t('th_status')}</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map((r, i) => buildBulkRow(r, i)).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function buildBulkRow(r, i) {
+  const input = r.stock_code ? r.stock_code : r.corp_name;
+  const d = r.result || {};
+  const clsLabel = d.corp_cls ? t('cls_'+d.corp_cls) : '';
+  const bsCls = { ok:'bs-ok', miss:'bs-miss', err:'bs-err', pend:'bs-pend' }[r.status] || 'bs-pend';
+  const bsLbl = t('bs_'+r.status) || r.status;
+  return `<tr>
+    <td style="color:var(--sub)">${i+1}</td>
+    <td title="${input}">${input}${r.memo?` <span style="color:var(--sub);font-size:10px">${r.memo}</span>`:''}</td>
+    <td title="${d.corp_name||''}">${d.corp_name||'—'}</td>
+    <td style="font-family:monospace">${d.corp_code||'—'}</td>
+    <td>${d.ceo_nm||'—'}</td>
+    <td title="${indutyName(d.induty_code)}">${indutyName(d.induty_code)}</td>
+    <td style="font-family:monospace">${d.stock_code||'—'}</td>
+    <td>${clsLabel||'—'}</td>
+    <td title="${d.adres||''}">${d.adres||'—'}</td>
+    <td><span class="bs ${bsCls}">${bsLbl}</span></td>
+  </tr>`;
+}
+
+/* ── CSV export ── */
+function downloadResultCsv() {
+  const bom = '﻿';
+  const headers = lang==='ko'
+    ? ['입력','메모','고유번호','조회회사명','상장구분','대표자','사업자번호','업종코드','설립일','결산월','주소','대표전화','홈페이지','종목코드','상태']
+    : ['input','memo','corp_code','found_name','corp_cls','ceo','bizr_no','induty_code','est_dt','acc_mt','adres','phone','website','stock_code','status'];
+  const esc = v => `"${String(v||'').replace(/"/g,'""')}"`;
+  const rows = bulkState.rows.map(r => {
+    const d = r.result || {};
+    const input = r.stock_code || r.corp_name;
+    return [input, r.memo, d.corp_code, d.corp_name, d.corp_cls, d.ceo_nm, d.bizr_no,
+            d.induty_code, d.est_dt, d.acc_mt, d.adres, d.phn_no, d.hm_url, d.stock_code,
+            r.status].map(esc).join(',');
+  });
+  const csv = bom + headers.map(esc).join(',') + '\n' + rows.join('\n');
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(blob),
+    download: `dart_bulk_${new Date().toISOString().slice(0,10)}.csv`
+  });
+  a.click();
+}
+
+/* ── Init ── */
+loadSettings();
+renderRecent();
+applyLang();
+document.getElementById('bulk-textarea').addEventListener('input', updateBulkCount);
+</script>
+</body>
+</html>

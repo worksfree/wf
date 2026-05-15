@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>수진기업 관리 — 현장클리닉</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f1f5f9;color:#1f2937;}
+input,select,textarea,button{font-family:inherit;}
+.inp{width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;outline:none;display:block;}
+.inp:focus{border-color:#1e3a5f;box-shadow:0 0 0 2px rgba(30,58,95,0.15);}
+.card{background:white;border-radius:12px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.card-title{font-weight:700;font-size:14px;color:#374151;margin-bottom:10px;}
+.row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f3f4f6;font-size:13px;}
+.row:last-child{border-bottom:none;}
+.row-l{color:#6b7280;}
+.row-v{font-weight:500;color:#1f2937;}
+.row-v.hl{font-weight:700;color:#166534;}
+.fi{margin-bottom:10px;}
+.fi-label{font-size:12px;color:#6b7280;margin-bottom:4px;}
+.fab{position:fixed;bottom:24px;right:20px;width:54px;height:54px;border-radius:50%;background:#1e3a5f;color:white;font-size:28px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;line-height:1;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ── 상수 데이터 ────────────────────────────────────────────────────────────
+const C = "#1e3a5f";
+
+const STAGES = [
+  {id:"상담진행중",         lb:"상담진행중",   me:false, act:"상담 내용 확인 및 현장클리닉 신청 안내"},
+  {id:"신청완료",           lb:"신청완료",     me:false, act:"지방청 전화 상담 대기"},
+  {id:"지방청전화상담",     lb:"전화상담완료", me:false, act:"전화 상담 완료 확인"},
+  {id:"현장클리닉최종승인", lb:"최종승인",     me:false, act:"기업의 위원 선정 대기"},
+  {id:"클리닉위원선정",     lb:"위원선정",     me:true,  act:"수행계획서 등록"},
+  {id:"수행계획서등록",     lb:"계획서작성",   me:false, act:"계획서 제출 확인"},
+  {id:"수행계획서승인",     lb:"계획서승인",   me:true,  act:"기업 부담금 납부 안내"},
+  {id:"기업입금확인요청",   lb:"기업입금",     me:false, act:"운영기관 확인 대기"},
+  {id:"운영기관입금확인",   lb:"입금확인",     me:true,  act:"현장클리닉 수행"},
+  {id:"현장클리닉수행중",   lb:"수행중",       me:true,  act:"현장지도결과서 등록"},
+  {id:"현장지도결과서등록", lb:"결과서등록",   me:false, act:"결과서 승인 대기"},
+  {id:"현장지도결과서승인", lb:"결과서승인",   me:true,  act:"전자세금계산서 등록"},
+  {id:"세금계산서발행완료", lb:"세금계산서",   me:false, act:"만족도 조사 독려"},
+  {id:"만족도조사",         lb:"만족도조사",   me:false, act:"자문료 지급 대기"},
+  {id:"자문료지급대기",     lb:"지급대기",     me:false, act:"자문료 입금 확인"},
+  {id:"자문료지급",         lb:"완  료",       me:false, act:"완료"},
+];
+
+const SI   = Object.fromEntries(STAGES.map((s,i) => [s.id, i]));
+const MY   = new Set(STAGES.filter(s => s.me).map(s => s.id));
+const getS = id => STAGES[SI[id]] ?? STAGES[0];
+
+const FIELDS = ["경영전략","창업","마케팅","기술","인사/노무","회계(세무)","정보화","생산관리","수출입","특허","법무","금융"];
+
+const FEES = {
+  "일반": {
+    1:{contract:350000,  gov:280000,  company:70000,  vat:35000,  actual:105000, tax:385000},
+    2:{contract:700000,  gov:560000,  company:140000, vat:70000,  actual:210000, tax:770000},
+    3:{contract:1050000, gov:840000,  company:210000, vat:105000, actual:315000, tax:1155000},
+  },
+  "면제": {
+    1:{contract:350000,  gov:350000,  company:0, vat:35000,  actual:35000,  tax:385000},
+    2:{contract:700000,  gov:700000,  company:0, vat:70000,  actual:70000,  tax:770000},
+    3:{contract:1050000, gov:1050000, company:0, vat:105000, actual:105000, tax:1155000},
+  }
+};
+
+const fw   = n => (n||0).toLocaleString()+"원";
+const uid  = () => Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const tod  = () => new Date().toISOString().slice(0,10);
+const BLANK = () => ({id:"",company:"",ceo:"",tel:"",manager:"",managerTel:"",
+  field:"경영전략",area:"일반",days:3,stage:"상담진행중",
+  startDate:tod(),endDate:"",memo:"",appliedAt:tod()});
+
+const escH = s => String(s||'')
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// ── 상태 ────────────────────────────────────────────────────────────────────
+const S = {
+  cls:[], busy:true,
+  page:'list', selId:null, form:null,
+  q:'', tab:'all',
+  aiLoad:false, aiTxt:'',
+  backupModal:false, backupTxt:'', copied:false,
+  showPicker:false, showDelConfirm:false,
+};
+
+// ── 저장소 ─────────────────────────────────────────────────────────────────
+const STORE = 'bzd_clients_v1';
+
+function load() {
+  try { const r = localStorage.getItem(STORE); if(r) S.cls = JSON.parse(r); } catch{}
+  S.busy = false;
+  render();
+}
+
+function persist(data) {
+  S.cls = data;
+  try { localStorage.setItem(STORE, JSON.stringify(data)); } catch{}
+}
+
+// ── 공통 HTML 조각 ──────────────────────────────────────────────────────────
+function badgeH(stageId) {
+  const s = getS(stageId);
+  const isMe = MY.has(stageId), isDone = stageId==="자문료지급";
+  const bg = isDone?"#dcfce7":isMe?"#fee2e2":"#dbeafe";
+  const c  = isDone?"#166534":isMe?"#b91c1c":"#1d4ed8";
+  return `<span style="font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;background:${bg};color:${c}">${s.lb}</span>`;
+}
+
+function barH(stageId, invert=false) {
+  const pct   = Math.round((SI[stageId]/(STAGES.length-1))*100);
+  const isDone = stageId==="자문료지급", isMe = MY.has(stageId);
+  const fill  = invert?"white":isDone?"#16a34a":isMe?"#dc2626":"#3b82f6";
+  const track = invert?"rgba(255,255,255,0.25)":"#e5e7eb";
+  return `<div style="background:${track};border-radius:4px;height:5px"><div style="width:${pct}%;height:5px;border-radius:4px;background:${fill};transition:width 0.3s"></div></div>`;
+}
+
+function feePreviewH(area, days) {
+  const fee = FEES[area]?.[days];
+  if (!fee) return '<div id="fee-preview"></div>';
+  return `<div id="fee-preview" style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 12px;margin-top:4px">
+    <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:6px">💰 비용 미리보기</div>
+    ${[["기업부담금",fee.company],["기업 실납부액",fee.actual],["세금계산서 발행액",fee.tax]].map(([k,v])=>
+      `<div style="display:flex;justify-content:space-between;font-size:13px;padding:2px 0">
+        <span style="color:#6b7280">${k}</span>
+        <span style="font-weight:700;color:#166534">${fw(v)}</span>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ── 목록 페이지 ─────────────────────────────────────────────────────────────
+function buildCardsH() {
+  let list = S.cls;
+  if (S.tab==="me")   list = S.cls.filter(c => MY.has(c.stage));
+  if (S.tab==="done") list = S.cls.filter(c => c.stage==="자문료지급");
+  if (S.q) list = list.filter(c => [c.company,c.field,c.ceo].some(v => v?.includes(S.q)));
+
+  if (!list.length)
+    return `<div style="text-align:center;padding:64px 0;color:#9ca3af;font-size:14px">${
+      S.cls.length===0
+        ? '우측 하단 <b>+</b> 버튼으로 첫 번째 수진기업을 등록하세요'
+        : '조건에 맞는 기업이 없습니다'}</div>`;
+
+  return list.map(c => {
+    const s = getS(c.stage), f = FEES[c.area]?.[c.days]||{};
+    const isMe = MY.has(c.stage), isDone = c.stage==="자문료지급";
+    const bc = isDone?"#16a34a":isMe?"#dc2626":"#3b82f6";
+    return `<div onclick="goDetail('${c.id}')" style="background:white;border-radius:12px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.08);cursor:pointer;border-left:4px solid ${bc}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+        <div style="font-weight:700;font-size:15px;color:#111827">${escH(c.company)}</div>
+        ${badgeH(c.stage)}
+      </div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:7px">${escH(c.field)} · ${c.days}일 · ${c.area}${c.ceo?" · "+escH(c.ceo):""}</div>
+      ${barH(c.stage)}
+      <div style="display:flex;justify-content:space-between;margin-top:7px;font-size:12px">
+        <span style="color:${isMe?"#b91c1c":"#6b7280"};font-weight:${isMe?600:400}">${isMe?"⚡ ":""}${escH(s.act)}</span>
+        <span style="color:#374151;font-weight:500">${fw(f.actual)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderList() {
+  const stats = {
+    all: S.cls.length,
+    me:  S.cls.filter(c => MY.has(c.stage)).length,
+    done:S.cls.filter(c => c.stage==="자문료지급").length,
+  };
+  const tabsH = [{k:"all",l:"전체",v:stats.all},{k:"me",l:"내 액션",v:stats.me},{k:"done",l:"완료",v:stats.done}]
+    .map(({k,l,v}) => {
+      const act = S.tab===k;
+      return `<button onclick="setTab('${k}')" style="flex:1;padding:8px 0;border:none;border-radius:8px 8px 0 0;background:${act?"#f1f5f9":"rgba(255,255,255,0.15)"};color:${act?C:"white"};cursor:pointer;font-weight:600">
+        <div style="font-size:20px;font-weight:700">${v}</div>
+        <div style="font-size:11px">${l}</div>
+      </button>`;
+    }).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div style="min-height:100vh;padding-bottom:90px">
+      <div style="background:${C};padding:20px 20px 0;position:sticky;top:0;z-index:10">
+        <div style="color:white;font-weight:700;font-size:18px;margin-bottom:14px">📋 수진기업 관리</div>
+        <div style="display:flex;gap:8px;margin-bottom:-1px">${tabsH}</div>
+      </div>
+      <div style="padding:12px 16px">
+        <input id="search-inp" value="${escH(S.q)}" oninput="onSearch(this.value)" placeholder="🔍 기업명·분야·대표자 검색" class="inp" style="border:1px solid #d1d5db">
+      </div>
+      <div id="cards-container" style="padding:0 16px;display:flex;flex-direction:column;gap:10px">${buildCardsH()}</div>
+      <button class="fab" onclick="goAdd()">+</button>
+      <button onclick="exportData()" style="position:fixed;bottom:24px;right:84px;height:40px;border-radius:20px;background:#059669;color:white;font-size:12px;font-weight:700;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);padding:0 14px">📤 백업</button>
+      <button onclick="importData()" style="position:fixed;bottom:24px;right:152px;height:40px;border-radius:20px;background:#7c3aed;color:white;font-size:12px;font-weight:700;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);padding:0 14px">📥 복원</button>
+    </div>
+    ${backupModalH()}`;
+}
+
+// ── 상세 페이지 ─────────────────────────────────────────────────────────────
+function renderDetail() {
+  const c = S.cls.find(x => x.id===S.selId);
+  if (!c) { S.page='list'; renderList(); return; }
+  const s = getS(c.stage), f = FEES[c.area]?.[c.days]||{};
+  const isMe = MY.has(c.stage), isDone = c.stage==="자문료지급";
+  const idx  = SI[c.stage]??0;
+
+  const actionH = isDone
+    ? `<div class="card" style="background:#f0fdf4;border:1px solid #86efac;box-shadow:none">
+        <div style="text-align:center;color:#166534;font-weight:700;font-size:15px">✅ 현장클리닉 완료</div>
+      </div>`
+    : `<div class="card" style="background:${isMe?"#fef2f2":"#eff6ff"};border:1px solid ${isMe?"#fca5a5":"#bfdbfe"};box-shadow:none">
+        <div style="font-weight:700;color:${isMe?"#b91c1c":"#1d4ed8"};font-size:13px;margin-bottom:4px">${isMe?"⚡ 지금 해야 할 일":"⏳ 대기 중"}</div>
+        <div style="color:#374151;font-size:15px;font-weight:600;margin-bottom:${isMe?10:0}px">${escH(s.act)}</div>
+        ${isMe&&idx<STAGES.length-1
+          ?`<button onclick="advanceStage()" style="background:#b91c1c;color:white;border:none;border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;font-weight:700">완료 → 다음 단계</button>`
+          :""}
+      </div>`;
+
+  const pickerH = S.showPicker
+    ? `<div style="background:white;border:1px solid #e5e7eb;border-radius:10px;margin-top:4px;padding:10px;display:flex;flex-wrap:wrap;gap:6px">
+        ${STAGES.map(st => {
+          const act = c.stage===st.id;
+          const bg  = act?C:st.me?"#fee2e2":st.id==="자문료지급"?"#dcfce7":"#f3f4f6";
+          const col = act?"white":st.me?"#b91c1c":st.id==="자문료지급"?"#166534":"#374151";
+          return `<button onclick="setStage('${st.id}')" style="padding:5px 11px;border-radius:999px;border:none;cursor:pointer;font-size:12px;font-weight:600;background:${bg};color:${col};outline:${act?"2px solid rgba(30,58,95,0.5)":"none"}">${st.lb}</button>`;
+        }).join('')}
+      </div>` : "";
+
+  const infoRowsH = [
+    ["대표자",c.ceo||"-"],["연락처",c.tel||"-"],["담당자",c.manager||"-"],
+    ["담당자 연락처",c.managerTel||"-"],["지원분야",c.field],["수행일수",c.days+"일"],
+    ["지역구분",c.area+"지역"],["수행기간",`${c.startDate} ~ ${c.endDate||"미정"}`],["신청일",c.appliedAt],
+  ].map(([k,v]) => `<div class="row"><span class="row-l">${k}</span><span class="row-v">${escH(v)}</span></div>`).join('');
+
+  const feeRowsH = [
+    ["계약금액 (100%)",f.contract,false],["정부지원금",f.gov,false],["기업부담금",f.company,false],
+    ["VAT (10%)",f.vat,false],["기업 실납부액",f.actual,true],["세금계산서 발행액",f.tax,true],
+  ].map(([k,v,hl]) => `<div class="row"><span class="row-l">${k}</span><span class="row-v${hl?" hl":""}">${fw(v)}</span></div>`).join('');
+
+  const aiH = S.aiLoad
+    ? `<div style="text-align:center;padding:20px 0;color:#6b7280;font-size:13px"><div style="font-size:24px;margin-bottom:6px">🔍</div>분석 중...</div>`
+    : S.aiTxt
+    ? `<div style="font-size:13px;color:#1f2937;line-height:1.8;white-space:pre-wrap">${escH(S.aiTxt)}</div>
+       <button onclick="callAI()" style="margin-top:10px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:12px">↺ 다시 분석</button>`
+    : `<div style="text-align:center;padding-bottom:4px">
+        <p style="font-size:13px;color:#6b7280;margin-bottom:12px;line-height:1.6">현재 상태와 메모를 분석해<br>구체적인 액션 아이템을 제안해 드립니다</p>
+        <button onclick="callAI()" style="background:${C};color:white;border:none;border-radius:10px;padding:10px 28px;cursor:pointer;font-size:14px;font-weight:700">AI 추천 받기</button>
+      </div>`;
+
+  const delModalH = S.showDelConfirm
+    ? `<div class="overlay">
+        <div style="background:white;border-radius:16px;padding:24px 20px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+          <div style="font-weight:700;font-size:16px;color:#111827;margin-bottom:8px">기업 삭제</div>
+          <div style="font-size:14px;color:#6b7280;margin-bottom:20px;line-height:1.6">
+            <b style="color:#111827">${escH(c.company)}</b>을(를)<br>삭제하시겠습니까?<br>
+            <span style="font-size:12px;color:#ef4444">삭제 후 복구할 수 없습니다.</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="S.showDelConfirm=false;renderDetail()" style="flex:1;padding:10px;border:1px solid #d1d5db;border-radius:8px;background:white;color:#374151;cursor:pointer;font-weight:600;font-size:14px">취소</button>
+            <button onclick="delClient()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#dc2626;color:white;cursor:pointer;font-weight:700;font-size:14px">삭제</button>
+          </div>
+        </div>
+      </div>` : "";
+
+  document.getElementById('app').innerHTML = `
+    <div style="min-height:100vh;padding-bottom:80px">
+      <div style="background:${C};padding:16px 20px 20px;color:white">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <button onclick="goList()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px">← 목록</button>
+          <div style="font-weight:700;font-size:17px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(c.company)}</div>
+          <button onclick="goEdit()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px">수정</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+          ${badgeH(c.stage)}
+          <span style="font-size:12px;opacity:0.8">${idx+1}/${STAGES.length} 단계</span>
+        </div>
+        ${barH(c.stage, true)}
+      </div>
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+        ${actionH}
+        <div>
+          <button onclick="togglePicker()" style="width:100%;background:white;border:1px solid #d1d5db;border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:600;text-align:left;color:#374151">
+            ${S.showPicker?"▲":"▼"} 진행상태 직접 변경
+          </button>
+          ${pickerH}
+        </div>
+        <div class="card">
+          <div class="card-title">📌 기업 정보</div>${infoRowsH}
+        </div>
+        <div class="card">
+          <div class="card-title">💰 비용 정보</div>${feeRowsH}
+        </div>
+        ${c.memo?`<div class="card"><div class="card-title">📝 메모</div><div style="font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap">${escH(c.memo)}</div></div>`:""}
+        <div class="card">
+          <div class="card-title">🤖 AI 액션 추천</div>${aiH}
+        </div>
+        <button onclick="S.showDelConfirm=true;renderDetail()" style="width:100%;background:white;border:1px solid #fca5a5;color:#dc2626;border-radius:10px;padding:11px;cursor:pointer;font-size:14px;font-weight:600">🗑 기업 삭제</button>
+      </div>
+    </div>
+    ${delModalH}`;
+}
+
+// ── 등록/수정 폼 ─────────────────────────────────────────────────────────────
+function renderForm() {
+  const f = S.form;
+  if (!f) { goList(); return; }
+
+  const areaH = ["일반","면제"].map(a => {
+    const act = f.area===a;
+    return `<button id="area-btn-${a}" onclick="formSetArea('${a}')" style="flex:1;padding:9px;border:2px solid ${act?C:"#d1d5db"};border-radius:8px;background:${act?C:"white"};color:${act?"white":"#374151"};cursor:pointer;font-weight:600;font-size:13px">${a}지역</button>`;
+  }).join('');
+
+  const daysH = [1,2,3].map(d => {
+    const act = f.days===d;
+    return `<button id="days-btn-${d}" onclick="formSetDays(${d})" style="flex:1;padding:9px;border:2px solid ${act?C:"#d1d5db"};border-radius:8px;background:${act?C:"white"};color:${act?"white":"#374151"};cursor:pointer;font-weight:700">${d}일</button>`;
+  }).join('');
+
+  const fieldOpts  = FIELDS.map(v => `<option${f.field===v?" selected":""}>${v}</option>`).join('');
+  const stageOpts  = STAGES.map(s => `<option value="${s.id}"${f.stage===s.id?" selected":""}>${s.lb}  ${s.me?"⚡":""} ${s.act}</option>`).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div style="min-height:100vh;padding-bottom:80px">
+      <div style="background:${C};padding:16px 20px;display:flex;align-items:center;gap:10px">
+        <button onclick="goList()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px">← 취소</button>
+        <span style="color:white;font-weight:700;font-size:17px">${f.company?"기업 수정":"기업 등록"}</span>
+      </div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+        <div class="card">
+          <div class="card-title">📌 기업 정보</div>
+          <div class="fi"><div class="fi-label">기업명 *</div><input id="fi-company" value="${escH(f.company)}" class="inp" placeholder="(주)예시기업"></div>
+          <div class="fi"><div class="fi-label">대표자명</div><input id="fi-ceo" value="${escH(f.ceo)}" class="inp" placeholder="홍길동"></div>
+          <div class="fi"><div class="fi-label">연락처 (대표)</div><input id="fi-tel" value="${escH(f.tel)}" class="inp" placeholder="010-0000-0000" inputmode="tel"></div>
+          <div class="fi"><div class="fi-label">담당자명</div><input id="fi-manager" value="${escH(f.manager||'')}" class="inp" placeholder="담당자 이름"></div>
+          <div class="fi"><div class="fi-label">담당자 연락처</div><input id="fi-managerTel" value="${escH(f.managerTel||'')}" class="inp" placeholder="010-0000-0000" inputmode="tel"></div>
+          <div class="fi"><div class="fi-label">신청일</div><input id="fi-appliedAt" type="date" value="${f.appliedAt}" class="inp"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 컨설팅 정보</div>
+          <div class="fi">
+            <div class="fi-label">지원분야</div>
+            <select id="fi-field" class="inp">${fieldOpts}</select>
+          </div>
+          <div class="fi">
+            <div class="fi-label">지역구분</div>
+            <div style="display:flex;gap:8px">${areaH}</div>
+          </div>
+          <div class="fi">
+            <div class="fi-label">수행일수</div>
+            <div style="display:flex;gap:8px">${daysH}</div>
+          </div>
+          ${feePreviewH(f.area, f.days)}
+        </div>
+        <div class="card">
+          <div class="card-title">📅 일정 및 진행상태</div>
+          <div class="fi">
+            <div class="fi-label">현재 진행상태</div>
+            <select id="fi-stage" class="inp">${stageOpts}</select>
+          </div>
+          <div class="fi"><div class="fi-label">수행 시작일</div><input id="fi-startDate" type="date" value="${f.startDate}" class="inp"></div>
+          <div class="fi"><div class="fi-label">수행 종료일</div><input id="fi-endDate" type="date" value="${f.endDate}" class="inp"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📝 메모</div>
+          <textarea id="fi-memo" rows="4" class="inp" placeholder="기업 특이사항, 애로사항, 담당자 요청 내용 등..." style="resize:vertical;line-height:1.6">${escH(f.memo)}</textarea>
+        </div>
+        <button onclick="saveForm()" style="width:100%;background:${C};color:white;border:none;border-radius:10px;padding:14px;cursor:pointer;font-size:15px;font-weight:700">저장</button>
+      </div>
+    </div>`;
+}
+
+// ── 백업 모달 HTML ─────────────────────────────────────────────────────────
+function backupModalH() {
+  if (!S.backupModal) return '';
+  return `<div class="overlay">
+    <div style="background:white;border-radius:16px;padding:20px;width:100%;max-width:480px;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+      <div style="font-weight:700;font-size:16px;color:#111827;margin-bottom:4px">📤 백업 데이터</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:10px">아래 내용을 전체 선택 후 복사해서 메모앱·카카오톡 나에게 보내기 등에 저장하세요.</div>
+      <textarea id="backup-textarea" readonly rows="10" class="inp" onfocus="this.select()"
+        style="font-size:11px;font-family:monospace;resize:none;background:#f9fafb;color:#374151">${escH(S.backupTxt)}</textarea>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button onclick="S.backupModal=false;renderList()" style="flex:1;padding:10px;border:1px solid #d1d5db;border-radius:8px;background:white;color:#374151;cursor:pointer;font-weight:600;font-size:14px">닫기</button>
+        <button onclick="copyBackup()" style="flex:2;padding:10px;border:none;border-radius:8px;background:${S.copied?"#059669":C};color:white;cursor:pointer;font-weight:700;font-size:14px">
+          ${S.copied?"✅ 복사 완료!":"📋 전체 복사"}
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── 메인 렌더 ────────────────────────────────────────────────────────────────
+function render() {
+  if (S.busy) {
+    document.getElementById('app').innerHTML =
+      `<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#6b7280;font-size:14px">불러오는 중...</div>`;
+    return;
+  }
+  if (S.page==='form'   && S.form) { renderForm();   return; }
+  if (S.page==='detail')           { renderDetail(); return; }
+  renderList();
+}
+
+// ── 액션 핸들러 ─────────────────────────────────────────────────────────────
+function setTab(k) { S.tab = k; renderList(); }
+
+function onSearch(v) {
+  S.q = v;
+  const el = document.getElementById('cards-container');
+  if (el) el.innerHTML = buildCardsH();
+}
+
+function goDetail(id) { S.selId=id; S.page='detail'; S.aiTxt=''; S.showPicker=false; S.showDelConfirm=false; renderDetail(); }
+function goList()     { S.page='list'; S.showPicker=false; S.showDelConfirm=false; renderList(); }
+function goAdd()      { S.form={...BLANK(),id:uid()}; S.page='form'; S.aiTxt=''; renderForm(); }
+function goEdit()     {
+  const c = S.cls.find(x => x.id===S.selId);
+  if (c) { S.form={...c}; S.page='form'; S.aiTxt=''; renderForm(); }
+}
+
+function togglePicker() { S.showPicker=!S.showPicker; renderDetail(); }
+
+function setStage(sid) {
+  persist(S.cls.map(c => c.id===S.selId ? {...c,stage:sid} : c));
+  S.showPicker=false; renderDetail();
+}
+
+function advanceStage() {
+  const c = S.cls.find(x => x.id===S.selId);
+  if (!c) return;
+  const i = SI[c.stage]??0;
+  if (i>=STAGES.length-1) return;
+  persist(S.cls.map(x => x.id===S.selId ? {...x,stage:STAGES[i+1].id} : x));
+  renderDetail();
+}
+
+function delClient() {
+  persist(S.cls.filter(c => c.id!==S.selId));
+  S.page='list'; S.selId=null; S.showDelConfirm=false; renderList();
+}
+
+// 폼: 지역/일수 버튼은 DOM 직접 조작 (입력 포커스 유지)
+function formSetArea(a) {
+  S.form.area = a;
+  ["일반","면제"].forEach(x => {
+    const btn = document.getElementById("area-btn-"+x);
+    if (!btn) return;
+    const act = x===a;
+    btn.style.border     = `2px solid ${act?C:"#d1d5db"}`;
+    btn.style.background = act?C:"white";
+    btn.style.color      = act?"white":"#374151";
+  });
+  updateFeePreview();
+}
+
+function formSetDays(d) {
+  S.form.days = d;
+  [1,2,3].forEach(x => {
+    const btn = document.getElementById("days-btn-"+x);
+    if (!btn) return;
+    const act = x===d;
+    btn.style.border     = `2px solid ${act?C:"#d1d5db"}`;
+    btn.style.background = act?C:"white";
+    btn.style.color      = act?"white":"#374151";
+  });
+  updateFeePreview();
+}
+
+function updateFeePreview() {
+  const el = document.getElementById('fee-preview');
+  if (!el) return;
+  el.outerHTML = feePreviewH(S.form.area, S.form.days);
+}
+
+function readForm() {
+  const g = id => (document.getElementById(id)||{}).value||'';
+  return {
+    ...S.form,
+    company:    g('fi-company').trim(),
+    ceo:        g('fi-ceo').trim(),
+    tel:        g('fi-tel').trim(),
+    manager:    g('fi-manager').trim(),
+    managerTel: g('fi-managerTel').trim(),
+    appliedAt:  g('fi-appliedAt'),
+    field:      g('fi-field')||S.form.field,
+    stage:      g('fi-stage')||S.form.stage,
+    startDate:  g('fi-startDate'),
+    endDate:    g('fi-endDate'),
+    memo:       g('fi-memo'),
+  };
+}
+
+function saveForm() {
+  const form = readForm();
+  if (!form.company) { alert("기업명을 입력해 주세요."); return; }
+  const exists = S.cls.some(c => c.id===form.id);
+  persist(exists ? S.cls.map(c => c.id===form.id?form:c) : [...S.cls,form]);
+  S.form=null; goList();
+}
+
+function exportData() {
+  S.backupTxt=JSON.stringify(S.cls,null,2); S.backupModal=true; S.copied=false; renderList();
+}
+
+function copyBackup() {
+  const ta = document.getElementById('backup-textarea');
+  if (!ta) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(ta.value).then(() => { S.copied=true; renderList(); }).catch(()=>{});
+  } else {
+    ta.select(); ta.setSelectionRange(0,99999);
+    try { document.execCommand('copy'); S.copied=true; renderList(); } catch{}
+  }
+}
+
+function importData() {
+  const input    = document.createElement('input');
+  input.type     = 'file';
+  input.accept   = '.json';
+  input.onchange = async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    try {
+      const parsed = JSON.parse(text);
+      if (!Array.isArray(parsed)) throw new Error();
+      persist(parsed);
+      alert(`✅ ${parsed.length}개 기업 데이터가 복원되었습니다.`);
+      renderList();
+    } catch { alert("❌ 올바른 백업 파일이 아닙니다."); }
+  };
+  input.click();
+}
+
+// ── AI 추천 ─────────────────────────────────────────────────────────────────
+async function callAI() {
+  const c = S.cls.find(x => x.id===S.selId);
+  if (!c) return;
+
+  let apiKey = localStorage.getItem('anthropic_api_key');
+  if (!apiKey) {
+    apiKey = prompt("Anthropic API 키를 입력하세요.\n(이 기기에 저장됩니다. sk-ant-...로 시작하는 키)");
+    if (!apiKey) return;
+    localStorage.setItem('anthropic_api_key', apiKey.trim());
+    apiKey = apiKey.trim();
+  }
+
+  S.aiLoad=true; S.aiTxt=''; renderDetail();
+
+  const s = getS(c.stage), f = FEES[c.area]?.[c.days]||{};
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 700,
+        system: "당신은 중소벤처기업부 비즈니스지원단 현장클리닉 클리닉위원(경영지도사) 보조 AI입니다. 수진기업 현황을 보고, 클리닉위원이 지금 당장 취해야 할 구체적인 액션 아이템 3가지를 번호 목록으로 제안하세요. 각 항목은 1~2문장, 실무적이고 명확하게 작성하세요. 한국어로만 답하세요.",
+        messages: [{role:"user", content:
+          `[수진기업 현황]\n기업명: ${c.company}\n지원분야: ${c.field}\n현재상태: ${c.stage}\n다음액션: ${s.act}\n수행일수: ${c.days}일 / ${c.area}지역\n기업 실납부액: ${fw(f.actual)} / 세금계산서: ${fw(f.tax)}\n수행기간: ${c.startDate}~${c.endDate||"미정"}\n메모: ${c.memo||"없음"}`
+        }]
+      })
+    });
+    const d = await res.json();
+    S.aiTxt = d.content?.[0]?.text || "결과를 불러올 수 없습니다.";
+  } catch {
+    S.aiTxt = "오류가 발생했습니다. 다시 시도해 주세요.";
+  }
+  S.aiLoad=false; renderDetail();
+}
+
+// ── 부모 SPA 메시지 수신 ─────────────────────────────────────────────────────
+window.addEventListener('message', e => {
+  if (e.data?.type === 'wf_lang') { /* i18n 확장 시 여기에 언어 적용 */ }
+});
+
+// ── 시작 ─────────────────────────────────────────────────────────────────────
+load();
+</script>
+</body>
+</html>

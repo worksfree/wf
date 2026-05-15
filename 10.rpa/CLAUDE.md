@@ -138,6 +138,57 @@ pytest 90.tests/ -v
 - PyInstaller 6.16.0 / NSIS 3.11 (패키징)
 - Google Sheets API (크레딧 동기화, 서비스 계정 키: `10.common/credentials/google-service-account.json`)
 
+## KO/EN 이중 언어 규칙 (전체 프로젝트 공통 — 필수)
+
+모든 개발 구현물은 **한국어(KO)와 영어(EN) 이중 언어를 기본**으로 제공한다.
+
+- **신규 UI 텍스트**: 하드코딩 금지. 반드시 언어 사전(`i18n`, `dict`, 번역 맵 등)에 ko/en 쌍으로 등록.
+- **신규 페이지/화면**: KO 단독 페이지 생성 금지. 반드시 KO/EN 버전을 동시에 작성.
+- **에러·알림 메시지**: 사용자에게 표시되는 모든 문자열 포함.
+- **적용 범위**: 웹(HTML/JS), Python Tkinter 앱, 문서(사용자에게 노출되는 항목) 모두 해당.
+
+> **예외**: 내부 개발자 전용 로그·디버그 메시지는 영어 단일로 작성 가능.
+
+## CSV/Excel 파일 인코딩 규칙 (전체 프로젝트 공통 — 필수)
+
+CSV 또는 스프레드시트 파일을 **생성·출력·테스트 데이터로 작성**할 때는 반드시 **UTF-8 BOM** 인코딩을 사용한다.
+
+- **이유**: Excel은 BOM(Byte Order Mark, `EF BB BF`)이 없는 UTF-8 파일을 시스템 기본 인코딩(CP949/ANSI)으로 열어 한글이 깨짐.
+- **적용 범위**: 테스트 픽스처, 앱 내 CSV 내보내기, 템플릿 다운로드, 스크립트 출력 파일 모두 해당.
+
+### 구현 방법
+
+**Python (앱/스크립트):**
+```python
+with open('output.csv', 'w', encoding='utf-8-sig', newline='') as f:
+    writer = csv.writer(f)
+```
+
+**JavaScript (웹 — 브라우저 다운로드):**
+```javascript
+const bom  = '﻿';   // UTF-8 BOM
+const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8' });
+```
+
+**PowerShell (스크립트/테스트 픽스처 생성):**
+```powershell
+$utf8bom = New-Object System.Text.UTF8Encoding $true
+[System.IO.File]::WriteAllText('output.csv', $content, $utf8bom)
+# 주의: Out-File -Encoding utf8 도 BOM을 붙이지만 줄바꿈이 CRLF로 고정됨
+```
+
+> **예외**: 서버 간 API 데이터 교환용 CSV (사람이 직접 Excel으로 열지 않는 파일)는 순수 UTF-8(BOM 없음)도 허용.
+
+## 버전 규칙 (전체 프로젝트 공통)
+
+버전 형식: `MAJOR.MINOR.PATCH.BUILD` (예: `0.7.0.3`)
+
+- 각 세그먼트는 0–9. 9를 넘으면 상위 자리로 올림 (계단식 진입).
+  - `0.7.0.9` → `0.7.1.0` / `0.7.9.9` → `0.8.0.0`
+- **BUILD** (4번째): 웹은 `deploy.ps1` 실행마다, 앱은 빌드 스크립트 실행마다 자동 증가.
+- **PATCH** (3번째) 이상: 기능 추가·수정·호환성 변경 시 수동으로 올림.
+- 자동 증가 로직은 스크립트가 자신의 파일을 읽어 `$VERSION = "X.X.X.X"` 패턴을 업데이트함.
+
 ## 개발 규칙
 
 - 버전 정보 단일 소스: `ui_main.py`의 `APP_VERSION_FULL` → `ui_setting.py`는 import해서 사용

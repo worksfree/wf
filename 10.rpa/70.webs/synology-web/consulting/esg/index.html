@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESG 자가진단 — WorksFree</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#0f1117;--panel:#1c2333;--panel2:#212d40;--border:#2a3347;
+  --text:#e2e8f0;--muted:#64748b;--accent:#10b981;
+  --E:#10b981;--S:#3b82f6;--G:#a855f7;
+  --yes:#10b981;--no:#ef4444;--na:#64748b;--none:#2a3347;
+  --radius:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;}
+
+/* ── top bar ── */
+.topbar{position:sticky;top:0;z-index:100;background:var(--panel);border-bottom:1px solid var(--border);
+  padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.topbar h1{font-size:16px;font-weight:600;flex:1;white-space:nowrap;}
+.topbar small{color:var(--muted);font-size:12px;}
+.btn{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--text);}
+.btn-danger{background:transparent;color:#ef4444;border:1px solid #ef4444;}
+.btn-danger:hover{background:#ef444420;}
+
+/* ── score dashboard ── */
+.dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:16px 20px;background:var(--panel);border-bottom:1px solid var(--border);}
+.score-card{background:var(--panel2);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);}
+.score-card .label{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.score-card .value{font-size:28px;font-weight:600;}
+.score-card .sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.bar{height:4px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:2px;transition:width .4s;}
+.color-E{color:var(--E);} .fill-E{background:var(--E);}
+.color-S{color:var(--S);} .fill-S{background:var(--S);}
+.color-G{color:var(--G);} .fill-G{background:var(--G);}
+.color-total{color:var(--accent);}
+
+/* ── tabs ── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 20px;background:var(--panel);}
+.tab{padding:10px 20px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--text);border-bottom-color:currentColor;}
+.tab[data-tab="E"].active{color:var(--E);}
+.tab[data-tab="S"].active{color:var(--S);}
+.tab[data-tab="G"].active{color:var(--G);}
+
+/* ── content area ── */
+.content{padding:20px;max-width:900px;margin:0 auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── section header ── */
+.section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin:24px 0 8px;padding-left:4px;}
+.section-label:first-child{margin-top:0;}
+
+/* ── indicator card ── */
+.ind-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;}
+.ind-head{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;}
+.ind-head:hover{background:var(--panel2);}
+.ind-num{font-size:12px;font-weight:600;color:var(--muted);min-width:44px;}
+.ind-name{flex:1;font-weight:500;font-size:14px;}
+.badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;letter-spacing:.04em;}
+.badge-common{background:#1e3a2f;color:#6ee7b7;}
+.badge-industry{background:#1e2d4a;color:#93c5fd;}
+.ind-result{font-size:12px;font-weight:600;padding:3px 10px;border-radius:10px;min-width:52px;text-align:center;}
+.result-pass{background:#0d2620;color:#34d399;}
+.result-fail{background:#2d1515;color:#f87171;}
+.result-na{background:#1f2937;color:#9ca3af;}
+.result-pending{background:#1c2333;color:#64748b;}
+.chevron{font-size:11px;color:var(--muted);transition:transform .2s;margin-left:4px;}
+.ind-card.open .chevron{transform:rotate(180deg);}
+
+/* ── indicator body ── */
+.ind-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border);}
+.ind-card.open .ind-body{display:block;}
+.na-all-row{display:flex;align-items:center;gap:10px;padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+.na-all-row label{font-size:12px;color:var(--muted);}
+.toggle{position:relative;width:36px;height:20px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;position:absolute;}
+.slider{position:absolute;inset:0;background:var(--border);border-radius:10px;transition:.2s;}
+.slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#9ca3af;border-radius:50%;transition:.2s;}
+.toggle input:checked+.slider{background:#374151;}
+.toggle input:checked+.slider::before{transform:translateX(16px);background:#6b7280;}
+
+/* ── check items ── */
+.item-row{display:flex;align-items:flex-start;gap:12px;padding:7px 0;border-bottom:1px solid #1a2235;}
+.item-row:last-child{border-bottom:none;}
+.item-type{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;min-width:30px;text-align:center;margin-top:2px;flex-shrink:0;}
+.type-p{background:#0c2640;color:#60a5fa;}
+.type-b{background:#1a2535;color:#94a3b8;}
+.type-c{background:#1a1a2e;color:#7c3aed;}
+.item-text{flex:1;font-size:13px;color:var(--text);}
+.item-text.na-text{color:var(--muted);text-decoration:line-through;}
+.pill-group{display:flex;gap:4px;flex-shrink:0;margin-top:1px;}
+.pill{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:.15s;white-space:nowrap;}
+.pill:hover{border-color:var(--text);color:var(--text);}
+.pill.active-yes{background:#0d2620;border-color:var(--yes);color:#34d399;}
+.pill.active-no{background:#2d1515;border-color:var(--no);color:#f87171;}
+.pill.active-na{background:#1f2937;border-color:#4b5563;color:#9ca3af;}
+.pill:disabled,.pill[disabled]{opacity:.3;cursor:default;pointer-events:none;}
+
+/* ── 업종 배너 ── */
+.industry-bar{
+  background:#0a1120;border-bottom:1px solid var(--border);
+  padding:9px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;
+}
+.ib-empty{color:var(--muted);flex:1;}
+.ib-name{font-weight:600;color:var(--text);}
+.ib-chip{font-size:11px;padding:2px 8px;border-radius:8px;white-space:nowrap;}
+.ib-chip-apply{background:#0a2a1f;color:#6ee7b7;}
+.ib-chip-excl{background:#1f2937;color:#6b7280;}
+.btn-xs{padding:3px 10px;font-size:11px;border-radius:5px;cursor:pointer;font-family:inherit;font-weight:500;border:none;}
+.btn-xs-accent{background:var(--accent);color:#fff;}
+.btn-xs-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-xs-ghost:hover{color:var(--text);}
+.btn-xs-danger{background:transparent;color:#ef4444;border:1px solid #ef444460;}
+.btn-xs-danger:hover{background:#ef444415;}
+
+/* ── 업종 선택 패널 ── */
+.ig-panel{background:#0d1623;border-bottom:2px solid var(--accent);padding:18px 20px;display:none;}
+.ig-panel.open{display:block;}
+.ig-panel-hdr{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.ig-panel-title{font-size:14px;font-weight:600;}
+.ig-panel-sub{font-size:12px;color:var(--muted);}
+.ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px;}
+.ig-card{
+  background:var(--panel2);border:2px solid var(--border);border-radius:var(--radius);
+  padding:14px;cursor:pointer;transition:border-color .15s,background .15s;
+}
+.ig-card:hover{border-color:#3b4f70;background:#1e2d42;}
+.ig-card.ig-selected{border-color:var(--accent);background:#061a12;}
+.ig-card-icon{font-size:22px;margin-bottom:8px;}
+.ig-card-name{font-size:13px;font-weight:600;margin-bottom:3px;}
+.ig-card-desc{font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:10px;min-height:30px;}
+.ig-card-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.ig-chip-s{font-size:10px;padding:2px 7px;border-radius:7px;}
+.ig-chip-s-apply{background:#0a2a1f;color:#6ee7b7;}
+.ig-chip-s-excl{background:#1f2937;color:#6b7280;}
+.ig-panel-foot{margin-top:14px;display:flex;gap:8px;justify-content:flex-end;}
+
+/* ── 열외 지표 카드 ── */
+.badge-excluded{background:#1a1f2e;color:#4b5563;}
+.ind-card.ind-excluded{opacity:0.45;}
+.ind-card.ind-excluded .ind-head{background:transparent!important;cursor:default;}
+.ind-excl-body{
+  padding:12px 0 4px;display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);
+}
+
+/* ── preview restrictions ── */
+.tab.preview-disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
+
+/* ── print ── */
+@media print{
+  .topbar .btn,.tabs{print-color-adjust:exact;}
+  body{background:#fff;color:#111;}
+  .topbar{position:static;background:#fff;border-color:#ccc;}
+  .btn{display:none;}
+  .dashboard{background:#fff;}
+  .score-card{background:#f5f5f5;border-color:#ddd;}
+  .score-card .label,.score-card .sub{color:#666;}
+  .score-card .value{color:#111;}
+  .ind-card{background:#fff;border-color:#ddd;break-inside:avoid;}
+  .ind-body{display:block!important;}
+  .ind-head{background:#f9f9f9;}
+  .tabs{display:none;}
+  .tab-panel{display:block!important;}
+  .section-label{color:#444;}
+  .item-text{color:#111;}
+  .item-text.na-text{color:#999;}
+  .bar-fill{print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>ESG 자가진단 <small>동반성장위원회 중소기업 ESG 표준 가이드라인</small></h1>
+  <button class="btn btn-ghost" onclick="expandAll()">전체 펼치기</button>
+  <button class="btn btn-primary" onclick="window.print()">🖨 인쇄 / PDF</button>
+  <button class="btn btn-danger" onclick="confirmReset()">초기화</button>
+</div>
+
+<!-- 업종군 배너 -->
+<div class="industry-bar" id="industry-bar"></div>
+
+<!-- 업종군 선택 패널 -->
+<div class="ig-panel" id="ig-panel">
+  <div class="ig-panel-hdr">
+    <span class="ig-panel-title">업종군 선택</span>
+    <span class="ig-panel-sub">선택한 업종에 해당하지 않는 지표를 자동으로 '해당없음' 처리합니다</span>
+  </div>
+  <div class="ig-grid" id="ig-grid"></div>
+  <div class="ig-panel-foot">
+    <button class="btn btn-ghost" onclick="closeIgPanel()">닫기</button>
+  </div>
+</div>
+
+<div class="dashboard">
+  <div class="score-card">
+    <div class="label">전체 준수율</div>
+    <div class="value color-total" id="sc-total">—</div>
+    <div class="sub" id="sc-total-sub">진단 진행 중</div>
+    <div class="bar"><div class="bar-fill fill-E" id="bar-total" style="width:0%"></div></div>
+  </div>
+  <div class="score-card">
+    <div class="label">E 환경</div>
+    <div class="value color-E" id="sc-E">—</div>
+    <div class="sub" id="sc-E-sub">14개 지표</div>
+    <div class="bar"><div class="bar-fill fill-E" id="bar-E" style="width:0%"></div></div>
+  </div>
+  <div class="score-card">
+    <div class="label">S 사회</div>
+    <div class="value color-S" id="sc-S">—</div>
+    <div class="sub" id="sc-S-sub">54개 지표</div>
+    <div class="bar"><div class="bar-fill fill-S" id="bar-S" style="width:0%"></div></div>
+  </div>
+  <div class="score-card">
+    <div class="label">G 지배구조</div>
+    <div class="value color-G" id="sc-G">—</div>
+    <div class="sub" id="sc-G-sub">11개 지표</div>
+    <div class="bar"><div class="bar-fill fill-G" id="bar-G" style="width:0%"></div></div>
+  </div>
+  <div class="score-card">
+    <div class="label">공통 지표 준수율</div>
+    <div class="value" id="sc-common" style="color:var(--text)">—</div>
+    <div class="sub" id="sc-common-sub">49개 공통 지표</div>
+    <div class="bar"><div class="bar-fill" id="bar-common" style="width:0%;background:var(--accent)"></div></div>
+  </div>
+  <div class="score-card" id="sc-ind-card" onclick="openIgPanel()" style="cursor:pointer" title="클릭하여 업종군 선택">
+    <div class="label">업종별 지표 준수율 <span id="sc-ind-ig" style="font-size:10px;color:var(--muted)"></span></div>
+    <div class="value" id="sc-ind" style="color:var(--text)">—</div>
+    <div class="sub" id="sc-ind-sub">30개 업종별 지표</div>
+    <div class="bar"><div class="bar-fill" id="bar-ind" style="width:0%;background:#f59e0b"></div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="E" onclick="switchTab('E')">🌿 E 환경 (14)</div>
+  <div class="tab" data-tab="S" onclick="switchTab('S')">👥 S 사회 (54)</div>
+  <div class="tab" data-tab="G" onclick="switchTab('G')">⚖ G 지배구조 (11)</div>
+</div>
+
+<div class="content" id="content"></div>
+
+<script>
+// ── 업종별 지표 전체 목록 (30개 중 환경 6 + 사회 8 = 14개 환경/안전 특화) ──
+const ALL_IND_IDS = ['E-08','E-10','E-11','E-12','E-13','E-14',
+                     'S-29','S-30','S-31','S-32','S-33','S-35','S-36','S-42'];
+
+const INDUSTRY_GROUPS = [
+  { id:'manufacturing', icon:'🏭', name:'제조업',
+    desc:'금속·기계·자동차·전자·화학·식음료·섬유 등',
+    applicable:['E-08','E-10','E-11','E-12','E-13','E-14','S-29','S-30','S-31','S-32','S-33','S-35','S-36','S-42']
+  },
+  { id:'construction', icon:'🏗', name:'건설업',
+    desc:'종합건설·전문건설·인테리어·설비공사 등',
+    applicable:['E-10','E-11','E-12','E-13','S-29','S-30','S-31','S-32','S-33','S-35','S-36','S-42']
+  },
+  { id:'logistics', icon:'🚚', name:'물류·운수업',
+    desc:'화물운송·택배·창고·하역·여객운송 등',
+    applicable:['E-11','E-13','S-29','S-35','S-36','S-42']
+  },
+  { id:'retail', icon:'🛒', name:'도소매·유통업',
+    desc:'도매·소매·온라인유통·식자재유통 등',
+    applicable:['E-14','S-35','S-42']
+  },
+  { id:'food', icon:'🍽', name:'음식·숙박업',
+    desc:'식당·카페·베이커리·호텔·숙박시설 등',
+    applicable:['E-08','S-35','S-42']
+  },
+  { id:'service', icon:'💻', name:'IT·서비스·사무',
+    desc:'소프트웨어·금융·교육·의료·컨설팅 등',
+    applicable:[]
+  },
+];
+
+// p=점검(scoring), b=보조, c=확인
+const DOMAINS = [
+{id:'E',name:'환경',sections:[
+  {id:'E1',name:'환경경영',inds:[
+    {id:'E-01',name:'환경 관련 법규 파악 및 준수',t:'공통',items:[
+      {t:'p',tx:'사업장에 적용되는 환경 관련 법규 목록을 파악하고 있다'},
+      {t:'p',tx:'환경 관련 법규 위반 사항이 없다 (최근 3년 기준)'},
+      {t:'b',tx:'환경 관련 허가·신고 현황을 관리하고 있다'},
+      {t:'c',tx:'환경 법규 위반 과태료·행정처분 이력을 관리하고 있다'},
+    ]},
+    {id:'E-02',name:'환경경영 체계 구축',t:'공통',items:[
+      {t:'p',tx:'환경경영 방침을 수립하고 임직원에게 공개하고 있다'},
+      {t:'p',tx:'환경경영 담당자(부서)를 지정하고 있다'},
+      {t:'b',tx:'환경경영시스템(ISO 14001 등) 인증 또는 이에 준하는 체계를 운영하고 있다'},
+      {t:'c',tx:'지속가능경영보고서 또는 ESG 보고서를 발간하고 있다'},
+    ]},
+    {id:'E-03',name:'환경목표 수립 및 이행',t:'공통',items:[
+      {t:'p',tx:'사업장의 환경 관련 목표를 수립하고 있다'},
+      {t:'p',tx:'환경 목표 이행 실적을 정기적으로 모니터링하고 있다'},
+      {t:'b',tx:'환경 개선 계획 및 투자 계획을 수립하고 있다'},
+    ]},
+    {id:'E-04',name:'임직원 환경 인식 제고',t:'공통',items:[
+      {t:'p',tx:'임직원을 대상으로 환경 관련 교육을 연 1회 이상 실시하고 있다'},
+      {t:'b',tx:'환경 교육 계획을 수립하고 연간 교육 실적을 관리하고 있다'},
+      {t:'c',tx:'환경 관련 우수 사례를 임직원과 공유하고 있다'},
+    ]},
+  ]},
+  {id:'E2',name:'환경관리',inds:[
+    {id:'E-05',name:'에너지 사용량 관리',t:'공통',items:[
+      {t:'p',tx:'에너지 사용량을 모니터링하고 기록·관리하고 있다'},
+      {t:'p',tx:'에너지 사용량을 감축하기 위한 활동을 추진하고 있다'},
+      {t:'b',tx:'에너지 사용량 감축 목표를 수립하고 있다'},
+      {t:'c',tx:'에너지 관련 인증 또는 진단을 받은 이력이 있다'},
+    ]},
+    {id:'E-06',name:'온실가스 배출량 관리',t:'공통',items:[
+      {t:'p',tx:'온실가스 배출량(직접·간접)을 산정하고 있다'},
+      {t:'p',tx:'온실가스 배출량 감축을 위한 활동을 추진하고 있다'},
+      {t:'b',tx:'온실가스 배출량 감축 목표를 수립하고 있다'},
+      {t:'c',tx:'온실가스 감축 실적을 외부에 공개하고 있다'},
+    ]},
+    {id:'E-07',name:'용수 사용량 관리',t:'공통',items:[
+      {t:'p',tx:'용수 사용량을 모니터링하고 기록하고 있다'},
+      {t:'p',tx:'용수 절약 활동을 추진하고 있다'},
+      {t:'b',tx:'용수 사용량 감축 목표를 수립하고 있다'},
+    ]},
+    {id:'E-08',name:'폐수 관리',t:'업종별',items:[
+      {t:'p',tx:'폐수 발생 현황을 파악하고 관련 법규를 준수하고 있다'},
+      {t:'p',tx:'폐수 배출 수질 기준을 준수하고 있다'},
+      {t:'b',tx:'폐수 처리 설비를 적정하게 유지·관리하고 있다'},
+      {t:'c',tx:'폐수 발생량 감축을 위한 활동을 추진하고 있다'},
+    ]},
+    {id:'E-09',name:'폐기물 관리',t:'공통',items:[
+      {t:'p',tx:'폐기물 발생 현황을 파악하고 관련 법규를 준수하고 있다'},
+      {t:'p',tx:'폐기물을 적법하게 처리하고 있다 (위탁 포함)'},
+      {t:'b',tx:'폐기물 발생량을 감축하기 위한 활동을 추진하고 있다'},
+      {t:'c',tx:'폐기물 재활용률 제고를 위한 노력을 하고 있다'},
+    ]},
+    {id:'E-10',name:'화학물질 관리',t:'업종별',items:[
+      {t:'p',tx:'취급 화학물질 현황을 파악하고 관련 법규(화학물질관리법 등)를 준수하고 있다'},
+      {t:'p',tx:'화학물질 취급 근로자에게 안전 정보(MSDS 등)를 제공하고 있다'},
+      {t:'p',tx:'화학물질 사고 예방 및 대응 절차를 갖추고 있다'},
+      {t:'b',tx:'유해화학물질 사용량을 감축하기 위한 활동을 추진하고 있다'},
+    ]},
+    {id:'E-11',name:'대기오염물질 관리',t:'업종별',items:[
+      {t:'p',tx:'대기오염물질 배출 현황을 파악하고 관련 법규를 준수하고 있다'},
+      {t:'p',tx:'대기오염물질 배출 허용기준을 준수하고 있다'},
+      {t:'b',tx:'대기오염물질 저감 설비를 적정하게 유지·관리하고 있다'},
+    ]},
+    {id:'E-12',name:'토양·지하수 오염 관리',t:'업종별',items:[
+      {t:'p',tx:'토양 또는 지하수 오염 가능성을 파악하고 있다'},
+      {t:'p',tx:'토양·지하수 오염 관련 법규를 준수하고 있다'},
+      {t:'b',tx:'토양·지하수 오염 예방 활동을 추진하고 있다'},
+    ]},
+    {id:'E-13',name:'소음·진동 관리',t:'업종별',items:[
+      {t:'p',tx:'소음·진동 발생 현황을 파악하고 관련 법규를 준수하고 있다'},
+      {t:'p',tx:'소음·진동 배출 허용기준을 준수하고 있다'},
+      {t:'b',tx:'소음·진동 저감을 위한 활동을 추진하고 있다'},
+    ]},
+    {id:'E-14',name:'녹색구매 실천',t:'업종별',items:[
+      {t:'p',tx:'친환경 제품·서비스 구매를 위한 기준을 마련하고 있다'},
+      {t:'p',tx:'친환경 제품·서비스 구매 실적을 관리하고 있다'},
+      {t:'b',tx:'공급망의 환경 영향을 고려한 구매 정책을 운영하고 있다'},
+    ]},
+  ]},
+]},
+
+{id:'S',name:'사회',sections:[
+  {id:'S1',name:'근로자 — 근로조건',inds:[
+    {id:'S-01',name:'고용 관련 법규 준수',t:'공통',items:[
+      {t:'p',tx:'근로기준법 등 고용 관련 법규를 준수하고 있다'},
+      {t:'p',tx:'고용 관련 법규 위반 사항이 없다 (최근 3년 기준)'},
+      {t:'b',tx:'고용 관련 법규 위반 과태료·행정처분 이력이 없다'},
+    ]},
+    {id:'S-02',name:'근로계약 체결 및 관리',t:'공통',items:[
+      {t:'p',tx:'근로자와 서면 근로계약서를 작성하고 교부하고 있다'},
+      {t:'p',tx:'근로계약서에 법적 필수 사항(임금, 근로시간, 업무내용 등)을 명시하고 있다'},
+      {t:'b',tx:'근로계약서 사본을 근로자가 언제든지 확인할 수 있도록 하고 있다'},
+    ]},
+    {id:'S-03',name:'최저임금 이행',t:'공통',items:[
+      {t:'p',tx:'모든 근로자에게 법정 최저임금 이상을 지급하고 있다'},
+      {t:'p',tx:'최저임금 산입 범위를 준수하고 있다'},
+      {t:'b',tx:'최저임금 변동 사항을 사업장 내에 게시하고 있다'},
+    ]},
+    {id:'S-04',name:'법정 근로시간 준수',t:'공통',items:[
+      {t:'p',tx:'법정 근로시간(주 40시간, 연장 포함 최대 52시간)을 준수하고 있다'},
+      {t:'p',tx:'연장·야간·휴일 근로에 대한 가산임금을 지급하고 있다'},
+      {t:'b',tx:'근로시간 기록을 보존·관리하고 있다'},
+    ]},
+    {id:'S-05',name:'법정 휴일·휴가 부여',t:'공통',items:[
+      {t:'p',tx:'법정 휴일(주휴일, 공휴일 등)을 부여하고 있다'},
+      {t:'p',tx:'법정 연차유급휴가를 부여하고 있다'},
+      {t:'b',tx:'미사용 연차휴가에 대해 수당을 지급하고 있다'},
+    ]},
+    {id:'S-06',name:'임금체불 예방',t:'공통',items:[
+      {t:'p',tx:'임금을 정해진 날짜에 전액 지급하고 있다'},
+      {t:'p',tx:'임금체불 이력이 없다 (최근 3년 기준)'},
+      {t:'b',tx:'임금 명세서를 근로자에게 교부하고 있다'},
+    ]},
+    {id:'S-07',name:'퇴직급여 보장',t:'공통',items:[
+      {t:'p',tx:'퇴직급여제도(퇴직금 또는 퇴직연금)를 운영하고 있다'},
+      {t:'p',tx:'퇴직급여를 적법하게 지급하고 있다'},
+      {t:'b',tx:'퇴직연금 가입 및 적립 현황을 관리하고 있다'},
+    ]},
+    {id:'S-08',name:'4대 사회보험 적용',t:'공통',items:[
+      {t:'p',tx:'모든 근로자에게 4대 사회보험(국민연금·건강보험·고용보험·산재보험)을 적용하고 있다'},
+      {t:'p',tx:'사회보험료를 기한 내에 납부하고 있다'},
+      {t:'b',tx:'사회보험 가입 현황을 정기적으로 점검하고 있다'},
+    ]},
+    {id:'S-09',name:'고용 평등 실현',t:'공통',items:[
+      {t:'p',tx:'채용·임금·승진 등에서 성별·연령·국적·장애 등을 이유로 한 차별이 없다'},
+      {t:'p',tx:'남녀고용평등법 등 고용상 차별 관련 법규를 준수하고 있다'},
+      {t:'b',tx:'고용 평등 이행 현황을 정기적으로 점검하고 있다'},
+    ]},
+    {id:'S-10',name:'직장 내 괴롭힘 예방',t:'공통',items:[
+      {t:'p',tx:'직장 내 괴롭힘 예방 교육을 실시하고 있다'},
+      {t:'p',tx:'직장 내 괴롭힘 신고·처리 절차를 마련하고 있다'},
+      {t:'b',tx:'직장 내 괴롭힘 사건 처리 결과를 기록·관리하고 있다'},
+    ]},
+    {id:'S-11',name:'직장 내 성희롱 예방',t:'공통',items:[
+      {t:'p',tx:'직장 내 성희롱 예방 교육을 연 1회 이상 실시하고 있다'},
+      {t:'p',tx:'직장 내 성희롱 신고·처리 절차를 마련하고 있다'},
+      {t:'b',tx:'성희롱 예방 교육 결과를 관할 노동관서에 보고하고 있다'},
+    ]},
+    {id:'S-12',name:'장애인 고용',t:'공통',items:[
+      {t:'p',tx:'장애인 고용촉진 및 직업재활법을 준수하고 있다'},
+      {t:'p',tx:'장애인 고용의무를 이행하고 있다 (의무 적용 사업장)'},
+      {t:'b',tx:'장애인 편의시설을 적절히 갖추고 있다'},
+    ]},
+    {id:'S-13',name:'근로자 단결권 보장',t:'공통',items:[
+      {t:'p',tx:'근로자의 단결권·단체교섭권·단체행동권을 보장하고 있다'},
+      {t:'p',tx:'노동조합 및 노동관계조정법을 준수하고 있다'},
+      {t:'b',tx:'노사 협의체를 정기적으로 운영하고 있다'},
+    ]},
+    {id:'S-14',name:'아동·강제 노동 금지',t:'공통',items:[
+      {t:'p',tx:'연소 근로자(18세 미만) 고용 시 근로기준법 관련 규정을 준수하고 있다'},
+      {t:'p',tx:'강제 노동(인신매매, 임금 착취 등)에 관여하지 않고 있다'},
+      {t:'b',tx:'외국인 근로자 고용 시 관련 법규를 준수하고 있다'},
+    ]},
+    {id:'S-15',name:'비정규직 처우 개선',t:'공통',items:[
+      {t:'p',tx:'비정규직 근로자에 대한 차별을 금지하고 있다'},
+      {t:'p',tx:'기간제 및 단시간근로자 보호 등에 관한 법률을 준수하고 있다'},
+      {t:'b',tx:'비정규직의 정규직 전환을 위한 노력을 하고 있다'},
+    ]},
+    {id:'S-16',name:'육아휴직 운영',t:'공통',items:[
+      {t:'p',tx:'근로자가 육아휴직을 신청·사용할 수 있는 환경을 조성하고 있다'},
+      {t:'p',tx:'육아휴직 사용을 이유로 불이익 처우를 하지 않고 있다'},
+      {t:'b',tx:'육아휴직 복귀 후 동등한 직무에 복귀하도록 지원하고 있다'},
+    ]},
+    {id:'S-17',name:'인력 채용 및 관리',t:'공통',items:[
+      {t:'p',tx:'공정하고 투명한 채용 절차를 운영하고 있다'},
+      {t:'p',tx:'채용 과정에서 개인정보를 적법하게 수집·관리하고 있다'},
+      {t:'b',tx:'채용 기준과 절차를 사전에 공개하고 있다'},
+    ]},
+    {id:'S-18',name:'임직원 교육훈련 지원',t:'공통',items:[
+      {t:'p',tx:'임직원의 직무능력 향상을 위한 교육을 지원하고 있다'},
+      {t:'p',tx:'연간 교육훈련 계획을 수립하고 실행하고 있다'},
+      {t:'b',tx:'교육훈련 실적을 기록하고 관리하고 있다'},
+    ]},
+    {id:'S-19',name:'임금 공정성 확보',t:'공통',items:[
+      {t:'p',tx:'동일 직무·직급에 대한 임금 체계가 합리적으로 운영되고 있다'},
+      {t:'p',tx:'임금 결정 기준이 명확하게 규정되어 있다'},
+      {t:'b',tx:'성별 임금 격차를 모니터링하고 있다'},
+    ]},
+    {id:'S-20',name:'인사평가 제도 운영',t:'공통',items:[
+      {t:'p',tx:'공정한 인사평가 기준과 절차를 마련하고 있다'},
+      {t:'p',tx:'인사평가 결과를 근로자에게 통보하고 있다'},
+      {t:'b',tx:'인사평가에 대한 이의신청 절차를 마련하고 있다'},
+    ]},
+  ]},
+  {id:'S2',name:'근로자 — 작업환경',inds:[
+    {id:'S-21',name:'산업안전보건 법규 준수',t:'공통',items:[
+      {t:'p',tx:'산업안전보건법 등 관련 법규를 준수하고 있다'},
+      {t:'p',tx:'산업안전보건 관련 법규 위반 사항이 없다 (최근 3년)'},
+      {t:'b',tx:'안전보건 관련 행정처분 이력이 없다'},
+    ]},
+    {id:'S-22',name:'안전보건 관리체계 구축',t:'공통',items:[
+      {t:'p',tx:'안전보건 방침을 수립하고 사업장 내에 게시하고 있다'},
+      {t:'p',tx:'안전보건 관리 담당자(안전관리자 등)를 선임하고 있다'},
+      {t:'p',tx:'안전보건위원회(또는 노사협의체)를 운영하고 있다 (의무 적용 사업장)'},
+      {t:'b',tx:'안전보건경영시스템(ISO 45001 등)을 운영하고 있다'},
+    ]},
+    {id:'S-23',name:'위험성 평가 실시',t:'공통',items:[
+      {t:'p',tx:'사업장의 유해·위험 요인을 파악하고 위험성 평가를 실시하고 있다'},
+      {t:'p',tx:'위험성 평가 결과에 따른 개선 조치를 이행하고 있다'},
+      {t:'b',tx:'위험성 평가 결과를 근로자와 공유하고 있다'},
+      {t:'c',tx:'위험성 평가를 매년 정기적으로 실시하고 있다'},
+    ]},
+    {id:'S-24',name:'안전보건 교육 실시',t:'공통',items:[
+      {t:'p',tx:'법정 안전보건 교육을 실시하고 있다 (신규 채용, 정기 교육 등)'},
+      {t:'p',tx:'안전보건 교육 실시 기록을 보존·관리하고 있다'},
+      {t:'b',tx:'안전보건 교육 내용을 업무 특성에 맞게 구성하고 있다'},
+    ]},
+    {id:'S-25',name:'사고 조사 및 재발 방지',t:'공통',items:[
+      {t:'p',tx:'산업재해 발생 시 원인 조사를 실시하고 있다'},
+      {t:'p',tx:'산업재해 재발 방지 대책을 수립하고 이행하고 있다'},
+      {t:'b',tx:'아차사고(위험 발생 사례)를 수집·분석하고 있다'},
+      {t:'c',tx:'산업재해 발생 현황을 기록·관리하고 있다'},
+    ]},
+    {id:'S-26',name:'개인보호구 지급 및 관리',t:'공통',items:[
+      {t:'p',tx:'유해·위험 작업에 적합한 개인보호구를 지급하고 있다'},
+      {t:'p',tx:'개인보호구의 착용 여부를 관리·감독하고 있다'},
+      {t:'b',tx:'개인보호구 지급 및 교체 이력을 관리하고 있다'},
+    ]},
+    {id:'S-27',name:'화재·폭발 예방',t:'공통',items:[
+      {t:'p',tx:'소화기, 화재경보기 등 소방 설비를 법적 기준에 따라 관리하고 있다'},
+      {t:'p',tx:'화재 예방 및 대피 훈련을 정기적으로 실시하고 있다'},
+      {t:'b',tx:'인화성·폭발성 물질을 법적 기준에 따라 보관·관리하고 있다'},
+    ]},
+    {id:'S-28',name:'전기 안전 관리',t:'공통',items:[
+      {t:'p',tx:'전기 설비에 대한 법정 안전 검사를 실시하고 있다'},
+      {t:'p',tx:'전기 관련 위험 요인(과부하, 노후 설비 등)을 관리하고 있다'},
+      {t:'b',tx:'전기 담당자를 지정하고 정기적으로 점검하고 있다'},
+    ]},
+    {id:'S-29',name:'기계·기구 안전 관리',t:'업종별',items:[
+      {t:'p',tx:'기계·기구에 대한 법정 안전 검사를 실시하고 있다'},
+      {t:'p',tx:'기계·기구의 방호 장치를 적정하게 설치·관리하고 있다'},
+      {t:'b',tx:'기계·기구 취급 근로자에 대한 안전 교육을 실시하고 있다'},
+    ]},
+    {id:'S-30',name:'화학물질 안전 관리',t:'업종별',items:[
+      {t:'p',tx:'취급 화학물질의 물질안전보건자료(MSDS)를 비치하고 있다'},
+      {t:'p',tx:'MSDS 내용에 따른 안전 조치를 이행하고 있다'},
+      {t:'b',tx:'화학물질 취급 근로자에게 정기적으로 안전 교육을 실시하고 있다'},
+    ]},
+    {id:'S-31',name:'밀폐공간 작업 안전',t:'업종별',items:[
+      {t:'p',tx:'밀폐공간 작업 전 산소 및 유해가스 농도를 측정하고 있다'},
+      {t:'p',tx:'밀폐공간 작업 시 안전 수칙(감시인 배치, 환기 등)을 준수하고 있다'},
+      {t:'b',tx:'밀폐공간 작업 허가제를 운영하고 있다'},
+    ]},
+    {id:'S-32',name:'추락 예방',t:'업종별',items:[
+      {t:'p',tx:'추락 위험 장소에 안전 난간, 안전망 등 방호 설비를 설치하고 있다'},
+      {t:'p',tx:'고소 작업 시 안전 장비(안전대 등)를 착용하도록 하고 있다'},
+      {t:'b',tx:'추락 위험 장소에 대한 접근 통제를 실시하고 있다'},
+    ]},
+    {id:'S-33',name:'폭발성 물질 관리',t:'업종별',items:[
+      {t:'p',tx:'폭발성·인화성 물질을 관련 법규에 따라 보관·관리하고 있다'},
+      {t:'p',tx:'폭발 위험 장소에 방폭 설비를 설치하고 있다'},
+      {t:'b',tx:'폭발 사고 예방 교육을 실시하고 있다'},
+    ]},
+    {id:'S-34',name:'직업병 예방 관리',t:'공통',items:[
+      {t:'p',tx:'직업성 질환 예방을 위한 조치를 취하고 있다'},
+      {t:'p',tx:'직업병 발생 시 원인 조사 및 재발 방지 대책을 수립하고 있다'},
+      {t:'b',tx:'직업병 유소견자에 대한 사후 조치를 실시하고 있다'},
+    ]},
+    {id:'S-35',name:'근골격계 질환 예방',t:'업종별',items:[
+      {t:'p',tx:'근골격계 부담 작업을 파악하고 유해 요인 조사를 실시하고 있다'},
+      {t:'p',tx:'근골격계 질환 예방을 위한 개선 조치를 이행하고 있다'},
+      {t:'b',tx:'근골격계 질환 예방 교육을 실시하고 있다'},
+    ]},
+    {id:'S-36',name:'작업환경 측정',t:'업종별',items:[
+      {t:'p',tx:'법정 작업환경 측정 대상 사업장에서 정기적으로 측정하고 있다'},
+      {t:'p',tx:'작업환경 측정 결과에 따른 개선 조치를 이행하고 있다'},
+      {t:'b',tx:'작업환경 측정 결과를 근로자에게 공개하고 있다'},
+    ]},
+    {id:'S-37',name:'근로자 건강검진',t:'공통',items:[
+      {t:'p',tx:'법정 건강검진(일반·특수 등)을 실시하고 있다'},
+      {t:'p',tx:'건강검진 결과에 따른 사후 조치를 실시하고 있다'},
+      {t:'b',tx:'건강검진 수검률을 관리하고 있다'},
+    ]},
+    {id:'S-38',name:'근로자 심리 건강 지원',t:'공통',items:[
+      {t:'p',tx:'근로자의 정신 건강을 지원하는 프로그램을 운영하고 있다 (EAP 등)'},
+      {t:'b',tx:'스트레스 예방 및 관리를 위한 활동을 추진하고 있다'},
+      {t:'c',tx:'직장 내 스트레스 실태를 정기적으로 파악하고 있다'},
+    ]},
+    {id:'S-39',name:'보육 지원',t:'공통',items:[
+      {t:'p',tx:'직장어린이집 설치 의무를 이행하거나 보육비를 지원하고 있다 (의무 적용 사업장)'},
+      {t:'b',tx:'임직원의 일·가정 양립을 지원하는 제도를 운영하고 있다'},
+    ]},
+    {id:'S-40',name:'유연근무제도 운영',t:'공통',items:[
+      {t:'p',tx:'유연근무제(탄력적 근로시간제, 재량근무제 등) 도입 여부를 검토하고 있다'},
+      {t:'b',tx:'근로자가 유연근무를 신청할 수 있는 절차를 마련하고 있다'},
+      {t:'c',tx:'유연근무 이용자 수와 만족도를 파악하고 있다'},
+    ]},
+    {id:'S-41',name:'쾌적한 작업장 환경 관리',t:'공통',items:[
+      {t:'p',tx:'작업장 조도·온도·습도 등 물리적 환경을 적정하게 유지하고 있다'},
+      {t:'p',tx:'휴게시설·화장실 등 편의시설을 법적 기준에 따라 갖추고 있다'},
+      {t:'b',tx:'작업장 환경 개선을 위한 활동을 주기적으로 추진하고 있다'},
+    ]},
+    {id:'S-42',name:'보건관리자 선임',t:'업종별',items:[
+      {t:'p',tx:'보건관리자 선임 의무가 있는 사업장에서 보건관리자를 선임하고 있다'},
+      {t:'p',tx:'보건관리자가 법정 업무를 수행하고 있다'},
+      {t:'b',tx:'보건관리자의 직무 수행을 위한 시간과 시설을 지원하고 있다'},
+    ]},
+  ]},
+  {id:'S3',name:'협력사',inds:[
+    {id:'S-43',name:'협력사 ESG 역량 지원',t:'공통',items:[
+      {t:'p',tx:'협력사의 ESG 관리 역량 향상을 위한 지원 프로그램을 운영하고 있다'},
+      {t:'b',tx:'협력사와 ESG 관련 정보를 공유하고 있다'},
+      {t:'c',tx:'협력사 ESG 지원 성과를 관리하고 있다'},
+    ]},
+    {id:'S-44',name:'협력사 선정 기준 관리',t:'공통',items:[
+      {t:'p',tx:'협력사 선정 시 ESG 또는 윤리·사회·환경 기준을 반영하고 있다'},
+      {t:'b',tx:'협력사 선정 기준을 협력사에 안내하고 있다'},
+      {t:'c',tx:'기존 협력사에 대한 ESG 기준 적용 여부를 검토하고 있다'},
+    ]},
+    {id:'S-45',name:'협력사와의 공정한 계약',t:'공통',items:[
+      {t:'p',tx:'협력사와의 계약을 서면으로 체결하고 있다'},
+      {t:'p',tx:'계약 내용에 대금 지급 조건, 납기 등을 명확히 기재하고 있다'},
+      {t:'b',tx:'계약 내용을 협력사가 충분히 이해한 상태에서 계약하고 있다'},
+    ]},
+    {id:'S-46',name:'협력사 대금 적기 지급',t:'공통',items:[
+      {t:'p',tx:'협력사 납품 대금을 계약에서 정한 기일 내에 지급하고 있다'},
+      {t:'p',tx:'하도급법 등 관련 법규를 준수하고 있다'},
+      {t:'b',tx:'협력사 대금 지급 현황을 관리하고 있다'},
+    ]},
+    {id:'S-47',name:'협력사 기술·지식재산권 보호',t:'공통',items:[
+      {t:'p',tx:'협력사의 기술 정보 및 영업 비밀을 보호하고 있다'},
+      {t:'p',tx:'협력사 기술 탈취 행위를 하지 않고 있다'},
+      {t:'b',tx:'기술 보호 관련 사항을 계약서에 명시하고 있다'},
+    ]},
+    {id:'S-48',name:'공급망 인권 관리',t:'공통',items:[
+      {t:'p',tx:'공급망 내 인권 침해 위험을 파악하고 있다'},
+      {t:'b',tx:'협력사의 인권 준수 여부를 확인하고 있다'},
+      {t:'c',tx:'공급망 인권 문제 발생 시 대응 절차를 마련하고 있다'},
+    ]},
+    {id:'S-49',name:'협력사 안전보건 지원',t:'공통',items:[
+      {t:'p',tx:'사내 협력사 근로자의 안전보건을 위한 조치를 취하고 있다'},
+      {t:'p',tx:'협력사 근로자에 대한 안전보건 교육을 지원하고 있다'},
+      {t:'b',tx:'협력사 작업장의 안전보건 실태를 점검하고 있다'},
+    ]},
+  ]},
+  {id:'S4',name:'이해관계자 일반',inds:[
+    {id:'S-50',name:'제품·서비스 고객 안전',t:'공통',items:[
+      {t:'p',tx:'제공하는 제품·서비스가 고객의 안전과 건강에 미치는 영향을 파악하고 있다'},
+      {t:'p',tx:'제품 안전 관련 법규를 준수하고 있다'},
+      {t:'b',tx:'고객 안전 관련 사고 발생 시 신속하게 대응하고 있다'},
+    ]},
+    {id:'S-51',name:'개인정보 보호',t:'공통',items:[
+      {t:'p',tx:'개인정보 보호법 등 관련 법규를 준수하고 있다'},
+      {t:'p',tx:'개인정보 수집·이용·제공 동의를 적법하게 받고 있다'},
+      {t:'p',tx:'개인정보 보호 책임자를 지정하고 있다'},
+      {t:'b',tx:'개인정보 보호 교육을 실시하고 있다'},
+    ]},
+    {id:'S-52',name:'고객 불만 처리',t:'공통',items:[
+      {t:'p',tx:'고객 불만 접수 및 처리 절차를 마련하고 있다'},
+      {t:'p',tx:'고객 불만을 정해진 기한 내에 처리하고 있다'},
+      {t:'b',tx:'고객 불만 처리 결과를 분석하여 개선에 활용하고 있다'},
+    ]},
+    {id:'S-53',name:'지역사회 기여',t:'공통',items:[
+      {t:'p',tx:'지역사회 발전에 기여하는 활동을 추진하고 있다'},
+      {t:'b',tx:'지역 인재 채용, 지역 기업 구매 등 지역사회 상생 활동을 하고 있다'},
+      {t:'c',tx:'지역사회 기여 활동 성과를 관리하고 있다'},
+    ]},
+    {id:'S-54',name:'사회 공헌 활동',t:'공통',items:[
+      {t:'p',tx:'사회적 약자 지원, 봉사 활동 등 사회 공헌 활동을 추진하고 있다'},
+      {t:'b',tx:'사회 공헌 활동 계획을 수립하고 실행하고 있다'},
+      {t:'c',tx:'사회 공헌 활동 지출액과 성과를 관리하고 있다'},
+    ]},
+  ]},
+]},
+
+{id:'G',name:'지배구조',sections:[
+  {id:'G1',name:'주주',inds:[
+    {id:'G-01',name:'주주 권리 보호',t:'공통',items:[
+      {t:'p',tx:'주주의 권리(의결권, 정보 접근권 등)를 보장하고 있다'},
+      {t:'p',tx:'주주총회를 상법 등 관련 법규에 따라 적법하게 개최하고 있다'},
+      {t:'b',tx:'소수 주주의 권리를 보호하기 위한 조치를 취하고 있다'},
+    ]},
+    {id:'G-02',name:'배당 정책',t:'공통',items:[
+      {t:'p',tx:'배당 관련 정책 또는 기준을 마련하고 있다'},
+      {t:'b',tx:'배당 정책을 주주에게 공개하고 있다'},
+      {t:'c',tx:'이익 대비 적정한 배당을 실시하고 있다'},
+    ]},
+  ]},
+  {id:'G2',name:'이사회',inds:[
+    {id:'G-03',name:'이사회 구성 및 운영',t:'공통',items:[
+      {t:'p',tx:'이사회(또는 이에 준하는 의사결정 기구)를 운영하고 있다'},
+      {t:'p',tx:'이사회 회의록 등 운영 기록을 보관하고 있다'},
+      {t:'b',tx:'독립적인 사외이사를 선임하고 있다 (의무 적용 법인)'},
+    ]},
+    {id:'G-04',name:'내부 감사 기능',t:'공통',items:[
+      {t:'p',tx:'내부 감사(감사 또는 감사위원회) 기능을 운영하고 있다'},
+      {t:'p',tx:'내부 감사 결과에 따른 시정 조치를 이행하고 있다'},
+      {t:'b',tx:'외부 회계감사를 정기적으로 받고 있다 (의무 적용 법인)'},
+    ]},
+    {id:'G-05',name:'임원 보수 공정성',t:'공통',items:[
+      {t:'p',tx:'임원 보수 결정 기준이 합리적으로 마련되어 있다'},
+      {t:'b',tx:'임원 보수와 성과 간의 연계성을 검토하고 있다'},
+      {t:'c',tx:'임원 보수 수준이 외부에 공개되고 있다 (의무 적용 법인)'},
+    ]},
+  ]},
+  {id:'G3',name:'윤리·준법 경영',inds:[
+    {id:'G-06',name:'윤리·준법 경영 체계',t:'공통',items:[
+      {t:'p',tx:'윤리 경영 방침 또는 행동 강령을 수립하고 있다'},
+      {t:'p',tx:'임직원을 대상으로 윤리 교육을 실시하고 있다'},
+      {t:'b',tx:'윤리 경영 실천 현황을 모니터링하고 있다'},
+    ]},
+    {id:'G-07',name:'경영 정보 공개 투명성',t:'공통',items:[
+      {t:'p',tx:'재무 정보를 적법하게 공시하고 있다 (공시 의무 법인)'},
+      {t:'p',tx:'주요 경영 정보를 이해관계자에게 공개하고 있다'},
+      {t:'b',tx:'지속가능경영보고서 또는 ESG 보고서를 발간하고 있다'},
+    ]},
+    {id:'G-08',name:'조세 전략 준수',t:'공통',items:[
+      {t:'p',tx:'세법 등 조세 관련 법규를 준수하고 있다'},
+      {t:'p',tx:'탈세 또는 조세 회피 행위를 하지 않고 있다'},
+      {t:'b',tx:'세금 납부 현황을 투명하게 관리하고 있다'},
+    ]},
+    {id:'G-09',name:'반부패·뇌물 방지',t:'공통',items:[
+      {t:'p',tx:'부패방지법 등 반부패 관련 법규를 준수하고 있다'},
+      {t:'p',tx:'임직원이 직무 관련 금품·향응을 수수하지 않도록 교육하고 있다'},
+      {t:'p',tx:'반부패 정책 또는 지침을 수립하고 있다'},
+      {t:'b',tx:'부패 발생 시 신고·처리 절차를 마련하고 있다'},
+    ]},
+    {id:'G-10',name:'공정거래 준수',t:'공통',items:[
+      {t:'p',tx:'독점규제 및 공정거래에 관한 법률을 준수하고 있다'},
+      {t:'p',tx:'담합, 불공정거래 행위를 하지 않고 있다'},
+      {t:'b',tx:'공정거래 준수 교육을 실시하고 있다'},
+    ]},
+    {id:'G-11',name:'내부 제보 시스템 운영',t:'공통',items:[
+      {t:'p',tx:'임직원이 비윤리적·불법적 행위를 신고할 수 있는 채널을 마련하고 있다'},
+      {t:'p',tx:'신고자에 대한 불이익 방지 조치를 갖추고 있다'},
+      {t:'b',tx:'내부 신고 내용을 조사하고 결과를 처리하는 절차가 있다'},
+    ]},
+  ]},
+]},
+];
+
+// ── state ──
+const KEY = 'wf_esg_v1';
+let state = {};
+
+function loadState(){
+  try{ state = JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ state={}; }
+}
+function saveState(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+}
+function getItem(indId, i){ return (state[indId]||{})[i]||null; }
+function setItem(indId, i, val){ if(!state[indId]) state[indId]={}; state[indId][i]=val; saveState(); }
+function getNaAll(indId){
+  // 업종군에 의해 열외인 경우도 NA로 처리
+  const ind=findInd(indId);
+  if(ind && isIndustryExcluded(ind)) return true;
+  return !!(state[indId]||{})['_na'];
+}
+function setNaAll(indId, v){ if(!state[indId]) state[indId]={}; state[indId]['_na']=v; saveState(); }
+
+// ── 업종 helpers ──
+function getIndustryId(){ return state['_industry']||null; }
+function getIndustryGroup(){
+  const id=getIndustryId();
+  return id ? INDUSTRY_GROUPS.find(g=>g.id===id)||null : null;
+}
+function isIndustryExcluded(ind){
+  if(ind.t!=='업종별') return false;
+  const ig=getIndustryGroup();
+  if(!ig) return false;
+  return !ig.applicable.includes(ind.id);
+}
+
+// ── scoring ──
+function scoreIndicator(ind){
+  if(getNaAll(ind.id)) return 'na';
+  const primary = ind.items.filter(x=>x.t==='p');
+  if(!primary.length) return 'pending';
+  let anyNo=false, anyNull=false;
+  for(let i=0;i<ind.items.length;i++){
+    const item=ind.items[i];
+    if(item.t!=='p') continue;
+    const v=getItem(ind.id,i);
+    if(v==='no'){ anyNo=true; break; }
+    if(!v||v===null) anyNull=true;
+  }
+  if(anyNo) return 'fail';
+  if(anyNull) return 'pending';
+  return 'pass';
+}
+
+function calcDomainScore(domain){
+  let pass=0,fail=0,na=0,total=0;
+  for(const sec of domain.sections)
+    for(const ind of sec.inds){
+      total++;
+      const s=scoreIndicator(ind);
+      if(s==='pass') pass++;
+      else if(s==='fail') fail++;
+      else if(s==='na') na++;
+    }
+  return {pass,fail,na,total,effective:total-na};
+}
+
+function updateScores(){
+  let totPass=0,totEff=0;
+  let comPass=0,comEff=0,indPass=0,indEff=0;
+  for(const dom of DOMAINS){
+    const sc=calcDomainScore(dom);
+    totPass+=sc.pass; totEff+=sc.effective;
+    const pct=sc.effective?Math.round(sc.pass/sc.effective*100):0;
+    document.getElementById('sc-'+dom.id).textContent=sc.effective?pct+'%':'—';
+    document.getElementById('sc-'+dom.id+'-sub').textContent=`${sc.pass}/${sc.effective} 준수 (해당없음 ${sc.na})`;
+    document.getElementById('bar-'+dom.id).style.width=(sc.effective?pct:0)+'%';
+    for(const sec of dom.sections)
+      for(const ind of sec.inds){
+        const s=scoreIndicator(ind);
+        if(ind.t==='공통'){ comEff++; if(s==='pass') comPass++; }
+        else{ if(s!=='na'){ indEff++; if(s==='pass') indPass++; } }
+      }
+  }
+  const tp=totEff?Math.round(totPass/totEff*100):0;
+  document.getElementById('sc-total').textContent=totEff?tp+'%':'—';
+  document.getElementById('sc-total-sub').textContent=totEff?`${totPass}/${totEff} 준수`:'진단 진행 중';
+  document.getElementById('bar-total').style.width=(totEff?tp:0)+'%';
+  const cp=comEff?Math.round(comPass/comEff*100):0;
+  document.getElementById('sc-common').textContent=comEff?cp+'%':'—';
+  document.getElementById('sc-common-sub').textContent=`${comPass}/${comEff} 준수 (공통)`;
+  document.getElementById('bar-common').style.width=cp+'%';
+  const ip=indEff?Math.round(indPass/indEff*100):0;
+  document.getElementById('sc-ind').textContent=indEff?ip+'%':'—';
+  document.getElementById('sc-ind-sub').textContent=`${indPass}/${indEff} 준수 (업종별·유효)`;
+  document.getElementById('bar-ind').style.width=ip+'%';
+  const igLabel = document.getElementById('sc-ind-ig');
+  if(igLabel){ const ig=getIndustryGroup(); igLabel.textContent = ig ? ig.icon+' '+ig.name : '업종 미설정 ▸'; }
+}
+
+// ── render ──
+function resultLabel(s){
+  if(s==='pass') return '<span class="ind-result result-pass">준수</span>';
+  if(s==='fail') return '<span class="ind-result result-fail">미준수</span>';
+  if(s==='na') return '<span class="ind-result result-na">해당없음</span>';
+  return '<span class="ind-result result-pending">미완료</span>';
+}
+
+function renderAll(){
+  const content=document.getElementById('content');
+  content.innerHTML='';
+  for(const dom of DOMAINS){
+    const panel=document.createElement('div');
+    panel.className='tab-panel'+(dom.id===currentTab?' active':'');
+    panel.id='panel-'+dom.id;
+    for(const sec of dom.sections){
+      const lbl=document.createElement('div');
+      lbl.className='section-label';
+      lbl.textContent=sec.name;
+      panel.appendChild(lbl);
+      for(const ind of sec.inds){
+        panel.appendChild(buildCard(ind, dom.id));
+      }
+    }
+    content.appendChild(panel);
+  }
+}
+
+function buildCard(ind, domId){
+  const card=document.createElement('div');
+  card.className='ind-card';
+  card.id='card-'+ind.id;
+
+  const industryExcl = isIndustryExcluded(ind);
+  const naAll = getNaAll(ind.id);
+  const score = scoreIndicator(ind);
+  const isIndustry = ind.t==='업종별';
+
+  const badgeClass = industryExcl ? 'badge-excluded' : (isIndustry ? 'badge-industry' : 'badge-common');
+  const badgeText  = industryExcl ? '업종 열외' : ind.t;
+
+  if(industryExcl) card.classList.add('ind-excluded');
+
+  if(industryExcl){
+    // 업종 열외 카드: 클릭으로 펼치기 가능하나 항목 조작 불가
+    const ig = getIndustryGroup();
+    card.innerHTML=`
+      <div class="ind-head" onclick="toggleCard('${ind.id}')">
+        <span class="ind-num">${ind.id}</span>
+        <span class="ind-name">${ind.name}</span>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+        ${resultLabel(score)}
+        <span class="chevron">▼</span>
+      </div>
+      <div class="ind-body">
+        <div class="ind-excl-body">
+          <span style="font-size:16px">⊘</span>
+          선택한 업종군(<strong>${ig?ig.name:'—'}</strong>)에 해당하지 않는 지표입니다.
+          업종을 변경하거나 <button class="btn-xs btn-xs-ghost" style="font-size:11px" onclick="openIgPanel()">업종 변경</button>하세요.
+        </div>
+        <div style="opacity:0.4;pointer-events:none">
+          ${ind.items.map((item,i)=>buildItemRow(ind,item,i,true)).join('')}
+        </div>
+      </div>`;
+  } else {
+    card.innerHTML=`
+      <div class="ind-head" onclick="toggleCard('${ind.id}')">
+        <span class="ind-num">${ind.id}</span>
+        <span class="ind-name">${ind.name}</span>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+        ${resultLabel(score)}
+        <span class="chevron">▼</span>
+      </div>
+      <div class="ind-body">
+        ${isIndustry?`<div class="na-all-row">
+          <label class="toggle">
+            <input type="checkbox" id="na-${ind.id}" ${naAll?'checked':''} onchange="toggleNaAll('${ind.id}',this.checked)">
+            <span class="slider"></span>
+          </label>
+          <label for="na-${ind.id}" style="cursor:pointer;font-size:13px;">이 지표 전체 해당없음 (업종 미해당)</label>
+        </div>`:''}
+        <div id="items-${ind.id}">
+          ${ind.items.map((item,i)=>buildItemRow(ind,item,i,naAll)).join('')}
+        </div>
+      </div>`;
+  }
+  return card;
+}
+
+function buildItemRow(ind, item, i, naAll){
+  const v=getItem(ind.id,i);
+  const disabled=naAll||(item.t!=='p'&&naAll)?'disabled':'';
+  const isNa=naAll;
+  const typeLabel={'p':'점검','b':'보조','c':'확인'}[item.t];
+  const typeClass={'p':'type-p','b':'type-b','c':'type-c'}[item.t];
+  return `<div class="item-row">
+    <span class="item-type ${typeClass}">${typeLabel}</span>
+    <span class="item-text${isNa?' na-text':''}">${item.tx}</span>
+    <div class="pill-group">
+      <button class="pill${v==='yes'?' active-yes':''}" ${isNa?'disabled':''} onclick="setPill('${ind.id}',${i},'yes',this)">예</button>
+      <button class="pill${v==='no'?' active-no':''}" ${isNa?'disabled':''} onclick="setPill('${ind.id}',${i},'no',this)">아니오</button>
+      <button class="pill${v==='na'?' active-na':''}" ${isNa?'disabled':''} onclick="setPill('${ind.id}',${i},'na',this)">해당없음</button>
+    </div>
+  </div>`;
+}
+
+function refreshCard(ind){
+  const oldCard=document.getElementById('card-'+ind.id);
+  if(!oldCard) return;
+  const wasOpen=oldCard.classList.contains('open');
+  const domId=ind.id.split('-')[0];
+  const newCard=buildCard(ind,domId);
+  if(wasOpen) newCard.classList.add('open');
+  oldCard.replaceWith(newCard);
+}
+
+// ── interactions ──
+let currentTab='E';
+const IS_PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
+function switchTab(id){
+  if(IS_PREVIEW && id !== 'E') return;
+  currentTab=id;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+id));
+}
+
+function toggleCard(indId){
+  const card=document.getElementById('card-'+indId);
+  card.classList.toggle('open');
+}
+
+function expandAll(){
+  document.querySelectorAll('.ind-card').forEach(c=>c.classList.add('open'));
+}
+
+function setPill(indId, i, val, btn){
+  const current=getItem(indId,i);
+  const newVal=current===val?null:val;
+  setItem(indId,i,newVal);
+  const ind=findInd(indId);
+  if(ind) refreshCard(ind);
+  updateScores();
+}
+
+function toggleNaAll(indId, checked){
+  setNaAll(indId,checked);
+  const ind=findInd(indId);
+  if(ind) refreshCard(ind);
+  updateScores();
+}
+
+function findInd(id){
+  for(const d of DOMAINS)
+    for(const s of d.sections)
+      for(const ind of s.inds)
+        if(ind.id===id) return ind;
+  return null;
+}
+
+// ── 업종군 선택 / 해제 ──
+function selectIndustry(igId){
+  state['_industry'] = igId;
+  saveState();
+  renderIndustryBar();
+  renderIgGrid();      // 패널 내 선택 상태 갱신
+  renderAll();
+  updateScores();
+}
+
+function clearIndustry(){
+  delete state['_industry'];
+  saveState();
+  renderIndustryBar();
+  closeIgPanel();
+  renderAll();
+  updateScores();
+}
+
+// ── 업종 배너 렌더 ──
+function renderIndustryBar(){
+  const bar = document.getElementById('industry-bar');
+  const ig  = getIndustryGroup();
+  if(!ig){
+    bar.innerHTML=`
+      <span style="font-size:16px;opacity:.6">🏢</span>
+      <span class="ib-empty">업종군을 선택하면 해당없음 항목을 자동으로 처리할 수 있습니다.</span>
+      <button class="btn-xs btn-xs-accent" onclick="openIgPanel()">업종군 설정</button>`;
+  } else {
+    const apply = ig.applicable.length;
+    const excl  = ALL_IND_IDS.length - apply;
+    bar.innerHTML=`
+      <span style="font-size:16px">${ig.icon}</span>
+      <span class="ib-name">${ig.name}</span>
+      <span class="ib-chip ib-chip-apply">적용 ${apply}개</span>
+      <span class="ib-chip ib-chip-excl">열외 ${excl}개</span>
+      <button class="btn-xs btn-xs-ghost" onclick="openIgPanel()">업종 변경</button>
+      <button class="btn-xs btn-xs-danger" onclick="clearIndustry()">해제</button>`;
+  }
+}
+
+// ── 업종 패널 ──
+function openIgPanel(){
+  const panel = document.getElementById('ig-panel');
+  renderIgGrid();
+  panel.classList.add('open');
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function closeIgPanel(){
+  document.getElementById('ig-panel').classList.remove('open');
+}
+function renderIgGrid(){
+  const grid = document.getElementById('ig-grid');
+  const cur  = getIndustryId();
+  grid.innerHTML = INDUSTRY_GROUPS.map(ig=>{
+    const apply = ig.applicable.length;
+    const excl  = ALL_IND_IDS.length - apply;
+    const sel   = ig.id === cur;
+    return `<div class="ig-card${sel?' ig-selected':''}" onclick="selectIndustry('${ig.id}')">
+      <div class="ig-card-icon">${ig.icon}</div>
+      <div class="ig-card-name">${ig.name}</div>
+      <div class="ig-card-desc">${ig.desc}</div>
+      <div class="ig-card-chips">
+        <span class="ig-chip-s ig-chip-s-apply">✔ 적용 ${apply}개</span>
+        <span class="ig-chip-s ig-chip-s-excl">⊘ 열외 ${excl}개</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function confirmReset(){
+  if(confirm('모든 진단 데이터를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'))
+    resetAll();
+}
+function resetAll(){
+  state={};
+  saveState();
+  renderIndustryBar();
+  renderAll();
+  updateScores();
+}
+
+// ── init ──
+loadState();
+renderIndustryBar();
+renderAll();
+updateScores();
+if(IS_PREVIEW){
+  document.querySelectorAll('.tab:not([data-tab="E"])').forEach(el=>el.classList.add('preview-disabled'));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,953 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korean Normalizer — WorksFree</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:      #0f1117;
+  --panel:   #1c2333;
+  --panel2:  #141922;
+  --border:  #2a3347;
+  --accent:  #3b82f6;
+  --accent2: #06b6d4;
+  --success: #10b981;
+  --warn:    #f59e0b;
+  --danger:  #ef4444;
+  --text:    #e2e8f0;
+  --muted:   #64748b;
+  --hover:   #243049;
+  --radius:  8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'IBM Plex Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 28px 32px;
+  font-size: 18px;
+}
+
+/* ── 헤더 ─────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.app-icon {
+  width: 52px; height: 52px;
+  background: #0c1f18;
+  border: 1px solid #065f46;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+}
+.page-title { font-size: 20px; font-weight: 600; margin-bottom: 3px; }
+.page-desc  { font-size: 17px; color: var(--muted); }
+
+/* ── 브라우저 경고 ──────────────────── */
+#browser-warn {
+  display: none;
+  background: #431407;
+  border: 1px solid #9a3412;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-size: 17px;
+  color: #fdba74;
+  margin-bottom: 16px;
+}
+
+/* ── 메인 레이아웃 ──────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+@media(max-width: 760px) { .layout { grid-template-columns: 1fr; } }
+
+/* ── 패널 공통 ─────────────────────── */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.panel-title {
+  font-size: 15px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .08em;
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── 컨트롤 패널 ────────────────────── */
+.ctrl-section { margin-bottom: 18px; }
+.ctrl-label {
+  font-size: 16px; color: #94a3b8; font-weight: 500;
+  margin-bottom: 8px; display: block;
+}
+
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; padding: 10px 14px;
+  border: none; border-radius: 6px;
+  font-size: 17px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: opacity .15s, transform .1s;
+}
+.btn:hover  { opacity: .88; }
+.btn:active { transform: scale(.98); }
+.btn:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--accent);  color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-outline {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); color: #93c5fd; background: var(--hover); }
+.btn-danger  { background: var(--danger);  color: white; }
+.btn + .btn  { margin-top: 8px; }
+
+.toggle-row {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 10px;
+}
+.toggle-row span { font-size: 16px; color: #94a3b8; }
+.toggle { position: relative; display: inline-block; width: 34px; height: 18px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; inset: 0; background: var(--border);
+  border-radius: 18px; cursor: pointer; transition: .2s;
+}
+.slider:before {
+  content: ''; position: absolute;
+  width: 12px; height: 12px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: .2s;
+}
+.toggle input:checked + .slider { background: var(--accent); }
+.toggle input:checked + .slider:before { transform: translateX(16px); }
+
+.stat-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 16px;
+}
+.stat-box {
+  background: var(--panel2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 12px; text-align: center;
+}
+.stat-num  { font-size: 22px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+.stat-lbl  { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.num-total  { color: var(--text); }
+.num-change { color: var(--warn); }
+.num-done   { color: var(--success); }
+.num-err    { color: var(--danger); }
+
+/* ── 진행 바 ────────────────────────── */
+.progress-wrap {
+  margin-bottom: 14px;
+  display: none;
+}
+.progress-wrap.show { display: block; }
+.progress-label {
+  display: flex; justify-content: space-between;
+  font-size: 15px; color: var(--muted); margin-bottom: 5px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.progress-track {
+  height: 6px; background: var(--border);
+  border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--success);
+  border-radius: 3px; transition: width .2s;
+  width: 0%;
+}
+
+/* ── 결과 패널 ─────────────────────── */
+.result-panel { display: flex; flex-direction: column; gap: 12px; }
+
+/* 안내 카드 */
+.guide-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 48px 32px;
+  text-align: center;
+  color: var(--muted);
+}
+.guide-icon { font-size: 48px; margin-bottom: 14px; opacity: .2; }
+.guide-title { font-size: 17px; color: var(--text); margin-bottom: 8px; font-weight: 500; }
+.guide-desc  { font-size: 16px; line-height: 1.8; }
+.guide-step  {
+  display: flex; gap: 10px; align-items: flex-start;
+  text-align: left; margin-top: 20px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.step-num {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--accent); color: white;
+  font-size: 15px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.step-text { font-size: 16px; color: #94a3b8; line-height: 1.6; }
+
+/* 파일 테이블 */
+.table-wrap {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.table-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel2);
+  gap: 10px;
+}
+.toolbar-left { display: flex; align-items: center; gap: 10px; }
+.toolbar-right { display: flex; align-items: center; gap: 8px; }
+.sel-all {
+  font-size: 16px; color: var(--accent2);
+  cursor: pointer; background: none; border: none;
+  font-family: inherit; font-weight: 500;
+}
+.sel-all:hover { color: var(--text); }
+.count-badge {
+  font-size: 15px; font-weight: 600;
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 2px 10px;
+  color: var(--warn);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.file-table { width: 100%; border-collapse: collapse; }
+.file-table th {
+  padding: 8px 12px; text-align: left;
+  font-size: 15px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .06em;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--border);
+}
+.file-table td {
+  padding: 9px 12px;
+  font-size: 16px;
+  border-bottom: 1px solid #1e2a3a;
+  vertical-align: middle;
+}
+.file-table tr:last-child td { border-bottom: none; }
+.file-table tr:hover td { background: rgba(36,48,73,.4); }
+.file-table tr.done td { opacity: .45; }
+.file-table tr.error td { background: rgba(239,68,68,.05); }
+
+.fname-old {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--muted);
+  word-break: break-all;
+}
+/* 자소 분리된 자모 개별 강조 */
+.jamo-ch {
+  color: var(--warn);
+  background: rgba(245,158,11,.13);
+  border-bottom: 1.5px solid var(--warn);
+  border-radius: 2px;
+  padding: 0 1px;
+  font-size: 15px;
+  cursor: default;
+}
+.fname-len {
+  font-size: 14px;
+  color: var(--warn);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-left: 5px;
+  opacity: .7;
+}
+.fname-new {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent2);
+  word-break: break-all;
+}
+.fname-arrow { color: var(--border); margin: 0 6px; }
+.path-badge {
+  font-size: 14px; color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 6px;
+  display: inline-block; margin-bottom: 3px;
+}
+.status-icon { font-size: 17px; }
+
+.empty-row td {
+  text-align: center; padding: 32px;
+  color: var(--muted); font-size: 17px;
+}
+
+/* 결과 배너 */
+.result-banner {
+  display: none;
+  background: #052e16;
+  border: 1px solid #065f46;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 17px;
+  color: #6ee7b7;
+  align-items: center;
+  gap: 10px;
+}
+.result-banner.show { display: flex; }
+.result-banner.warn { background: #431407; border-color: #9a3412; color: #fdba74; }
+
+/* ── 충돌 모달 ─────────────────────── */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(8,10,18,.75);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-box {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 28px 28px 24px;
+  width: min(480px, 90vw); max-height: 80vh;
+  display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 0 24px 48px rgba(0,0,0,.5);
+}
+.modal-icon  { font-size: 30px; text-align: center; }
+.modal-title { font-size: 18px; font-weight: 600; text-align: center; }
+.modal-sub   { font-size: 16px; color: var(--muted); text-align: center; }
+.modal-list  {
+  background: var(--panel2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 14px;
+  max-height: 180px; overflow-y: auto;
+  font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.modal-list::-webkit-scrollbar { width: 4px; }
+.modal-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.conflict-item { color: var(--warn); word-break: break-all; }
+.conflict-more { color: var(--muted); font-style: italic; }
+.modal-actions { display: flex; gap: 8px; padding-top: 4px; }
+.modal-actions .btn { flex: 1; padding: 9px; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="page-header">
+  <div class="app-icon">가</div>
+  <div>
+    <div class="page-title">Korean Normalizer</div>
+    <div class="page-desc">한글 파일명 자소 분리(NFD) → 완성형(NFC) 일괄 복원 · 설치 불필요</div>
+  </div>
+</div>
+
+<!-- 브라우저 경고 -->
+<div id="browser-warn">
+  ⚠️ 이 도구는 Chrome 또는 Edge(최신 버전)가 필요합니다. 현재 브라우저는 File System Access API를 지원하지 않습니다.
+</div>
+
+<div class="layout">
+
+  <!-- ── 컨트롤 패널 ── -->
+  <div class="panel">
+    <div class="panel-title">설정</div>
+
+    <!-- 폴더 선택 -->
+    <div class="ctrl-section">
+      <span class="ctrl-label">대상 폴더</span>
+      <button class="btn btn-primary" id="btnPick">📂 폴더 선택</button>
+      <div id="pickedPath" style="font-size:15px;color:var(--muted);margin-top:8px;font-family:'IBM Plex Mono',monospace;word-break:break-all;"></div>
+    </div>
+
+    <!-- 옵션 -->
+    <div class="ctrl-section">
+      <span class="ctrl-label">옵션</span>
+      <div class="toggle-row">
+        <span>하위 폴더 포함 (재귀)</span>
+        <label class="toggle"><input type="checkbox" id="optRecursive" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>폴더명도 변환</span>
+        <label class="toggle"><input type="checkbox" id="optDirs" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>변환 없는 파일 숨기기</span>
+        <label class="toggle"><input type="checkbox" id="optHideClean" checked><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <!-- 통계 -->
+    <div class="ctrl-section">
+      <span class="ctrl-label">현황</span>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-num num-total" id="statTotal">0</div>
+          <div class="stat-lbl">전체 파일</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num num-change" id="statChange">0</div>
+          <div class="stat-lbl">변환 대상</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num num-done" id="statDone">0</div>
+          <div class="stat-lbl">완료</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num num-err" id="statErr">0</div>
+          <div class="stat-lbl">오류</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 진행 바 -->
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-label">
+        <span id="progressLabel">처리 중...</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- 실행 버튼 -->
+    <button class="btn btn-outline" id="btnScan" disabled>🔍 스캔</button>
+    <button class="btn btn-success" id="btnApply" disabled>✔ 선택 항목 변환 적용</button>
+    <button class="btn btn-outline" id="btnReset" disabled>↺ 초기화</button>
+  </div>
+
+  <!-- ── 결과 패널 ── -->
+  <div class="result-panel">
+
+    <!-- 결과 배너 -->
+    <div class="result-banner" id="resultBanner"></div>
+
+    <!-- 안내 카드 / 테이블 -->
+    <div id="guideCard" class="guide-card">
+      <div class="guide-icon">가</div>
+      <div class="guide-title">한글 파일명 자소 분리 복원 도구</div>
+      <div class="guide-desc">
+        macOS에서 생성된 한글 파일명이 Windows에서<br>
+        자소 분리(ㄱㅏㄴㅏ)로 깨지는 현상을 일괄 복원합니다.
+      </div>
+      <div class="guide-step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong style="color:var(--text)">폴더 선택</strong> — 왼쪽에서 대상 폴더를 선택합니다.</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong style="color:var(--text)">스캔</strong> — 자소 분리 파일을 검색합니다. 변환 미리보기를 확인하세요.</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong style="color:var(--text)">변환 적용</strong> — 선택한 파일의 이름을 NFC로 복원합니다.</div>
+      </div>
+    </div>
+
+    <!-- 파일 테이블 -->
+    <div class="table-wrap" id="tableWrap" style="display:none">
+      <div class="table-toolbar">
+        <div class="toolbar-left">
+          <button class="sel-all" id="btnSelAll">전체 선택</button>
+          <button class="sel-all" id="btnSelNone" style="color:var(--muted)">전체 해제</button>
+          <span class="count-badge" id="selCount">0개 선택</span>
+        </div>
+        <div class="toolbar-right">
+          <span style="font-size:15px;color:var(--muted)" id="tableInfo"></span>
+        </div>
+      </div>
+      <div style="overflow-x:auto;max-height:calc(100vh - 320px);overflow-y:auto;">
+        <table class="file-table">
+          <thead>
+            <tr>
+              <th style="width:32px"></th>
+              <th>경로</th>
+              <th>원본 파일명</th>
+              <th>→</th>
+              <th>변환 후 파일명</th>
+              <th style="width:36px"></th>
+            </tr>
+          </thead>
+          <tbody id="fileTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- result-panel -->
+</div><!-- layout -->
+
+<script>
+/* ════════════════════════════════════════════
+   브라우저 지원 확인
+════════════════════════════════════════════ */
+if (!('showDirectoryPicker' in window)) {
+  document.getElementById('browser-warn').style.display = 'block';
+  document.getElementById('browser-warn').textContent =
+    '⚠️ 이 도구는 Chrome 또는 Edge(최신 버전)가 필요합니다. 현재 브라우저는 File System Access API를 지원하지 않습니다.';
+  document.getElementById('btnPick').disabled = true;
+}
+
+// file:// 프로토콜 감지 → 사용자에게 안내
+if (location.protocol === 'file:') {
+  const warn = document.getElementById('browser-warn');
+  warn.style.display = 'block';
+  warn.innerHTML = `
+    ⚠️ <strong>로컬 파일(file://)로 열면 폴더 선택이 동작하지 않습니다.</strong><br>
+    <span style="font-size:16px;line-height:2">
+    다음 방법으로 실행해 주세요:<br>
+    ① VS Code → 우하단 <strong>[Go Live]</strong> 클릭 → http://localhost:5500<br>
+    ② 또는 PowerShell: <code style="background:#0f1117;padding:2px 6px;border-radius:3px">python -m http.server 5500</code> 후 브라우저에서 http://localhost:5500 접속
+    </span>
+  `;
+  document.getElementById('btnPick').disabled = true;
+}
+
+/* ════════════════════════════════════════════
+   상태
+════════════════════════════════════════════ */
+let rootHandle  = null;
+let fileEntries = [];   // { pathStr, name, nfc, handle, dirHandle, type, checked, status }
+
+/* ════════════════════════════════════════════
+   통계 업데이트
+════════════════════════════════════════════ */
+function updateStats() {
+  const targets = fileEntries.filter(e => e.name !== e.nfc);
+  const done    = fileEntries.filter(e => e.status === 'done');
+  const err     = fileEntries.filter(e => e.status === 'error');
+  document.getElementById('statTotal') .textContent = fileEntries.length;
+  document.getElementById('statChange').textContent = targets.length;
+  document.getElementById('statDone')  .textContent = done.length;
+  document.getElementById('statErr')   .textContent = err.length;
+}
+
+/* ════════════════════════════════════════════
+   폴더 선택
+════════════════════════════════════════════ */
+document.getElementById('btnPick').addEventListener('click', async () => {
+  try {
+    rootHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    document.getElementById('pickedPath').textContent = '📁 ' + rootHandle.name;
+    document.getElementById('btnScan').disabled  = false;
+    document.getElementById('btnReset').disabled = false;
+    // 자동 스캔
+    runScan();
+  } catch(e) {
+    if (e.name === 'AbortError') return; // 사용자가 취소
+    if (e.name === 'SecurityError' || e.name === 'NotAllowedError') {
+      alert('보안 오류: file:// 프로토콜에서는 폴더 접근이 차단됩니다.\nhttp://localhost 로 접속해 주세요.');
+    } else {
+      console.error(e);
+    }
+  }
+});
+
+/* ════════════════════════════════════════════
+   재귀 스캔
+════════════════════════════════════════════ */
+async function scanDir(dirHandle, pathStr, entries) {
+  const recursive = document.getElementById('optRecursive').checked;
+  const inclDirs  = document.getElementById('optDirs').checked;
+
+  for await (const [name, handle] of dirHandle.entries()) {
+    const nfc  = name.normalize('NFC');
+    const type = handle.kind; // 'file' | 'directory'
+
+    if (type === 'file' || (type === 'directory' && inclDirs)) {
+      entries.push({
+        pathStr, name, nfc,
+        handle, dirHandle,
+        type,
+        checked: name !== nfc,   // 변환 필요한 것만 기본 선택
+        status: 'pending'
+      });
+    }
+
+    if (type === 'directory' && recursive) {
+      await scanDir(handle, pathStr ? pathStr + '/' + name : name, entries);
+    }
+  }
+}
+
+/* ════════════════════════════════════════════
+   스캔 실행
+════════════════════════════════════════════ */
+async function runScan() {
+  if (!rootHandle) return;
+
+  fileEntries = [];
+  document.getElementById('btnApply').disabled = true;
+  document.getElementById('btnScan').disabled  = true;
+  document.getElementById('pickedPath').textContent = '📁 ' + rootHandle.name + ' — 스캔 중...';
+
+  await scanDir(rootHandle, '', fileEntries);
+
+  document.getElementById('pickedPath').textContent = '📁 ' + rootHandle.name;
+  document.getElementById('btnScan').disabled = false;
+
+  updateStats();
+  renderTable();
+
+  const targets = fileEntries.filter(e => e.name !== e.nfc);
+  document.getElementById('btnApply').disabled = targets.length === 0;
+}
+
+document.getElementById('btnScan').addEventListener('click', runScan);
+
+/* ════════════════════════════════════════════
+   테이블 렌더
+════════════════════════════════════════════ */
+function renderTable() {
+  const hideClean = document.getElementById('optHideClean').checked;
+  const body = document.getElementById('fileTableBody');
+  const shown = hideClean
+    ? fileEntries.filter(e => e.name !== e.nfc)
+    : fileEntries;
+
+  document.getElementById('guideCard').style.display  = 'none';
+  document.getElementById('tableWrap').style.display  = 'block';
+  document.getElementById('tableInfo').textContent    =
+    `전체 ${fileEntries.length}개 중 ${shown.length}개 표시`;
+
+  body.innerHTML = '';
+
+  if (shown.length === 0) {
+    body.innerHTML = '<tr class="empty-row"><td colspan="6">자소 분리 파일이 없습니다. 모든 파일명이 정상입니다 ✅</td></tr>';
+    updateSelCount();
+    return;
+  }
+
+  shown.forEach((entry, idx) => {
+    const globalIdx = fileEntries.indexOf(entry);
+    const needsChange = entry.name !== entry.nfc;
+    const typeIcon = entry.type === 'directory' ? '📁' : '📄';
+
+    let statusIcon = '';
+    if (entry.status === 'done')  statusIcon = '<span class="status-icon" style="color:var(--success)">✔</span>';
+    if (entry.status === 'error') statusIcon = '<span class="status-icon" style="color:var(--danger)" title="이름 충돌 또는 권한 오류">✗</span>';
+
+    const tr = document.createElement('tr');
+    if (entry.status === 'done')  tr.classList.add('done');
+    if (entry.status === 'error') tr.classList.add('error');
+
+    tr.innerHTML = `
+      <td>
+        ${needsChange
+          ? `<input type="checkbox" data-idx="${globalIdx}" ${entry.checked ? 'checked' : ''}
+               style="accent-color:var(--accent);width:14px;height:14px;cursor:pointer">`
+          : ''}
+      </td>
+      <td>
+        ${entry.pathStr
+          ? `<div class="path-badge">${entry.pathStr}</div>`
+          : '<span style="font-size:14px;color:var(--border)">루트</span>'}
+        <div style="font-size:15px;color:var(--muted)">${typeIcon}</div>
+      </td>
+      <td><span class="fname-old">${renderNFD(entry.name)}</span></td>
+      <td><span class="fname-arrow">→</span></td>
+      <td><span class="fname-new">${needsChange ? escHtml(entry.nfc) : '<span style="color:var(--border)">변환 없음</span>'}</span></td>
+      <td>${statusIcon}</td>
+    `;
+
+    // 체크박스 이벤트
+    const cb = tr.querySelector('input[type="checkbox"]');
+    if (cb) {
+      cb.addEventListener('change', e => {
+        fileEntries[globalIdx].checked = e.target.checked;
+        updateSelCount();
+        updateApplyBtn();
+      });
+    }
+
+    body.appendChild(tr);
+  });
+
+  updateSelCount();
+  updateApplyBtn();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* NFD 파일명을 자모 단위로 시각화
+   - 분리된 자모(U+1100–U+11FF 등)는 주황 하이라이트
+   - 일반 문자는 그대로 출력
+   - 뒤에 자모 개수 표시 (예: 4자소)                   */
+function renderNFD(str) {
+  // NFD 자모 범위: Hangul Jamo / Extended-A / Extended-B
+  const isJamo = cp =>
+    (cp >= 0x1100 && cp <= 0x11FF) ||
+    (cp >= 0xA960 && cp <= 0xA97F) ||
+    (cp >= 0xD7B0 && cp <= 0xD7FF);
+
+  let html = '';
+  let jamoCount = 0;
+
+  for (const ch of str) {
+    const cp = ch.codePointAt(0);
+    const safe = escHtml(ch);
+    if (isJamo(cp)) {
+      html += `<span class="jamo-ch" title="U+${cp.toString(16).toUpperCase().padStart(4,'0')} 자소분리">${safe}&#x200C;</span>`;
+      jamoCount++;
+    } else {
+      html += safe;
+    }
+  }
+
+  if (jamoCount > 0) {
+    html += `<span class="fname-len">(${jamoCount}자소)</span>`;
+  }
+  return html;
+}
+
+function updateSelCount() {
+  const n = fileEntries.filter(e => e.checked && e.name !== e.nfc && e.status === 'pending').length;
+  document.getElementById('selCount').textContent = `${n}개 선택`;
+}
+
+function updateApplyBtn() {
+  const n = fileEntries.filter(e => e.checked && e.name !== e.nfc && e.status === 'pending').length;
+  document.getElementById('btnApply').disabled = n === 0;
+}
+
+/* ════════════════════════════════════════════
+   전체 선택 / 해제
+════════════════════════════════════════════ */
+document.getElementById('btnSelAll').addEventListener('click', () => {
+  fileEntries.forEach(e => { if (e.name !== e.nfc && e.status === 'pending') e.checked = true; });
+  renderTable();
+});
+document.getElementById('btnSelNone').addEventListener('click', () => {
+  fileEntries.forEach(e => { e.checked = false; });
+  renderTable();
+});
+
+/* ════════════════════════════════════════════
+   충돌 감지
+════════════════════════════════════════════ */
+async function checkConflict(entry) {
+  try {
+    if (entry.type === 'file') {
+      await entry.dirHandle.getFileHandle(entry.nfc);
+    } else {
+      await entry.dirHandle.getDirectoryHandle(entry.nfc);
+    }
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+/* ════════════════════════════════════════════
+   충돌 모달
+════════════════════════════════════════════ */
+function showConflictModal(conflicts, total) {
+  return new Promise(resolve => {
+    document.getElementById('conflictTitle').textContent =
+      `${conflicts.length}개 파일에서 이름 충돌이 발생했습니다`;
+    document.getElementById('conflictSub').textContent =
+      `전체 ${total}개 대상 중 — 동일한 이름이 이미 존재합니다`;
+
+    const list = document.getElementById('conflictList');
+    list.innerHTML = '';
+    conflicts.slice(0, 15).forEach(e => {
+      const div = document.createElement('div');
+      div.className = 'conflict-item';
+      div.textContent = (e.pathStr ? e.pathStr + '/' : '') + e.nfc;
+      list.appendChild(div);
+    });
+    if (conflicts.length > 15) {
+      const more = document.createElement('div');
+      more.className = 'conflict-more';
+      more.textContent = `... 외 ${conflicts.length - 15}개`;
+      list.appendChild(more);
+    }
+
+    document.getElementById('conflictModal').style.display = 'flex';
+    const close = () => { document.getElementById('conflictModal').style.display = 'none'; };
+
+    document.getElementById('btnConflictSkip')     .onclick = () => { close(); resolve('skip'); };
+    document.getElementById('btnConflictOverwrite').onclick = () => { close(); resolve('overwrite'); };
+    document.getElementById('btnConflictCancel')   .onclick = () => { close(); resolve('cancel'); };
+  });
+}
+
+/* ════════════════════════════════════════════
+   변환 실행
+════════════════════════════════════════════ */
+async function applyRename(targets, overwrite = false) {
+  if (targets.length === 0) { showResultBanner(0, 0); return; }
+
+  document.getElementById('btnApply').disabled = true;
+  document.getElementById('btnScan').disabled  = true;
+  document.getElementById('btnPick').disabled  = true;
+
+  const wrap = document.getElementById('progressWrap');
+  wrap.classList.add('show');
+
+  let done = 0, errCount = 0;
+
+  for (const entry of targets) {
+    const pct = Math.round(done / targets.length * 100);
+    document.getElementById('progressFill').style.width  = pct + '%';
+    document.getElementById('progressPct').textContent   = pct + '%';
+    document.getElementById('progressLabel').textContent =
+      `처리 중 (${done}/${targets.length}): ${entry.name}`;
+
+    try {
+      if (entry.type === 'file') {
+        await renameFile(entry, overwrite);
+      } else {
+        await renameDir(entry);
+      }
+      entry.status  = 'done';
+      entry.checked = false;
+      done++;
+    } catch(e) {
+      console.error('rename error:', entry.name, e);
+      entry.status = 'error';
+      errCount++;
+      done++;
+    }
+  }
+
+  document.getElementById('progressFill').style.width  = '100%';
+  document.getElementById('progressPct').textContent   = '100%';
+  document.getElementById('progressLabel').textContent = '완료';
+  document.getElementById('btnScan').disabled = false;
+  document.getElementById('btnPick').disabled = false;
+
+  updateStats();
+  renderTable();
+  showResultBanner(targets.length - errCount, errCount);
+  setTimeout(() => wrap.classList.remove('show'), 2000);
+}
+
+/* ════════════════════════════════════════════
+   변환 적용
+════════════════════════════════════════════ */
+document.getElementById('btnApply').addEventListener('click', async () => {
+  const targets = fileEntries.filter(e => e.checked && e.name !== e.nfc && e.status === 'pending');
+  if (targets.length === 0) return;
+
+  // 충돌 사전 스캔
+  document.getElementById('btnApply').disabled = true;
+  const conflicts = [];
+  for (const entry of targets) {
+    if (await checkConflict(entry)) conflicts.push(entry);
+  }
+  document.getElementById('btnApply').disabled = false;
+
+  if (conflicts.length > 0) {
+    const decision = await showConflictModal(conflicts, targets.length);
+    if (decision === 'cancel') return;
+    if (decision === 'skip') {
+      const skipSet = new Set(conflicts);
+      await applyRename(targets.filter(e => !skipSet.has(e)), false);
+    } else {
+      await applyRename(targets, true);
+    }
+  } else {
+    await applyRename(targets, false);
+  }
+});
+
+/* ════════════════════════════════════════════
+   파일 이름 변경
+════════════════════════════════════════════ */
+async function renameFile(entry, overwrite = false) {
+  // overwrite=false 이고 move() 지원 시: move() 사용 (충돌 없음이 보장된 경우)
+  if (!overwrite && typeof entry.handle.move === 'function') {
+    await entry.handle.move(entry.nfc);
+    entry.name = entry.nfc;
+    return;
+  }
+  // 복사 후 원본 삭제 (overwrite=true 시 대상 파일 덮어씀)
+  const file      = await entry.handle.getFile();
+  const newHandle = await entry.dirHandle.getFileHandle(entry.nfc, { create: true });
+  const writable  = await newHandle.createWritable();
+  await writable.write(await file.arrayBuffer());
+  await writable.close();
+  await entry.dirHandle.removeEntry(entry.name);
+  entry.handle = newHandle;
+  entry.name   = entry.nfc;
+}
+
+async function renameDir(entry) {
+  // Chrome 121+: FileSystemDirectoryHandle.move(newName) 지원
+  if (typeof entry.handle.move === 'function') {
+    await entry.handle.move(entry.nfc);
+    entry.name = entry.nfc;
+    return;
+  }
+  throw new Error('Directory rename not supported in this browser version');
+}
+
+/* ════════════════════════════════════════════
+   결과 배너
+════════════════════════════════════════════ */
+function showResultBanner(ok, err) {
+  const banner = document.getElementById('resultBanner');
+  banner.classList.remove('warn');
+  if (ok === 0 && err === 0) {
+    banner.classList.add('warn');
+    banner.textContent = '⚠️ 충돌로 인해 건너뛰어 변환된 파일이 없습니다.';
+  } else if (err === 0) {
+    banner.textContent = `✅ ${ok}개 파일명이 성공적으로 변환됐습니다.`;
+  } else {
+    banner.classList.add('warn');
+    banner.textContent = `⚠️ ${ok}개 성공, ${err}개 실패. 실패 항목은 이름 충돌 또는 권한 문제일 수 있습니다.`;
+  }
+  banner.classList.add('show');
+}
+
+/* ════════════════════════════════════════════
+   초기화
+════════════════════════════════════════════ */
+document.getElementById('btnReset').addEventListener('click', () => {
+  rootHandle  = null;
+  fileEntries = [];
+  document.getElementById('pickedPath').textContent   = '';
+  document.getElementById('btnScan').disabled         = true;
+  document.getElementById('btnApply').disabled        = true;
+  document.getElementById('btnReset').disabled        = true;
+  document.getElementById('guideCard').style.display  = 'block';
+  document.getElementById('tableWrap').style.display  = 'none';
+  document.getElementById('resultBanner').classList.remove('show');
+  document.getElementById('progressWrap').classList.remove('show');
+  updateStats();
+});
+
+/* 옵션 변경 시 테이블 재렌더 */
+['optRecursive','optDirs','optHideClean'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    if (fileEntries.length > 0) renderTable();
+  });
+});
+</script>
+
+<!-- 충돌 확인 모달 -->
+<div id="conflictModal" class="modal-backdrop" style="display:none">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title" id="conflictTitle"></div>
+    <div class="modal-sub"   id="conflictSub"></div>
+    <div class="modal-list"  id="conflictList"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="btnConflictSkip">건너뛰기</button>
+      <button class="btn btn-danger"  id="btnConflictOverwrite">덮어쓰기</button>
+      <button class="btn btn-outline" id="btnConflictCancel" style="flex:.6;color:var(--muted)">취소</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

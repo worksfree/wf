@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>예비창업패키지 — WorksFree</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg:    #080d18;
+  --panel: #111827;
+  --bd:    #1f2d45;
+  --text:  #e2e8f0;
+  --muted: #64748b;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  width:100%; height:100%;
+  overflow:hidden;
+  background:var(--bg);
+  font-family:'IBM Plex Sans KR',sans-serif;
+  color:var(--text);
+  user-select:none;
+}
+
+/* ── 뷰포트 ── */
+#vp {
+  position:fixed; inset:0;
+  overflow:hidden;
+  cursor:grab;
+}
+#vp.grabbing { cursor:grabbing; }
+#vp::before {
+  content:'';
+  position:absolute; inset:0;
+  background-image:radial-gradient(circle, rgba(99,102,241,0.1) 1px, transparent 1px);
+  background-size:44px 44px;
+  pointer-events:none;
+}
+
+/* ── 캔버스 ── */
+#canvas {
+  position:absolute;
+  width:2800px; height:1900px;
+  transform-origin:0 0;
+  will-change:transform;
+}
+#svg-lines {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  pointer-events:none;
+  overflow:visible;
+}
+
+/* ── 허브 ── */
+.pz-hub {
+  position:absolute;
+  left:1190px; top:840px;
+  width:420px; height:220px;
+  background:linear-gradient(135deg,#1e1b4b,#312e81);
+  border:2px solid rgba(129,140,248,0.45);
+  border-radius:110px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+  cursor:pointer;
+  box-shadow:0 0 0 10px rgba(99,102,241,0.07), 0 20px 60px rgba(0,0,0,0.6);
+  transition:border-color .3s;
+  z-index:10;
+  animation:hub-pulse 3.5s ease-in-out infinite;
+  padding:0 28px;
+}
+@keyframes hub-pulse {
+  0%,100% { box-shadow:0 0 0 10px rgba(99,102,241,0.07),  0 20px 60px rgba(0,0,0,0.6); }
+  50%      { box-shadow:0 0 0 18px rgba(99,102,241,0.13), 0 20px 60px rgba(0,0,0,0.6); }
+}
+.pz-hub:hover { border-color:rgba(129,140,248,0.8); }
+.hub-badge { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(165,180,252,0.5); }
+.hub-title { font-size:52px; font-weight:800; color:#e0e7ff; letter-spacing:-.02em; text-align:center; line-height:1.15; }
+.hub-hint  { font-size:10px; color:rgba(165,180,252,0.32); }
+
+/* ── 노드 공통 ── */
+.pz-node {
+  position:absolute;
+  width:340px;
+  overflow:hidden;
+  cursor:pointer;
+  border-radius:16px;
+  border:1.5px solid var(--bd);
+  box-shadow:0 4px 24px rgba(0,0,0,0.45);
+  transition:border-color .3s, box-shadow .3s;
+}
+.pz-node:hover        { box-shadow:0 8px 40px rgba(0,0,0,0.5); }
+.pz-node.focused      { border-color:rgba(129,140,248,.6); box-shadow:0 0 0 3px rgba(99,102,241,.2), 0 12px 40px rgba(0,0,0,.5); }
+
+/* ─── 오버뷰 레이어 (전체보기 시 보임) ─── */
+.ov-layer {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:14px;
+  padding:20px;
+  opacity:1;
+  pointer-events:auto;
+  transition:opacity .22s;
+}
+.ov-icon  { font-size:52px; line-height:1; }
+.ov-title {
+  font-size:40px; font-weight:700;
+  text-align:center; line-height:1.25;
+  letter-spacing:-.02em;
+  word-break:keep-all;
+}
+.ov-seq   { font-size:11px; font-weight:700; opacity:.35; letter-spacing:.05em; }
+
+/* 오버뷰 배경 색상 */
+.ov-blue   { background:linear-gradient(135deg,#1e3a8a 0%,#131929 100%); }
+.ov-green  { background:linear-gradient(135deg,#064e3b 0%,#131929 100%); }
+.ov-amber  { background:linear-gradient(135deg,#78350f 0%,#131929 100%); }
+.ov-pink   { background:linear-gradient(135deg,#701a75 0%,#131929 100%); }
+.ov-cyan   { background:linear-gradient(135deg,#0c4a6e 0%,#131929 100%); }
+.ov-orange { background:linear-gradient(135deg,#7c2d12 0%,#131929 100%); }
+.ov-red    { background:linear-gradient(135deg,#7f1d1d 0%,#131929 100%); }
+
+/* 오버뷰 텍스트 색상 */
+.ov-blue   .ov-title { color:#93c5fd; }
+.ov-green  .ov-title { color:#6ee7b7; }
+.ov-amber  .ov-title { color:#fcd34d; }
+.ov-pink   .ov-title { color:#f9a8d4; }
+.ov-cyan   .ov-title { color:#67e8f9; }
+.ov-orange .ov-title { color:#fdba74; }
+.ov-red    .ov-title { color:#fca5a5; }
+
+/* ─── 디테일 레이어 (줌인 시 보임) ─── */
+.dt-layer {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  background:var(--panel);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .32s .1s;
+}
+.node-hd {
+  display:flex; align-items:center; gap:10px;
+  padding:13px 16px 12px; flex-shrink:0;
+}
+.node-icon { font-size:18px; }
+.node-name { flex:1; font-size:14px; font-weight:700; letter-spacing:-.01em; }
+.node-seq  { font-size:10px; font-weight:700; opacity:.38; }
+.node-kws  { padding:6px 14px 15px; display:flex; flex-wrap:wrap; gap:7px; overflow:hidden; }
+.kw {
+  font-size:11.5px; font-weight:500;
+  padding:4px 11px; border-radius:99px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  white-space:nowrap; line-height:1.4;
+}
+
+/* 헤더 색상 */
+.hd-blue   { background:linear-gradient(90deg,rgba(30,58,138,.7),var(--panel));  color:#93c5fd; }
+.hd-green  { background:linear-gradient(90deg,rgba(6,78,59,.7),var(--panel));   color:#6ee7b7; }
+.hd-amber  { background:linear-gradient(90deg,rgba(120,53,15,.7),var(--panel)); color:#fcd34d; }
+.hd-pink   { background:linear-gradient(90deg,rgba(112,26,117,.7),var(--panel));color:#f9a8d4; }
+.hd-cyan   { background:linear-gradient(90deg,rgba(12,74,110,.7),var(--panel)); color:#67e8f9; }
+.hd-orange { background:linear-gradient(90deg,rgba(124,45,18,.7),var(--panel)); color:#fdba74; }
+.hd-red    { background:linear-gradient(90deg,rgba(127,29,29,.7),var(--panel)); color:#fca5a5; }
+
+/* ─── 포커스 시 레이어 전환 ─── */
+.pz-node.focused .ov-layer {
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s;
+}
+.pz-node.focused .dt-layer {
+  opacity:1;
+  pointer-events:auto;
+  transition:opacity .35s .2s;
+}
+.pz-node.focused .kw {
+  background:rgba(255,255,255,0.08);
+  border-color:rgba(255,255,255,0.17);
+}
+
+/* ── 네비게이션 ── */
+#nav {
+  position:fixed; bottom:18px; left:50%;
+  transform:translateX(-50%);
+  z-index:300;
+  display:flex; align-items:center; gap:6px;
+  background:rgba(8,13,24,0.88);
+  backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:99px;
+  padding:7px 14px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.5);
+}
+.nbtn {
+  background:none;
+  border:1px solid rgba(255,255,255,0.12);
+  color:var(--text);
+  border-radius:99px;
+  padding:5px 14px;
+  font-size:12px; font-weight:500;
+  cursor:pointer; font-family:inherit;
+  transition:background .15s, border-color .15s;
+  white-space:nowrap;
+}
+.nbtn:hover { background:rgba(255,255,255,0.07); }
+.nbtn.ov { border-color:rgba(129,140,248,.4); color:#a5b4fc; }
+#nav-ctr { font-size:12px; color:var(--muted); min-width:70px; text-align:center; }
+
+/* ── 언어 토글 ── */
+#lang-bar { position:fixed; top:14px; right:14px; z-index:300; display:flex; gap:4px; }
+.lbtn {
+  font-size:10px; font-weight:700;
+  padding:3px 10px; border-radius:99px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(8,13,24,0.8); color:var(--muted);
+  cursor:pointer; backdrop-filter:blur(8px);
+  transition:all .15s;
+}
+.lbtn.active { background:rgba(99,102,241,.28); border-color:rgba(129,140,248,.5); color:#a5b4fc; }
+
+/* ── 힌트 ── */
+#hint {
+  position:fixed; top:18px; left:50%; transform:translateX(-50%);
+  z-index:300;
+  font-size:11px; color:rgba(255,255,255,.24);
+  pointer-events:none; transition:opacity 1.2s; white-space:nowrap;
+}
+</style>
+</head>
+<body>
+
+<div id="vp">
+  <div id="canvas">
+    <svg id="svg-lines" width="2800" height="1900"></svg>
+
+    <!-- ── HUB ── -->
+    <div class="pz-hub" id="n-hub" onclick="showOverview()">
+      <div class="hub-badge" data-ko="중소벤처기업부 지원사업" data-en="Ministry of SMEs Program"></div>
+      <div class="hub-title" data-ko="예비창업패키지"         data-en="Pre-Startup Package"></div>
+      <div class="hub-hint"  data-ko="노드 클릭 → 집중 · 배경 클릭 → 전체보기" data-en="Click node → focus · bg click → overview"></div>
+    </div>
+
+    <!-- ── 01 프로그램 개요 ── -->
+    <div class="pz-node" id="n1" style="left:320px;top:220px;height:200px" onclick="focusNode('n1')">
+      <div class="ov-layer ov-blue">
+        <span class="ov-icon">🏛</span>
+        <span class="ov-title" data-ko="프로그램 개요" data-en="Program Overview"></span>
+        <span class="ov-seq">01</span>
+      </div>
+      <div class="dt-layer">
+        <div class="node-hd hd-blue">
+          <span class="node-icon">🏛</span>
+          <span class="node-name" data-ko="프로그램 개요" data-en="Program Overview"></span>
+          <span class="node-seq">01</span>
+        </div>
+        <div class="node-kws">
+          <span class="kw" data-ko="중기부 · 창업진흥원"   data-en="MoSMEs · KISED"></span>
+          <span class="kw" data-ko="예비창업자 전용"       data-en="Pre-founders only"></span>
+          <span class="kw" data-ko="최대 12개월"           data-en="Up to 12 months"></span>
+          <span class="kw" data-ko="주관기관 공모 선발"    data-en="Host institution selection"></span>
+          <span class="kw" data-ko="40+ 주관기관"          data-en="40+ host institutions"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 02 지원 금액 ── -->
+    <div class="pz-node" id="n2" style="left:2140px;top:220px;height:200px" onclick="focusNode('n2')">
+      <div class="ov-layer ov-green">
+        <span class="ov-icon">💰</span>
+        <span class="ov-title" data-ko="지원 금액" data-en="Funding Scale"></span>
+        <span class="ov-seq">02</span>
+      </div>
+      <div class="dt-layer">
+        <div class="node-hd hd-green">
+          <span class="node-icon">💰</span>
+          <span class="node-name" data-ko="지원 금액" data-en="Funding Scale"></span>
+          <span class="node-seq">02</span>
+        </div>
+        <div class="node-kws">
+          <span class="kw" data-ko="최대 1억원 — 우수"   data-en="Up to ₩100M — Excellent"></span>
+          <span class="kw" data-ko="4천~7천만 — 일반"    data-en="₩40–70M — Standard"></span>
+          <span class="kw" data-ko="~4천만 — 기초"       data-en="Up to ₩40M — Basic"></span>
+          <span class="kw" data-ko="상환 의무 없음"       data-en="Non-repayable grant"></span>
+          <span class="kw" data-ko="집행 증빙 필수"       data-en="Spending docs required"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 03 지원 대상 ── -->
+    <div class="pz-node" id="n3" style="left:60px;top:840px;height:175px" onclick="focusNode('n3')">
+      <div class="ov-layer ov-amber">
+        <span class="ov-icon">👤</span>
+        <span class="ov-title" data-ko="지원 대상" data-en="Eligibility"></span>
+        <span class="ov-seq">03</span>
+      </div>
+      <div class="dt-layer">
+        <div class="node-hd hd-amber">
+          <span class="node-icon">👤</span>
+          <span class="node-name" data-ko="지원 대상" data-en="Eligibility"></span>
+          <span class="node-seq">03</span>
+        </div>
+        <div class="node-kws">
+          <span class="kw" data-ko="사업자 미등록 (공고일)"   data-en="No biz reg (as of notice)"></span>
+          <span class="kw" data-ko="폐업 재창업 가능"         data-en="Re-starters eligible"></span>
+          <span class="kw" data-ko="청년 우대 — 만 39세↓"    data-en="Youth track — age ≤39"></span>
+          <span class="kw" data-ko="동일 아이템 중복 불가"    data-en="No duplicate same idea"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 04 지원 내용 ── -->
+    <div class="pz-node" id="n4" style="left:2400px;top:840px;height:175px" onclick="focusNode('n4')">
+      <div class="ov-layer ov-pink">
+        <span class="ov-icon">📦</span>
+        <span class="ov-title" data-ko="지원 내용" data-en="Support Package"></span>
+        <span class="ov-seq">04</span>
+      </div>
+      <div class="dt-layer">
+        <div class="node-hd hd-pink">
+          <span class="node-icon">📦</span>
+          <span class="node-name" data-ko="지원 내용" data-en="Support Package"></span>
+          <span class="node-seq">04</span>
+        </div>
+        <div class="node-kws">
+          <span class="kw" data-ko="사업화 자금"            data-en="Business funding"></span>
+          <span class="kw" data-ko="창업 교육 — 필수 40h"  data-en="Startup edu — 40h req."></span>
+          <span class="kw" data-ko="전담 멘토링 — 월 2회+" data-en="Mentoring — 2×/month+"></span>
+          <span class="kw" data-ko="창업 공간 제공"         data-en="Workspace provided"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 05 일정 · 프로세스 ── -->
+    <div class="pz-node" id="n5" style="left:440px;top:1440px;height:205px" onclick="focusNode('n5')">
+      <div class="ov-layer ov-cyan">
+        <span class="ov-icon">📅</span>
+        <span class="ov-title" data-ko="일정 · 프로세스" data-en="Schedule · Process"></span>
+        <span class="ov-seq">05</span>
+      </div>
+      <div class="dt-layer">
+        <div class="node-hd hd-cyan">
+          <span class="node-icon">📅</span>
+          <span class="node-name" data-ko="일정 · 프로세스" data-en="Schedule · Process"></span>
+          <span class="node-seq">05</span>
+        </div>
+        <div class="node-kws">
+          <span class="kw" data-ko="공고: 매년 1~2월"        data-en="Notice: Jan–Feb annually"></span>
+          <span class="kw" data-ko="신청: K-Startup 온라인"  data-en="Apply: K-Startup online"></span>
+          <span class="kw" data-ko="서류 → 발표 평가"        data-en="Docs → Pitch eval"></span>
+          <span class="kw" data-ko="최종 선발 → 협약"        data-en="Final select → Agreement"></span>
+          <span class="kw" data-ko="협약 후 12개월 수행"     data-en="12 months post-agreement"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 06 서류 평가 전략 ── -->
+    <div class="pz-node" id="n6" style="left:2000px;top:1420px;height:265px" onclick="focusNode('n6')">
+      <div class="ov-layer ov-orange">
+        <span class="ov-icon">📝</span>
+        <span class="ov-title" data-ko="서류 평가 전략" data-en="Document Strategy"></span>
+        <span class="ov-seq">06</span>
+      </div>
+      <div class="dt-layer">
+        <div class="node-hd hd-orange">
+          <span class="node-icon">📝</span>
+          <span class="node-name" data-ko="서류 평가 전략" data-en="Document Strategy"></span>
+          <span class="node-seq">06</span>
+        </div>
+        <div class="node-kws">
+          <span class="kw" data-ko="제목 = 사업의 얼굴"              data-en="Title = Face of business"></span>
+          <span class="kw" data-ko="제목 30번↑ 수정"                data-en="Revise title 30+ times"></span>
+          <span class="kw" data-ko="평가순서: 제목 → 개요 → 본문"   data-en="Read: title→summary→body"></span>
+          <span class="kw" data-ko="제목 이해 O → 장점 탐색 → 고점" data-en="Title OK → strengths → high score"></span>
+          <span class="kw" data-ko="제목 이해 X → 감점 탐색"        data-en="Title unclear → find faults"></span>
+          <span class="kw" data-ko="Top-down: PPT → 개요 → 본문"    data-en="Top-down: PPT → outline → body"></span>
+          <span class="kw" data-ko="Bottom-up: 본문 → 개요 → 제목"  data-en="Bottom-up: body → outline → title"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 07 실전 꿀팁 ── -->
+    <div class="pz-node" id="n7" style="left:1230px;top:1650px;height:185px" onclick="focusNode('n7')">
+      <div class="ov-layer ov-red">
+        <span class="ov-icon">💡</span>
+        <span class="ov-title" data-ko="실전 꿀팁" data-en="Pro Tips"></span>
+        <span class="ov-seq">07</span>
+      </div>
+      <div class="dt-layer">
+        <div class="node-hd hd-red">
+          <span class="node-icon">💡</span>
+          <span class="node-name" data-ko="실전 꿀팁" data-en="Pro Tips"></span>
+          <span class="node-seq">07</span>
+        </div>
+        <div class="node-kws">
+          <span class="kw" data-ko="조기재취업수당 → 사업개시일 기준"  data-en="Early reemploy benefit → biz start date"></span>
+          <span class="kw" data-ko="사업자등록일 기준 아님 ❌"         data-en="NOT registration date ❌"></span>
+          <span class="kw" data-ko="선불요금제 결제일 → 월말"          data-en="Prepaid billing date → end of month"></span>
+          <span class="kw" data-ko="막달 중말 결제 차단 대비"          data-en="Mid-month block (last month) — plan ahead"></span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #canvas -->
+</div><!-- #vp -->
+
+<!-- 언어 토글 -->
+<div id="lang-bar">
+  <button class="lbtn active" onclick="setLang('ko')">KO</button>
+  <button class="lbtn"        onclick="setLang('en')">EN</button>
+</div>
+
+<!-- 네비게이션 -->
+<div id="nav">
+  <button class="nbtn ov" onclick="showOverview()">🗺 <span data-ko="전체" data-en="All"></span></button>
+  <button class="nbtn" onclick="prevNode()">‹</button>
+  <span id="nav-ctr"></span>
+  <button class="nbtn" onclick="nextNode()">›</button>
+</div>
+
+<div id="hint"
+     data-ko="클릭 → 집중 &nbsp;|&nbsp; ESC · 배경 클릭 → 전체보기 &nbsp;|&nbsp; ← → 이동"
+     data-en="Click → focus &nbsp;|&nbsp; ESC · bg click → overview &nbsp;|&nbsp; ← → navigate">
+</div>
+
+<script>
+/* ── 상수 ─────────────────────────── */
+const CW = 2800, CH = 1900;
+const ZOOM_IN = 2.0;
+const SEQ = ['n1','n2','n3','n4','n5','n6','n7'];
+
+/* ── 상태 ─────────────────────────── */
+let vw = window.innerWidth, vh = window.innerHeight;
+let curIdx  = -1;
+let curTX   = 0, curTY = 0, curScale = 1;
+let lang    = localStorage.getItem('prebiz_lang') || 'ko';
+let didDrag = false;
+
+const vp     = document.getElementById('vp');
+const canvas = document.getElementById('canvas');
+const ctrEl  = document.getElementById('nav-ctr');
+const hintEl = document.getElementById('hint');
+
+/* ── 언어 ─────────────────────────── */
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('prebiz_lang', l);
+  applyLang();
+}
+function applyLang() {
+  document.querySelectorAll('[data-ko]').forEach(el => {
+    const val = el.dataset[lang] || el.dataset.ko;
+    if (el.id === 'hint') el.innerHTML = val;
+    else                  el.textContent = val;
+  });
+  document.querySelectorAll('.lbtn').forEach(b =>
+    b.classList.toggle('active', b.textContent === lang.toUpperCase())
+  );
+  updateNav();
+}
+
+/* ── 트랜스폼 ──────────────────────── */
+function applyTF(tx, ty, s, dur = 820) {
+  canvas.style.transition = dur > 0
+    ? `transform ${dur}ms cubic-bezier(0.25,0.46,0.45,0.94)`
+    : 'none';
+  canvas.style.transform = `translate(${tx}px,${ty}px) scale(${s})`;
+  curTX = tx; curTY = ty; curScale = s;
+}
+
+/* ── 전체보기 ──────────────────────── */
+function fitVal() {
+  const s = Math.min((vw - 60) / CW, (vh - 80) / CH);
+  return { s, tx: (vw - CW * s) / 2, ty: (vh - CH * s) / 2 };
+}
+function showOverview() {
+  const f = fitVal();
+  applyTF(f.tx, f.ty, f.s);
+  curIdx = -1;
+  updateNav();
+  document.querySelectorAll('.pz-node').forEach(n => n.classList.remove('focused'));
+}
+
+/* ── 노드 포커스 ───────────────────── */
+function focusNode(id) {
+  const el = document.getElementById(id);
+  const nx = el.offsetLeft + el.offsetWidth  / 2;
+  const ny = el.offsetTop  + el.offsetHeight / 2;
+  applyTF(vw / 2 - nx * ZOOM_IN, vh / 2 - ny * ZOOM_IN, ZOOM_IN);
+  curIdx = SEQ.indexOf(id);
+  updateNav();
+  document.querySelectorAll('.pz-node').forEach(n => n.classList.remove('focused'));
+  el.classList.add('focused');
+}
+function prevNode() {
+  if (curIdx <= 0)            { showOverview(); return; }
+  focusNode(SEQ[curIdx - 1]);
+}
+function nextNode() {
+  if (curIdx < 0)             { focusNode(SEQ[0]); return; }
+  if (curIdx >= SEQ.length-1) { showOverview(); return; }
+  focusNode(SEQ[curIdx + 1]);
+}
+function updateNav() {
+  ctrEl.textContent = curIdx < 0
+    ? (lang === 'ko' ? '전체 보기' : 'Overview')
+    : `${curIdx + 1} / ${SEQ.length}`;
+}
+
+/* ── SVG 연결선 ────────────────────── */
+function drawLines() {
+  const svg  = document.getElementById('svg-lines');
+  const hub  = document.getElementById('n-hub');
+  const hx   = hub.offsetLeft + hub.offsetWidth  / 2;
+  const hy   = hub.offsetTop  + hub.offsetHeight / 2;
+  SEQ.forEach(id => {
+    const el = document.getElementById(id);
+    const nx = el.offsetLeft + el.offsetWidth  / 2;
+    const ny = el.offsetTop  + el.offsetHeight / 2;
+    /* 살짝 휜 곡선 — 수직 성분 기반 제어점 */
+    const mx  = (hx + nx) / 2;
+    const my  = (hy + ny) / 2;
+    const cpx = mx + (ny - hy) * 0.08;
+    const cpy = my - (nx - hx) * 0.08;
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d', `M${hx},${hy} Q${cpx},${cpy} ${nx},${ny}`);
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke','rgba(99,102,241,0.2)');
+    p.setAttribute('stroke-width','2');
+    p.setAttribute('stroke-dasharray','7 5');
+    svg.appendChild(p);
+  });
+}
+
+/* ── 드래그 패닝 ───────────────────── */
+let dragging = false, dsx = 0, dsy = 0;
+vp.addEventListener('mousedown', e => {
+  if (e.target.closest('.pz-node,.pz-hub,#nav,#lang-bar')) return;
+  dragging = true; didDrag = false;
+  dsx = e.clientX - curTX; dsy = e.clientY - curTY;
+  vp.classList.add('grabbing');
+  canvas.style.transition = 'none';
+});
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  didDrag = true;
+  curTX = e.clientX - dsx; curTY = e.clientY - dsy;
+  canvas.style.transform = `translate(${curTX}px,${curTY}px) scale(${curScale})`;
+});
+window.addEventListener('mouseup', () => { dragging = false; vp.classList.remove('grabbing'); });
+
+/* ── 배경 클릭 → 전체보기 ─────────── */
+vp.addEventListener('click', e => {
+  if (e.target.closest('.pz-node,.pz-hub,#nav,#lang-bar')) return;
+  if (didDrag) { didDrag = false; return; }
+  if (curIdx >= 0) showOverview();
+});
+
+/* ── 휠 줌 ─────────────────────────── */
+vp.addEventListener('wheel', e => {
+  e.preventDefault();
+  const f  = e.deltaY < 0 ? 1.1 : 0.9;
+  const ns = Math.min(3.5, Math.max(0.12, curScale * f));
+  applyTF(
+    e.clientX - (e.clientX - curTX) * (ns / curScale),
+    e.clientY - (e.clientY - curTY) * (ns / curScale),
+    ns, 0
+  );
+  curIdx = -1; updateNav();
+}, { passive: false });
+
+/* ── 키보드 ────────────────────────── */
+window.addEventListener('keydown', e => {
+  if      (e.key === 'Escape')                       showOverview();
+  else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextNode(); }
+  else if (e.key === 'ArrowLeft')                    prevNode();
+  else if (e.key === 'ArrowDown')                    nextNode();
+  else if (e.key === 'ArrowUp')                      prevNode();
+  else if (e.key === 'Home')                         focusNode(SEQ[0]);
+  else if (e.key === 'End')                          focusNode(SEQ[SEQ.length-1]);
+});
+
+/* ── 터치 ──────────────────────────── */
+let tx0 = 0, ty0 = 0;
+vp.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  tx0 = e.touches[0].clientX - curTX;
+  ty0 = e.touches[0].clientY - curTY;
+  canvas.style.transition = 'none';
+}, { passive: true });
+vp.addEventListener('touchmove', e => {
+  if (e.touches.length !== 1) return;
+  curTX = e.touches[0].clientX - tx0;
+  curTY = e.touches[0].clientY - ty0;
+  canvas.style.transform = `translate(${curTX}px,${curTY}px) scale(${curScale})`;
+}, { passive: true });
+
+/* ── 리사이즈 ──────────────────────── */
+window.addEventListener('resize', () => {
+  vw = window.innerWidth; vh = window.innerHeight;
+  if (curIdx < 0) showOverview();
+});
+
+/* ── 초기화 ────────────────────────── */
+window.addEventListener('load', () => {
+  applyLang();
+  drawLines();
+  showOverview();
+  setTimeout(() => { hintEl.style.opacity = '0'; }, 5000);
+});
+</script>
+</body>
+</html>
