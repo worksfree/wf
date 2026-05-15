@@ -234,6 +234,11 @@
     .fs-acc-sub  { color:var(--sub); padding-left:18px; font-size:11px; }
     .fs-neg      { color:var(--danger); }
     .fs-zero     { color:var(--sub); }
+    /* account_detail 레이블 (SCE 자본 구성요소 등) */
+    .fs-detail-label { color:var(--sub); font-size:10px; font-weight:400; margin-left:3px; }
+    /* SCE 구조 안내 문구 */
+    .fs-sce-note { font-size:10px; font-weight:400; color:var(--muted); margin-left:8px;
+                   vertical-align:middle; letter-spacing:0; text-transform:none; }
 
     .fs-actions {
       padding:12px 20px; border-top:1px solid var(--border);
@@ -397,6 +402,7 @@ const I18N = {
     fs_account:'계정과목',
     fs_dl_csv:'CSV 다운로드',
     fs_sj:{ BS:'재무상태표', IS:'손익계산서', CIS:'포괄손익계산서', CF:'현금흐름표', SCE:'자본변동표' },
+    fs_sce_note:'※ 각 행은 자본 구성요소별(자본금·이익잉여금 등) 변동액입니다',
     dash:'-',
     preview_detail_tip:'로그인 후 상세 정보를 확인할 수 있습니다.',
     tab_single:'단건 조회', tab_bulk:'CSV 대량조회',
@@ -446,6 +452,7 @@ const I18N = {
     fs_account:'Account',
     fs_dl_csv:'Download CSV',
     fs_sj:{ BS:'Balance Sheet', IS:'Income Statement', CIS:'Comprehensive Income', CF:'Cash Flow', SCE:'Changes in Equity' },
+    fs_sce_note:'※ Each row shows changes per equity component (capital, retained earnings, etc.)',
     dash:'-',
     preview_detail_tip:'Log in to view company details.',
     tab_single:'Single Search', tab_bulk:'Bulk CSV',
@@ -1098,10 +1105,12 @@ function renderFinSheet(list) {
 
   let html = '';
   for (const div of divs) {
-    const grp  = groups[div];
-    const sjNm = (t('fs_sj') || {})[div] || grp.nm;
+    const grp    = groups[div];
+    const sjNm   = (t('fs_sj') || {})[div] || grp.nm;
+    const sceTag = div === 'SCE'
+      ? `<span class="fs-sce-note">${t('fs_sce_note')}</span>` : '';
     html += `<div class="fs-section">
-      <div class="fs-section-title">${sjNm} (${div})</div>
+      <div class="fs-section-title">${sjNm} (${div})${sceTag}</div>
       <table class="fs-table">
         <thead><tr>
           <th>${t('fs_account')}</th>
@@ -1118,12 +1127,23 @@ function renderFinSheet(list) {
 
 /* ── 재무제표 행 렌더 ── */
 function buildFsRow(r, hasPP) {
-  // 들여쓰기: account_detail이 '-'가 아니거나 account_nm이 공백으로 시작하면 sub
-  const isSub = r.account_detail !== '-' || /^\s/.test(r.account_nm);
+  const detail    = (r.account_detail || '').trim();
+  const hasDetail = detail && detail !== '-';
+
+  // 들여쓰기: account_nm에 선행 공백이 있는 경우만 sub (하위 계정)
+  // account_detail은 들여쓰기 기준이 아닌 레이블로만 활용
+  const isSub = /^\s/.test(r.account_nm);
   const cls   = isSub ? 'fs-acc-sub' : 'fs-acc-main';
   const nm    = r.account_nm.trim();
+
+  // account_detail이 있으면 계정명 뒤에 소형 레이블로 표시
+  // (SCE의 자본 구성요소 컬럼 구분, 일부 BS/IS 세부 항목 등)
+  const label = hasDetail
+    ? `${nm}<span class="fs-detail-label">(${detail})</span>`
+    : nm;
+
   return `<tr>
-    <td class="${cls}" title="${r.account_id||''}">${nm}</td>
+    <td class="${cls}" title="${r.account_id||''}">${label}</td>
     <td>${fmtFsAmount(r.thstrm_amount)}</td>
     <td>${fmtFsAmount(r.frmtrm_amount)}</td>
     ${hasPP ? `<td>${fmtFsAmount(r.bfefrmtrm_amount)}</td>` : ''}
@@ -1157,15 +1177,20 @@ function downloadFinSheetCsv() {
     lang === 'ko' ? '재무제표명'   : 'FS Name',
     lang === 'ko' ? '계정과목ID'   : 'Account ID',
     lang === 'ko' ? '계정과목'     : 'Account',
+    lang === 'ko' ? '구성항목'     : 'Detail',   // account_detail (SCE 자본구성요소 등)
     colCur, colPrev, colPP,
     lang === 'ko' ? '통화' : 'Currency',
   ];
 
-  const rows = list.map(r => [
-    r.sj_div, r.sj_nm, r.account_id || '', r.account_nm,
-    r.thstrm_amount || '', r.frmtrm_amount || '', r.bfefrmtrm_amount || '',
-    r.currency || 'KRW',
-  ].map(esc).join(','));
+  const rows = list.map(r => {
+    const detail = (r.account_detail || '').trim();
+    return [
+      r.sj_div, r.sj_nm, r.account_id || '', r.account_nm,
+      detail !== '-' ? detail : '',
+      r.thstrm_amount || '', r.frmtrm_amount || '', r.bfefrmtrm_amount || '',
+      r.currency || 'KRW',
+    ].map(esc).join(',');
+  });
 
   const bom  = '﻿';
   const csv  = bom + headers.map(esc).join(',') + '\n' + rows.join('\n');
