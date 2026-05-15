@@ -820,6 +820,34 @@
   .credit-note {
     font-size:11px; color:var(--muted); margin-top:14px; line-height:1.6;
   }
+  /* ── 크레딧/구독 탭 ───────────────────── */
+  .credit-tabs { display:flex; gap:6px; margin-bottom:16px; }
+  .credit-tab  {
+    flex:1; padding:8px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--muted); font-size:13px; cursor:pointer;
+    font-family:inherit; transition:all .15s;
+  }
+  .credit-tab.active {
+    border-color:var(--accent); color:var(--accent);
+    background:rgba(59,130,246,.08); font-weight:600;
+  }
+  /* ── 구독 패키지 카드 ─────────────────── */
+  .sub-pkg-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
+  .sub-pkg {
+    position:relative; border:1.5px solid var(--border); border-radius:10px;
+    padding:20px 12px 14px; cursor:pointer; text-align:center;
+    transition:border-color .15s, background .15s;
+  }
+  .sub-pkg:hover    { border-color:var(--accent); background:rgba(59,130,246,.07); }
+  .sub-pkg.selected { border-color:var(--accent); background:rgba(59,130,246,.13); }
+  .sub-pkg-badge {
+    position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+    background:var(--accent); color:#fff; font-size:10px; font-weight:700;
+    padding:2px 9px; border-radius:10px; white-space:nowrap;
+  }
+  .sub-pkg-name  { font-size:14px; font-weight:700; margin-bottom:8px; }
+  .sub-pkg-price { font-size:20px; font-weight:800; color:var(--accent); }
+  .sub-pkg-desc  { font-size:11px; color:var(--muted); margin-top:6px; line-height:1.5; }
   /* ── 토스트 알림 ─────────────────────── */
   #wf-toast {
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
@@ -1105,7 +1133,16 @@
     <button class="credit-close" onclick="closeCreditModal()">✕</button>
     <div class="credit-title" id="credit-modal-title">크레딧 구매</div>
     <div class="credit-sub"   id="credit-modal-sub">앱 이용에 사용되는 크레딧을 충전합니다.</div>
-    <div class="credit-pkg-grid" id="credit-pkg-grid"><!-- JS 렌더 --></div>
+    <div class="credit-tabs">
+      <button class="credit-tab active" id="tab-credit" onclick="switchCreditTab('credit')">크레딧 충전</button>
+      <button class="credit-tab"        id="tab-sub"    onclick="switchCreditTab('sub')">기간제 구독</button>
+    </div>
+    <div id="credit-pkg-panel">
+      <div class="credit-pkg-grid" id="credit-pkg-grid"><!-- JS 렌더 --></div>
+    </div>
+    <div id="sub-pkg-panel" style="display:none">
+      <div class="sub-pkg-grid" id="sub-pkg-grid"><!-- JS 렌더 --></div>
+    </div>
     <div class="credit-pay-btns">
       <button class="credit-pay-btn toss"   id="credit-btn-toss"   onclick="purchaseWithToss()"   disabled>🇰🇷 Toss Payments (국내)</button>
       <button class="credit-pay-btn stripe" id="credit-btn-stripe" onclick="purchaseWithStripe()" disabled>🌍 Stripe (해외 카드)</button>
@@ -1288,10 +1325,14 @@ const HUB_I18N = {
     overlay_back:            '홈으로 돌아가기',
     // 크레딧 구매
     credit_buy_btn:          '크레딧 구매',
-    credit_modal_title:      '크레딧 구매',
-    credit_modal_sub:        '앱 이용에 사용되는 크레딧을 충전합니다.',
+    credit_modal_title:      '크레딧 / 구독',
+    credit_modal_sub:        '앱 이용에 사용되는 크레딧을 충전하거나 기간제 구독을 시작하세요.',
     credit_unit:             '크레딧',
     credit_popular:          '인기',
+    credit_tab_credit:       '크레딧 충전',
+    credit_tab_sub:          '기간제 구독',
+    credit_sub_ok:           '구독이 활성화됐습니다!',
+    credit_sub_label:        '구독',
     credit_btn_toss:         '🇰🇷 Toss Payments (국내)',
     credit_btn_stripe:       '🌍 Stripe (해외 카드)',
     credit_btn_paying:       '결제 진행 중...',
@@ -1314,6 +1355,7 @@ const HUB_I18N = {
     ch_reason_use_app:       '앱 사용',
     ch_reason_admin_grant:   '지급 (관리자)',
     ch_reason_refund:        '환불',
+    ch_reason_subscription:  '구독 활성화',
   },
   en: {
     home:          'Home',
@@ -1376,11 +1418,15 @@ const HUB_I18N = {
     overlay_btn:             'Sign In / Sign Up',
     overlay_back:            'Back to Home',
     // Credits
-    credit_buy_btn:          'Buy Credits',
-    credit_modal_title:      'Buy Credits',
-    credit_modal_sub:        'Top up credits used for WorksFree app services.',
+    credit_buy_btn:          'Credits / Subscribe',
+    credit_modal_title:      'Credits / Subscribe',
+    credit_modal_sub:        'Top up credits for app usage, or start an unlimited subscription.',
     credit_unit:             'credits',
     credit_popular:          'Popular',
+    credit_tab_credit:       'Top Up Credits',
+    credit_tab_sub:          'Subscribe',
+    credit_sub_ok:           'Subscription activated!',
+    credit_sub_label:        'Subscription',
     credit_btn_toss:         '🇰🇷 Toss Payments (Korea)',
     credit_btn_stripe:       '🌍 Stripe (International)',
     credit_btn_paying:       'Processing...',
@@ -1403,6 +1449,7 @@ const HUB_I18N = {
     ch_reason_use_app:       'App Usage',
     ch_reason_admin_grant:   'Granted (Admin)',
     ch_reason_refund:        'Refund',
+    ch_reason_subscription:  'Subscription Activated',
   }
 };
 
@@ -1520,13 +1567,19 @@ function applyHubLang() {
   const elCreditToss   = document.getElementById('credit-btn-toss');
   const elCreditStripe = document.getElementById('credit-btn-stripe');
   const elCreditNote   = document.getElementById('credit-note');
+  const elTabCredit    = document.getElementById('tab-credit');
+  const elTabSub       = document.getElementById('tab-sub');
   if (elCreditTitle)  elCreditTitle.textContent  = t('credit_modal_title');
   if (elCreditSub)    elCreditSub.textContent    = t('credit_modal_sub');
   if (elCreditToss && !elCreditToss.disabled)   elCreditToss.textContent   = t('credit_btn_toss');
   if (elCreditStripe && !elCreditStripe.disabled) elCreditStripe.textContent = t('credit_btn_stripe');
   if (elCreditNote)   elCreditNote.textContent   = t('credit_note');
+  if (elTabCredit)    elTabCredit.textContent     = t('credit_tab_credit');
+  if (elTabSub)       elTabSub.textContent        = t('credit_tab_sub');
   // 크레딧 패키지 그리드 재렌더 (열려 있을 때만)
-  if (document.getElementById('credit-modal')?.classList.contains('show')) renderCreditPkgs();
+  if (document.getElementById('credit-modal')?.classList.contains('show')) {
+    if (_currentTab === 'credit') renderCreditPkgs(); else renderSubPkgs();
+  }
 }
 
 const HUB_VERSION = '0.7.1.4';             // deploy.ps1이 자동 증가
@@ -2459,26 +2512,48 @@ async function devLogout() {
    크레딧 구매 & 결제
 ════════════════════════════════════════════ */
 
-// 크레딧 패키지 정의
+// ── 크레딧 패키지 (RPA 앱 크레딧 단가 기준) ─────────────────────
+// bom_exporter:100/file, batch_print:40/file, attribute_reset:200/work, dwg_classifier:50/work
 const CREDIT_PKGS = [
-  { id:'basic',    credits:50,  krw:5500,  usd:4.99,  label:{ko:'베이직',   en:'Basic'}    },
-  { id:'standard', credits:150, krw:14000, usd:12.99, label:{ko:'스탠다드', en:'Standard'}, popular:true },
-  { id:'pro',      credits:500, krw:39000, usd:34.99, label:{ko:'프로',     en:'Pro'}      },
+  { id:'starter',  credits:100,  krw:9900,  usd:8.99,  label:{ko:'스타터',   en:'Starter'}  },
+  { id:'standard', credits:300,  krw:27000, usd:23.99, label:{ko:'스탠다드', en:'Standard'}, popular:true },
+  { id:'pro',      credits:1000, krw:79000, usd:69.99, label:{ko:'프로',     en:'Pro'}      },
 ];
 
-// ── Worker URL (배포 후 실제 URL로 교체) ──────────────────────────
-// Cloudflare → Workers & Pages → 각 워커 URL 확인
+// ── 기간제 구독 패키지 (purchased_credits:-1 정책 반영) ───────────
+const SUB_PKGS = [
+  {
+    id:'monthly', period:30, krw:39000, usd:34.99,
+    label:{ ko:'월간 구독', en:'Monthly' },
+    desc: { ko:'₩39,000/월\n무제한 이용', en:'₩39,000/mo\nUnlimited' },
+  },
+  {
+    id:'annual', period:365, krw:320000, usd:279.99,
+    label:{ ko:'연간 구독', en:'Annual' },
+    desc: { ko:'₩320,000/년\n약 18% 절약', en:'₩320,000/yr\nSave ~18%' },
+    popular: true,
+  },
+];
+
+// ── Worker URL ──────────────────────────────────────────────────
 const TOSS_VERIFY_URL    = 'https://toss-verify.worksfree.workers.dev';
 const STRIPE_SESSION_URL = 'https://stripe-session.worksfree.workers.dev';
-// ── Toss Payments 클라이언트 키 ───────────────────────────────────
-// Toss 대시보드 → 개발 → API 키 → 테스트 클라이언트 키
-const TOSS_CLIENT_KEY = 'test_ck_YOUR_TOSS_CLIENT_KEY';
+// ── Toss Payments 클라이언트 키 (테스트) ────────────────────────
+const TOSS_CLIENT_KEY = 'test_ck_d46qopOB89Z0Z0ZQxGBE3ZmM75y0';
 
 let _selectedPkg = null;
+let _selectedSub = null;
+let _currentTab  = 'credit';
 
 function openCreditModal() {
   if (!authUser) { openAuthModal(); return; }
   _selectedPkg = null;
+  _selectedSub = null;
+  _currentTab  = 'credit';
+  document.getElementById('tab-credit')?.classList.add('active');
+  document.getElementById('tab-sub')?.classList.remove('active');
+  document.getElementById('credit-pkg-panel').style.display = '';
+  document.getElementById('sub-pkg-panel').style.display    = 'none';
   renderCreditPkgs();
   _updateCreditPayBtns();
   document.getElementById('credit-result').className = 'credit-result';
@@ -2486,6 +2561,18 @@ function openCreditModal() {
 }
 function closeCreditModal() {
   document.getElementById('credit-modal').classList.remove('show');
+}
+
+function switchCreditTab(tab) {
+  _currentTab  = tab;
+  _selectedPkg = null;
+  _selectedSub = null;
+  document.getElementById('tab-credit').classList.toggle('active', tab === 'credit');
+  document.getElementById('tab-sub').classList.toggle('active',    tab === 'sub');
+  document.getElementById('credit-pkg-panel').style.display = tab === 'credit' ? '' : 'none';
+  document.getElementById('sub-pkg-panel').style.display    = tab === 'sub'    ? '' : 'none';
+  if (tab === 'sub') renderSubPkgs();
+  _updateCreditPayBtns();
 }
 
 function renderCreditPkgs() {
@@ -2514,8 +2601,33 @@ function selectCreditPkg(i) {
   _updateCreditPayBtns();
 }
 
+function renderSubPkgs() {
+  const grid = document.getElementById('sub-pkg-grid');
+  if (!grid) return;
+  const popular = t('credit_popular');
+  grid.innerHTML = SUB_PKGS.map((pkg, i) => {
+    const name = pkg.label[lang] || pkg.label.ko;
+    const desc = (pkg.desc[lang] || pkg.desc.ko).replace(/\n/g, '<br>');
+    return `
+      <div class="sub-pkg" onclick="selectSubPkg(${i})" id="sub-pkg-${i}">
+        ${pkg.popular ? `<div class="sub-pkg-badge">${popular}</div>` : ''}
+        <div class="sub-pkg-name">${name}</div>
+        <div class="sub-pkg-price">₩${pkg.krw.toLocaleString()}</div>
+        <div class="sub-pkg-desc">${desc}</div>
+      </div>`;
+  }).join('');
+}
+
+function selectSubPkg(i) {
+  _selectedSub = SUB_PKGS[i];
+  document.querySelectorAll('.sub-pkg').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+  });
+  _updateCreditPayBtns();
+}
+
 function _updateCreditPayBtns() {
-  const on = !!_selectedPkg;
+  const on = _currentTab === 'credit' ? !!_selectedPkg : !!_selectedSub;
   const tossBtn   = document.getElementById('credit-btn-toss');
   const stripeBtn = document.getElementById('credit-btn-stripe');
   if (tossBtn)   { tossBtn.disabled   = !on; if (on) tossBtn.textContent   = t('credit_btn_toss'); }
@@ -2523,13 +2635,22 @@ function _updateCreditPayBtns() {
 }
 
 async function purchaseWithToss() {
-  if (!_selectedPkg || !authUser) return;
-  const pkg      = _selectedPkg;
-  const orderId  = 'wf_' + Date.now() + '_' + authUser.id.slice(0, 8);
-  const origin   = location.origin + location.pathname;
+  const isCredit = _currentTab === 'credit';
+  const pkg      = isCredit ? _selectedPkg : _selectedSub;
+  if (!pkg || !authUser) return;
+
+  const amount    = pkg.krw;
+  const credits   = isCredit ? pkg.credits : 0;
+  const subId     = isCredit ? '' : pkg.id;
+  const orderId   = 'wf_' + Date.now() + '_' + authUser.id.slice(0, 8);
+  const origin    = location.origin + location.pathname;
+  const orderName = isCredit
+    ? `WorksFree ${pkg.credits}${t('credit_unit')}`
+    : `WorksFree ${pkg.label[lang] || pkg.label.ko} ${t('credit_sub_label')}`;
   const successUrl = origin + '?payment=toss_ok&orderId=' + orderId
-                   + '&credits=' + pkg.credits + '&amount=' + pkg.krw;
-  const failUrl    = origin + '?payment=toss_fail';
+    + '&credits=' + credits + '&amount=' + amount
+    + (subId ? '&sub=' + subId : '');
+  const failUrl = origin + '?payment=toss_fail';
 
   let tossPayments;
   try {
@@ -2541,9 +2662,7 @@ async function purchaseWithToss() {
 
   try {
     await tossPayments.requestPayment('카드', {
-      amount:       pkg.krw,
-      orderId,
-      orderName:    `WorksFree ${pkg.credits}${t('credit_unit')}`,
+      amount, orderId, orderName,
       customerName: authUser.user_metadata?.full_name || authUser.email,
       successUrl,
       failUrl,
@@ -2603,7 +2722,8 @@ async function initPaymentResult() {
     const paymentKey = p.get('paymentKey');
     const amount     = parseInt(p.get('amount')  || '0');
     const credits    = parseInt(p.get('credits') || '0');
-    await _handleTossSuccess(orderId, paymentKey, amount, credits);
+    const subId      = p.get('sub') || '';
+    await _handleTossSuccess(orderId, paymentKey, amount, credits, subId);
   } else if (payment === 'toss_fail') {
     showToast(t('credit_fail'), 'warn');
   } else if (payment === 'stripe_ok') {
@@ -2615,7 +2735,7 @@ async function initPaymentResult() {
   }
 }
 
-async function _handleTossSuccess(orderId, paymentKey, amount, credits) {
+async function _handleTossSuccess(orderId, paymentKey, amount, credits, subId) {
   try {
     const res  = await fetch(TOSS_VERIFY_URL, {
       method: 'POST',
@@ -2624,8 +2744,11 @@ async function _handleTossSuccess(orderId, paymentKey, amount, credits) {
     });
     const data = await res.json();
     if (!res.ok || data.error) throw new Error(data.error || '검증 실패');
-    await _recordPurchase(orderId, 'toss', amount, 0, credits);
-    showToast(`✅ ${credits}${t('credit_unit')} ${t('credit_ok')}`, 'ok');
+    await _recordPurchase(orderId, 'toss', amount, 0, credits, subId);
+    const msg = subId
+      ? `✅ ${t('credit_sub_ok')}`
+      : `✅ ${credits}${t('credit_unit')} ${t('credit_ok')}`;
+    showToast(msg, 'ok');
     loadCreditBalance();
   } catch (e) {
     showToast(t('credit_verify_err') + e.message, 'err');
@@ -2649,12 +2772,32 @@ async function _handleStripeSuccess(sessionId, credits) {
   }
 }
 
-/* ── 크레딧 잔액 로드 + 드롭다운 표시 ── */
+/* ── 크레딧 잔액 / 구독 상태 로드 ── */
 async function loadCreditBalance() {
   const el = document.getElementById('userBalance');
   if (!el) return;
   if (!_sbReady || !_sb || !authUser) { el.textContent = '💎 —'; return; }
   el.textContent = t('credit_balance_loading');
+
+  // 활성 구독 우선 확인
+  const { data: sub } = await _sb
+    .from('subscriptions')
+    .select('plan, expires_at')
+    .eq('user_id', authUser.id)
+    .gt('expires_at', new Date().toISOString())
+    .order('expires_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (sub) {
+    const pkg      = SUB_PKGS.find(p => p.id === sub.plan);
+    const planName = pkg ? (pkg.label[lang] || pkg.label.ko) : sub.plan;
+    const expDate  = new Date(sub.expires_at).toLocaleDateString(lang === 'ko' ? 'ko-KR' : 'en-US', { month:'short', day:'numeric' });
+    el.textContent = `🔑 ${planName} (~${expDate})`;
+    return;
+  }
+
+  // 크레딧 잔액
   const { data } = await _sb
     .from('credit_balance')
     .select('balance')
@@ -2666,10 +2809,11 @@ async function loadCreditBalance() {
 
 /* ── 크레딧 내역 모달 ── */
 const REASON_MAP = {
-  purchase:    { icon:'💳', key:'ch_reason_purchase' },
-  use_app:     { icon:'⚡', key:'ch_reason_use_app' },
-  admin_grant: { icon:'🎁', key:'ch_reason_admin_grant' },
-  refund:      { icon:'↩️', key:'ch_reason_refund' },
+  purchase:     { icon:'💳', key:'ch_reason_purchase' },
+  use_app:      { icon:'⚡', key:'ch_reason_use_app' },
+  admin_grant:  { icon:'🎁', key:'ch_reason_admin_grant' },
+  refund:       { icon:'↩️', key:'ch_reason_refund' },
+  subscription: { icon:'🔑', key:'ch_reason_subscription' },
 };
 
 function openCreditHistory() {
@@ -2737,16 +2881,39 @@ async function loadCreditHistory() {
   }).join('');
 }
 
-async function _recordPurchase(orderId, pg, krw, usd, credits) {
+async function _recordPurchase(orderId, pg, krw, usd, credits, subId) {
   if (!authUser || !_sb) return;
   await _sb.from('payments').insert({
     user_id: authUser.id, order_id: orderId, pg,
-    amount_krw: krw, amount_usd: usd, credits, status: 'paid',
+    amount_krw: krw, amount_usd: usd,
+    credits: credits || 0,
+    sub_id:  subId  || null,
+    status: 'paid',
   });
-  await _sb.from('credits').insert({
-    user_id: authUser.id, delta: credits,
-    reason: 'purchase', ref_order_id: orderId,
-  });
+  if (credits > 0) {
+    await _sb.from('credits').insert({
+      user_id: authUser.id, delta: credits,
+      reason: 'purchase', ref_order_id: orderId,
+    });
+  }
+  if (subId) {
+    const subPkg = SUB_PKGS.find(p => p.id === subId);
+    if (subPkg) {
+      const expiresAt = new Date(Date.now() + subPkg.period * 24 * 3600 * 1000).toISOString();
+      await _sb.from('subscriptions').upsert({
+        user_id:      authUser.id,
+        plan:         subId,
+        starts_at:    new Date().toISOString(),
+        expires_at:   expiresAt,
+        ref_order_id: orderId,
+      }, { onConflict: 'user_id' });
+      await _sb.from('credits').insert({
+        user_id: authUser.id, delta: 0,
+        reason: 'subscription', ref_order_id: orderId,
+        note: subPkg.label.ko,
+      });
+    }
+  }
 }
 
 /* 토스트 알림 */

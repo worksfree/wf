@@ -59,7 +59,8 @@ CREATE TABLE payments (
   pg          text NOT NULL,          -- 'toss' | 'stripe'
   amount_krw  integer DEFAULT 0,
   amount_usd  numeric(10,2) DEFAULT 0,
-  credits     integer NOT NULL,
+  credits     integer NOT NULL DEFAULT 0,
+  sub_id      text,                   -- 구독 패키지 ID (크레딧 구매 시 NULL)
   status      text DEFAULT 'paid',
   created_at  timestamptz DEFAULT now()
 );
@@ -68,23 +69,43 @@ CREATE TABLE payments (
 CREATE TABLE credits (
   id           uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id      uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-  delta        integer NOT NULL,       -- 양수: 충전, 음수: 차감
-  reason       text NOT NULL,          -- 'purchase' | 'usage' | 'refund'
+  delta        integer NOT NULL,
+  reason       text NOT NULL,          -- 'purchase' | 'use_app' | 'refund' | 'admin_grant' | 'subscription'
   ref_order_id text,
+  app_id       text,                   -- 앱 사용 시 앱 식별자 (bom_exporter 등)
+  note         text,                   -- 자유 메모
   created_at   timestamptz DEFAULT now()
 );
 
+-- 기간제 구독 (per-user, upsert 방식으로 갱신)
+CREATE TABLE subscriptions (
+  id           uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id      uuid REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+  plan         text NOT NULL,          -- 'monthly' | 'annual'
+  starts_at    timestamptz NOT NULL DEFAULT now(),
+  expires_at   timestamptz NOT NULL,
+  ref_order_id text,
+  created_at   timestamptz DEFAULT now(),
+  updated_at   timestamptz DEFAULT now()
+);
+
 -- RLS 활성화
-ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE credits  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE credits       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- 본인 데이터만 접근
-CREATE POLICY "payments_self" ON payments USING (auth.uid() = user_id);
-CREATE POLICY "credits_self"  ON credits  USING (auth.uid() = user_id);
+CREATE POLICY "payments_self"      ON payments      USING (auth.uid() = user_id);
+CREATE POLICY "credits_self"       ON credits       USING (auth.uid() = user_id);
+CREATE POLICY "subscriptions_self" ON subscriptions USING (auth.uid() = user_id);
 
--- 잔여 크레딧 계산 뷰
+-- 잔여 크레딧 계산 뷰 (total_charged / total_used / balance)
 CREATE VIEW credit_balance AS
-  SELECT user_id, SUM(delta) AS balance
+  SELECT
+    user_id,
+    COALESCE(SUM(delta), 0)                        AS balance,
+    COALESCE(SUM(CASE WHEN delta > 0 THEN  delta ELSE 0 END), 0) AS total_charged,
+    COALESCE(SUM(CASE WHEN delta < 0 THEN -delta ELSE 0 END), 0) AS total_used
   FROM credits
   GROUP BY user_id;
 ```
