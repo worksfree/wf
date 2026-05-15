@@ -179,6 +179,46 @@ $utf8bom = New-Object System.Text.UTF8Encoding $true
 
 > **예외**: 서버 간 API 데이터 교환용 CSV (사람이 직접 Excel으로 열지 않는 파일)는 순수 UTF-8(BOM 없음)도 허용.
 
+## Excel 숫자 포맷 규칙 (전체 프로젝트 공통 — 필수)
+
+Excel 파일(.xlsx)을 생성할 때 **숫자 셀은 반드시 정수/소수 포맷을 명시**해야 한다.
+
+- **문제**: 포맷 미지정 시 Excel이 큰 숫자를 과학적 표기법(`3.58902E+14`)으로 표시함.
+- **적용 범위**: SheetJS(xlsx.js), openpyxl, xlsxwriter 등 모든 Excel 생성 라이브러리.
+
+### 구현 방법
+
+**JavaScript — SheetJS (웹):**
+```javascript
+// aoa_to_sheet 후 반드시 호출
+function setIntegerFormat(ws) {
+  if (!ws['!ref']) return;
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+      if (cell && cell.t === 'n') cell.z = '0';  // 정수 포맷
+    }
+  }
+}
+// 소수점이 필요한 경우: cell.z = '0.00'
+```
+
+**Python — openpyxl:**
+```python
+from openpyxl.styles import numbers
+cell.number_format = '#,##0'      # 천단위 구분자 포함 정수
+cell.number_format = '#,##0.00'   # 소수점 2자리
+```
+
+**Python — xlsxwriter:**
+```python
+fmt_int = workbook.add_format({'num_format': '#,##0'})
+worksheet.write_number(row, col, value, fmt_int)
+```
+
+> **예외**: 비율(%), 소수 등 정밀도가 필요한 셀은 적합한 포맷(`'0.00'`, `'0.00%'`)을 명시.
+
 ## 버전 규칙 (전체 프로젝트 공통)
 
 버전 형식: `MAJOR.MINOR.PATCH.BUILD` (예: `0.7.0.3`)

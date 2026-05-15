@@ -905,8 +905,11 @@ async function startBulk() {
   document.getElementById('btn-start').disabled = true;
   document.getElementById('btn-stop').style.display = '';
   document.getElementById('bulk-progress').style.display = '';
-  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('progress-fill').style.width = '3%';  // 즉시 시작 표시
+  document.getElementById('progress-info').textContent =
+    t('bulk_processing').replace('{done}', 0).replace('{total}', rows.length);
   renderBulkTable(bulkState.rows);
+  await new Promise(r => setTimeout(r, 60));  // 브라우저 첫 렌더 보장
 
   let done = 0;
   for (let i = 0; i < rows.length; i += CHUNK) {
@@ -1089,13 +1092,15 @@ async function downloadBulkExcel() {
   const progFill = document.getElementById('dl-progress-fill');
   const progInfo = document.getElementById('dl-progress-info');
   if (progWrap) progWrap.style.display = '';
+  // 루프 시작 전 즉시 표시 — 브라우저가 첫 프레임을 렌더할 시간 확보
+  if (progFill) progFill.style.width = '3%';
+  if (progInfo) progInfo.textContent = t('bulk_dl_progress').replace('{done}', 0).replace('{total}', toProcess.length);
+  await new Promise(r => setTimeout(r, 60));
 
   const zip = new JSZip();
   let done = 0, ok = 0;
 
   for (const row of toProcess) {
-    if (progFill) progFill.style.width = (done / toProcess.length * 100) + '%';
-    if (progInfo) progInfo.textContent = t('bulk_dl_progress').replace('{done}', done).replace('{total}', toProcess.length);
     try {
       const wb = await buildCorpExcelWb(row.corp_code, row.corp_name, year, reprt, fsDiv);
       if (wb) {
@@ -1106,6 +1111,10 @@ async function downloadBulkExcel() {
       }
     } catch(e) { /* skip */ }
     done++;
+    // 처리 완료 후 진행률 업데이트 — fetch가 await이므로 다음 이터레이션 전 repaint 가능
+    const pct = Math.max(3, Math.round(done / toProcess.length * 100));
+    if (progFill) progFill.style.width = pct + '%';
+    if (progInfo) progInfo.textContent = t('bulk_dl_progress').replace('{done}', done).replace('{total}', toProcess.length);
   }
 
   if (progFill) progFill.style.width = '100%';
@@ -1403,6 +1412,7 @@ function buildFinExcelWb(list, corpName, year, fsDiv) {
     }
     const ws = XLSX.utils.aoa_to_sheet(dataRows);
     ws['!cols'] = [{ wch: 18 }, { wch: 30 }, { wch: 16 }, { wch: 16 }, ...(hasPP ? [{ wch: 16 }] : [])];
+    setIntegerFormat(ws);
     XLSX.utils.book_append_sheet(wb, ws, SHEET_NM[div] || div);
   }
 
@@ -1437,6 +1447,7 @@ function buildFinExcelWb(list, corpName, year, fsDiv) {
     if (hasPP) matrix.push([''], ...buildMatrix(mapPP, colPP));
     const sceWs = XLSX.utils.aoa_to_sheet(matrix);
     sceWs['!cols'] = [{ wch: 26 }, ...eqCols.map(() => ({ wch: 14 }))];
+    setIntegerFormat(sceWs);
     XLSX.utils.book_append_sheet(wb, sceWs, '자본변동표');
   }
 
@@ -1448,6 +1459,18 @@ function parseFsAmount(raw) {
   if (!raw || raw.trim() === '' || raw.trim() === '-') return '';
   const n = parseInt(String(raw).replace(/,/g, ''), 10);
   return isNaN(n) ? raw : n;
+}
+
+/* ── SheetJS 워크시트 숫자 셀에 정수 포맷 적용 (E+14 방지) ── */
+function setIntegerFormat(ws) {
+  if (!ws['!ref']) return;
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+      if (cell && cell.t === 'n') cell.z = '0';
+    }
+  }
 }
 
 /* ── Init ── */
