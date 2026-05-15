@@ -1127,17 +1127,13 @@ function renderFinSheet(list) {
 
 /* ── 재무제표 행 렌더 ── */
 function buildFsRow(r, hasPP) {
-  const detail    = (r.account_detail || '').trim();
+  const detail    = cleanXbrlLabel((r.account_detail || '').trim());
   const hasDetail = detail && detail !== '-';
 
-  // 들여쓰기: account_nm에 선행 공백이 있는 경우만 sub (하위 계정)
-  // account_detail은 들여쓰기 기준이 아닌 레이블로만 활용
   const isSub = /^\s/.test(r.account_nm);
   const cls   = isSub ? 'fs-acc-sub' : 'fs-acc-main';
-  const nm    = r.account_nm.trim();
+  const nm    = cleanXbrlLabel(r.account_nm.trim());
 
-  // account_detail이 있으면 계정명 뒤에 소형 레이블로 표시
-  // (SCE의 자본 구성요소 컬럼 구분, 일부 BS/IS 세부 항목 등)
   const label = hasDetail
     ? `${nm}<span class="fs-detail-label">(${detail})</span>`
     : nm;
@@ -1148,6 +1144,15 @@ function buildFsRow(r, hasPP) {
     <td>${fmtFsAmount(r.frmtrm_amount)}</td>
     ${hasPP ? `<td>${fmtFsAmount(r.bfefrmtrm_amount)}</td>` : ''}
   </tr>`;
+}
+
+/* ── XBRL 타입 주석 제거 ── */
+// DART API는 XBRL 분류체계 주석을 bracket으로 반환:
+//   "별도재무제표 [member]" → "별도재무제표"
+//   "주식발행초과금 [구성요소]" → "주식발행초과금"
+function cleanXbrlLabel(str) {
+  if (!str) return str;
+  return str.replace(/\s*\[[^\]]+\]/g, '').trim();
 }
 
 /* ── 금액 포매팅 (백만원 단위) ── */
