@@ -98,8 +98,127 @@ synology-web/
 | staging | staging.worksfree.kr | /volume1/web/staging | 8082 |
 | portal | portal.worksfree.kr | /volume1/web/portal | 8080 |
 
+## 결제 데이터 환경 격리 (env 컬럼)
+
+test/staging/portal 세 환경이 **동일한 Supabase DB**를 공유하므로, 결제 관련 테이블에 `env` 컬럼으로 출처를 구분한다.
+
+### 컬럼 추가 SQL (최초 1회)
+
+```sql
+ALTER TABLE payments      ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'portal';
+ALTER TABLE credits       ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'portal';
+ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'portal';
+```
+
+### env 값 결정 규칙
+
+| 조건 | env 값 |
+|------|--------|
+| IS_DEV = true (dev 툴바) | `'dev'` |
+| hostname이 `test.`로 시작 | `'test'` |
+| hostname이 `staging.`로 시작 | `'staging'` |
+| 그 외 (portal, www 등) | `'portal'` |
+
+```javascript
+function getPaymentEnv() {
+  if (IS_DEV) return 'dev';
+  const h = location.hostname;
+  if (h.startsWith('test.'))    return 'test';
+  if (h.startsWith('staging.')) return 'staging';
+  return 'portal';
+}
+```
+
+### 사용 패턴
+
+- `_recordPurchase()` — 모든 insert/upsert에 `env: getPaymentEnv()` 추가
+- `loadCreditBalance()` / `loadCreditHistory()` — 모든 credits/subscriptions 쿼리에 `.eq('env', getPaymentEnv())` 추가
+- 이렇게 하면 각 환경은 자기 데이터만 보임
+
+### 출시 전 데이터 청소 SQL
+
+Supabase → SQL Editor에서 환경별 선택 삭제:
+
+```sql
+-- 개발 모드 데이터 삭제
+DELETE FROM credits       WHERE env = 'dev';
+DELETE FROM payments      WHERE env = 'dev';
+DELETE FROM subscriptions WHERE env = 'dev';
+
+-- test 서버 데이터 삭제
+DELETE FROM credits       WHERE env = 'test';
+DELETE FROM payments      WHERE env = 'test';
+DELETE FROM subscriptions WHERE env = 'test';
+
+-- staging 데이터 삭제
+DELETE FROM credits       WHERE env = 'staging';
+DELETE FROM payments      WHERE env = 'staging';
+DELETE FROM subscriptions WHERE env = 'staging';
+
+-- portal 데이터 삭제 (출시 전 시험 구매 정리)
+DELETE FROM credits       WHERE env = 'portal';
+DELETE FROM payments      WHERE env = 'portal';
+DELETE FROM subscriptions WHERE env = 'portal';
+
+-- 전체 한 번에 (완전 초기화)
+DELETE FROM credits;
+DELETE FROM payments;
+DELETE FROM subscriptions;
+```
+
+> **출시 체크리스트**: 정식 서비스 오픈 직전에 portal 데이터 삭제 후 시작. 그 이후에는 portal 데이터 = 실제 고객 데이터.
+
 ## Supabase 설정 필수값
 
 - `SUPABASE_URL` / `SUPABASE_ANON`: `index.html` 상단 상수
-- Redirect URLs: `https://test.worksfree.kr/**`, `https://staging.worksfree.kr/**`, `https://portal.worksfree.kr/**`
-- Site URL: `https://portal.worksfree.kr`
+
+### Redirect URLs 설정 경로
+
+```
+Supabase 대시보드
+  → Authentication
+    → URL Configuration
+      → Auth → Redirect URLs
+```
+
+등록 필요 URL:
+- `https://test.worksfree.kr/**`
+- `https://staging.worksfree.kr/**`
+- `https://portal.worksfree.kr/**`
+- `https://www.worksfree.kr/**` (www 사용 시)
+
+Site URL: `https://portal.worksfree.kr` (또는 www로 변경 시 `https://www.worksfree.kr`)
+
+## Cloudflare Tunnel 서브도메인 설정
+
+### 신규 서브도메인 추가 경로
+
+```
+Cloudflare 대시보드 (one.dash.cloudflare.com)
+  → Protect & Connect
+    → Networking
+      → Tunnels
+        → synology-tunnel
+          → Configure
+            → Public Hostnames 탭
+              → Add a public hostname  (또는 기존 행 Edit route)
+```
+
+| 필드 | 값 |
+|------|-----|
+| Subdomain | `test` / `staging` / `portal` / `www` |
+| Domain | `worksfree.kr` |
+| Service Type | `HTTP` |
+| URL | `localhost:포트` (환경별 포트 아래 표 참고) |
+
+Public Hostname을 저장하면 Cloudflare DNS에 Tunnel CNAME 레코드가 **자동 생성**된다.  
+DNS 탭에서 직접 레코드를 추가/삭제하지 말 것 — Tunnel이 관리하는 레코드임.
+
+### www 서브도메인 추가 시 주의
+
+www를 추가해도 NAS nginx의 `server_name`에 `www.worksfree.kr`이 없으면 404/502가 발생한다.  
+`nginx-wfhub.conf`의 portal 서버 블록에 추가 필요:
+
+```nginx
+server_name portal.worksfree.kr www.worksfree.kr;
+```

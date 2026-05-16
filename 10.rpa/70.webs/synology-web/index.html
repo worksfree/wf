@@ -535,6 +535,77 @@
   .magic-link-icon {
     font-size:40px; text-align:center; margin:8px 0 12px;
   }
+  .auth-or-divider {
+    display:flex; align-items:center; gap:10px;
+    margin:14px 0; color:var(--muted); font-size:12px;
+  }
+  .auth-or-divider::before, .auth-or-divider::after {
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+
+  /* ── 내 계정 모달 ───────────────────────────────── */
+  #profile-modal {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.65); z-index:350;
+    align-items:flex-start; justify-content:center;
+    padding:24px 16px 40px; overflow-y:auto;
+  }
+  #profile-modal.show { display:flex; }
+  .profile-box {
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:14px; width:min(480px,100%);
+    padding:28px 24px 32px; position:relative;
+    margin:auto; flex-shrink:0;
+  }
+  .profile-close {
+    position:absolute; top:12px; right:14px;
+    background:none; border:none; color:var(--muted);
+    font-size:16px; cursor:pointer; padding:4px 6px;
+    border-radius:4px; transition:color .15s, background .15s; line-height:1;
+  }
+  .profile-close:hover { color:var(--text); background:var(--hover); }
+  .profile-page-title {
+    font-size:19px; font-weight:700; margin:0 0 20px;
+  }
+  .profile-section {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:18px; margin-bottom:12px;
+  }
+  .profile-section h3 {
+    font-size:12px; font-weight:600; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.04em; margin:0 0 12px;
+  }
+  .profile-field { margin-bottom:10px; }
+  .profile-field label {
+    display:block; font-size:12px; color:var(--muted); margin-bottom:4px;
+  }
+  .profile-static {
+    font-size:14px; color:var(--text); padding:6px 0; word-break:break-all;
+  }
+  .profile-credit-display {
+    font-size:20px; font-weight:700; color:var(--accent); margin-bottom:10px;
+  }
+  .profile-credit-btns { display:flex; gap:8px; flex-wrap:wrap; }
+  .profile-btn {
+    padding:8px 16px; border:1px solid var(--border);
+    border-radius:8px; background:var(--panel); color:var(--text);
+    font-size:13px; font-family:inherit; cursor:pointer;
+    transition:background .15s, border-color .15s;
+  }
+  .profile-btn:hover { background:var(--hover); border-color:var(--accent); }
+  .profile-btn-primary {
+    background:var(--accent); color:#fff; border-color:var(--accent);
+  }
+  .profile-btn-primary:hover { filter:brightness(1.1); background:var(--accent); }
+  .profile-btn-danger { color:#ef4444; border-color:#ef4444; }
+  .profile-btn-danger:hover { background:#fef2f2; }
+  .profile-msg {
+    font-size:12px; margin:8px 0; padding:7px 10px;
+    border-radius:6px; display:none; line-height:1.5;
+  }
+  .profile-msg.ok  { background:#d1fae5; color:#065f46; display:block; }
+  .profile-msg.err { background:#fee2e2; color:#991b1b; display:block; }
+  .profile-danger-section { border-color:#fca5a5; }
 
   /* ── 개인정보 동의 모달 ──────────────────────────── */
   #consent-modal {
@@ -879,41 +950,23 @@
 
     <!-- 탭 -->
     <div class="auth-tabs">
-      <button class="auth-tab active" id="auth-tab-social" onclick="switchAuthTab('social')">소셜 로그인</button>
-      <button class="auth-tab"        id="auth-tab-email"  onclick="switchAuthTab('email')">이메일</button>
+      <button class="auth-tab active" id="auth-tab-login"  onclick="switchAuthTab('login')">로그인</button>
+      <button class="auth-tab"        id="auth-tab-signup" onclick="switchAuthTab('signup')">회원가입</button>
     </div>
 
-    <!-- 소셜 로그인 패널 -->
-    <div class="auth-panel show" id="auth-panel-social">
-      <button class="btn-oauth btn-google" onclick="signInWithGoogle()">
-        <svg class="oauth-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        <span id="auth-btn-google">Google로 계속하기</span>
-      </button>
-      <button class="btn-oauth btn-kakao" onclick="signInWithKakao()">
-        <svg class="oauth-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.7 1.696 5.08 4.255 6.47L5.2 21l4.896-2.6c.61.083 1.234.127 1.904.127 5.523 0 10-3.477 10-7.727C22 6.477 17.523 3 12 3z" fill="#191919"/>
-        </svg>
-        <span id="auth-btn-kakao">카카오로 계속하기</span>
-      </button>
+    <!-- 로그인 패널 (이메일+비밀번호) -->
+    <div class="auth-panel show" id="auth-panel-login">
+      <input class="auth-input" id="el-email" type="email" placeholder="이메일" autocomplete="email" onkeydown="if(event.key==='Enter')doEmailLogin()">
+      <input class="auth-input" id="el-pw"    type="password" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')doEmailLogin()">
+      <div class="auth-msg" id="el-msg"></div>
+      <button class="auth-btn-email" id="el-login-btn" onclick="doEmailLogin()">로그인</button>
+      <div class="auth-switch" id="el-no-acct">처음이신가요? <span onclick="switchAuthTab('signup')">회원가입</span></div>
     </div>
 
-    <!-- 이메일 패널 -->
-    <div class="auth-panel" id="auth-panel-email">
-      <!-- 로그인 폼 -->
-      <div id="email-login-form">
-        <input class="auth-input" id="el-email" type="email" placeholder="이메일" autocomplete="email">
-        <input class="auth-input" id="el-pw"    type="password" placeholder="비밀번호" autocomplete="current-password">
-        <div class="auth-msg" id="el-msg"></div>
-        <button class="auth-btn-email" id="el-login-btn" onclick="doEmailLogin()">로그인</button>
-        <div class="auth-switch" id="el-no-acct">계정이 없으신가요? <span onclick="toggleEmailMode(true)">회원가입</span></div>
-      </div>
-      <!-- 회원가입 폼 — Step 1: 정보 입력 -->
-      <div id="email-signup-form" style="display:none">
+    <!-- 회원가입 패널 (이메일 가입 + 소셜 가입) -->
+    <div class="auth-panel" id="auth-panel-signup">
+      <!-- 이메일 회원가입 -->
+      <div id="email-signup-form">
         <div id="signup-step1">
           <input class="auth-input" id="es-name"  type="text"     placeholder="이름 (선택)" autocomplete="name">
           <input class="auth-input" id="es-email" type="email"    placeholder="이메일" autocomplete="email">
@@ -921,7 +974,7 @@
           <input class="auth-input" id="es-pw2"   type="password" placeholder="비밀번호 확인" autocomplete="new-password">
           <div class="auth-msg" id="es-msg"></div>
           <button class="auth-btn-email" id="es-send-btn" onclick="sendSignupOtp(event)">인증 메일 받기</button>
-          <div class="auth-switch" id="es-have-acct">이미 계정이 있으신가요? <span onclick="toggleEmailMode(false)">로그인</span></div>
+          <div class="auth-switch" id="es-have-acct">이미 계정이 있으신가요? <span onclick="switchAuthTab('login')">로그인</span></div>
         </div>
         <!-- Step 2: 매직 링크 대기 -->
         <div id="signup-step2" style="display:none">
@@ -937,8 +990,76 @@
           </div>
         </div>
       </div>
+      <!-- 소셜 가입 구분선 + 버튼 (step2에서는 숨김) -->
+      <div id="auth-social-section">
+        <div class="auth-or-divider"><span id="auth-or-text">또는 소셜 계정으로 가입</span></div>
+        <button class="btn-oauth btn-google" onclick="signInWithGoogle()">
+          <svg class="oauth-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          <span id="auth-btn-google">Google로 가입하기</span>
+        </button>
+        <button class="btn-oauth btn-kakao" onclick="signInWithKakao()">
+          <svg class="oauth-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.7 1.696 5.08 4.255 6.47L5.2 21l4.896-2.6c.61.083 1.234.127 1.904.127 5.523 0 10-3.477 10-7.727C22 6.477 17.523 3 12 3z" fill="#191919"/>
+          </svg>
+          <span id="auth-btn-kakao">카카오로 가입하기</span>
+        </button>
+      </div>
     </div>
 
+  </div>
+</div>
+
+<!-- 내 계정 모달 -->
+<div id="profile-modal" onclick="if(event.target===this)closeProfileModal()">
+  <div class="profile-box">
+    <button class="profile-close" onclick="closeProfileModal()">✕</button>
+    <h2 class="profile-page-title" id="profile-title">내 계정</h2>
+
+    <!-- 크레딧 -->
+    <section class="profile-section">
+      <h3 id="profile-credit-section-title">크레딧</h3>
+      <div class="profile-credit-display" id="profile-balance">💎 —</div>
+      <div class="profile-credit-btns">
+        <button class="profile-btn" id="profile-credit-history-btn" onclick="closeProfileModal();openCreditHistory()">크레딧 내역 보기</button>
+        <button class="profile-btn profile-btn-primary" id="profile-view-credit-btn" onclick="closeProfileModal();openCreditModal()">크레딧 구매</button>
+      </div>
+    </section>
+
+    <!-- 계정 정보 -->
+    <section class="profile-section">
+      <h3 id="profile-info-section-title">계정 정보</h3>
+      <div class="profile-field">
+        <label id="profile-email-label">이메일</label>
+        <div id="profile-email-val" class="profile-static"></div>
+      </div>
+      <div class="profile-field">
+        <label id="profile-name-label">이름</label>
+        <input class="auth-input" id="profile-name-input" type="text" placeholder="이름 입력">
+      </div>
+      <div class="profile-msg" id="profile-info-msg"></div>
+      <button class="profile-btn profile-btn-primary" id="profile-save-name-btn" onclick="saveProfileName()">저장</button>
+    </section>
+
+    <!-- 비밀번호 변경 -->
+    <section class="profile-section">
+      <h3 id="profile-pw-section-title">비밀번호 변경</h3>
+      <p id="profile-pw-note" style="font-size:12px;color:var(--muted);margin:0 0 10px;line-height:1.6"></p>
+      <input class="auth-input" id="profile-new-pw" type="password" placeholder="새 비밀번호 (8자 이상)">
+      <input class="auth-input" id="profile-confirm-pw" type="password" placeholder="새 비밀번호 확인">
+      <div class="profile-msg" id="profile-pw-msg"></div>
+      <button class="profile-btn profile-btn-primary" id="profile-save-pw-btn" onclick="changePassword()">비밀번호 변경</button>
+    </section>
+
+    <!-- 계정 위험 구역 -->
+    <section class="profile-section profile-danger-section">
+      <h3 id="profile-danger-section-title">계정</h3>
+      <button class="profile-btn profile-btn-danger" id="profile-withdraw-btn" onclick="withdrawUser()">회원 탈퇴</button>
+    </section>
   </div>
 </div>
 
@@ -1281,21 +1402,22 @@ const HUB_I18N = {
     tooltip_consultant: '경영지도사 / GFC 파트너 전용 서비스입니다',
     denied_consultant_title: '컨설팅 서비스 전용',
     denied_consultant_desc:  '이 서비스는 경영지도사 및 GFC 파트너 전용입니다.<br>WorksFree에 문의하시면 컨설팅 서비스를 이용하실 수 있습니다.',
-    login_btn:       '로그인',
+    login_btn:       '로그인 / 회원가입',
     auth_title:      'WorksFree에 로그인',
     auth_desc:       '회원 전용 콘텐츠에 접근하려면<br>로그인이 필요합니다.',
-    auth_google:     'Google로 계속하기',
-    auth_kakao:      '카카오로 계속하기',
+    auth_google:     'Google로 가입하기',
+    auth_kakao:      '카카오로 가입하기',
     tooltip_member:  '로그인이 필요한 콘텐츠입니다',
     logout_btn:      '로그아웃',
-    // 이메일 탭
-    auth_tab_social:         '소셜 로그인',
-    auth_tab_email:          '이메일',
+    // 로그인/회원가입 탭
+    auth_tab_login:          '로그인',
+    auth_tab_signup:         '회원가입',
+    auth_or:                 '또는 소셜 계정으로 가입',
     auth_email_ph:           '이메일',
     auth_pw_ph:              '비밀번호',
     auth_login_btn:          '로그인',
     auth_login_loading:      '로그인 중...',
-    auth_no_account:         '계정이 없으신가요?',
+    auth_no_account:         '처음이신가요?',
     auth_to_signup:          '회원가입',
     auth_name_ph:            '이름 (선택)',
     auth_new_pw_ph:          '비밀번호 (8자 이상)',
@@ -1317,6 +1439,30 @@ const HUB_I18N = {
     auth_err_invalid_login:  '이메일 또는 비밀번호가 틀렸습니다.',
     auth_resend_ok:          '인증 메일을 재발송했습니다. 받은편지함을 확인하세요.',
     auth_magic_resend_ok:    '인증 메일을 재발송했습니다.',
+    // 내 계정 페이지
+    profile_menu:            '내 계정',
+    profile_title:           '내 계정',
+    profile_credit_section:  '크레딧',
+    profile_info_section:    '계정 정보',
+    profile_email_label:     '이메일',
+    profile_name_label:      '이름',
+    profile_name_ph:         '이름 입력',
+    profile_save_name:       '저장',
+    profile_pw_section:      '비밀번호 변경',
+    profile_new_pw_ph:       '새 비밀번호 (8자 이상)',
+    profile_confirm_pw_ph:   '새 비밀번호 확인',
+    profile_save_pw:         '비밀번호 변경',
+    profile_danger_section:  '계정',
+    profile_withdraw:        '회원 탈퇴',
+    profile_withdraw_confirm:'정말 탈퇴하시겠습니까?\n모든 데이터가 삭제됩니다.',
+    profile_withdraw_note:   '탈퇴를 원하시면 contact@worksfree.co.kr로 문의해 주세요.',
+    profile_pw_social_note:  '소셜(Google/카카오) 계정으로 가입하셨습니다. 비밀번호를 설정하려면 로그인 화면에서 "처음이신가요? 회원가입"을 선택하세요.',
+    profile_save_ok:         '저장됐습니다.',
+    profile_pw_ok:           '비밀번호가 변경됐습니다.',
+    profile_pw_err_short:    '비밀번호는 8자 이상이어야 합니다.',
+    profile_pw_err_mismatch: '비밀번호가 일치하지 않습니다.',
+    profile_credit_history:  '크레딧 내역 보기',
+    profile_credit_buy:      '크레딧 구매',
     dev_login_user:          '▶ 사용자 로그인 (부분 표시)',
     dev_login_admin:         '▶ 관리자 로그인 (전체 표시)',
     overlay_title:           '미리보기 모드',
@@ -1375,21 +1521,22 @@ const HUB_I18N = {
     tooltip_consultant: 'For Consultants / GFC Partners only',
     denied_consultant_title: 'Consultant Service',
     denied_consultant_desc:  'This service is for consultants and GFC partners only.<br>Contact WorksFree to learn about consulting services.',
-    login_btn:       'Sign In',
+    login_btn:       'Sign In / Sign Up',
     auth_title:      'Sign in to WorksFree',
     auth_desc:       'Login required to access<br>member-only content.',
-    auth_google:     'Continue with Google',
-    auth_kakao:      'Continue with Kakao',
+    auth_google:     'Sign up with Google',
+    auth_kakao:      'Sign up with Kakao',
     tooltip_member:  'Login required',
     logout_btn:      'Sign Out',
-    // Email tab
-    auth_tab_social:         'Social Login',
-    auth_tab_email:          'Email',
+    // Login / Sign Up tabs
+    auth_tab_login:          'Sign In',
+    auth_tab_signup:         'Sign Up',
+    auth_or:                 'Or sign up with',
     auth_email_ph:           'Email',
     auth_pw_ph:              'Password',
     auth_login_btn:          'Sign In',
     auth_login_loading:      'Signing in...',
-    auth_no_account:         "Don't have an account?",
+    auth_no_account:         'New here?',
     auth_to_signup:          'Sign Up',
     auth_name_ph:            'Name (optional)',
     auth_new_pw_ph:          'Password (8+ characters)',
@@ -1411,6 +1558,30 @@ const HUB_I18N = {
     auth_err_invalid_login:  'Invalid email or password.',
     auth_resend_ok:          'Verification email sent. Please check your inbox.',
     auth_magic_resend_ok:    'Verification email resent.',
+    // My Account page
+    profile_menu:            'My Account',
+    profile_title:           'My Account',
+    profile_credit_section:  'Credits',
+    profile_info_section:    'Account Info',
+    profile_email_label:     'Email',
+    profile_name_label:      'Display Name',
+    profile_name_ph:         'Enter name',
+    profile_save_name:       'Save',
+    profile_pw_section:      'Change Password',
+    profile_new_pw_ph:       'New password (8+ characters)',
+    profile_confirm_pw_ph:   'Confirm new password',
+    profile_save_pw:         'Change Password',
+    profile_danger_section:  'Account',
+    profile_withdraw:        'Delete Account',
+    profile_withdraw_confirm:'Are you sure you want to delete your account?\nAll data will be permanently removed.',
+    profile_withdraw_note:   'To delete your account, please email contact@worksfree.co.kr.',
+    profile_pw_social_note:  'You signed up with a social account (Google/Kakao). To set a password, use "New here? Sign Up" on the login screen.',
+    profile_save_ok:         'Saved.',
+    profile_pw_ok:           'Password changed successfully.',
+    profile_pw_err_short:    'Password must be at least 8 characters.',
+    profile_pw_err_mismatch: 'Passwords do not match.',
+    profile_credit_history:  'View Credit History',
+    profile_credit_buy:      'Buy Credits',
     dev_login_user:          '▶ User Login (partial view)',
     dev_login_admin:         '▶ Admin Login (full view)',
     overlay_title:           'Preview Mode',
@@ -1493,12 +1664,15 @@ function applyHubLang() {
   if (aDesc)   aDesc.innerHTML     = t('auth_desc');
   if (aGoogle) aGoogle.textContent = t('auth_google');
   if (aKakao)  aKakao.textContent  = t('auth_kakao');
-  // 이메일 탭 — 탭 버튼
-  const elTabSocial   = document.getElementById('auth-tab-social');
-  const elTabEmail    = document.getElementById('auth-tab-email');
-  if (elTabSocial)  elTabSocial.textContent  = t('auth_tab_social');
-  if (elTabEmail)   elTabEmail.textContent   = t('auth_tab_email');
-  // 이메일 탭 — 로그인 폼
+  // 탭 버튼
+  const elTabLogin  = document.getElementById('auth-tab-login');
+  const elTabSignup = document.getElementById('auth-tab-signup');
+  if (elTabLogin)  elTabLogin.textContent  = t('auth_tab_login');
+  if (elTabSignup) elTabSignup.textContent = t('auth_tab_signup');
+  // 소셜 구분선
+  const elAuthOr = document.getElementById('auth-or-text');
+  if (elAuthOr) elAuthOr.textContent = t('auth_or');
+  // 로그인 패널
   const elEmailPh  = document.getElementById('el-email');
   const elPwPh     = document.getElementById('el-pw');
   const elLoginBtn = document.getElementById('el-login-btn');
@@ -1506,8 +1680,8 @@ function applyHubLang() {
   if (elEmailPh)  elEmailPh.placeholder  = t('auth_email_ph');
   if (elPwPh)     elPwPh.placeholder     = t('auth_pw_ph');
   if (elLoginBtn) elLoginBtn.textContent = t('auth_login_btn');
-  if (elNoAcct)   elNoAcct.innerHTML     = t('auth_no_account') + ' <span onclick="toggleEmailMode(true)">' + t('auth_to_signup') + '</span>';
-  // 이메일 탭 — 회원가입 폼
+  if (elNoAcct)   elNoAcct.innerHTML     = t('auth_no_account') + ' <span onclick="switchAuthTab(\'signup\')">' + t('auth_to_signup') + '</span>';
+  // 회원가입 패널 — 폼
   const elNamePh      = document.getElementById('es-name');
   const elSEmailPh    = document.getElementById('es-email');
   const elNewPwPh     = document.getElementById('es-pw');
@@ -1519,14 +1693,45 @@ function applyHubLang() {
   if (elNewPwPh)   elNewPwPh.placeholder   = t('auth_new_pw_ph');
   if (elCfmPwPh)   elCfmPwPh.placeholder   = t('auth_confirm_pw_ph');
   if (elSendBtn)   elSendBtn.textContent   = t('auth_send_magic');
-  if (elHaveAcct)  elHaveAcct.innerHTML    = t('auth_have_account') + ' <span onclick="toggleEmailMode(false)">' + t('auth_to_login') + '</span>';
-  // 이메일 탭 — Step2 매직 링크 대기 화면
+  if (elHaveAcct)  elHaveAcct.innerHTML    = t('auth_have_account') + ' <span onclick="switchAuthTab(\'login\')">' + t('auth_to_login') + '</span>';
+  // 회원가입 패널 — Step2 매직 링크 대기 화면
   const elMagicMsg    = document.getElementById('es-otp-msg');
   const elChangeEmail = document.getElementById('es-change-email');
   const elResendLink  = document.getElementById('es-resend-link');
   if (elMagicMsg && elMagicMsg.classList.contains('ok')) elMagicMsg.innerHTML = t('auth_magic_msg');
   if (elChangeEmail)  elChangeEmail.textContent = t('auth_change_email');
   if (elResendLink)   elResendLink.textContent  = t('auth_resend_link');
+  // 내 계정 페이지
+  const elProfileTitle      = document.getElementById('profile-title');
+  const elProfileCreditSec  = document.getElementById('profile-credit-section-title');
+  const elProfileInfoSec    = document.getElementById('profile-info-section-title');
+  const elProfileEmailLbl   = document.getElementById('profile-email-label');
+  const elProfileNameLbl    = document.getElementById('profile-name-label');
+  const elProfileNameInput  = document.getElementById('profile-name-input');
+  const elProfileSaveName   = document.getElementById('profile-save-name-btn');
+  const elProfilePwSec      = document.getElementById('profile-pw-section-title');
+  const elProfileNewPw      = document.getElementById('profile-new-pw');
+  const elProfileCfmPw      = document.getElementById('profile-confirm-pw');
+  const elProfileSavePw     = document.getElementById('profile-save-pw-btn');
+  const elProfileDangerSec  = document.getElementById('profile-danger-section-title');
+  const elProfileWithdraw   = document.getElementById('profile-withdraw-btn');
+  const elProfileHistBtn    = document.getElementById('profile-credit-history-btn');
+  const elProfileBuyBtn     = document.getElementById('profile-view-credit-btn');
+  if (elProfileTitle)     elProfileTitle.textContent     = t('profile_title');
+  if (elProfileCreditSec) elProfileCreditSec.textContent = t('profile_credit_section');
+  if (elProfileInfoSec)   elProfileInfoSec.textContent   = t('profile_info_section');
+  if (elProfileEmailLbl)  elProfileEmailLbl.textContent  = t('profile_email_label');
+  if (elProfileNameLbl)   elProfileNameLbl.textContent   = t('profile_name_label');
+  if (elProfileNameInput) elProfileNameInput.placeholder = t('profile_name_ph');
+  if (elProfileSaveName)  elProfileSaveName.textContent  = t('profile_save_name');
+  if (elProfilePwSec)     elProfilePwSec.textContent     = t('profile_pw_section');
+  if (elProfileNewPw)     elProfileNewPw.placeholder     = t('profile_new_pw_ph');
+  if (elProfileCfmPw)     elProfileCfmPw.placeholder     = t('profile_confirm_pw_ph');
+  if (elProfileSavePw)    elProfileSavePw.textContent    = t('profile_save_pw');
+  if (elProfileDangerSec) elProfileDangerSec.textContent = t('profile_danger_section');
+  if (elProfileWithdraw)  elProfileWithdraw.textContent  = t('profile_withdraw');
+  if (elProfileHistBtn)   elProfileHistBtn.textContent   = t('profile_credit_history');
+  if (elProfileBuyBtn)    elProfileBuyBtn.textContent    = t('profile_credit_buy');
   // 접근 거부 모달
   document.getElementById('denied-title').textContent = t('denied_title');
   document.getElementById('denied-desc').innerHTML    = t('denied_desc');
@@ -1582,7 +1787,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.7.1.4';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.7.3.8';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 이 값만 GFC 동료에게 공유
 
 const params   = new URLSearchParams(location.search);
@@ -2006,6 +2211,22 @@ try {
 
     _sb.auth.onAuthStateChange(async (_event, session) => {
       const user = session?.user || null;
+      // Supabase 세션이 없을 때 dev 세션이 있으면 dev 유저로 처리
+      // (setTimeout 기반 복원은 onAuthStateChange가 늦게 오면 덮어쓰는 race condition 발생)
+      if (!user && IS_DEV) {
+        const _savedRole = localStorage.getItem('wf_dev_session');
+        if (_savedRole) {
+          const _devUser = _savedRole === 'gfc' ? DEV_USER_GFC : DEV_USER;
+          if (!localStorage.getItem('wf_agreed_' + _devUser.id)) {
+            localStorage.setItem('wf_agreed_' + _devUser.id, JSON.stringify({
+              agreed_at: new Date().toISOString(), marketing: false
+            }));
+          }
+          userRole = _savedRole;
+          await handleAuthStateChange(_devUser);
+          return;
+        }
+      }
       await handleAuthStateChange(user);
     });
   }
@@ -2015,6 +2236,7 @@ try {
 
 /* ── 매직 링크 가입 중 임시 보관 (리다이렉트 후에도 유지되도록 sessionStorage 사용) ── */
 let _otpEmail = '';
+let _consentSignupPending = null; // 이메일 가입 동의 대기 데이터 {name,email,pw}
 function _setPending(pw, name) {
   sessionStorage.setItem('wf_signup_pw',   pw);
   sessionStorage.setItem('wf_signup_name', name);
@@ -2040,10 +2262,25 @@ async function handleAuthStateChange(user) {
       await _sb.auth.updateUser(upd);
       _clearPending();
     }
+    // 이메일 가입 플로우에서 미리 동의한 경우 — localStorage에서 자동 처리
+    // (이메일 링크가 새 탭에서 열려도 localStorage는 탭 간 공유됨)
+    const _pendingConsent = localStorage.getItem('wf_pending_consent');
+    if (_pendingConsent) {
+      try {
+        const { marketing } = JSON.parse(_pendingConsent);
+        await saveConsent(user.id, marketing);
+      } catch (_e) { console.warn('[consent] pending consent error:', _e); }
+      localStorage.removeItem('wf_pending_consent');
+      onAuthComplete();
+      return;
+    }
+
     const agreed = await checkConsent(user.id);
-    if (!agreed) {
+    const isInternal = ['gfc', 'ceo', 'staff', 'consultant'].includes(userRole);
+    if (!agreed && !isInternal) {
       showConsentModal();
     } else {
+      if (!agreed) saveConsent(user.id, true).catch(() => {}); // 내부 역할 자동 동의 저장
       onAuthComplete();
     }
   } else {
@@ -2053,6 +2290,7 @@ async function handleAuthStateChange(user) {
 
 function onAuthComplete() {
   hidePreviewOverlay();
+  localStorage.setItem('wf_last_login', '1'); // 재방문 감지 — 다음 방문 시 로그인 탭 기본
   updateAuthUI();
   refreshTreeAndCards();
   updateDevStatus();
@@ -2078,30 +2316,32 @@ function refreshTreeAndCards() {
    (설정 전: localStorage 폴백)
 ════════════════════════════════════════════ */
 async function checkConsent(userId) {
+  // dev 모드: 가짜 UUID가 Supabase에 없으므로 localStorage만 확인
+  if (IS_DEV) return !!localStorage.getItem('wf_agreed_' + userId);
   if (_sbReady && _sb) {
     const { data } = await _sb.from('profiles')
       .select('agreed_at, role').eq('id', userId).maybeSingle();
     if (data?.role) userRole = data.role;
-    return !!(data?.agreed_at);
+    if (data?.agreed_at) return true;
   }
-  /* localStorage 폴백 (테스트 모드·Supabase 미설정 시) */
+  // Supabase 미설정·행 없음·RLS 차단 시 localStorage 폴백
   return !!localStorage.getItem('wf_agreed_' + userId);
 }
 
 async function saveConsent(userId, marketingAgreed) {
+  // localStorage에 먼저 저장 — Supabase 실패 시에도 새로고침 후 팝업 반복 방지
+  localStorage.setItem('wf_agreed_' + userId, JSON.stringify({
+    agreed_at: new Date().toISOString(), marketing: marketingAgreed
+  }));
+  if (IS_DEV) return; // dev 모드는 localStorage만 사용
   if (_sbReady && _sb) {
-    await _sb.from('profiles').upsert({
+    const { error } = await _sb.from('profiles').upsert({
       id:               userId,
       agreed_at:        new Date().toISOString(),
       marketing_agreed: marketingAgreed,
     });
-    return;
+    if (error) console.warn('[saveConsent] Supabase 저장 실패 (localStorage 폴백 유지):', error.message);
   }
-  /* localStorage 폴백 */
-  localStorage.setItem('wf_agreed_' + userId, JSON.stringify({
-    agreed_at: new Date().toISOString(),
-    marketing: marketingAgreed
-  }));
 }
 
 /* ════════════════════════════════════════════
@@ -2133,16 +2373,26 @@ async function signOut() {
    이메일 로그인 / 회원가입
 ════════════════════════════════════════════ */
 function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach((t,i) =>
-    t.classList.toggle('active', (tab==='social' ? i===0 : i===1)));
-  document.getElementById('auth-panel-social').classList.toggle('show', tab==='social');
-  document.getElementById('auth-panel-email').classList.toggle('show',  tab==='email');
+  const isLogin = tab === 'login';
+  document.querySelectorAll('.auth-tab').forEach((t, i) =>
+    t.classList.toggle('active', isLogin ? i === 0 : i === 1));
+  document.getElementById('auth-panel-login').classList.toggle('show', isLogin);
+  document.getElementById('auth-panel-signup').classList.toggle('show', !isLogin);
+  if (!isLogin) {
+    // 회원가입 탭으로 오면 step1으로 초기화
+    const step1 = document.getElementById('signup-step1');
+    const step2 = document.getElementById('signup-step2');
+    const social = document.getElementById('auth-social-section');
+    if (step1) step1.style.display = 'block';
+    if (step2) step2.style.display = 'none';
+    if (social) social.style.display = 'block';
+  }
+  clearAuthMsg('el-msg'); clearAuthMsg('es-msg'); clearAuthMsg('es-otp-msg');
 }
 
 function toggleEmailMode(isSignup) {
-  document.getElementById('email-login-form').style.display  = isSignup ? 'none'  : 'block';
-  document.getElementById('email-signup-form').style.display = isSignup ? 'block' : 'none';
-  clearAuthMsg('el-msg'); clearAuthMsg('es-msg'); clearAuthMsg('es-otp-msg');
+  // 레거시 호환 — switchAuthTab으로 위임
+  switchAuthTab(isSignup ? 'signup' : 'login');
   if (isSignup) {
     document.getElementById('signup-step1').style.display = 'block';
     document.getElementById('signup-step2').style.display = 'none';
@@ -2162,10 +2412,10 @@ async function doEmailLogin() {
   const pw    = document.getElementById('el-pw').value;
   if (!email || !pw) { setAuthMsg('el-msg','err', t('auth_err_email_pw_req')); return; }
 
-  const btn = event.currentTarget;
-  btn.disabled = true; btn.textContent = t('auth_login_loading');
+  const btn = document.getElementById('el-login-btn');
+  if (btn) { btn.disabled = true; btn.textContent = t('auth_login_loading'); }
   const { error } = await _sb.auth.signInWithPassword({ email, password: pw });
-  btn.disabled = false; btn.textContent = t('auth_login_btn');
+  if (btn) { btn.disabled = false; btn.textContent = t('auth_login_btn'); }
 
   if (error) {
     if (error.message.includes('Email not confirmed')) {
@@ -2195,7 +2445,7 @@ function clearAuthMsg(id) {
   const el = document.getElementById(id); if (el) el.className = 'auth-msg';
 }
 
-/* ── 회원가입 Step1: 인증 메일 발송 ── */
+/* ── 회원가입 Step1: 폼 검증 후 동의 모달 표시 ── */
 async function sendSignupOtp(e) {
   if (!_sbReady) { alert('Supabase 설정 후 이용 가능합니다.'); return; }
   const name  = document.getElementById('es-name').value.trim();
@@ -2207,8 +2457,18 @@ async function sendSignupOtp(e) {
   if (pw.length < 8) { setAuthMsg('es-msg','err', t('auth_err_pw_short')); return; }
   if (pw !== pw2)    { setAuthMsg('es-msg','err', t('auth_err_pw_mismatch')); return; }
 
-  const btn = e.currentTarget;
-  btn.disabled = true; btn.textContent = t('auth_sending');
+  // 폼 유효 → 동의 모달 먼저 표시 (실제 OTP 발송은 동의 후)
+  _consentSignupPending = { name, email, pw };
+  toggleAllConsent(false);
+  updateConsentBtn();
+  showConsentModal();
+}
+
+/* ── 회원가입 Step1: 실제 OTP 발송 (동의 완료 후 호출) ── */
+async function _sendSignupOtpActual({ name, email, pw }) {
+  const btn = document.getElementById('es-send-btn');
+  if (btn) { btn.disabled = true; btn.textContent = t('auth_sending'); }
+
   const { error } = await _sb.auth.signInWithOtp({
     email,
     options: {
@@ -2217,7 +2477,8 @@ async function sendSignupOtp(e) {
       emailRedirectTo: location.origin + location.pathname
     }
   });
-  btn.disabled = false; btn.textContent = t('auth_send_magic');
+
+  if (btn) { btn.disabled = false; btn.textContent = t('auth_send_magic'); }
 
   if (error) {
     setAuthMsg('es-msg', 'err', error.message); return;
@@ -2230,6 +2491,8 @@ async function sendSignupOtp(e) {
     `<b>${email}</b><br>${t('auth_sent_to')}`;
   document.getElementById('signup-step1').style.display = 'none';
   document.getElementById('signup-step2').style.display = 'block';
+  const social = document.getElementById('auth-social-section');
+  if (social) social.style.display = 'none';
 }
 
 /* ── Step2 → Step1 돌아가기 ── */
@@ -2237,6 +2500,8 @@ function backToSignupStep1() {
   _clearPending(); _otpEmail = '';
   document.getElementById('signup-step1').style.display = 'block';
   document.getElementById('signup-step2').style.display = 'none';
+  const social = document.getElementById('auth-social-section');
+  if (social) social.style.display = 'block';
   clearAuthMsg('es-msg');
 }
 
@@ -2257,15 +2522,92 @@ async function resendSignupOtp() {
 /* ════════════════════════════════════════════
    로그인 모달
 ════════════════════════════════════════════ */
-function openAuthModal() {
+function openAuthModal(forceTab) {
   document.getElementById('auth-modal').classList.add('show');
-  switchAuthTab('social');
-  toggleEmailMode(false);
+  // 방문 이력 있으면 로그인, 없으면 회원가입
+  const hasVisited = localStorage.getItem('wf_last_login');
+  const startTab = forceTab || (hasVisited ? 'login' : 'signup');
+  switchAuthTab(startTab);
   ['el-email','el-pw','es-name','es-email','es-pw','es-pw2'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
+  // 이전 로그인 시도에서 버튼이 로딩 상태로 남아있을 경우 초기화
+  const loginBtn = document.getElementById('el-login-btn');
+  if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = t('auth_login_btn'); }
 }
 function closeAuthModal() { document.getElementById('auth-modal').classList.remove('show'); }
+
+/* ════════════════════════════════════════════
+   내 계정 모달
+════════════════════════════════════════════ */
+function showUserProfile() {
+  closeUserDropdown();
+  document.getElementById('profile-modal').classList.add('show');
+
+  // 계정 정보 채우기
+  const name = authUser?.user_metadata?.full_name || authUser?.user_metadata?.name || '';
+  const emailEl = document.getElementById('profile-email-val');
+  const nameEl  = document.getElementById('profile-name-input');
+  if (emailEl) emailEl.textContent = authUser?.email || '';
+  if (nameEl)  nameEl.value = name;
+
+  // 비밀번호 변경 안내 — 소셜 계정은 비밀번호 없음
+  const pwNote = document.getElementById('profile-pw-note');
+  const provider = authUser?.app_metadata?.provider;
+  const isSocial = provider === 'google' || provider === 'kakao';
+  if (pwNote) pwNote.textContent = isSocial ? t('profile_pw_social_note') : '';
+
+  // 크레딧 잔액
+  loadCreditBalance().then(b => {
+    const el = document.getElementById('profile-balance');
+    if (el) el.textContent = t('credit_balance_tpl').replace('{n}', b.toLocaleString());
+  });
+
+  // 메시지 초기화
+  ['profile-info-msg','profile-pw-msg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = ''; el.className = 'profile-msg'; }
+  });
+  // 폼 초기화
+  ['profile-new-pw','profile-confirm-pw'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+}
+
+function closeProfileModal() {
+  document.getElementById('profile-modal').classList.remove('show');
+}
+
+async function saveProfileName() {
+  if (!authUser || !_sb) return;
+  const name = (document.getElementById('profile-name-input')?.value || '').trim();
+  const msg = document.getElementById('profile-info-msg');
+  const { error } = await _sb.auth.updateUser({ data: { full_name: name, name } });
+  if (msg) {
+    if (error) { msg.textContent = error.message; msg.className = 'profile-msg err'; }
+    else        { msg.textContent = t('profile_save_ok'); msg.className = 'profile-msg ok'; }
+  }
+}
+
+async function changePassword() {
+  if (!authUser || !_sb) return;
+  const pw  = document.getElementById('profile-new-pw')?.value || '';
+  const pw2 = document.getElementById('profile-confirm-pw')?.value || '';
+  const msg = document.getElementById('profile-pw-msg');
+  const setMsg = (text, type) => { if (msg) { msg.textContent = text; msg.className = 'profile-msg ' + type; } };
+  if (pw.length < 8)  { setMsg(t('profile_pw_err_short'), 'err'); return; }
+  if (pw !== pw2)     { setMsg(t('profile_pw_err_mismatch'), 'err'); return; }
+  const { error } = await _sb.auth.updateUser({ password: pw });
+  if (error) { setMsg(error.message, 'err'); return; }
+  setMsg(t('profile_pw_ok'), 'ok');
+  if (document.getElementById('profile-new-pw'))    document.getElementById('profile-new-pw').value = '';
+  if (document.getElementById('profile-confirm-pw')) document.getElementById('profile-confirm-pw').value = '';
+}
+
+function withdrawUser() {
+  if (!confirm(t('profile_withdraw_confirm'))) return;
+  showToast(t('profile_withdraw_note'), 'info');
+}
 
 /* ════════════════════════════════════════════
    개인정보 동의 모달
@@ -2323,9 +2665,30 @@ function updateConsentBtn() {
 }
 
 async function handleConsent() {
-  if (!authUser) return;
   const marketing = document.getElementById('chk4').checked;
-  await saveConsent(authUser.id, marketing);
+
+  // 이메일 가입 플로우 — 동의 후 OTP 발송
+  // localStorage 사용: 이메일 링크는 새 탭에서 열리므로 sessionStorage는 소실됨
+  if (_consentSignupPending) {
+    localStorage.setItem('wf_pending_consent', JSON.stringify({
+      marketing, agreed_at: new Date().toISOString()
+    }));
+    hideConsentModal();
+    const pending = _consentSignupPending;
+    _consentSignupPending = null;
+    await _sendSignupOtpActual(pending);
+    return;
+  }
+
+  // 기존 로그인 후 동의 플로우
+  if (!authUser) { showToast(t('auth_err_no_session') || '로그인이 필요합니다.', 'err'); return; }
+  const btn = document.getElementById('consentAgreeBtn');
+  if (btn) btn.disabled = true;
+  try {
+    await saveConsent(authUser.id, marketing);
+  } catch (e) {
+    console.warn('[consent] saveConsent error:', e);
+  }
   hideConsentModal();
   onAuthComplete();
 }
@@ -2360,6 +2723,7 @@ function updateAuthUI() {
         <div class="user-dropdown-email">${authUser.email || ''}</div>
         <div class="user-balance" id="userBalance" onclick="closeUserDropdown();openCreditHistory()" title="${t('ch_title')}">💎 —</div>
         <button class="user-dropdown-btn" onclick="closeCreditModal();closeUserDropdown();openCreditModal()">${t('credit_buy_btn')}</button>
+        <button class="user-dropdown-btn" onclick="showUserProfile()">${t('profile_menu')}</button>
         <button class="user-dropdown-btn" onclick="signOut()">${t('logout_btn')}</button>
       </div>`;
   } else {
@@ -2385,6 +2749,16 @@ document.addEventListener('click', closeUserDropdown);
 const IS_DEV = new URLSearchParams(location.search).get('dev') === '1'
             || localStorage.getItem('wf_dev') === '1';
 
+/* 결제 데이터 환경 태그: dev/test/staging/portal
+   같은 Supabase DB를 공유하므로 env 컬럼으로 환경 구분 */
+function getPaymentEnv() {
+  if (IS_DEV) return 'dev';
+  const h = location.hostname;
+  if (h.startsWith('test.'))    return 'test';
+  if (h.startsWith('staging.')) return 'staging';
+  return 'portal';
+}
+
 const DEV_USER = {
   id: 'dev-test-user-001',
   email: 'test@worksfree.co.kr',
@@ -2405,6 +2779,7 @@ if (IS_DEV) {
     const _caret = document.getElementById('dev-title-caret');
     if (_caret) _caret.textContent = '▼ 열기';
   }
+  // dev 세션 복원은 onAuthStateChange 내부에서 처리 (race condition 방지)
 }
 
 function devToggleCollapse() {
@@ -2488,6 +2863,7 @@ async function devLogin(role = 'general') {
   }));
 
   userRole = role;
+  localStorage.setItem('wf_dev_session', role); // 새로고침 후 복원용
   await handleAuthStateChange(user);
 }
 
@@ -2505,6 +2881,7 @@ function devResetConsent() {
 }
 
 async function devLogout() {
+  localStorage.removeItem('wf_dev_session');
   await handleAuthStateChange(null);
 }
 
@@ -2712,6 +3089,7 @@ function _setCreditResult(type, msg) {
 
 /* 결제 리다이렉트 파라미터 처리 — onAuthComplete() 에서 호출 */
 async function initPaymentResult() {
+  if (!authUser) return; // Supabase가 SIGNED_OUT→SIGNED_IN 순으로 이벤트를 두 번 발생시키므로, 비로그인 상태에서는 처리하지 않음
   const p       = new URLSearchParams(location.search);
   const payment = p.get('payment');
   if (!payment) return;
@@ -2779,11 +3157,14 @@ async function loadCreditBalance() {
   if (!_sbReady || !_sb || !authUser) { el.textContent = '💎 —'; return; }
   el.textContent = t('credit_balance_loading');
 
-  // 활성 구독 우선 확인
+  const env = getPaymentEnv();
+
+  // 활성 구독 우선 확인 (현재 환경 데이터만)
   const { data: sub } = await _sb
     .from('subscriptions')
     .select('plan, expires_at')
     .eq('user_id', authUser.id)
+    .eq('env', env)
     .gt('expires_at', new Date().toISOString())
     .order('expires_at', { ascending: false })
     .limit(1)
@@ -2797,14 +3178,14 @@ async function loadCreditBalance() {
     return;
   }
 
-  // 크레딧 잔액
-  const { data } = await _sb
-    .from('credit_balance')
-    .select('balance')
+  // 크레딧 잔액 (현재 환경 데이터만 집계)
+  const { data: rows } = await _sb
+    .from('credits')
+    .select('delta')
     .eq('user_id', authUser.id)
-    .maybeSingle();
-  const bal = data?.balance ?? 0;
-  el.textContent = t('credit_balance_tpl').replace('{n}', bal.toLocaleString());
+    .eq('env', env);
+  const bal = (rows || []).reduce((s, r) => s + (r.delta || 0), 0);
+  el.textContent = t('credit_balance_tpl').replace('{n}', Math.max(0, bal).toLocaleString());
 }
 
 /* ── 크레딧 내역 모달 ── */
@@ -2833,25 +3214,30 @@ async function loadCreditHistory() {
 
   if (!_sbReady || !_sb || !authUser) return;
 
-  // 잔액 요약
-  const { data: bal } = await _sb
-    .from('credit_balance')
-    .select('balance, total_charged, total_used')
-    .eq('user_id', authUser.id)
-    .maybeSingle();
+  const env = getPaymentEnv();
 
-  if (bal) {
+  // 잔액 요약 (현재 환경 데이터만 집계)
+  const { data: allRows } = await _sb
+    .from('credits')
+    .select('delta')
+    .eq('user_id', authUser.id)
+    .eq('env', env);
+  if (allRows) {
+    const total_charged = allRows.filter(r => r.delta > 0).reduce((s, r) => s + r.delta, 0);
+    const total_used    = allRows.filter(r => r.delta < 0).reduce((s, r) => s + Math.abs(r.delta), 0);
+    const balance       = total_charged - total_used;
     summary.innerHTML = `
-      <div>${t('ch_total_charged')}: <span>+${bal.total_charged.toLocaleString()}</span></div>
-      <div>${t('ch_total_used')}: <span>-${bal.total_used.toLocaleString()}</span></div>
-      <div>${t('ch_balance')}: <span>${bal.balance.toLocaleString()}</span></div>`;
+      <div>${t('ch_total_charged')}: <span>+${total_charged.toLocaleString()}</span></div>
+      <div>${t('ch_total_used')}: <span>-${total_used.toLocaleString()}</span></div>
+      <div>${t('ch_balance')}: <span>${Math.max(0, balance).toLocaleString()}</span></div>`;
   }
 
-  // 최근 100건 내역
+  // 최근 100건 내역 (현재 환경 데이터만)
   const { data: rows } = await _sb
     .from('credits')
     .select('delta, reason, note, app_id, created_at')
     .eq('user_id', authUser.id)
+    .eq('env', env)
     .order('created_at', { ascending: false })
     .limit(100);
 
@@ -2882,36 +3268,50 @@ async function loadCreditHistory() {
 }
 
 async function _recordPurchase(orderId, pg, krw, usd, credits, subId) {
-  if (!authUser || !_sb) return;
-  await _sb.from('payments').insert({
+  if (!authUser || !_sb) throw new Error('Not authenticated');
+
+  const env = getPaymentEnv();
+
+  const { error: e1 } = await _sb.from('payments').insert({
     user_id: authUser.id, order_id: orderId, pg,
     amount_krw: krw, amount_usd: usd,
     credits: credits || 0,
     sub_id:  subId  || null,
     status: 'paid',
+    env,
   });
+  if (e1) throw new Error('payments insert: ' + e1.message);
+
   if (credits > 0) {
-    await _sb.from('credits').insert({
+    const { error: e2 } = await _sb.from('credits').insert({
       user_id: authUser.id, delta: credits,
       reason: 'purchase', ref_order_id: orderId,
+      env,
     });
+    if (e2) throw new Error('credits insert: ' + e2.message);
   }
+
   if (subId) {
     const subPkg = SUB_PKGS.find(p => p.id === subId);
     if (subPkg) {
       const expiresAt = new Date(Date.now() + subPkg.period * 24 * 3600 * 1000).toISOString();
-      await _sb.from('subscriptions').upsert({
+      const { error: e3 } = await _sb.from('subscriptions').upsert({
         user_id:      authUser.id,
         plan:         subId,
         starts_at:    new Date().toISOString(),
         expires_at:   expiresAt,
         ref_order_id: orderId,
+        env,
       }, { onConflict: 'user_id' });
-      await _sb.from('credits').insert({
+      if (e3) throw new Error('subscriptions upsert: ' + e3.message);
+
+      const { error: e4 } = await _sb.from('credits').insert({
         user_id: authUser.id, delta: 0,
         reason: 'subscription', ref_order_id: orderId,
         note: subPkg.label.ko,
+        env,
       });
+      if (e4) throw new Error('credits subscription log: ' + e4.message);
     }
   }
 }

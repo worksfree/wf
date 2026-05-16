@@ -392,7 +392,9 @@ sudo cloudflared service install eyJhIjoiXXX...토큰값...
 > `portal.example.co.kr` → NAS 포트 8080 → `/volume1/web/portal` 폴더 순서로 연결됩니다.
 
 **메뉴 경로**:  
-`터널 설정 화면 → [Public Hostname] 탭 → [Add a public hostname] 버튼`
+`Cloudflare 대시보드 (one.dash.cloudflare.com) → Protect & Connect → Networking → Tunnels → [tunnel 이름] 클릭 → Configure → Public Hostnames 탭 → [Add a public hostname] 버튼`
+
+> **기존 서브도메인 수정**: 목록에서 해당 행의 **Edit route** 클릭
 
 서브도메인마다 아래 항목을 입력하고 **[Save]**:
 
@@ -696,15 +698,21 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 ### 7.2 API 키 확인
 
 **메뉴 경로**:  
-`프로젝트 대시보드 → 왼쪽 메뉴 [Project Settings] → [API]`
+`프로젝트 대시보드 → 왼쪽 메뉴 [Settings] → [API Keys] → **Legacy anon, service_role API keys** 탭`
 
-| 항목 | 설명 |
-|------|------|
-| Project URL | `https://xxxxxxxxxxxx.supabase.co` |
-| anon public | 프런트엔드 코드에 사용하는 공개 키 |
-| service_role | 서버 전용 (절대 프런트엔드 노출 금지) |
+> Supabase UI 업데이트로 메뉴 명칭이 변경됨.  
+> 탭이 두 개(Publishable and secret / **Legacy anon, service_role**)이므로 반드시 **Legacy** 탭을 선택.
 
-**Project URL**과 **anon public** 키를 복사해둡니다.
+| 키 이름 | 용도 | 노출 범위 |
+|---------|------|-----------|
+| `anon public` | 프런트엔드 코드 (`SUPABASE_ANON` 상수) | 브라우저 공개 가능 |
+| `service_role` **secret** | Admin API, Playwright 실DB 테스트 (`.env.test`) | 서버·환경변수 전용 — **절대 프런트엔드·커밋 금지** |
+
+> `service_role` 키는 RLS(Row Level Security)를 **완전히 우회**합니다.  
+> 유출 시 즉시 Supabase 대시보드에서 **Revoke** 후 재발급하세요.
+
+**Project URL**과 **anon public** 키를 복사해 `index.html` 상단의 `SUPABASE_URL` / `SUPABASE_ANON` 상수에 입력합니다.  
+**service_role** 키는 `.env.test`(Playwright 실DB 테스트용)에만 사용합니다.
 
 ### 7.3 Google OAuth 설정
 
@@ -765,6 +773,22 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 
 - 사이트 도메인: `https://portal.example.co.kr` → **[저장]**
 
+#### ② - 동의항목 설정 (KOE205 오류 방지)
+
+**메뉴 경로**:  
+`앱 → [제품 설정] → [카카오 로그인] → [동의항목]`
+
+Supabase가 요청하는 scope에 해당하는 항목을 **필수 동의** 또는 **선택 동의**로 활성화합니다:
+
+| 동의항목 | 설정 |
+|---------|------|
+| 닉네임 (profile_nickname) | 필수 동의 |
+| 프로필 사진 (profile_image) | 선택 동의 |
+| 카카오계정(이메일) (account_email) | 필수 동의 |
+
+> **주의**: 이 항목을 설정하지 않으면 로그인 시 **KOE205 오류**("요청하신 기능을 사용할 수 없습니다")가 발생합니다.  
+> 신규 앱은 기본적으로 모든 동의항목이 비활성 상태입니다.
+
 #### ③ Supabase에 Kakao 정보 입력
 
 **메뉴 경로**:  
@@ -776,27 +800,57 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 
 ### 7.5 Redirect URL 허용 목록 설정
 
-> 로그인 후 리디렉션할 URL을 명시적으로 허용해야 합니다.
+> 로그인 후 리디렉션할 URL을 명시적으로 허용해야 합니다.  
+> 미등록 URL로 리디렉션을 시도하면 Supabase가 거부합니다.
 
 **메뉴 경로**:  
-`[Authentication] → [URL Configuration]`
+`Supabase 대시보드 → [Authentication] → [URL Configuration]`
 
-| 항목 | 입력값 |
-|------|--------|
-| Site URL | `https://portal.example.co.kr` |
+#### Site URL
 
-**Redirect URLs** (Additional redirect URLs):
+**Site URL은 이메일 확인·비밀번호 재설정 링크의 실제 리디렉션 목적지**입니다.  
+Redirect URLs 허용 목록과는 별개로, 이메일 본문의 링크가 이 URL을 기준으로 생성됩니다.
+
+| 항목 | 올바른 값 | ❌ 잘못된 예 |
+|------|-----------|------------|
+| Site URL | `https://portal.worksfree.co.kr` | `http://localhost:3000` |
+
+> **주의**: Site URL을 `localhost`로 두면 사용자가 이메일 링크를 클릭했을 때  
+> `localhost:3000/#access_token=...` 으로 리디렉션되어 인증이 완료되지 않습니다.  
+> **반드시 실제 서비스 도메인**으로 설정하세요.
+
+#### Redirect URLs
+
+이메일 링크에서 허용할 목적지 URL 허용 목록입니다. **Add URL** 버튼으로 하나씩 추가:
 
 ```
-https://portal.example.co.kr/**
-https://staging.example.co.kr/**
-https://test.example.co.kr/**
+https://portal.worksfree.co.kr/**
+https://staging.worksfree.co.kr/**
+https://test.worksfree.co.kr/**
 http://127.0.0.1:5500/**
 ```
 
 **[Save]** 클릭
 
-> `http://127.0.0.1:5500/**` 는 로컬 개발 환경(VS Code Live Server)에서 테스트할 때 필요합니다.
+> `http://127.0.0.1:5500/**` 는 로컬 개발 환경(VS Code Live Server)에서 테스트할 때 필요합니다.  
+> 와일드카드 `/**`를 반드시 포함해야 OAuth 콜백 및 매직 링크 리디렉션이 정상 동작합니다.
+
+---
+
+### 7.6 사용자 비밀번호 재설정 (관리자 처리)
+
+사용자가 비밀번호를 잊은 경우, Supabase 대시보드에서 직접 재설정 이메일을 발송할 수 있습니다.
+
+**메뉴 경로**:  
+`Supabase 대시보드 → [Authentication] → [Users] → 해당 사용자 클릭 → [Send Password Recovery]`
+
+1. Users 탭에서 이메일로 사용자 검색
+2. 해당 사용자 행 클릭
+3. 우측 패널 또는 상세 화면에서 **[Send Password Recovery]** 버튼 클릭
+4. 사용자의 이메일로 비밀번호 재설정 링크가 발송됨
+
+> **주의**: 비밀번호 재설정 링크는 Supabase Site URL 설정에 따라 생성됩니다.  
+> Site URL이 실서비스 도메인(`portal.example.co.kr`)으로 설정되어 있어야 링크가 올바르게 동작합니다.
 
 ---
 
@@ -1042,12 +1096,18 @@ END; $$;
 ```sql
 -- 1. 대상 계정의 UUID 확인
 --    Supabase → Authentication → Users 탭에서 이메일로 검색
--- 2. role 업데이트
-UPDATE profiles SET role = 'gfc' WHERE id = '<GFC_파트너_UUID>';
 
--- 초기 크레딧 지급도 함께
+-- 2. role 업데이트 (profiles 행이 없는 경우도 안전하게 처리)
+INSERT INTO profiles (id, agreed_at, role)
+SELECT id, now(), 'gfc' FROM auth.users WHERE email = '관리자이메일@example.co.kr'
+ON CONFLICT (id) DO UPDATE SET role = 'gfc', agreed_at = COALESCE(profiles.agreed_at, now());
+
+-- 3. 초기 크레딧 지급도 함께
 SELECT admin_grant_credits('<UUID>', 9999, '파트너 계정 초기 지급');
 ```
+
+> **주의**: `UPDATE profiles SET role = 'gfc' WHERE id = '<UUID>'` 방식은 해당 사용자의 profiles 행이 이미 존재하는 경우에만 동작합니다.  
+> 소셜 로그인(Google/Kakao)으로 첫 로그인한 직후 바로 역할을 지정할 때는 트리거가 행을 아직 생성하지 않았을 수 있으므로 위의 `INSERT ... ON CONFLICT DO UPDATE` 방식을 사용합니다.
 
 ### 8.6 프런트엔드에서 잔액 조회
 
@@ -1062,6 +1122,93 @@ async function loadCreditBalance() {
   return data?.balance ?? 0;
 }
 ```
+
+### 8.7 결제 데이터 환경 격리 — env 컬럼
+
+test / staging / portal 세 환경이 **동일한 Supabase 프로젝트를 공유**할 때,  
+결제 관련 테이블에 `env` 텍스트 컬럼을 추가하여 환경별 데이터를 분리합니다.
+
+#### ① env 컬럼 추가 (최초 1회, SQL Editor에서 실행)
+
+```sql
+ALTER TABLE payments      ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'portal';
+ALTER TABLE credits       ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'portal';
+ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'portal';
+```
+
+> `subscriptions` 테이블이 없다면 해당 줄은 건너뜁니다.
+
+#### ② RLS INSERT 정책 추가
+
+기존 INSERT 정책만으로는 프런트엔드에서 직접 INSERT할 때 `new row violates row-level security policy` 오류가 납니다.  
+아래 정책을 추가합니다:
+
+```sql
+-- payments: 본인 결제 기록 INSERT 허용
+DROP POLICY IF EXISTS "payments_insert_own" ON payments;
+CREATE POLICY "payments_insert_own"
+  ON payments FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- credits: 본인 충전(delta > 0, reason = 'purchase') INSERT 허용
+DROP POLICY IF EXISTS "credits_insert_purchase" ON credits;
+CREATE POLICY "credits_insert_purchase"
+  ON credits FOR INSERT
+  WITH CHECK (auth.uid() = user_id AND delta > 0 AND reason = 'purchase');
+
+-- profiles: 본인 동의 정보 upsert 허용
+DROP POLICY IF EXISTS "profiles_insert_own" ON profiles;
+CREATE POLICY "profiles_insert_own"
+  ON profiles FOR INSERT
+  WITH CHECK (auth.uid() = id);
+```
+
+#### ③ 프런트엔드 env 감지 함수
+
+```javascript
+function getPaymentEnv() {
+  if (IS_DEV) return 'dev';          // ?dev=1 또는 localStorage.wf_dev='1'
+  const h = location.hostname;
+  if (h.startsWith('test.'))    return 'test';
+  if (h.startsWith('staging.')) return 'staging';
+  return 'portal';
+}
+```
+
+모든 결제 관련 INSERT/SELECT에 이 값을 적용합니다:
+
+```javascript
+// INSERT 시
+const env = getPaymentEnv();
+await _sb.from('payments').insert({ ..., env });
+await _sb.from('credits').insert({ ..., env });
+
+// SELECT 시 (잔액 조회, 이력 조회)
+.eq('env', getPaymentEnv())
+```
+
+#### ④ 출시 전 테스트 데이터 정리 SQL
+
+```sql
+-- 개발 모드 데이터 삭제
+DELETE FROM credits  WHERE env = 'dev';
+DELETE FROM payments WHERE env = 'dev';
+
+-- test 서버 데이터 삭제
+DELETE FROM credits  WHERE env = 'test';
+DELETE FROM payments WHERE env = 'test';
+
+-- staging 데이터 삭제
+DELETE FROM credits  WHERE env = 'staging';
+DELETE FROM payments WHERE env = 'staging';
+
+-- portal 시험 구매 데이터 삭제 (출시 직전)
+DELETE FROM credits  WHERE env = 'portal';
+DELETE FROM payments WHERE env = 'portal';
+```
+
+> **출시 체크리스트**: 정식 서비스 오픈 직전에 portal 데이터를 삭제하고 시작합니다.  
+> 그 이후의 portal 데이터는 실제 고객 데이터이므로 절대 삭제하지 않습니다.
 
 ---
 
@@ -1161,6 +1308,23 @@ Supabase DB: payments 테이블에 이력 저장
 | 시크릿 키 | 결제 검증 (서버/Worker에서만 사용, 절대 노출 금지) |
 
 > 테스트용 키와 실서비스용 키가 별도로 존재합니다. 개발 중에는 반드시 **테스트 키** 사용.
+
+#### ② 허용 도메인 등록 (중요)
+
+토스페이먼츠 결제창은 **등록되지 않은 도메인에서 호출하면 "인증되지 않은 클라이언트 키" 오류**가 발생합니다.  
+`localhost`는 기본적으로 차단됩니다.
+
+**메뉴 경로**:  
+`토스페이먼츠 대시보드 → [개발] → [웹훅/도메인]` (또는 앱 설정 내 허용 도메인)
+
+```
+https://test.example.co.kr
+https://staging.example.co.kr
+https://portal.example.co.kr
+```
+
+> **핵심**: 결제 기능 테스트는 반드시 등록된 도메인(예: `test.example.co.kr`)에서 진행합니다.  
+> `localhost`나 `127.0.0.1`에서 결제창을 열면 클라이언트 키 오류가 발생합니다.
 
 #### ③ 프런트엔드 결제창 호출 코드
 
@@ -1923,6 +2087,113 @@ cat ~/.ssh/id_ed25519.pub | ssh admin@192.168.x.x 'cat > ~/.ssh/authorized_keys'
 
 - SSL/TLS 모드를 **Full**로 변경 (Full strict → Full)
 - NAS에 유효한 인증서가 없을 때 발생
+
+---
+
+### 카카오 로그인 오류 — KOE205 (요청 권한 없음)
+
+**증상**: 카카오 로그인 시 "요청하신 기능을 사용할 수 없습니다 (KOE205)" 오류 발생
+
+**원인**: 앱이 요청하는 동의 항목(scope)이 카카오 개발자 콘솔에서 활성화되지 않았음
+
+**해결**:  
+`카카오 개발자 콘솔 (developers.kakao.com) → [내 애플리케이션] → 앱 선택 → [제품 설정] → [카카오 로그인] → [동의항목]`
+
+필요한 항목을 **필수 동의** 또는 **선택 동의**로 설정:
+
+| 항목 | 권장 설정 |
+|------|-----------|
+| 닉네임 (profile_nickname) | 필수 동의 |
+| 프로필 사진 (profile_image) | 선택 동의 |
+| 카카오계정(이메일) (account_email) | 필수 동의 |
+
+> **검토 상태 주의**: 항목을 처음 추가하면 "검토 중" 상태일 수 있습니다.  
+> 테스트 환경에서는 앱 팀원으로 등록된 계정만 로그인 가능합니다.  
+> 운영 전환 시 카카오 검토 완료 후 전체 사용자에게 공개됩니다.
+
+---
+
+### 토스페이먼츠 — "인증되지 않은 클라이언트 키" 오류
+
+**증상**: 결제창 버튼 클릭 시 Toss 결제창이 열리지 않고 "인증되지 않은 클라이언트 키" 또는 "인증되지 않은 시크릿 키" 오류
+
+**원인 1**: `localhost`에서 결제창 호출 시도  
+**해결**: 8.7절 참고 — 등록된 도메인(예: `test.example.co.kr`)에서 테스트
+
+**원인 2**: 도메인이 토스 대시보드에 미등록  
+**해결**: `토스 대시보드 → [개발] → 허용 도메인`에 서비스 도메인 등록
+
+**원인 3**: 테스트 키(`test_ck_`)와 실서비스 키(`live_ck_`) 혼용  
+**해결**: `index.html`의 `TOSS_CLIENT_KEY` 값과 Worker의 `TOSS_SECRET_KEY` 값이 같은 환경(테스트/실서비스)인지 확인
+
+---
+
+### 결제 성공 후 "Not authenticated" 토스트 메시지
+
+**증상**: 토스 결제 완료 후 서비스 페이지로 돌아왔을 때 "인증되지 않은 사용자" 오류 토스트가 표시되고 크레딧이 충전되지 않음
+
+**원인**: 결제 완료 페이지 리다이렉트 후 Supabase가 인증 세션을 복원하기 전에 결제 처리 함수(`initPaymentResult`)가 실행되는 타이밍 문제 (race condition)
+
+**해결**: `initPaymentResult()` 함수 최상단에 인증 상태 확인 가드를 추가합니다:
+
+```javascript
+async function initPaymentResult() {
+  if (!authUser) return;  // 세션 복원 전 실행 방지
+  const p = new URLSearchParams(location.search);
+  if (!p.get('payment')) return;
+  // ... 결제 처리 로직
+}
+```
+
+그리고 `onAuthStateChange` 콜백 내에서 인증 완료 후 `initPaymentResult()`를 다시 호출하도록 합니다.
+
+---
+
+### 서비스 이용 동의 팝업이 매번 반복됨
+
+**증상**: 로그인·새로고침할 때마다 "서비스 이용 동의" 팝업이 다시 표시됨
+
+**원인 A**: `saveConsent()`에서 Supabase profiles 테이블 upsert가 실패(RLS INSERT 정책 없음)하여 동의 사실이 저장되지 않음  
+**해결**: 8.7절의 RLS INSERT 정책 추가 후 재시도; `saveConsent()`는 localStorage에 먼저 저장 후 Supabase에 시도하는 방식으로 구현
+
+**원인 B**: 내부 관리자 역할(gfc/ceo/staff/consultant)임에도 동의 팝업이 표시됨  
+**해결**: 인증 완료 콜백에서 사용자 역할 확인 후 내부 역할은 팝업 건너뜀:
+
+```javascript
+const isInternal = ['gfc', 'ceo', 'staff', 'consultant'].includes(userRole);
+if (!agreed && !isInternal) {
+  showConsentModal();
+} else {
+  if (!agreed) saveConsent(user.id, true).catch(() => {});
+  onAuthComplete();
+}
+```
+
+---
+
+### 새로고침 후 로그인 상태가 사라짐 (Dev 모드)
+
+**증상**: 개발 모드(`?dev=1`)에서 로그인 후 페이지를 새로고침하면 로그인 전 상태로 돌아감
+
+**원인**: `setTimeout(() => { /* 세션 복원 */ }, 0)`과 `onAuthStateChange(null)` 이벤트 간의 경쟁 조건.  
+실행 순서가 비결정적이어서 세션 복원이 때로는 성공하고 때로는 실패함.
+
+**해결**: Dev 세션 복원 로직을 `setTimeout` 대신 `onAuthStateChange` 콜백 내부로 이동:
+
+```javascript
+_sb.auth.onAuthStateChange(async (_event, session) => {
+  const user = session?.user || null;
+  if (!user && IS_DEV) {
+    const savedRole = localStorage.getItem('wf_dev_session');
+    if (savedRole) {
+      // 저장된 dev 역할로 세션 복원
+      await handleAuthStateChange(devUser);
+      return;
+    }
+  }
+  await handleAuthStateChange(user);
+});
+```
 
 ---
 

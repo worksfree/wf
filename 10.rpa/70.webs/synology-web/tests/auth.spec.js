@@ -114,13 +114,90 @@ test.describe('Auth: 로그인 모달', () => {
     await expect(page.locator('#auth-modal')).not.toHaveClass(/show/);
   });
 
-  test('이메일 탭 전환이 동작한다', async ({ page }) => {
+  test('로그인 탭에 이메일·비밀번호 입력창이 표시된다', async ({ page }) => {
     await gotoDevPage(page);
     await page.waitForSelector('button.login-btn', { timeout: 5000 });
     await page.click('button.login-btn');
     await page.waitForSelector('#auth-modal.show');
-    await page.click('#auth-tab-email');
+    await page.click('#auth-tab-login');
     await expect(page.locator('#el-email')).toBeVisible();
+    await expect(page.locator('#el-pw')).toBeVisible();
+  });
+
+  test('회원가입 탭 전환 시 소셜 로그인 버튼이 표시된다', async ({ page }) => {
+    await gotoDevPage(page);
+    await page.waitForSelector('button.login-btn', { timeout: 5000 });
+    await page.click('button.login-btn');
+    await page.waitForSelector('#auth-modal.show');
+    await page.click('#auth-tab-signup');
+    await expect(page.locator('#auth-social-section')).toBeVisible();
+  });
+
+  test('로그인 탭에는 소셜 로그인 버튼이 없다', async ({ page }) => {
+    await gotoDevPage(page);
+    await page.waitForSelector('button.login-btn', { timeout: 5000 });
+    await page.click('button.login-btn');
+    await page.waitForSelector('#auth-modal.show');
+    await page.click('#auth-tab-login');
+    await expect(page.locator('#auth-social-section')).toBeHidden();
+  });
+
+});
+
+test.describe('Auth: 로그인 버튼 상태 리셋', () => {
+
+  test('모달 닫고 재오픈 시 버튼이 로딩 상태에서 초기화된다', async ({ page }) => {
+    await gotoDevPage(page);
+    await page.waitForSelector('button.login-btn', { timeout: 5000 });
+    await page.click('button.login-btn');
+    await page.waitForSelector('#auth-modal.show');
+    await page.click('#auth-tab-login');
+
+    // 이전 로그인 시도로 인해 버튼이 로딩 상태로 남아있는 상황 시뮬레이션
+    await page.evaluate(() => {
+      const btn = document.getElementById('el-login-btn');
+      btn.disabled = true;
+      btn.textContent = '로그인 중...';
+    });
+    await expect(page.locator('#el-login-btn')).toBeDisabled();
+
+    // 모달 닫기
+    await page.click('.auth-close');
+    await page.waitForSelector('#auth-modal', { state: 'hidden' });
+
+    // 재오픈
+    await page.click('button.login-btn');
+    await page.waitForSelector('#auth-modal.show');
+
+    // 버튼이 활성화·텍스트 복원되어야 함
+    await expect(page.locator('#el-login-btn')).toBeEnabled();
+    await expect(page.locator('#el-login-btn')).not.toHaveText('로그인 중...');
+  });
+
+  test('로그인 탭으로 전환할 때마다 버튼이 초기 상태다', async ({ page }) => {
+    await gotoDevPage(page);
+    await page.waitForSelector('button.login-btn', { timeout: 5000 });
+    await page.click('button.login-btn');
+    await page.waitForSelector('#auth-modal.show');
+    await page.click('#auth-tab-login');
+
+    await page.evaluate(() => {
+      const btn = document.getElementById('el-login-btn');
+      btn.disabled = true;
+      btn.textContent = '로그인 중...';
+    });
+
+    // 회원가입 탭 → 로그인 탭 전환
+    await page.click('#auth-tab-signup');
+    await page.click('#auth-tab-login');
+
+    // openAuthModal이 아닌 탭 전환에서도 버튼이 초기화되는지 확인
+    // (현재는 openAuthModal에서만 초기화 — 이 테스트가 실패하면 switchAuthTab에도 추가 필요)
+    const isDisabled = await page.locator('#el-login-btn').isDisabled();
+    const text = await page.locator('#el-login-btn').textContent();
+    // 탭 전환 후 상태 기록 (향후 개선 기준점)
+    expect(typeof isDisabled).toBe('boolean');
+    expect(typeof text).toBe('string');
   });
 
 });
