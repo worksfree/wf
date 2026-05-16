@@ -1,5 +1,7 @@
 /**
  * 스모크 테스트 — 페이지 기본 구조 및 로드 검증
+ * 배포 환경 접근성 테스트는 DEPLOY_TARGET 환경변수로 URL을 지정:
+ *   DEPLOY_TARGET=https://test.worksfree.co.kr npx playwright test tests/smoke.spec.js
  */
 
 const { test, expect, mockExternalAPIs, gotoDevPage } = require('./fixtures');
@@ -60,6 +62,58 @@ test.describe('Smoke: 페이지 기본 로드', () => {
     await page.goto('/');
     await expect(page.locator('#btnKo')).toBeVisible();
     await expect(page.locator('#btnEn')).toBeVisible();
+  });
+
+});
+
+/* ─────────────────────────────────────────────────────────────────
+   Smoke: 배포 환경 접근성 (Cloudflare Tunnel 생존 여부)
+   실행: DEPLOY_TARGET=https://test.worksfree.co.kr npx playwright test tests/smoke.spec.js --project=mock
+   CI/CD나 배포 후 서버 점검 시 사용.
+───────────────────────────────────────────────────────────────── */
+const DEPLOY_TARGET = process.env.DEPLOY_TARGET;
+
+test.describe('Smoke: 배포 환경 접근성', () => {
+  test.skip(!DEPLOY_TARGET, 'DEPLOY_TARGET 환경변수 미설정 시 건너뜀');
+
+  test('배포 서버에서 페이지가 200으로 응답한다', async ({ page }) => {
+    const response = await page.goto(DEPLOY_TARGET, { timeout: 15000 });
+    expect(response?.status(), `${DEPLOY_TARGET} 접속 실패 — Cloudflare Tunnel 또는 NAS nginx 확인 필요`).toBe(200);
+  });
+
+  test('배포 서버에서 WorksFree Hub 타이틀이 표시된다', async ({ page }) => {
+    await page.goto(DEPLOY_TARGET, { timeout: 15000 });
+    await expect(page).toHaveTitle('WorksFree Hub');
+  });
+
+  test('배포 서버에서 JS 콘솔 에러가 없다', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', err => errors.push(err.message));
+    await page.goto(DEPLOY_TARGET, { timeout: 15000 });
+    await page.waitForTimeout(2000);
+    expect(errors, `콘솔 에러: ${errors.join(', ')}`).toHaveLength(0);
+  });
+
+  test('배포 서버에서 로그인 버튼이 표시된다', async ({ page }) => {
+    await page.goto(DEPLOY_TARGET, { timeout: 15000 });
+    await expect(page.locator('button.login-btn')).toBeVisible({ timeout: 8000 });
+  });
+
+  test('배포 서버에서 dev 로그인이 동작한다', async ({ page }) => {
+    await page.goto(`${DEPLOY_TARGET}?dev=1`, { timeout: 15000 });
+    await page.waitForSelector('#dev-toolbar.show', { timeout: 8000 });
+    await page.click('#dev-btn-user');
+    await expect(page.locator('.user-pill')).toBeVisible({ timeout: 8000 });
+  });
+
+  test('배포 서버에서 dev 관리자 로그인이 동작한다', async ({ page }) => {
+    await page.goto(`${DEPLOY_TARGET}?dev=1`, { timeout: 15000 });
+    await page.waitForSelector('#dev-toolbar.show', { timeout: 8000 });
+    // 관리자 로그인 (비밀번호 모달 → 확인)
+    await page.click('#dev-btn-admin');
+    await page.waitForSelector('#dev-pw-modal', { state: 'visible', timeout: 3000 });
+    await page.click('#dev-pw-modal button:text("확인")');
+    await expect(page.locator('.user-pill')).toBeVisible({ timeout: 8000 });
   });
 
 });

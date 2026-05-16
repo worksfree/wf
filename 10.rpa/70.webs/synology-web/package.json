@@ -10,7 +10,10 @@
     "test:smoke":     "playwright test tests/smoke.spec.js --project=mock",
     "test:debug":     "playwright test --debug --project=mock",
     "test:realdb":    "cross-env PLAYWRIGHT_PROJECT=realdb playwright test --project=realdb",
-    "test:all":       "npm run test && npm run test:realdb"
+    "test:all":       "npm run test && npm run test:realdb",
+    "test:deploy:test":    "cross-env DEPLOY_TARGET=https://test.worksfree.co.kr playwright test tests/smoke.spec.js --project=mock",
+    "test:deploy:staging": "cross-env DEPLOY_TARGET=https://staging.worksfree.co.kr playwright test tests/smoke.spec.js --project=mock",
+    "test:deploy:portal":  "cross-env DEPLOY_TARGET=https://portal.worksfree.co.kr playwright test tests/smoke.spec.js --project=mock"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0",
