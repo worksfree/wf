@@ -182,7 +182,7 @@
   .d2 > .tree-label { padding-left:44px; font-size:15px; color:#94a3b8; }
   .d2 > .tree-label.active { color:#93c5fd; }
 
-  /* GFC 전용 메뉴 강조 */
+  /* 파트너 전용 메뉴 강조 */
   .d2.gfc-item > .tree-label {
     color:#60a5fa;
   }
@@ -1228,8 +1228,10 @@
   </div>
   <div class="dev-body">
     <div class="dev-status" id="dev-status">비로그인</div>
-    <button class="dev-btn" id="dev-btn-user" onclick="devLogin('general')">▶ 사용자 로그인 (부분 표시)</button>
-    <button class="dev-btn" id="dev-btn-admin" onclick="devLogin('gfc')" style="border-color:#7c3aed;color:#c4b5fd">▶ 관리자 로그인 (전체 표시)</button>
+    <button class="dev-btn" id="dev-btn-general"    onclick="devLogin('general')">▶ 일반회원</button>
+    <button class="dev-btn" id="dev-btn-consultant" onclick="devLogin('consultant')" style="border-color:#0ea5e9;color:#7dd3fc">▶ 컨설턴트</button>
+    <button class="dev-btn" id="dev-btn-gfc"        onclick="devLogin('gfc')"        style="border-color:#7c3aed;color:#c4b5fd">▶ 파트너 (🔒)</button>
+    <button class="dev-btn" id="dev-btn-admin"      onclick="devLogin('admin')"      style="border-color:#dc2626;color:#fca5a5">▶ 관리자 (🔒)</button>
     <button class="dev-btn" onclick="devShowConsent()">📋 동의 모달 보기</button>
     <button class="dev-btn danger" onclick="devResetConsent()">↺ 동의 초기화</button>
     <button class="dev-btn danger" onclick="devLogout()">✕ 테스트 로그아웃</button>
@@ -1376,7 +1378,7 @@ function closeSidebar() {
    1. 역할(Role) 판별
    ────────────────────────────────────────────
    URL 파라미터 ?role=<TOKEN> 을 읽어서
-   GFC 전용 콘텐츠 표시 여부 결정.
+   파트너 전용 콘텐츠 표시 여부 결정.
 
    토큰은 여기서 관리 — 바꾸고 싶으면 이 값만 수정
 ════════════════════════════════════════════ */
@@ -1399,9 +1401,9 @@ const HUB_I18N = {
     card_lock:       '파트너 전용',
     member_tag:      '회원전용',
     consultant_tag:  '컨설팅 전용',
-    tooltip_consultant: '경영지도사 / GFC 파트너 전용 서비스입니다',
+    tooltip_consultant: '경영지도사 / 파트너 전용 서비스입니다',
     denied_consultant_title: '컨설팅 서비스 전용',
-    denied_consultant_desc:  '이 서비스는 경영지도사 및 GFC 파트너 전용입니다.<br>WorksFree에 문의하시면 컨설팅 서비스를 이용하실 수 있습니다.',
+    denied_consultant_desc:  '이 서비스는 경영지도사 및 파트너 전용입니다.<br>WorksFree에 문의하시면 컨설팅 서비스를 이용하실 수 있습니다.',
     login_btn:       '로그인 / 회원가입',
     auth_title:      'WorksFree에 로그인',
     auth_desc:       '회원 전용 콘텐츠에 접근하려면<br>로그인이 필요합니다.',
@@ -1463,8 +1465,10 @@ const HUB_I18N = {
     profile_pw_err_mismatch: '비밀번호가 일치하지 않습니다.',
     profile_credit_history:  '크레딧 내역 보기',
     profile_credit_buy:      '크레딧 구매',
-    dev_login_user:          '▶ 사용자 로그인 (부분 표시)',
-    dev_login_admin:         '▶ 관리자 로그인 (전체 표시)',
+    dev_login_general:       '▶ 일반회원',
+    dev_login_consultant:    '▶ 컨설턴트',
+    dev_login_gfc:           '▶ 파트너 (🔒)',
+    dev_login_admin:         '▶ 관리자 (🔒)',
     overlay_title:           '미리보기 모드',
     overlay_desc:            '이 기능을 직접 사용하려면 WorksFree 회원 로그인이 필요합니다.',
     overlay_btn:             '로그인 / 회원가입',
@@ -1518,9 +1522,9 @@ const HUB_I18N = {
     card_lock:       'Partner Only',
     member_tag:      'Member Only',
     consultant_tag:  'Consultant Only',
-    tooltip_consultant: 'For Consultants / GFC Partners only',
+    tooltip_consultant: 'For Consultants / Partners only',
     denied_consultant_title: 'Consultant Service',
-    denied_consultant_desc:  'This service is for consultants and GFC partners only.<br>Contact WorksFree to learn about consulting services.',
+    denied_consultant_desc:  'This service is for consultants and partners only.<br>Contact WorksFree to learn about consulting services.',
     login_btn:       'Sign In / Sign Up',
     auth_title:      'Sign in to WorksFree',
     auth_desc:       'Login required to access<br>member-only content.',
@@ -1582,8 +1586,10 @@ const HUB_I18N = {
     profile_pw_err_mismatch: 'Passwords do not match.',
     profile_credit_history:  'View Credit History',
     profile_credit_buy:      'Buy Credits',
-    dev_login_user:          '▶ User Login (partial view)',
-    dev_login_admin:         '▶ Admin Login (full view)',
+    dev_login_general:       '▶ General User',
+    dev_login_consultant:    '▶ Consultant',
+    dev_login_gfc:           '▶ Partner (🔒)',
+    dev_login_admin:         '▶ Admin (🔒)',
     overlay_title:           'Preview Mode',
     overlay_desc:            'Sign in to your WorksFree account to use this feature.',
     overlay_btn:             'Sign In / Sign Up',
@@ -1753,10 +1759,14 @@ function applyHubLang() {
   // 브레드크럼 재렌더
   if (currentLabel) setBreadcrumb(currentPath, currentLabel);
   // dev 툴바 버튼
-  const elDevUser  = document.getElementById('dev-btn-user');
-  const elDevAdmin = document.getElementById('dev-btn-admin');
-  if (elDevUser)  elDevUser.textContent  = t('dev_login_user');
-  if (elDevAdmin) elDevAdmin.textContent = t('dev_login_admin');
+  const elDevGeneral    = document.getElementById('dev-btn-general');
+  const elDevConsultant = document.getElementById('dev-btn-consultant');
+  const elDevGfc        = document.getElementById('dev-btn-gfc');
+  const elDevAdmin      = document.getElementById('dev-btn-admin');
+  if (elDevGeneral)    elDevGeneral.textContent    = t('dev_login_general');
+  if (elDevConsultant) elDevConsultant.textContent = t('dev_login_consultant');
+  if (elDevGfc)        elDevGfc.textContent        = t('dev_login_gfc');
+  if (elDevAdmin)      elDevAdmin.textContent      = t('dev_login_admin');
   // 미리보기 오버레이
   const elOvTitle = document.getElementById('overlay-title');
   const elOvDesc  = document.getElementById('overlay-desc');
@@ -1787,12 +1797,12 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.7.5.3';             // deploy.ps1이 자동 증가
-const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 이 값만 GFC 동료에게 공유
+const HUB_VERSION = '0.7.5.7';             // deploy.ps1이 자동 증가
+const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
 const roleToken = params.get('role') || '';
-const IS_GFC   = true; // roleToken === GFC_TOKEN;  ← 테스트 중 권한 해제
+let IS_GFC   = false; // onAuthComplete()에서 userRole 기반으로 설정
 
 /* ─ 역할 배지 — applyHubLang에서 렌더됨 ─ */
 const badgeWrap = document.getElementById('role-badge-wrap');
@@ -1809,7 +1819,7 @@ if (IS_GFC) {
 /* ════════════════════════════════════════════
    2. 메뉴 트리 데이터
    ────────────────────────────────────────────
-   gfcOnly: true  → IS_GFC 일 때만 표시
+   gfcOnly: true  → 파트너(IS_GFC) 일 때만 표시
    iframe  : 경로 → 클릭 시 iframe에 로드
 ════════════════════════════════════════════ */
 const TREE = [
@@ -1819,21 +1829,21 @@ const TREE = [
       { label:{ko:'QR 생성기',           en:'QR Generator'},       icon:'✦', iframe:'service/qr/index.html' },
       { label:{ko:'파일명 자소복원',        en:'Korean Normalizer'},   icon:'✦', iframe:'service/normalizer/index.html' },
       { label:{ko:'변환 결과 검증',        en:'Conversion Verifier'}, icon:'✦', iframe:'service/conversion-verifier/index.html' },
+      { label:{ko:'컨설팅 마인드맵',       en:'Consulting Mindmap'}, icon:'🗺', iframe:'consulting/mindmap/index.html', consultantOnly:true },
       { label:{ko:'앱 요청 게시판',        en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
     ]
   },
   {
     label:{ko:'컨설팅', en:'Consulting (KR)'}, icon:'◈', consultantTag:true, children:[
-      { label:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'}, icon:'✦', iframe:'consulting/soho/index.html', consultantOnly:true },
-      { label:{ko:'기업공시 조회',  en:'DART Disclosure'},     icon:'✦', iframe:'consulting/dart/index.html', consultantOnly:true },
-      { label:{ko:'ESG 자가진단',  en:'ESG Assessment'},      icon:'✦', iframe:'consulting/esg/index.html', consultantOnly:true },
-      { label:{ko:'중대재해처벌법', en:'Serious Accident Act'}, icon:'✦', iframe:'consulting/jdh/index.html', consultantOnly:true },
-      { label:{ko:'현장클리닉 관리', en:'Field Clinic'},        icon:'✦', iframe:'consulting/g1/index.html',  consultantOnly:true },
-      { label:{ko:'예비창업패키지', en:'Pre-Startup Package'}, icon:'🚀', iframe:'consulting/prebiz/index.html', consultantOnly:true },
-      { label:{ko:'경영종합진단',   en:'Financial Plan'},      icon:'✦', iframe:'consulting/gfc/index.html', roleOnly:'gfc', gfcTag:true },
-      { label:{ko:'CEO 플랜',      en:'CEO Plan'},            icon:'✦', iframe:'consulting/ceo/index.html', roleOnly:'gfc', gfcTag:true },
-      { label:{ko:'상속·증여 진단', en:'Inheritance Plan'},   icon:'🏛', iframe:'consulting/inheritance/index.html', roleOnly:'gfc', gfcTag:true },
-      { label:{ko:'컨설팅 마인드맵', en:'Consulting Mindmap'}, icon:'🗺', iframe:'consulting/mindmap/index.html', consultantOnly:true },
+      { label:{ko:'예비창업패키지',        en:'Pre-Startup Package'}, icon:'🚀', iframe:'consulting/prebiz/index.html', consultantOnly:true },
+      { label:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'}, icon:'🏪', iframe:'consulting/soho/index.html',  consultantOnly:true },
+      { label:{ko:'현장클리닉 관리',       en:'Field Clinic'},        icon:'🏥', iframe:'consulting/g1/index.html',    consultantOnly:true },
+      { label:{ko:'중대재해처벌법',        en:'Serious Accident Act'}, icon:'⚖', iframe:'consulting/jdh/index.html',  consultantOnly:true },
+      { label:{ko:'ESG 자가진단',         en:'ESG Assessment'},      icon:'🏢', iframe:'consulting/esg/index.html',   consultantOnly:true },
+      { label:{ko:'기업공시 조회',         en:'DART Disclosure'},     icon:'🏙', iframe:'consulting/dart/index.html',  consultantOnly:true },
+      { label:{ko:'상속·증여 진단',        en:'Inheritance Plan'},    icon:'🔑', iframe:'consulting/inheritance/index.html', roleOnly:'gfc', gfcTag:true },
+      { label:{ko:'경영종합진단',          en:'Financial Plan'},      icon:'🔑', iframe:'consulting/gfc/index.html',   roleOnly:'gfc', gfcTag:true },
+      { label:{ko:'CEO 플랜',             en:'CEO Plan'},            icon:'🔑', iframe:'consulting/ceo/index.html',   roleOnly:'gfc', gfcTag:true },
     ]
   },
   {
@@ -1856,6 +1866,13 @@ const TREE = [
       },
     ]
   },
+  {
+    label:{ko:'O&M 관리', en:'O&M Admin'}, icon:'⚙', adminOnly:true, children:[
+      { label:{ko:'사용자 현황',   en:'User Status'},    icon:'👥', coming:true },
+      { label:{ko:'시스템 모니터', en:'System Monitor'}, icon:'📊', coming:true },
+      { label:{ko:'콘텐츠 관리',  en:'Content Mgmt'},   icon:'📝', coming:true },
+    ]
+  },
 ];
 
 /* 대시보드 카드 */
@@ -1872,46 +1889,46 @@ const DASH_CARDS = [
     title:{ko:'변환 결과 검증',        en:'Conversion Verifier'},
     desc: {ko:'변환 전·후 파일 쌍 검증',             en:'Verify source/target conversion pairs'},
     iframe:'service/conversion-verifier/index.html', gfcOnly:false },
-  { icon:'🏪',
-    title:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'},
-    desc: {ko:'정부 지원 사업 한눈에 보기',           en:'Government support programs at a glance'},
-    iframe:'consulting/soho/index.html', consultantOnly:true },
-  { icon:'📊',
-    title:{ko:'기업공시 조회',          en:'DART Disclosure'},
-    desc: {ko:'DART 기업 공시 정보 조회·분석',        en:'Search & analyze DART corporate disclosures'},
-    iframe:'consulting/dart/index.html', consultantOnly:true },
-  { icon:'♻',
-    title:{ko:'ESG 자가진단',        en:'ESG Assessment'},
-    desc: {ko:'환경·사회·지배구조 수준 점검',        en:'Assess ESG readiness level'},
-    iframe:'consulting/esg/index.html', consultantOnly:true },
-  { icon:'⚖',
-    title:{ko:'중대재해처벌법',      en:'Serious Accident Act'},
-    desc: {ko:'기업 의무·리스크 자가진단',           en:'Corporate obligations & risk self-check'},
-    iframe:'consulting/jdh/index.html', consultantOnly:true },
-  { icon:'🏥',
-    title:{ko:'현장클리닉 관리',       en:'Field Clinic'},
-    desc: {ko:'수진기업 현장클리닉 진행현황 관리',    en:'Manage field clinic client progress'},
-    iframe:'consulting/g1/index.html', consultantOnly:true },
-  { icon:'🚀',
-    title:{ko:'예비창업패키지',        en:'Pre-Startup Package'},
-    desc: {ko:'정부 지원 최대 1억원 · 창업 교육·멘토링 패키지', en:'Up to ₩100M gov\'t fund · education & mentoring'},
-    iframe:'consulting/prebiz/index.html', consultantOnly:true },
-  { icon:'◈',
-    title:{ko:'경영종합진단',         en:'Financial Plan'},
-    desc: {ko:'기업 경영 종합 컨설팅 진단',           en:'Comprehensive business consulting diagnosis'},
-    iframe:'consulting/gfc/index.html', roleOnly:'gfc', gfcTag:true },
-  { icon:'◉',
-    title:{ko:'CEO 플랜',            en:'CEO Plan'},
-    desc: {ko:'법인 컨설팅 종합 플랜',               en:'Corporate consulting comprehensive plan'},
-    iframe:'consulting/ceo/index.html', roleOnly:'gfc', gfcTag:true },
-  { icon:'🏛',
-    title:{ko:'상속·증여 진단',       en:'Inheritance Plan'},
-    desc: {ko:'상속세 20년 동결·부동산 급등 — GFC 등급 진단', en:'Inheritance tax 20yr freeze · GFC grade diagnosis'},
-    iframe:'consulting/inheritance/index.html', roleOnly:'gfc', gfcTag:true },
   { icon:'🗺',
     title:{ko:'컨설팅 마인드맵',       en:'Consulting Mindmap'},
     desc: {ko:'전체 체크리스트 노드 한눈에 보기',     en:'All checklist nodes at a glance'},
     iframe:'consulting/mindmap/index.html', consultantOnly:true },
+  { icon:'🚀',
+    title:{ko:'예비창업패키지',        en:'Pre-Startup Package'},
+    desc: {ko:'정부 지원 최대 1억원 · 창업 교육·멘토링 패키지', en:'Up to ₩100M gov\'t fund · education & mentoring'},
+    iframe:'consulting/prebiz/index.html', consultantOnly:true },
+  { icon:'🏪',
+    title:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'},
+    desc: {ko:'정부 지원 사업 한눈에 보기',           en:'Government support programs at a glance'},
+    iframe:'consulting/soho/index.html', consultantOnly:true },
+  { icon:'🏥',
+    title:{ko:'현장클리닉 관리',       en:'Field Clinic'},
+    desc: {ko:'수진기업 현장클리닉 진행현황 관리',    en:'Manage field clinic client progress'},
+    iframe:'consulting/g1/index.html', consultantOnly:true },
+  { icon:'⚖',
+    title:{ko:'중대재해처벌법',      en:'Serious Accident Act'},
+    desc: {ko:'기업 의무·리스크 자가진단',           en:'Corporate obligations & risk self-check'},
+    iframe:'consulting/jdh/index.html', consultantOnly:true },
+  { icon:'🏢',
+    title:{ko:'ESG 자가진단',        en:'ESG Assessment'},
+    desc: {ko:'환경·사회·지배구조 수준 점검',        en:'Assess ESG readiness level'},
+    iframe:'consulting/esg/index.html', consultantOnly:true },
+  { icon:'🏙',
+    title:{ko:'기업공시 조회',          en:'DART Disclosure'},
+    desc: {ko:'DART 기업 공시 정보 조회·분석',        en:'Search & analyze DART corporate disclosures'},
+    iframe:'consulting/dart/index.html', consultantOnly:true },
+  { icon:'🔑',
+    title:{ko:'상속·증여 진단',       en:'Inheritance Plan'},
+    desc: {ko:'상속세 20년 동결·부동산 급등 — 파트너 등급 진단', en:'Inheritance tax 20yr freeze · partner grade diagnosis'},
+    iframe:'consulting/inheritance/index.html', roleOnly:'gfc', gfcTag:true },
+  { icon:'🔑',
+    title:{ko:'경영종합진단',         en:'Financial Plan'},
+    desc: {ko:'기업 경영 종합 컨설팅 진단',           en:'Comprehensive business consulting diagnosis'},
+    iframe:'consulting/gfc/index.html', roleOnly:'gfc', gfcTag:true },
+  { icon:'🔑',
+    title:{ko:'CEO 플랜',            en:'CEO Plan'},
+    desc: {ko:'법인 컨설팅 종합 플랜',               en:'Corporate consulting comprehensive plan'},
+    iframe:'consulting/ceo/index.html', roleOnly:'gfc', gfcTag:true },
   { icon:'📋',
     title:{ko:'앱 요청 게시판',         en:'App Request Board'},
     desc: {ko:'원하는 자동화 앱을 요청하세요',        en:'Request an automation app you need'},
@@ -1935,15 +1952,17 @@ const DASH_CARDS = [
 ════════════════════════════════════════════ */
 let activeLabel = null;
 
-// consultant 또는 gfc 역할이면 true
-const canConsult = () => userRole === 'consultant' || userRole === 'gfc';
+// consultant, gfc, admin 역할이면 true
+const canConsult = () => userRole === 'consultant' || userRole === 'gfc' || userRole === 'admin';
 
 function buildTree(nodes, depth=0, path=[]) {
   const wrap = document.createElement('div');
 
   nodes.forEach(node => {
-    // roleOnly: 지정 역할이 아니면 트리에서 완전히 숨김 (GFC 전용 보험 항목 등)
-    if (node.roleOnly && userRole !== node.roleOnly) return;
+    // adminOnly: 관리자만 표시
+    if (node.adminOnly && userRole !== 'admin') return;
+    // roleOnly: 지정 역할 + 관리자(모든 권한)가 아니면 숨김
+    if (node.roleOnly && userRole !== 'admin' && userRole !== node.roleOnly) return;
 
     const isGfcItem = !!node.gfcOnly;
 
@@ -2065,8 +2084,9 @@ const dashGrid = document.getElementById('dashGrid');
 function renderDashCards() {
   dashGrid.innerHTML = '';
   DASH_CARDS.forEach(card => {
+    if (card.adminOnly && userRole !== 'admin') return;
     if (card.gfcOnly && !IS_GFC) return;
-    if (card.roleOnly && userRole !== card.roleOnly) return;
+    if (card.roleOnly && userRole !== 'admin' && userRole !== card.roleOnly) return;
     const titleStr = getLabel(card.title);
     const descStr  = getLabel(card.desc);
     const el = document.createElement('div');
@@ -2224,7 +2244,10 @@ try {
       if (!user && IS_DEV) {
         const _savedRole = localStorage.getItem('wf_dev_session');
         if (_savedRole) {
-          const _devUser = _savedRole === 'gfc' ? DEV_USER_GFC : DEV_USER;
+          const _devUser = _savedRole === 'admin'      ? DEV_USER_ADMIN
+                         : _savedRole === 'gfc'        ? DEV_USER_GFC
+                         : _savedRole === 'consultant' ? DEV_USER_CONSULTANT
+                         : DEV_USER;
           if (!localStorage.getItem('wf_agreed_' + _devUser.id)) {
             localStorage.setItem('wf_agreed_' + _devUser.id, JSON.stringify({
               agreed_at: new Date().toISOString(), marketing: false
@@ -2284,7 +2307,7 @@ async function handleAuthStateChange(user) {
     }
 
     const agreed = await checkConsent(user.id);
-    const isInternal = ['gfc', 'ceo', 'staff', 'consultant'].includes(userRole);
+    const isInternal = ['gfc', 'ceo', 'staff', 'consultant', 'admin'].includes(userRole);
     if (!agreed && !isInternal) {
       showConsentModal();
     } else {
@@ -2297,6 +2320,7 @@ async function handleAuthStateChange(user) {
 }
 
 function onAuthComplete() {
+  IS_GFC = userRole === 'gfc' || userRole === 'admin';
   hidePreviewOverlay();
   localStorage.setItem('wf_last_login', '1'); // 재방문 감지 — 다음 방문 시 로그인 탭 기본
   updateAuthUI();
@@ -2772,10 +2796,20 @@ const DEV_USER = {
   email: 'test@worksfree.co.kr',
   user_metadata: { full_name: '테스트 회원', avatar_url: '' }
 };
+const DEV_USER_CONSULTANT = {
+  id: 'dev-test-user-consultant',
+  email: 'consultant@worksfree.co.kr',
+  user_metadata: { full_name: '컨설턴트 테스터', avatar_url: '' }
+};
 const DEV_USER_GFC = {
   id: 'dev-test-user-gfc',
   email: 'gfc@worksfree.co.kr',
-  user_metadata: { full_name: 'GFC 테스터', avatar_url: '' }
+  user_metadata: { full_name: '파트너 테스터', avatar_url: '' }
+};
+const DEV_USER_ADMIN = {
+  id: 'dev-test-user-admin',
+  email: 'admin@worksfree.co.kr',
+  user_metadata: { full_name: '관리자 테스터', avatar_url: '' }
 };
 
 if (IS_DEV) {
@@ -2829,8 +2863,8 @@ function updateDevStatus() {
 }
 
 async function devLogin(role = 'general') {
-  // 관리자 로그인: 비밀번호 확인 + 잠금 처리
-  if (role === 'gfc') {
+  // 파트너 / 관리자: 비밀번호 확인 + 잠금 처리
+  if (role === 'gfc' || role === 'admin') {
     const LOCK_KEY     = 'wf_dev_admin_lock';
     const ATTEMPT_KEY  = 'wf_dev_admin_attempts';
     const MAX_ATTEMPTS = 3;
@@ -2840,7 +2874,7 @@ async function devLogin(role = 'general') {
     if (Date.now() < lockUntil) {
       const remain = Math.ceil((lockUntil - Date.now()) / 1000);
       const m = Math.floor(remain / 60), s = remain % 60;
-      alert(`🔒 관리자 잠금 중 — ${m}분 ${s}초 후 다시 시도하세요.`);
+      alert(`🔒 잠금 중 — ${m}분 ${s}초 후 다시 시도하세요.`);
       return;
     }
 
@@ -2865,7 +2899,10 @@ async function devLogin(role = 'general') {
   }
 
   // 자동 동의 (모달 생략)
-  const user = role === 'gfc' ? DEV_USER_GFC : DEV_USER;
+  const user = role === 'admin'      ? DEV_USER_ADMIN
+             : role === 'gfc'        ? DEV_USER_GFC
+             : role === 'consultant' ? DEV_USER_CONSULTANT
+             : DEV_USER;
   localStorage.setItem('wf_agreed_' + user.id, JSON.stringify({
     agreed_at: new Date().toISOString(), marketing: false
   }));

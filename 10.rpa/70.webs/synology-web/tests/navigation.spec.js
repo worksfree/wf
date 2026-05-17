@@ -3,7 +3,7 @@
  * - 트리 구조 렌더
  * - 폴더 펼치기/접기
  * - 메뉴 클릭 → iframe 로드
- * - GFC 전용 메뉴 접근 제어
+ * - 파트너 전용 메뉴 접근 제어
  * - 대시보드 카드 렌더
  */
 
@@ -66,14 +66,14 @@ test.describe('Navigation: 트리 구조', () => {
 
 test.describe('Navigation: 접근 제어', () => {
 
-  test('일반 사용자는 GFC 전용 메뉴가 보이지 않는다', async ({ page }) => {
+  test('일반 사용자는 파트너 전용 메뉴가 보이지 않는다', async ({ page }) => {
     await loginAsUser(page);
     // gfc roleOnly 메뉴는 트리에서 완전히 제거됨
     await expect(page.locator('#treeRoot')).not.toContainText('경영종합진단');
     await expect(page.locator('#treeRoot')).not.toContainText('CEO 플랜');
   });
 
-  test('관리자 로그인 시 GFC 전용 메뉴가 표시된다', async ({ page }) => {
+  test('관리자 로그인 시 파트너 전용 메뉴가 표시된다', async ({ page }) => {
     await loginAsAdmin(page);
     await expect(page.locator('#treeRoot')).toContainText('경영종합진단');
     await expect(page.locator('#treeRoot')).toContainText('CEO 플랜');

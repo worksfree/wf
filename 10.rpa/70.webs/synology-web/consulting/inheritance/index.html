@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GFC 상속·증여 종합진단</title>
+<title>상속·증여 종합진단</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
 :root{
@@ -405,7 +405,7 @@ function renderSimResult(R) {
   const res = R.taxBase > 0
     ? `<div class="sim-result-box">
         <div><div class="srb-label">산출 상속세 (인적공제 기준 추정)</div><div class="srb-val">${fmtA(R.totalTax)}</div></div>
-        <div class="srb-note">※ 세액공제·추가공제 미포함 추정값<br>실제 절세 설계 후 세액은 GFC 진단에서 확인</div>
+        <div class="srb-note">※ 세액공제·추가공제 미포함 추정값<br>실제 절세 설계 후 세액은 전문 진단에서 확인</div>
       </div>`
     : '';
   el.innerHTML = ded + tb + tbl + res;
@@ -648,7 +648,7 @@ function goBack() {
 function restart() { history=[]; C={}; render(); scrollToQ(); }
 
 /* ═══════════════════════════════════════════════════
-   GFC 상속·증여 등급 시스템
+   상속·증여 등급 시스템
    SAFE → PLAN-A → PLAN-B → ALERT → CRITICAL
 ═══════════════════════════════════════════════════ */
 function buildResult() {
@@ -692,7 +692,7 @@ function buildResult() {
   if (planNone && assetHigh) score += 1;
   if (ongoingRole) score += 1;
 
-  /* ── GFC 전용 등급 ── */
+  /* ── 파트너 전용 등급 ── */
   let grade, gradeSub, gradeColor, gradeBadge;
   if (assetSafe) {
     grade = 'SAFE'; gradeSub = '상속세 부담 없음';
@@ -780,7 +780,7 @@ function buildResult() {
   const nhisSimul = (nhisDep || nhisLocal) ? {
     탈락기준: nhisDep ? '피부양자 — 금융소득 1,000만원 초과 시 즉시 탈락' : '지역가입자 — 증여 재산 점수화 적용',
     전환후보험료: noReserve ? '월 50만원+ 예상' : '월 30~80만원 (자산·소득 규모별)',
-    절감방법: '증여 전 소득 분산·재산 이전 설계 → GFC 시뮬레이션 제공',
+    절감방법: '증여 전 소득 분산·재산 이전 설계 → 전문 시뮬레이션 제공',
     주의사항: '증여 계약 전 반드시 건보료 사전 시뮬레이션 필수',
   } : null;
 
@@ -860,7 +860,7 @@ function renderResult() {
   document.getElementById('view').innerHTML = `
     <div class="result-wrap">
       ${R.grade !== 'SAFE' && R.score >= 5 ? `<div class="alert alert-red"><div class="alert-icon">⚠</div>
-        <div>현재 상속·증여 준비 상태가 <strong>위험 수준</strong>입니다. 자산 규모, 부동산 비중, 납부 재원 부족이 복합적으로 작용하고 있습니다. GFC 긴급 진단 상담을 권장합니다.</div>
+        <div>현재 상속·증여 준비 상태가 <strong>위험 수준</strong>입니다. 자산 규모, 부동산 비중, 납부 재원 부족이 복합적으로 작용하고 있습니다. 전문 진단 상담을 권장합니다.</div>
       </div>` : ''}
       ${ROLE==='ongoing' ? `<div class="alert alert-amber"><div class="alert-icon">⏰</div>
         <div>상속 개시 후 <strong>6개월 이내</strong>에 상속세 신고·납부 의무가 있습니다. 기한을 넘기면 가산세(20%+)가 부과됩니다. 즉시 세무사·법무사와 함께 진행하세요.</div>
@@ -869,7 +869,7 @@ function renderResult() {
       <div class="r-hero">
         <div class="r-top">
           <div>
-            <div class="r-badge tag-gold">GFC 상속·증여 등급</div>
+            <div class="r-badge tag-gold">상속·증여 등급</div>
             <div class="r-title" style="color:${R.gradeColor}">${R.grade} <span style="font-size:14px;color:var(--muted);font-weight:400">— ${R.gradeSub}</span></div>
             <div class="r-desc">
               ${R.grade==='SAFE' ? '현재 자산 규모 기준 상속세 과세 대상에 해당하지 않습니다. 향후 자산 변화에 대비한 모니터링만 유지하세요.' : ''}
@@ -880,7 +880,7 @@ function renderResult() {
             </div>
           </div>
           <div class="grade-box">
-            <div class="grade-label">GFC 등급</div>
+            <div class="grade-label">진단 등급</div>
             <div class="grade-val" style="color:${R.gradeColor}">${R.grade}</div>
             <div class="grade-sub">${R.gradeSub}</div>
             <div style="font-size:10px;color:var(--hint);margin-top:6px">리스크 점수 ${R.score}점</div>
@@ -904,7 +904,7 @@ function renderResult() {
       <div class="section">
         <div class="section-hd">
           <div class="section-hd-icon" style="background:var(--blue-bg);color:var(--blue)">→</div>
-          <span class="section-hd-title" style="color:var(--blue)">GFC 상속·증여 로드맵</span>
+          <span class="section-hd-title" style="color:var(--blue)">상속·증여 로드맵</span>
         </div>
         ${roadHtml(R.phase1,'1','즉시 실행 (1~3개월)','핵심 점검 및 증여 착수','#10b981')}
         ${roadHtml(R.phase2,'2','단기 실행 (3~12개월)','납부 재원 확보 및 설계 확정','#3b82f6')}
@@ -1004,7 +1004,7 @@ function renderResult() {
       </div>
 
       <div class="action-row">
-        <button class="btn-p" onclick="alert('GFC 컨설턴트에게 상담을 요청합니다.')">GFC 상속·증여 전문 상담 신청</button>
+        <button class="btn-p" onclick="alert('전담 컨설턴트에게 상담을 요청합니다.')">상속·증여 전문 상담 신청</button>
         <button class="btn-g" onclick="restart()">처음부터 다시 진단</button>
       </div>
     </div>`;

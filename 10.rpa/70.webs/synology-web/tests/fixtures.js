@@ -130,7 +130,7 @@ async function loginAsUser(page) {
 }
 
 /**
- * Dev 모드 — 관리자(GFC) 로그인
+ * Dev 모드 — 관리자(파트너) 로그인
  * 비밀번호가 자동 입력되어 있으므로 확인 버튼만 클릭
  */
 async function loginAsAdmin(page) {

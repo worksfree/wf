@@ -1343,7 +1343,7 @@ function resetAll(){
 // ── 테스트 모드 자동 채움 (test.worksfree.kr) — 총점 ~65%, 모든 항목 선택 ──
 function autoFillTest(){
   if(!location.hostname.startsWith('test.')) return;
-  if(Object.keys(state).length>0) return;
+  // test 서버는 항상 데모 상태로 시작 (localStorage 덮어씀)
   state['_industry']='service'; // IT·서비스 업종 (업종별 지표 전체 해당없음)
   for(const dom of DOMAINS)
     for(const sec of dom.sections)
