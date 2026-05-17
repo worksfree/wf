@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISO 자가진단 — WorksFree</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#0f1117;--panel:#1c2333;--panel2:#212d40;--border:#2a3347;
+  --text:#e2e8f0;--muted:#64748b;--hint:#475569;--radius:8px;
+  --acc:#3b82f6;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;}
+
+/* topbar */
+.topbar{position:sticky;top:0;z-index:100;background:var(--panel);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.topbar-title{font-size:16px;font-weight:600;}
+.topbar-sub{font-size:12px;color:var(--muted);margin-left:6px;}
+.std-select{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 10px;font-size:13px;font-family:inherit;cursor:pointer;flex:1;min-width:200px;max-width:340px;}
+.std-select:focus{outline:none;border-color:var(--acc);}
+.tb-spacer{flex:1;}
+.btn{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--text);}
+.btn-primary{background:var(--acc);color:#fff;}
+.btn-primary:hover{opacity:.9;}
+.btn-danger{background:transparent;color:#ef4444;border:1px solid #ef4444;}
+.btn-danger:hover{background:#ef444415;}
+
+/* std info banner */
+.std-banner{padding:12px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);background:#0d1220;}
+.std-icon{font-size:26px;flex-shrink:0;}
+.std-name{font-size:15px;font-weight:600;}
+.std-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+.std-chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;}
+.std-chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;border:1px solid;}
+
+/* score dashboard */
+.dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px 20px;background:var(--panel);border-bottom:1px solid var(--border);}
+.sc{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
+.sc-label{font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:500;}
+.sc-val{font-size:24px;font-weight:700;}
+.sc-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.sc-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;}
+.sc-fill{height:100%;border-radius:2px;transition:width .4s;}
+
+/* content */
+.content{padding:16px 20px;max-width:860px;margin:0 auto;}
+
+/* clause accordion */
+.clause{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;}
+.clause-head{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;user-select:none;}
+.clause-head:hover{background:var(--panel2);}
+.clause-num{font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;background:var(--panel2);min-width:36px;text-align:center;}
+.clause-name{flex:1;font-weight:600;font-size:14px;}
+.clause-score{font-size:13px;font-weight:600;margin-left:auto;margin-right:8px;}
+.chevron{font-size:10px;color:var(--muted);transition:transform .2s;}
+.clause.open .chevron{transform:rotate(180deg);}
+.clause-body{display:none;border-top:1px solid var(--border);}
+.clause.open .clause-body{display:block;}
+
+/* req row */
+.req-row{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid #1a2235;}
+.req-row:last-child{border-bottom:none;}
+.req-id{font-size:11px;font-weight:600;color:var(--muted);min-width:38px;flex-shrink:0;padding-top:2px;}
+.req-text{flex:1;font-size:13px;}
+.pill-group{display:flex;gap:4px;flex-shrink:0;}
+.pill{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:.15s;white-space:nowrap;}
+.pill:hover{border-color:var(--text);color:var(--text);}
+.pill.py{background:#0d2620;border-color:#10b981;color:#34d399;}
+.pill.pn{background:#2d1515;border-color:#ef4444;color:#f87171;}
+.pill.pa{background:#1f2937;border-color:#4b5563;color:#9ca3af;}
+
+/* report overlay */
+.iso-report{display:none;position:fixed;inset:0;background:#fff;z-index:200;overflow-y:auto;font-family:'IBM Plex Sans KR',sans-serif;color:#111;font-size:14px;line-height:1.6;}
+.iso-report.open{display:block;}
+.rp-topbar{position:sticky;top:0;background:#fff;border-bottom:2px solid #e5e7eb;padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:10;}
+.rp-topbar h2{font-size:16px;font-weight:700;flex:1;}
+.rp-btn{padding:7px 18px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;}
+.rp-btn-print{color:#fff;}
+.rp-btn-close{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;}
+.rp-body{max-width:780px;margin:0 auto;padding:24px 24px 60px;}
+.rp-hdr{text-align:center;padding:20px 0 28px;border-bottom:2px solid #111;margin-bottom:24px;}
+.rp-hdr h1{font-size:20px;font-weight:700;margin-bottom:6px;}
+.rp-hdr-meta{font-size:12px;color:#6b7280;}
+.rp-section{margin-bottom:28px;}
+.rp-hd{font-size:15px;font-weight:700;padding-left:12px;margin-bottom:12px;}
+.rp-score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px;}
+.rp-sc{border:1px solid #e5e7eb;border-radius:8px;padding:14px;text-align:center;}
+.rp-sc-label{font-size:11px;font-weight:600;color:#6b7280;margin-bottom:4px;}
+.rp-sc-val{font-size:26px;font-weight:700;}
+.rp-sc-sub{font-size:11px;color:#9ca3af;margin-top:2px;}
+.rp-clause-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;}
+.rp-clause-table th{background:#f9fafb;padding:7px 10px;text-align:left;font-weight:600;border:1px solid #e5e7eb;}
+.rp-clause-table td{padding:7px 10px;border:1px solid #e5e7eb;}
+.rp-clause-table tr:nth-child(even) td{background:#f9fafb;}
+.rp-fails{margin-bottom:8px;}
+.rp-fail-hd{font-size:13px;font-weight:700;color:#dc2626;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #fee2e2;}
+.rp-fail-row{font-size:12px;padding:5px 8px;display:flex;gap:8px;}
+.rp-fail-row:nth-child(even){background:#fff5f5;}
+.rp-fail-id{font-size:11px;font-weight:600;color:#dc2626;min-width:42px;}
+.rp-gap{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px 16px;margin-bottom:8px;}
+.rp-gap-hd{font-size:13px;font-weight:700;color:#166534;margin-bottom:6px;}
+.rp-gap-item{font-size:12px;color:#15803d;padding:3px 0;display:flex;gap:8px;}
+.rp-gap-item::before{content:'→';}
+
+@media print{
+  .rp-topbar{display:none!important;}
+  .iso-report{position:static!important;overflow:visible!important;}
+  .rp-body{max-width:100%;padding:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- topbar -->
+<div class="topbar">
+  <span class="topbar-title">ISO 자가진단</span>
+  <select class="std-select" id="std-select" onchange="selectStd(this.value)">
+    <option value="9001">ISO 9001:2015 — 품질경영시스템 (QMS)</option>
+    <option value="14001">ISO 14001:2015 — 환경경영시스템 (EMS)</option>
+    <option value="45001">ISO 45001:2018 — 안전보건경영시스템 (OH&SMS)</option>
+    <option value="42001">ISO 42001:2023 — AI 경영시스템 (AIMS)</option>
+    <option value="27001">ISO 27001:2022 — 정보보안경영시스템 (ISMS)</option>
+  </select>
+  <div class="tb-spacer"></div>
+  <button class="btn btn-ghost" onclick="expandAll()">전체 펼치기</button>
+  <button class="btn btn-primary" id="btn-report" onclick="showReport()">📋 보고서 생성</button>
+  <button class="btn btn-danger" onclick="confirmReset()">초기화</button>
+</div>
+
+<!-- std info banner -->
+<div class="std-banner" id="std-banner"></div>
+
+<!-- score dashboard -->
+<div class="dashboard" id="dashboard"></div>
+
+<!-- content area -->
+<div class="content" id="content"></div>
+
+<!-- report overlay -->
+<div class="iso-report" id="iso-report">
+  <div class="rp-topbar">
+    <h2 id="rp-title">ISO 준비도 진단 보고서</h2>
+    <button class="rp-btn rp-btn-print" id="rp-btn-print" onclick="window.print()">🖨 인쇄 / PDF</button>
+    <button class="rp-btn rp-btn-close" onclick="closeReport()">✕ 닫기</button>
+  </div>
+  <div class="rp-body" id="rp-body"></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   ISO 표준 데이터
+════════════════════════════════════════════════════════ */
+const STANDARDS = {
+  '9001': {
+    name:'ISO 9001:2015', sub:'품질경영시스템 (QMS)', icon:'✅',
+    color:'#3b82f6', bg:'#0c1a30', border:'#1e3a6e', chipBg:'#1e2d50', chipText:'#93c5fd',
+    chips:['품질', '고객만족', '프로세스'],
+    clauses:[
+      { id:'4', name:'조직의 상황', reqs:[
+        {id:'4.1a',txt:'외부 이슈(시장·경쟁·법규·기술 등)를 파악하고 주기적으로 검토한다'},
+        {id:'4.1b',txt:'내부 이슈(문화·역량·자원·성과 등)를 파악하고 주기적으로 검토한다'},
+        {id:'4.2',txt:'이해관계자(고객·공급업체·규제기관 등)와 그 요구사항을 파악한다'},
+        {id:'4.3',txt:'QMS 적용범위를 결정하고 문서화했다'},
+        {id:'4.4',txt:'프로세스 기반 접근법을 적용하고 프로세스 간 상호작용을 파악했다'},
+      ]},
+      { id:'5', name:'리더십', reqs:[
+        {id:'5.1',txt:'최고경영자가 QMS에 대한 책임을 직접 지고 참여한다'},
+        {id:'5.2',txt:'품질방침이 수립·문서화되어 조직에 전달·이해되고 있다'},
+        {id:'5.3',txt:'역할·책임·권한이 명확히 부여되고 전달되어 있다'},
+      ]},
+      { id:'6', name:'기획', reqs:[
+        {id:'6.1',txt:'QMS에 영향을 미치는 리스크와 기회를 파악하고 대응 방법을 계획했다'},
+        {id:'6.2a',txt:'품질목표가 수립·문서화되어 있고 측정 가능하다'},
+        {id:'6.2b',txt:'품질목표 달성을 위한 구체적 실행계획(누가·언제·어떻게)이 있다'},
+        {id:'6.3',txt:'변경이 계획적으로 이루어지도록 관리한다'},
+      ]},
+      { id:'7', name:'지원', reqs:[
+        {id:'7.1',txt:'QMS 운용에 필요한 인적·인프라·환경 자원을 파악하고 제공한다'},
+        {id:'7.2',txt:'인원의 역량을 결정하고 필요 시 교육·훈련을 실시하며 기록한다'},
+        {id:'7.3',txt:'인원이 품질방침·목표·QMS 기여 방법·부적합 영향을 인식하고 있다'},
+        {id:'7.4',txt:'내·외부 커뮤니케이션 계획(무엇을·누가·언제·어떻게)이 수립되어 있다'},
+        {id:'7.5a',txt:'문서화 정보(절차서·기록 등)를 생성·갱신하고 적절히 관리한다'},
+        {id:'7.5b',txt:'외부 출처 문서를 파악하고 적용 여부와 배포를 관리한다'},
+      ]},
+      { id:'8', name:'운용', reqs:[
+        {id:'8.1',txt:'운용 기획을 수립하고 관리한다 (변경·외주 포함)'},
+        {id:'8.2',txt:'고객 요구사항(법규·안전 요구 포함)을 결정하고 계약 전 검토한다'},
+        {id:'8.3',txt:'제품·서비스 설계 및 개발 프로세스(해당 시)를 수립하고 관리한다'},
+        {id:'8.4',txt:'외부 제공자(공급업체)의 프로세스·제품·서비스를 관리한다'},
+        {id:'8.5',txt:'생산·서비스 제공 조건(식별·추적관리·고객 재산 등)을 관리한다'},
+        {id:'8.6',txt:'출하 전 제품·서비스 요구사항 충족 여부를 확인하고 기록한다'},
+        {id:'8.7',txt:'부적합 출력물을 파악하고 격리·처분·통보 등 조치를 취한다'},
+      ]},
+      { id:'9', name:'성과 평가', reqs:[
+        {id:'9.1a',txt:'QMS 성과 모니터링·측정·분석·평가를 계획하고 실시한다'},
+        {id:'9.1b',txt:'고객만족도를 파악하고 모니터링한다'},
+        {id:'9.2',txt:'계획된 주기로 내부 심사를 실시하고 결과를 문서화한다'},
+        {id:'9.3',txt:'경영검토를 주기적으로 실시하고 결정사항을 문서화한다'},
+      ]},
+      { id:'10', name:'개선', reqs:[
+        {id:'10.1',txt:'지속적 개선의 기회를 파악하고 실행한다'},
+        {id:'10.2a',txt:'부적합 발생 시 즉각 조치하고 원인 분석·시정조치를 취한다'},
+        {id:'10.2b',txt:'시정조치 효과를 검토하고 결과를 문서화한다'},
+      ]},
+    ]
+  },
+  '14001': {
+    name:'ISO 14001:2015', sub:'환경경영시스템 (EMS)', icon:'🌱',
+    color:'#10b981', bg:'#061a12', border:'#065f46', chipBg:'#0a2a1f', chipText:'#6ee7b7',
+    chips:['환경', '탄소저감', '법규준수'],
+    clauses:[
+      { id:'4', name:'조직의 상황', reqs:[
+        {id:'4.1a',txt:'환경 관련 외부 이슈(규제·시장·기후·이해관계자 기대)를 파악하고 검토한다'},
+        {id:'4.1b',txt:'환경 관련 내부 이슈(방침·역량·자원·문화 등)를 파악하고 검토한다'},
+        {id:'4.2',txt:'이해관계자(규제기관·지역사회·공급망)와 환경 관련 요구사항을 파악한다'},
+        {id:'4.3',txt:'EMS 적용범위를 결정하고 문서화했다'},
+        {id:'4.4',txt:'환경 측면에 영향을 미치는 프로세스를 파악하고 EMS를 수립했다'},
+      ]},
+      { id:'5', name:'리더십', reqs:[
+        {id:'5.1',txt:'최고경영자가 EMS에 대한 책임과 의지를 보이고 자원을 지원한다'},
+        {id:'5.2',txt:'환경방침이 수립·문서화되어 조직에 전달·공개되고 있다'},
+        {id:'5.3',txt:'EMS 역할·책임·권한이 명확히 지정되어 있다'},
+      ]},
+      { id:'6', name:'기획', reqs:[
+        {id:'6.1.1',txt:'환경 측면(입력물·출력물·배출물 등)을 파악하고 유의한 환경 측면을 결정했다'},
+        {id:'6.1.2',txt:'법적 준수의무(환경법령·인허가·협약 등)를 파악하고 접근 방법을 마련했다'},
+        {id:'6.1.3',txt:'환경 리스크와 기회를 파악하고 대응 방법을 계획했다'},
+        {id:'6.2',txt:'환경목표를 수립하고 달성을 위한 실행계획이 있다'},
+        {id:'6.3',txt:'변경 계획 시 환경 영향을 고려한다'},
+      ]},
+      { id:'7', name:'지원', reqs:[
+        {id:'7.1',txt:'EMS 운용에 필요한 자원을 파악하고 제공한다'},
+        {id:'7.2',txt:'환경 영향 관련 업무 담당 인원의 역량을 파악하고 교육한다'},
+        {id:'7.3',txt:'인원이 환경방침·유의한 측면·EMS 기여 방법을 인식하고 있다'},
+        {id:'7.4',txt:'내·외부 커뮤니케이션(환경정보 공개 포함) 계획이 있다'},
+        {id:'7.5',txt:'문서화 정보(환경 기록 포함)를 적절히 생성·갱신·관리한다'},
+      ]},
+      { id:'8', name:'운용', reqs:[
+        {id:'8.1',txt:'유의한 환경 측면 관련 운용 기준을 수립하고 절차에 따라 관리한다'},
+        {id:'8.1.2',txt:'생애주기 관점을 고려하여 설계·조달·사용·폐기 단계의 환경 영향을 관리한다'},
+        {id:'8.1.3',txt:'외부 제공자(공급업체·계약자)에게 환경 요구사항을 전달하고 관리한다'},
+        {id:'8.2',txt:'비상 상황(누출·화재 등) 대비 절차를 수립하고 정기적으로 훈련한다'},
+      ]},
+      { id:'9', name:'성과 평가', reqs:[
+        {id:'9.1.1',txt:'환경 성과(오염물질·에너지·자원 사용 등) 모니터링·측정·분석·평가를 실시한다'},
+        {id:'9.1.2',txt:'법적 준수의무 이행 여부를 평가하고 결과를 기록한다'},
+        {id:'9.2',txt:'계획된 주기로 내부 심사를 실시하고 결과를 문서화한다'},
+        {id:'9.3',txt:'경영검토를 정기적으로 실시하고 결정사항을 문서화한다'},
+      ]},
+      { id:'10', name:'개선', reqs:[
+        {id:'10.1',txt:'부적합 발생 시 시정조치를 취하고 효과를 검토하여 문서화한다'},
+        {id:'10.2',txt:'환경 사고(누출·오염) 발생 시 조사하고 재발 방지 조치를 한다'},
+        {id:'10.3',txt:'환경 성과를 지속적으로 개선한다'},
+      ]},
+    ]
+  },
+  '45001': {
+    name:'ISO 45001:2018', sub:'안전보건경영시스템 (OH&SMS)', icon:'⛑',
+    color:'#f97316', bg:'#1a0e00', border:'#7a3500', chipBg:'#2a1500', chipText:'#fdba74',
+    chips:['산업안전', '위험성평가', '근로자보호'],
+    clauses:[
+      { id:'4', name:'조직의 상황', reqs:[
+        {id:'4.1',txt:'OH&S 관련 내·외부 이슈를 파악하고 주기적으로 검토한다'},
+        {id:'4.2',txt:'근로자 및 기타 이해관계자의 OH&S 요구사항을 파악한다'},
+        {id:'4.3',txt:'OH&SMS 적용범위를 결정하고 문서화했다'},
+        {id:'4.4',txt:'OH&SMS와 관련된 프로세스를 파악하고 시스템을 수립했다'},
+      ]},
+      { id:'5', name:'리더십·근로자 참여', reqs:[
+        {id:'5.1',txt:'최고경영자가 OH&SMS에 대한 리더십과 의지를 보이고 자원을 지원한다'},
+        {id:'5.2',txt:'OH&S 방침이 수립·문서화되어 조직에 전달·공개되고 있다'},
+        {id:'5.3',txt:'OH&S 역할·책임·권한이 명확히 지정되어 있다'},
+        {id:'5.4a',txt:'근로자가 OH&SMS 수립·운용·평가·개선에 참여·협의한다'},
+        {id:'5.4b',txt:'근로자의 참여를 방해하는 장벽(언어·문화·위계 등)을 파악하고 제거한다'},
+      ]},
+      { id:'6', name:'기획', reqs:[
+        {id:'6.1.1',txt:'위험요인을 체계적으로 파악하고 OH&S 리스크를 평가·관리한다'},
+        {id:'6.1.2',txt:'OH&S 기회(개선 기회·작업 조직 변경 기회 등)를 파악하고 평가한다'},
+        {id:'6.1.3',txt:'법적 요구사항 및 기타 요구사항(단체협약·표준 등)을 파악하고 관리한다'},
+        {id:'6.2',txt:'OH&S 목표를 수립하고 달성을 위한 실행계획이 있다'},
+        {id:'6.3',txt:'변경 관리 절차가 있어 새로운 위험요인을 사전에 파악하고 통제한다'},
+      ]},
+      { id:'7', name:'지원', reqs:[
+        {id:'7.1',txt:'OH&SMS 운용에 필요한 자원을 파악하고 제공한다'},
+        {id:'7.2',txt:'OH&S 영향 관련 업무 담당 인원의 역량을 파악하고 교육한다'},
+        {id:'7.3',txt:'인원이 OH&S 방침·위험요인·비상절차·참여 권리를 인식하고 있다'},
+        {id:'7.4',txt:'OH&S 관련 커뮤니케이션 계획(근로자·이해관계자)이 있다'},
+        {id:'7.5',txt:'문서화 정보(위험성 평가 기록·사고 기록 등)를 적절히 관리한다'},
+      ]},
+      { id:'8', name:'운용', reqs:[
+        {id:'8.1.1',txt:'위험요인 제거 시 위계(제거→대체→공학적→관리적→PPE)를 적용한다'},
+        {id:'8.1.2',txt:'변경 관리(임시·영구·조직 변경 모두)를 체계적으로 실시한다'},
+        {id:'8.1.3',txt:'외부 공급업체·계약자·아웃소싱 프로세스의 OH&S를 관리한다'},
+        {id:'8.2',txt:'비상 상황(화재·사고·폭발 등) 대비 절차를 수립하고 정기적으로 훈련한다'},
+      ]},
+      { id:'9', name:'성과 평가', reqs:[
+        {id:'9.1.1',txt:'OH&S 성과(재해율·아차사고·위험요인 등)를 모니터링·측정·분석·평가한다'},
+        {id:'9.1.2',txt:'법적 준수의무 이행 여부를 평가하고 결과를 기록한다'},
+        {id:'9.2',txt:'계획된 주기로 내부 심사를 실시하고 결과를 문서화한다'},
+        {id:'9.3',txt:'경영검토를 주기적으로 실시하고 결정사항을 문서화한다'},
+      ]},
+      { id:'10', name:'개선', reqs:[
+        {id:'10.1',txt:'사고·부적합 발생 시 즉각 조치하고 원인 분석·시정조치를 취한다'},
+        {id:'10.2',txt:'시정조치 효과를 검토하고 결과를 근로자와 공유한다'},
+        {id:'10.3',txt:'OH&S 성과를 지속적으로 개선하기 위한 조치를 취한다'},
+      ]},
+    ]
+  },
+  '42001': {
+    name:'ISO 42001:2023', sub:'AI 경영시스템 (AIMS)', icon:'🤖',
+    color:'#a855f7', bg:'#1a0a2e', border:'#4c1d95', chipBg:'#2d1655', chipText:'#c084fc',
+    chips:['AI 거버넌스', 'AI 윤리', '책임 AI'],
+    clauses:[
+      { id:'4', name:'조직의 상황', reqs:[
+        {id:'4.1',txt:'AI 활용 현황과 관련된 내·외부 이슈(규제·기술·윤리·사회적 기대)를 파악한다'},
+        {id:'4.2',txt:'AI 이해관계자(규제기관·고객·근로자·영향받는 집단)와 요구사항을 파악한다'},
+        {id:'4.3',txt:'AIMS 적용범위(AI 시스템 목록 포함)를 결정하고 문서화했다'},
+        {id:'4.4',txt:'AI가 조직·사회·개인에 미치는 영향(긍정·부정)을 분석하고 기록했다'},
+      ]},
+      { id:'5', name:'리더십', reqs:[
+        {id:'5.1',txt:'최고경영자가 AI 거버넌스에 대한 책임과 의지를 보이고 자원을 지원한다'},
+        {id:'5.2',txt:'AI 방침(윤리 원칙·책임 원칙 포함)이 수립·문서화되어 전달되고 있다'},
+        {id:'5.3',txt:'AI 역할·책임·권한(CISO·AI 책임자 등)이 명확히 지정되어 있다'},
+        {id:'5.4',txt:'AI 관련 의사결정 프레임워크(허용·금지 사용 기준 등)가 수립되어 있다'},
+      ]},
+      { id:'6', name:'기획', reqs:[
+        {id:'6.1',txt:'AI 특정 리스크(편향·개인정보·보안·설명불가능성·오남용)를 파악하고 평가한다'},
+        {id:'6.2',txt:'AI 관련 기회와 혜택을 파악하고 실현 계획이 있다'},
+        {id:'6.3',txt:'AI 목표(성과 지표·신뢰성·공정성 기준 등)를 수립했다'},
+        {id:'6.4',txt:'AI 시스템 수명주기(개발→검증→배포→모니터링→폐기) 계획이 있다'},
+      ]},
+      { id:'7', name:'지원', reqs:[
+        {id:'7.1',txt:'AI 역량(기술·데이터과학·윤리·법규)을 갖춘 인원을 확보하고 개발한다'},
+        {id:'7.2',txt:'조직 내 AI 리터러시 교육을 실시한다 (비기술직 포함)'},
+        {id:'7.3a',txt:'AI 개발에 사용되는 데이터의 품질·출처·편향을 검토하고 관리한다'},
+        {id:'7.3b',txt:'외부 데이터·모델 제공자를 평가하고 계약에 요구사항을 반영한다'},
+        {id:'7.4',txt:'AI 시스템·의사결정 과정을 추적 가능하도록 문서화한다'},
+      ]},
+      { id:'8', name:'운용', reqs:[
+        {id:'8.1',txt:'AI 시스템 도입 전 영향 평가(Ethics·Privacy·Risk)를 실시한다'},
+        {id:'8.2',txt:'AI 시스템의 투명성과 설명가능성(출력 근거 설명)을 확보한다'},
+        {id:'8.3',txt:'AI 모델의 편향·공정성을 평가하고 배포 후에도 모니터링한다'},
+        {id:'8.4',txt:'고위험 의사결정에 인간 감독(Human-in-the-loop) 체계가 운영된다'},
+        {id:'8.5',txt:'AI 시스템 보안(데이터 중독·모델 탈취·적대적 공격)을 관리한다'},
+        {id:'8.6',txt:'AI 시스템 폐기 시 데이터·모델을 안전하게 처리·삭제한다'},
+      ]},
+      { id:'9', name:'성과 평가', reqs:[
+        {id:'9.1',txt:'AI 시스템 성능·신뢰성·공정성을 정기적으로 모니터링하고 평가한다'},
+        {id:'9.2',txt:'AI 관련 내부 심사(거버넌스·윤리·기술 준수)를 실시한다'},
+        {id:'9.3',txt:'AI 경영검토를 주기적으로 실시하고 결정사항을 문서화한다'},
+      ]},
+      { id:'10', name:'개선', reqs:[
+        {id:'10.1',txt:'AI 관련 사고(오작동·편향 피해·보안침해)를 파악하고 시정조치를 취한다'},
+        {id:'10.2',txt:'AI 관련 이해관계자 불만을 접수하고 처리한다'},
+        {id:'10.3',txt:'AI 시스템·거버넌스·방침을 정기적으로 검토하고 지속 개선한다'},
+      ]},
+    ]
+  },
+  '27001': {
+    name:'ISO 27001:2022', sub:'정보보안경영시스템 (ISMS)', icon:'🔒',
+    color:'#ef4444', bg:'#1c0a0a', border:'#7f1d1d', chipBg:'#2d1515', chipText:'#fca5a5',
+    chips:['정보보안', '위험관리', 'ISMS'],
+    clauses:[
+      { id:'4', name:'조직의 상황', reqs:[
+        {id:'4.1',txt:'정보보안 관련 내·외부 이슈를 파악하고 주기적으로 검토한다'},
+        {id:'4.2',txt:'이해관계자(규제기관·고객·파트너)의 정보보안 요구사항을 파악한다'},
+        {id:'4.3',txt:'ISMS 적용범위(자산·위치·기술 경계)를 결정하고 문서화했다'},
+        {id:'4.4',txt:'정보보안에 영향을 미치는 모든 프로세스를 파악하고 ISMS를 수립했다'},
+      ]},
+      { id:'5', name:'리더십', reqs:[
+        {id:'5.1',txt:'최고경영자가 ISMS에 대한 책임과 의지를 보이고 자원을 지원한다'},
+        {id:'5.2',txt:'정보보안 방침이 수립·문서화되어 조직에 전달·공개되고 있다'},
+        {id:'5.3',txt:'정보보안 역할·책임·권한이 명확히 지정되어 있다'},
+      ]},
+      { id:'6', name:'기획', reqs:[
+        {id:'6.1.1',txt:'정보보안 위험 평가 방법론을 수립하고 위험 수용 기준을 결정했다'},
+        {id:'6.1.2',txt:'정보보안 위험을 식별·분석·평가하고 처리 계획을 수립했다'},
+        {id:'6.1.3',txt:'적용선언서(SoA: Statement of Applicability)를 작성했다'},
+        {id:'6.2',txt:'정보보안 목표를 수립하고 달성을 위한 계획이 있다'},
+      ]},
+      { id:'7', name:'지원', reqs:[
+        {id:'7.1',txt:'ISMS 운용에 필요한 자원을 파악하고 제공한다'},
+        {id:'7.2',txt:'정보보안 역량을 갖춘 인원을 확보하고 교육·훈련을 실시한다'},
+        {id:'7.3',txt:'인원이 정보보안 방침·기여 방법·위반 시 결과를 인식하고 있다'},
+        {id:'7.4',txt:'내·외부 커뮤니케이션 계획(사고 보고 경로 포함)이 수립되어 있다'},
+        {id:'7.5',txt:'정책서·절차서·기록 등 문서화 정보를 적절히 생성·갱신·관리한다'},
+      ]},
+      { id:'8', name:'운용', reqs:[
+        {id:'8.1',txt:'정보보안 위험 처리 계획을 실행하고 결과를 문서화한다'},
+        {id:'8.2',txt:'접근통제(계정관리·최소권한·권한 검토)가 수립·운용된다'},
+        {id:'8.3',txt:'암호화 정책과 암호키 관리 절차가 있다'},
+        {id:'8.4',txt:'물리적 보안(시설 출입통제·장비 보호·보안구역)을 관리한다'},
+        {id:'8.5',txt:'운용 보안(변경관리·용량관리·백업·로깅)이 수립·운용된다'},
+        {id:'8.6',txt:'공급업체·외주 계약 시 정보보안 요구사항을 반영하고 관리한다'},
+        {id:'8.7',txt:'정보보안 사고 대응 절차(탐지→분류→보고→처리→사후검토)가 있다'},
+      ]},
+      { id:'9', name:'성과 평가', reqs:[
+        {id:'9.1',txt:'정보보안 성과 모니터링·측정·분석·평가를 실시한다'},
+        {id:'9.2',txt:'내부 심사를 계획된 주기로 실시하고 결과를 문서화한다'},
+        {id:'9.3',txt:'경영검토를 정기적으로 실시하고 결정사항을 문서화한다'},
+        {id:'9.4',txt:'보안 로그를 적절히 수집·보관하고 주기적으로 검토한다'},
+      ]},
+      { id:'10', name:'개선', reqs:[
+        {id:'10.1',txt:'정보보안 사고·부적합에 대한 시정조치를 취하고 효과를 검토한다'},
+        {id:'10.2',txt:'시정조치 결과를 문서화하고 유사 위험이 재발하지 않도록 관리한다'},
+        {id:'10.3',txt:'정보보안 관리체계를 지속적으로 개선한다'},
+      ]},
+    ]
+  }
+};
+
+/* ════════════════════════════════════════════════════════
+   상태 관리
+════════════════════════════════════════════════════════ */
+let curStd = '9001';
+// state: { '9001': { '4.1a': 'y'|'n'|'na', ... }, '14001': { ... }, ... }
+let state = JSON.parse(localStorage.getItem('wf_iso_state') || '{}');
+
+function saveState() {
+  localStorage.setItem('wf_iso_state', JSON.stringify(state));
+}
+
+function getAns(stdId, reqId) {
+  return (state[stdId] || {})[reqId] || '';
+}
+
+function setAns(stdId, reqId, val) {
+  if (!state[stdId]) state[stdId] = {};
+  if (state[stdId][reqId] === val) {
+    delete state[stdId][reqId]; // 같은 값 클릭 시 해제
+  } else {
+    state[stdId][reqId] = val;
+  }
+  saveState();
+  renderDashboard();
+  updateClauseScore(reqId);
+}
+
+/* ════════════════════════════════════════════════════════
+   점수 계산
+════════════════════════════════════════════════════════ */
+function calcScore(stdId) {
+  const std = STANDARDS[stdId];
+  const st  = state[stdId] || {};
+  let total = {y:0, n:0, na:0, total:0};
+  const byClause = {};
+  std.clauses.forEach(cl => {
+    let c = {y:0, n:0, na:0};
+    cl.reqs.forEach(r => {
+      const v = st[r.id] || '';
+      if (v === 'y')  { c.y++;  total.y++;  }
+      if (v === 'n')  { c.n++;  total.n++;  }
+      if (v === 'na') { c.na++; total.na++; }
+    });
+    byClause[cl.id] = c;
+    total.total += cl.reqs.length;
+  });
+  const applicable = total.y + total.n;
+  const pct = applicable > 0 ? Math.round(total.y / applicable * 100) : 0;
+  return { total, byClause, pct, applicable };
+}
+
+function clausePct(c) {
+  const a = c.y + c.n;
+  return a > 0 ? Math.round(c.y / a * 100) : null;
+}
+
+/* ════════════════════════════════════════════════════════
+   렌더 — 표준 배너
+════════════════════════════════════════════════════════ */
+function renderBanner(std) {
+  const el = document.getElementById('std-banner');
+  el.style.borderBottom = `1px solid ${std.border}`;
+  el.style.background = std.bg;
+  el.innerHTML = `
+    <div class="std-icon">${std.icon}</div>
+    <div>
+      <div class="std-name" style="color:${std.color}">${std.name}</div>
+      <div class="std-desc">${std.sub}</div>
+    </div>
+    <div class="std-chips">
+      ${std.chips.map(c=>`<span class="std-chip" style="background:${std.chipBg};color:${std.chipText};border-color:${std.border}">${c}</span>`).join('')}
+    </div>
+  `;
+  document.getElementById('btn-report').style.background = std.color;
+}
+
+/* ════════════════════════════════════════════════════════
+   렌더 — 대시보드
+════════════════════════════════════════════════════════ */
+function renderDashboard() {
+  const std   = STANDARDS[curStd];
+  const score = calcScore(curStd);
+  const el    = document.getElementById('dashboard');
+  const color = std.color;
+
+  let html = `
+    <div class="sc">
+      <div class="sc-label">전체 준비율</div>
+      <div class="sc-val" style="color:${color}">${score.applicable > 0 ? score.pct + '%' : '—'}</div>
+      <div class="sc-sub">${score.total.y} / ${score.applicable} 충족 (해당없음 ${score.total.na}건 제외)</div>
+      <div class="sc-bar"><div class="sc-fill" style="background:${color};width:${score.pct}%"></div></div>
+    </div>
+    <div class="sc">
+      <div class="sc-label">응답 현황</div>
+      <div class="sc-val">${score.total.y + score.total.n + score.total.na}</div>
+      <div class="sc-sub">전체 ${score.total.total}개 요건 중 응답</div>
+      <div class="sc-bar"><div class="sc-fill" style="background:#6b7280;width:${Math.round((score.total.y+score.total.n+score.total.na)/score.total.total*100)}%"></div></div>
+    </div>
+  `;
+
+  std.clauses.forEach(cl => {
+    const c   = score.byClause[cl.id] || {y:0,n:0,na:0};
+    const pct = clausePct(c);
+    html += `
+      <div class="sc">
+        <div class="sc-label">조항 ${cl.id}. ${cl.name}</div>
+        <div class="sc-val" style="color:${pct===null?'var(--muted)':pct>=80?color:pct>=60?'#f97316':'#ef4444'}">${pct !== null ? pct + '%' : '—'}</div>
+        <div class="sc-sub">${c.y}/${c.y+c.n} 충족</div>
+        <div class="sc-bar"><div class="sc-fill" style="background:${pct===null?'#374151':pct>=80?color:pct>=60?'#f97316':'#ef4444'};width:${pct||0}%"></div></div>
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════
+   렌더 — 조항 목록
+════════════════════════════════════════════════════════ */
+function renderContent() {
+  const std   = STANDARDS[curStd];
+  const st    = state[curStd] || {};
+  const score = calcScore(curStd);
+  const el    = document.getElementById('content');
+  let html    = '';
+
+  std.clauses.forEach((cl, ci) => {
+    const c   = score.byClause[cl.id] || {y:0,n:0,na:0};
+    const pct = clausePct(c);
+    const pctLabel = pct !== null ? `<span style="color:${pct>=80?std.color:pct>=60?'#f97316':'#ef4444'}">${pct}%</span>` : '<span style="color:var(--muted)">—</span>';
+    let reqHtml = '';
+    cl.reqs.forEach(r => {
+      const v = st[r.id] || '';
+      reqHtml += `
+        <div class="req-row">
+          <div class="req-id">${r.id}</div>
+          <div class="req-text">${r.txt}</div>
+          <div class="pill-group">
+            <button class="pill ${v==='y'?'py':''}" onclick="setAns('${curStd}','${r.id}','y')" data-req="${r.id}" data-val="y">충족</button>
+            <button class="pill ${v==='n'?'pn':''}" onclick="setAns('${curStd}','${r.id}','n')" data-req="${r.id}" data-val="n">미충족</button>
+            <button class="pill ${v==='na'?'pa':''}" onclick="setAns('${curStd}','${r.id}','na')" data-req="${r.id}" data-val="na">해당없음</button>
+          </div>
+        </div>
+      `;
+    });
+    html += `
+      <div class="clause" id="clause-${cl.id}">
+        <div class="clause-head" onclick="toggleClause('${cl.id}')">
+          <div class="clause-num" style="color:${std.color};border:1px solid ${std.border}">${cl.id}</div>
+          <div class="clause-name">${cl.name}</div>
+          <div class="clause-score">${pctLabel}</div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="clause-body">${reqHtml}</div>
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
+}
+
+function updateClauseScore(reqId) {
+  // 해당 조항 헤더 점수만 갱신 (전체 재렌더 방지)
+  const std   = STANDARDS[curStd];
+  const score = calcScore(curStd);
+  const clId  = reqId.split('.')[0];
+  const cl    = std.clauses.find(c => c.id === clId);
+  if (!cl) return;
+  const c   = score.byClause[clId] || {y:0,n:0,na:0};
+  const pct = clausePct(c);
+  const el  = document.querySelector(`#clause-${clId} .clause-score`);
+  if (el) el.innerHTML = pct !== null
+    ? `<span style="color:${pct>=80?std.color:pct>=60?'#f97316':'#ef4444'}">${pct}%</span>`
+    : '<span style="color:var(--muted)">—</span>';
+  // pill 상태 갱신
+  cl.reqs.forEach(r => {
+    const v = getAns(curStd, r.id);
+    ['y','n','na'].forEach(val => {
+      const pills = document.querySelectorAll(`[data-req="${r.id}"][data-val="${val}"]`);
+      pills.forEach(p => {
+        p.classList.toggle('py', val==='y' && v==='y');
+        p.classList.toggle('pn', val==='n' && v==='n');
+        p.classList.toggle('pa', val==='na' && v==='na');
+      });
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════
+   UI 액션
+════════════════════════════════════════════════════════ */
+function selectStd(id) {
+  curStd = id;
+  const std = STANDARDS[id];
+  renderBanner(std);
+  renderDashboard();
+  renderContent();
+}
+
+function toggleClause(id) {
+  const el = document.getElementById('clause-' + id);
+  if (el) el.classList.toggle('open');
+}
+
+function expandAll() {
+  document.querySelectorAll('.clause').forEach(el => el.classList.add('open'));
+}
+
+function confirmReset() {
+  if (confirm(`${STANDARDS[curStd].name} 진단 내용을 모두 초기화하시겠습니까?`)) {
+    delete state[curStd];
+    saveState();
+    renderDashboard();
+    renderContent();
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   보고서
+════════════════════════════════════════════════════════ */
+function showReport() {
+  const std   = STANDARDS[curStd];
+  const score = calcScore(curStd);
+  const st    = state[curStd] || {};
+  const date  = new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
+
+  // grade
+  const grade = score.pct >= 85 ? '우수 (인증 준비 완료)'
+               : score.pct >= 70 ? '양호 (일부 보완 필요)'
+               : score.pct >= 50 ? '보통 (개선 계획 수립 필요)'
+               : score.applicable > 0 ? '미흡 (전면적 개선 필요)'
+               : '미응답';
+
+  // 미충족 요건 목록
+  let failRows = '';
+  std.clauses.forEach(cl => {
+    const fails = cl.reqs.filter(r => (st[r.id] || '') === 'n');
+    if (fails.length > 0) {
+      failRows += `<div class="rp-fail-hd">조항 ${cl.id}. ${cl.name}</div>`;
+      fails.forEach(r => {
+        failRows += `<div class="rp-fail-row"><span class="rp-fail-id">${r.id}</span><span>${r.txt}</span></div>`;
+      });
+    }
+  });
+
+  // 조항별 점수 표
+  let clauseRows = '';
+  std.clauses.forEach(cl => {
+    const c   = score.byClause[cl.id] || {y:0,n:0,na:0};
+    const pct = clausePct(c);
+    const status = pct === null ? '미응답' : pct >= 85 ? '✅ 우수' : pct >= 70 ? '🟡 양호' : pct >= 50 ? '🟠 보통' : '🔴 미흡';
+    clauseRows += `<tr><td>${cl.id}</td><td>${cl.name}</td><td>${c.y}</td><td>${c.n}</td><td>${c.na}</td><td style="font-weight:600">${pct !== null ? pct + '%' : '—'}</td><td>${status}</td></tr>`;
+  });
+
+  // 개선 권고
+  let gapItems = '';
+  const lowClauses = std.clauses.filter(cl => {
+    const c = score.byClause[cl.id] || {y:0,n:0,na:0};
+    const p = clausePct(c);
+    return p !== null && p < 70;
+  });
+  if (lowClauses.length > 0) {
+    lowClauses.forEach(cl => {
+      const c = score.byClause[cl.id] || {y:0,n:0,na:0};
+      gapItems += `<div class="rp-gap-item">조항 ${cl.id} (${cl.name}): 미충족 ${c.n}건 개선 계획 수립 필요</div>`;
+    });
+  } else if (score.applicable > 0) {
+    gapItems = '<div class="rp-gap-item">전반적으로 양호합니다. 정기적인 내부 심사를 통해 유지관리하세요.</div>';
+  } else {
+    gapItems = '<div class="rp-gap-item">진단을 완료한 후 보고서를 생성하세요.</div>';
+  }
+
+  document.getElementById('rp-title').textContent = `${std.name} 준비도 진단 보고서`;
+  document.getElementById('rp-btn-print').style.background = std.color;
+  document.getElementById('rp-body').innerHTML = `
+    <div class="rp-hdr">
+      <h1>${std.name} — ${std.sub}</h1>
+      <h1>준비도 자가진단 보고서</h1>
+      <div class="rp-hdr-meta">작성일: ${date} &nbsp;|&nbsp; WorksFree ISO 진단 도구</div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-hd" style="border-left-color:${std.color}">종합 준비율</div>
+      <div class="rp-score-grid">
+        <div class="rp-sc">
+          <div class="rp-sc-label">전체 준비율</div>
+          <div class="rp-sc-val" style="color:${std.color}">${score.applicable > 0 ? score.pct + '%' : '—'}</div>
+          <div class="rp-sc-sub">${grade}</div>
+        </div>
+        <div class="rp-sc">
+          <div class="rp-sc-label">충족</div>
+          <div class="rp-sc-val" style="color:#16a34a">${score.total.y}</div>
+          <div class="rp-sc-sub">요건</div>
+        </div>
+        <div class="rp-sc">
+          <div class="rp-sc-label">미충족</div>
+          <div class="rp-sc-val" style="color:#dc2626">${score.total.n}</div>
+          <div class="rp-sc-sub">요건</div>
+        </div>
+        <div class="rp-sc">
+          <div class="rp-sc-label">해당없음</div>
+          <div class="rp-sc-val" style="color:#6b7280">${score.total.na}</div>
+          <div class="rp-sc-sub">요건</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-hd" style="border-left-color:${std.color}">조항별 준비율</div>
+      <table class="rp-clause-table">
+        <thead><tr><th>조항</th><th>명칭</th><th>충족</th><th>미충족</th><th>해당없음</th><th>준비율</th><th>수준</th></tr></thead>
+        <tbody>${clauseRows}</tbody>
+      </table>
+    </div>
+
+    ${failRows ? `
+    <div class="rp-section">
+      <div class="rp-hd" style="border-left-color:#dc2626">미충족 요건 목록</div>
+      <div class="rp-fails">${failRows}</div>
+    </div>` : ''}
+
+    <div class="rp-section">
+      <div class="rp-hd" style="border-left-color:#16a34a">개선 권고사항</div>
+      <div class="rp-gap">
+        <div class="rp-gap-hd">우선 개선 조항</div>
+        ${gapItems}
+      </div>
+      <div style="font-size:12px;color:#6b7280;margin-top:10px;">
+        ※ 본 보고서는 자가진단 결과이며 공식 인증과는 무관합니다.<br>
+        ※ 인증 취득을 위해서는 인정된 인증기관(CB)의 외부 심사가 필요합니다.
+      </div>
+    </div>
+  `;
+
+  document.getElementById('iso-report').classList.add('open');
+}
+
+function closeReport() {
+  document.getElementById('iso-report').classList.remove('open');
+}
+
+/* ════════════════════════════════════════════════════════
+   초기화
+════════════════════════════════════════════════════════ */
+selectStd('9001');
+</script>
+</body>
+</html>
