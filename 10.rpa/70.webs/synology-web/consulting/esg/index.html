@@ -157,61 +157,80 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 /* ── preview restrictions ── */
 .tab.preview-disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
 
-/* ── 리스크·혜택 패널 ── */
-.risk-panel{background:var(--panel);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;flex-direction:column;gap:14px;}
-.rp-size-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.rp-size-label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;}
-.rp-size-btn{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;transition:.15s;}
-.rp-size-btn.active{background:#0c1a30;border-color:#1e40af;color:#60a5fa;font-weight:600;}
-.rp-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:680px){.rp-cards{grid-template-columns:1fr;}}
-.rp-card{border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);}
-.rp-card-red{background:#1a0a0a;border-color:#7f1d1d;}
-.rp-card-green{background:#0a1f12;border-color:#1a3a2a;}
-.rp-card-blue{background:#0c1a30;border-color:#1e3a5f;}
-.rp-card-amber{background:#1c1200;border-color:#78350f;}
-.rp-card-label{font-size:10px;font-weight:700;letter-spacing:.08em;margin-bottom:4px;}
-.rp-card-label-red{color:#f87171;}
-.rp-card-label-green{color:#34d399;}
-.rp-card-label-blue{color:#60a5fa;}
-.rp-card-label-amber{color:#f59e0b;}
-.rp-card-val{font-size:22px;font-weight:700;margin-bottom:4px;line-height:1.1;}
-.rp-card-sub{font-size:11.5px;color:var(--muted);line-height:1.5;}
-.rp-gov{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:4px;}
-.rp-gov-item{background:var(--panel2);border:1px solid #1a3a2a;border-left:3px solid #34d399;border-radius:8px;padding:10px 12px;}
-.rp-gov-type{font-size:10px;font-weight:700;color:#34d399;margin-bottom:2px;}
-.rp-gov-name{font-size:12.5px;font-weight:600;margin-bottom:2px;}
-.rp-gov-desc{font-size:11px;color:var(--muted);line-height:1.4;}
-.rp-section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+/* ── 보고서 생성 바 ── */
+.report-bar{background:#0a1120;border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;}
+.rb-label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;}
+.rb-select{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 10px;font-size:12px;font-family:inherit;cursor:pointer;}
+.rb-select:focus{outline:none;border-color:var(--accent);}
+.rb-spacer{flex:1;}
+
+/* ── ESG 보고서 오버레이 ── */
+.esg-report{display:none;position:fixed;inset:0;background:#fff;z-index:200;overflow-y:auto;font-family:'IBM Plex Sans KR',sans-serif;color:#111;font-size:14px;line-height:1.6;}
+.esg-report.open{display:block;}
+.er-topbar{position:sticky;top:0;background:#fff;border-bottom:2px solid #e5e7eb;padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:10;}
+.er-topbar h2{font-size:16px;font-weight:700;flex:1;}
+.er-btn{padding:7px 18px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;}
+.er-btn-print{background:#10b981;color:#fff;}
+.er-btn-close{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;}
+.er-body{max-width:800px;margin:0 auto;padding:24px 24px 60px;}
+.er-header{text-align:center;padding:20px 0 32px;border-bottom:2px solid #111;margin-bottom:28px;}
+.er-header h1{font-size:22px;font-weight:700;margin-bottom:8px;}
+.er-header-meta{font-size:13px;color:#6b7280;}
+.er-section{margin-bottom:32px;}
+.er-hd{font-size:15px;font-weight:700;border-left:4px solid #10b981;padding-left:12px;margin-bottom:14px;}
+.er-score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
+@media(max-width:640px){.er-score-grid{grid-template-columns:1fr 1fr;}}
+.er-score-card{border:1px solid #e5e7eb;border-radius:8px;padding:14px;text-align:center;}
+.er-score-label{font-size:11px;font-weight:600;color:#6b7280;margin-bottom:4px;}
+.er-score-val{font-size:28px;font-weight:700;}
+.er-score-sub{font-size:11px;color:#9ca3af;margin-top:3px;}
+.er-fail-section{margin-bottom:12px;}
+.er-fail-hd{font-size:13px;font-weight:700;color:#dc2626;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #fee2e2;}
+.er-fail-item{font-size:12px;padding:4px 8px;display:flex;gap:8px;align-items:baseline;}
+.er-fail-item:nth-child(even){background:#fff5f5;}
+.er-fail-id{font-size:11px;font-weight:600;color:#dc2626;min-width:40px;}
+.er-penalty-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+@media(max-width:540px){.er-penalty-grid{grid-template-columns:1fr;}}
+.er-penalty-card{border-radius:8px;padding:16px;}
+.er-penalty-card-red{background:#fff1f2;border:1px solid #fecdd3;}
+.er-penalty-card-green{background:#f0fdf4;border:1px solid #bbf7d0;}
+.er-penalty-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.er-penalty-label-red{color:#dc2626;}
+.er-penalty-label-green{color:#16a34a;}
+.er-penalty-val{font-size:22px;font-weight:700;margin-bottom:4px;}
+.er-penalty-sub{font-size:11.5px;color:#6b7280;line-height:1.5;}
+.er-law-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px;}
+.er-law-table th{background:#f9fafb;padding:6px 10px;text-align:left;font-weight:600;border:1px solid #e5e7eb;}
+.er-law-table td{padding:6px 10px;border:1px solid #e5e7eb;}
+.er-law-table tr:nth-child(even) td{background:#f9fafb;}
+.er-gov-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:540px){.er-gov-grid{grid-template-columns:1fr;}}
+.er-gov-item{border:1px solid #e5e7eb;border-left:3px solid #10b981;border-radius:8px;padding:12px 14px;}
+.er-gov-type{font-size:10px;font-weight:700;color:#059669;margin-bottom:3px;}
+.er-gov-name{font-size:13px;font-weight:600;margin-bottom:3px;}
+.er-gov-desc{font-size:11.5px;color:#6b7280;line-height:1.4;}
+.er-risk-list{display:flex;flex-direction:column;gap:8px;}
+.er-risk-item{background:#f9fafb;border-radius:8px;padding:14px 16px;border:1px solid #e5e7eb;}
+.er-risk-item-hd{font-size:13px;font-weight:700;margin-bottom:4px;}
+.er-risk-item-body{font-size:12.5px;color:#4b5563;line-height:1.5;}
+.er-ins-box{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:16px;margin-top:12px;}
+.er-ins-hd{font-size:13px;font-weight:700;color:#92400e;margin-bottom:8px;}
+.er-ins-item{font-size:12.5px;color:#78350f;padding:4px 0;display:flex;gap:8px;}
+.er-ins-item::before{content:'•';}
 
 /* ── print ── */
 @media print{
-  body{background:#fff;color:#111;}
-  .topbar{display:none;}
-  .btn{display:none;}
-  .dashboard{background:#fff;}
-  .score-card{background:#f5f5f5;border-color:#ddd;}
-  .score-card .label,.score-card .sub{color:#666;}
-  .score-card .value{color:#111;}
-  .ind-card{background:#fff;border-color:#ddd;break-inside:avoid;}
-  .ind-body{display:block!important;}
-  .ind-head{background:#f9f9f9;}
-  .tabs{display:none;}
-  .tab-panel{display:block!important;}
-  .section-label{color:#444;}
-  .item-text{color:#111;}
-  .item-text.na-text{color:#999;}
-  .bar-fill{print-color-adjust:exact;}
-  .risk-panel{background:#f9f9f9;border-color:#ddd;}
-  .rp-card{background:#fff!important;border-color:#ccc!important;break-inside:avoid;}
-  .rp-card-val,.rp-card-label-red{color:#c00!important;}
-  .rp-card-label-green{color:#065f46!important;}
-  .rp-card-label-blue{color:#1e40af!important;}
-  .rp-card-label-amber{color:#92400e!important;}
-  .rp-gov-item{background:#fff!important;border-color:#ccc!important;border-left-color:#059669!important;}
-  .rp-gov-type{color:#065f46!important;}
-  .rp-size-btn{display:none;}
-  .rp-size-label{display:none;}
+  .topbar,.report-bar,.industry-bar,.ig-panel,.tabs,.content,.dashboard{display:none!important;}
+  .esg-report{display:block!important;position:static!important;overflow:visible!important;}
+  .er-topbar{display:none!important;}
+  .er-body{max-width:100%;padding:0;}
+  .er-score-grid{grid-template-columns:repeat(4,1fr)!important;}
+  .er-penalty-grid,.er-gov-grid{grid-template-columns:1fr 1fr!important;}
+  .er-section,.er-fail-item,.er-risk-item,.er-gov-item,.er-score-card{break-inside:avoid;}
+  .er-penalty-card-red{background:#fff1f2!important;}
+  .er-penalty-card-green{background:#f0fdf4!important;}
+  .er-gov-item{border-left-color:#059669!important;}
+  .er-ins-box{background:#fffbeb!important;}
 }
 </style>
 </head>
@@ -220,7 +239,7 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 <div class="topbar">
   <h1>ESG 자가진단 <small>동반성장위원회 중소기업 ESG 표준 가이드라인</small></h1>
   <button class="btn btn-ghost" onclick="expandAll()">전체 펼치기</button>
-  <button class="btn btn-primary" onclick="window.print()">🖨 인쇄 / PDF</button>
+  <button class="btn btn-primary" onclick="showEsgReport()">📋 보고서 생성</button>
   <button class="btn btn-danger" onclick="confirmReset()">초기화</button>
 </div>
 
@@ -278,64 +297,24 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
   </div>
 </div>
 
-<div class="risk-panel" id="risk-panel">
-  <!-- 기업 규모 선택 -->
-  <div class="rp-size-row">
-    <span class="rp-size-label">기업 규모:</span>
-    <button class="rp-size-btn active" onclick="setEsgSize('u10',this)">10인 미만</button>
-    <button class="rp-size-btn" onclick="setEsgSize('10to49',this)">10~49인</button>
-    <button class="rp-size-btn" onclick="setEsgSize('50to299',this)">50~299인</button>
-    <button class="rp-size-btn" onclick="setEsgSize('300up',this)">300인 이상</button>
-  </div>
-  <!-- 과징금·혜택 카드 -->
-  <div class="rp-cards" id="rp-cards">
-    <div class="rp-card rp-card-red">
-      <div class="rp-card-label rp-card-label-red">법령 위반 과태료 리스크</div>
-      <div class="rp-card-val" id="rp-fine">—</div>
-      <div class="rp-card-sub" id="rp-fine-sub">항목을 진단하면 추정됩니다</div>
-    </div>
-    <div class="rp-card rp-card-green">
-      <div class="rp-card-label rp-card-label-green">ESG 인증 획득 시 연간 기대 효과</div>
-      <div class="rp-card-val" id="rp-benefit">—</div>
-      <div class="rp-card-sub" id="rp-benefit-sub">금리 우대·입찰 가점·공급망 유지 등</div>
-    </div>
-    <div class="rp-card rp-card-blue">
-      <div class="rp-card-label rp-card-label-blue">공공입찰 ESG 가점</div>
-      <div class="rp-card-val" style="color:#60a5fa" id="rp-bid">최대 3점</div>
-      <div class="rp-card-sub">조달청·공기업·지자체 입찰 평가 반영. K-ESG 자가진단 결과 제출 요구 확대 추세.</div>
-    </div>
-    <div class="rp-card rp-card-amber">
-      <div class="rp-card-label rp-card-label-amber">미준수 항목 수</div>
-      <div class="rp-card-val" style="color:#f59e0b" id="rp-fail-cnt">—</div>
-      <div class="rp-card-sub" id="rp-fail-sub">법령 의무 위반 항목은 즉시 시정이 필요합니다</div>
-    </div>
-  </div>
-  <!-- 정부지원사업 -->
-  <div>
-    <div class="rp-section-title">ESG 의무 이행 정부지원사업</div>
-    <div class="rp-gov">
-      <div class="rp-gov-item">
-        <div class="rp-gov-type">무료 컨설팅</div>
-        <div class="rp-gov-name">안전보건관리체계 구축 컨설팅 (KOSHA)</div>
-        <div class="rp-gov-desc">S지표(작업환경·재해예방) 5~299인 사업장 전액 무료. kosha.or.kr</div>
-      </div>
-      <div class="rp-gov-item">
-        <div class="rp-gov-type">보조금</div>
-        <div class="rp-gov-name">스마트공장·환경설비 지원</div>
-        <div class="rp-gov-desc">E지표 개선. 제조업 최대 1억원 보조. 환경설비 융자 연 1.5%. clean.kosha.or.kr</div>
-      </div>
-      <div class="rp-gov-item">
-        <div class="rp-gov-type">무료 컨설팅</div>
-        <div class="rp-gov-name">ESG 공급망 컨설팅 (수출기업)</div>
-        <div class="rp-gov-desc">중진공·무역협회 전액 무료. EU 공급망실사법 대응. 2025년 수출 중소기업 우선.</div>
-      </div>
-      <div class="rp-gov-item">
-        <div class="rp-gov-type">금리 우대</div>
-        <div class="rp-gov-name">ESG 우수기업 정책자금 금리 우대</div>
-        <div class="rp-gov-desc">중진공·IBK기업은행 ESG 우수기업 연 0.3~0.5% 금리 인하. 1억 대출 시 연 30~50만원 절감.</div>
-      </div>
-    </div>
-  </div>
+<div class="report-bar" id="report-bar">
+  <span class="rb-label">근로자 수:</span>
+  <select class="rb-select" id="rb-emp">
+    <option value="u10">10인 미만</option>
+    <option value="10to49">10~49인</option>
+    <option value="50to299" selected>50~299인</option>
+    <option value="300up">300인 이상</option>
+  </select>
+  <span class="rb-label">연 매출:</span>
+  <select class="rb-select" id="rb-rev">
+    <option value="u10">10억 미만</option>
+    <option value="10to50">10~50억</option>
+    <option value="50to300" selected>50~300억</option>
+    <option value="300to1000">300~1,000억</option>
+    <option value="o1000">1,000억 이상</option>
+  </select>
+  <div class="rb-spacer"></div>
+  <small style="color:var(--muted);font-size:11px;">진단 완료 후 보고서 생성</small>
 </div>
 
 <div class="tabs">
@@ -909,62 +888,215 @@ function updateScores(){
   document.getElementById('bar-ind').style.width=ip+'%';
   const igLabel = document.getElementById('sc-ind-ig');
   if(igLabel){ const ig=getIndustryGroup(); igLabel.textContent = ig ? ig.icon+' '+ig.name : '업종 미설정 ▸'; }
-  updateRiskPanel();
 }
 
-// ── 과징금 리스크 & ESG 혜택 패널 ──
-let esgSize = 'u10';
+// ── ESG 보고서 생성 ──
+function empSzLabel(v){return{u10:'10인 미만','10to49':'10~49인','50to299':'50~299인','300up':'300인 이상'}[v]||v;}
+function revSzLabel(v){return{u10:'10억 미만','10to50':'10~50억','50to300':'50~300억','300to1000':'300~1,000억',o1000:'1,000억 이상'}[v]||v;}
 
-function setEsgSize(sz, btn) {
-  esgSize = sz;
-  document.querySelectorAll('.rp-size-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  updateRiskPanel();
+function showEsgReport(){
+  const el=document.getElementById('esg-report');
+  el.innerHTML=buildEsgReport();
+  el.classList.add('open');
+}
+function closeEsgReport(){
+  document.getElementById('esg-report').classList.remove('open');
 }
 
-function updateRiskPanel() {
-  // 전체 미준수(fail) 카운트
-  let failCnt = 0, pendCnt = 0;
-  for (const dom of DOMAINS)
-    for (const sec of dom.sections)
-      for (const ind of sec.inds) {
-        const s = scoreIndicator(ind);
-        if (s === 'fail') failCnt++;
-        else if (s === 'pending') pendCnt++;
+function buildEsgReport(){
+  const empSz=document.getElementById('rb-emp').value;
+  const revSz=document.getElementById('rb-rev').value;
+  const now=new Date();
+  const dateStr=now.getFullYear()+'년 '+(now.getMonth()+1)+'월 '+now.getDate()+'일';
+
+  // 도메인별 점수 및 미준수 목록 수집
+  let totPass=0,totEff=0;
+  const ds={};
+  const failItems=[];
+  const S1_IDS=['S-01','S-02','S-03','S-04','S-05','S-06','S-07','S-08','S-09','S-10','S-11','S-12','S-13','S-14','S-15','S-16','S-17','S-18','S-19','S-20'];
+  const S2_IDS=['S-21','S-22','S-23','S-24','S-25','S-26','S-27','S-28','S-29','S-30','S-31','S-32','S-33','S-34','S-35','S-36','S-37','S-38','S-39','S-40','S-41','S-42'];
+  const S34_IDS=['S-43','S-44','S-45','S-46','S-47','S-48','S-49','S-50','S-51','S-52','S-53','S-54'];
+
+  for(const dom of DOMAINS){
+    let dp=0,de=0;
+    for(const sec of dom.sections)
+      for(const ind of sec.inds){
+        const s=scoreIndicator(ind);
+        if(s==='na') continue;
+        de++; totEff++;
+        if(s==='pass'){dp++;totPass++;}
+        else if(s==='fail') failItems.push({domId:dom.id,id:ind.id,name:ind.name});
       }
-
-  // 기업 규모별 건당 평균 과태료 (근로기준법·산업안전보건법·환경법 평균)
-  const finePerViol = {u10: 100, '10to49': 250, '50to299': 450, '300up': 700}; // 만원
-  const loanAmt = {u10: 3000, '10to49': 10000, '50to299': 30000, '300up': 100000}; // 만원 (평균 융자)
-
-  const minFine = Math.round(failCnt * finePerViol[esgSize] * 0.5);
-  const maxFine = Math.round(failCnt * finePerViol[esgSize] * 1.8);
-  const benefitMin = Math.round(loanAmt[esgSize] * 0.003 + 500); // 금리우대+입찰가점 환산
-  const benefitMax = Math.round(loanAmt[esgSize] * 0.005 + 1200);
-
-  const fmt = n => n >= 10000 ? (n/10000).toFixed(1) + '억원' : n.toLocaleString() + '만원';
-
-  const fineEl = document.getElementById('rp-fine');
-  const fineSubEl = document.getElementById('rp-fine-sub');
-  const benefitEl = document.getElementById('rp-benefit');
-  const benefitSubEl = document.getElementById('rp-benefit-sub');
-  const failCntEl = document.getElementById('rp-fail-cnt');
-  const failSubEl = document.getElementById('rp-fail-sub');
-
-  if (!fineEl) return;
-
-  if (failCnt === 0 && pendCnt > 0) {
-    fineEl.textContent = '—'; fineSubEl.textContent = '미완료 항목이 있습니다 (' + pendCnt + '건)';
-    benefitEl.textContent = '—'; benefitSubEl.textContent = '진단 완료 후 산정됩니다';
-    failCntEl.textContent = '—'; failSubEl.textContent = '진단을 완료해 주세요';
-  } else {
-    fineEl.textContent = fmt(minFine) + ' ~ ' + fmt(maxFine);
-    fineSubEl.textContent = `미준수 ${failCnt}건 × 건당 평균 ${(finePerViol[esgSize]*0.5).toFixed(0)}~${(finePerViol[esgSize]*1.8).toFixed(0)}만원 (근로기준법·산안법·환경법 기준)`;
-    benefitEl.textContent = '연 ' + fmt(benefitMin) + '~ ' + fmt(benefitMax);
-    benefitSubEl.textContent = `금리 우대(0.3~0.5%) + 공공입찰 가점 + 공급망 수요 대응 기대효과`;
-    failCntEl.textContent = failCnt + '건';
-    failSubEl.textContent = failCnt > 0 ? `법령 의무항목 즉시 시정 필요. 잠재 제재 위험 존재.` : '모든 항목 준수 — 우수 ESG 경영 상태';
+    ds[dom.id]={pass:dp,eff:de,pct:de?Math.round(dp/de*100):0};
   }
+  const totalPct=totEff?Math.round(totPass/totEff*100):0;
+
+  // 법령별 미준수 분류
+  const s1Fails=failItems.filter(f=>S1_IDS.includes(f.id));
+  const s2Fails=failItems.filter(f=>S2_IDS.includes(f.id));
+  const eFails=failItems.filter(f=>f.domId==='E');
+  const gFails=failItems.filter(f=>f.domId==='G');
+  const s34Fails=failItems.filter(f=>S34_IDS.includes(f.id));
+
+  // 과태료 산정 — 근로기준법·산안법=근로자 수 기준, 환경·개인정보=매출 기준
+  const empBase={u10:50,'10to49':150,'50to299':300,'300up':500};
+  const revBase={u10:30,'10to50':80,'50to300':250,'300to1000':500,o1000:1000};
+  const lrFine=(s1Fails.length+s2Fails.length)*empBase[empSz];
+  const envFine=eFails.length*Math.round(empBase[empSz]*0.4+revBase[revSz]*0.6);
+  const govFine=(gFails.length+s34Fails.length)*revBase[revSz];
+  const baseFine=lrFine+envFine+govFine;
+  const minFine=Math.round(baseFine*0.6);
+  const maxFine=Math.round(baseFine*1.8);
+  const loanAmt={u10:3000,'10to49':10000,'50to299':30000,'300up':100000};
+  const benefitMin=Math.round(loanAmt[empSz]*0.003+300);
+  const benefitMax=Math.round(loanAmt[empSz]*0.005+1200);
+  const fmt=n=>n>=10000?(n/10000).toFixed(1)+'억원':n.toLocaleString()+'만원';
+  const grade=totalPct>=90?'AA':totalPct>=80?'A':totalPct>=70?'B+':totalPct>=60?'B':'C';
+  const gradeColor=totalPct>=80?'#16a34a':totalPct>=70?'#2563eb':totalPct>=60?'#d97706':'#dc2626';
+
+  return `<div class="er-topbar">
+  <h2>ESG 자가진단 보고서</h2>
+  <button class="er-btn er-btn-close" onclick="closeEsgReport()">✕ 닫기</button>
+  <button class="er-btn er-btn-print" onclick="window.print()">🖨 인쇄/PDF</button>
+</div>
+<div class="er-body">
+  <div class="er-header">
+    <h1>ESG 자가진단 보고서</h1>
+    <div class="er-header-meta">WorksFree 컨설팅 서비스 &nbsp;|&nbsp; 동반성장위원회 중소기업 ESG 표준 가이드라인 기반<br>진단일: ${dateStr} &nbsp;|&nbsp; 기업규모: ${empSzLabel(empSz)} &nbsp;|&nbsp; 연매출: ${revSzLabel(revSz)}</div>
+  </div>
+
+  <div class="er-section">
+    <div class="er-hd">1. ESG 진단 점수 요약</div>
+    <div class="er-score-grid">
+      <div class="er-score-card">
+        <div class="er-score-label">종합 준수율</div>
+        <div class="er-score-val" style="color:${gradeColor}">${totalPct}%</div>
+        <div class="er-score-sub">등급: ${grade}</div>
+      </div>
+      <div class="er-score-card">
+        <div class="er-score-label">E 환경</div>
+        <div class="er-score-val" style="color:#10b981">${ds.E.pct}%</div>
+        <div class="er-score-sub">${ds.E.pass}/${ds.E.eff} 준수</div>
+      </div>
+      <div class="er-score-card">
+        <div class="er-score-label">S 사회</div>
+        <div class="er-score-val" style="color:#3b82f6">${ds.S.pct}%</div>
+        <div class="er-score-sub">${ds.S.pass}/${ds.S.eff} 준수</div>
+      </div>
+      <div class="er-score-card">
+        <div class="er-score-label">G 지배구조</div>
+        <div class="er-score-val" style="color:#a855f7">${ds.G.pct}%</div>
+        <div class="er-score-sub">${ds.G.pass}/${ds.G.eff} 준수</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="er-section">
+    <div class="er-hd">2. 미준수 항목 목록 (${failItems.length}건)</div>
+    ${failItems.length===0
+      ? '<div style="color:#16a34a;padding:12px;background:#f0fdf4;border-radius:8px;font-weight:600;">✓ 모든 항목 준수 — 우수 ESG 경영 상태</div>'
+      : ['E','S','G'].map(did=>{
+          const df=failItems.filter(f=>f.domId===did);
+          if(!df.length) return '';
+          const dn={E:'E 환경',S:'S 사회',G:'G 지배구조'}[did];
+          return '<div class="er-fail-section"><div class="er-fail-hd">'+dn+' — '+df.length+'건 미준수</div>'
+            +df.map(f=>'<div class="er-fail-item"><span class="er-fail-id">'+f.id+'</span>'+f.name+'</div>').join('')+'</div>';
+        }).join('')}
+  </div>
+
+  <div class="er-section">
+    <div class="er-hd">3. 법령 위반 과징금 리스크 산정</div>
+    <div class="er-penalty-grid">
+      <div class="er-penalty-card er-penalty-card-red">
+        <div class="er-penalty-label er-penalty-label-red">예상 과태료·과징금 리스크</div>
+        <div class="er-penalty-val" style="color:#dc2626">${failItems.length>0?fmt(minFine)+' ~ '+fmt(maxFine):'해당없음'}</div>
+        <div class="er-penalty-sub">미준수 ${failItems.length}건 기준 추정. 실제 처분은 위반 경중·이행 노력에 따라 상이.</div>
+      </div>
+      <div class="er-penalty-card er-penalty-card-green">
+        <div class="er-penalty-label er-penalty-label-green">ESG 인증 시 연간 기대 편익</div>
+        <div class="er-penalty-val" style="color:#16a34a">연 ${fmt(benefitMin)} ~ ${fmt(benefitMax)}</div>
+        <div class="er-penalty-sub">금리 우대 0.3~0.5% + 공공입찰 가점 + 공급망 참여 기회 환산 추정</div>
+      </div>
+    </div>
+    <table class="er-law-table">
+      <tr><th>관련 법령</th><th>해당 지표</th><th>미준수 건수</th><th>추정 과태료</th></tr>
+      <tr><td>근로기준법·고용관계법</td><td>S1 근로조건 지표</td><td>${s1Fails.length}건</td><td>${fmt(s1Fails.length*empBase[empSz])}</td></tr>
+      <tr><td>산업안전보건법</td><td>S2 작업환경 지표</td><td>${s2Fails.length}건</td><td>${fmt(s2Fails.length*empBase[empSz])}</td></tr>
+      <tr><td>환경 관련법</td><td>E 환경 지표</td><td>${eFails.length}건</td><td>${fmt(envFine)}</td></tr>
+      <tr><td>공정거래·개인정보보호법</td><td>G·S3·S4 지표</td><td>${gFails.length+s34Fails.length}건</td><td>${fmt(govFine)}</td></tr>
+    </table>
+    <div style="font-size:11px;color:#9ca3af;padding:4px 0;">* 기업 규모(${empSzLabel(empSz)})·연매출(${revSzLabel(revSz)}) 기준 추정치. 과징금 산정은 개별 위반 건 및 관할 기관 재량에 따라 달라질 수 있습니다.</div>
+  </div>
+
+  <div class="er-section">
+    <div class="er-hd">4. ESG 인증 기대 효과</div>
+    <div class="er-risk-list">
+      <div class="er-risk-item">
+        <div class="er-risk-item-hd">💰 금융 비용 절감</div>
+        <div class="er-risk-item-body">K-ESG·ISO 14001·ISO 45001 인증 취득 시 중진공·IBK기업은행 정책자금 금리 우대 0.3~0.5% 적용. ${fmt(loanAmt[empSz])} 대출 기준 연 ${fmt(Math.round(loanAmt[empSz]*0.003))}~${fmt(Math.round(loanAmt[empSz]*0.005))} 절감 가능.</div>
+      </div>
+      <div class="er-risk-item">
+        <div class="er-risk-item-hd">🏆 공공입찰 경쟁력</div>
+        <div class="er-risk-item-body">조달청·공기업 입찰 시 ESG 우수기업 최대 3점 가점. K-ESG 자가진단 결과 제출 요구 확대. 2025년부터 공공기관 협력사 ESG 평가 의무화 추진 중.</div>
+      </div>
+      <div class="er-risk-item">
+        <div class="er-risk-item-hd">🌐 공급망 참여 기회</div>
+        <div class="er-risk-item-body">EU 공급망실사법(CSDDD) 시행으로 수출 대기업이 협력사 ESG 요건 강화. ESG 인증 보유 시 대기업 1차 공급망 등록·유지에 유리. 미인증 시 거래 제한 리스크 증가.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="er-section">
+    <div class="er-hd">5. 유관 정부지원사업</div>
+    <div class="er-gov-grid">
+      <div class="er-gov-item">
+        <div class="er-gov-type">무료 컨설팅</div>
+        <div class="er-gov-name">안전보건관리체계 구축 컨설팅 (KOSHA)</div>
+        <div class="er-gov-desc">S지표 개선 전용. 5~299인 사업장 3~4개월 전문가 지원, 전액 무료. kosha.or.kr</div>
+      </div>
+      <div class="er-gov-item">
+        <div class="er-gov-type">보조금·융자</div>
+        <div class="er-gov-name">스마트공장·환경설비 지원 (중기부·환경부)</div>
+        <div class="er-gov-desc">E지표 개선. 제조업 스마트공장 최대 1억 보조. 환경설비 융자 연 1.5%. clean.kosha.or.kr</div>
+      </div>
+      <div class="er-gov-item">
+        <div class="er-gov-type">무료 컨설팅</div>
+        <div class="er-gov-name">ESG 공급망 컨설팅 (중진공·무역협회)</div>
+        <div class="er-gov-desc">EU 공급망실사법 대응. 수출 중소기업 전액 무료. G·E 지표 전반 지원. smtech.go.kr</div>
+      </div>
+      <div class="er-gov-item">
+        <div class="er-gov-type">금리 우대</div>
+        <div class="er-gov-name">ESG 우수기업 정책자금 금리 우대 (중진공·IBK)</div>
+        <div class="er-gov-desc">ESG 인증 취득 시 정책자금 연 0.3~0.5% 금리 인하. 신용보증기금 보증료 0.1% 할인.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="er-section">
+    <div class="er-hd">6. 위험관리 — 전반 및 보험 권고</div>
+    <div class="er-risk-list">
+      <div class="er-risk-item">
+        <div class="er-risk-item-hd">📋 법적 리스크 관리</div>
+        <div class="er-risk-item-body">미준수 ${failItems.length}건에 대한 즉시 시정 계획 수립 권고. 근로기준법(S1)·산안법(S2) 위반은 근로감독 강화 추세로 행정처분 위험이 상시 존재합니다. 법무·노무 전문가 자문 계약 체결을 권장합니다.</div>
+      </div>
+      <div class="er-risk-item">
+        <div class="er-risk-item-hd">🛡 산업재해 및 배상책임 리스크</div>
+        <div class="er-risk-item-body">ESG S2(작업환경) 미준수 시 산재 발생 가능성 증가. 중대재해처벌법 적용 사업장은 경영진 형사처벌·기업 과징금 위험이 있습니다. 위험성평가 선제 실시 및 안전관리 체계 구축이 선행되어야 합니다.</div>
+      </div>
+      <div class="er-risk-item">
+        <div class="er-risk-item-hd">🔒 환경·개인정보 리스크</div>
+        <div class="er-risk-item-body">E지표 미준수 시 환경부 점검·과태료 위험. 개인정보보호법(G지표) 위반 시 과징금 매출액 3% 이하 부과 가능. 환경관리 체계 및 정보보안 정책 수립을 권장합니다.</div>
+      </div>
+    </div>
+    <div class="er-ins-box">
+      <div class="er-ins-hd">🏥 보험 권고 사항</div>
+      <div class="er-ins-item"><strong>근로자재해보상보험 (산재보험 초과)</strong> — 법정 산재보험 보상 초과분 보전. 중대재해·직업병 발생 시 기업 추가 배상 부담 완화.</div>
+      <div class="er-ins-item"><strong>기업배상책임보험</strong> — 제품·서비스·시설로 인한 제3자 신체·재물 피해 배상. ESG S4(고객안전) 리스크 대응.</div>
+      <div class="er-ins-item"><strong>임원배상책임보험 (D&amp;O)</strong> — ESG 이사회·지배구조 관련 주주·이해관계자 소송 위험 대비. G지표 미준수 시 임원 책임 증가.</div>
+      <div class="er-ins-item"><strong>환경오염배상책임보험</strong> — E지표 환경 사고 발생 시 정화 비용·제3자 배상 커버. 제조·물류 업종 필수 검토.</div>
+    </div>
+  </div>
+</div>`;
 }
 
 // ── render ──
@@ -1208,8 +1340,39 @@ function resetAll(){
   updateScores();
 }
 
+// ── 테스트 모드 자동 채움 (test.worksfree.kr) — 총점 ~65%, 모든 항목 선택 ──
+function autoFillTest(){
+  if(!location.hostname.startsWith('test.')) return;
+  if(Object.keys(state).length>0) return;
+  state['_industry']='service'; // IT·서비스 업종 (업종별 지표 전체 해당없음)
+  for(const dom of DOMAINS)
+    for(const sec of dom.sections)
+      for(const ind of sec.inds)
+        for(let i=0;i<ind.items.length;i++){
+          if(!state[ind.id]) state[ind.id]={};
+          state[ind.id][i]='yes';
+        }
+  // 의도적 미준수 항목 — 총점 ~65% 목표 (23건 fail)
+  const failIds=[
+    'E-03','E-06','E-07',                        // E (3건)
+    'S-05','S-12','S-15','S-17','S-19','S-20',  // S1 근로조건 (6건)
+    'S-24','S-26','S-34','S-38','S-40',          // S2 작업환경 (5건)
+    'S-43','S-48',                                // S3 협력사 (2건)
+    'S-53','S-54',                                // S4 이해관계자 (2건)
+    'G-02','G-05','G-07','G-10','G-11',          // G 지배구조 (5건)
+  ];
+  for(const indId of failIds){
+    const ind=findInd(indId);
+    if(!ind) continue;
+    if(!state[indId]) state[indId]={};
+    ind.items.forEach((item,i)=>{ if(item.t==='p') state[indId][i]='no'; });
+  }
+  saveState();
+}
+
 // ── init ──
 loadState();
+autoFillTest();
 renderIndustryBar();
 renderAll();
 updateScores();
@@ -1217,5 +1380,6 @@ if(IS_PREVIEW){
   document.querySelectorAll('.tab:not([data-tab="E"])').forEach(el=>el.classList.add('preview-disabled'));
 }
 </script>
+<div class="esg-report" id="esg-report"></div>
 </body>
 </html>
