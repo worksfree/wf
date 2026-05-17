@@ -63,6 +63,9 @@
     .recent-label { font-size:11px; color:var(--sub); }
     .recent-chip { background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:2px 10px; font-size:13px; cursor:pointer; color:var(--sub); }
     .recent-chip:hover { color:var(--text); border-color:var(--accent); }
+    .filter-row { display:flex; align-items:center; gap:8px; margin-top:8px; min-height:24px; }
+    .filter-chk-label { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--sub); cursor:pointer; user-select:none; }
+    .filter-chk-label input[type=checkbox] { cursor:pointer; width:14px; height:14px; accent-color:var(--accent); }
 
     /* ── Results ── */
     .results-wrap { padding:16px 20px 40px; max-width:800px; }
@@ -126,7 +129,7 @@
     .btn-stop { background:none; border:1px solid var(--danger); color:var(--danger); border-radius:6px; padding:6px 14px; font-size:13px; font-family:inherit; cursor:pointer; }
     .bulk-result-actions { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
     .bulk-result-meta { font-size:13px; color:var(--sub); }
-    .btn-sel-dl { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:13px; font-family:inherit; cursor:pointer; font-weight:500; display:none; }
+    .btn-sel-dl { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:13px; font-family:inherit; cursor:pointer; font-weight:500; }
     .btn-sel-dl:disabled { opacity:.6; cursor:default; }
     .btn-fs-row { background:none; border:1px solid var(--border); color:var(--sub); border-radius:4px; padding:2px 8px; font-size:12px; cursor:pointer; font-family:inherit; transition:all .15s; white-space:nowrap; }
     .btn-fs-row:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
@@ -331,10 +334,6 @@
         <option value="OFS">개별재무제표</option>
       </select>
     </div>
-    <div class="dl-progress-wrap" id="dl-progress-wrap">
-      <div class="progress-bar"><div class="progress-fill" id="dl-progress-fill"></div></div>
-      <div class="progress-info" id="dl-progress-info"></div>
-    </div>
     <div id="bulk-results"></div>
   </div>
 </div>
@@ -349,6 +348,12 @@
     <button class="btn-search" id="btn-search" onclick="doSearch()">조회</button>
   </div>
   <div class="recent-row" id="recent-row"></div>
+  <div class="filter-row" id="filter-row">
+    <label class="filter-chk-label">
+      <input type="checkbox" id="chk-listed" checked onchange="applyListedFilter()">
+      <span id="lbl-chk-listed">상장사만 보기</span>
+    </label>
+  </div>
 </div>
 
 <!-- RESULTS -->
@@ -440,7 +445,10 @@ const I18N = {
     drop_msg:'CSV 파일을 드래그하거나 클릭하여 업로드',
     drop_sub:'또는 아래에 직접 입력 (회사명·종목코드, 줄바꿈 구분)',
     bulk_ph:'삼성전자\n카카오\n005930\n...',
-    btn_start:'조회 시작', btn_stop:'중지', btn_tmpl:'템플릿 다운로드', btn_dl:'CSV 다운로드',
+    btn_start:'조회 시작', btn_stop:'중지', btn_tmpl:'템플릿 다운로드', btn_dl:'목록 CSV',
+    lbl_listed_only:'상장사만 보기 (Y·K·N)',
+    no_listed_result:'상장사 검색 결과가 없습니다. 필터를 해제하거나 다른 회사명을 입력하세요.',
+    bulk_limit_warn:'최대 {n}건 — 초과분 무시',
     bulk_preview:'로그인 후 대량 조회를 이용할 수 있습니다.',
     bulk_rows:'{n}건 입력됨',
     bulk_processing:'{done} / {total} 처리 중…',
@@ -449,12 +457,12 @@ const I18N = {
     th_ceo:'대표자', th_bizno:'사업자번호', th_induty:'업종',
     th_stock:'종목코드', th_cls:'상장구분', th_adres:'주소', th_status:'상태',
     bs_ok:'완료', bs_miss:'미매칭', bs_err:'오류', bs_pend:'대기',
-    btn_sel_dl:'📊 선택 Excel 다운로드',
+    btn_sel_dl:'엑셀 다운로드',
     bulk_sel_count:'({n}건 선택)',
     bulk_dl_fs_label:'재무제표 옵션:',
     bulk_dl_progress:'{done} / {total} 재무제표 조회 중…',
-    bulk_dl_done:'완료 {ok}건 · 실패 {fail}건 — ZIP 다운로드 시작',
-    bulk_dl_limit:'100건 초과 시 처음 100건만 처리됩니다.',
+    bulk_dl_done:'{ok}건 완료 · {fail}건 실패 — Excel 다운로드 완료',
+    bulk_dl_limit:'최대 {n}건 초과 선택됨. 처음 {n}건만 처리합니다.',
     btn_fs_row:'📊',
   },
   en: {
@@ -497,7 +505,10 @@ const I18N = {
     drop_msg:'Drag & drop CSV or click to upload',
     drop_sub:'Or enter directly below (company name or ticker, one per line)',
     bulk_ph:'Samsung Electronics\nKakao\n005930\n...',
-    btn_start:'Start', btn_stop:'Stop', btn_tmpl:'Download Template', btn_dl:'Download CSV',
+    btn_start:'Start', btn_stop:'Stop', btn_tmpl:'Download Template', btn_dl:'List CSV',
+    lbl_listed_only:'Listed Only (Y·K·N)',
+    no_listed_result:'No listed companies found. Uncheck the filter or try a different name.',
+    bulk_limit_warn:'Max {n} — excess skipped',
     bulk_preview:'Please log in to use bulk inquiry.',
     bulk_rows:'{n} rows entered',
     bulk_processing:'{done} / {total} processing…',
@@ -506,12 +517,12 @@ const I18N = {
     th_ceo:'CEO', th_bizno:'Business No.', th_induty:'Industry',
     th_stock:'Ticker', th_cls:'Listed', th_adres:'Address', th_status:'Status',
     bs_ok:'OK', bs_miss:'Not Found', bs_err:'Error', bs_pend:'Pending',
-    btn_sel_dl:'📊 Download Excel',
+    btn_sel_dl:'Download Excel',
     bulk_sel_count:'({n} selected)',
     bulk_dl_fs_label:'FS Options:',
     bulk_dl_progress:'Fetching {done} / {total}…',
-    bulk_dl_done:'{ok} done · {fail} failed — Downloading ZIP',
-    bulk_dl_limit:'Over 100 selected. Only first 100 will be processed.',
+    bulk_dl_done:'{ok} done · {fail} failed — Excel downloaded',
+    bulk_dl_limit:'Over {n} selected. Only first {n} will be processed.',
     btn_fs_row:'📊',
   },
 };
@@ -538,6 +549,8 @@ function applyLang(){
   document.getElementById('inp-search').placeholder  = t('search_ph');
   document.getElementById('btn-search').textContent  = t('search_btn');
   document.getElementById('init-msg').textContent    = t('init_msg');
+  const lblListed = document.getElementById('lbl-chk-listed');
+  if (lblListed) lblListed.textContent = t('lbl_listed_only');
   document.getElementById('btn-ko').classList.toggle('lang-active', lang==='ko');
   document.getElementById('btn-en').classList.toggle('lang-active', lang==='en');
   document.getElementById('tab-single').textContent    = t('tab_single');
@@ -674,13 +687,26 @@ async function runSearch(q, page){
 /* ── Render results ── */
 function renderResults(list, page, total, q){
   const wrap = document.getElementById('results-wrap');
-  if(!list||!list.length){
-    wrap.innerHTML = `<div class="state-box"><div class="state-icon">🔎</div><div>${t('no_result')}</div></div>`;
+  const listedOnly = document.getElementById('chk-listed')?.checked;
+  // preserve original indices for selectCard / selectCard to work correctly
+  const items = list.reduce((acc, c, i) => {
+    const cls = c.corp_cls || (c.stock_code?.trim() ? 'L' : 'E');
+    // 'L' = stock_code는 있지만 corp_cls가 검색 API에서 미반환된 경우 (상장사로 간주)
+    if (!listedOnly || ['Y','K','N','L'].includes(cls)) acc.push({c, i});
+    return acc;
+  }, []);
+  if(!items.length){
+    const msg = list.length && listedOnly ? t('no_listed_result') : t('no_result');
+    wrap.innerHTML = `<div class="state-box"><div class="state-icon">🔎</div><div>${msg}</div></div>`;
     return;
   }
   const totalPages = Math.ceil(total/10);
-  let html = `<div class="results-meta">"${q}" — ${total.toLocaleString()} ${t('results_count')}</div><div class="result-list">`;
-  list.forEach((c,i) => { html += buildCard(c,i); });
+  let metaHtml = `"${q}" — ${total.toLocaleString()} ${t('results_count')}`;
+  if (listedOnly && items.length < list.length) {
+    metaHtml += ` &nbsp;·&nbsp; <span style="color:var(--success);font-size:12px">${t('lbl_listed_only')} ${items.length}건</span>`;
+  }
+  let html = `<div class="results-meta">${metaHtml}</div><div class="result-list">`;
+  items.forEach(({c, i}) => { html += buildCard(c, i); });
   html += `</div>`;
   if(totalPages>1){
     html += `<div class="pagination">
@@ -793,6 +819,10 @@ function showError(msg){
     `<div class="state-box state-err"><div class="state-icon">⚠</div><div>${msg}</div></div>`;
 }
 
+function applyListedFilter(){
+  if(state.results.length) renderResults(state.results, state.page, state.total, state.query);
+}
+
 /* ═══════════════════════════════════════
    대량 조회 (Bulk CSV)
 ═══════════════════════════════════════ */
@@ -868,9 +898,12 @@ function parseBulkInput(raw) {
   }).filter(r => r.corp_name || r.stock_code);
 }
 
+const MAX_BULK = 20;
+
 function updateBulkCount() {
   const rows = parseBulkInput(document.getElementById('bulk-textarea').value);
-  const msg  = rows.length ? t('bulk_rows').replace('{n}', rows.length) : '';
+  let msg = rows.length ? t('bulk_rows').replace('{n}', rows.length) : '';
+  if (rows.length > MAX_BULK) msg += `  ⚠ ${t('bulk_limit_warn').replace(/{n}/g, MAX_BULK)}`;
   document.getElementById('bulk-count').textContent = msg;
 }
 
@@ -895,8 +928,12 @@ async function startBulk() {
     return;
   }
   const raw = document.getElementById('bulk-textarea').value;
-  const rows = parseBulkInput(raw);
+  let rows = parseBulkInput(raw);
   if (!rows.length) return;
+  if (rows.length > MAX_BULK) {
+    alert(t('bulk_limit_warn').replace(/{n}/g, MAX_BULK));
+    rows = rows.slice(0, MAX_BULK);
+  }
 
   bulkAbort = false;
   bulkState.rows  = rows.map(r => ({...r, status:'pend', result:null}));
@@ -967,16 +1004,18 @@ function renderBulkTable(rows, done = false) {
     ? t('bulk_done').replace('{ok}',ok).replace('{miss}',rows.filter(r=>r.status==='miss').length).replace('{err}',rows.filter(r=>r.status==='err').length)
     : `${ok} / ${rows.length - pend} ${t('results_count')}`;
 
-  const dlCsvBtn  = done ? `<button class="btn-dl-csv" onclick="downloadResultCsv()">${t('btn_dl')}</button>` : '';
-  const selDlBtn  = done && ok > 0
-    ? `<button class="btn-sel-dl" id="btn-sel-dl" onclick="downloadBulkExcel()">${t('btn_sel_dl')} <span id="sel-count-badge">${t('bulk_sel_count').replace('{n}','0')}</span></button>`
+  const selDlBtn = done && ok > 0
+    ? `<button class="btn-sel-dl" id="btn-sel-dl" onclick="downloadBulkExcel()" disabled>${t('btn_sel_dl')} <span id="sel-count-badge">${t('bulk_sel_count').replace('{n}','0')}</span></button>`
     : '';
 
   wrap.innerHTML = `
     <div class="bulk-result-actions">
-      ${dlCsvBtn}
       ${selDlBtn}
       <span class="bulk-result-meta">${meta}</span>
+    </div>
+    <div id="dl-progress-wrap" style="display:none;margin:0 0 10px">
+      <div class="progress-bar"><div class="progress-fill" id="dl-progress-fill" style="width:0%"></div></div>
+      <div class="progress-info" id="dl-progress-info" style="margin-top:5px"></div>
     </div>
     <div class="bulk-table-wrap">
       <table class="bulk-table">
@@ -1003,6 +1042,7 @@ function renderBulkTable(rows, done = false) {
   if (done && ok > 0) {
     document.getElementById('bulk-fs-bar').classList.add('show');
     initBulkFsYear();
+    updateSelCount();  // auto-select했으므로 배지 즉시 갱신
   }
 }
 
@@ -1012,12 +1052,13 @@ function buildBulkRow(r, i) {
   const clsLabel = d.corp_cls ? t('cls_'+d.corp_cls) : '';
   const bsCls = { ok:'bs-ok', miss:'bs-miss', err:'bs-err', pend:'bs-pend' }[r.status] || 'bs-pend';
   const bsLbl = t('bs_'+r.status) || r.status;
-  const isOk  = r.status === 'ok';
+  const isOk     = r.status === 'ok';
+  const isListed = isOk && ['Y','K','N'].includes(d.corp_cls);
   const fsBtn = isOk
     ? `<button class="btn-fs-row" title="재무제표 조회" onclick="openFinSheet('${d.corp_code}','${(d.corp_name||'').replace(/'/g,"\\'")}','${d.acc_mt||''}')">${t('btn_fs_row')}</button>`
     : '—';
   return `<tr>
-    <td class="chk-cell"><input type="checkbox" class="row-chk" data-corp-code="${d.corp_code||''}" data-corp-name="${(d.corp_name||'').replace(/"/g,'&quot;')}" data-acc-mt="${d.acc_mt||''}" ${isOk?'':'disabled'} onchange="updateSelCount()"></td>
+    <td class="chk-cell"><input type="checkbox" class="row-chk" data-corp-code="${d.corp_code||''}" data-corp-name="${(d.corp_name||'').replace(/"/g,'&quot;')}" data-acc-mt="${d.acc_mt||''}" ${isListed?'checked':''} ${isOk?'':'disabled'} onchange="updateSelCount()"></td>
     <td style="color:var(--sub)">${i+1}</td>
     <td title="${input}">${input}${r.memo?` <span style="color:var(--sub);font-size:10px">${r.memo}</span>`:''}</td>
     <td title="${d.corp_name||''}">${d.corp_name||'—'}</td>
@@ -1043,7 +1084,7 @@ function updateSelCount() {
   const badge = document.getElementById('sel-count-badge');
   if (badge) badge.textContent = t('bulk_sel_count').replace('{n}', n);
   const btn = document.getElementById('btn-sel-dl');
-  if (btn) btn.style.display = n > 0 ? '' : 'none';
+  if (btn) btn.disabled = n === 0;
   const chkAll = document.getElementById('chk-all');
   if (chkAll) {
     const total = document.querySelectorAll('.row-chk:not(:disabled)').length;
@@ -1072,14 +1113,21 @@ function initBulkFsYear() {
   }
 }
 
-/* ── Bulk Excel 다운로드 (ZIP) ── */
+/* ── 선택된 행의 bulkState 전체 객체 반환 ── */
+function getSelectedBulkRows() {
+  return [...document.querySelectorAll('.row-chk:checked')].map(cb => {
+    const code = cb.dataset.corpCode;
+    return bulkState.rows.find(r => r.result?.corp_code === code) || null;
+  }).filter(Boolean);
+}
+
+/* ── Bulk Excel 다운로드 (단일 xlsx: 요약+개별시트) ── */
 async function downloadBulkExcel() {
-  const selected = getSelectedRows().filter(r => r.corp_code);
+  const selected = getSelectedBulkRows();
   if (!selected.length) return;
 
-  const LIMIT = 100;
-  const toProcess = selected.slice(0, LIMIT);
-  if (selected.length > LIMIT) alert(t('bulk_dl_limit'));
+  const toProcess = selected.slice(0, MAX_BULK);
+  if (selected.length > MAX_BULK) alert(t('bulk_dl_limit').replace(/{n}/g, MAX_BULK));
 
   const year  = document.getElementById('bulk-fs-year')?.value  || String(new Date().getFullYear() - 1);
   const reprt = document.getElementById('bulk-fs-reprt')?.value || '11011';
@@ -1091,45 +1139,125 @@ async function downloadBulkExcel() {
   const progWrap = document.getElementById('dl-progress-wrap');
   const progFill = document.getElementById('dl-progress-fill');
   const progInfo = document.getElementById('dl-progress-info');
-  if (progWrap) progWrap.style.display = '';
-  // 루프 시작 전 즉시 표시 — 브라우저가 첫 프레임을 렌더할 시간 확보
+  if (progWrap) {
+    progWrap.style.display = 'block';
+    progWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
   if (progFill) progFill.style.width = '3%';
   if (progInfo) progInfo.textContent = t('bulk_dl_progress').replace('{done}', 0).replace('{total}', toProcess.length);
   await new Promise(r => setTimeout(r, 60));
 
-  const zip = new JSZip();
-  let done = 0, ok = 0;
-
-  for (const row of toProcess) {
+  // Phase 1: 재무제표 데이터 일괄 fetch
+  const fetched = [];
+  let done = 0;
+  for (const bulkRow of toProcess) {
+    const d = bulkRow.result || {};
     try {
-      const wb = await buildCorpExcelWb(row.corp_code, row.corp_name, year, reprt, fsDiv);
-      if (wb) {
-        const data = XLSX.write(wb, { bookType:'xlsx', type:'array' });
-        const safe = row.corp_name.replace(/[\\/:*?"<>|]/g, '_');
-        zip.file(`fs_${safe}_${year}.xlsx`, data);
-        ok++;
-      }
-    } catch(e) { /* skip */ }
+      const data = await dartCall('fnlttSinglAcntAll.json', {
+        corp_code: d.corp_code, bsns_year: year, reprt_code: reprt, fs_div: fsDiv,
+      });
+      fetched.push({ d, fsList: (data?.status === '000' && data.list?.length) ? data.list : null });
+    } catch(e) {
+      fetched.push({ d, fsList: null });
+    }
     done++;
-    // 처리 완료 후 진행률 업데이트 — fetch가 await이므로 다음 이터레이션 전 repaint 가능
-    const pct = Math.max(3, Math.round(done / toProcess.length * 100));
-    if (progFill) progFill.style.width = pct + '%';
+    if (progFill) progFill.style.width = Math.max(3, Math.round(done / toProcess.length * 100)) + '%';
     if (progInfo) progInfo.textContent = t('bulk_dl_progress').replace('{done}', done).replace('{total}', toProcess.length);
   }
 
-  if (progFill) progFill.style.width = '100%';
-  if (progInfo) progInfo.textContent = t('bulk_dl_done').replace('{ok}',ok).replace('{fail}',done-ok);
+  // Phase 2: 워크북 조립
+  const wb   = XLSX.utils.book_new();
+  let   ok = 0, fail = 0;
 
-  if (ok > 0) {
-    const blob = await zip.generateAsync({ type:'blob' });
-    const a = Object.assign(document.createElement('a'), {
-      href: URL.createObjectURL(blob),
-      download: `dart_fs_${year}_${new Date().toISOString().slice(0,10)}.zip`,
-    });
-    a.click();
+  // 요약 시트 (첫 번째)
+  const sumHdr = lang === 'ko'
+    ? ['번호','회사명','종목코드','상장구분','대표자','업종','설립일','결산월','고유번호','재무제표']
+    : ['#','Company','Ticker','Listed','CEO','Industry','Founded','FY Month','Corp Code','FS'];
+  const sumData = [sumHdr, ...fetched.map(({d, fsList}, idx) => [
+    idx + 1, d.corp_name||'', d.stock_code||'',
+    t('cls_'+(d.corp_cls||'E'))||d.corp_cls||'',
+    d.ceo_nm||'', indutyName(d.induty_code),
+    fmtDate(d.est_dt), fmtAccMt(d.acc_mt), d.corp_code||'',
+    fsList ? (lang==='ko'?'있음':'Available') : (lang==='ko'?'없음':'N/A'),
+  ])];
+  const sumWs = XLSX.utils.aoa_to_sheet(sumData);
+  sumWs['!cols'] = [{wch:4},{wch:18},{wch:8},{wch:10},{wch:14},{wch:18},{wch:12},{wch:8},{wch:12},{wch:8}];
+  XLSX.utils.book_append_sheet(wb, sumWs, lang === 'ko' ? '요약' : 'Summary');
+
+  // 개별 시트 (회사별)
+  const usedNames = new Set([lang==='ko'?'요약':'Summary']);
+  for (const {d, fsList} of fetched) {
+    if (!fsList) { fail++; continue; }
+    const aoa = buildCorpSheetAoa(d, fsList, year, fsDiv);
+    const ws  = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [{wch:30},{wch:16},{wch:16},{wch:16},{wch:16},{wch:14}];
+    setIntegerFormat(ws);
+    let nm = (d.corp_name||'corp').replace(/[\\/:*?"[\]]/g,'_').slice(0, 28);
+    let final = nm, sfx = 1;
+    while (usedNames.has(final)) { final = nm.slice(0, 25) + '_' + sfx++; }
+    usedNames.add(final);
+    XLSX.utils.book_append_sheet(wb, ws, final);
+    ok++;
   }
 
+  if (progFill) progFill.style.width = '100%';
+  if (progInfo) progInfo.textContent = t('bulk_dl_done').replace('{ok}', ok).replace('{fail}', fail);
+
+  if (ok > 0) {
+    XLSX.writeFile(wb, `dart_fs_bulk_${year}_${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
   if (btn) btn.disabled = false;
+  setTimeout(() => { if (progWrap) progWrap.style.display = 'none'; }, 3000);
+}
+
+/* ── 회사별 재무제표 AOA 생성 (다건 xlsx 개별 시트용) ── */
+function buildCorpSheetAoa(d, list, year, fsDiv) {
+  const fsDivNm = fsDiv === 'CFS' ? '연결재무제표' : '별도재무제표';
+  const first   = list[0] || {};
+  const colCur  = first.thstrm_nm    || (year + ' 당기');
+  const colPrev = first.frmtrm_nm    || ((+year - 1) + ' 전기');
+  const colPP   = first.bfefrmtrm_nm || ((+year - 2) + ' 전전기');
+  const hasPP   = list.some(r => r.bfefrmtrm_amount?.trim() && r.bfefrmtrm_amount.trim() !== '-');
+  const currency = first.currency || 'KRW';
+  const unitNote = currency === 'KRW' ? '(단위: 백만원)' : '(Unit: ' + currency + ')';
+
+  const rows = [];
+  rows.push([d.corp_name||'', d.stock_code||'', t('cls_'+(d.corp_cls||'E'))||d.corp_cls||'', year+'년', fsDivNm, unitNote]);
+  rows.push(['대표자: '+(d.ceo_nm||'-'), '설립일: '+fmtDate(d.est_dt), '결산월: '+fmtAccMt(d.acc_mt), '', '', '']);
+  rows.push(['출처: DART 금융감독원 전자공시시스템', '', '', '', '조회일: '+new Date().toLocaleDateString('ko-KR'), '']);
+  rows.push([]);
+
+  const ORDER = ['BS','IS','CIS','CF','SCE'];
+  const SNMS  = {BS:'재무상태표',IS:'손익계산서',CIS:'포괄손익계산서',CF:'현금흐름표',SCE:'자본변동표'};
+  const groups = {};
+  for (const r of list) {
+    if (!groups[r.sj_div]) groups[r.sj_div] = {rows:[]};
+    groups[r.sj_div].rows.push(r);
+  }
+  const divs = [...ORDER.filter(x => groups[x]), ...Object.keys(groups).filter(x => !ORDER.includes(x))];
+
+  for (const div of divs) {
+    const grp   = groups[div];
+    const sjNm  = (t('fs_sj')||{})[div] || div;
+    const isSCE = div === 'SCE';
+    rows.push([`── ${sjNm} (${div}) ──`]);
+    if (isSCE) {
+      rows.push(['계정과목', '자본구성요소', colCur, colPrev, ...(hasPP ? [colPP] : [])]);
+      for (const r of grp.rows) {
+        const nm  = cleanXbrlLabel(r.account_nm.trim());
+        const det = cleanXbrlLabel((r.account_detail||'').trim());
+        const eq  = (det && det !== '-') ? det.replace(/^자본\s*\|?\s*/, '') : '';
+        rows.push([nm, eq, parseFsAmount(r.thstrm_amount), parseFsAmount(r.frmtrm_amount), ...(hasPP ? [parseFsAmount(r.bfefrmtrm_amount)] : [])]);
+      }
+    } else {
+      rows.push(['계정과목', colCur, colPrev, ...(hasPP ? [colPP] : [])]);
+      for (const r of grp.rows) {
+        rows.push([cleanXbrlLabel(r.account_nm.trim()), parseFsAmount(r.thstrm_amount), parseFsAmount(r.frmtrm_amount), ...(hasPP ? [parseFsAmount(r.bfefrmtrm_amount)] : [])]);
+      }
+    }
+    rows.push([]);
+  }
+  return rows;
 }
 
 /* ── 기업 재무제표 Excel 워크북 생성 (DART API 호출) ── */

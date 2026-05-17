@@ -239,16 +239,62 @@ synology-web/
 
 ### 브라우저 캐시 버스팅 패턴
 
-허브(`index.html`)는 컨설팅 페이지를 iframe으로 로드한다.  
-배포 시 버전이 바뀌면 iframe URL에 `?v=HUB_VERSION`이 붙어 브라우저가 새 리소스로 인식한다.
+**왜 필요한가**: Cloudflare 퍼지는 Edge 캐시만 지운다. 브라우저 로컬 캐시는 URL이 달라야 만료된다.  
+NAS nginx가 HTML 파일에 `Cache-Control` 헤더를 보내지 않으면 브라우저는 `Last-Modified` 기반 휴리스틱 캐시를 사용하며, 이 경우 배포 후에도 구버전이 서빙될 수 있다.
+
+#### 레이어 1 — 허브 → 컨설팅 페이지
+
+`index.html`은 컨설팅 페이지를 iframe으로 로드할 때 `?v=HUB_VERSION`을 붙인다.  
+매 배포마다 버전이 올라가므로 consulting/*.html은 항상 새 URL을 받는다.
 
 ```javascript
-// index.html 내부 — iframe 로드 시점
+// index.html 내부
 iframe.src = src + '?v=' + HUB_VERSION;
 ```
 
-- **왜 필요한가**: Cloudflare 퍼지는 Edge 캐시만 지운다. 브라우저 로컬 캐시는 URL이 달라야 만료된다.
-- **효과**: 매 배포마다 `?v=` 값이 달라지므로 사용자가 강제 새로고침 없이도 최신 콘텐츠를 받는다.
+#### 레이어 2 — 컨설팅 페이지 → 하위 HTML 파일 (플라이어 등)
+
+컨설팅 페이지가 추가 HTML 파일을 로드하는 경우(예: `consulting/ceo/` → 플라이어 모달), 그 페이지도 캐시 버스팅이 필요하다.  
+허브가 전달한 `?v=` 값을 재사용하고, 직접 접근 시에는 `Date.now()`로 대체한다.
+
+```javascript
+// consulting/ceo/index.html 등 — 하위 HTML을 로드하는 컨설팅 페이지에 반드시 추가
+const _FV = new URLSearchParams(location.search).get('v') || Date.now();
+
+// 썸네일 iframe들 캐시 버스팅 (페이지 로드 시 1회)
+document.querySelectorAll('.flyer-thumb iframe').forEach(function(f){
+  var s = f.getAttribute('src');
+  if(s) f.src = s + '?v=' + _FV;
+});
+
+// 모달 iframe 열기 시
+function openFlyer(src) {
+  document.getElementById('flyer-modal-iframe').src = 'flyers/' + src + '?v=' + _FV;
+  ...
+}
+```
+
+#### 레이어 3 — nginx HTML no-cache (서버 측, 1회 DSM 설정)
+
+NAS nginx가 HTML 파일에 `Cache-Control: no-cache, no-store, must-revalidate`를 보내면 브라우저가 항상 서버에 재검증 요청을 보낸다. `?v=` 파라미터 없이도 최신 HTML이 서빙된다.
+
+`nginx-wfhub.conf`에 설정이 이미 작성돼 있다. **DSM → 웹 스테이션 → 가상 호스트 → 각 환경(test/staging/portal) → 사용자 설정 → 사용자 nginx 설정**에 아래 블록을 추가하면 적용된다.
+
+```nginx
+# HTML은 항상 재검증 (브라우저 휴리스틱 캐시 방지)
+location ~* \.html$ {
+    add_header Cache-Control "no-cache, no-store, must-revalidate";
+    add_header Pragma "no-cache";
+    add_header Expires "0";
+}
+# 정적 자산은 캐시 (7일)
+location ~* \.(js|css|png|jpg|svg|ico|woff2?)$ {
+    expires 7d;
+    add_header Cache-Control "public";
+}
+```
+
+> **레이어 1·2로 대부분의 케이스는 커버된다. 레이어 3은 안전망(defense in depth).**
 
 ## 버전 규칙 (웹 전용)
 

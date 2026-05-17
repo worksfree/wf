@@ -13,10 +13,16 @@
 $OutputEncoding          = [System.Text.Encoding]::UTF8
 chcp 65001 | Out-Null
 
+# bat 래퍼(deploy.bat)로 실행됐는지 감지 — bat는 cmd.exe가 새 powershell.exe를 생성하므로 부모 프로세스가 cmd
+$fromBat = try {
+    $parentId = (Get-CimInstance -ClassName Win32_Process -Filter "ProcessId = $PID").ParentProcessId
+    (Get-Process -Id $parentId -ErrorAction Stop).Name -like 'cmd'
+} catch { $false }
+
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.7.5.7"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.7.5.24"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -27,7 +33,7 @@ $TARGETS = @{
 }
 
 # 배포 제외 목록
-$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log",".git","node_modules","*.sh")
+$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log",".git","node_modules","*.sh",".claude","test-results","playwright-report")
 # ────────────────────────────────────────────────────────────────
 
 # 배포 환경 선택 후 증가하므로, 여기서는 현재값 저장만
@@ -52,7 +58,7 @@ if (-not (Get-Command scp -ErrorAction SilentlyContinue)) {
     Write-Host "  [오류] OpenSSH 클라이언트가 없습니다." -ForegroundColor Red
     Write-Host "  Windows 설정 → 앱 → 선택적 기능 → OpenSSH 클라이언트 추가" -ForegroundColor Yellow
     Write-Host ""
-    Read-Host "  Enter 키로 종료"
+    if ($fromBat) { Read-Host "  Enter 키로 종료" }
     exit 1
 }
 
@@ -85,7 +91,7 @@ if ($choice -match "^[Rr]$") {
     $envChoice = Read-Host "  선택"
     if (-not $TARGETS.ContainsKey($envChoice)) {
         Write-Host "  [오류] 잘못된 선택." -ForegroundColor Red
-        Read-Host "  Enter 키로 종료"; exit 1
+        if ($fromBat) { Read-Host "  Enter 키로 종료" }; exit 1
     }
     $T = $TARGETS[$envChoice]
     $listCmd = "ls -t '${BACKUP_ROOT}/$($T.Name)' 2>/dev/null"
@@ -93,7 +99,7 @@ if ($choice -match "^[Rr]$") {
     $backupList = @($backups | Where-Object { $_ -match '\S' })
     if ($backupList.Count -eq 0) {
         Write-Host "`n  백업이 없습니다. 한 번이라도 배포해야 백업이 생성됩니다." -ForegroundColor Red
-        Read-Host "  Enter 키로 종료"; exit 1
+        if ($fromBat) { Read-Host "  Enter 키로 종료" }; exit 1
     }
     Write-Host "`n  복원 가능한 백업 ($($T.Name)):" -ForegroundColor White
     for ($i = 0; $i -lt $backupList.Count; $i++) {
@@ -105,14 +111,14 @@ if ($choice -match "^[Rr]$") {
     if ([string]::IsNullOrWhiteSpace($pick)) { $pick = "1" }
     $idx = [int]$pick - 1
     if ($idx -lt 0 -or $idx -ge $backupList.Count) {
-        Write-Host "  잘못된 번호." -ForegroundColor Red; Read-Host "  Enter 키로 종료"; exit 1
+        Write-Host "  잘못된 번호." -ForegroundColor Red; if ($fromBat) { Read-Host "  Enter 키로 종료" }; exit 1
     }
     $selected    = $backupList[$idx]
     $restoreSrc  = "${BACKUP_ROOT}/$($T.Name)/${selected}"
     Write-Host "`n  ⚠️  [$($T.Name)] 을(를) 아래 버전으로 복원합니다:" -ForegroundColor Yellow
     Write-Host "     $selected" -ForegroundColor White
     $confirm = Read-Host "  계속하려면 'yes' 입력"
-    if ($confirm -ne "yes") { Write-Host "`n  취소됨." -ForegroundColor Gray; Read-Host "  Enter 키로 종료"; exit 0 }
+    if ($confirm -ne "yes") { Write-Host "`n  취소됨." -ForegroundColor Gray; if ($fromBat) { Read-Host "  Enter 키로 종료" }; exit 0 }
     Write-Host "`n  ▶ 복원 중..." -ForegroundColor Yellow
     $restoreCmd = "rm -rf '$($T.Path)' && cp -r '${restoreSrc}' '$($T.Path)' && echo OK"
     $restoreResult = & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} `"$restoreCmd`"" 2>&1
@@ -122,13 +128,13 @@ if ($choice -match "^[Rr]$") {
         Write-Host "  ❌ 롤백 실패" -ForegroundColor Red
         Write-Host $restoreResult -ForegroundColor DarkRed
     }
-    Read-Host "`n  Enter 키로 종료"; exit 0
+    if ($fromBat) { Read-Host "`n  Enter 키로 종료" }; exit 0
 }
 # ─────────────────────────────────────────────────────────────────
 
 if (-not $TARGETS.ContainsKey($choice)) {
     Write-Host "`n  [오류] 잘못된 선택." -ForegroundColor Red
-    Read-Host "  Enter 키로 종료"; exit 1
+    if ($fromBat) { Read-Host "  Enter 키로 종료" }; exit 1
 }
 
 # ── 버전 자동 증가 (환경별: test·g1=4번째 0-99, staging=3번째, portal=2번째) ──
@@ -242,15 +248,24 @@ if (Test-Path $gitBash) {
     $excludeFlags = if ($isSubDir) { "" } else {
         "--exclude='deploy.ps1' --exclude='deploy.bat' " +
         "--exclude='*.log' --exclude='*.sh' " +
-        "--exclude='.git' --exclude='node_modules' --exclude='.vscode' "
+        "--exclude='.git' --exclude='node_modules' --exclude='.vscode' " +
+        "--exclude='.claude' --exclude='test-results' --exclude='playwright-report' "
     }
-    $bashCmd = "cd '$posixLocal' && tar -czf - ${excludeFlags}" +
-               ". | ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} " +
-               "'tar -xzf - -C ${remotePath}/ --no-same-permissions --no-same-owner 2>/dev/null; exit 0'"
+    # set -o pipefail: local tar 실패(클라우드 파일 읽기 오류 등)를 exit code로 전파
+    # echo TAR_EXIT:$?: remote tar 결과를 명시적으로 출력 (exit 0 마스킹 제거)
+    $bashCmd = "set -o pipefail; cd '$posixLocal' && tar -czf - ${excludeFlags}" +
+               ". | ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} " +
+               "'tar -xzf - -C ${remotePath}/ --no-same-permissions --no-same-owner 2>&1; echo TAR_EXIT:`$?'"
 
     Write-Host "  (Git Bash tar+SSH — cloud-only 파일 포함 전체 전송)" -ForegroundColor Gray
-    $result = & $gitBash -c $bashCmd 2>&1
-    $ok     = ($LASTEXITCODE -eq 0)
+    $result    = & $gitBash -c $bashCmd 2>&1
+    $resultStr = ($result -join "`n")
+    # "Cannot change mode" / "Exiting with failure": NAS 웹 루트 디렉터리 소유자가
+    # wfadmin이 아닐 때 발생하는 무해한 권한 복원 실패 — 파일 추출은 정상 완료됨
+    # PS 쪽에서 필터링 (bash 쪽 grep "..." 사용 시 PS→bash 인자 전달 quoting 파괴됨)
+    $meaningfulLines = $result | Where-Object { $_ -notmatch 'Cannot change mode|Exiting with failure' }
+    $hasTarErrors    = ($meaningfulLines | Where-Object { $_ -match '^tar:' }).Count -gt 0
+    $ok = ($LASTEXITCODE -eq 0) -and ($resultStr -match 'TAR_EXIT:[012]') -and -not $hasTarErrors
 } else {
     Write-Host "  ⚠ Git Bash 미설치 — Windows scp 사용 (클라우드 파일 누락 위험)" -ForegroundColor DarkYellow
     $scpArgs = @("-r", "-O", "-o", "StrictHostKeyChecking=no", $sourcePath, "${NAS_USER}@${NAS_IP}:$($T.Path)/")
@@ -278,19 +293,25 @@ if ($ok) {
     Write-Host "  ▶ NAS 파일 검증 중..." -ForegroundColor Gray
     $tPath = $T.Path
     if ($isSubDir) {
-        $remoteCheck = "echo '[배포경로] $tPath'; " +
-                       "ls -la $tPath/index.html 2>&1; " +
-                       "test -f $tPath/index.html && echo '[결과] index.html 확인 OK' || echo '[결과] index.html 없음 — 전송 실패'"
+        $f1 = "$tPath/index.html"
+        $remoteCheck = "test -f '$f1' && echo 'OK: $f1' || echo 'FAIL: $f1'; " +
+                       "test -d '$tPath/.claude' && echo 'WARN: .claude_exists' || echo 'OK: no_claude'"
     } else {
-        $remoteCheck = "echo '[배포경로] $tPath'; " +
-                       "ls -la $tPath/index.html $tPath/consulting/ 2>&1; " +
-                       "test -f $tPath/index.html && echo '[결과] index.html 확인 OK' || echo '[결과] index.html 없음 — 전송 실패'"
+        $f1 = "$tPath/index.html"
+        $f2 = "$tPath/consulting/dart/index.html"
+        $f3 = "$tPath/consulting/ceo/flyers/flyer-ceo.html"
+        $remoteCheck = "test -f '$f1' && echo 'OK: $f1' || echo 'FAIL: $f1'; " +
+                       "test -f '$f2' && echo 'OK: $f2' || echo 'FAIL: $f2'; " +
+                       "test -f '$f3' && echo 'OK: $f3' || echo 'FAIL: $f3'; " +
+                       "test -d '$tPath/.claude' && echo 'WARN: .claude_exists' || echo 'OK: no_claude'"
     }
-    $verifyResult = & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} ""$remoteCheck""" 2>&1
+    $verifyResult = & $gitBash -c "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} ""$remoteCheck""" 2>&1
     Write-Host $verifyResult -ForegroundColor DarkCyan
-    # index.html 없으면 실제 전송 실패로 재판정
-    if ($verifyResult -match "전송 실패") {
-        Write-Host "  ⚠️  NAS에 파일이 없습니다. 전송을 다시 시도하세요." -ForegroundColor Red
+    if ($verifyResult -match 'FAIL:') {
+        Write-Host "  ⚠️  일부 파일 전송 실패. 배포를 다시 시도하세요." -ForegroundColor Red
+    }
+    if ($verifyResult -match 'WARN:') {
+        Write-Host "  ⚠️  .claude 폴더가 NAS에 남아있습니다. 수동으로 삭제하세요." -ForegroundColor Yellow
     }
 
     # ── Cloudflare 캐시 퍼지 ────────────────────────────────────────
@@ -330,4 +351,4 @@ if ($ok) {
 }
 
 Write-Host ""
-Read-Host "  Enter 키로 종료"
+if ($fromBat) { Read-Host "  Enter 키로 종료" }

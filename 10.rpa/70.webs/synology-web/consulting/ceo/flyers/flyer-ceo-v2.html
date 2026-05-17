@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>중대재해 트렌드 전단지 v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#111;
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh; padding:20px;
+  font-family:'Noto Sans KR', sans-serif;
+}
+.a4 {
+  width:794px; min-height:1123px;
+  background:#f5f0e8;
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  box-shadow:0 0 80px rgba(0,0,0,0.6);
+}
+
+/* 상단 진한 네이비 블록 */
+.top-block {
+  background:#0d1b2a;
+  padding:40px 48px 32px;
+  position:relative;
+  overflow:hidden;
+}
+.top-block::after {
+  content:'';
+  position:absolute;
+  bottom:-24px; left:0; right:0;
+  height:48px;
+  background:#f5f0e8;
+  clip-path: polygon(0 100%, 100% 0%, 100% 100%);
+  z-index:2;
+}
+.top-block::before {
+  content:'2025';
+  position:absolute;
+  right:40px; top:16px;
+  font-size:110px; font-weight:900;
+  color:rgba(255,255,255,0.04);
+  font-family:'Noto Serif KR', serif;
+  line-height:1;
+}
+
+.tag-line {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(220,50,50,0.2);
+  border:1px solid rgba(220,50,50,0.5);
+  padding:5px 14px;
+  margin-bottom:18px;
+}
+.tag-line span {
+  color:#ff6b6b; font-size:11px; font-weight:700; letter-spacing:3px;
+}
+
+.headline {
+  font-family:'Noto Serif KR', serif;
+  font-size:48px; font-weight:900;
+  color:#ffffff; line-height:1.15;
+  margin-bottom:12px; letter-spacing:-1px;
+}
+.headline em {
+  color:#ff4444; font-style:normal;
+  border-bottom:3px solid #ff4444;
+}
+
+.sub-headline {
+  font-size:15.5px; color:rgba(255,255,255,0.65);
+  font-weight:300; line-height:1.6;
+  margin-bottom:6px;
+}
+
+/* 메인 콘텐츠 */
+.content {
+  padding:44px 48px 32px;
+  flex:1; display:flex; flex-direction:column; gap:22px;
+}
+
+/* 큰 숫자 스탯 3개 */
+.stats-row {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;
+}
+.stat-box {
+  background:#0d1b2a;
+  padding:20px 18px;
+  position:relative;
+  overflow:hidden;
+}
+.stat-box::before {
+  content:'';
+  position:absolute; top:0; left:0;
+  width:3px; height:100%;
+  background:#ff4444;
+}
+.stat-box .big-num {
+  font-family:'Noto Serif KR', serif;
+  font-size:40px; font-weight:900;
+  color:#ffffff; line-height:1;
+  margin-bottom:5px;
+}
+.stat-box .big-num span { font-size:20px; color:#ff4444; }
+.stat-box .label {
+  font-size:11.5px; color:rgba(255,255,255,0.5);
+  line-height:1.5; letter-spacing:0.5px;
+}
+.stat-box .change {
+  margin-top:7px;
+  font-size:10.5px; font-weight:700;
+  color:#ff6b6b; letter-spacing:1px;
+}
+
+/* 산재 vs 민사배상 격차 박스 (신규) */
+.gap-box {
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.1);
+  border-top:3px solid #ff4444;
+  padding:20px 22px;
+}
+.gap-box-title {
+  font-size:11px; font-weight:700; letter-spacing:2px;
+  color:#0d1b2a; margin-bottom:16px;
+  display:flex; align-items:center; gap:10px;
+}
+.gap-box-title::before {
+  content:''; width:16px; height:2px; background:#ff4444; flex-shrink:0;
+}
+.gap-case {
+  margin-bottom:12px;
+}
+.gap-case-label {
+  font-size:10px; font-weight:700; color:rgba(0,0,0,0.45);
+  letter-spacing:2px; margin-bottom:8px;
+}
+.gap-row {
+  display:flex; gap:0; align-items:stretch;
+}
+.gap-col {
+  flex:1; padding:12px 14px;
+  display:flex; flex-direction:column; gap:3px;
+}
+.gap-col:first-child {
+  background:#f0f4f8;
+  border:1px solid rgba(0,0,0,0.08);
+}
+.gap-col.middle {
+  background:#e8f0f8;
+  border:1px solid rgba(0,0,0,0.08);
+}
+.gap-col.result {
+  background:#0d1b2a;
+  border:none;
+  position:relative;
+}
+.gap-arrow {
+  display:flex; align-items:center; justify-content:center;
+  padding:0 8px;
+  font-size:14px; color:#cc0000; font-weight:700;
+  flex-shrink:0;
+}
+.gap-col .gc-label {
+  font-size:9.5px; color:rgba(0,0,0,0.45); letter-spacing:1px;
+}
+.gap-col.result .gc-label { color:rgba(255,255,255,0.5); }
+.gap-col .gc-num {
+  font-family:'Noto Serif KR', serif;
+  font-size:18px; font-weight:700; color:#0d1b2a; line-height:1.1;
+}
+.gap-col.result .gc-num { color:#ff4444; font-size:20px; }
+.gap-col .gc-sub {
+  font-size:10px; color:rgba(0,0,0,0.4); line-height:1.4;
+}
+.gap-col.result .gc-sub { color:rgba(255,255,255,0.45); }
+.gap-note {
+  margin-top:10px;
+  font-size:10px; color:rgba(0,0,0,0.35); line-height:1.5;
+}
+.gap-divider {
+  height:1px; background:rgba(0,0,0,0.07); margin:10px 0;
+}
+
+/* 구분 타이틀 */
+.section-title {
+  display:flex; align-items:center; gap:12px;
+}
+.section-title .bar { width:4px; height:20px; background:#0d1b2a; flex-shrink:0; }
+.section-title span {
+  font-size:13px; font-weight:700; color:#0d1b2a; letter-spacing:2px;
+}
+
+/* 타임라인 기소 증가 */
+.timeline {
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.1);
+  padding:20px 22px;
+}
+.timeline-title {
+  font-size:12.5px; font-weight:700; color:#0d1b2a;
+  letter-spacing:1px; margin-bottom:14px;
+  display:flex; align-items:center; gap:10px;
+}
+.timeline-title::before {
+  content:''; width:18px; height:2px; background:#ff4444;
+}
+.bar-chart {
+  display:flex; align-items:flex-end; gap:8px; height:72px;
+}
+.bar-item {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;
+}
+.bar-fill {
+  width:100%;
+  background:linear-gradient(to top, #0d1b2a, #1e3a5f);
+  border-radius:2px 2px 0 0;
+  position:relative;
+  display:flex; align-items:flex-start; justify-content:center;
+}
+.bar-fill.highlight {
+  background:linear-gradient(to top, #cc0000, #ff4444);
+}
+.bar-fill .val {
+  position:absolute; top:-18px;
+  font-size:11.5px; font-weight:900; color:#0d1b2a;
+  white-space:nowrap;
+}
+.bar-fill.highlight .val { color:#cc0000; }
+.bar-label {
+  font-size:10.5px; color:rgba(0,0,0,0.5);
+}
+
+/* 가입률 대비 박스 + 처벌 수위 2열 */
+.bottom-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:14px;
+}
+
+/* 가입률 대비 박스 */
+.compare-box {
+  display:flex; flex-direction:column; gap:0;
+  border:1px solid rgba(0,0,0,0.12);
+}
+.compare-item {
+  padding:16px 20px;
+  position:relative;
+}
+.compare-item:first-child {
+  background:#0d1b2a;
+}
+.compare-item:last-child {
+  background:#fff;
+  border-left:3px solid #ff4444;
+}
+.compare-item .c-label {
+  font-size:10px; letter-spacing:2px; margin-bottom:8px;
+}
+.compare-item:first-child .c-label { color:rgba(255,255,255,0.5); }
+.compare-item:last-child .c-label { color:rgba(0,0,0,0.4); }
+.compare-item .c-num {
+  font-family:'Noto Serif KR', serif;
+  font-size:36px; font-weight:900; line-height:1;
+  margin-bottom:6px;
+}
+.compare-item:first-child .c-num { color:#fff; }
+.compare-item:last-child .c-num { color:#cc0000; }
+.compare-item .c-desc {
+  font-size:11.5px; line-height:1.5;
+}
+.compare-item:first-child .c-desc { color:rgba(255,255,255,0.6); }
+.compare-item:last-child .c-desc { color:rgba(0,0,0,0.6); }
+.vs-badge {
+  text-align:center; padding:5px 0;
+  font-size:9px; font-weight:700; color:rgba(0,0,0,0.25);
+  letter-spacing:3px; background:#f0ead8;
+}
+
+/* 처벌수위 상세 박스 (신규) */
+.penalty-box {
+  background:#0d1b2a;
+  padding:18px 20px;
+  display:flex; flex-direction:column; gap:10px;
+}
+.penalty-box-title {
+  font-size:10px; font-weight:700; letter-spacing:2px;
+  color:#ff6b6b;
+}
+.penalty-item {
+  display:flex; gap:12px; align-items:flex-start;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding-bottom:10px;
+}
+.penalty-item:last-child { border-bottom:none; padding-bottom:0; }
+.penalty-num {
+  width:20px; height:20px; background:#ff4444;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:700; color:#fff; flex-shrink:0;
+}
+.penalty-text .pt-title {
+  font-size:12.5px; font-weight:700; color:#fff; margin-bottom:2px;
+}
+.penalty-text .pt-desc {
+  font-size:11px; color:rgba(255,255,255,0.45); line-height:1.4;
+}
+.penalty-text .pt-amount {
+  font-size:12px; font-weight:700; color:#ff6b6b; margin-top:2px;
+}
+
+/* 핵심 메시지 강조 박스 */
+.message-box {
+  background:#0d1b2a;
+  padding:24px 30px;
+  position:relative; overflow:hidden;
+  border-left:5px solid #ff4444;
+}
+.message-box::after {
+  content:'"';
+  position:absolute; right:22px; bottom:-28px;
+  font-size:160px; color:rgba(255,255,255,0.04);
+  font-family:'Noto Serif KR', serif; line-height:1;
+}
+.message-box p {
+  font-family:'Noto Serif KR', serif;
+  font-size:20px; font-weight:700;
+  color:#fff; line-height:1.6;
+  position:relative; z-index:1;
+}
+.message-box p em {
+  color:#ff4444; font-style:normal;
+}
+.message-box .source {
+  margin-top:8px; font-size:10.5px;
+  color:rgba(255,255,255,0.35); letter-spacing:1px;
+}
+
+/* CTA 하단 */
+.cta-bar {
+  background:#ff4444;
+  padding:18px 48px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.cta-bar .cta-left p {
+  font-size:11px; color:rgba(255,255,255,0.7); letter-spacing:1px; margin-bottom:3px;
+}
+.cta-bar .cta-left strong {
+  font-size:19px; color:#fff; font-weight:900;
+}
+.cta-bar .cta-right {
+  background:#fff;
+  padding:11px 26px;
+  font-size:14px; font-weight:700; color:#cc0000;
+  letter-spacing:1px; cursor:pointer;
+}
+
+.footer2 {
+  background:#0d1b2a;
+  padding:11px 48px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.footer2 span { font-size:10px; color:rgba(255,255,255,0.25); letter-spacing:1px; }
+</style>
+</head>
+<body>
+<div class="a4">
+
+  <!-- 상단 블록 -->
+  <div class="top-block">
+    <div class="tag-line"><span>▶ 2025 TREND REPORT — CEO RISK DATA</span></div>
+    <div class="headline">
+      아는 대표는<br>
+      이미 <em>다 했습니다.</em>
+    </div>
+    <div class="sub-headline">
+      중대재해 기소 건수 매년 2배 증가 · 유죄율 89.3% · 상장사 70% 이미 임원보험 가입<br>
+      지금 이 순간도, 경쟁사 대표는 보험으로 리스크를 관리하고 있습니다.
+    </div>
+  </div>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="content">
+
+    <!-- 3대 핵심 수치 -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="big-num">887<span>건</span></div>
+        <div class="label">법 시행 3년간<br>중대산업재해 발생 건수</div>
+        <div class="change">▲ 2024년 단독 436건 (전년比 82%↑)</div>
+      </div>
+      <div class="stat-box">
+        <div class="big-num">121<span>건</span></div>
+        <div class="label">CEO·경영책임자<br>기소 누적 건수</div>
+        <div class="change">▲ 유죄율 89.3% · 2025 상반기 47건</div>
+      </div>
+      <div class="stat-box">
+        <div class="big-num">70<span>%</span></div>
+        <div class="label">국내 상장 기업<br>임원보험 가입률</div>
+        <div class="change">▲ 중소기업 가입률 0.008%에 불과</div>
+      </div>
+    </div>
+
+    <!-- 산재 vs 민사배상 격차 (신규 추가) -->
+    <div class="gap-box">
+      <div class="gap-box-title">산재보험의 함정 — 사고 1건 시 회사의 실제 부담액</div>
+      <div class="gap-case">
+        <div class="gap-case-label">CASE 1 · 사망 사고</div>
+        <div class="gap-row">
+          <div class="gap-col">
+            <div class="gc-label">산재보험 지급액</div>
+            <div class="gc-num">1억 2,006만원</div>
+            <div class="gc-sub">근로복지공단 지급</div>
+          </div>
+          <div class="gap-arrow">→</div>
+          <div class="gap-col middle">
+            <div class="gc-label">민사 배상 청구액</div>
+            <div class="gc-num">4억 1,278만원</div>
+            <div class="gc-sub">법원 판결 기준</div>
+          </div>
+          <div class="gap-arrow">→</div>
+          <div class="gap-col result">
+            <div class="gc-label">회사 추가 부담</div>
+            <div class="gc-num">2억 9,272만원</div>
+            <div class="gc-sub">산재보험 초과 민사부담</div>
+          </div>
+        </div>
+      </div>
+      <div class="gap-divider"></div>
+      <div class="gap-case">
+        <div class="gap-case-label">CASE 2 · 장해 7급 (재해 후 복귀)</div>
+        <div class="gap-row">
+          <div class="gap-col">
+            <div class="gc-label">산재보험 지급액</div>
+            <div class="gc-num">5,133만원</div>
+            <div class="gc-sub">근로복지공단 지급</div>
+          </div>
+          <div class="gap-arrow">→</div>
+          <div class="gap-col middle">
+            <div class="gc-label">민사 배상 청구액</div>
+            <div class="gc-num">3억 4,511만원</div>
+            <div class="gc-sub">법원 판결 기준</div>
+          </div>
+          <div class="gap-arrow">→</div>
+          <div class="gap-col result">
+            <div class="gc-label">회사 추가 부담</div>
+            <div class="gc-num">2억 9,377만원</div>
+            <div class="gc-sub">산재보험 초과 민사부담</div>
+          </div>
+        </div>
+      </div>
+      <div class="gap-note">※ 가정: 30세 근로자 · 월급여 250만원 · 회사정년 55세 · 근로자 과실 20% / 출처: 삼성생명 보험연구소<br>
+      ※ 중대재해처벌법 적용 시 손해배상액의 최대 5배까지 징벌적 배상 청구 가능 (실제 부담 최대 14억 이상)</div>
+    </div>
+
+    <!-- 기소 건수 차트 + 처벌수위 상세 -->
+    <div class="bottom-grid">
+
+      <!-- 기소 건수 차트 -->
+      <div class="timeline">
+        <div class="timeline-title">연도별 기소 건수 — 매년 2배 증가</div>
+        <div class="bar-chart">
+          <div class="bar-item">
+            <div class="bar-fill" style="height:22%"><span class="val">11</span></div>
+            <div class="bar-label">2022</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill" style="height:44%"><span class="val">22</span></div>
+            <div class="bar-label">2023</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill" style="height:82%"><span class="val">41</span></div>
+            <div class="bar-label">2024</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill highlight" style="height:96%"><span class="val">47건↑</span></div>
+            <div class="bar-label" style="color:#cc0000;font-weight:700">25 상반기</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:10.5px;color:rgba(0,0,0,0.4);line-height:1.5">
+          ※ 2025 상반기만 47건 — 전년(41건) 이미 초과<br>
+          출처: 매일노동뉴스 전수조사(2025.08)
+        </div>
+      </div>
+
+      <!-- 처벌 수위 상세 (신규 추가) -->
+      <div class="penalty-box">
+        <div class="penalty-box-title">중대재해처벌법 — 처벌 수위</div>
+        <div class="penalty-item">
+          <div class="penalty-num">1</div>
+          <div class="penalty-text">
+            <div class="pt-title">대표이사 형사처벌</div>
+            <div class="pt-amount">1년 이상 징역 / 10억원 이하 벌금</div>
+            <div class="pt-desc">CSO가 있어도 무조건 경영책임자 수사</div>
+          </div>
+        </div>
+        <div class="penalty-item">
+          <div class="penalty-num">2</div>
+          <div class="penalty-text">
+            <div class="pt-title">법인 추가 과징금</div>
+            <div class="pt-amount">최대 50억원 이하 벌금</div>
+            <div class="pt-desc">대표 처벌과 별도로 법인에 부과</div>
+          </div>
+        </div>
+        <div class="penalty-item">
+          <div class="penalty-num">3</div>
+          <div class="penalty-text">
+            <div class="pt-title">징벌적 손해배상</div>
+            <div class="pt-amount">피해액의 최대 5배 배상</div>
+            <div class="pt-desc">고의·중과실 인정 시 민사소송 확대</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상장사 vs 중소기업 대비 -->
+    <div>
+      <div class="section-title" style="margin-bottom:12px">
+        <div class="bar"></div>
+        <span>가입률 현황 — 당신은 어디에 있습니까</span>
+      </div>
+      <div class="compare-box">
+        <div class="compare-item">
+          <div class="c-label">상장 대기업</div>
+          <div class="c-num">70%</div>
+          <div class="c-desc">10곳 중 7곳 이미 임원배상책임보험 가입<br>(2003년 31% → 2023년 70%로 급성장)</div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="compare-item">
+          <div class="c-label">중소기업 (5~49인)</div>
+          <div class="c-num">0.008%</div>
+          <div class="c-desc">전국 83만 7천 개 중소기업 중<br>중대재해 전용보험 가입은 단 64곳</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 핵심 메시지 -->
+    <div class="message-box">
+      <p>
+        대기업 대표는 이미 <em>보험으로 리스크를 관리</em>합니다.<br>
+        중소기업 대표만, 아직 <em>2억 9천만원 부담을 혼자</em> 지고 있습니다.<br>
+        사고는 회사 규모를 가리지 않습니다.
+      </p>
+      <div class="source">출처: 금융감독원, 삼성생명, 고용노동부, 매일노동뉴스 (2024~2025)</div>
+    </div>
+
+  </div>
+
+  <!-- CTA 바 -->
+  <div class="cta-bar">
+    <div class="cta-left">
+      <p>지금 바로 시작하세요</p>
+      <strong>무료 기업리스크 진단 · 맞춤 설계 상담</strong>
+    </div>
+    <div class="cta-right">→ 상담 신청</div>
+  </div>
+
+  <div class="footer2">
+    <span>CORPORATE RISK CONSULTING · GFC</span>
+    <span>본 자료는 공개된 정부·언론·보험사 통계를 기반으로 작성되었습니다. 개인별 상황에 따라 결과가 다를 수 있습니다.</span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -166,6 +166,38 @@ html[lang="en"] .en{display:block;}
     <div class="flyer-name ko">열심히했는데<br>남는 게 없다</div>
     <div class="flyer-name en">Worked Hard,<br>Nothing Left</div>
   </div>
+  <div class="flyer-card" onclick="openFlyer('flyer-ceo-v2.html')">
+    <div class="flyer-thumb">
+      <iframe src="flyers/flyer-ceo-v2.html" scrolling="no" loading="lazy" title="아는 대표는 이미 다했다 v2"></iframe>
+      <div class="flyer-overlay"></div>
+    </div>
+    <div class="flyer-name ko">아는 대표는<br>이미 다했다<br><span style="color:var(--accent);font-size:9px">v2</span></div>
+    <div class="flyer-name en">CEOs Already<br>Know This<br><span style="color:var(--accent);font-size:9px">v2</span></div>
+  </div>
+  <div class="flyer-card" onclick="openFlyer('flyer-safety-all-v2.html')">
+    <div class="flyer-thumb">
+      <iframe src="flyers/flyer-safety-all-v2.html" scrolling="no" loading="lazy" title="안전조치, 그게 전부 v2"></iframe>
+      <div class="flyer-overlay"></div>
+    </div>
+    <div class="flyer-name ko">안전조치,<br>그게 전부?<br><span style="color:var(--accent);font-size:9px">v2</span></div>
+    <div class="flyer-name en">Safety Measures<br>Are Not Enough<br><span style="color:var(--accent);font-size:9px">v2</span></div>
+  </div>
+  <div class="flyer-card" onclick="openFlyer('flyer-safety-only-v2.html')">
+    <div class="flyer-thumb">
+      <iframe src="flyers/flyer-safety-only-v2.html" scrolling="no" loading="lazy" title="안전조치만 했다고 v2"></iframe>
+      <div class="flyer-overlay"></div>
+    </div>
+    <div class="flyer-name ko">안전조치만<br>했다고<br><span style="color:var(--accent);font-size:9px">v2</span></div>
+    <div class="flyer-name en">Just Safety<br>Measures?<br><span style="color:var(--accent);font-size:9px">v2</span></div>
+  </div>
+  <div class="flyer-card" onclick="openFlyer('flyer-hard-work-v2.html')">
+    <div class="flyer-thumb">
+      <iframe src="flyers/flyer-hard-work-v2.html" scrolling="no" loading="lazy" title="열심히했는데 남는게 없다 v2"></iframe>
+      <div class="flyer-overlay"></div>
+    </div>
+    <div class="flyer-name ko">열심히했는데<br>남는 게 없다<br><span style="color:var(--accent);font-size:9px">v2</span></div>
+    <div class="flyer-name en">Worked Hard,<br>Nothing Left<br><span style="color:var(--accent);font-size:9px">v2</span></div>
+  </div>
 </div>
 
 <!-- 헤더 -->
@@ -374,8 +406,17 @@ html[lang="en"] .en{display:block;}
   });
 })();
 
+// 브라우저 캐시에 남은 구버전 플라이어 방지.
+// 허브가 ?v=HUB_VERSION으로 이 페이지를 로드하면 그 버전을 재사용.
+// 직접 접근 시엔 Date.now()로 항상 최신 버전을 받는다.
+const _FV = new URLSearchParams(location.search).get('v') || Date.now();
+document.querySelectorAll('.flyer-thumb iframe').forEach(function(f){
+  var s = f.getAttribute('src');
+  if(s) f.src = s + '?v=' + _FV;
+});
+
 function openFlyer(src) {
-  document.getElementById('flyer-modal-iframe').src = 'flyers/' + src;
+  document.getElementById('flyer-modal-iframe').src = 'flyers/' + src + '?v=' + _FV;
   document.getElementById('flyer-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }

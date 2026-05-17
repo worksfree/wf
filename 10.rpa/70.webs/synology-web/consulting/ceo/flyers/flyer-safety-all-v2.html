@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중대재해처벌법 전단지 v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', sans-serif;
+    padding: 20px;
+  }
+
+  .a4 {
+    width: 794px;
+    min-height: 1123px;
+    background: #0a0a0a;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 80px rgba(220, 30, 30, 0.3);
+  }
+
+  .a4::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.012) 2px,
+        rgba(255,255,255,0.012) 4px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .accent-bar {
+    position: absolute;
+    top: 0; right: 0;
+    width: 220px; height: 100%;
+    background: linear-gradient(135deg, transparent 40%, rgba(180, 10, 10, 0.08) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .urgent-band {
+    background: #cc0000;
+    padding: 10px 44px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .urgent-band .dot {
+    width: 10px; height: 10px;
+    background: white; border-radius: 50%;
+    flex-shrink: 0;
+    animation: blink 1.4s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .urgent-band span {
+    color: white;
+    font-size: 11px; font-weight: 700; letter-spacing: 4px;
+  }
+
+  .urgent-band .year {
+    margin-left: auto;
+    color: rgba(255,255,255,0.7);
+    font-size: 11px; letter-spacing: 2px;
+  }
+
+  .content {
+    padding: 40px 44px 36px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 2;
+  }
+
+  .law-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .law-label .line {
+    width: 28px; height: 2px; background: #cc0000;
+  }
+
+  .law-label span {
+    color: #cc0000;
+    font-size: 12px; font-weight: 700; letter-spacing: 3px;
+  }
+
+  .main-question {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 52px; font-weight: 900;
+    line-height: 1.1;
+    color: #ffffff;
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+
+  .main-question .highlight {
+    color: #cc0000;
+    position: relative;
+    display: inline-block;
+  }
+
+  .main-question .highlight::after {
+    content: '';
+    position: absolute;
+    bottom: 2px; left: 0; right: 0;
+    height: 4px; background: #cc0000; opacity: 0.3;
+  }
+
+  .sub-question {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 28px; font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 28px;
+    line-height: 1.3;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 26px;
+  }
+
+  .divider .line-left {
+    flex: 1; height: 1px;
+    background: linear-gradient(to right, #cc0000, rgba(200,200,200,0.2));
+  }
+
+  .divider .diamond {
+    width: 8px; height: 8px;
+    background: #cc0000;
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  .divider .line-right {
+    flex: 1; height: 1px;
+    background: rgba(200,200,200,0.15);
+  }
+
+  /* 충격 박스 — 법률 조문 강조 */
+  .shock-box {
+    border: 1px solid rgba(204, 0, 0, 0.4);
+    background: rgba(204, 0, 0, 0.07);
+    padding: 20px 26px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .shock-box::before {
+    content: '!';
+    position: absolute;
+    top: -13px; left: 24px;
+    background: #cc0000; color: white;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 900;
+  }
+
+  .shock-box p {
+    color: rgba(255,255,255,0.9);
+    font-size: 14.5px; line-height: 1.7;
+    font-weight: 400;
+  }
+
+  .shock-box strong { color: #ff4444; font-weight: 700; }
+
+  /* 처벌 수위 상세 (신규) */
+  .penalty-detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .pd-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(204,0,0,0.25);
+    border-top: 2px solid #cc0000;
+    padding: 14px 15px;
+    text-align: center;
+  }
+
+  .pd-item .pd-num {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 24px; font-weight: 900;
+    color: #ff4444; line-height: 1; margin-bottom: 4px;
+  }
+
+  .pd-item .pd-unit {
+    font-size: 12px; color: rgba(255,255,255,0.6);
+    font-weight: 700; letter-spacing: 1px;
+  }
+
+  .pd-item .pd-label {
+    font-size: 11px; color: rgba(255,255,255,0.4);
+    margin-top: 6px; line-height: 1.4;
+  }
+
+  /* 리스크 항목들 */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .risk-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-left: 3px solid #cc0000;
+    padding: 15px 17px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .risk-item .number {
+    font-size: 10px; color: #cc0000;
+    font-weight: 700; letter-spacing: 2px;
+  }
+
+  .risk-item .title {
+    font-size: 14px; font-weight: 700; color: white;
+  }
+
+  .risk-item .desc {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+  }
+
+  .risk-item .amount {
+    font-size: 12px; font-weight: 700;
+    color: #ff6b6b; margin-top: 3px;
+  }
+
+  /* 민사배상 계산 예시 (신규) */
+  .calc-example {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 18px 22px;
+    margin-bottom: 22px;
+  }
+
+  .ce-title {
+    font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.4);
+    font-weight: 700; margin-bottom: 14px;
+  }
+
+  .ce-row {
+    display: flex; gap: 8px; align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .ce-label {
+    font-size: 11.5px; color: rgba(255,255,255,0.5);
+    flex: 1;
+  }
+
+  .ce-bar-track {
+    flex: 2; height: 14px;
+    background: rgba(255,255,255,0.06);
+    position: relative;
+  }
+
+  .ce-bar-fill {
+    height: 100%;
+  }
+
+  .ce-bar-fill.blue { background: #1e3a5f; }
+  .ce-bar-fill.gray { background: #666; }
+  .ce-bar-fill.red { background: #cc0000; }
+
+  .ce-value {
+    font-size: 12px; font-weight: 700;
+    color: #fff; min-width: 80px; text-align: right;
+  }
+
+  .ce-value.red { color: #ff4444; }
+
+  .ce-note {
+    margin-top: 10px;
+    font-size: 10px; color: rgba(255,255,255,0.3); line-height: 1.5;
+  }
+
+  /* 핵심 메시지 */
+  .core-message {
+    background: #cc0000;
+    padding: 22px 28px;
+    margin-bottom: 22px;
+    position: relative; overflow: hidden;
+  }
+
+  .core-message::before {
+    content: '"';
+    position: absolute;
+    right: 20px; top: -20px;
+    font-size: 160px;
+    color: rgba(0,0,0,0.15);
+    font-family: 'Noto Serif KR', serif;
+    line-height: 1;
+  }
+
+  .core-message p {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 18px; font-weight: 700;
+    color: white; line-height: 1.6;
+    position: relative; z-index: 1;
+  }
+
+  .core-message .sub {
+    font-size: 12.5px; font-weight: 400;
+    color: rgba(255,255,255,0.8);
+    margin-top: 7px;
+    font-family: 'Noto Sans KR', sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  /* 솔루션 영역 */
+  .solution-area {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .solution-item {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-top: 2px solid #cc0000;
+    padding: 16px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .solution-item .icon { font-size: 24px; margin-bottom: 2px; }
+
+  .solution-item .s-title {
+    font-size: 13px; font-weight: 700; color: white; text-align: center;
+  }
+
+  .solution-item .s-desc {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.5; text-align: center;
+  }
+
+  .solution-item .s-benefit {
+    font-size: 10.5px; font-weight: 700;
+    color: #ff6b6b; margin-top: 4px;
+    text-align: center; line-height: 1.4;
+  }
+
+  /* CTA */
+  .cta-section {
+    margin-top: auto;
+    display: flex;
+    align-items: stretch;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .cta-text {
+    flex: 1; padding: 18px 22px;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .cta-text .cta-q {
+    font-size: 12px; color: rgba(255,255,255,0.55); margin-bottom: 4px;
+  }
+
+  .cta-text .cta-main {
+    font-size: 17px; font-weight: 700; color: white;
+  }
+
+  .cta-text .cta-sub {
+    font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px;
+  }
+
+  .cta-button {
+    background: #cc0000;
+    padding: 18px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .cta-button .btn-label {
+    font-size: 11px; color: rgba(255,255,255,0.8); letter-spacing: 1px;
+  }
+
+  .cta-button .btn-main {
+    font-size: 15px; font-weight: 700; color: white;
+  }
+
+  .footer {
+    background: rgba(0,0,0,0.5);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 12px 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative; z-index: 2;
+  }
+
+  .footer .company {
+    font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 2px;
+  }
+
+  .footer .disclaimer {
+    font-size: 10px; color: rgba(255,255,255,0.2); text-align: right;
+  }
+
+  .corner-tl {
+    position: absolute;
+    top: 44px; right: 44px;
+    width: 60px; height: 60px;
+    border-top: 2px solid rgba(204,0,0,0.4);
+    border-right: 2px solid rgba(204,0,0,0.4);
+    z-index: 1;
+  }
+
+  .corner-br {
+    position: absolute;
+    bottom: 64px; left: 44px;
+    width: 40px; height: 40px;
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+    border-left: 2px solid rgba(255,255,255,0.1);
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="a4">
+  <div class="accent-bar"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+
+  <div class="urgent-band">
+    <div class="dot"></div>
+    <span>중대재해처벌법 — 경영자 필독</span>
+    <span class="year">2025 · 시행 3년차</span>
+  </div>
+
+  <div class="content">
+
+    <div class="law-label">
+      <div class="line"></div>
+      <span>SERIOUS ACCIDENTS PUNISHMENT ACT</span>
+    </div>
+
+    <div class="main-question">
+      안전조치,<br>
+      그게 <span class="highlight">전부</span>라고<br>
+      생각하십니까?
+    </div>
+    <div class="sub-question">
+      안전관리 의무 이행 후에도 사고가 나면<br>
+      대표님과 법인에 수억원의 추가 부담이 남습니다.
+    </div>
+
+    <div class="divider">
+      <div class="line-left"></div>
+      <div class="diamond"></div>
+      <div class="line-right"></div>
+    </div>
+
+    <!-- 충격 박스 -->
+    <div class="shock-box">
+      <p>
+        중대재해처벌법은 <strong>안전보건관리체계 구축</strong>만으로 끝나지 않습니다.<br>
+        사고 발생 시 <strong>대표이사 형사처벌</strong>, <strong>법인 최대 50억원 추가 과징금</strong>,
+        피해자 <strong>손해액 5배 징벌적 손해배상</strong>까지—<br>
+        <strong>산재보험으로는 메울 수 없는 2억9천만원 격차</strong>가 발생합니다.
+      </p>
+    </div>
+
+    <!-- 처벌 수위 3단계 (신규 추가) -->
+    <div class="penalty-detail">
+      <div class="pd-item">
+        <div class="pd-num">10억</div>
+        <div class="pd-unit">이하 벌금</div>
+        <div class="pd-label">대표이사 형사처벌<br>+ 1년 이상 징역</div>
+      </div>
+      <div class="pd-item">
+        <div class="pd-num">50억</div>
+        <div class="pd-unit">이하 과징금</div>
+        <div class="pd-label">법인 추가 제재<br>대표 형사와 별도 부과</div>
+      </div>
+      <div class="pd-item">
+        <div class="pd-num">5배</div>
+        <div class="pd-unit">징벌적 배상</div>
+        <div class="pd-label">민사 손해배상<br>고의·중과실 인정 시</div>
+      </div>
+    </div>
+
+    <!-- 리스크 그리드 -->
+    <div class="risk-grid">
+      <div class="risk-item">
+        <span class="number">RISK 01</span>
+        <span class="title">대표이사 형사처벌</span>
+        <span class="desc">안전조치 미흡 시 1년 이상 징역<br>또는 10억원 이하 벌금</span>
+        <span class="amount">유죄율 89.3% · 2025 기소 47건↑</span>
+      </div>
+      <div class="risk-item">
+        <span class="number">RISK 02</span>
+        <span class="title">거액 민사 손해배상</span>
+        <span class="desc">사망 1건 시 민사배상 청구액<br>최대 4억1,278만원 (과실 20% 기준)</span>
+        <span class="amount">산재보험 초과 회사부담 2억9,272만원</span>
+      </div>
+      <div class="risk-item">
+        <span class="number">RISK 03</span>
+        <span class="title">기업 존폐 위기</span>
+        <span class="desc">영업정지·입찰제한·기업명 공표<br>사업 연속성 자체가 흔들림</span>
+        <span class="amount">행정처분 + 수주 박탈 이중 타격</span>
+      </div>
+      <div class="risk-item">
+        <span class="number">RISK 04</span>
+        <span class="title">법률 비용 폭탄</span>
+        <span class="desc">형사·민사 소송 대응 변호사 비용<br>수천만원~수억원 이상 발생</span>
+        <span class="amount">보험 없이 대응 시 100% 자기부담</span>
+      </div>
+    </div>
+
+    <!-- 민사배상 계산 예시 (신규 추가) -->
+    <div class="calc-example">
+      <div class="ce-title">민사 배상금액 산정 예시 — 사망 사고 1건 (월급여 250만원 · 30세 근로자 · 과실 20%)</div>
+      <div class="ce-row">
+        <span class="ce-label">산재보험 지급액</span>
+        <div class="ce-bar-track"><div class="ce-bar-fill blue" style="width:29%"></div></div>
+        <span class="ce-value">1억 2,006만원</span>
+      </div>
+      <div class="ce-row">
+        <span class="ce-label">민사 배상 총액</span>
+        <div class="ce-bar-track"><div class="ce-bar-fill gray" style="width:100%"></div></div>
+        <span class="ce-value">4억 1,278만원</span>
+      </div>
+      <div class="ce-row">
+        <span class="ce-label">→ 회사 추가 부담</span>
+        <div class="ce-bar-track"><div class="ce-bar-fill red" style="width:71%"></div></div>
+        <span class="ce-value red">2억 9,272만원</span>
+      </div>
+      <div class="ce-note">※ 출처: 삼성생명 보험연구소 / 중대재해처벌법 적용 시 손해배상액 최대 5배 청구 가능</div>
+    </div>
+
+    <!-- 핵심 메시지 -->
+    <div class="core-message">
+      <p>
+        안전관리는 의무, 그러나<br>
+        <strong>리스크 대비는 전략입니다.</strong>
+      </p>
+      <p class="sub">
+        실손 하나 없이 사업하는 대표님은 없습니다. 기업 리스크도 마찬가지입니다.<br>
+        사고 후 2억9천만원을 자기부담으로 지는 대표와, 보험으로 관리하는 대표—차이는 지금 만들어집니다.
+      </p>
+    </div>
+
+    <!-- 솔루션 -->
+    <div class="solution-area">
+      <div class="solution-item">
+        <div class="icon">🛡️</div>
+        <div class="s-title">기업재해보장보험</div>
+        <div class="s-desc">산재·중대재해 발생 시<br>배상 재원 즉시 확보</div>
+        <div class="s-benefit">민사부담 2억9천만원<br>→ 보험으로 대체</div>
+      </div>
+      <div class="solution-item">
+        <div class="icon">⚖️</div>
+        <div class="s-title">임원배상책임보험</div>
+        <div class="s-desc">형사·민사 소송<br>법률비용 전액 지원</div>
+        <div class="s-benefit">변호사비 수천만원<br>→ 보험금으로 지원</div>
+      </div>
+      <div class="solution-item">
+        <div class="icon">📋</div>
+        <div class="s-title">경영인 보호플랜</div>
+        <div class="s-desc">대표 부재 시<br>기업 운영 연속성 보장</div>
+        <div class="s-benefit">법인 절세 재원으로<br>→ 보험료 충당 가능</div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <div class="cta-text">
+        <div class="cta-q">지금 귀사는 준비되어 있습니까?</div>
+        <div class="cta-main">무료 기업리스크 진단을 받아보세요</div>
+        <div class="cta-sub">재무제표 없이도 간단한 현황 파악만으로 30분 진단 가능합니다</div>
+      </div>
+      <div class="cta-button">
+        <span class="btn-label">상담 신청</span>
+        <span class="btn-main">→ 지금 바로</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span class="company">CORPORATE RISK CONSULTING · GFC</span>
+    <span class="disclaimer">본 자료는 공개 통계·삼성생명 자료를 기반으로 작성되었습니다. 개인별 상황에 따라 결과가 다를 수 있으며, 전문가 상담을 권장합니다.</span>
+  </div>
+
+</div>
+
+</body>
+</html>

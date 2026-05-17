@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>GFC 기업컨설팅 전단지 양면</title>
+<title>GFC 기업컨설팅 전단지 양면 v2</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -72,7 +72,7 @@ body {
 
 /* 앞면 히어로 */
 .front-hero {
-  padding:52px 52px 36px;
+  padding:42px 52px 28px;
   border-bottom:1px solid rgba(28,45,79,0.12);
   position:relative;
 }
@@ -86,7 +86,7 @@ body {
 }
 
 .eyebrow {
-  display:flex; align-items:center; gap:12px; margin-bottom:24px;
+  display:flex; align-items:center; gap:12px; margin-bottom:20px;
 }
 .eyebrow .dash { width:28px; height:1px; background:#c8922a; }
 .eyebrow span {
@@ -95,9 +95,9 @@ body {
 
 .front-title {
   font-family:'Noto Serif KR', serif;
-  font-size:44px; font-weight:900;
+  font-size:42px; font-weight:900;
   color:#1c2d4f; line-height:1.2; letter-spacing:-1px;
-  margin-bottom:18px;
+  margin-bottom:14px;
 }
 .front-title .underline {
   position:relative; display:inline;
@@ -109,70 +109,107 @@ body {
 }
 
 .front-subtitle {
-  font-size:15.5px; color:#4a5568; line-height:1.75;
-  font-weight:400; max-width:500px;
+  font-size:14.5px; color:#4a5568; line-height:1.7;
+  font-weight:400; max-width:560px;
+}
+.front-subtitle .red-accent {
+  color:#b50000; font-weight:700;
 }
 
 /* 공감 질문 카드들 */
 .questions-section {
-  padding:36px 52px;
+  padding:28px 52px;
 }
 .qs-label {
   font-size:10px; letter-spacing:3px; color:#c8922a; font-weight:700;
-  margin-bottom:20px;
+  margin-bottom:16px;
 }
 .q-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:14px;
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
 }
 .q-card {
   background:#fff;
   border:1px solid rgba(28,45,79,0.08);
-  padding:20px 22px;
+  padding:17px 20px;
   position:relative;
-  transition:all 0.2s;
 }
 .q-card::before {
   content:'Q';
-  position:absolute; top:16px; right:18px;
+  position:absolute; top:14px; right:16px;
   font-family:'IBM Plex Mono', monospace;
-  font-size:28px; font-weight:600;
+  font-size:26px; font-weight:600;
   color:rgba(200,146,42,0.12);
 }
-.q-card .q-icon { font-size:22px; margin-bottom:10px; }
+.q-card .q-icon { font-size:20px; margin-bottom:8px; }
 .q-card .q-text {
-  font-size:14px; color:#1c2d4f; line-height:1.65;
+  font-size:13.5px; color:#1c2d4f; line-height:1.6;
   font-weight:500;
 }
 .q-card .q-sub {
-  font-size:11.5px; color:#888; margin-top:6px; line-height:1.5;
+  font-size:11px; color:#888; margin-top:5px; line-height:1.45;
+}
+.q-card.q-alert .q-sub {
+  color:#b50000; font-weight:600;
+}
+
+/* 민사배상 격차 미니 섹션 */
+.damage-mini {
+  margin:14px 52px 0;
+  background:#1c2d4f;
+  padding:14px 20px;
+  display:flex; align-items:center; gap:0;
+}
+.dm-label {
+  font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:2px;
+  font-weight:700; flex-shrink:0; padding-right:20px;
+  border-right:1px solid rgba(255,255,255,0.1);
+  white-space:nowrap;
+}
+.dm-items {
+  display:flex; gap:0; flex:1; align-items:stretch;
+}
+.dm-item {
+  flex:1; text-align:center; padding:0 16px;
+  border-right:1px solid rgba(255,255,255,0.08);
+}
+.dm-item:last-child { border-right:none; }
+.dm-item .di-top { font-size:10px; color:rgba(255,255,255,0.4); margin-bottom:3px; }
+.dm-item .di-val { font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:600; color:#fff; }
+.dm-item .di-val.gold { color:#c8922a; }
+.dm-item .di-val.danger { color:#ff6b6b; }
+.dm-arrow {
+  font-size:16px; color:rgba(255,255,255,0.25); padding:0 4px; align-self:center;
 }
 
 /* 중간 강조 문구 */
 .mid-emphasis {
-  margin:0 52px;
+  margin:16px 52px 0;
   background:#1c2d4f;
-  padding:26px 32px;
-  display:flex; gap:20px; align-items:center;
+  padding:20px 28px;
+  display:flex; gap:18px; align-items:center;
 }
 .mid-emphasis .me-icon {
-  font-size:36px; flex-shrink:0;
+  font-size:32px; flex-shrink:0;
 }
 .mid-emphasis .me-text p {
   font-family:'Noto Serif KR', serif;
-  font-size:17px; font-weight:700; color:#fff; line-height:1.6;
+  font-size:15.5px; font-weight:700; color:#fff; line-height:1.55;
 }
 .mid-emphasis .me-text span {
-  font-size:12px; color:rgba(255,255,255,0.5); margin-top:4px; display:block;
+  font-size:11.5px; color:rgba(255,255,255,0.5); margin-top:4px; display:block;
+}
+.mid-emphasis .me-text em {
+  color:#c8922a; font-style:normal; font-weight:700;
 }
 
 /* 3가지 핵심 고민 */
 .concerns-section {
-  padding:32px 52px;
+  padding:22px 52px;
   flex:1;
 }
 .concerns-label {
   font-size:10px; letter-spacing:3px; color:#888; font-weight:700;
-  margin-bottom:20px; display:flex; align-items:center; gap:10px;
+  margin-bottom:16px; display:flex; align-items:center; gap:10px;
 }
 .concerns-label::before { content:''; width:20px; height:1px; background:#888; }
 
@@ -180,7 +217,7 @@ body {
 .concern-row {
   display:flex; align-items:flex-start; gap:0;
   border-bottom:1px solid rgba(28,45,79,0.08);
-  padding:16px 0;
+  padding:13px 0;
 }
 .concern-row:first-child { border-top:1px solid rgba(28,45,79,0.08); }
 .c-num {
@@ -189,16 +226,19 @@ body {
   letter-spacing:1px; width:36px; flex-shrink:0; padding-top:2px;
 }
 .c-content .c-title {
-  font-size:14.5px; font-weight:700; color:#1c2d4f; margin-bottom:3px;
+  font-size:14px; font-weight:700; color:#1c2d4f; margin-bottom:2px;
 }
 .c-content .c-desc {
-  font-size:12px; color:#666; line-height:1.6;
+  font-size:12px; color:#666; line-height:1.55;
+}
+.c-content .c-figure {
+  font-size:11px; color:#b50000; font-weight:700; margin-top:3px;
 }
 
 /* 앞면 하단 CTA */
 .front-cta {
   background:#c8922a;
-  padding:22px 52px;
+  padding:20px 52px;
   display:flex; align-items:center; justify-content:space-between;
 }
 .front-cta .fc-text p {
@@ -220,7 +260,7 @@ body {
 
 .front-footer {
   background:#f0ead8;
-  padding:12px 52px;
+  padding:10px 52px;
   display:flex; justify-content:space-between; align-items:center;
   border-top:1px solid rgba(28,45,79,0.1);
 }
@@ -243,19 +283,15 @@ body {
 .back-header .bh-left {
   display:flex; align-items:center; gap:14px;
 }
-.back-header .bh-logo { /* same as front */ }
-.back-header span {
-  font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:2px;
-}
 
 /* 뒷면 히어로 */
 .back-hero {
-  padding:40px 52px 28px;
+  padding:32px 52px 22px;
   background:#fff;
   border-bottom:2px solid #1c2d4f;
 }
 .back-eyebrow {
-  display:flex; align-items:center; gap:10px; margin-bottom:16px;
+  display:flex; align-items:center; gap:10px; margin-bottom:12px;
 }
 .back-eyebrow .tag {
   background:#1c2d4f; color:#c8922a;
@@ -266,24 +302,24 @@ body {
 }
 .back-title {
   font-family:'Noto Serif KR', serif;
-  font-size:36px; font-weight:900; color:#1c2d4f; line-height:1.25;
-  margin-bottom:10px;
+  font-size:33px; font-weight:900; color:#1c2d4f; line-height:1.25;
+  margin-bottom:8px;
 }
 .back-title em { color:#c8922a; font-style:normal; }
 .back-desc {
-  font-size:13.5px; color:#555; line-height:1.7;
+  font-size:13px; color:#555; line-height:1.65;
 }
 
 /* 핵심 로직 플로우 */
 .logic-flow {
-  padding:32px 52px;
+  padding:24px 52px;
   background:#fff;
   margin:0;
   border-bottom:1px solid rgba(0,0,0,0.07);
 }
 .lf-title {
   font-size:10px; letter-spacing:3px; color:#c8922a; font-weight:700;
-  margin-bottom:22px;
+  margin-bottom:18px;
 }
 
 /* 플로우 스텝 */
@@ -291,53 +327,53 @@ body {
   display:flex; flex-direction:column; gap:0;
 }
 .flow-step {
-  display:flex; gap:20px; align-items:flex-start;
-  padding:16px 0;
+  display:flex; gap:18px; align-items:flex-start;
+  padding:14px 0;
   border-bottom:1px dashed rgba(0,0,0,0.1);
   position:relative;
 }
 .flow-step:last-child { border-bottom:none; }
 
 .step-left {
-  flex-shrink:0; width:48px;
-  display:flex; flex-direction:column; align-items:center; gap:6px;
+  flex-shrink:0; width:44px;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
 }
 .step-circle {
-  width:40px; height:40px;
+  width:38px; height:38px;
   border:2px solid #1c2d4f;
   border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   font-family:'IBM Plex Mono', monospace;
-  font-size:13px; font-weight:600; color:#1c2d4f;
+  font-size:12px; font-weight:600; color:#1c2d4f;
 }
 .step-circle.gold { border-color:#c8922a; color:#c8922a; }
 .step-line {
-  width:1px; height:24px; background:rgba(0,0,0,0.12);
+  width:1px; height:20px; background:rgba(0,0,0,0.12);
 }
 
 .step-content .sc-tag {
-  font-size:10px; font-weight:700; letter-spacing:2px; color:#888; margin-bottom:4px;
+  font-size:10px; font-weight:700; letter-spacing:2px; color:#888; margin-bottom:3px;
 }
 .step-content .sc-title {
-  font-size:15px; font-weight:700; color:#1c2d4f; margin-bottom:5px;
+  font-size:14.5px; font-weight:700; color:#1c2d4f; margin-bottom:4px;
 }
 .step-content .sc-desc {
-  font-size:12.5px; color:#555; line-height:1.65;
+  font-size:12px; color:#555; line-height:1.6;
 }
 
 /* 계산 예시 박스 */
 .calc-box {
   background:#1c2d4f;
-  margin:24px 0 0;
-  padding:20px 24px;
+  margin:16px 0 0;
+  padding:16px 20px;
 }
 .calc-box .cb-title {
   font-size:10px; letter-spacing:2px; color:#c8922a; font-weight:700;
-  margin-bottom:14px;
+  margin-bottom:12px;
 }
 .calc-row {
   display:flex; justify-content:space-between; align-items:center;
-  padding:8px 0;
+  padding:7px 0;
   border-bottom:1px solid rgba(255,255,255,0.07);
 }
 .calc-row:last-child { border-bottom:none; }
@@ -347,64 +383,93 @@ body {
 .calc-row .cr-val.gold { color:#c8922a; }
 .calc-row .cr-val.green { color:#6fcf97; }
 .calc-note {
-  margin-top:12px; font-size:11px; color:rgba(255,255,255,0.35); line-height:1.6;
+  margin-top:10px; font-size:11px; color:rgba(255,255,255,0.35); line-height:1.55;
 }
+
+/* 보험 상세 박스 (STEP 2) */
+.ins-detail {
+  background:#f2f6ff;
+  border:1px solid rgba(28,45,79,0.12);
+  border-left:3px solid #1c2d4f;
+  padding:14px 18px;
+  margin:14px 0 0;
+}
+.ins-detail .id-title {
+  font-size:10px; font-weight:700; color:#1c2d4f; letter-spacing:1px;
+  margin-bottom:10px;
+}
+.ins-rows {
+  display:flex; flex-direction:column; gap:6px;
+}
+.ins-row {
+  display:flex; gap:12px; align-items:baseline;
+  font-size:11.5px;
+}
+.ins-row .ir-key {
+  color:#888; flex-shrink:0; width:110px;
+}
+.ins-row .ir-val {
+  color:#1c2d4f; font-weight:700;
+}
+.ins-row .ir-val .green { color:#2d7a3a; }
+.ins-row .ir-val .gold { color:#c8922a; }
 
 /* 세금 투명성 박스 */
 .tax-box {
-  margin:24px 52px 0;
+  margin:0 52px;
   background:#fff3cd;
   border:1px solid #e6c04a;
   border-left:3px solid #c8922a;
-  padding:16px 20px;
+  padding:14px 18px;
 }
 .tax-box .tb-title {
   font-size:11px; font-weight:700; color:#7a5c00; letter-spacing:1px;
-  margin-bottom:6px; display:flex; align-items:center; gap:8px;
+  margin-bottom:5px; display:flex; align-items:center; gap:8px;
 }
 .tax-box .tb-title::before { content:'⚠'; font-size:13px; }
 .tax-box .tb-text {
-  font-size:12px; color:#5a4200; line-height:1.65;
+  font-size:11.5px; color:#5a4200; line-height:1.6;
 }
 
 /* 중대재해 간략 연결 */
 .risk-connect {
-  padding:24px 52px;
-  display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;
+  padding:18px 52px;
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;
 }
 .rc-title {
   grid-column:1/-1;
-  font-size:10px; letter-spacing:3px; color:#888; font-weight:700; margin-bottom:4px;
+  font-size:10px; letter-spacing:3px; color:#888; font-weight:700; margin-bottom:2px;
 }
 .rc-item {
   background:#fff;
   border:1px solid rgba(0,0,0,0.08);
   border-top:2px solid #1c2d4f;
-  padding:14px 16px;
+  padding:12px 14px;
 }
-.rc-item .ri-label { font-size:10px; color:#c8922a; font-weight:700; letter-spacing:1px; margin-bottom:4px; }
-.rc-item .ri-title { font-size:13px; font-weight:700; color:#1c2d4f; margin-bottom:3px; }
-.rc-item .ri-desc { font-size:11px; color:#777; line-height:1.5; }
+.rc-item .ri-label { font-size:10px; color:#c8922a; font-weight:700; letter-spacing:1px; margin-bottom:3px; }
+.rc-item .ri-title { font-size:13px; font-weight:700; color:#1c2d4f; margin-bottom:2px; }
+.rc-item .ri-amount { font-size:12px; font-weight:700; color:#b50000; margin-bottom:2px; }
+.rc-item .ri-desc { font-size:11px; color:#777; line-height:1.45; }
 
 /* 뒷면 CTA */
 .back-cta {
-  margin:20px 52px;
+  margin:16px 52px;
   display:flex; gap:0;
   border:1.5px solid #1c2d4f;
 }
 .bc-left {
-  flex:1; padding:20px 24px;
+  flex:1; padding:18px 22px;
 }
-.bc-left .bcl-q { font-size:12px; color:#888; margin-bottom:5px; }
+.bc-left .bcl-q { font-size:12px; color:#888; margin-bottom:4px; }
 .bc-left .bcl-main {
-  font-size:19px; font-weight:700; color:#1c2d4f;
+  font-size:18px; font-weight:700; color:#1c2d4f;
   font-family:'Noto Serif KR', serif; line-height:1.4;
 }
-.bc-left .bcl-sub { font-size:11.5px; color:#888; margin-top:6px; line-height:1.6; }
+.bc-left .bcl-sub { font-size:11px; color:#888; margin-top:5px; line-height:1.55; }
 .bc-right {
   background:#1c2d4f; min-width:180px;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:20px; gap:8px;
+  padding:18px; gap:7px;
 }
 .bc-right .br-top { font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:2px; }
 .bc-right .br-num {
@@ -419,7 +484,7 @@ body {
 .back-footer {
   margin-top:auto;
   background:#f0ead8;
-  padding:12px 52px;
+  padding:10px 52px;
   border-top:1px solid rgba(28,45,79,0.1);
   display:flex; justify-content:space-between; align-items:center;
 }
@@ -452,8 +517,8 @@ body {
     </div>
     <div class="front-subtitle">
       매출은 늘었는데 세금도 늘고, 직원 관리는 더 어려워지고,<br>
-      회사 돈이 내 돈 같지 않은 이 구조—<br>
-      사실 설계의 문제입니다.
+      현장에서 사고 한 번 나면 <span class="red-accent">회사 추가부담 최대 2억 9천만원</span>이 청구됩니다.<br>
+      이 구조는 설계의 문제입니다.
     </div>
   </div>
 
@@ -466,10 +531,10 @@ body {
         <div class="q-text">세금을 너무 많이 내고 있는 것 같은데, 줄일 방법이 있는지 모르겠다.</div>
         <div class="q-sub">법인세·소득세 이중 부담, 매년 반복</div>
       </div>
-      <div class="q-card">
+      <div class="q-card q-alert">
         <div class="q-icon">🏭</div>
         <div class="q-text">현장에서 사고 한 번 나면 나까지 형사처벌 받을 수 있다는 게 불안하다.</div>
-        <div class="q-sub">중대재해처벌법 시행 3년, 기소 <span class="ft" data-fact="중대재해처벌법 위반으로 기소된 CEO·경영책임자 누적 121건 (2025.08 기준). 유죄율 89.3%. 매일노동뉴스 전수조사." data-src="매일노동뉴스 중대재해 전수조사 (2025.08)" data-url="https://www.labortoday.co.kr">121건</span></div>
+        <div class="q-sub">사망 사고 1건 → 산재 12,006만원 vs 민사 41,278만원<br>회사 추가부담 최대 2억 9,272만원</div>
       </div>
       <div class="q-card">
         <div class="q-icon">📊</div>
@@ -484,12 +549,39 @@ body {
     </div>
   </div>
 
+  <!-- 민사배상 격차 미니 바 -->
+  <div class="damage-mini">
+    <div class="dm-label">사망 사고 1건 실제 비용</div>
+    <div class="dm-items">
+      <div class="dm-item">
+        <div class="di-top">산재보험 지급</div>
+        <div class="di-val">12,006만원</div>
+      </div>
+      <div class="dm-arrow">→</div>
+      <div class="dm-item">
+        <div class="di-top">법원 민사배상 판결</div>
+        <div class="di-val">41,278만원</div>
+      </div>
+      <div class="dm-arrow">→</div>
+      <div class="dm-item">
+        <div class="di-top">회사 추가부담</div>
+        <div class="di-val danger">2억 9,272만원</div>
+      </div>
+      <div class="dm-arrow">→</div>
+      <div class="dm-item">
+        <div class="di-top">대표이사 처벌 상한</div>
+        <div class="di-val gold">10억원 벌금</div>
+      </div>
+    </div>
+  </div>
+
   <!-- 중간 강조 -->
   <div class="mid-emphasis">
     <div class="me-icon">💡</div>
     <div class="me-text">
-      <p>이 네 가지 고민, 사실 서로 연결되어 있고<br>동시에 해결하는 구조가 존재합니다.</p>
-      <span>절세로 만들어진 재원으로 리스크를 막고, 그 돈을 합법적으로 대표님께 돌려드립니다.</span>
+      <p>이 네 가지 고민은 서로 연결되어 있고 동시에 해결하는 구조가 존재합니다.<br>
+      <em>절세액으로 리스크를 막고, 그 돈을 대표님 통장에 돌려드립니다.</em></p>
+      <span>절세 재원 → 법인 단체보험(비용처리+환급) → 2억 9천만원 배상 대체 → 7년 후 퇴직소득 환수</span>
     </div>
   </div>
 
@@ -501,7 +593,7 @@ body {
         <div class="c-num">01</div>
         <div class="c-content">
           <div class="c-title">법인세·소득세 절세 구조 설계</div>
-          <div class="c-desc">현재 납부 세금에서 합법적으로 줄일 수 있는 포인트를 먼저 진단합니다. 대부분의 기업은 <span class="ft" data-fact="기업의 재무구조·납세현황에 따라 다르나, 법인세·소득세 절세 구조 설계 도입 시 현재 납부 세금의 20~40% 절감이 가능한 경우가 많습니다. 개별 진단 후 확인 필요." data-src="GFC 기업 재무진단 사례 기반 (개별 기업 상이)" data-url="">20~40%의 절세 여지</span>가 있습니다.</div>
+          <div class="c-desc">현재 납부 세금에서 합법적으로 줄일 수 있는 포인트를 먼저 진단합니다. 대부분의 기업은 20~40%의 절세 여지가 있습니다.</div>
         </div>
       </div>
       <div class="concern-row">
@@ -509,6 +601,7 @@ body {
         <div class="c-content">
           <div class="c-title">중대재해·사고 리스크 차단</div>
           <div class="c-desc">사고 한 번에 형사처벌·배상·법률비용이 한꺼번에 옵니다. 절세 재원으로 리스크를 차단하는 구조를 만듭니다.</div>
+          <div class="c-figure">사망 사고 1건 회사 추가부담 최대 2억 9,272만원 · 장해 7급도 2억 9,377만원</div>
         </div>
       </div>
       <div class="concern-row">
@@ -562,8 +655,9 @@ body {
       리스크를 막고 <em>대표님 통장에 돌려드립니다</em>
     </div>
     <div class="back-desc">
-      많은 기업이 내고 있는 세금 중 일부는 합법적으로 줄일 수 있습니다.<br>
-      그 절세 재원으로 법인 단체보험을 설계하면 — 비용은 그대로이고, 리스크는 차단되며,<br>
+      내고 있는 세금 중 일부는 합법적으로 줄일 수 있습니다.<br>
+      그 절세 재원으로 <strong>법인 단체환급부보장성보험</strong>을 설계하면 — 비용은 그대로이고,
+      <strong>2억 9천만원 민사배상</strong>은 보험으로 대체되며,<br>
       7년 후 환급금은 대표님의 퇴직소득으로 전환할 수 있습니다.
     </div>
   </div>
@@ -582,11 +676,8 @@ body {
           <div class="sc-tag">STEP 1 — 절세 진단</div>
           <div class="sc-title">현재 세금에서 절세 포인트를 찾는다</div>
           <div class="sc-desc">
-            기업 재무제표와 납세 현황을 분석해 불필요하게 새고 있는 세금을 찾습니다.<br>
-            <strong>예시:</strong> 월 법인세·소득세 합계 800만 원 → 절세 구조 도입 후 500만 원<br>
-            → <strong style="color:#1c2d4f">절세액 월 300만 원 확보</strong>
+            기업 재무제표와 납세 현황을 분석해 불필요하게 새고 있는 세금을 찾습니다.
           </div>
-
           <!-- 계산 박스 -->
           <div class="calc-box">
             <div class="cb-title">계산 예시 — 월 기준</div>
@@ -603,7 +694,7 @@ body {
               <span class="cr-val gold">▼ 300만원</span>
             </div>
             <div class="calc-row">
-              <span class="cr-label">실질 월 비용 (세금 + 보험)</span>
+              <span class="cr-label">실질 월 비용 (세금 + 보험료)</span>
               <span class="cr-val green">= 800만원 동일</span>
             </div>
             <div class="calc-note">
@@ -620,13 +711,32 @@ body {
         </div>
         <div class="step-content">
           <div class="sc-tag">STEP 2 — 법인 단체보험 설계</div>
-          <div class="sc-title">절세 재원으로 리스크를 차단한다</div>
+          <div class="sc-title">절세 재원으로 리스크를 차단하고 환급을 받는다</div>
           <div class="sc-desc">
-            절세액(월 300만 원)을 재원으로 법인 명의 단체보험을 가입합니다.<br>
-            중대재해 배상, 형사 방어 비용, 경영인 부재 시 기업 연속성을 동시에 보장합니다.<br><br>
-            <strong>보험 구조:</strong> 법인 계약자 · 대표 피보험자 · 법인 수익자 (초기 설정)<br>
-            → <span class="ft" data-fact="법인 단체보험 중 저축성 구조 상품의 경우 통상 7년 이후 해지환급율이 납입 보험료의 약 90% 수준에 도달하는 상품이 있습니다. 상품 종류와 설계에 따라 다름." data-src="보험 상품 설계 기준 (상품별 상이, 보험사 공시 기준)" data-url="https://www.kidi.or.kr">환급율 7년차 기준 약 90%</span> → <strong style="color:#1c2d4f">300만 원 中 270만 원은 돌려받는 구조</strong><br>
-            → 월 실질 순비용 약 <strong class="ft" style="color:#c8922a" data-fact="월 300만원 절세 재원 중 270만원(90%)이 7년 후 환급될 경우, 실질 월 순비용은 약 30만원 수준. 절세 재원 규모와 보험 설계에 따라 개인차 있음." data-src="GFC 설계 예시 (개별 기업 상이)" data-url="">30만 원</strong>으로 리스크 전체 차단
+            절세액(월 300만원)을 재원으로 법인 명의 <strong>단체환급부보장성보험</strong>을 가입합니다.<br>
+            중대재해 배상, 형사 방어 비용, 경영인 부재 시 기업 연속성을 동시에 보장합니다.
+          </div>
+          <!-- 보험 상세 -->
+          <div class="ins-detail">
+            <div class="id-title">보험 구조 핵심 4가지</div>
+            <div class="ins-rows">
+              <div class="ins-row">
+                <span class="ir-key">계약 구조</span>
+                <span class="ir-val">법인 계약자 · 임직원 피보험자 · 법인 수익자</span>
+              </div>
+              <div class="ins-row">
+                <span class="ir-key">비용처리</span>
+                <span class="ir-val"><span class="green">종업원 인당 연 70만원 이하 → 인건비/복리후생비 처리</span> (근로소득 미포함)</span>
+              </div>
+              <div class="ins-row">
+                <span class="ir-key">만기 환급</span>
+                <span class="ir-val"><span class="gold">7년차 환급율 약 90%</span> → 월 300만원 중 270만원 돌려받는 구조</span>
+              </div>
+              <div class="ins-row">
+                <span class="ir-key">실질 순비용</span>
+                <span class="ir-val">월 약 <strong>30만원</strong>으로 2억 9천만원 민사배상 리스크 전체 차단</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -640,8 +750,8 @@ body {
           <div class="sc-title">7년 후 환급금을 대표님의 자산으로 전환한다</div>
           <div class="sc-desc">
             7년 후 환급 시점에 계약자·수익자를 <strong>법인 → 대표님 개인</strong>으로 승계하면,<br>
-            환급금은 <strong style="color:#1c2d4f">퇴직소득</strong>으로 분류됩니다.<br><br>
-            퇴직소득은 일반 근로소득보다 세율이 낮고, 장기근속 공제를 받을수록 실질 세부담이 줄어드는<br>
+            환급금은 <strong style="color:#1c2d4f">퇴직소득</strong>으로 분류됩니다.<br>
+            퇴직소득은 일반 근로소득보다 세율이 낮고, 장기근속 공제를 받을수록 실질 세부담이 줄어드는
             가장 합법적이고 효율적인 법인자금 개인 전환 방법입니다.
           </div>
         </div>
@@ -655,9 +765,8 @@ body {
     <div class="tb-title">세금 관련 투명한 안내</div>
     <div class="tb-text">
       환급금 수령 시 <strong>퇴직소득세가 부과</strong>됩니다 (일반 소득세보다 낮은 세율 적용).
-      재직 중 수익자만 변경해 수령할 경우 근로소득세 또는 증여세 이슈가 발생할 수 있어,
-      반드시 퇴직 시 계약 승계 구조로 설계해야 합니다.
-      GFC는 세무사·법무사와 협업하여 <strong>가장 세부담이 낮은 합법 구조</strong>를 설계해 드립니다.
+      재직 중 수익자만 변경해 수령하면 근로소득세·증여세 이슈가 발생할 수 있어 반드시 <strong>퇴직 시 계약 승계 구조</strong>로 설계해야 합니다.
+      GFC는 세무사·법무사와 협업해 가장 세부담이 낮은 합법 구조를 설계해 드립니다.
     </div>
   </div>
 
@@ -666,18 +775,21 @@ body {
     <div class="rc-title">법인 단체보험이 동시에 해결하는 3가지</div>
     <div class="rc-item">
       <div class="ri-label">RISK 01</div>
-      <div class="ri-title">중대재해 배상</div>
-      <div class="ri-desc">사고 발생 시 <span class="ft" data-fact="중대재해처벌법 제15조: 경영책임자 고의·중과실로 중대재해 발생 시 손해액의 5배를 넘지 않는 범위에서 배상 책임. 이 리스크를 보험으로 대비." data-src="중대재해처벌법 제15조 (법령정보센터)" data-url="https://www.law.go.kr/lsInfoP.do?lsiSeq=236036">징벌적 손해배상 최대 5배</span>까지 보장</div>
+      <div class="ri-title">중대재해 민사배상</div>
+      <div class="ri-amount">최대 2억 9,272만원</div>
+      <div class="ri-desc">사망 1건 기준 산재-민사 격차 전액 · 징벌적 손해배상 5배까지 보장</div>
     </div>
     <div class="rc-item">
       <div class="ri-label">RISK 02</div>
       <div class="ri-title">형사 법률비용</div>
-      <div class="ri-desc">대표이사 형사소송 변호사 비용 수천만 원 보장</div>
+      <div class="ri-amount">수천만원 수준</div>
+      <div class="ri-desc">대표이사 형사소송 변호사 선임·재판 비용 전액 보장</div>
     </div>
     <div class="rc-item">
       <div class="ri-label">ASSET</div>
       <div class="ri-title">대표 소득 환수</div>
-      <div class="ri-desc">7년 후 환급금을 퇴직소득 구조로 합법 전환</div>
+      <div class="ri-amount">7년차 환급 약 90%</div>
+      <div class="ri-desc">환급금을 퇴직소득 구조로 합법 전환 — 세율 최소화</div>
     </div>
   </div>
 
@@ -705,15 +817,5 @@ body {
 
 </div>
 
-<style>
-.ft{cursor:pointer;border-bottom:1.5px dashed rgba(180,120,20,.7);display:inline}
-.ft:hover{border-bottom-color:rgba(180,120,20,1)}
-#ft-pop{display:none;position:fixed;z-index:99999;max-width:300px;background:rgba(6,8,18,.97);border:1px solid rgba(255,190,50,.3);border-left:3px solid rgba(255,190,50,.7);border-radius:4px;padding:12px 14px 10px;font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.65;color:rgba(255,255,255,.9);box-shadow:0 8px 32px rgba(0,0,0,.75);pointer-events:none;white-space:normal}
-#ft-pop .fp-src{margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:rgba(255,190,50,.8);line-height:1.5}
-#ft-pop .fp-hint{font-size:10px;color:rgba(255,255,255,.3);margin-top:3px}
-</style>
-<script>
-!function(){var p=document.createElement('div');p.id='ft-pop';p.innerHTML='<div class="fp-bd"></div><div class="fp-src"></div><div class="fp-hint">클릭 → 원본 자료 열기</div>';document.body.appendChild(p);var u='';document.querySelectorAll('.ft').forEach(function(e){e.addEventListener('mouseenter',function(ev){p.querySelector('.fp-bd').textContent=e.dataset.fact||'';p.querySelector('.fp-src').textContent='출처: '+(e.dataset.src||'');u=e.dataset.url||'';p.querySelector('.fp-hint').style.display=u?'':'none';p.style.display='block';mv(ev);});e.addEventListener('mousemove',mv);e.addEventListener('mouseleave',function(){p.style.display='none';});e.addEventListener('click',function(ev){if(u){ev.stopPropagation();window.open(u,'_blank');}});});function mv(ev){var pw=p.offsetWidth||300,ph=p.offsetHeight||80,x=ev.clientX+14,y=ev.clientY+14;if(x+pw>window.innerWidth-8)x=ev.clientX-pw-6;if(y+ph>window.innerHeight-8)y=ev.clientY-ph-6;p.style.left=x+'px';p.style.top=y+'px';}}();
-</script>
 </body>
 </html>

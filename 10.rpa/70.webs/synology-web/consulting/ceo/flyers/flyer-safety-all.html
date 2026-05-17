@@ -485,7 +485,7 @@
     <div class="shock-box">
       <p>
         중대재해처벌법은 <strong>안전보건관리체계 구축</strong>만으로 끝나지 않습니다.<br>
-        사고 발생 시 <strong>대표이사 형사처벌(1년 이상 징역)</strong>, 기업 과징금,
+        사고 발생 시 <strong class="ft" data-fact="중대재해처벌법 제6조: 사망 1명 이상 중대재해 발생 시 경영책임자에게 '1년 이상 징역 또는 10억 원 이하 벌금'. 두 형벌 병과 가능. 법인도 최대 50억 원 벌금." data-src="중대재해처벌법 제6조 (법령정보센터)" data-url="https://www.law.go.kr/lsInfoP.do?lsiSeq=236036">대표이사 형사처벌(1년 이상 징역)</strong>, 기업 과징금,
         피해자 손해배상까지—<strong>준비되지 않은 기업은 단 한 번의 사고로 무너집니다.</strong>
       </p>
     </div>
@@ -495,12 +495,12 @@
       <div class="risk-item">
         <span class="number">RISK 01</span>
         <span class="title">대표이사 형사처벌</span>
-        <span class="desc">안전조치 미흡 시 1년 이상 징역<br>또는 10억 원 이하 벌금</span>
+        <span class="desc"><span class="ft" data-fact="중대재해처벌법 제6조: 사망 1명 이상 중대재해 발생 시 경영책임자에게 1년 이상의 징역 또는 10억 원 이하의 벌금. 두 가지 병과 가능. 법인은 최대 50억 원 벌금." data-src="중대재해처벌법 제6조 (법령정보센터)" data-url="https://www.law.go.kr/lsInfoP.do?lsiSeq=236036">안전조치 미흡 시 1년 이상 징역<br>또는 10억 원 이하 벌금</span></span>
       </div>
       <div class="risk-item">
         <span class="number">RISK 02</span>
         <span class="title">거액 손해배상 청구</span>
-        <span class="desc">민사소송으로 수억~수십억 원<br>배상 판결 사례 급증</span>
+        <span class="desc"><span class="ft" data-fact="중대재해처벌법 제15조: 경영책임자 고의·중과실로 중대재해 발생 시 손해액의 5배 이내 배상 책임. 민사소송 수억~수십억 원 판결 사례 증가." data-src="중대재해처벌법 제15조 (법령정보센터)" data-url="https://www.law.go.kr/lsInfoP.do?lsiSeq=236036">민사소송으로 수억~수십억 원<br>배상 판결 사례 급증</span></span>
       </div>
       <div class="risk-item">
         <span class="number">RISK 03</span>
@@ -566,5 +566,15 @@
 
 </div>
 
+<style>
+.ft{cursor:pointer;border-bottom:1.5px dashed rgba(255,190,50,.75);display:inline}
+.ft:hover{border-bottom-color:rgba(255,190,50,1)}
+#ft-pop{display:none;position:fixed;z-index:99999;max-width:300px;background:rgba(6,8,18,.97);border:1px solid rgba(255,190,50,.3);border-left:3px solid rgba(255,190,50,.7);border-radius:4px;padding:12px 14px 10px;font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.65;color:rgba(255,255,255,.9);box-shadow:0 8px 32px rgba(0,0,0,.75);pointer-events:none;white-space:normal}
+#ft-pop .fp-src{margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:rgba(255,190,50,.8);line-height:1.5}
+#ft-pop .fp-hint{font-size:10px;color:rgba(255,255,255,.3);margin-top:3px}
+</style>
+<script>
+!function(){var p=document.createElement('div');p.id='ft-pop';p.innerHTML='<div class="fp-bd"></div><div class="fp-src"></div><div class="fp-hint">클릭 → 원본 자료 열기</div>';document.body.appendChild(p);var u='';document.querySelectorAll('.ft').forEach(function(e){e.addEventListener('mouseenter',function(ev){p.querySelector('.fp-bd').textContent=e.dataset.fact||'';p.querySelector('.fp-src').textContent='출처: '+(e.dataset.src||'');u=e.dataset.url||'';p.querySelector('.fp-hint').style.display=u?'':'none';p.style.display='block';mv(ev);});e.addEventListener('mousemove',mv);e.addEventListener('mouseleave',function(){p.style.display='none';});e.addEventListener('click',function(ev){if(u){ev.stopPropagation();window.open(u,'_blank');}});});function mv(ev){var pw=p.offsetWidth||300,ph=p.offsetHeight||80,x=ev.clientX+14,y=ev.clientY+14;if(x+pw>window.innerWidth-8)x=ev.clientX-pw-6;if(y+ph>window.innerHeight-8)y=ev.clientY-ph-6;p.style.left=x+'px';p.style.top=y+'px';}}();
+</script>
 </body>
 </html>
