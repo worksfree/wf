@@ -1797,7 +1797,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.7.5.10';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.7.5.11';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -1840,7 +1840,7 @@ const TREE = [
       { label:{ko:'현장클리닉 관리',       en:'Field Clinic'},        icon:'🏥', iframe:'consulting/g1/index.html',    consultantOnly:true },
       { label:{ko:'중대재해처벌법',        en:'Serious Accident Act'}, icon:'⚖', iframe:'consulting/jdh/index.html',  consultantOnly:true },
       { label:{ko:'ESG 자가진단',         en:'ESG Assessment'},      icon:'🏢', iframe:'consulting/esg/index.html',   consultantOnly:true },
-      { label:{ko:'ISO 자가진단',         en:'ISO Self-Check'},      icon:'📋', iframe:'consulting/iso/index.html',   consultantOnly:true },
+      // { label:{ko:'ISO 자가진단',         en:'ISO Self-Check'},      icon:'📋', iframe:'consulting/iso/index.html',   consultantOnly:true },
       { label:{ko:'기업공시 조회',         en:'DART Disclosure'},     icon:'🏙', iframe:'consulting/dart/index.html',  consultantOnly:true },
       { label:{ko:'상속·증여 진단',        en:'Inheritance Plan'},    icon:'🔑', iframe:'consulting/inheritance/index.html', roleOnly:'gfc', gfcTag:true },
       { label:{ko:'경영종합진단',          en:'Financial Plan'},      icon:'🔑', iframe:'consulting/gfc/index.html',   roleOnly:'gfc', gfcTag:true },
@@ -1914,10 +1914,10 @@ const DASH_CARDS = [
     title:{ko:'ESG 자가진단',        en:'ESG Assessment'},
     desc: {ko:'환경·사회·지배구조 수준 점검',        en:'Assess ESG readiness level'},
     iframe:'consulting/esg/index.html', consultantOnly:true },
-  { icon:'📋',
-    title:{ko:'ISO 자가진단',        en:'ISO Self-Check'},
-    desc: {ko:'ISO 9001·14001·45001·42001·27001 인증 준비도 점검', en:'Check readiness for ISO 9001·14001·45001·42001·27001'},
-    iframe:'consulting/iso/index.html', consultantOnly:true },
+  // { icon:'📋',
+  //   title:{ko:'ISO 자가진단',        en:'ISO Self-Check'},
+  //   desc: {ko:'ISO 9001·14001·45001·42001·27001 인증 준비도 점검', en:'Check readiness for ISO 9001·14001·45001·42001·27001'},
+  //   iframe:'consulting/iso/index.html', consultantOnly:true },
   { icon:'🏙',
     title:{ko:'기업공시 조회',          en:'DART Disclosure'},
     desc: {ko:'DART 기업 공시 정보 조회·분석',        en:'Search & analyze DART corporate disclosures'},
