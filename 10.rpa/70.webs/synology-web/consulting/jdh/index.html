@@ -151,6 +151,15 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 .urg-high{background:#2d1515;color:#f87171;}
 .urg-mid{background:#2d1f08;color:#fbbf24;}
 
+/* gov support section */
+.gov-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.gov-card{background:var(--panel);border:1px solid #1a3a2a;border-left:3px solid var(--green);border-radius:var(--radius);padding:14px;}
+.gov-card .gov-type{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--green);margin-bottom:3px;}
+.gov-card .gov-name{font-size:13px;font-weight:600;margin-bottom:5px;}
+.gov-card .gov-benefit{font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;}
+.gov-card .gov-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:8px;}
+.gov-card .gov-target{font-size:11px;padding:2px 8px;border-radius:6px;background:#0a1f12;border:1px solid #1a3a2a;color:#6ee7b7;display:inline-block;}
+
 /* actions */
 .result-actions{display:flex;gap:10px;padding:16px 0;flex-wrap:wrap;}
 .btn-print{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;
@@ -181,15 +190,17 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 @media(max-width:380px){.trend-grid{grid-template-columns:1fr}}
 @media print{
   body{background:#fff;color:#111;}
-  .topbar{background:#fff;border-color:#ddd;color:#111;}
-  .topbar .sub{color:#666;}
+  .topbar{display:none;}
   .trend-banner{display:none;}
   .progress-wrap,.btn-print,.btn-restart,.btn-back,.wizard,.back-row{display:none;}
   .result{padding:0;}
   .apply-banner.full{background:#dbeafe;border-color:#2563eb;color:#1e40af;}
   .apply-banner.extended{background:#fef9c3;border-color:#d97706;color:#92400e;}
   .apply-banner.exempt{background:#d1fae5;border-color:#059669;color:#065f46;}
-  .section,.phase,.score-card,.ins-card{background:#fff;border-color:#ccc;break-inside:avoid;}
+  .section,.phase,.score-card,.ins-card,.gov-card{background:#fff;border-color:#ccc;break-inside:avoid;}
+  .gov-card{border-left-color:#059669;}
+  .gov-card .gov-type,.gov-card .gov-benefit{color:#065f46;}
+  .gov-card .gov-target{background:#f0fdf4;border-color:#bbf7d0;color:#065f46;}
   .section-head{border-color:#ddd;background:#f5f5f5;}
   .obl-row{border-color:#e5e7eb;}
   .obl-body .obl-title,.phase-title{color:#111;}
@@ -197,7 +208,7 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
   .section-head h3,.ins-card .ins-name{color:#111;}
   .score-card .s-lbl,.ins-card .ins-tag{color:#555;}
   .roadmap{grid-template-columns:repeat(3,1fr);}
-  .ins-grid{grid-template-columns:1fr 1fr;}
+  .ins-grid,.gov-grid{grid-template-columns:1fr 1fr;}
   .result-actions{display:none;}
 }
 </style>
@@ -773,6 +784,71 @@ function buildReport(){
     phase3.push('사업 확장 시 중대재해처벌법 적용 여부 재진단');
   }
 
+  // --- government support programs ---
+  const govPrograms = [];
+  if(appl !== 'exempt'){
+    // 안전보건관리체계 무료 컨설팅: 5~299인 (300인 이상도 신청 가능)
+    if(!['u5'].includes(C.headcount)){
+      govPrograms.push({
+        type:'무료 컨설팅',
+        name:'안전보건관리체계 구축 무료 컨설팅',
+        benefit:'전액 무료 (3~4개월 전문가 지원)',
+        desc:'KOSHA 안전보건 전문가가 사업장을 5회 방문해 위험성 평가 체계를 직접 구축해 드립니다. 중대재해처벌법 핵심 의무 이행의 가장 빠른 출발점입니다.',
+        target:['5to49','50to299'].includes(C.headcount) ? '5~299인 사업장 (신청 우선)' : '300인 이상도 신청 가능 (예산 내)',
+      });
+    }
+    // 스마트 안전장비 보조금: 50인 미만 우선
+    if(C.headcount === '5to49'){
+      govPrograms.push({
+        type:'직접 보조금',
+        name:'클린사업장 스마트 안전장비 지원',
+        benefit:'최대 4,000만원 현금 보조',
+        desc:'CCTV·충돌 감지·가스 감지기 등 스마트 안전장비 구매 비용을 정부가 직접 지원합니다. 50인 미만 사업장 우선 배정, 예산 소진 시 조기 마감.',
+        target:'50인 미만 사업장 (clean.kosha.or.kr)',
+      });
+    }
+    // 산재예방시설 융자: 300인 미만 우선
+    if(['5to49','50to299'].includes(C.headcount)){
+      govPrograms.push({
+        type:'저금리 융자',
+        name:'산재예방시설 융자금 지원',
+        benefit:'최대 10억원 · 연 1.5%',
+        desc:'안전 설비 투자 시 시중금리 대비 파격적인 장기 저리로 자금을 조달할 수 있습니다. 거치 3년 + 상환 7년으로 초기 부담이 없습니다.',
+        target:'300인 미만 우선 (clean.kosha.or.kr)',
+      });
+    }
+    // 위험성평가 인정 → 산재보험료 최대 30% 할인: 50인 미만
+    if(C.headcount === '5to49'){
+      govPrograms.push({
+        type:'보험료 절감',
+        name:'위험성평가 인정 — 산재보험료 최대 30% 할인',
+        benefit:'산재보험료 매년 최대 30% 절감',
+        desc:'위험성평가를 실시하고 고용노동부 인정을 받으면 산재보험료율이 최대 30% 인하됩니다. 법적 의무 이행과 비용 절감을 동시에 달성합니다.',
+        target:'50인 미만 제조·임업 등 (근로복지공단)',
+      });
+    }
+    // 소규모 안전보건 기술지원: 50인 미만
+    if(C.headcount === '5to49'){
+      govPrograms.push({
+        type:'무료 기술지원',
+        name:'소규모 사업장 안전보건 기술지원',
+        benefit:'전액 무료 (정기 방문 지원)',
+        desc:'안전보건 전문기관이 정기 방문해 위험요인 발굴, 개선 지도, 교육자료 제공 등을 무료로 지원합니다. 중대재해처벌법 의무 기록 구비에 직접 도움이 됩니다.',
+        target:'50인 미만 전 업종 (kosha.or.kr)',
+      });
+    }
+    // 대·중소기업 상생협력: 모기업 있는 경우
+    if(['300to499','o500'].includes(C.headcount) || ['sub','both'].includes(C.dispatch)){
+      govPrograms.push({
+        type:'상생협력 지원',
+        name:'대·중소기업 안전보건 상생협력사업',
+        benefit:'컨설팅·안전활동비 매칭 지원',
+        desc:'모기업과 협력업체가 공동 신청 시 정부가 매칭 지원. 안전보건 컨설팅, 교육, 장비 비용의 상당 부분을 지원받을 수 있습니다.',
+        target:'협력사 보유 사업장 (kosha.or.kr)',
+      });
+    }
+  }
+
   // --- insurance ---
   const ins = [];
   if(appl !== 'exempt'){
@@ -887,6 +963,27 @@ function buildReport(){
         </div>
       </div>
     </div>
+
+    ${govPrograms.length > 0 ? `
+    <div class="section">
+      <div class="section-head">
+        <h3>정부지원사업 활용 — 법령 준수 비용 절감</h3>
+        <span class="cnt cnt-green">${govPrograms.length}개 사업 해당</span>
+      </div>
+      <div style="padding:16px">
+        <div class="gov-grid">
+          ${govPrograms.map(g=>`
+          <div class="gov-card">
+            <div class="gov-type">${g.type}</div>
+            <div class="gov-name">${g.name}</div>
+            <div class="gov-benefit">${g.benefit}</div>
+            <div class="gov-desc">${g.desc}</div>
+            <div class="gov-target">▸ 신청 대상: ${g.target}</div>
+          </div>`).join('')}
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">※ 예산 소진 시 조기 마감됩니다. 빠른 신청을 권장합니다. 통합 신청처: <strong style="color:var(--text)">KOSHA (kosha.or.kr)</strong> · <strong style="color:var(--text)">클린사업장 (clean.kosha.or.kr)</strong></p>
+      </div>
+    </div>` : ''}
 
     ${ins.length > 0 ? `
     <div class="section">

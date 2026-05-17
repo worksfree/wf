@@ -95,7 +95,8 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 
 /* ── print ── */
 @media print{
-  .topbar,.filters{position:static;}
+  .topbar{display:none;}
+  .filters{position:static;}
   body{background:#fff;color:#111;}
   .prog-card{background:#f9f9f9;border-color:#ddd;break-inside:avoid;page-break-inside:avoid;}
   .card-detail{max-height:none!important;padding-bottom:10px!important;}
