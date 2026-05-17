@@ -1797,7 +1797,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.7.5.8';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.7.5.10';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -1869,9 +1869,9 @@ const TREE = [
   },
   {
     label:{ko:'O&M 관리', en:'O&M Admin'}, icon:'⚙', adminOnly:true, children:[
-      { label:{ko:'사용자 현황',   en:'User Status'},    icon:'👥', coming:true },
-      { label:{ko:'시스템 모니터', en:'System Monitor'}, icon:'📊', coming:true },
-      { label:{ko:'콘텐츠 관리',  en:'Content Mgmt'},   icon:'📝', coming:true },
+      { label:{ko:'사용자 현황',   en:'User Status'},    icon:'👥', iframe:'admin/users/index.html' },
+      { label:{ko:'시스템 모니터', en:'System Monitor'}, icon:'📊', iframe:'admin/monitor/index.html' },
+      { label:{ko:'콘텐츠 관리',  en:'Content Mgmt'},   icon:'📝', iframe:'admin/content/index.html' },
     ]
   },
 ];

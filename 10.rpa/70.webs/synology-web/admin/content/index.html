@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>콘텐츠 관리 — WorksFree O&M</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root {
+  --bg:#0f1117; --surface:#1a1d27; --surface2:#222536; --border:#2d3047;
+  --text:#e2e8f0; --muted:#94a3b8; --hint:#64748b;
+  --blue:#3b82f6; --green:#10b981; --yellow:#f59e0b; --red:#ef4444; --purple:#8b5cf6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.hdr-icon{font-size:22px}.hdr-title{font-size:16px;font-weight:600;flex:1}
+.hdr-sub{font-size:12px;color:var(--hint)}
+.btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:12px;transition:.15s}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.page{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+.section{margin-bottom:28px}
+.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* Search bar */
+.search-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.search-input{flex:1;min-width:160px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none}
+.search-input:focus{border-color:var(--blue)}
+.search-input::placeholder{color:var(--hint)}
+.filter-btn{padding:5px 12px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;transition:.15s;white-space:nowrap}
+.filter-btn.active,.filter-btn:hover{border-color:var(--blue);color:var(--blue);background:#1e3a5f30}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--surface);padding:10px 14px;text-align:left;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface)}
+td{padding:10px 14px;vertical-align:middle}
+
+/* Role badge */
+.badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-general{background:#1e2535;color:var(--muted);border:1px solid var(--border)}
+.badge-consultant{background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb40}
+.badge-gfc{background:#2d1d5a;color:#c4b5fd;border:1px solid #7c3aed40}
+.badge-admin{background:#3b0f0f;color:#fca5a5;border:1px solid #dc262640}
+
+/* Role select */
+.role-select{padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;cursor:pointer}
+.role-select:hover{border-color:var(--blue)}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
+#toast.ok{background:#0c2a1a;color:#34d399;border:1px solid #10b98150}
+#toast.err{background:#2a0808;color:#fca5a5;border:1px solid #ef444450}
+#toast.show{opacity:1}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:#00000088;display:flex;align-items:center;justify-content:center;z-index:9000;display:none}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;max-width:400px;width:90%}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:8px}
+.modal-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.modal-cancel{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px}
+.modal-confirm{padding:8px 16px;border-radius:8px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:13px;font-weight:500}
+.modal-confirm:hover{background:#2563eb}
+.modal-confirm.danger{background:var(--red)}.modal-confirm.danger:hover{background:#b91c1c}
+
+.status-bar{font-size:11px;color:var(--hint);text-align:right;margin-bottom:6px}
+.screen{display:flex;align-items:center;justify-content:center;min-height:300px}
+.denied-box{text-align:center}.denied-icon{font-size:44px;margin-bottom:12px}
+.empty-row td{text-align:center;padding:32px;color:var(--hint)}
+.credit-chip{font-size:11px;color:var(--blue);background:#1e3a5f30;border-radius:10px;padding:2px 8px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">📝</div>
+  <div class="hdr-title">콘텐츠 관리</div>
+  <div class="hdr-sub" id="last-updated"></div>
+  <button class="btn" onclick="loadData()">↻ 새로고침</button>
+</header>
+
+<div id="loading" class="screen"><span style="color:var(--muted)">데이터 로딩 중…</span></div>
+
+<div id="denied" class="screen" style="display:none">
+  <div class="denied-box">
+    <div class="denied-icon">🔒</div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:8px">관리자 전용 페이지</div>
+    <div style="color:var(--muted);font-size:13px">관리자 권한으로 로그인 후 이용하세요.</div>
+  </div>
+</div>
+
+<div id="app" class="page" style="display:none">
+
+  <!-- 역할 관리 -->
+  <div class="section">
+    <div class="section-title">회원 역할 관리</div>
+    <div class="search-bar">
+      <input class="search-input" id="search-input" placeholder="User ID 또는 역할로 검색…" oninput="filterUsers()">
+      <button class="filter-btn active" data-role="all"        onclick="filterRole('all')">전체</button>
+      <button class="filter-btn" data-role="general"           onclick="filterRole('general')">일반회원</button>
+      <button class="filter-btn" data-role="consultant"        onclick="filterRole('consultant')">컨설턴트</button>
+      <button class="filter-btn" data-role="gfc"               onclick="filterRole('gfc')">파트너</button>
+    </div>
+    <div class="status-bar" id="status-bar"></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>현재 역할</th>
+            <th>동의일</th>
+            <th>크레딧 잔액</th>
+            <th>역할 변경</th>
+            <th>User ID</th>
+          </tr>
+        </thead>
+        <tbody id="user-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 크레딧 지급 -->
+  <div class="section">
+    <div class="section-title">수동 크레딧 지급</div>
+    <div style="padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px">특정 회원에게 크레딧을 수동으로 지급합니다. User ID를 정확히 입력하세요.</div>
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end;flex-wrap:wrap">
+        <div>
+          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">User ID</label>
+          <input class="search-input" id="credit-uid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">지급량</label>
+          <input class="search-input" id="credit-amount" type="number" min="1" max="99999" value="100" style="width:100px">
+        </div>
+        <button class="btn" style="border-color:var(--green);color:var(--green);padding:8px 16px" onclick="openCreditModal()">✚ 지급</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 역할 변경 확인 모달 -->
+<div class="modal-bg" id="role-modal">
+  <div class="modal-box">
+    <div class="modal-title">역할 변경 확인</div>
+    <div class="modal-desc" id="role-modal-desc"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal('role-modal')">취소</button>
+      <button class="modal-confirm" id="role-modal-ok" onclick="confirmRoleChange()">변경</button>
+    </div>
+  </div>
+</div>
+
+<!-- 크레딧 지급 확인 모달 -->
+<div class="modal-bg" id="credit-modal">
+  <div class="modal-box">
+    <div class="modal-title">크레딧 지급 확인</div>
+    <div class="modal-desc" id="credit-modal-desc"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal('credit-modal')">취소</button>
+      <button class="modal-confirm" style="background:var(--green)" onclick="confirmCreditGrant()">지급</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let allProfiles = [];
+let credMap     = {};
+let curFilter   = 'all';
+let pendingRoleChange = null;
+
+function show(id) {
+  ['loading','denied','app'].forEach(i =>
+    document.getElementById(i).style.display = i === id ? '' : 'none'
+  );
+}
+
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `${type} show`;
+  setTimeout(() => { el.classList.remove('show'); }, 3000);
+}
+
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function openModal(id)  { document.getElementById(id).style.display = 'flex'; }
+
+function roleBadge(role) {
+  const lbl = {general:'일반',consultant:'컨설턴트',gfc:'파트너',admin:'관리자'};
+  return `<span class="badge badge-${role||'general'}">${lbl[role]||role||'—'}</span>`;
+}
+function fmtDate(iso) { return iso ? iso.slice(0,10) : '—'; }
+function shortId(id)  { return id ? `<span title="${id}">${id.slice(0,8)}…</span>` : '—'; }
+function num(n)       { return (n||0).toLocaleString(); }
+
+function filterRole(role) {
+  curFilter = role;
+  document.querySelectorAll('[data-role]').forEach(b =>
+    b.classList.toggle('active', b.dataset.role === role)
+  );
+  renderTable();
+}
+
+function filterUsers() { renderTable(); }
+
+function renderTable() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  let rows = curFilter === 'all' ? allProfiles : allProfiles.filter(p => p.role === curFilter);
+  if (q) rows = rows.filter(p => p.id.toLowerCase().includes(q) || (p.role||'').includes(q));
+
+  document.getElementById('status-bar').textContent =
+    `${rows.length}명 표시 · ${allProfiles.length}명 전체`;
+
+  const tbody = document.getElementById('user-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">회원 없음</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map((p, i) => {
+    const cr  = credMap[p.id] || {};
+    const bal = cr.balance || 0;
+    const isAdmin = p.role === 'admin';
+    const roleOpts = ['general','consultant','gfc']
+      .filter(r => r !== p.role)
+      .map(r => {
+        const lbl = {general:'일반',consultant:'컨설턴트',gfc:'파트너'};
+        return `<option value="${r}">${lbl[r]}</option>`;
+      }).join('');
+
+    return `<tr>
+      <td style="color:var(--hint)">${i+1}</td>
+      <td>${roleBadge(p.role)}</td>
+      <td style="color:var(--muted)">${fmtDate(p.agreed_at)}</td>
+      <td>${bal > 0 ? `<span class="credit-chip">${num(bal)} cr</span>` : '<span style="color:var(--hint)">—</span>'}</td>
+      <td>${isAdmin
+        ? '<span style="color:var(--hint);font-size:12px">변경 불가</span>'
+        : `<div style="display:flex;align-items:center;gap:6px">
+            <select class="role-select" id="sel-${p.id}" onchange="">
+              <option value="${p.role}" selected>${{general:'일반',consultant:'컨설턴트',gfc:'파트너'}[p.role]}</option>
+              ${roleOpts}
+            </select>
+            <button class="btn" style="padding:4px 10px;font-size:11px"
+              onclick="openRoleModal('${p.id}','${p.role}')">적용</button>
+          </div>`
+      }</td>
+      <td style="color:var(--hint);font-family:monospace;font-size:12px">${shortId(p.id)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openRoleModal(userId, curRole) {
+  const sel    = document.getElementById(`sel-${userId}`);
+  const newRole = sel ? sel.value : curRole;
+  if (newRole === curRole) { toast('동일한 역할입니다.', 'err'); return; }
+  const lbl = {general:'일반회원',consultant:'컨설턴트',gfc:'파트너'};
+  pendingRoleChange = { userId, curRole, newRole };
+  document.getElementById('role-modal-desc').innerHTML =
+    `User ID: <code style="font-size:12px;color:var(--blue)">${userId.slice(0,12)}…</code><br><br>` +
+    `<strong>${lbl[curRole]||curRole}</strong> → <strong style="color:var(--blue)">${lbl[newRole]||newRole}</strong><br><br>` +
+    `<span style="color:var(--yellow)">⚠ 역할 변경 시 해당 회원의 서비스 접근 권한이 즉시 변경됩니다.</span>`;
+  openModal('role-modal');
+}
+
+async function confirmRoleChange() {
+  if (!pendingRoleChange) return;
+  const { userId, newRole } = pendingRoleChange;
+  closeModal('role-modal');
+
+  const { error } = await sb.from('profiles')
+    .update({ role: newRole })
+    .eq('id', userId);
+
+  if (error) {
+    toast(`오류: ${error.message}`, 'err');
+  } else {
+    toast('역할이 변경되었습니다.', 'ok');
+    await loadData();
+  }
+  pendingRoleChange = null;
+}
+
+function openCreditModal() {
+  const uid    = document.getElementById('credit-uid').value.trim();
+  const amount = parseInt(document.getElementById('credit-amount').value);
+  if (!uid || uid.length < 20) { toast('User ID를 정확히 입력하세요.', 'err'); return; }
+  if (!amount || amount < 1)   { toast('지급량을 입력하세요.', 'err'); return; }
+  document.getElementById('credit-modal-desc').innerHTML =
+    `User ID: <code style="font-size:12px;color:var(--blue)">${uid.slice(0,12)}…</code><br><br>` +
+    `<strong style="color:var(--green);font-size:18px">+${amount.toLocaleString()} 크레딧</strong> 을 지급합니다.`;
+  openModal('credit-modal');
+}
+
+async function confirmCreditGrant() {
+  const uid    = document.getElementById('credit-uid').value.trim();
+  const amount = parseInt(document.getElementById('credit-amount').value);
+  closeModal('credit-modal');
+
+  const env = (() => {
+    const h = location.hostname;
+    if (h.startsWith('test.'))    return 'test';
+    if (h.startsWith('staging.')) return 'staging';
+    return 'portal';
+  })();
+
+  const { error } = await sb.from('credits').insert({
+    user_id:    uid,
+    amount:     amount,
+    type:       'manual_grant',
+    description:'관리자 수동 지급',
+    env,
+    created_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    toast(`오류: ${error.message}`, 'err');
+  } else {
+    toast(`${amount.toLocaleString()} 크레딧이 지급되었습니다.`, 'ok');
+    document.getElementById('credit-uid').value = '';
+    await loadData();
+  }
+}
+
+async function loadData() {
+  const [profRes, credRes] = await Promise.all([
+    sb.from('profiles').select('id,role,agreed_at').order('agreed_at',{ascending:false}),
+    sb.from('credit_balance').select('user_id,balance'),
+  ]);
+
+  credMap     = {};
+  (credRes.data||[]).forEach(c => { credMap[c.user_id] = c; });
+  allProfiles = (profRes.data||[]).filter(p => p.role !== 'admin');
+
+  document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+  renderTable();
+}
+
+async function init() {
+  if (localStorage.getItem('wf_dev_session') === 'admin') {
+    show('app'); await loadData(); return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { show('denied'); return; }
+  const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+  if (!prof || prof.role !== 'admin') { show('denied'); return; }
+  show('app'); await loadData();
+}
+init();
+</script>
+</body>
+</html>

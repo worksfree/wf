@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시스템 모니터 — WorksFree O&M</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root {
+  --bg:#0f1117; --surface:#1a1d27; --surface2:#222536; --border:#2d3047;
+  --text:#e2e8f0; --muted:#94a3b8; --hint:#64748b;
+  --blue:#3b82f6; --green:#10b981; --yellow:#f59e0b; --red:#ef4444; --purple:#8b5cf6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.hdr-icon{font-size:22px}.hdr-title{font-size:16px;font-weight:600;flex:1}
+.hdr-sub{font-size:12px;color:var(--hint)}
+.btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:12px;transition:.15s}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.page{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+.section{margin-bottom:28px}
+.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative}
+.sc-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.sc-val{font-size:24px;font-weight:700;line-height:1}
+.sc-sub{font-size:11px;color:var(--hint);margin-top:4px}
+.sc-dot{position:absolute;top:14px;right:14px;width:8px;height:8px;border-radius:50%;background:var(--green)}
+.sc-dot.warn{background:var(--yellow)}.sc-dot.err{background:var(--red)}
+
+/* Status indicator */
+.status-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.ok{background:var(--green)}.status-dot.warn{background:var(--yellow)}.status-dot.err{background:var(--red)}
+.status-label{font-size:13px;flex:1}
+.status-val{font-size:12px;color:var(--muted)}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--surface);padding:10px 14px;text-align:left;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface)}
+td{padding:10px 14px;vertical-align:middle}
+
+/* Env badge */
+.env-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.env-portal{background:#0c2a1a;color:#34d399;border:1px solid #10b98140}
+.env-staging{background:#1e2a3b;color:#60a5fa;border:1px solid #3b82f640}
+.env-test{background:#2a2208;color:#fbbf24;border:1px solid #f59e0b40}
+.env-dev{background:#1e1e2e;color:var(--muted);border:1px solid var(--border)}
+
+/* Status badge */
+.pay-done{color:var(--green)}.pay-fail{color:var(--red)}.pay-pend{color:var(--yellow)}
+
+.bar-wrap{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s}
+.screen{display:flex;align-items:center;justify-content:center;min-height:300px}
+.denied-box{text-align:center}.denied-icon{font-size:44px;margin-bottom:12px}
+.empty-row td{text-align:center;padding:32px;color:var(--hint)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">📊</div>
+  <div class="hdr-title">시스템 모니터</div>
+  <div class="hdr-sub" id="last-updated"></div>
+  <button class="btn" onclick="loadData()">↻ 새로고침</button>
+</header>
+
+<div id="loading" class="screen"><span style="color:var(--muted)">데이터 로딩 중…</span></div>
+
+<div id="denied" class="screen" style="display:none">
+  <div class="denied-box">
+    <div class="denied-icon">🔒</div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:8px">관리자 전용 페이지</div>
+    <div style="color:var(--muted);font-size:13px">관리자 권한으로 로그인 후 이용하세요.</div>
+  </div>
+</div>
+
+<div id="app" class="page" style="display:none">
+
+  <!-- 시스템 상태 -->
+  <div class="section">
+    <div class="section-title">시스템 상태</div>
+    <div id="status-rows"></div>
+  </div>
+
+  <!-- 결제 요약 -->
+  <div class="section">
+    <div class="section-title">결제 요약</div>
+    <div class="stats">
+      <div class="stat-card"><div class="sc-label">총 결제 건수</div><div class="sc-val" id="pay-count">—</div></div>
+      <div class="stat-card"><div class="sc-label">성공 결제</div><div class="sc-val" id="pay-done" style="color:var(--green)">—</div></div>
+      <div class="stat-card"><div class="sc-label">총 결제액</div><div class="sc-val" id="pay-total" style="color:var(--blue)">—</div><div class="sc-sub">원</div></div>
+      <div class="stat-card"><div class="sc-label">구독 활성</div><div class="sc-val" id="sub-active" style="color:var(--purple)">—</div></div>
+      <div class="stat-card"><div class="sc-label">크레딧 발행</div><div class="sc-val" id="cr-issued" style="color:var(--yellow)">—</div><div class="sc-sub">건</div></div>
+    </div>
+  </div>
+
+  <!-- 환경별 결제 -->
+  <div class="section">
+    <div class="section-title">환경별 결제 현황</div>
+    <div id="env-bars"></div>
+  </div>
+
+  <!-- 최근 결제 내역 -->
+  <div class="section">
+    <div class="section-title">최근 결제 내역 (최대 20건)</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>일시</th><th>환경</th><th>상태</th>
+            <th style="text-align:right">금액(원)</th>
+            <th>결제수단</th><th>User ID</th>
+          </tr>
+        </thead>
+        <tbody id="pay-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 구독 현황 -->
+  <div class="section">
+    <div class="section-title">활성 구독 목록</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>환경</th><th>시작일</th><th>만료일</th><th>상태</th><th>User ID</th>
+          </tr>
+        </thead>
+        <tbody id="sub-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+function show(id) {
+  ['loading','denied','app'].forEach(i =>
+    document.getElementById(i).style.display = i === id ? '' : 'none'
+  );
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('ko-KR', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+function shortId(id) { return id ? id.slice(0,8)+'…' : '—'; }
+function num(n)      { return (n||0).toLocaleString(); }
+
+function statusRow(dot, label, val) {
+  return `<div class="status-row">
+    <div class="status-dot ${dot}"></div>
+    <div class="status-label">${label}</div>
+    <div class="status-val">${val}</div>
+  </div>`;
+}
+
+function envBadge(env) {
+  return `<span class="env-badge env-${env||'dev'}">${env||'—'}</span>`;
+}
+
+async function ping() {
+  const t0 = Date.now();
+  await sb.from('profiles').select('id').limit(1);
+  return Date.now() - t0;
+}
+
+async function loadData() {
+  const t0 = Date.now();
+
+  const [payRes, subRes, crRes, profRes, latency] = await Promise.all([
+    sb.from('payments').select('*').order('created_at',{ascending:false}).limit(100),
+    sb.from('subscriptions').select('*').eq('status','active').order('expires_at',{ascending:false}),
+    sb.from('credits').select('id,env,created_at').order('created_at',{ascending:false}).limit(200),
+    sb.from('profiles').select('id',{count:'exact',head:true}),
+    ping(),
+  ]);
+
+  const loadMs = Date.now() - t0;
+
+  // 시스템 상태
+  const statusRows = document.getElementById('status-rows');
+  statusRows.innerHTML =
+    statusRow('ok',  'Supabase 연결', `${latency}ms`) +
+    statusRow('ok',  '데이터 로드',   `${loadMs}ms`) +
+    statusRow(profRes.count > 0 ? 'ok' : 'warn', '총 회원 수', `${profRes.count || 0}명`) +
+    statusRow('ok',  '현재 시각', new Date().toLocaleString('ko-KR'));
+
+  // 결제 통계
+  const pays = payRes.data || [];
+  const donePays = pays.filter(p => p.status === 'DONE' || p.status === 'done' || p.status === 'succeeded');
+  const totalAmt = donePays.reduce((s,p) => s + (p.amount || p.totalAmount || 0), 0);
+
+  document.getElementById('pay-count').textContent  = pays.length;
+  document.getElementById('pay-done').textContent   = donePays.length;
+  document.getElementById('pay-total').textContent  = num(totalAmt);
+  document.getElementById('sub-active').textContent = (subRes.data||[]).length;
+  document.getElementById('cr-issued').textContent  = (crRes.data||[]).length;
+
+  // 환경별 바
+  const envCounts = {};
+  pays.forEach(p => { const e=p.env||'portal'; envCounts[e]=(envCounts[e]||0)+1; });
+  const maxEnv = Math.max(...Object.values(envCounts), 1);
+  const envColors = {portal:'var(--green)',staging:'var(--blue)',test:'var(--yellow)',dev:'var(--muted)'};
+  document.getElementById('env-bars').innerHTML = Object.entries(envCounts)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([env,cnt]) => `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span>${envBadge(env)}</span>
+          <span style="color:var(--muted)">${cnt}건</span>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-fill" style="width:${Math.round(cnt/maxEnv*100)}%;background:${envColors[env]||'var(--blue)'}"></div>
+        </div>
+      </div>
+    `).join('') || '<div style="color:var(--hint);font-size:13px;padding:8px">결제 데이터 없음</div>';
+
+  // 최근 결제
+  const payTbody = document.getElementById('pay-tbody');
+  const recent20 = pays.slice(0,20);
+  if (!recent20.length) {
+    payTbody.innerHTML = '<tr class="empty-row"><td colspan="6">결제 내역 없음</td></tr>';
+  } else {
+    payTbody.innerHTML = recent20.map(p => {
+      const st = p.status||'';
+      const stClass = (st==='DONE'||st==='done'||st==='succeeded') ? 'pay-done'
+                    : (st==='FAILED'||st==='failed') ? 'pay-fail' : 'pay-pend';
+      const amt = p.amount || p.totalAmount || 0;
+      return `<tr>
+        <td style="color:var(--muted);white-space:nowrap">${fmtDate(p.created_at)}</td>
+        <td>${envBadge(p.env)}</td>
+        <td class="${stClass}">${st||'—'}</td>
+        <td style="text-align:right;font-weight:600">${num(amt)}</td>
+        <td style="color:var(--muted)">${p.method||p.payment_method||'—'}</td>
+        <td style="color:var(--hint);font-family:monospace;font-size:12px">${shortId(p.user_id)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // 구독 목록
+  const subs = subRes.data || [];
+  const subTbody = document.getElementById('sub-tbody');
+  if (!subs.length) {
+    subTbody.innerHTML = '<tr class="empty-row"><td colspan="5">활성 구독 없음</td></tr>';
+  } else {
+    subTbody.innerHTML = subs.map(s => `<tr>
+      <td>${envBadge(s.env)}</td>
+      <td style="color:var(--muted)">${fmtDate(s.starts_at)}</td>
+      <td style="color:var(--yellow)">${fmtDate(s.expires_at)}</td>
+      <td style="color:var(--green)">${s.status||'—'}</td>
+      <td style="color:var(--hint);font-family:monospace;font-size:12px">${shortId(s.user_id)}</td>
+    </tr>`).join('');
+  }
+
+  document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+}
+
+async function init() {
+  if (localStorage.getItem('wf_dev_session') === 'admin') {
+    show('app'); await loadData(); return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { show('denied'); return; }
+  const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+  if (!prof || prof.role !== 'admin') { show('denied'); return; }
+  show('app'); await loadData();
+}
+init();
+</script>
+</body>
+</html>

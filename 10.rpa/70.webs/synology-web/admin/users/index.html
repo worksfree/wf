@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사용자 현황 — WorksFree O&M</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root {
+  --bg:#0f1117; --surface:#1a1d27; --surface2:#222536; --border:#2d3047;
+  --text:#e2e8f0; --muted:#94a3b8; --hint:#64748b;
+  --blue:#3b82f6; --green:#10b981; --yellow:#f59e0b; --red:#ef4444; --purple:#8b5cf6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.hdr-icon{font-size:22px}.hdr-title{font-size:16px;font-weight:600;flex:1}
+.hdr-sub{font-size:12px;color:var(--hint)}
+.btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:12px;transition:.15s}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.page{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+.section{margin-bottom:28px}
+.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:4px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.sc-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.sc-val{font-size:26px;font-weight:700;line-height:1}
+.sc-sub{font-size:11px;color:var(--hint);margin-top:4px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--surface);padding:10px 14px;text-align:left;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface)}
+td{padding:10px 14px;vertical-align:middle}
+.badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-general{background:#1e2535;color:var(--muted);border:1px solid var(--border)}
+.badge-consultant{background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb40}
+.badge-gfc{background:#2d1d5a;color:#c4b5fd;border:1px solid #7c3aed40}
+.badge-admin{background:#3b0f0f;color:#fca5a5;border:1px solid #dc262640}
+.status-bar{font-size:11px;color:var(--hint);text-align:right;margin-bottom:6px}
+.err-note{font-size:12px;color:var(--yellow);padding:10px 14px;background:#2a2208;border-radius:8px;border:1px solid #78350f;margin-bottom:12px}
+.screen{display:flex;align-items:center;justify-content:center;min-height:300px}
+.denied-box{text-align:center}.denied-icon{font-size:44px;margin-bottom:12px}
+.empty-row td{text-align:center;padding:32px;color:var(--hint)}
+.filter-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.filter-btn{padding:4px 12px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;transition:.15s}
+.filter-btn.active,.filter-btn:hover{border-color:var(--blue);color:var(--blue);background:#1e3a5f30}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">👥</div>
+  <div class="hdr-title">사용자 현황</div>
+  <div class="hdr-sub" id="last-updated"></div>
+  <button class="btn" onclick="loadData()">↻ 새로고침</button>
+</header>
+
+<div id="loading" class="screen"><span style="color:var(--muted)">데이터 로딩 중…</span></div>
+
+<div id="denied" class="screen" style="display:none">
+  <div class="denied-box">
+    <div class="denied-icon">🔒</div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:8px">관리자 전용 페이지</div>
+    <div style="color:var(--muted);font-size:13px">관리자 권한으로 로그인 후 이용하세요.</div>
+  </div>
+</div>
+
+<div id="app" class="page" style="display:none">
+
+  <div class="section">
+    <div class="section-title">회원 현황</div>
+    <div class="stats">
+      <div class="stat-card"><div class="sc-label">총 회원</div><div class="sc-val" id="cnt-total">—</div></div>
+      <div class="stat-card"><div class="sc-label">일반회원</div><div class="sc-val" id="cnt-general" style="color:var(--muted)">—</div></div>
+      <div class="stat-card"><div class="sc-label">컨설턴트</div><div class="sc-val" id="cnt-consultant" style="color:var(--blue)">—</div></div>
+      <div class="stat-card"><div class="sc-label">파트너</div><div class="sc-val" id="cnt-gfc" style="color:var(--purple)">—</div></div>
+      <div class="stat-card"><div class="sc-label">관리자</div><div class="sc-val" id="cnt-admin" style="color:var(--red)">—</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">크레딧 요약</div>
+    <div class="stats">
+      <div class="stat-card"><div class="sc-label">총 충전</div><div class="sc-val" id="cr-charged" style="color:var(--green)">—</div><div class="sc-sub">크레딧</div></div>
+      <div class="stat-card"><div class="sc-label">총 잔액</div><div class="sc-val" id="cr-balance" style="color:var(--blue)">—</div><div class="sc-sub">크레딧</div></div>
+      <div class="stat-card"><div class="sc-label">총 사용</div><div class="sc-val" id="cr-used" style="color:var(--yellow)">—</div><div class="sc-sub">크레딧</div></div>
+      <div class="stat-card"><div class="sc-label">잔액 보유 회원</div><div class="sc-val" id="cr-holders">—</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">회원 목록</div>
+    <div id="err-note" class="err-note" style="display:none"></div>
+    <div class="filter-row">
+      <button class="filter-btn active" data-role="all"   onclick="filterRole('all')">전체</button>
+      <button class="filter-btn" data-role="general"      onclick="filterRole('general')">일반회원</button>
+      <button class="filter-btn" data-role="consultant"   onclick="filterRole('consultant')">컨설턴트</button>
+      <button class="filter-btn" data-role="gfc"          onclick="filterRole('gfc')">파트너</button>
+      <button class="filter-btn" data-role="admin"        onclick="filterRole('admin')">관리자</button>
+    </div>
+    <div class="status-bar" id="status-bar"></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>역할</th><th>동의일</th>
+            <th style="text-align:right">크레딧 잔액</th>
+            <th style="text-align:right">총 충전</th>
+            <th style="text-align:right">총 사용</th>
+            <th>User ID</th>
+          </tr>
+        </thead>
+        <tbody id="user-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let allProfiles = [];
+let credMap     = {};
+let curFilter   = 'all';
+
+function show(id) {
+  ['loading','denied','app'].forEach(i =>
+    document.getElementById(i).style.display = i === id ? '' : 'none'
+  );
+}
+
+function roleBadge(role) {
+  const lbl = {general:'일반',consultant:'컨설턴트',gfc:'파트너',admin:'관리자'};
+  return `<span class="badge badge-${role||'general'}">${lbl[role]||role||'—'}</span>`;
+}
+
+function fmtDate(iso) { return iso ? iso.slice(0,10) : '—'; }
+function shortId(id)  { return id ? id.slice(0,8)+'…' : '—'; }
+function num(n)       { return (n||0).toLocaleString(); }
+
+function filterRole(role) {
+  curFilter = role;
+  document.querySelectorAll('.filter-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.role === role)
+  );
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('user-tbody');
+  const rows  = curFilter === 'all'
+    ? allProfiles
+    : allProfiles.filter(p => p.role === curFilter);
+
+  document.getElementById('status-bar').textContent =
+    `${rows.length}명 표시 · 마지막 갱신: ${new Date().toLocaleTimeString()}`;
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">해당 역할의 회원이 없습니다.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map((p, i) => {
+    const cr = credMap[p.id] || {};
+    return `<tr>
+      <td style="color:var(--hint)">${i+1}</td>
+      <td>${roleBadge(p.role)}</td>
+      <td style="color:var(--muted)">${fmtDate(p.agreed_at)}</td>
+      <td style="text-align:right;color:var(--blue)">${num(cr.balance)}</td>
+      <td style="text-align:right;color:var(--green)">${num(cr.total_charged)}</td>
+      <td style="text-align:right;color:var(--hint)">${num(cr.total_used)}</td>
+      <td style="color:var(--hint);font-family:monospace;font-size:12px">${shortId(p.id)}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function loadData() {
+  document.getElementById('status-bar').textContent = '로딩 중…';
+  document.getElementById('err-note').style.display = 'none';
+
+  const [profRes, credRes] = await Promise.all([
+    sb.from('profiles').select('id,role,agreed_at').order('agreed_at', {ascending:false}),
+    sb.from('credit_balance').select('user_id,balance,total_charged,total_used'),
+  ]);
+
+  // Credit map
+  credMap = {};
+  (credRes.data || []).forEach(c => { credMap[c.user_id] = c; });
+
+  // Profile stats
+  allProfiles = profRes.data || [];
+  if (profRes.error) {
+    const note = document.getElementById('err-note');
+    note.textContent = `데이터 로드 오류: ${profRes.error.message} — RLS 정책에서 admin 역할에 SELECT 권한을 부여해야 합니다.`;
+    note.style.display = '';
+  }
+
+  const byRole = {};
+  allProfiles.forEach(p => { byRole[p.role] = (byRole[p.role]||0)+1; });
+  document.getElementById('cnt-total').textContent      = allProfiles.length;
+  document.getElementById('cnt-general').textContent    = byRole.general    || 0;
+  document.getElementById('cnt-consultant').textContent = byRole.consultant  || 0;
+  document.getElementById('cnt-gfc').textContent        = byRole.gfc        || 0;
+  document.getElementById('cnt-admin').textContent      = byRole.admin      || 0;
+
+  // Credit summary
+  const creds = credRes.data || [];
+  document.getElementById('cr-charged').textContent = num(creds.reduce((s,c)=>s+(c.total_charged||0),0));
+  document.getElementById('cr-balance').textContent = num(creds.reduce((s,c)=>s+(c.balance||0),0));
+  document.getElementById('cr-used').textContent    = num(creds.reduce((s,c)=>s+(c.total_used||0),0));
+  document.getElementById('cr-holders').textContent = creds.filter(c=>c.balance>0).length;
+
+  document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+  renderTable();
+}
+
+async function init() {
+  if (localStorage.getItem('wf_dev_session') === 'admin') {
+    show('app'); await loadData(); return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { show('denied'); return; }
+  const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+  if (!prof || prof.role !== 'admin') { show('denied'); return; }
+  show('app'); await loadData();
+}
+init();
+</script>
+</body>
+</html>
