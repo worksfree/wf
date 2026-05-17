@@ -16,14 +16,14 @@
 body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
 /* ── top header ── */
-.topbar{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--panel);
-  display:flex;align-items:center;gap:14px;}
+.topbar{min-height:72px;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--panel);
+  display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
 .topbar .icon{font-size:28px;}
 .topbar h1{font-size:17px;font-weight:600;}
 .topbar .sub{font-size:13px;color:var(--muted);}
 
 /* ── progress ── */
-.progress-wrap{padding:14px 24px 0;background:var(--panel);border-bottom:1px solid var(--border);}
+.progress-wrap{padding:14px 24px 0;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:72px;z-index:99;}
 .progress-top{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;}
 .progress-bar{height:3px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden;}
 .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s;}
@@ -166,10 +166,24 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 .alert-box .al-body .al-text{font-size:12px;color:#fca5a5;line-height:1.6;}
 
 /* ── print ── */
+/* ── TREND BANNER ── */
+.trend-banner{background:#120d06;border-bottom:1px solid var(--border);padding:16px 24px}
+.trend-inner{max-width:740px;margin:0 auto}
+.trend-title{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.trend-title::before{content:'';width:16px;height:1px;background:var(--amber);flex-shrink:0}
+.trend-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.trend-stat{background:#1a110a;border:1px solid #4a2a0a;border-radius:8px;padding:12px 14px}
+.ts-val{font-size:22px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums;margin-bottom:2px}
+.ts-label{font-size:11px;color:var(--muted);line-height:1.4}
+.trend-note{background:#1a110a;border:1px solid #4a2a0a;border-left:3px solid var(--amber);border-radius:6px;padding:11px 14px;font-size:12.5px;color:#fcd34d;line-height:1.65}
+.trend-note strong{color:var(--amber)}
+@media(max-width:680px){.trend-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:380px){.trend-grid{grid-template-columns:1fr}}
 @media print{
   body{background:#fff;color:#111;}
   .topbar{background:#fff;border-color:#ddd;color:#111;}
   .topbar .sub{color:#666;}
+  .trend-banner{display:none;}
   .progress-wrap,.btn-print,.btn-restart,.btn-back,.wizard,.back-row{display:none;}
   .result{padding:0;}
   .apply-banner.full{background:#dbeafe;border-color:#2563eb;color:#1e40af;}
@@ -195,6 +209,37 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
   <div>
     <h1>중대재해처벌법 컨설팅 진단</h1>
     <div class="sub">법 적용 여부 · 의무 이행 현황 · 위험도 · 맞춤 로드맵</div>
+  </div>
+</div>
+
+<!-- ── 트렌드 배너 ── -->
+<div class="trend-banner">
+  <div class="trend-inner">
+    <div class="trend-title">중대재해처벌법 — 대응 현황과 리스크</div>
+    <div class="trend-grid">
+      <div class="trend-stat">
+        <div class="ts-val">50억</div>
+        <div class="ts-label">사망사고 법인 최대 벌금액<br>(중대재해처벌법 제11조)</div>
+      </div>
+      <div class="trend-stat">
+        <div class="ts-val">5인↑</div>
+        <div class="ts-label">2024년 1월 전면 확대<br>5인 이상 전 사업장 적용</div>
+      </div>
+      <div class="trend-stat">
+        <div class="ts-val">800+</div>
+        <div class="ts-label">연간 산업재해 사망자<br>(2023년 829명, 중대재해 포함)</div>
+      </div>
+      <div class="trend-stat">
+        <div class="ts-val">2018</div>
+        <div class="ts-label">출퇴근 재해 산재 인정 원년<br>(산재보험법 개정, 2018.1.1 시행)</div>
+      </div>
+    </div>
+    <div class="trend-note">
+      <strong>핵심 문제:</strong> 2022년 1월 시행 이후 건설·제조업을 중심으로 경영책임자 기소 사례가 잇따르고 있습니다.
+      2024년 1월부터 <strong>5인 이상 모든 사업장</strong>으로 전면 확대되어 소규모 사업체 대표도
+      안전보건관리체계 미비 시 1년 이상 징역 또는 10억 원 이하 벌금의 형사처벌 대상이 됩니다.
+      또한 <strong>2018년부터는 출퇴근 중 발생한 사고도 산재로 인정</strong>되어 사업주의 산재보험 관리 부담이 커졌습니다.
+    </div>
   </div>
 </div>
 

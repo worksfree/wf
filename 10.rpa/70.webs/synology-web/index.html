@@ -375,19 +375,19 @@
     padding:2px 7px; font-weight:600;
   }
   .tree-gfc-tag {
-    font-size:11px; background:#1e1b4b; color:#a5b4fc;
-    border:1px solid #4338ca; border-radius:10px;
-    padding:1px 7px; margin-left:auto; flex-shrink:0;
+    font-size:11px; background:#0c2340; color:#60a5fa;
+    border:1px solid #1e40af; border-radius:10px;
+    padding:1px 7px; flex-shrink:0;
   }
   .tree-consultant-tag {
     font-size:11px; background:#0a1f1a; color:#34d399;
     border:1px solid #065f46; border-radius:10px;
-    padding:1px 7px; margin-left:auto; flex-shrink:0;
+    padding:1px 7px; flex-shrink:0;
   }
   .tree-member-tag {
     font-size:11px; background:#1c1200; color:#f59e0b;
     border:1px solid #78350f; border-radius:10px;
-    padding:1px 7px; margin-left:auto; flex-shrink:0;
+    padding:1px 7px; flex-shrink:0;
   }
 
   /* ── 유저 위젯 (사이드바 상단) ──────────────────── */
@@ -937,7 +937,7 @@
   <div class="denied-box">
     <div class="denied-icon">🔒</div>
     <div class="denied-title" id="denied-title">접근 권한 없음</div>
-    <div class="denied-desc"  id="denied-desc">이 메뉴는 GFC 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.</div>
+    <div class="denied-desc"  id="denied-desc">이 메뉴는 파트너 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.</div>
   </div>
 </div>
 
@@ -1386,17 +1386,17 @@ let lang = localStorage.getItem('wf_lang') || 'ko';
 const HUB_I18N = {
   ko: {
     home:          '홈',
-    badge_gfc:     'GFC 전용 접속',
+    badge_gfc:     '파트너 전용 접속',
     badge_open:    '일반 접속',
     denied_title:  '접근 권한 없음',
-    denied_desc:   '이 메뉴는 GFC 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.',
+    denied_desc:   '이 메뉴는 파트너 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.',
     dashboard:     '대시보드',
-    home_desc_gfc: 'GFC 전용 도구 포함 전체 메뉴에 접근 가능합니다.',
-    home_desc_open:'공용 도구에 접근 가능합니다. GFC 전용 콘텐츠는 제공되지 않습니다.',
-    tooltip_gfc:   'GFC 파트너 전용 메뉴입니다',
+    home_desc_gfc: '파트너 전용 도구 포함 전체 메뉴에 접근 가능합니다.',
+    home_desc_open:'공용 도구에 접근 가능합니다. 파트너 전용 콘텐츠는 제공되지 않습니다.',
+    tooltip_gfc:   '파트너 전용 메뉴입니다',
     tooltip_coming:'준비 중인 메뉴입니다',
     coming_tag:    '준비중',
-    card_lock:       'GFC 전용',
+    card_lock:       '파트너 전용',
     member_tag:      '회원전용',
     consultant_tag:  '컨설팅 전용',
     tooltip_consultant: '경영지도사 / GFC 파트너 전용 서비스입니다',
@@ -1505,17 +1505,17 @@ const HUB_I18N = {
   },
   en: {
     home:          'Home',
-    badge_gfc:     'GFC Partner Access',
+    badge_gfc:     'Partner Access',
     badge_open:    'General Access',
     denied_title:  'Access Denied',
-    denied_desc:   'This menu is for GFC partners only.<br>Please use the correct link or<br>contact your account manager.',
+    denied_desc:   'This menu is for partners only.<br>Please use the correct link or<br>contact your account manager.',
     dashboard:     'Dashboard',
-    home_desc_gfc: 'You have access to all menus including GFC-exclusive tools.',
-    home_desc_open:'You have access to public tools. GFC-exclusive content is not available.',
-    tooltip_gfc:   'GFC Partner exclusive menu',
+    home_desc_gfc: 'You have access to all menus including partner-exclusive tools.',
+    home_desc_open:'You have access to public tools. Partner-exclusive content is not available.',
+    tooltip_gfc:   'Partner exclusive menu',
     tooltip_coming:'This menu is coming soon',
     coming_tag:    'Coming Soon',
-    card_lock:       'GFC Only',
+    card_lock:       'Partner Only',
     member_tag:      'Member Only',
     consultant_tag:  'Consultant Only',
     tooltip_consultant: 'For Consultants / GFC Partners only',
@@ -1787,7 +1787,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.7.3.8';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.7.5.1';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 이 값만 GFC 동료에게 공유
 
 const params   = new URLSearchParams(location.search);
@@ -1832,6 +1832,8 @@ const TREE = [
       { label:{ko:'예비창업패키지', en:'Pre-Startup Package'}, icon:'🚀', iframe:'consulting/prebiz/index.html', consultantOnly:true },
       { label:{ko:'경영종합진단',   en:'Financial Plan'},      icon:'✦', iframe:'consulting/gfc/index.html', roleOnly:'gfc', gfcTag:true },
       { label:{ko:'CEO 플랜',      en:'CEO Plan'},            icon:'✦', iframe:'consulting/ceo/index.html', roleOnly:'gfc', gfcTag:true },
+      { label:{ko:'상속·증여 진단', en:'Inheritance Plan'},   icon:'🏛', iframe:'consulting/inheritance/index.html', roleOnly:'gfc', gfcTag:true },
+      { label:{ko:'컨설팅 마인드맵', en:'Consulting Mindmap'}, icon:'🗺', iframe:'consulting/mindmap/index.html', consultantOnly:true },
     ]
   },
   {
@@ -1902,6 +1904,14 @@ const DASH_CARDS = [
     title:{ko:'CEO 플랜',            en:'CEO Plan'},
     desc: {ko:'법인 컨설팅 종합 플랜',               en:'Corporate consulting comprehensive plan'},
     iframe:'consulting/ceo/index.html', roleOnly:'gfc', gfcTag:true },
+  { icon:'🏛',
+    title:{ko:'상속·증여 진단',       en:'Inheritance Plan'},
+    desc: {ko:'상속세 20년 동결·부동산 급등 — GFC 등급 진단', en:'Inheritance tax 20yr freeze · GFC grade diagnosis'},
+    iframe:'consulting/inheritance/index.html', roleOnly:'gfc', gfcTag:true },
+  { icon:'🗺',
+    title:{ko:'컨설팅 마인드맵',       en:'Consulting Mindmap'},
+    desc: {ko:'전체 체크리스트 노드 한눈에 보기',     en:'All checklist nodes at a glance'},
+    iframe:'consulting/mindmap/index.html', consultantOnly:true },
   { icon:'📋',
     title:{ko:'앱 요청 게시판',         en:'App Request Board'},
     desc: {ko:'원하는 자동화 앱을 요청하세요',        en:'Request an automation app you need'},
@@ -1953,6 +1963,19 @@ function buildTree(nodes, depth=0, path=[]) {
     labelEl.appendChild(textEl);
 
     if (node.children && node.children.length) {
+      // 태그는 노드 이름 바로 옆 (▶ 앞)
+      if (node.consultantTag) {
+        const tag = document.createElement('span');
+        tag.className = 'tree-consultant-tag';
+        tag.textContent = t('consultant_tag');
+        labelEl.appendChild(tag);
+      } else if (node.memberTag) {
+        const tag = document.createElement('span');
+        tag.className = 'tree-member-tag';
+        tag.textContent = t('member_tag');
+        labelEl.appendChild(tag);
+      }
+
       const caret = document.createElement('span');
       caret.className = 'tree-caret';
       caret.textContent = '▶';
@@ -1968,21 +1991,6 @@ function buildTree(nodes, depth=0, path=[]) {
         caret.classList.toggle('open', open);
       });
 
-      // 부모 노드 뱃지 — consultantTag / memberTag
-      if (node.consultantTag) {
-        const tag = document.createElement('span');
-        tag.className = 'tree-consultant-tag';
-        tag.textContent = t('consultant_tag');
-        tag.style.marginLeft = 'auto';
-        labelEl.appendChild(tag);
-      } else if (node.memberTag) {
-        const tag = document.createElement('span');
-        tag.className = 'tree-member-tag';
-        tag.textContent = t('member_tag');
-        tag.style.marginLeft = 'auto';
-        labelEl.appendChild(tag);
-      }
-
       nodeEl.appendChild(labelEl);
       nodeEl.appendChild(children);
 
@@ -1990,7 +1998,7 @@ function buildTree(nodes, depth=0, path=[]) {
       labelEl.style.cursor = node.coming ? 'default' : 'pointer';
       if (node.coming) {
         const tag = document.createElement('span');
-        tag.style.cssText = 'font-size:12px;background:#1c2333;color:#475569;border:1px solid #334155;border-radius:10px;padding:1px 7px;margin-left:auto;';
+        tag.style.cssText = 'font-size:12px;background:#1c2333;color:#475569;border:1px solid #334155;border-radius:10px;padding:1px 7px;';
         tag.textContent = t('coming_tag');
         labelEl.appendChild(tag);
       }
@@ -2127,7 +2135,7 @@ function loadIframe(src, path=[], label='') {
   const fc = document.getElementById('frame-container');
   fc.style.display = 'block';
   const iframe = document.getElementById('contentFrame');
-  iframe.src = src;
+  iframe.src = src + '?v=' + HUB_VERSION;
   setBreadcrumb(path, label);
   // 로드 후 현재 언어·역할 전파
   iframe.onload = () => {

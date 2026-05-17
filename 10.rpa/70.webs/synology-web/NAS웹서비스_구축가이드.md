@@ -1752,31 +1752,113 @@ _sb.auth.onAuthStateChange((event, session) => {
 ## 11장. 배포 자동화 스크립트 (Windows PowerShell)
 
 > 로컬에서 작업한 파일을 NAS에 자동으로 업로드하는 스크립트입니다.  
-> Git Bash의 `tar`를 사용하여 Google Drive 클라우드 파일도 포함 전송합니다.
+> Git Bash의 `tar`를 사용하여 Google Drive 클라우드 파일도 포함 전송하며,  
+> 배포 후 Cloudflare Edge 캐시까지 자동으로 초기화합니다.
 
-```powershell
-# deploy.ps1
-$NAS_USER   = "admin"
-$NAS_IP     = "192.168.x.x"
-$LOCAL_PATH = "C:\path\to\your\webfiles"
-$REMOTE_PATH = "/volume1/web/portal"
-$GIT_BASH   = "C:\Program Files\Git\bin\bash.exe"
+### 11.1 3단계 배포 흐름
 
-# POSIX 경로 변환
-$drive   = $LOCAL_PATH.Substring(0,1).ToLower()
-$posix   = '/' + $drive + ($LOCAL_PATH.Substring(2) -replace '\\', '/')
-
-# tar로 묶어서 SSH 파이프로 전송
-$cmd = "cd '$posix' && tar -czf - . | ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} 'tar -xzf - -C ${REMOTE_PATH}/ --no-same-permissions'"
-& $GIT_BASH -c $cmd
+```
+로컬 편집
+   ↓  deploy.ps1 실행
+버전 자동 증가 (환경별)
+   ↓
+index.html HUB_VERSION 동기화
+   ↓
+tar + SSH → NAS 전송
+   ↓
+Cloudflare purge_everything (Edge 캐시 초기화)
+   ↓
+NAS에서 index.html 존재 확인 (배포 검증)
 ```
 
+### 11.2 3-레이어 캐시 구조와 버스팅 전략
+
+정적 웹사이트 배포 시 캐시는 세 단계에 걸쳐 동작한다.
+
+```
+[사용자 브라우저 캐시]  ← URL이 같으면 네트워크 요청 자체를 건너뜀
+        ↓
+[Cloudflare Edge 캐시] ← purge_everything으로 초기화 가능
+        ↓
+[NAS 원본 파일]         ← 배포 시 tar+SSH로 교체
+```
+
+**문제**: Cloudflare 퍼지는 Edge 캐시만 지운다. 브라우저가 이전 버전을 로컬에 캐싱했다면 사용자는 여전히 낡은 화면을 본다.
+
+**해결책 (현재 적용 방식)**:
+
+| 레이어 | 해결 방법 |
+|--------|----------|
+| Cloudflare Edge | 배포 직후 `purge_everything` API 호출 |
+| 브라우저 (iframe) | `?v=HUB_VERSION` — 배포마다 URL이 달라져 브라우저가 새 리소스로 인식 |
+
+```javascript
+// index.html 내부 — 컨설팅 페이지 iframe 로드 시
+iframe.src = src + '?v=' + HUB_VERSION;
+// HUB_VERSION은 배포마다 자동 갱신되므로 강제 새로고침 없이도 최신 파일 수신
+```
+
+### 11.3 배포 환경별 버전 증가 규칙
+
+버전 형식: `MAJOR.MINOR.PATCH.BUILD` (예: `0.7.4.12`)
+
+| 환경 | 메뉴 번호 | 증가 자리 | 동작 | 예시 |
+|------|----------|----------|------|------|
+| test | 1 | BUILD (4번째) | 자연 증가, 상한 없음 | `0.7.4.9` → `0.7.4.10` |
+| staging | 2 | PATCH (3번째) | BUILD를 0으로 리셋 | `0.7.4.15` → `0.7.5.0` |
+| portal | 3 | MINOR (2번째) | PATCH·BUILD를 0으로 리셋 | `0.7.5.3` → `0.8.0.0` |
+| g1consulting | 4 | BUILD (4번째) | test와 동일 | `0.7.4.9` → `0.7.4.10` |
+
+- BUILD 자리는 test 반복 횟수 — 10을 넘어도 캐스케이드 없이 그대로 증가 (`0.7.4.10`, `0.7.4.11` …)
+- PATCH·MINOR는 9를 넘으면 상위 자리 올림 (`0.7.9.x` staging → `0.8.0.0`)
+- Q(취소)·R(롤백) 선택 시 버전 변경 없음
+
+**권장 배포 순서**: test → staging → portal (각 환경에서 검증 후 다음 단계)
+
+### 11.4 deploy.bat (더블클릭 실행기)
+
 ```batch
-rem deploy.bat (더블클릭으로 실행)
 @echo off
 powershell -ExecutionPolicy Bypass -File "%~dp0deploy.ps1"
 pause
 ```
+
+### 11.5 deploy.ps1 핵심 로직 (참고용)
+
+```powershell
+# ── 변수 ──
+$VERSION    = "0.7.4.12"   # 배포 시 자동 갱신
+$NAS_USER   = "wfadmin"
+$NAS_IP     = "192.168.100.38"
+$GIT_BASH   = "C:\Program Files\Git\bin\bash.exe"
+$CF_ZONE_ID = "<Cloudflare Zone ID>"
+$CF_API_TOKEN = "<Cloudflare API Token>"
+
+# ── 배포 환경 메뉴 ──
+# [1] test  [2] staging  [3] portal  [4] g1consulting  [Q] 취소  [R] 롤백
+
+# ── 버전 증가 (환경 선택 직후 실행) ──
+switch ($choice) {
+    "2" { $p[2]++; $p[3] = 0 }           # staging: PATCH↑, BUILD 리셋
+    "3" { $p[1]++; $p[2] = 0; $p[3] = 0 } # portal: MINOR↑, PATCH·BUILD 리셋
+    default { $p[3]++ }                    # test·g1: BUILD 자연 증가
+}
+# deploy.ps1 자신의 $VERSION 라인과 index.html의 HUB_VERSION 동기화
+
+# ── tar+SSH 전송 (Google Drive 클라우드 파일 포함) ──
+$cmd = "cd '$posix' && tar -czf - --exclude='.git' --exclude='*.log' . " +
+       "| ssh user@${NAS_IP} 'tar -xzf - -C ${REMOTE_PATH}/ --no-same-permissions --no-same-owner 2>/dev/null; exit 0'"
+& $GIT_BASH -c $cmd
+
+# ── Cloudflare Edge 캐시 퍼지 ──
+Invoke-RestMethod -Uri "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" `
+    -Method POST `
+    -Headers @{ Authorization = "Bearer $CF_API_TOKEN"; "Content-Type" = "application/json" } `
+    -Body '{"purge_everything":true}'
+```
+
+> ⚠️ `--no-same-permissions --no-same-owner 2>/dev/null; exit 0` 없으면  
+> NAS의 BusyBox tar가 디렉토리 권한 변경 실패 오류를 내며 배포 실패로 잘못 판정됩니다.
 
 ---
 

@@ -1,5 +1,5 @@
 # 시놀로지 NAS 웹서비스 완전 구축 가이드
-**최종 업데이트:** 2026년 5월 10일  
+**최종 업데이트:** 2026년 5월 17일  
 **대상 도메인:** `worksfree.kr` (예시 — 실제 운영: `worksfree.co.kr`)  
 **환경:** 시놀로지 NAS + Cloudflare Tunnel + Windows 배포 + Supabase Auth  
 **목적:** SOHO 수준의 최저 비용으로 test/staging/portal 3단계 웹서비스 + 소셜·이메일 회원가입 구축
@@ -230,7 +230,7 @@ ssh-copy-id wfadmin@192.168.100.38
 
 > ℹ️ NAS 재부팅 후 비밀번호를 다시 요구하면 `ssh-copy-id`를 한 번 더 실행하세요.
 
-### 4-2. deploy.ps1 — 3단계 배포 스크립트
+### 4-2. deploy.ps1 — 3단계 + 파트너 배포 스크립트
 
 **실행 방법 (택 1):**
 - `deploy.bat` 더블클릭
@@ -239,13 +239,28 @@ ssh-copy-id wfadmin@192.168.100.38
 
 **실행 흐름:**
 ```
-[1] test     → 기능 검증 (즉시 배포)
-[2] staging  → 최종 점검 (즉시 배포)
-[3] portal   → 실 서비스 ('yes' 입력 이중 확인 후 배포)
-[Q] 취소
+[1] test          → 기능 검증 (즉시 배포)
+[2] staging       → 최종 점검 (즉시 배포)
+[3] portal        → 실 서비스 ('yes' 입력 이중 확인 후 배포)
+[4] g1consulting  → GFC 파트너 전용 서버
+[Q] 취소 / [R] 롤백
 ```
 
-**배포 완료 후 자동 검증:** NAS SSH 접속 → index.html 존재 여부 확인 → 결과 출력
+**배포 시 자동 처리:**
+
+| 단계 | 내용 |
+|------|------|
+| ① 버전 증가 | 환경에 따라 자리수 선택 (test·g1=4번째, staging=3번째, portal=2번째) |
+| ② index.html 동기화 | `HUB_VERSION` 상수를 새 버전으로 자동 업데이트 |
+| ③ tar+SSH 전송 | Git Bash tar로 묶어 SSH 파이프 전송 (Google Drive 파일 포함) |
+| ④ Cloudflare 캐시 퍼지 | 배포 후 Edge 캐시 자동 초기화 (`purge_everything`) |
+| ⑤ 배포 검증 | NAS SSH 접속 → index.html 존재 여부 확인 |
+
+**브라우저 캐시 버스팅:**  
+`HUB_VERSION` 값이 매 배포마다 바뀌므로, iframe URL(`?v=HUB_VERSION`)도 함께 바뀐다.  
+Cloudflare 퍼지는 Edge 캐시만 지우지만, URL 변경은 브라우저 로컬 캐시도 우회한다.
+
+> ⚠️ Q(취소)·R(롤백) 선택 시 버전이 증가하지 않습니다.
 
 ### 4-3. Google Drive 경로에서 배포 시 주의사항
 

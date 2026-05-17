@@ -62,6 +62,154 @@ setAuthMsg('el-msg', 'err', '이메일 또는 비밀번호가 틀렸습니다.')
 - [ ] HTML 요소에 ID 부여 (applyHubLang에서 참조용)
 - [ ] HTML 초기값은 ko로 작성 (페이지 로드 직후 applyHubLang이 덮어씀)
 
+## 컨설팅 진단 페이지 — 스티키 헤더 + 프로그레스바 템플릿
+
+프로그레스바가 있는 모든 컨설팅 진단 페이지는 아래 구조를 **그대로** 복사해서 시작한다.  
+확정된 레퍼런스 구현: `gfc/index.html`, `inheritance/index.html`, `jdh/index.html`
+
+### ❌ 절대 하지 말 것
+
+```html
+<!-- iframe 임베드 시 헤더를 숨기는 스크립트 — 절대 추가 금지 -->
+<script>
+(function(){
+  if(window.self !== window.top){
+    document.querySelector('header').style.display = 'none'; // ← 금지
+  }
+})();
+</script>
+```
+> 이 스크립트가 있으면 허브(index.html)의 iframe 안에서 헤더가 사라진다.  
+> 컨설팅 페이지는 항상 iframe으로 로드되므로 헤더가 완전히 숨겨지는 버그 발생.
+
+---
+
+### HTML 구조 (템플릿)
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- ↑ iframe hide 스크립트 없음 — 절대 추가 금지 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>페이지 제목 — WorksFree</title>
+<style>
+/* ... CSS ... */
+</style>
+</head>
+<body>
+
+<!-- 1. 스티키 헤더 (72px) — 항상 화면 상단에 고정 -->
+<header>
+  <div class="hdr-icon">🔷</div>          <!-- 페이지 대표 이모지/아이콘 -->
+  <div class="hdr-info">
+    <div class="hdr-title">진단 페이지 제목</div>
+    <div class="hdr-sub">부제목 · 키워드 · 설명</div>
+  </div>
+  <div class="hdr-r" id="hdr-r"></div>    <!-- JS가 진행 단계 표시 (선택) -->
+</header>
+
+<!-- 2. 트렌드 배너 — 스티키 아님, 스크롤 시 사라짐 -->
+<div class="trend-banner">
+  <div class="trend-inner">
+    <div class="trend-title">배너 제목</div>
+    <div class="trend-grid">
+      <div class="trend-stat"><div class="ts-val">수치</div><div class="ts-label">설명</div></div>
+      <!-- 3~4개 통계 카드 -->
+    </div>
+    <div class="trend-note"><strong>핵심 문제:</strong> ...</div>
+  </div>
+</div>
+
+<!-- 3. 기타 섹션 (시뮬레이터 등, 선택) -->
+
+<!-- 4. 스티키 프로그레스바 — header 바로 아래 고정 (top:72px) -->
+<div class="prog-wrap">
+  <div class="prog-inner">
+    <div class="prog-meta"><span id="prog-lbl">진단 시작</span><span id="prog-pct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="breadcrumb" id="bc"></div>
+  </div>
+</div>
+
+<!-- 5. 질문 렌더링 영역 -->
+<div class="page">
+  <div id="view"></div>
+</div>
+
+<script>
+/* ... */
+</script>
+</body>
+</html>
+```
+
+---
+
+### 필수 CSS
+
+```css
+/* ── 헤더 (스티키, 72px) ── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  min-height: 72px; padding: 14px 24px;
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.hdr-icon  { font-size: 26px; flex-shrink: 0; }
+.hdr-info  { flex: 1; }
+.hdr-title { font-size: 17px; font-weight: 600; letter-spacing: -.2px; }
+.hdr-sub   { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.hdr-r     { font-size: 12px; color: var(--hint); font-weight: 500; margin-left: auto; flex-shrink: 0; }
+
+/* ── 프로그레스바 래퍼 (스티키, 헤더 바로 아래) ── */
+.prog-wrap  { position: sticky; top: 72px; z-index: 99; background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px 0; }
+.prog-inner { max-width: 740px; margin: 0 auto; }
+.prog-meta  { display: flex; justify-content: space-between; font-size: 11px; color: var(--hint); margin-bottom: 7px; }
+.prog-track { height: 3px; background: var(--border); border-radius: 2px; }
+.prog-fill  { height: 100%; background: var(--blue); border-radius: 2px; transition: width .4s; }
+.breadcrumb { display: flex; flex-wrap: wrap; gap: 4px; min-height: 24px; padding-bottom: 10px; align-items: center; }
+.crumb      { font-size: 11px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 2px 9px; border-radius: 20px; }
+
+/* ── 콘텐츠 영역 ── */
+.page { max-width: 740px; margin: 0 auto; padding: 8px 18px 72px; }
+```
+
+---
+
+### 필수 JS — scrollToQ()
+
+질문 선택·뒤로 가기·재시작 시 `window.scrollTo({top:0})` 금지.  
+`top:0`으로 스크롤하면 트렌드 배너가 화면을 가려 질문이 프로그레스바 뒤에 묻힌다.
+
+```javascript
+function scrollToQ() {
+  const pw = document.querySelector('.prog-wrap');
+  window.scrollTo({top: pw ? Math.max(0, pw.offsetTop - 72) : 0, behavior:'smooth'});
+}
+
+function pick(pos, optIdx) {
+  /* ... 로직 ... */
+  render();
+  scrollToQ(); // ← window.scrollTo({top:0}) 금지
+}
+function goBack()  { /* ... */ render(); scrollToQ(); }
+function restart() { /* ... */ render(); scrollToQ(); }
+```
+
+---
+
+### 신규 진단 페이지 추가 시 체크리스트
+
+- [ ] `<head>` 상단에 iframe hide 스크립트 없음 확인 (추가 금지)
+- [ ] `<header>` — `min-height:72px`, `position:sticky; top:0` + `.hdr-icon` / `.hdr-info` / `.hdr-title` / `.hdr-sub` 구조
+- [ ] `<div class="prog-wrap">` — `.page` 컨테이너 **밖**에 배치, `position:sticky; top:72px`
+- [ ] `.page` — `padding-top:8px` (상단 여백 최소화)
+- [ ] JS — `scrollToQ()` 사용, `window.scrollTo({top:0})` 사용 금지
+- [ ] 트렌드 배너 — `<header>` 바로 아래, `.prog-wrap` 바로 위 (스티키 아님)
+
 ## 파일 구조
 
 ```
@@ -81,6 +229,44 @@ synology-web/
 .\deploy.ps1   # 또는 deploy.bat 더블클릭
 # [1] test → [2] staging → [3] portal 순서 권장
 ```
+
+### 자동 처리 항목 (매 배포 시)
+
+1. **버전 자동 증가** — 환경에 따라 다른 자리수 증가 (버전 규칙 섹션 참고)  
+2. **`index.html` 동기화** — `HUB_VERSION` 상수를 deploy.ps1의 `$VERSION`과 동일하게 업데이트  
+3. **tar+SSH 전송** — Google Drive 클라우드 파일 포함 전송  
+4. **Cloudflare 캐시 퍼지** — 배포 후 Edge 캐시 자동 초기화  
+
+### 브라우저 캐시 버스팅 패턴
+
+허브(`index.html`)는 컨설팅 페이지를 iframe으로 로드한다.  
+배포 시 버전이 바뀌면 iframe URL에 `?v=HUB_VERSION`이 붙어 브라우저가 새 리소스로 인식한다.
+
+```javascript
+// index.html 내부 — iframe 로드 시점
+iframe.src = src + '?v=' + HUB_VERSION;
+```
+
+- **왜 필요한가**: Cloudflare 퍼지는 Edge 캐시만 지운다. 브라우저 로컬 캐시는 URL이 달라야 만료된다.
+- **효과**: 매 배포마다 `?v=` 값이 달라지므로 사용자가 강제 새로고침 없이도 최신 콘텐츠를 받는다.
+
+## 버전 규칙 (웹 전용)
+
+버전 형식: `MAJOR.MINOR.PATCH.BUILD` (예: `0.7.4.12`)
+
+배포 환경마다 증가하는 자리가 다르며, `deploy.ps1`이 선택된 환경에 따라 자동 증가한다.
+
+| 환경 | 증가 자리 | 동작 | 예시 |
+|------|----------|------|------|
+| test (1번) | BUILD (4번째) | 자연 증가, 상한 없음 | `0.7.4.9` → `0.7.4.10` |
+| staging (2번) | PATCH (3번째) | BUILD를 0으로 리셋 | `0.7.4.15` → `0.7.5.0` |
+| portal (3번) | MINOR (2번째) | PATCH·BUILD를 0으로 리셋 | `0.7.5.3` → `0.8.0.0` |
+| g1consulting (4번) | BUILD (4번째) | test와 동일 | `0.7.4.9` → `0.7.4.10` |
+
+- BUILD는 test 반복 횟수 — 상한 없이 자연 증가 (`0.7.4.9 → 0.7.4.10`, 캐스케이드 없음).
+- PATCH·MINOR cascade: PATCH가 9 초과 시 MINOR 올림 (`0.7.9.x` staging → `0.8.0.0`).
+- Q(취소)·R(롤백) 선택 시 버전 변경 없음.
+- 버전은 `deploy.ps1`의 `$VERSION`과 `index.html`의 `HUB_VERSION`에 동기화됨.
 
 ## 인증 구조
 

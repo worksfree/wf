@@ -16,40 +16,23 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.7.3.8"             # 현재 배포 버전 (스크립트가 자동 증가)
+$VERSION  = "0.7.5.1"             # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
-    "1" = @{ Name="test";             Path="/volume1/web/test";         URL="https://test.worksfree.co.kr";          Color="Yellow"; SubDir=$null }
-    "2" = @{ Name="staging";          Path="/volume1/web/staging";      URL="https://staging.worksfree.co.kr";       Color="Cyan";   SubDir=$null }
-    "3" = @{ Name="portal (prod)";    Path="/volume1/web/portal";       URL="https://portal.worksfree.co.kr";        Color="Green";  SubDir=$null }
-    "4" = @{ Name="g1consulting";     Path="/volume1/web/g1consulting"; URL="https://g1consulting.worksfree.kr";     Color="Magenta"; SubDir="consulting/g1" }
+    "1" = @{ Name="test";             Path="/volume1/web/test";         URL="https://test.worksfree.kr";          Color="Yellow"; SubDir=$null }
+    "2" = @{ Name="staging";          Path="/volume1/web/staging";      URL="https://staging.worksfree.kr";       Color="Cyan";   SubDir=$null }
+    "3" = @{ Name="portal (prod)";    Path="/volume1/web/portal";       URL="https://portal.worksfree.kr";        Color="Green";  SubDir=$null }
+    "4" = @{ Name="g1consulting";     Path="/volume1/web/g1consulting"; URL="https://g1consulting.worksfree.kr";  Color="Magenta"; SubDir="consulting/g1" }
 }
 
 # 배포 제외 목록
 $EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log",".git","node_modules","*.sh")
 # ────────────────────────────────────────────────────────────────
 
-# ── 버전 자동 증가 (계단식: X.X.X.9 → X.X.(X+1).0) ─────────────
+# 배포 환경 선택 후 증가하므로, 여기서는 현재값 저장만
+$OLD_VERSION   = $VERSION
 $scriptContent = [System.IO.File]::ReadAllText($PSCommandPath, [System.Text.Encoding]::UTF8)
-if ($scriptContent -match '\$VERSION\s*=\s*"(\d+)\.(\d+)\.(\d+)\.(\d+)"') {
-    $p = @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4])
-    $p[3]++
-    for ($i = 3; $i -gt 0; $i--) { if ($p[$i] -ge 10) { $p[$i] = 0; $p[$i-1]++ } }
-    $newVer  = "$($p[0]).$($p[1]).$($p[2]).$($p[3])"
-    # deploy.ps1 자신 업데이트
-    $updated = $scriptContent -replace '(\$VERSION\s*=\s*")[\d.]+"', ('${1}' + $newVer + '"')
-    [System.IO.File]::WriteAllText($PSCommandPath, $updated, [System.Text.Encoding]::UTF8)
-    $VERSION = $newVer
-    # index.html 의 HUB_VERSION 상수 동기화
-    $indexPath = Join-Path $PSScriptRoot 'index.html'
-    if (Test-Path $indexPath) {
-        $html = [System.IO.File]::ReadAllText($indexPath, [System.Text.Encoding]::UTF8)
-        $html = $html -replace "(const HUB_VERSION\s*=\s*')[\d.]+'", ('${1}' + $newVer + "'")
-        [System.IO.File]::WriteAllText($indexPath, $html, [System.Text.Encoding]::UTF8)
-    }
-}
-# ─────────────────────────────────────────────────────────────────
 
 $LOCAL_PATH = $PSScriptRoot
 $TIMESTAMP  = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -76,9 +59,9 @@ if (-not (Get-Command scp -ErrorAction SilentlyContinue)) {
 # ── 배포 대상 선택 ───────────────────────────────────────────────
 Write-Host "  배포 대상을 선택하세요:" -ForegroundColor White
 Write-Host ""
-Write-Host "    [1]  test          — 기능 검증용     (test.worksfree.co.kr)"          -ForegroundColor Yellow
-Write-Host "    [2]  staging       — 최종 점검용    (staging.worksfree.co.kr)"       -ForegroundColor Cyan
-Write-Host "    [3]  portal        — 실 서비스 배포  (portal.worksfree.co.kr)"       -ForegroundColor Green
+Write-Host "    [1]  test          — 기능 검증용     (test.worksfree.kr)"          -ForegroundColor Yellow
+Write-Host "    [2]  staging       — 최종 점검용    (staging.worksfree.kr)"       -ForegroundColor Cyan
+Write-Host "    [3]  portal        — 실 서비스 배포  (portal.worksfree.kr)"       -ForegroundColor Green
 Write-Host "    [4]  g1consulting  — 현장클리닉 전용 (g1consulting.worksfree.kr)"    -ForegroundColor Magenta
 Write-Host "    [Q]  취소"                                                            -ForegroundColor Gray
 Write-Host "    [R]  롤백          — 이전 배포 버전 복원"                             -ForegroundColor DarkYellow
@@ -148,6 +131,35 @@ if (-not $TARGETS.ContainsKey($choice)) {
     Read-Host "  Enter 키로 종료"; exit 1
 }
 
+# ── 버전 자동 증가 (환경별: test·g1=4번째 0-99, staging=3번째, portal=2번째) ──
+if ($scriptContent -match '\$VERSION\s*=\s*"(\d+)\.(\d+)\.(\d+)\.(\d+)"') {
+    $p = @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4])
+    switch ($choice) {
+        "2" {        # staging: 3번째↑, 4번째 리셋
+            $p[2]++; $p[3] = 0
+            for ($i = 2; $i -gt 0; $i--) { if ($p[$i] -ge 10) { $p[$i] = 0; $p[$i-1]++ } }
+        }
+        "3" {        # portal:  2번째↑, 3·4번째 리셋
+            $p[1]++; $p[2] = 0; $p[3] = 0
+            if ($p[1] -ge 10) { $p[1] = 0; $p[0]++ }
+        }
+        default {    # test(1) · g1consulting(4): 4번째 자연 증가 (상한 없음)
+            $p[3]++
+        }
+    }
+    $newVer  = "$($p[0]).$($p[1]).$($p[2]).$($p[3])"
+    $updated = $scriptContent -replace '(\$VERSION\s*=\s*")[\d.]+"', ('${1}' + $newVer + '"')
+    [System.IO.File]::WriteAllText($PSCommandPath, $updated, [System.Text.Encoding]::UTF8)
+    $VERSION = $newVer
+    $indexPath = Join-Path $PSScriptRoot 'index.html'
+    if (Test-Path $indexPath) {
+        $html = [System.IO.File]::ReadAllText($indexPath, [System.Text.Encoding]::UTF8)
+        $html = $html -replace "(const HUB_VERSION\s*=\s*')[\d.]+'", ('${1}' + $newVer + "'")
+        [System.IO.File]::WriteAllText($indexPath, $html, [System.Text.Encoding]::UTF8)
+    }
+}
+# ─────────────────────────────────────────────────────────────────
+
 $T = $TARGETS[$choice]
 
 # ── portal / g1consulting 이중 확인 ─────────────────────────────
@@ -201,7 +213,7 @@ if (-not (Test-Path $gitBash)) { $gitBash = "$env:ProgramFiles\Git\bin\bash.exe"
 # ── 배포 전 NAS 현재 버전 백업 ──────────────────────────────────
 $BACKUP_ROOT = "/volume1/web/_backups"
 $BACKUP_TS   = Get-Date -Format "yyyyMMdd_HHmmss"
-$BACKUP_NAME = "${BACKUP_TS}_v${VERSION}"
+$BACKUP_NAME = "${BACKUP_TS}_v${OLD_VERSION}"
 $BACKUP_PATH = "${BACKUP_ROOT}/$($T.Name)/${BACKUP_NAME}"
 $KEEP_N      = 5  # 환경별 최대 보관 개수
 Write-Host "  ▶ 현재 NAS 파일 백업 중..." -ForegroundColor Gray
@@ -280,6 +292,28 @@ if ($ok) {
     if ($verifyResult -match "전송 실패") {
         Write-Host "  ⚠️  NAS에 파일이 없습니다. 전송을 다시 시도하세요." -ForegroundColor Red
     }
+
+    # ── Cloudflare 캐시 퍼지 ────────────────────────────────────────
+    $CF_ZONE_ID   = "b5e82c46532b06a2cd456cc5ff3b9234"
+    $CF_API_TOKEN = "cfut_t1QcLw16LQHPBUCoYL8YxVJdr7yTBmYmXH4zQ8HW9a552a28"
+    Write-Host ""
+    Write-Host "  ▶ Cloudflare 캐시 퍼지 중..." -ForegroundColor Gray
+    try {
+        $cfResult = Invoke-RestMethod `
+            -Uri     "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" `
+            -Method  POST `
+            -Headers @{ "Authorization" = "Bearer $CF_API_TOKEN"; "Content-Type" = "application/json" } `
+            -Body    '{"purge_everything":true}' `
+            -ErrorAction Stop
+        if ($cfResult.success) {
+            Write-Host "    ✅ Cloudflare 캐시 퍼지 완료 — 브라우저 새로고침 시 최신 파일 적용됨" -ForegroundColor Green
+        } else {
+            Write-Host "    ⚠️  Cloudflare 퍼지 실패: $($cfResult.errors | ConvertTo-Json -Compress)" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "    ⚠️  Cloudflare 퍼지 오류: $_" -ForegroundColor Yellow
+    }
+    # ────────────────────────────────────────────────────────────────
 } else {
     Write-Host "  ╔════════════════════════════════════════╗" -ForegroundColor Red
     Write-Host "  ║  ❌ 배포 실패                           ║" -ForegroundColor Red
