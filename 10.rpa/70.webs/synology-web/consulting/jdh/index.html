@@ -987,8 +987,13 @@ function buildReport(){
 
     ${ins.length > 0 ? `
     <div class="section">
-      <div class="section-head"><h3>${isInsRole() ? '리스크 완충 솔루션 — 보험 연계' : '재무적 리스크 이전 전략 — 잔여리스크 재무적 담보 방안'}</h3></div>
-      <div style="padding:16px">
+      <div class="section-head"><h3>위험관리 — 전반 및 보험 권고</h3></div>
+      <div style="padding:12px 16px 4px;font-size:12.5px;color:var(--muted);line-height:1.6;border-bottom:1px solid var(--border);margin-bottom:12px;">
+        중대재해처벌법 위반 시 <strong style="color:var(--text)">경영진 형사처벌(1년 이상 징역) + 법인 과징금(10억 이하)</strong>이 동시에 발생합니다.
+        법적 의무 이행과 함께 <strong style="color:var(--text)">잔여 리스크에 대한 재무적 담보</strong>가 기업 존속의 핵심입니다.
+        ${appl==='exempt'?'(5인 미만 사업장은 현재 중처법 적용 제외이나, 근로기준법·산안법 적용은 동일하게 유지됩니다.)':''}
+      </div>
+      <div style="padding:4px 16px 16px">
         <div class="ins-grid">
           ${ins.map(c=>`
           <div class="ins-card">

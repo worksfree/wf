@@ -1008,6 +1008,63 @@ function renderResult() {
         ${phaseHtml(3, R.phase3Items)}
       </div>
 
+      <div class="section">
+        <div class="section-hd">
+          <div class="section-hd-icon" style="background:#1a0c2e;color:#c084fc">⚠</div>
+          <div class="section-hd-title" style="color:#c084fc">위험관리 — 전반 및 보험 권고</div>
+        </div>
+        ${(()=>{
+          const insItems = [];
+          // 경영인정기보험 — 법인세 절감 + 보장
+          if (C.bizType !== 'indiv') {
+            insItems.push({
+              name:'경영인정기보험 (법인)',
+              urgency: C.age === 'senior' ? '🔴 즉시 가입 권고' : C.age === 'mid' ? '🟡 조기 가입 권고' : '🟢 검토 권고',
+              desc:`보험료 100% 법인 비용처리(법인세 절감) + 만기 환급(환급률 100%). 대표 유고 시 운영자금 확보. ${C.age==='senior'?'현재 연령('+C.ageLabel+')에서 가입 지체 시 보험료 급등 및 가입 불가 위험 있음.':''}`
+            });
+            insItems.push({
+              name:'법인 종신보험 (상속세 재원)',
+              urgency: C.ceoCont === 'none' ? '🔴 즉시 설계 권고' : '🟡 병행 검토',
+              desc:'계약자·납입=법인(비용처리), 피보험자=CEO, 수익자=상속인. 대표 사망 시 지분 상속세(최고 65%) 납부 재원 마련. 현금 이체로는 사전 준비 불가.'
+            });
+          } else {
+            insItems.push({
+              name:'개인 종신보험 / 정기보험',
+              urgency:'🟡 우선 검토',
+              desc:'개인사업주 유고 시 가족 생활비·부채 상환 재원. 소득세 절감 효과(연금저축 연계 구조) 병행 설계.'
+            });
+          }
+          if (C.gi !== 'full') {
+            insItems.push({
+              name:'임직원 단체 재해보장보험',
+              urgency: C.gi === 'none' ? '🔴 즉시 가입 필요' : '🟡 보완 설계 권고',
+              desc:`중대재해처벌법 대응 핵심 수단. 50인 미만 사업장에서 산재사고의 68.8% 발생. 미가입 시 업무 사고 발생 시 기업 직접 배상 리스크. 인당 월 5~10만원 설계 가능.`
+            });
+          }
+          if (C.retire !== 'insured') {
+            insItems.push({
+              name:'임원 퇴직급여 + 보험 연계 퇴직금',
+              urgency:'🟡 6개월 내 실행 권고',
+              desc:'이익잉여금 출구전략으로 활용. 정관에 임원 퇴직급여 지급 규정 반영 + 법인 보험 납입으로 퇴직금 재원 사전 적립. 법인세 절감 효과 겸용.'
+            });
+          }
+          insItems.push({
+            name:'기업배상책임 / 화재·휴지 보험',
+            urgency:'🟢 포트폴리오 점검',
+            desc:'제품·서비스·시설로 인한 제3자 배상 리스크 커버. 화재 발생 시 복구 비용과 영업중단 손실을 함께 보장. 기존 가입 보험 갱신 시 비교 설계 필수.'
+          });
+          return `<div style="padding:4px 22px 16px;">
+            ${insItems.map(it=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);">
+              <div style="font-size:13px;min-width:120px;flex-shrink:0;">
+                <div style="font-weight:600;color:var(--text);margin-bottom:2px;">${it.name}</div>
+                <div style="font-size:11px;">${it.urgency}</div>
+              </div>
+              <div style="font-size:12.5px;color:var(--hint);line-height:1.55;">${it.desc}</div>
+            </div>`).join('')}
+          </div>`;
+        })()}
+      </div>
+
       <div class="action-row no-print">
         <button class="btn-p" onclick="window.print()">결과 인쇄 / PDF 저장</button>
         <button class="btn-g" onclick="restart()">↺ 처음부터 다시</button>

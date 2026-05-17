@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFC 상속·증여 종합진단</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#0f1117;--surface:#1c2333;--border:#2a3347;--border2:#3a4a5c;
+  --text:#e2e8f0;--muted:#64748b;--hint:#475569;
+  --blue-bg:#0c1a30;--blue:#3b82f6;--blue-dark:#2563eb;
+  --green-bg:#0d2620;--green:#10b981;
+  --amber-bg:#2d1f08;--amber:#f59e0b;
+  --red-bg:#2d1515;--red:#ef4444;
+  --purple-bg:#1e1a3f;--purple:#a855f7;
+  --gray-bg:#1f2937;--gray:#6b7280;
+  --teal-bg:#0d2620;--teal:#14b8a6;
+  --gold:#d97706;--gold-bg:#1c1508;
+  --r:10px;--rl:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px;min-height:72px;position:sticky;top:0;z-index:100}
+.hdr-icon{font-size:26px;flex-shrink:0}
+.hdr-info{flex:1}
+.hdr-title{font-size:17px;font-weight:600;letter-spacing:-.2px}
+.hdr-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.hdr-r{font-size:12px;color:var(--hint);font-weight:500;margin-left:auto;flex-shrink:0}
+
+/* ── TREND BANNER ── */
+.trend-banner{background:#12100a;border-bottom:1px solid var(--border);padding:16px 24px}
+.trend-inner{max-width:740px;margin:0 auto}
+.trend-title{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.trend-title::before{content:'';width:16px;height:1px;background:var(--gold);flex-shrink:0}
+.trend-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.trend-stat{background:#1a160a;border:1px solid #352b0a;border-radius:8px;padding:12px 14px}
+.ts-val{font-size:22px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;margin-bottom:2px}
+.ts-label{font-size:11px;color:var(--muted);line-height:1.4}
+.trend-note{background:#1a160a;border:1px solid #352b0a;border-left:3px solid var(--gold);border-radius:6px;padding:11px 14px;font-size:12.5px;color:#c9a96e;line-height:1.65}
+.trend-note strong{color:var(--gold)}
+
+/* ── CHECKLIST ENTRY SELECTOR ── */
+.entry-banner{background:#131c30;border-bottom:1px solid var(--border);padding:12px 24px}
+.entry-inner{max-width:740px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.entry-label{font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--muted)}
+.entry-btn{background:transparent;border:1px solid var(--border2);border-radius:6px;padding:6px 14px;font-size:12.5px;font-weight:500;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s}
+.entry-btn:hover,.entry-btn.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+
+.page{max-width:740px;margin:0 auto;padding:8px 18px 72px}
+
+.prog-wrap{position:sticky;top:72px;z-index:99;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px 0}
+.prog-inner{max-width:740px;margin:0 auto}
+.prog-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--hint);font-weight:500;margin-bottom:7px}
+.prog-track{height:3px;background:var(--border);border-radius:2px}
+.prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+.breadcrumb{display:flex;flex-wrap:wrap;gap:4px;min-height:24px;padding-bottom:10px;align-items:center}
+.crumb{font-size:11px;background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:2px 9px;border-radius:20px;white-space:nowrap}
+.crumb-sep{color:var(--hint);font-size:12px}
+
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:26px 28px;animation:fu .22s ease}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.q-step{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--blue);text-transform:uppercase;margin-bottom:9px}
+.q-text{font-size:17px;font-weight:700;line-height:1.5;margin-bottom:6px;letter-spacing:-.3px}
+.q-sub{font-size:12.5px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.q-law{font-size:11px;color:var(--gold);background:var(--gold-bg);border:1px solid #352b0a;border-radius:6px;padding:7px 12px;margin-bottom:16px;line-height:1.6}
+.options{display:flex;flex-direction:column;gap:7px}
+.opt{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 16px;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:400;color:var(--text);text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:border-color .12s,background .12s,transform .08s;line-height:1.5}
+.opt:hover{border-color:var(--blue);background:var(--blue-bg);transform:translateX(3px)}
+.opt:active{transform:translateX(2px) scale(.99)}
+.opt-l{flex:1}
+.opt-main{font-weight:500}
+.opt-sub{font-size:12px;color:var(--hint);margin-top:2px}
+.opt-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.opt-arr{color:var(--hint);font-size:16px;flex-shrink:0;transition:transform .12s}
+.opt:hover .opt-arr{transform:translateX(2px);color:var(--blue)}
+
+.tag-blue{background:var(--blue-bg);color:var(--blue)}
+.tag-green{background:var(--green-bg);color:var(--green)}
+.tag-amber{background:var(--amber-bg);color:var(--amber)}
+.tag-red{background:var(--red-bg);color:var(--red)}
+.tag-purple{background:var(--purple-bg);color:var(--purple)}
+.tag-gray{background:var(--gray-bg);color:var(--gray)}
+.tag-teal{background:var(--teal-bg);color:var(--teal)}
+.tag-gold{background:var(--gold-bg);color:var(--gold)}
+
+.back-btn{background:none;border:none;font-family:inherit;font-size:12.5px;color:var(--hint);cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;margin-bottom:14px;transition:color .12s}
+.back-btn:hover{color:var(--text)}
+
+/* ── RESULT ── */
+.result-wrap{animation:fu .3s ease}
+.r-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:26px 28px;margin-bottom:14px}
+.r-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.r-badge{font-size:11px;font-weight:700;letter-spacing:.4px;padding:4px 12px;border-radius:20px;margin-bottom:10px;display:inline-block}
+.r-title{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:5px}
+.r-desc{font-size:13px;color:var(--muted);line-height:1.65}
+.grade-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;min-width:150px;text-align:center;flex-shrink:0}
+.grade-label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--hint);text-transform:uppercase;margin-bottom:6px}
+.grade-val{font-size:13px;font-weight:700;letter-spacing:.3px;margin-bottom:2px}
+.grade-sub{font-size:11px;color:var(--hint);margin-top:2px}
+.flags{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.flag{font-size:11px;background:var(--bg);border:1px solid var(--border);color:var(--muted);padding:2px 10px;border-radius:20px}
+
+/* ── SECTION ── */
+.section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
+.section-hd{padding:13px 22px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.section-hd-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.section-hd-title{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.section-hd-count{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:auto}
+
+.item{padding:14px 22px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start}
+.item:last-child{border-bottom:none}
+.item-pri{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700}
+.item-body{flex:1}
+.item-title{font-size:13.5px;font-weight:700;margin-bottom:3px}
+.item-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+.item-link{font-size:12px;font-weight:700;margin-top:5px;padding:3px 0;display:inline-block;color:var(--gold)}
+
+/* 경보 박스 */
+.alert{border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px;display:flex;gap:10px;align-items:flex-start;border:1px solid;line-height:1.6}
+.alert-amber{background:var(--amber-bg);border-color:#7a5000;color:var(--amber)}
+.alert-red{background:var(--red-bg);border-color:#7a2020;color:var(--red)}
+.alert-blue{background:var(--blue-bg);border-color:#1e3a6e;color:var(--blue)}
+.alert-gold{background:var(--gold-bg);border-color:#4a3000;color:var(--gold)}
+.alert-icon{flex-shrink:0;margin-top:1px;font-size:15px}
+
+/* 건보료 계산 박스 */
+.nhis-box{background:#0c1a2a;border:1px solid #1e3a5c;border-radius:var(--r);padding:16px 20px;margin-top:8px}
+.nhis-title{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--blue);margin-bottom:10px;text-transform:uppercase}
+.nhis-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.nhis-row:last-child{border-bottom:none}
+.nhis-label{font-size:12px;color:var(--muted)}
+.nhis-val{font-size:13px;font-weight:600;color:var(--text)}
+.nhis-val.warn{color:var(--amber)}
+.nhis-val.danger{color:var(--red)}
+
+/* 로드맵 phase */
+.phase{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;gap:14px}
+.phase:last-child{border-bottom:none}
+.ph-num{width:30px;height:30px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ph-body{flex:1}
+.ph-tag{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.ph-title{font-size:14.5px;font-weight:700;margin-bottom:10px;letter-spacing:-.2px}
+.ph-items{display:flex;flex-direction:column;gap:6px}
+.ph-item{font-size:13px;color:var(--muted);display:flex;gap:7px;align-items:flex-start;line-height:1.6}
+.ph-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);margin-top:8px;flex-shrink:0}
+
+.action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.btn-p{flex:1;min-width:160px;background:var(--gold);color:#000;border:none;border-radius:var(--r);padding:13px 20px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .12s}
+.btn-p:hover{opacity:.85}
+.btn-g{background:var(--surface);color:var(--muted);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 20px;font-family:inherit;font-size:14px;cursor:pointer;transition:border-color .12s,color .12s;white-space:nowrap}
+.btn-g:hover{border-color:var(--border2);color:var(--text)}
+
+@media(max-width:500px){.page{padding:18px 12px 56px}.q-card{padding:18px 16px}.q-text{font-size:15px}.r-title{font-size:17px}.phase{padding:14px 16px}.action-row{flex-direction:column}.btn-p{min-width:unset}.trend-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:380px){.trend-grid{grid-template-columns:1fr}}
+
+/* ── TAX SIMULATOR ── */
+.sim-section{background:#0e1218;border-bottom:1px solid var(--border)}
+.sim-inner{max-width:740px;margin:0 auto;padding:16px 24px}
+.sim-hd{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0}
+.sim-hd-l{display:flex;align-items:center;gap:10px}
+.sim-hd-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.sim-hd-badge{font-size:10px;font-weight:600;background:#2a1a00;color:var(--gold);padding:2px 8px;border-radius:10px}
+.sim-toggle{font-size:11px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:inherit;padding:4px 8px}
+.sim-body.collapsed{display:none}
+.sim-inputs{display:flex;gap:12px;flex-wrap:wrap;padding:14px 0 12px;border-bottom:1px solid var(--border)}
+.sim-field{display:flex;flex-direction:column;gap:5px}
+.sim-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sim-num{background:#131b2a;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:15px;font-weight:600;color:var(--text);font-family:inherit;width:100px}
+.sim-num:focus{outline:none;border-color:var(--gold)}
+.sim-unit{font-size:12px;color:var(--muted)}
+.sim-tog-btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid;transition:all .12s}
+.sim-tog-btn.off{background:#131b2a;border-color:var(--border2);color:var(--muted)}
+.sim-tog-btn.on{background:#1c1508;border-color:var(--gold);color:var(--gold)}
+.sim-cnt-btn{width:30px;height:34px;background:#131b2a;border:1px solid var(--border2);color:var(--text);font-size:18px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.sim-cnt-btn:first-child{border-radius:8px 0 0 8px}
+.sim-cnt-btn:last-child{border-radius:0 8px 8px 0}
+.sim-cnt-val{width:40px;height:34px;background:#131b2a;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);color:var(--text);font-size:15px;font-weight:700;text-align:center;line-height:34px}
+.sim-ded{padding:12px 0;border-bottom:1px solid var(--border)}
+.sim-ded-title{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.sim-ded-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:4px}
+.sim-ded-row.total{border-top:1px solid var(--border2);margin-top:4px;padding-top:6px;font-weight:700}
+.sim-ded-label{color:var(--muted)}
+.sim-ded-val{color:var(--text);font-variant-numeric:tabular-nums}
+.sim-taxbase{margin:10px 0;background:#1a160a;border:1px solid #4a3000;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.sim-taxbase-label{font-size:12px;color:var(--gold)}
+.sim-taxbase-val{font-size:18px;font-weight:700;color:var(--gold)}
+.sim-table{width:100%;border-collapse:collapse;font-size:12px}
+.sim-table th{padding:7px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sim-table th:not(:first-child){text-align:right}
+.sim-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text)}
+.sim-table td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+.sim-table td.rate{color:var(--amber)}
+.sim-table tr.total-row{border-top:1px solid var(--border2);background:#131b2a}
+.sim-table tr.total-row td{font-weight:700;padding:9px 10px}
+.sim-table tr.total-row td:last-child{color:var(--gold)}
+.sim-result-box{margin-top:12px;background:#1a160a;border:1px solid var(--gold);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:8px}
+.srb-label{font-size:11px;color:#c9a96e;margin-bottom:4px}
+.srb-val{font-size:24px;font-weight:700;color:var(--gold);letter-spacing:-.5px}
+.srb-note{font-size:10.5px;color:var(--muted);text-align:right;line-height:1.5}
+.sim-zero{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">🏛</div>
+  <div class="hdr-info">
+    <div class="hdr-title">상속·증여 종합진단</div>
+    <div class="hdr-sub">상속세 위험도 · 자산 구조 · 절세 전략 종합 진단</div>
+  </div>
+  <div class="hdr-r" id="hdr-r">파트너 전용</div>
+</header>
+
+<!-- ── 트렌드 배너 ── -->
+<div class="trend-banner">
+  <div class="trend-inner">
+    <div class="trend-title">상속세 위기 트렌드 — 왜 지금인가</div>
+    <div class="trend-grid">
+      <div class="trend-stat">
+        <div class="ts-val">20년</div>
+        <div class="ts-label">상속세 세율 구조<br>동결 기간 (2000년 이후)</div>
+      </div>
+      <div class="trend-stat">
+        <div class="ts-val">50%</div>
+        <div class="ts-label">30억 초과 구간<br>최고 세율 (+ 자녀공제 10%)</div>
+      </div>
+      <div class="trend-stat">
+        <div class="ts-val">2.4배</div>
+        <div class="ts-label">2015→2024년<br>수도권 아파트 평균가 상승</div>
+      </div>
+    </div>
+    <div class="trend-note">
+      <strong>핵심 문제:</strong> 상속세 과세 기준은 20년 동안 동결됐지만, 우리나라 자산가의 80%는 부동산 보유자입니다.
+      수도권 중형 아파트 2채만 보유해도 상속세 최고 구간(30억 초과, 50%)에 진입합니다.
+      단순히 집값이 올랐을 뿐인데 갑자기 <strong>억대 상속세 납부 대상</strong>이 되는 가구가 급증하고 있습니다.
+      사전 증여·분산·보험 설계 없이 상속이 개시되면, 부동산을 매각하거나 자녀가 대출을 받아
+      세금을 납부해야 하는 상황이 벌어집니다.
+    </div>
+  </div>
+</div>
+
+<!-- ── 상속세 시뮬레이터 ── -->
+<div class="sim-section">
+  <div class="sim-inner">
+    <div class="sim-hd" onclick="toggleSim()">
+      <div class="sim-hd-l">
+        <span style="font-size:14px;color:var(--gold)">⚖</span>
+        <span class="sim-hd-title">상속세 기본 산정 시뮬레이터</span>
+        <span class="sim-hd-badge">인적공제 기준 · 추정값</span>
+      </div>
+      <button class="sim-toggle"><span id="sim-chev">▲</span> 접기</button>
+    </div>
+    <div class="sim-body" id="sim-body">
+      <div class="sim-inputs">
+        <div class="sim-field">
+          <div class="sim-label">총 상속재산</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="number" class="sim-num" id="sim-asset" value="50" min="0" step="1" oninput="calcTax()">
+            <span class="sim-unit">억원</span>
+          </div>
+        </div>
+        <div class="sim-field">
+          <div class="sim-label">배우자</div>
+          <div style="display:flex;gap:8px">
+            <button class="sim-tog-btn on" id="btn-sp-y" onclick="setSpouse(true)">있음</button>
+            <button class="sim-tog-btn off" id="btn-sp-n" onclick="setSpouse(false)">없음</button>
+          </div>
+        </div>
+        <div class="sim-field">
+          <div class="sim-label">자녀 수</div>
+          <div style="display:flex;align-items:center">
+            <button class="sim-cnt-btn" onclick="adjChildren(-1)">−</button>
+            <div class="sim-cnt-val" id="sim-child-disp">2</div>
+            <button class="sim-cnt-btn" onclick="adjChildren(1)">+</button>
+          </div>
+        </div>
+      </div>
+      <div id="sim-result"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 시작점 선택 배너 ── -->
+<div class="entry-banner">
+  <div class="entry-inner">
+    <span class="entry-label">진단 시작점 :</span>
+    <button class="entry-btn active" id="btn-role-heir" onclick="setRole('heir')">상속받을 예정 (상속인)</button>
+    <button class="entry-btn" id="btn-role-donor" onclick="setRole('donor')">자산 이전 준비 중 (피상속인·증여자)</button>
+    <button class="entry-btn" id="btn-role-ongoing" onclick="setRole('ongoing')">상속 절차 진행 중</button>
+  </div>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-inner">
+    <div class="prog-meta"><span id="prog-lbl">진단 시작</span><span id="prog-pct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="breadcrumb" id="bc"></div>
+  </div>
+</div>
+<div class="page">
+  <div id="view"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   상속세 시뮬레이터
+═══════════════════════════════════════════════════ */
+const TAX_BRACKETS = [
+  {min:0,  max:1,        rate:0.10, label:'1억원 이하'},
+  {min:1,  max:5,        rate:0.20, label:'1억원 초과 ~ 5억원 이하'},
+  {min:5,  max:10,       rate:0.30, label:'5억원 초과 ~ 10억원 이하'},
+  {min:10, max:30,       rate:0.40, label:'10억원 초과 ~ 30억원 이하'},
+  {min:30, max:Infinity, rate:0.50, label:'30억원 초과'},
+];
+let simSpouse = true, simChildren = 2;
+
+function setSpouse(v) {
+  simSpouse = v;
+  document.getElementById('btn-sp-y').className = 'sim-tog-btn '+(v?'on':'off');
+  document.getElementById('btn-sp-n').className = 'sim-tog-btn '+(!v?'on':'off');
+  calcTax();
+}
+function adjChildren(d) {
+  simChildren = Math.max(0, Math.min(10, simChildren+d));
+  document.getElementById('sim-child-disp').textContent = simChildren;
+  calcTax();
+}
+function toggleSim() {
+  const b = document.getElementById('sim-body');
+  b.classList.toggle('collapsed');
+  document.getElementById('sim-chev').textContent = b.classList.contains('collapsed')?'▼':'▲';
+}
+function fmtA(억) {
+  if (!억 || 억 <= 0) return '0원';
+  const 만총 = Math.round(억 * 10000);
+  const 억부 = Math.floor(만총 / 10000);
+  const 만부 = 만총 % 10000;
+  let s = '';
+  if (억부 > 0) s += 억부.toLocaleString() + '억';
+  if (만부 > 0) { if (억부 > 0) s += ' '; s += 만부.toLocaleString() + '만'; }
+  return s + '원';
+}
+function calcTax() {
+  const total = parseFloat(document.getElementById('sim-asset').value) || 0;
+  const basicDed = 2, childDed = simChildren * 0.5;
+  const personalTotal = basicDed + childDed;
+  const blanketDed = Math.max(personalTotal, 5);
+  let spouseDed = 0, spouseLegal = 0, spouseAmt = 0;
+  if (simSpouse && total > 0) {
+    spouseLegal = simChildren > 0 ? 1.5 / (simChildren + 1.5) : 1.0;
+    spouseAmt = total * spouseLegal;
+    spouseDed = total >= 5
+      ? Math.min(Math.max(spouseAmt, 5), 30)
+      : Math.min(spouseAmt, total);
+  }
+  const totalDed = blanketDed + spouseDed;
+  const taxBase = Math.max(total - totalDed, 0);
+  let remaining = taxBase, rows = [], totalTax = 0;
+  for (const b of TAX_BRACKETS) {
+    if (remaining <= 0) break;
+    const size = b.max === Infinity ? remaining : Math.min(b.max - b.min, remaining);
+    if (size <= 0) continue;
+    const tax = size * b.rate;
+    rows.push({label: b.label, amount: size, rate: b.rate, tax});
+    totalTax += tax;
+    remaining -= size;
+  }
+  renderSimResult({total, basicDed, childDed, personalTotal, blanketDed, spouseDed, spouseLegal, totalDed, taxBase, rows, totalTax});
+}
+function renderSimResult(R) {
+  const el = document.getElementById('sim-result');
+  if (R.total <= 0) {
+    el.innerHTML = '<div class="sim-zero">총 상속재산을 입력하면 결과가 표시됩니다.</div>';
+    return;
+  }
+  const spRow = simSpouse
+    ? `<div class="sim-ded-row"><span class="sim-ded-label">배우자공제 (법정지분 ${(R.spouseLegal*100).toFixed(1)}% 기준, 최대 30억)</span><span class="sim-ded-val">−${fmtA(R.spouseDed)}</span></div>`
+    : '';
+  const ded = `<div class="sim-ded">
+    <div class="sim-ded-title">공제 내역 (인적공제 기준)</div>
+    <div class="sim-ded-row"><span class="sim-ded-label">기초공제 2억 + 자녀공제 (${simChildren}명×5천만)</span><span class="sim-ded-val">합계 ${fmtA(R.personalTotal)}</span></div>
+    <div class="sim-ded-row"><span class="sim-ded-label">일괄공제 적용 (인적공제 vs 5억 중 큰 금액)</span><span class="sim-ded-val">−${fmtA(R.blanketDed)}</span></div>
+    ${spRow}
+    <div class="sim-ded-row total"><span class="sim-ded-label">총 공제액</span><span class="sim-ded-val">−${fmtA(R.totalDed)}</span></div>
+  </div>`;
+  const tb = `<div class="sim-taxbase">
+    <span class="sim-taxbase-label">▶ 과세표준 (${fmtA(R.total)} − ${fmtA(R.totalDed)})</span>
+    <span class="sim-taxbase-val">${fmtA(R.taxBase)}</span>
+  </div>`;
+  let tbl = '';
+  if (R.taxBase <= 0) {
+    tbl = '<div class="sim-zero">과세표준 0원 이하 — 상속세 없음</div>';
+  } else {
+    const rowsHtml = R.rows.map(r =>
+      `<tr><td>${r.label}</td><td>${fmtA(r.amount)}</td><td class="rate">${(r.rate*100).toFixed(0)}%</td><td>${fmtA(r.tax)}</td></tr>`
+    ).join('');
+    tbl = `<div style="overflow-x:auto;margin-top:10px"><table class="sim-table">
+      <thead><tr><th>과세표준 구간</th><th>구간 내 과세금액</th><th>세율</th><th>구간별 산출세액</th></tr></thead>
+      <tbody>${rowsHtml}<tr class="total-row"><td>합계 (총 과세표준)</td><td>${fmtA(R.taxBase)}</td><td>—</td><td>${fmtA(R.totalTax)}</td></tr></tbody>
+    </table></div>`;
+  }
+  const res = R.taxBase > 0
+    ? `<div class="sim-result-box">
+        <div><div class="srb-label">산출 상속세 (인적공제 기준 추정)</div><div class="srb-val">${fmtA(R.totalTax)}</div></div>
+        <div class="srb-note">※ 세액공제·추가공제 미포함 추정값<br>실제 절세 설계 후 세액은 GFC 진단에서 확인</div>
+      </div>`
+    : '';
+  el.innerHTML = ded + tb + tbl + res;
+}
+
+/* ═══════════════════════════════════════════════════
+   역할별 진단 질문 정의
+═══════════════════════════════════════════════════ */
+let ROLE = 'heir';   // 'heir' | 'donor' | 'ongoing'
+let history = [];
+let C = {};
+
+function setRole(r) {
+  ROLE = r;
+  ['heir','donor','ongoing'].forEach(k => {
+    document.getElementById('btn-role-'+k).classList.toggle('active', k===r);
+  });
+  history = []; C = {};
+  render();
+}
+
+/* ── 공통 질문 ── */
+const Q_ASSET = {
+  id:'assetTotal', step:'총 자산 규모',
+  q:'예상 상속·증여 대상 순자산 규모는? (부동산+금융+사업체 − 채무)',
+  sub:'부동산은 공시지가가 아닌 시가로 평가합니다. 배우자공제(최대 30억)·일괄공제(5억) 적용 후 과세 여부 결정',
+  law:'상속세법 기초공제 2억 + 인적공제 합산 vs 일괄공제 5억 중 큰 금액 적용. 배우자 단독 상속 시 최소 5억 공제.',
+  opts:[
+    {t:'5억 미만',sub:'기초공제·일괄공제 이하 — 상속세 없음',tag:'안전',d:{asset:'safe',assetLabel:'5억 미만'}},
+    {t:'5억 ~ 15억',sub:'배우자 있으면 세금 없거나 소액, 없으면 수천만원 발생',tag:'주의',d:{asset:'low',assetLabel:'5~15억'}},
+    {t:'15억 ~ 30억',sub:'상속세 수천만~수억원 발생 — 설계 효과 최대',tag:'설계 필요',d:{asset:'mid',assetLabel:'15~30억'}},
+    {t:'30억 ~ 100억',sub:'최고세율(50%) 구간 진입 — 납부 재원 확보 시급',tag:'긴급',d:{asset:'high',assetLabel:'30~100억'}},
+    {t:'100억 초과',sub:'이미 최고세율 구간 — 장기 플랜 즉시 착수',tag:'위기',d:{asset:'vhigh',assetLabel:'100억 초과'}},
+  ]
+};
+
+const Q_ASSET_TYPE = {
+  id:'assetType', step:'자산 구성',
+  q:'자산의 주요 구성 비율은?',
+  sub:'자산 종류에 따라 납부 재원 확보 난이도와 최적 설계 방법이 달라집니다',
+  opts:[
+    {t:'부동산 위주 (70% 이상)',sub:'현금화 어려움 — 납부 재원 부족 위험 높음',tag:'납부 위험',d:{atype:'realestate',atypeLabel:'부동산 위주'}},
+    {t:'금융자산 위주 (예금·주식·펀드)',sub:'유동성 높음 — 납부 재원 확보 용이',tag:'유리',d:{atype:'financial',atypeLabel:'금융자산 위주'}},
+    {t:'비상장 법인 지분 포함',sub:'지분 가치 평가 문제 — 상속 전 구조 정비 필수',tag:'복잡',d:{atype:'corp',atypeLabel:'법인지분 포함'}},
+    {t:'혼합형 (부동산 50% 내외 + 금융)',sub:'균형 잡힌 구조 — 납부 재원 일부 확보 가능',tag:'보통',d:{atype:'mixed',atypeLabel:'혼합형'}},
+  ]
+};
+
+const Q_FAMILY = {
+  id:'family', step:'법정 상속인',
+  q:'법정 상속인 구성은?',
+  sub:'상속인 구성에 따라 상속세 공제 금액과 세율 구간이 달라집니다',
+  law:'배우자+자녀: 배우자공제 최대 30억 + 자녀 1인당 5천만원 / 자녀만: 일괄공제 5억 / 직계존속: 공제 한도 제한적',
+  opts:[
+    {t:'배우자 + 자녀 1~2명',sub:'배우자공제 최대 30억 → 공제 최대 구간',tag:'공제 최대',d:{family:'spouse_child',familyLabel:'배우자+자녀 1~2'}},
+    {t:'배우자 + 자녀 3명 이상',sub:'자녀 공제 합산 상승 → 세부담 분산',tag:'유리',d:{family:'spouse_children',familyLabel:'배우자+자녀 3+'}},
+    {t:'자녀만 (배우자 없음)',sub:'배우자공제 없음 — 일괄공제 5억만 적용, 세부담 급증',tag:'주의',d:{family:'child_only',familyLabel:'자녀만'}},
+    {t:'배우자만 (자녀 없음)',sub:'배우자공제 최대 적용 가능하나 차기 상속 설계 필요',tag:'중간',d:{family:'spouse_only',familyLabel:'배우자만'}},
+    {t:'부모 또는 형제 (직계비속 없음)',sub:'공제 혜택 제한 — 세율 구간 불리',tag:'불리',d:{family:'parent',familyLabel:'직계존속/형제'}},
+  ]
+};
+
+const Q_GIFT_HISTORY = {
+  id:'giftHistory', step:'사전 증여 이력',
+  q:'최근 10년 내 사전 증여 이력이 있습니까?',
+  sub:'상속 전 10년 내 증여액은 상속세 과세가액에 합산됩니다 (상속세법 §13)',
+  law:'10년 내 증여 = 상속세 합산 과세. 배우자 증여 한도 6억 / 자녀 5천만원 / 미성년 자녀 2천만원 (10년 기준)',
+  opts:[
+    {t:'없음',sub:'사전 증여 전무 — 지금 시작이 최적 타이밍',tag:'시작 권장',d:{gift:'none',giftLabel:'없음'}},
+    {t:'소액 증여 (3,000만원 미만)',sub:'한도 여유 충분 — 추가 증여 설계 가능',tag:'여유',d:{gift:'small',giftLabel:'소액 증여'}},
+    {t:'5,000만원 이상 증여 완료',sub:'한도 일부 소진 — 잔여 한도 및 추가 절세 방법 점검',tag:'일부 소진',d:{gift:'mid',giftLabel:'5천만원 이상'}},
+    {t:'부동산 현물 증여 이력 있음',sub:'취득세·증여세 이미 납부 — 이후 상속세와의 합산 계획 필요',tag:'복합 검토',d:{gift:'realestate',giftLabel:'부동산 증여'}},
+  ]
+};
+
+const Q_NHIS = {
+  id:'nhis', step:'건강보험 형태',
+  q:'현재 건강보험 부과 형태는?',
+  sub:'증여 후 자산·소득 증가 시 피부양자 자격 박탈 → 지역가입자 전환 → 건강보험료 폭탄 가능성',
+  law:'피부양자 탈락 기준: 금융소득 연 1,000만원 초과 / 임대소득 400만원 초과 / 사업소득 있음 / 재산세 과표 5.4억 초과',
+  opts:[
+    {t:'직장가입자 (근로소득 위주)',sub:'증여 후에도 당장 피부양자 탈락 없음 — 단, 부모·배우자 세대분리 점검',tag:'안전',d:{nhis:'work',nhisLabel:'직장가입자'}},
+    {t:'피부양자 (직장인 가족)',sub:'증여 후 소득·재산 기준 초과 시 즉시 탈락 → 월 30만원+ 건보료 추가',tag:'위험',d:{nhis:'dep',nhisLabel:'피부양자'}},
+    {t:'지역가입자 (자영업·프리랜서)',sub:'이미 자산 기준 적용 — 증여 후 재산 점수 상승 우려',tag:'모니터링',d:{nhis:'local',nhisLabel:'지역가입자'}},
+  ]
+};
+
+const Q_FINANCE_INCOME = {
+  id:'finIncome', step:'금융·임대소득',
+  q:'연간 금융소득(이자+배당) 및 임대소득 수준은?',
+  sub:'금융소득 2,000만원 초과 시 종합과세 전환, 1,000만원 초과 시 피부양자 탈락',
+  opts:[
+    {t:'금융소득 1,000만원 미만',sub:'피부양자 유지 가능, 종합과세 無',tag:'안전',d:{finIncome:'safe',finLabel:'금융 1천 미만'}},
+    {t:'금융소득 1,000만원 ~ 2,000만원',sub:'피부양자 탈락 구간 — 증여 추가 시 주의 필요',tag:'경계',d:{finIncome:'warn',finLabel:'금융 1~2천'}},
+    {t:'금융소득 2,000만원 이상',sub:'종합과세 대상 — 최고세율 49.5% 가능성',tag:'종합과세',d:{finIncome:'tax',finLabel:'금융 2천+ 종합과세'}},
+    {t:'임대소득 400만원 이상 있음',sub:'피부양자 탈락 기준 충족 — 건보료 별도 부과',tag:'탈락 위험',d:{finIncome:'rent',finLabel:'임대소득 400만+'}},
+  ]
+};
+
+const Q_CORP = {
+  id:'corpStock', step:'사업체 지분',
+  q:'경영에 참여하는 사업체 지분을 보유하고 있습니까?',
+  sub:'여기서 묻는 것은 주식 투자(ETF·소액 주식)가 아니라 직접 운영하거나 설립에 참여한 사업체 지분입니다. 투자용 주식·ETF는 아래 안내를 확인하세요.',
+  law:'비상장주식: 순자산가치 40% + 순이익가치 60% 가중평균 평가 (세법상 복잡). 상장주식 대주주(종목당 10억 이상 또는 지분율 1% 이상): 양도소득세 중과 대상. 일반 투자자 주식·ETF: 사망일 전후 2개월 평균 종가로 단순 시가 평가 — 별도 전문 감정 불필요.',
+  opts:[
+    {t:'없음 — 사업체 지분 미보유',sub:'주식·ETF 투자만 있다면 이 항목 선택. 투자 주식은 시가로 단순 평가됩니다.',tag:null,d:{corp:'none',corpLabel:'사업지분 無'}},
+    {t:'비상장법인 지분 보유 (중소기업·스타트업 등)',sub:'복잡한 가치평가 필요 — 이익잉여금 규모·업력에 따라 평가액 급변',tag:'전문 평가 필요',d:{corp:'unlisted',corpLabel:'비상장지분'}},
+    {t:'상장사 대주주 지분 (종목당 10억 이상 또는 지분율 1%+)',sub:'양도세 중과·상속 후 처분 전략 별도 필요. 일반 투자용 주식과 다릅니다.',tag:'대주주 해당',d:{corp:'listed_major',corpLabel:'상장 대주주'}},
+    {t:'비상장·상장 둘 다 해당',sub:null,tag:'복합',d:{corp:'both',corpLabel:'복합 지분'}},
+  ]
+};
+
+const Q_RESERVE = {
+  id:'reserve', step:'납부 재원',
+  q:'상속세 납부 재원 현황은?',
+  sub:'상속세는 상속 개시일로부터 6개월 이내 현금 납부 원칙 (연부연납·물납 가능)',
+  opts:[
+    {t:'충분한 현금·금융자산 보유',sub:'납부 재원 확보 — 절세 최적화에 집중',tag:'양호',d:{reserve:'ok',reserveLabel:'재원 충분'}},
+    {t:'일부 보유 (50% 수준)',sub:'부족분은 연부연납(최대 5년 분할) 또는 대출 필요',tag:'보완 필요',d:{reserve:'partial',reserveLabel:'재원 일부'}},
+    {t:'생명보험(종신) 활용 가능',sub:'보험금 = 상속세 납부 재원으로 최적 — 사전 설계 완료 여부 확인',tag:'보험 활용',d:{reserve:'insurance',reserveLabel:'종신보험 있음'}},
+    {t:'납부 재원 전혀 없음',sub:'부동산 매각 또는 대출 불가피 — 플랜 즉시 수립 필요',tag:'긴급',d:{reserve:'none',reserveLabel:'재원 없음'}},
+  ]
+};
+
+const Q_URGENCY = {
+  id:'urgency', step:'긴급도',
+  q:'상속·증여 준비의 시간적 긴급도는?',
+  sub:'준비 시간이 길수록 합법적 절세 여지가 큽니다. 상속 개시 후에는 절세 선택지가 대부분 사라집니다.',
+  opts:[
+    {t:'충분 (10년 이상 여유)',sub:'장기 설계 — 분산 증여, 보험 적립, 특정법인 설계 가능',tag:'여유',d:{urg:'ample',urgLabel:'10년 이상'}},
+    {t:'5~10년',sub:'중기 플랜 — 단계별 증여 + 납부 재원 보험 설계',tag:'중기',d:{urg:'mid',urgLabel:'5~10년'}},
+    {t:'3~5년',sub:'빠른 실행 필요 — 핵심 절세부터 우선 착수',tag:'시급',d:{urg:'short',urgLabel:'3~5년'}},
+    {t:'3년 미만 또는 진행 중',sub:'긴급 대응 모드 — 즉시 플랜 수립 후 실행',tag:'긴급',d:{urg:'now',urgLabel:'3년 이내'}},
+  ]
+};
+
+const Q_PLAN = {
+  id:'plan', step:'현재 준비 현황',
+  q:'현재 상속·증여 플랜 수립 현황은?',
+  sub:null,
+  opts:[
+    {t:'전혀 없음 — 처음 생각하는 단계',sub:null,tag:'초기',d:{plan:'none',planLabel:'미수립'}},
+    {t:'막연하게 자녀에게 줘야 한다고만 생각',sub:null,tag:'인식 단계',d:{plan:'vague',planLabel:'인식만'}},
+    {t:'세무사 상담은 받아봤음',sub:null,tag:'상담 완료',d:{plan:'consulted',planLabel:'상담 완료'}},
+    {t:'구체적 실행 중 (증여 계약·보험 등)',sub:null,tag:'진행 중',d:{plan:'wip',planLabel:'실행 중'}},
+  ]
+};
+
+/* ── 역할별 질문 세트 ── */
+function getQS() {
+  const common = [Q_ASSET, Q_ASSET_TYPE, Q_FAMILY, Q_GIFT_HISTORY, Q_NHIS, Q_FINANCE_INCOME, Q_CORP, Q_RESERVE];
+  if (ROLE==='heir')    return [...common, Q_PLAN];
+  if (ROLE==='donor')   return [...common, Q_URGENCY, Q_PLAN];
+  if (ROLE==='ongoing') return [Q_ASSET, Q_ASSET_TYPE, Q_FAMILY, Q_GIFT_HISTORY, Q_RESERVE, Q_PLAN];
+  return common;
+}
+
+function tagColor(tag) {
+  const m = {
+    '안전':'green','주의':'amber','설계 필요':'blue','긴급':'red','위기':'red',
+    '납부 위험':'red','유리':'green','복잡':'purple','보통':'gray',
+    '공제 최대':'green','중간':'blue','불리':'amber',
+    '시작 권장':'blue','여유':'green','일부 소진':'amber','복합 검토':'purple',
+    '피부양자 탈락 우려':'amber','안전':'green','위험':'red','모니터링':'amber',
+    '경계':'amber','종합과세':'red','탈락 위험':'red',
+    '전문 평가 필요':'purple','시가 평가':'blue',
+    '양호':'green','보완 필요':'amber','보험 활용':'teal',
+    '중기':'blue','시급':'amber',
+    '초기':'gray','인식 단계':'gray','상담 완료':'blue','진행 중':'teal',
+    '불리':'red','공제 최대':'green',
+  };
+  return m[tag]||'gray';
+}
+
+function render() {
+  const qs = getQS();
+  const pos = history.length;
+  const pct = qs.length===0 ? 100 : Math.round(pos/qs.length*100);
+  document.getElementById('prog-fill').style.width = (pos>=qs.length?100:pct)+'%';
+  document.getElementById('prog-pct').textContent = (pos>=qs.length?100:pct)+'%';
+  document.getElementById('prog-lbl').textContent = pos>=qs.length?'진단 완료':`항목 ${pos+1} / ${qs.length}`;
+  document.getElementById('hdr-r').textContent = pos>=qs.length?'결과 확인':`파트너 전용 · ${pos+1}/${qs.length}`;
+  document.getElementById('bc').innerHTML = history.map((h,i)=>
+    `<span class="crumb">${h.answer}</span>${i<history.length-1?'<span class="crumb-sep">›</span>':''}`
+  ).join('');
+
+  if (pos >= qs.length) { renderResult(); return; }
+
+  const q = qs[pos];
+  document.getElementById('view').innerHTML = `
+    ${history.length>0?`<button class="back-btn" onclick="goBack()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 3L5 8L10 13"/></svg>
+      이전 항목으로
+    </button>`:''}
+    <div class="q-card">
+      <div class="q-step">체크포인트 ${pos+1} / ${qs.length} &nbsp;—&nbsp; ${q.step}</div>
+      <div class="q-text">${q.q}</div>
+      ${q.sub?`<div class="q-sub">${q.sub}</div>`:''}
+      ${q.law?`<div class="q-law">📋 법령 근거: ${q.law}</div>`:''}
+      <div class="options">
+        ${q.opts.map((o,i)=>`
+          <button class="opt" onclick="pick(${pos},${i})">
+            <div class="opt-l">
+              <div class="opt-main">${o.t}</div>
+              ${o.sub?`<div class="opt-sub">${o.sub}</div>`:''}
+            </div>
+            ${o.tag?`<span class="opt-tag tag-${tagColor(o.tag)}">${o.tag}</span>`:`<span class="opt-arr">›</span>`}
+          </button>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function scrollToQ() {
+  const pw = document.querySelector('.prog-wrap');
+  window.scrollTo({top: pw ? Math.max(0, pw.offsetTop - 72) : 0, behavior:'smooth'});
+}
+
+function pick(pos, optIdx) {
+  const qs = getQS();
+  const o = qs[pos].opts[optIdx];
+  history.push({answer:o.t});
+  Object.assign(C, o.d||{});
+  render();
+  scrollToQ();
+}
+
+function goBack() {
+  if (!history.length) return;
+  history.pop();
+  C = {};
+  history.forEach((h,i) => {
+    const qs = getQS();
+    if (qs[i]) Object.assign(C, qs[i].opts.find(o=>o.t===h.answer)?.d||{});
+  });
+  render();
+  scrollToQ();
+}
+
+function restart() { history=[]; C={}; render(); scrollToQ(); }
+
+/* ═══════════════════════════════════════════════════
+   GFC 상속·증여 등급 시스템
+   SAFE → PLAN-A → PLAN-B → ALERT → CRITICAL
+═══════════════════════════════════════════════════ */
+function buildResult() {
+  const assetSafe  = C.asset === 'safe';
+  const assetLow   = C.asset === 'low';
+  const assetMid   = C.asset === 'mid';
+  const assetHigh  = ['high','vhigh'].includes(C.asset);
+  const assetVhigh = C.asset === 'vhigh';
+  const realEstate      = C.atype === 'realestate' || C.atype === 'mixed';
+  const corpUnlisted    = ['unlisted','both'].includes(C.corp);
+  const corpListedMajor = ['listed_major','both'].includes(C.corp);
+  const corpStock       = corpUnlisted || corpListedMajor;
+  const noReserve  = C.reserve === 'none';
+  const insReserve = C.reserve === 'insurance';
+  const partReserve= C.reserve === 'partial';
+  const familyBad  = ['child_only','parent'].includes(C.family);
+  const giftNone   = C.gift === 'none';
+  const nhisDep    = C.nhis === 'dep';
+  const nhisLocal  = C.nhis === 'local';
+  const finTax     = ['tax','rent'].includes(C.finIncome);
+  const finWarn    = C.finIncome === 'warn';
+  const urgNow     = C.urg === 'now';
+  const urgShort   = ['now','short'].includes(C.urg);
+  const planNone   = ['none','vague'].includes(C.plan);
+  const ongoingRole= ROLE === 'ongoing';
+
+  /* ── 리스크 점수 ── */
+  let score = 0;
+  if (assetVhigh)  score += 4;
+  else if (assetHigh) score += 3;
+  else if (assetMid)  score += 2;
+  else if (assetLow)  score += 1;
+  if (C.atype === 'realestate') score += 2;
+  if (corpStock) score += 1;
+  if (noReserve) score += 2;
+  if (familyBad && assetMid) score += 1;
+  if (giftNone && assetHigh) score += 1;
+  if (nhisDep && finTax) score += 1;
+  if (urgNow) score += 2;
+  else if (urgShort) score += 1;
+  if (planNone && assetHigh) score += 1;
+  if (ongoingRole) score += 1;
+
+  /* ── GFC 전용 등급 ── */
+  let grade, gradeSub, gradeColor, gradeBadge;
+  if (assetSafe) {
+    grade = 'SAFE'; gradeSub = '상속세 부담 없음';
+    gradeColor = '#10b981'; gradeBadge = 'tag-green';
+  } else if (score <= 2) {
+    grade = 'PLAN-A'; gradeSub = '절세 최적화 구간';
+    gradeColor = '#3b82f6'; gradeBadge = 'tag-blue';
+  } else if (score <= 4) {
+    grade = 'PLAN-B'; gradeSub = '시급 설계 권장';
+    gradeColor = '#f59e0b'; gradeBadge = 'tag-amber';
+  } else if (score <= 7) {
+    grade = 'ALERT'; gradeSub = '상속세 폭탄 경보';
+    gradeColor = '#ef4444'; gradeBadge = 'tag-red';
+  } else {
+    grade = 'CRITICAL'; gradeSub = '즉각 대응 필요';
+    gradeColor = '#a855f7'; gradeBadge = 'tag-purple';
+  }
+
+  /* ── 절세 포인트 ── */
+  const points = [];
+
+  if (!assetSafe && giftNone) points.push({
+    pri:'기회', priC:'#0d2620', priTC:'#10b981',
+    title:'사전 증여 전무 — 지금이 시작 타이밍',
+    desc:'배우자 6억 / 자녀 1인당 5,000만원 / 손주 2,000만원(미성년 1,000만원)을 10년 단위로 비과세 증여 가능합니다. 지금 시작하면 10년 후 한 번 더 증여 기회가 생깁니다.',
+    link:'→ 세대별 증여 한도 활용 플랜 수립'
+  });
+
+  if (C.atype === 'realestate' && assetHigh) points.push({
+    pri:'긴급', priC:'#2d1515', priTC:'#ef4444',
+    title:'부동산 위주 자산 — 납부 재원 확보 불가 우려',
+    desc:`부동산만 있으면 상속세를 낼 현금이 없습니다. 상속세는 원칙적으로 현금 납부이며, 물납(부동산으로 납부)은 국세청 수용 여부가 불확실합니다. 종신보험으로 납부 재원을 미리 마련해두는 것이 핵심입니다.`,
+    link:'→ 상속세 납부 재원용 종신보험 설계'
+  });
+
+  if (corpUnlisted) points.push({
+    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title:'비상장 법인 지분 — 평가 구조 점검 필요',
+    desc:'비상장주식은 순자산가치+순이익가치로 평가합니다. 이익잉여금이 많을수록 주식가치가 올라 상속세가 급증합니다. 업력에 따라 액면가 증여 타이밍이 있으며, 특정법인 설립을 통한 분산도 검토 대상입니다.',
+    link:'→ 법인 지분 상속·증여 구조 점검'
+  });
+  if (corpListedMajor) points.push({
+    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title:'상장사 대주주 지분 — 양도세·상속 처분 전략 필요',
+    desc:'종목당 10억 이상 또는 지분율 1% 이상 보유자는 상장주식 대주주로 분류됩니다. 상속 후 처분 시 양도소득세 20~25%가 중과됩니다. 상속인이 대주주 요건을 피하도록 지분을 분산하거나, 처분 시점·방법을 사전에 설계해야 합니다.',
+    link:'→ 상장사 대주주 상속·처분 전략 수립'
+  });
+
+  if (nhisDep && (finTax || finWarn)) points.push({
+    pri:'위험', priC:'#2d1515', priTC:'#ef4444',
+    title:'피부양자 탈락 — 건강보험료 폭탄 위험',
+    desc:'증여를 받으면 재산·소득 기준 초과로 건강보험 피부양자 자격을 잃을 수 있습니다. 탈락 시 지역가입자로 전환되어 월 30만원~100만원 이상 건보료가 추가됩니다. 증여 전 소득·재산 시뮬레이션이 필수입니다.',
+    link:'→ 증여 후 건강보험 시뮬레이션 사전 점검'
+  });
+
+  if (nhisLocal && C.atype === 'realestate') points.push({
+    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title:'지역가입자 + 부동산 증가 → 건보료 상승',
+    desc:'지역가입자는 보유 부동산의 재산세 과표를 점수화해 건보료에 반영합니다. 증여로 재산이 늘면 건보료가 즉시 오릅니다. 전월세 수익 구조로 전환하거나 자녀 명의로 이전하는 방법을 검토해야 합니다.',
+    link:'→ 지역가입자 건보료 절감 설계'
+  });
+
+  if (finTax) points.push({
+    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title:'금융소득 종합과세 — 최고 세율 49.5% 노출',
+    desc:'이자+배당이 연 2,000만원을 초과하면 종합소득세 대상이 됩니다. 세율은 최고 49.5%(지방세 포함). 금융상품을 분산하거나 연금·보험 구조로 전환해 과세 소득을 줄이는 설계가 필요합니다.',
+    link:'→ 금융소득 종합과세 절감 포트폴리오 구성'
+  });
+
+  if (assetHigh && noReserve) points.push({
+    pri:'긴급', priC:'#2d1515', priTC:'#ef4444',
+    title:'납부 재원 없음 — 강제 매각·대출 위기',
+    desc:'상속세는 6개월 이내 납부 원칙입니다. 재원이 없으면 부동산을 급매로 팔거나 자녀가 대출을 받아야 합니다. 연부연납(최대 5년 분할)을 활용하더라도 이자가 발생합니다. 종신보험 납부 재원 마련이 가장 합리적입니다.',
+    link:'→ 상속세 납부 재원 종신보험 긴급 설계'
+  });
+
+  if (!assetSafe && C.family === 'child_only') points.push({
+    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title:'배우자 없음 — 공제 축소로 세부담 증가',
+    desc:'배우자가 없으면 배우자공제(최대 30억)를 받을 수 없습니다. 일괄공제 5억만 적용되므로 자산이 동일해도 세금이 크게 늘어납니다. 자녀에게 분산 증여해 상속 재산 자체를 줄이는 전략이 필요합니다.',
+    link:'→ 배우자 없는 경우 자녀 사전 증여 플랜'
+  });
+
+  /* ── 건보료 시뮬레이션 박스 ── */
+  const nhisSimul = (nhisDep || nhisLocal) ? {
+    탈락기준: nhisDep ? '피부양자 — 금융소득 1,000만원 초과 시 즉시 탈락' : '지역가입자 — 증여 재산 점수화 적용',
+    전환후보험료: noReserve ? '월 50만원+ 예상' : '월 30~80만원 (자산·소득 규모별)',
+    절감방법: '증여 전 소득 분산·재산 이전 설계 → GFC 시뮬레이션 제공',
+    주의사항: '증여 계약 전 반드시 건보료 사전 시뮬레이션 필수',
+  } : null;
+
+  /* ── 로드맵 ── */
+  const phase1 = [], phase2 = [], phase3 = [];
+  if (giftNone && !assetSafe) phase1.push('자녀·배우자 증여 한도(배우자 6억/자녀 5천만원) 활용 — 증여세 신고 착수');
+  if (corpUnlisted) phase1.push('비상장주식 가치평가 의뢰 — 최저 평가 시점 포착 후 증여 타이밍 결정');
+  if (corpListedMajor) phase1.push('상장사 대주주 요건 확인 — 상속인의 취득 후 지분율·보유액 시뮬레이션');
+  if (nhisDep || nhisLocal) phase1.push('건강보험 피부양자 유지·탈락 시뮬레이션 실시 — 증여 전 필수 점검');
+  if (finTax) phase1.push('금융소득 분산 — ISA·연금계좌 이전, 상품 포트폴리오 재구성');
+  phase1.push('상속세 추정액 계산 (가상 시뮬레이션) — 현재 기준 세부담 확인');
+
+  if (assetHigh && (noReserve || partReserve)) phase2.push('납부 재원용 종신보험 설계 (피상속인 피보험자, 법인 또는 상속인 수익자)');
+  if (!assetSafe) phase2.push('사전 증여 연간 실행 계획 수립 — 10년 주기 분산 스케줄링');
+  if (corpUnlisted) phase2.push('법인 이익잉여금 출구전략 연계 — 임원퇴직금·경영인정기·법인보험 3단계');
+  if (corpListedMajor) phase2.push('대주주 지분 분산 설계 — 배우자·자녀 증여를 통한 대주주 요건 탈피 검토');
+  phase2.push('유언장·신탁 설계 검토 — 법적 분쟁 방지 및 상속 의사 명확화');
+
+  if (assetVhigh) phase3.push('가업승계 플랜 연계 — 특정법인 설립을 통한 장기 지분 이전');
+  if (!assetSafe) phase3.push('연간 자산 재평가 — 공시지가 변동에 따른 세부담 재계산');
+  phase3.push('상속세 납부 재원 종신보험 납입 지속 + 환급금 모니터링');
+  if (ongoingRole) phase3.push('상속세 신고 기한(6개월) 내 세무사·법무사 공동 신고 대응');
+
+  return { grade, gradeSub, gradeColor, gradeBadge, score, points, nhisSimul, phase1, phase2, phase3 };
+}
+
+function renderResult() {
+  const R = buildResult();
+  const flagPairs = [
+    ['역할', ROLE==='heir'?'상속인':ROLE==='donor'?'증여자·피상속인':'진행 중'],
+    ['자산 규모', C.assetLabel], ['자산 구성', C.atypeLabel], ['상속인', C.familyLabel],
+    ['사전 증여', C.giftLabel], ['건강보험', C.nhisLabel], ['금융소득', C.finLabel],
+    ['법인 지분', C.corpLabel], ['납부 재원', C.reserveLabel],
+    ['긴급도', C.urgLabel], ['현재 준비', C.planLabel],
+  ].filter(([,v])=>v);
+
+  const pointsHtml = R.points.map(p=>`
+    <div class="item">
+      <div class="item-pri" style="background:${p.priC};color:${p.priTC}">${p.pri}</div>
+      <div class="item-body">
+        <div class="item-title">${p.title}</div>
+        <div class="item-desc">${p.desc}</div>
+        <div class="item-link">${p.link}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const nhisHtml = R.nhisSimul ? `
+    <div class="section" style="margin-bottom:14px">
+      <div class="section-hd">
+        <div class="section-hd-icon" style="background:#0c1a2a;color:#3b82f6">🏥</div>
+        <span class="section-hd-title" style="color:#3b82f6">건강보험료 영향 시뮬레이션</span>
+      </div>
+      <div style="padding:16px 22px">
+        <div class="nhis-box">
+          <div class="nhis-title">건강보험 부과 시나리오</div>
+          ${Object.entries(R.nhisSimul).map(([k,v])=>`
+            <div class="nhis-row">
+              <span class="nhis-label">${k}</span>
+              <span class="nhis-val ${k.includes('보험료')?'warn':k.includes('주의')?'danger':''}">${v}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>` : '';
+
+  const roadHtml = (items, num, tag, title, color) => !items.length ? '' : `
+    <div class="phase">
+      <div class="ph-num" style="background:${color}22;color:${color}">${num}</div>
+      <div class="ph-body">
+        <div class="ph-tag" style="color:${color}">${tag}</div>
+        <div class="ph-title">${title}</div>
+        <div class="ph-items">${items.map(i=>`<div class="ph-item"><div class="ph-dot"></div><span>${i}</span></div>`).join('')}</div>
+      </div>
+    </div>`;
+
+  document.getElementById('view').innerHTML = `
+    <div class="result-wrap">
+      ${R.grade !== 'SAFE' && R.score >= 5 ? `<div class="alert alert-red"><div class="alert-icon">⚠</div>
+        <div>현재 상속·증여 준비 상태가 <strong>위험 수준</strong>입니다. 자산 규모, 부동산 비중, 납부 재원 부족이 복합적으로 작용하고 있습니다. GFC 긴급 진단 상담을 권장합니다.</div>
+      </div>` : ''}
+      ${ROLE==='ongoing' ? `<div class="alert alert-amber"><div class="alert-icon">⏰</div>
+        <div>상속 개시 후 <strong>6개월 이내</strong>에 상속세 신고·납부 의무가 있습니다. 기한을 넘기면 가산세(20%+)가 부과됩니다. 즉시 세무사·법무사와 함께 진행하세요.</div>
+      </div>` : ''}
+
+      <div class="r-hero">
+        <div class="r-top">
+          <div>
+            <div class="r-badge tag-gold">GFC 상속·증여 등급</div>
+            <div class="r-title" style="color:${R.gradeColor}">${R.grade} <span style="font-size:14px;color:var(--muted);font-weight:400">— ${R.gradeSub}</span></div>
+            <div class="r-desc">
+              ${R.grade==='SAFE' ? '현재 자산 규모 기준 상속세 과세 대상에 해당하지 않습니다. 향후 자산 변화에 대비한 모니터링만 유지하세요.' : ''}
+              ${R.grade==='PLAN-A' ? '절세 최적화 설계로 세부담을 크게 줄일 수 있는 구간입니다. 사전 증여·분산 설계를 지금 착수하세요.' : ''}
+              ${R.grade==='PLAN-B' ? '납부 재원 부족 또는 설계 공백이 있습니다. 핵심 항목부터 빠르게 실행해야 합니다.' : ''}
+              ${R.grade==='ALERT' ? '상속세 폭탄 위험 수준입니다. 부동산 자산 비중과 납부 재원 부족이 복합 리스크를 만들고 있습니다.' : ''}
+              ${R.grade==='CRITICAL' ? '즉각 대응이 필요한 위기 상황입니다. 상속 개시가 임박하거나 준비가 전혀 없는 상태입니다.' : ''}
+            </div>
+          </div>
+          <div class="grade-box">
+            <div class="grade-label">GFC 등급</div>
+            <div class="grade-val" style="color:${R.gradeColor}">${R.grade}</div>
+            <div class="grade-sub">${R.gradeSub}</div>
+            <div style="font-size:10px;color:var(--hint);margin-top:6px">리스크 점수 ${R.score}점</div>
+          </div>
+        </div>
+        <div class="flags">${flagPairs.map(([k,v])=>`<span class="flag">${k}: ${v}</span>`).join('')}</div>
+      </div>
+
+      ${nhisHtml}
+
+      ${R.points.length > 0 ? `
+      <div class="section">
+        <div class="section-hd">
+          <div class="section-hd-icon" style="background:var(--gold-bg);color:var(--gold)">!</div>
+          <span class="section-hd-title" style="color:var(--gold)">절세·리스크 포인트</span>
+          <span class="section-hd-count" style="background:var(--gold-bg);color:var(--gold)">${R.points.length}건</span>
+        </div>
+        ${pointsHtml}
+      </div>` : ''}
+
+      <div class="section">
+        <div class="section-hd">
+          <div class="section-hd-icon" style="background:var(--blue-bg);color:var(--blue)">→</div>
+          <span class="section-hd-title" style="color:var(--blue)">GFC 상속·증여 로드맵</span>
+        </div>
+        ${roadHtml(R.phase1,'1','즉시 실행 (1~3개월)','핵심 점검 및 증여 착수','#10b981')}
+        ${roadHtml(R.phase2,'2','단기 실행 (3~12개월)','납부 재원 확보 및 설계 확정','#3b82f6')}
+        ${roadHtml(R.phase3,'3','중장기 관리 (1~10년)','지속 실행 및 모니터링','#a855f7')}
+      </div>
+
+      <div class="section">
+        <div class="section-hd">
+          <div class="section-hd-icon" style="background:var(--green-bg);color:var(--green)">▸</div>
+          <span class="section-hd-title" style="color:var(--green)">유관 정부지원사업 및 법적 제도</span>
+        </div>
+        ${(()=>{
+          const govItems=[];
+          govItems.push({icon:'🏭',type:'세액 공제',name:'가업상속공제 (최대 600억)',benefit:'피상속인 10년 이상 영위 중소·중견기업 최대 600억 공제',desc:'매출 5,000억 이하 중견기업도 적용. 사전에 업종 해당 여부 확인 필수. 사후 관리 요건(고용 유지 등) 준수 시 추가 혜택.'});
+          govItems.push({icon:'💰',type:'절세 한도',name:'증여세 공제 한도 (10년마다 갱신)',benefit:'직계비속 5,000만원 · 배우자 6억원 비과세',desc:'10년 단위로 리셋. 자녀에게 매 10년마다 5,000만원 무세 증여 가능. 지금 착수할수록 총 증여 가능 금액이 증가합니다.'});
+          if(['unlisted','both'].includes(C.corp||'')||['mid','high','vhigh'].includes(C.asset||'')){
+            govItems.push({icon:'🏢',type:'세율 특례',name:'가업승계 증여세 과세특례 (중소기업)',benefit:'100억 이하 10%, 500억 이하 20% 특례세율',desc:'일반 증여세(최고 50%)에서 파격 인하. 수증자(자녀)가 7년 이상 가업에 종사해야 하며 대표이사 취임 의무 있음.'});
+          }
+          govItems.push({icon:'📋',type:'무료 상담',name:'국세청 상속세 신고 납세 지원',benefit:'영세납세자 무료 세무 도움 서비스',desc:'상속세 신고 기한(6개월) 내 국세청 세무 도우미 신청 가능. 공익법인 출연 시 추가 공제 전략도 문의 가능.'});
+          govItems.push({icon:'🌾',type:'세액 공제',name:'영농·영어 상속공제 (최대 30억)',benefit:'농지·어업 자산 상속 시 최대 30억 공제',desc:'피상속인이 2년 이상 영농에 종사하고 상속인이 계속 영위할 것 조건. 농업인 자산 승계 최우선 활용 제도.'});
+          return `<div style="padding:4px 22px 16px;">
+            ${govItems.map(g=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);">
+              <div style="font-size:18px;flex-shrink:0;padding-top:2px">${g.icon}</div>
+              <div>
+                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:3px;">
+                  <span style="font-size:10px;font-weight:700;background:var(--green-bg);color:var(--green);padding:1px 7px;border-radius:8px;">${g.type}</span>
+                  <span style="font-size:13px;font-weight:600;">${g.name}</span>
+                </div>
+                <div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:3px;">${g.benefit}</div>
+                <div style="font-size:12px;color:var(--hint);line-height:1.55;">${g.desc}</div>
+              </div>
+            </div>`).join('')}
+          </div>`;
+        })()}
+      </div>
+
+      <div class="section">
+        <div class="section-hd">
+          <div class="section-hd-icon" style="background:var(--purple-bg);color:var(--purple)">⚠</div>
+          <span class="section-hd-title" style="color:var(--purple)">위험관리 — 전반 및 보험 권고</span>
+        </div>
+        ${(()=>{
+          const risks=[];
+          // 납부 재원 부족 위험
+          if(noReserve && !assetSafe){
+            risks.push({lv:'red',title:'납부 재원 없음 — 즉각 대응 필요',
+              desc:'상속세는 현금으로만 납부 가능합니다. 부동산·비상장주식 등 현물로는 세금을 낼 수 없습니다. 재원이 없으면 분할납부 또는 물납 외에 선택지가 없으며, 법정 기한(6개월) 초과 시 가산세 20% 이상 부과됩니다.'});
+          }
+          if(realEstate && !insReserve){
+            risks.push({lv:'red',title:'부동산 과중 → 현금 부족 리스크',
+              desc:'자산의 70% 이상이 부동산인 경우 급매 처분 시 손실이 크고 기한 내 처분도 어렵습니다. 종신보험 또는 금융자산으로 최소 예상 상속세의 50% 이상을 현금으로 준비해 두어야 합니다.'});
+          }
+          if(assetHigh || R.grade==='ALERT'||R.grade==='CRITICAL'){
+            risks.push({lv:'amber',title:'고액 자산 → 최고세율(50%) 구간',
+              desc:'30억 초과 자산은 최고세율 50%(최대주주 할증 시 60%) 적용. 사전 증여를 통한 과세표준 분산이 가장 효과적인 절세 수단입니다. 10년 이상의 장기 플랜이 필요합니다.'});
+          }
+          risks.push({lv:'info',title:'신탁 활용 — 재산 이전 리스크 관리',
+            desc:'유언대용신탁·수익자연속신탁으로 상속 분쟁을 사전 차단하고 재산 이전을 유연하게 설계할 수 있습니다. 특히 자녀 간 지분 분쟁 가능성이 있는 경우 신탁을 통한 명확한 승계 구조 설계를 권장합니다.'});
+
+          // 보험 권고
+          const insRecs=[];
+          if(!insReserve){
+            insRecs.push({name:'종신보험 (상속세 납부 재원)',urgency:'🔴 최우선 가입 권고',
+              desc:'상속세 납부 재원으로 유일하게 현금을 사전 적립할 수 있는 수단. 사망보험금은 상속세 과세 대상이지만, 보험료를 사전에 납부하여 현금을 준비하는 효과가 있습니다. 가입 시기가 빠를수록 보험료가 저렴합니다.'});
+          }
+          if(partReserve){
+            insRecs.push({name:'종신보험 추가 설계 (보장 부족 보완)',urgency:'🟡 보장액 점검 후 보완',
+              desc:'기존 종신보험의 사망보험금이 예상 상속세 전액을 커버하는지 확인하세요. 부족분에 대해 추가 계약 또는 보장 업그레이드가 필요합니다.'});
+          }
+          insRecs.push({name:'연금보험 / 즉시연금 (건강보험료 절감)',urgency:'🟢 부부 동시 가입 검토',
+            desc:'금융소득(이자·배당)이 연 2,000만원 이상이면 건강보험료가 급증합니다. 즉시연금은 금융소득 과세 제외 구조로 건강보험료 절감에 유리합니다. 상속 전 자산 이전 방법으로도 활용.'});
+          if(corpUnlisted||['mid','high','vhigh'].includes(C.asset||'')){
+            insRecs.push({name:'기업경영인 특화 보험 (가업승계 연계)',urgency:'🟡 사업체 규모에 맞게 설계',
+              desc:'비상장법인 대주주는 사망 시 기업가치 전체가 상속세 대상. 경영인정기보험(비용처리)과 종신보험(상속세 재원)을 동시에 설계하여 기업 존속과 절세를 함께 해결하세요.'});
+          }
+
+          return `<div style="padding:4px 22px 16px;">
+            ${risks.map(r=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);">
+              <div style="width:8px;height:8px;border-radius:50%;background:${r.lv==='red'?'#ef4444':r.lv==='amber'?'#f59e0b':'#3b82f6'};flex-shrink:0;margin-top:5px;"></div>
+              <div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:3px;">${r.title}</div>
+                <div style="font-size:12px;color:var(--hint);line-height:1.55;">${r.desc}</div>
+              </div>
+            </div>`).join('')}
+            <div style="background:var(--gold-bg);border:1px solid #352b0a;border-left:3px solid var(--gold);border-radius:8px;padding:14px;margin-top:12px;">
+              <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px;">🏥 보험 권고 사항</div>
+              ${insRecs.map(i=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #352b0a;">
+                <div style="min-width:160px;flex-shrink:0;">
+                  <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:1px;">${i.name}</div>
+                  <div style="font-size:11px;">${i.urgency}</div>
+                </div>
+                <div style="font-size:12px;color:var(--muted);line-height:1.5;">${i.desc}</div>
+              </div>`).join('')}
+            </div>
+          </div>`;
+        })()}
+      </div>
+
+      <div class="action-row">
+        <button class="btn-p" onclick="alert('GFC 컨설턴트에게 상담을 요청합니다.')">GFC 상속·증여 전문 상담 신청</button>
+        <button class="btn-g" onclick="restart()">처음부터 다시 진단</button>
+      </div>
+    </div>`;
+}
+
+/* 초기 실행 */
+calcTax();
+render();
+</script>
+</body>
+</html>
