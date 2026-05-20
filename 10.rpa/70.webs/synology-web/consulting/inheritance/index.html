@@ -146,6 +146,10 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .ph-items{display:flex;flex-direction:column;gap:6px}
 .ph-item{font-size:13px;color:var(--muted);display:flex;gap:7px;align-items:flex-start;line-height:1.6}
 .ph-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);margin-top:8px;flex-shrink:0}
+.ph-item-body{flex:1}
+.ph-sub{font-size:12px;color:var(--hint);line-height:1.7;margin-top:5px;background:rgba(255,255,255,.04);border-left:3px solid var(--border2);padding:8px 11px;border-radius:0 6px 6px 0}
+.ph-link{font-size:11px;color:var(--blue);text-decoration:none;display:inline-block;margin-top:5px;opacity:.85}
+.ph-link:hover{opacity:1;text-decoration:underline}
 
 .action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
 .btn-p{flex:1;min-width:160px;background:var(--gold);color:#000;border:none;border-radius:var(--r);padding:13px 20px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .12s}
@@ -155,6 +159,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 
 @media(max-width:500px){.page{padding:18px 12px 56px}.q-card{padding:18px 16px}.q-text{font-size:15px}.r-title{font-size:17px}.phase{padding:14px 16px}.action-row{flex-direction:column}.btn-p{min-width:unset}.trend-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:380px){.trend-grid{grid-template-columns:1fr}}
+@media print{.no-print{display:none!important}}
 
 /* ── TAX SIMULATOR ── */
 .sim-section{background:#0e1218;border-bottom:1px solid var(--border)}
@@ -368,7 +373,7 @@ function calcTax() {
     totalTax += tax;
     remaining -= size;
   }
-  renderSimResult({total, basicDed, childDed, personalTotal, blanketDed, spouseDed, spouseLegal, totalDed, taxBase, rows, totalTax});
+  renderSimResult({total, basicDed, childDed, personalTotal, blanketDed, spouseAmt, spouseDed, spouseLegal, totalDed, taxBase, rows, totalTax});
 }
 function renderSimResult(R) {
   const el = document.getElementById('sim-result');
@@ -625,6 +630,7 @@ function scrollToQ() {
 }
 
 function pick(pos, optIdx) {
+  if (pos !== history.length) return;
   const qs = getQS();
   const o = qs[pos].opts[optIdx];
   history.push({answer:o.t});
@@ -786,29 +792,81 @@ function buildResult() {
 
   /* ── 로드맵 ── */
   const phase1 = [], phase2 = [], phase3 = [];
-  if (giftNone && !assetSafe) phase1.push('자녀·배우자 증여 한도(배우자 6억/자녀 5천만원) 활용 — 증여세 신고 착수');
-  if (corpUnlisted) phase1.push('비상장주식 가치평가 의뢰 — 최저 평가 시점 포착 후 증여 타이밍 결정');
-  if (corpListedMajor) phase1.push('상장사 대주주 요건 확인 — 상속인의 취득 후 지분율·보유액 시뮬레이션');
-  if (nhisDep || nhisLocal) phase1.push('건강보험 피부양자 유지·탈락 시뮬레이션 실시 — 증여 전 필수 점검');
-  if (finTax) phase1.push('금융소득 분산 — ISA·연금계좌 이전, 상품 포트폴리오 재구성');
-  phase1.push('상속세 추정액 계산 (가상 시뮬레이션) — 현재 기준 세부담 확인');
+  if (giftNone && !assetSafe) phase1.push({
+    text:'자녀·배우자에게 지금 바로 증여 시작 — 10년 면세 한도 활용',
+    sub:'자녀 1인당 5,000만원, 배우자 6억원까지 세금 없이 줄 수 있습니다(10년마다 한도 리셋). 예시: 자녀 2명에게 오늘 각 5,000만원 → 10년 후 다시 각 5,000만원 → 20년간 총 2억원 무세 이전. 증여세 신고는 증여일이 속한 달의 말일로부터 3개월 이내에 해야 가산세가 없습니다.',
+    link:{label:'국세청 증여세 신고 안내', url:'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2340&cntntsId=7744'}
+  });
+  if (corpUnlisted) phase1.push({
+    text:'비상장주식 — 회사 이익이 낮을 때 빨리 증여해야 세금이 적습니다',
+    sub:'비상장주식 가치는 순자산 + 순이익으로 계산합니다. 회사 실적이 좋을수록 주식 가치가 오르고 증여세도 늘어납니다. 매출이 일시적으로 낮거나 결손이 발생한 시점에 공인평가기관에 가치평가를 의뢰하고 그 가격으로 자녀에게 증여하면 세금을 크게 아낄 수 있습니다.'
+  });
+  if (corpListedMajor) phase1.push({
+    text:'상장주식 대주주라면 — 지분율 먼저 확인하세요',
+    sub:'종목당 보유액 10억 이상 또는 지분율 1% 이상이면 상장주식 대주주입니다. 대주주가 주식을 팔면 양도세 20~25%가 붙는데, 상속인이 상속으로 이 주식을 물려받으면 대주주 요건을 그대로 이어받습니다. 지금 배우자·자녀에게 지분을 분산해 대주주 요건을 벗어나두면 향후 양도세 부담을 크게 줄일 수 있습니다.'
+  });
+  if (nhisDep || nhisLocal) phase1.push({
+    text:'증여 전 건강보험료 영향 반드시 확인하세요 — 매달 수십만원이 달라질 수 있습니다',
+    sub:'자녀가 직장가입자의 피부양자라면, 증여받은 재산이 기준(재산과표 5.4억 초과 또는 금융소득 연 1,000만원 초과)을 넘는 순간 피부양자 자격을 잃습니다. 이후 지역가입자로 전환돼 재산·소득에 따라 월 30~100만원 이상 건보료가 새로 생깁니다. 예시: 공시가 3억 아파트를 자녀에게 증여 시 건보료 월 약 22~30만원 추가 예상. 증여 계약서 쓰기 전에 시뮬레이션 필수.',
+    link:{label:'건강보험공단 피부양자 자격 확인', url:'https://www.nhis.or.kr/nhis/policy/wbhaca03600m01.do'}
+  });
+  if (finTax) phase1.push({
+    text:'이자·배당이 연 2,000만원 넘으면 세율이 최고 49.5%로 급등 — 지금 구조를 바꾸세요',
+    sub:'예금이자 + 주식 배당금 합계가 연 2,000만원을 초과하면 금융소득종합과세 대상이 됩니다. ISA(개인종합자산관리계좌)에 넣은 금융소득은 최대 500만원까지 비과세이고, 연금저축·IRP로 이전하면 저율 분리과세(3.3~5.5%)가 적용됩니다. 상품 교체만으로 수백만 원 절세가 가능한 영역입니다.'
+  });
+  phase1.push({
+    text:'지금 상속이 개시된다면 세금이 얼마나 나올까? — 미리 계산해두세요',
+    sub:'자산 총액에서 기본공제(일괄 5억), 배우자공제(최대 30억), 금융재산공제(순금융재산의 20%, 최대 2억) 등을 차감한 뒤 세율 10~50%를 적용합니다. 예시: 자산 20억 / 배우자+자녀 2명 → 공제 후 과세표준 약 9억 → 상속세 약 1억 9,000만원. 국세청 상속세 계산 서비스로 직접 확인할 수 있습니다.',
+    link:{label:'국세청 상속세 계산 서비스', url:'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2338'}
+  });
 
-  if (assetHigh && (noReserve || partReserve)) phase2.push('납부 재원용 종신보험 설계 (피상속인 피보험자, 법인 또는 상속인 수익자)');
-  if (!assetSafe) phase2.push('사전 증여 연간 실행 계획 수립 — 10년 주기 분산 스케줄링');
-  if (corpUnlisted) phase2.push('법인 이익잉여금 출구전략 연계 — 임원퇴직금·경영인정기·법인보험 3단계');
-  if (corpListedMajor) phase2.push('대주주 지분 분산 설계 — 배우자·자녀 증여를 통한 대주주 요건 탈피 검토');
-  phase2.push('유언장·신탁 설계 검토 — 법적 분쟁 방지 및 상속 의사 명확화');
+  if (assetHigh && (noReserve || partReserve)) phase2.push({
+    text:'상속세 낼 현금이 없다면 — 종신보험으로 납부 재원을 미리 마련하세요',
+    sub:'상속세는 원칙적으로 현금만 납부 가능합니다. 부동산·주식으로는 낼 수 없습니다(물납은 국세청이 거부할 수 있음). 피상속인(부모)을 피보험자로, 상속인(자녀)을 수익자로 종신보험을 가입하면 부모 사망 시 보험금이 즉시 나와 상속세 납부에 사용합니다. 가입이 5년만 빨라도 보험료가 20~30% 저렴해집니다.'
+  });
+  if (!assetSafe) phase2.push({
+    text:'10년 단위 증여 스케줄표 만들기 — 계획 없이는 절세도 없습니다',
+    sub:'자녀 1명에게 매 10년마다 5,000만원 무세 증여 가능. 예시: 자녀 3명 / 2025년 각 5,000만원(총 1.5억) → 2035년 각 5,000만원(총 1.5억) → 2045년 각 5,000만원(총 1.5억). 20년간 총 4.5억을 세금 없이 이전. 단, 증여일 기준 10년 이내 금액은 합산되므로 날짜 관리가 핵심입니다.'
+  });
+  if (corpUnlisted) phase2.push({
+    text:'법인에 쌓인 이익잉여금 — 그냥 두면 상속세 폭탄이 됩니다',
+    sub:'법인의 이익잉여금이 많을수록 비상장주식 평가액이 오르고 상속세도 늘어납니다. 3단계 출구전략: ① 임원퇴직금 규정 개정 → 대표이사 퇴직 시 합법적 고액 지급(퇴직소득세 분리과세로 세율 낮음) ② 경영인정기보험 가입 → 보험료를 회사 비용으로 처리하며 대표 사망 리스크도 해결 ③ 법인보험 활용 → 이익잉여금을 보험료로 전환해 자산 구조 개선.'
+  });
+  if (corpListedMajor) phase2.push({
+    text:'대주주 요건에서 벗어나는 것만으로 양도세가 확 줄어듭니다',
+    sub:'상장주식 대주주(지분 1% 이상 또는 보유액 10억 이상)는 주식 매도 시 양도세 20~25%가 붙습니다. 배우자·자녀에게 지분을 증여해 각자의 보유액을 10억 미만·지분율 1% 미만으로 낮추면 대주주 요건에서 벗어나 소액주주 세율(없음~22%)이 적용됩니다. 증여 가격은 시가로 평가하며 증여세 신고가 필요합니다.'
+  });
+  phase2.push({
+    text:'유언장이 없으면 자녀들이 법대로 싸웁니다 — 미리 정해두는 것이 가족을 지킵니다',
+    sub:'유언장 없이 사망하면 법정상속 비율(배우자 1.5 : 자녀 각 1)로 강제 분할됩니다. 자녀 간 합의가 안 되면 법원 소송까지 수년이 걸립니다(2022년 상속 관련 소송 7,200건 이상). 유언대용신탁은 생전에 재산을 신탁사에 맡겨 내가 정한 대로 자동 분배되는 제도로, 유언장보다 법적 분쟁 방지 효과가 높습니다.'
+  });
 
-  if (assetVhigh) phase3.push('가업승계 플랜 연계 — 특정법인 설립을 통한 장기 지분 이전');
-  if (!assetSafe) phase3.push('연간 자산 재평가 — 공시지가 변동에 따른 세부담 재계산');
-  phase3.push('상속세 납부 재원 종신보험 납입 지속 + 환급금 모니터링');
-  if (ongoingRole) phase3.push('상속세 신고 기한(6개월) 내 세무사·법무사 공동 신고 대응');
+  if (assetVhigh) phase3.push({
+    text:'자산 30억 이상이라면 — 특정법인으로 장기 절세 구조를 만드세요',
+    sub:'자녀가 대주주인 새 법인(특정법인)에 부동산이나 사업권을 이전하면, 법인 가치가 늘어날수록 자녀 지분 가치도 올라 증여세 없이 자산을 이전하는 효과가 생깁니다. 10년 이상 장기 플랜이므로 지금 설계를 시작해야 효과가 납니다. 설계 시 특수관계자 거래 이슈를 반드시 세무사와 검토해야 합니다.'
+  });
+  if (!assetSafe) phase3.push({
+    text:'매년 1월 공시지가 발표 때 상속세가 달라집니다 — 연 1회 재계산 필수',
+    sub:'아파트·토지의 상속세 산정 기준은 시가(실거래가)이며, 시가 불분명 시 공시지가로 대체합니다. 국토부가 매년 1월(공동주택) / 5월(표준주택·토지) 발표하는 공시지가가 오르면 세금도 같이 오릅니다. 공시지가 하락 연도(예: 2023년 공동주택 공시가 전년 대비 −18.6%)는 증여 적기입니다. 매년 공시지가 발표 후 예상 세금을 다시 계산해보세요.',
+    link:{label:'부동산 공시가격 알리미 (국토부)', url:'https://www.realtyprice.kr/notice/main/mainBody.htm'}
+  });
+  phase3.push({
+    text:'종신보험은 10년 이상 납입하면 해지해도 낸 돈을 돌려받습니다 — 매년 점검하세요',
+    sub:'종신보험 해지환급금은 초기엔 납입보험료보다 적지만, 보통 가입 후 10~15년 시점에 납입 총액을 넘어섭니다(환급률 100% 초과). 이 시점부터는 상속세 납부 재원 확보 + 저축 효과가 동시에 생깁니다. 매년 보험사에서 보내는 연간 안내장(환급금·사망보험금 현황)으로 납부 재원이 충분한지 확인하고, 부족하면 추가 계약을 검토하세요.'
+  });
+  if (ongoingRole) phase3.push({
+    text:'상속 개시 후 6개월이 법적 신고 기한 — 하루라도 늦으면 가산세 20%',
+    sub:'부모님이 돌아가신 날로부터 6개월 이내에 상속세 신고·납부를 마쳐야 합니다. 기한을 넘기면 ① 무신고가산세 납부세액의 20% ② 납부지연가산세 하루 0.022%(연 8%)가 추가로 붙습니다. 세무사(세금 계산·신고)와 법무사(부동산 이전등기)가 동시에 진행해야 기한 내 처리가 가능합니다. 상속 개시 즉시 전문가에게 연락하세요.',
+    link:{label:'국세청 상속세 신고 안내', url:'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2338'}
+  });
 
-  return { grade, gradeSub, gradeColor, gradeBadge, score, points, nhisSimul, phase1, phase2, phase3 };
+  return { grade, gradeSub, gradeColor, gradeBadge, score, points, nhisSimul, phase1, phase2, phase3,
+           noReserve, assetSafe, assetHigh, realEstate, insReserve, partReserve, corpUnlisted };
 }
 
 function renderResult() {
   const R = buildResult();
+  const { noReserve, assetSafe, assetHigh, realEstate, insReserve, partReserve, corpUnlisted } = R;
   const flagPairs = [
     ['역할', ROLE==='heir'?'상속인':ROLE==='donor'?'증여자·피상속인':'진행 중'],
     ['자산 규모', C.assetLabel], ['자산 구성', C.atypeLabel], ['상속인', C.familyLabel],
@@ -853,7 +911,7 @@ function renderResult() {
       <div class="ph-body">
         <div class="ph-tag" style="color:${color}">${tag}</div>
         <div class="ph-title">${title}</div>
-        <div class="ph-items">${items.map(i=>`<div class="ph-item"><div class="ph-dot"></div><span>${i}</span></div>`).join('')}</div>
+        <div class="ph-items">${items.map(i=>{const o=typeof i==='string'?{text:i}:i;return`<div class="ph-item"><div class="ph-dot"></div><div class="ph-item-body"><span>${o.text}</span>${o.sub?`<div class="ph-sub">${o.sub}</div>`:''} ${o.link?`<a class="ph-link" href="${o.link.url}" target="_blank" rel="noopener noreferrer">↗ ${o.link.label}</a>`:''}</div></div>`;}).join('')}</div>
       </div>
     </div>`;
 
@@ -1003,7 +1061,8 @@ function renderResult() {
         })()}
       </div>
 
-      <div class="action-row">
+      <div class="action-row no-print">
+        <button class="btn-p" onclick="window.print()">🖨 결과 인쇄 / PDF 저장</button>
         <button class="btn-p" onclick="alert('전담 컨설턴트에게 상담을 요청합니다.')">상속·증여 전문 상담 신청</button>
         <button class="btn-g" onclick="restart()">처음부터 다시 진단</button>
       </div>

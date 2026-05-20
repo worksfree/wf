@@ -231,13 +231,13 @@
     .fs-section-title {
       font-size:11px; font-weight:700; color:var(--sub); letter-spacing:.06em;
       text-transform:uppercase; padding:9px 20px; background:rgba(255,255,255,.025);
-      border-bottom:1px solid var(--border); position:sticky; top:0; z-index:1;
+      border-bottom:1px solid var(--border);
     }
     .fs-table { width:100%; border-collapse:collapse; font-size:12px; }
     .fs-table th {
       background:var(--panel); color:var(--sub); font-weight:600;
       padding:7px 14px; text-align:left; border-bottom:1px solid var(--border);
-      white-space:nowrap; position:sticky; top:32px; z-index:1;
+      white-space:nowrap;
     }
     .fs-table th:not(:first-child) { text-align:right; min-width:110px; }
     .fs-table td { padding:5px 14px; border-bottom:1px solid rgba(45,55,72,.35); vertical-align:middle; }
@@ -260,6 +260,10 @@
     }
     .fs-actions.show { display:flex; }
     .fs-unit-note { font-size:11px; color:var(--sub); margin-left:auto; }
+    #fs-sticky-bar {
+      flex-shrink:0; display:none; background:var(--panel);
+      border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,.35);
+    }
   </style>
 </head>
 <body>
@@ -389,6 +393,10 @@
         <option value="OFS" id="fs-opt-ofs">개별재무제표</option>
       </select>
       <button class="fs-query-btn" id="fs-query-btn" onclick="queryFinSheet()">조회</button>
+    </div>
+    <div id="fs-sticky-bar">
+      <div id="fs-sticky-title" class="fs-section-title"></div>
+      <table class="fs-table"><thead id="fs-sticky-thead"></thead></table>
     </div>
     <div class="fs-content" id="fs-content">
       <div class="state-box" id="fs-init-msg">조회 옵션을 선택 후 [조회]를 누르세요.</div>
@@ -1335,6 +1343,7 @@ function openFinSheet(corpCode, corpName, accMt) {
   const content = document.getElementById('fs-content');
   content.innerHTML = `<div class="state-box" id="fs-init-msg">${t('fs_init_msg')}</div>`;
   document.getElementById('fs-actions').classList.remove('show');
+  document.getElementById('fs-sticky-bar').style.display = 'none';
 
   // corp_code를 dataset에 저장 (queryFinSheet에서 참조)
   document.getElementById('fs-modal').dataset.corpCode = corpCode;
@@ -1344,6 +1353,33 @@ function openFinSheet(corpCode, corpName, accMt) {
 /* ── 모달 닫기 ── */
 function closeFinSheet() {
   document.getElementById('fs-modal').classList.remove('show');
+}
+
+/* ── 재무제표 sticky bar 업데이트 ── */
+function _updateFsStickyBar() {
+  const content = document.getElementById('fs-content');
+  const bar     = document.getElementById('fs-sticky-bar');
+  if (!content || !bar) return;
+  const sections = content.querySelectorAll('.fs-section');
+  if (!sections.length) { bar.style.display = 'none'; return; }
+  const cTop = content.getBoundingClientRect().top;
+  const barH = bar.offsetHeight || 0;
+  // Section is "active" when its title bottom has scrolled above barH from content top
+  let active = null;
+  for (const sec of sections) {
+    const title      = sec.querySelector('.fs-section-title');
+    const titleH     = title ? title.getBoundingClientRect().height : 0;
+    const secTop     = sec.getBoundingClientRect().top - cTop; // relative to content visible top
+    const titleBottom = secTop + titleH;
+    if (titleBottom <= barH + 1) active = sec;
+    else break;
+  }
+  if (!active) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  document.getElementById('fs-sticky-title').innerHTML =
+    active.querySelector('.fs-section-title')?.innerHTML || '';
+  document.getElementById('fs-sticky-thead').innerHTML =
+    active.querySelector('thead')?.innerHTML || '';
 }
 
 /* ── 조회 실행 ── */
@@ -1431,7 +1467,14 @@ function renderFinSheet(list) {
       </table>
     </div>`;
   }
-  document.getElementById('fs-content').innerHTML = html;
+  const contentEl = document.getElementById('fs-content');
+  contentEl.innerHTML = html;
+  contentEl.scrollTop = 0;
+  if (!contentEl._fsBound) {
+    contentEl.addEventListener('scroll', _updateFsStickyBar, {passive:true});
+    contentEl._fsBound = true;
+  }
+  _updateFsStickyBar();
 }
 
 /* ── 재무제표 행 렌더 ── */

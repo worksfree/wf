@@ -109,6 +109,15 @@
     color: var(--accent2);
     letter-spacing: .05em;
     margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    flex-shrink: 0;
   }
 
   /* 역할 배지 */
@@ -1287,7 +1296,7 @@
 <!-- 사이드바 -->
 <div id="sidebar">
   <div class="sidebar-header">
-    <div class="logo">◈ WorksFree Hub</div>
+    <div class="logo"><img src="assets/logo-481KB.png" alt="WorksFree">WorksFree Hub</div>
     <div class="badge-lang-row">
       <div id="user-widget-wrap" class="user-widget"></div>
       <div class="lang-toggle">
@@ -1797,7 +1806,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.7.5.26';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.7.5.28';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2784,7 +2793,9 @@ document.addEventListener('click', closeUserDropdown);
    URL: ?dev=1  또는  localStorage.wf_dev = '1'
 ════════════════════════════════════════════ */
 const IS_DEV = new URLSearchParams(location.search).get('dev') === '1'
-            || localStorage.getItem('wf_dev') === '1';
+            || localStorage.getItem('wf_dev') === '1'
+            || location.hostname === 'localhost'
+            || location.hostname === '127.0.0.1';
 
 /* 결제 데이터 환경 태그: dev/test/staging/portal
    같은 Supabase DB를 공유하므로 env 컬럼으로 환경 구분 */

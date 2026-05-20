@@ -598,6 +598,8 @@ function commitMulti(){
 }
 
 function pick(stepId, optKey){
+  const steps = visibleSteps();
+  if (steps[currentStep]?.id !== stepId) return;
   answers[stepId] = optKey;
   currentStep++;
   renderStep();

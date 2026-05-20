@@ -526,6 +526,7 @@ function scrollToQ() {
 }
 
 function selectOpt(vqPos, optIdx) {
+  if (vqPos !== history.length) return;
   const vqs = visibleQuestions();
   const q = vqs[vqPos];
   const o = q.opts[optIdx];
