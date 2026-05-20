@@ -23,3 +23,13 @@ htmlcov/
 *~
 .env
 .env.local
+
+# 릴리스 바이너리 / 빌드 산출물
+90.release/
+10.rpa/70.webs/k_startup.zip
+*.zip
+build/
+dist/
+
+# 앱 설정 (인증키·이메일 비밀번호 포함)
+wf_rpa_config.json
