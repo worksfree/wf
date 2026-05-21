@@ -88,6 +88,22 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 
 .back-btn{background:none;border:none;font-family:inherit;font-size:12.5px;color:var(--hint);cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;margin-bottom:14px;transition:color .12s}
 .back-btn:hover{color:var(--text)}
+.cases-wrap{margin-bottom:18px}
+.cases-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.cases-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.cases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.case-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;font-family:inherit;text-align:left;transition:border-color .12s,background .12s,transform .08s;display:flex;flex-direction:column;gap:5px}
+.case-btn:hover{border-color:var(--blue);background:rgba(59,130,246,.06);transform:translateY(-2px)}
+.case-icon-row{display:flex;align-items:center;gap:8px}
+.case-icon{font-size:20px}
+.case-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:12px;margin-left:auto}
+.case-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
+.case-sub{font-size:11px;color:var(--muted);line-height:1.4}
+.ctag-red{background:rgba(239,68,68,.12);color:#f87171}
+.ctag-blue{background:rgba(59,130,246,.12);color:#60a5fa}
+.ctag-green{background:rgba(16,185,129,.12);color:#34d399}
+.ctag-amber{background:rgba(245,158,11,.12);color:#fbbf24}
+.ctag-purple{background:rgba(139,92,246,.12);color:#a78bfa}
 
 /* ── RESULT ── */
 .result-wrap{animation:fu .3s ease}
@@ -417,6 +433,78 @@ function renderSimResult(R) {
 }
 
 /* ═══════════════════════════════════════════════════
+   원클릭 사례
+═══════════════════════════════════════════════════ */
+const CASES_INH = [
+  { icon:'🏠', tag:'긴급 설계 필요', tagClass:'ctag-red',
+    title:'부동산 위주 고액 자산가 · 납부 재원 부재',
+    sub:'30~100억 부동산 위주 · 자녀만 · 3~5년 · 재원 전무',
+    role:'donor',
+    picks:['30억 ~ 100억','부동산 위주 (70% 이상)','자녀만 (배우자 없음)','없음','피부양자 (직장인 가족)','금융소득 1,000만원 미만','없음 — 사업체 지분 미보유','납부 재원 전혀 없음','3~5년','전혀 없음 — 처음 생각하는 단계'] },
+  { icon:'🏢', tag:'법인지분·복잡', tagClass:'ctag-purple',
+    title:'비상장법인 지분 보유 · 자녀 승계 계획',
+    sub:'15~30억 법인지분 · 자녀만 · 5~10년 · 막연히 인식',
+    role:'donor',
+    picks:['15억 ~ 30억','비상장 법인 지분 포함','자녀만 (배우자 없음)','소액 증여 (3,000만원 미만)','직장가입자 (근로소득 위주)','금융소득 1,000만원 미만','비상장법인 지분 보유 (중소기업·스타트업 등)','일부 보유 (50% 수준)','5~10년','막연하게 자녀에게 줘야 한다고만 생각'] },
+  { icon:'🚨', tag:'상속 진행 중', tagClass:'ctag-red',
+    title:'100억 초과 부동산 · 상속 이미 개시',
+    sub:'100억 초과 · 배우자+자녀 1~2 · 진행 중 · 재원 없음',
+    role:'ongoing',
+    picks:['100억 초과','부동산 위주 (70% 이상)','배우자 + 자녀 1~2명','부동산 현물 증여 이력 있음','납부 재원 전혀 없음','전혀 없음 — 처음 생각하는 단계'] },
+  { icon:'✅', tag:'안전 구간', tagClass:'ctag-green',
+    title:'5억 미만 소액 상속 · 세금 없음 확인',
+    sub:'5억 미만 금융 · 배우자+자녀 · 재원 충분',
+    role:'heir',
+    picks:['5억 미만','금융자산 위주 (예금·주식·펀드)','배우자 + 자녀 1~2명','없음','직장가입자 (근로소득 위주)','금융소득 1,000만원 미만','없음 — 사업체 지분 미보유','충분한 현금·금융자산 보유','전혀 없음 — 처음 생각하는 단계'] },
+  { icon:'📈', tag:'종합과세·건보', tagClass:'ctag-amber',
+    title:'금융소득 종합과세 구간 · 건보료 이중타격',
+    sub:'15~30억 금융 · 배우자+자녀3+ · 금융소득2천만+',
+    role:'donor',
+    picks:['15억 ~ 30억','금융자산 위주 (예금·주식·펀드)','배우자 + 자녀 3명 이상','5,000만원 이상 증여 완료','지역가입자 (자영업·프리랜서)','금융소득 2,000만원 이상','없음 — 사업체 지분 미보유','생명보험(종신) 활용 가능','5~10년','세무사 상담은 받아봤음'] },
+  { icon:'💔', tag:'단독상속·위험', tagClass:'ctag-red',
+    title:'배우자 없는 단독 상속인 · 배우자공제 0',
+    sub:'30~100억 부동산 · 자녀만 · 피부양자 · 재원 없음',
+    role:'heir',
+    picks:['30억 ~ 100억','부동산 위주 (70% 이상)','자녀만 (배우자 없음)','없음','피부양자 (직장인 가족)','금융소득 1,000만원 ~ 2,000만원','없음 — 사업체 지분 미보유','납부 재원 전혀 없음','전혀 없음 — 처음 생각하는 단계'] },
+];
+
+function buildCasesHtml_INH() {
+  return `<div class="cases-wrap no-print">
+    <div class="cases-label">대표 사례 — 원클릭 결과 보기</div>
+    <div class="cases-grid">
+      ${CASES_INH.map((c,i)=>`
+        <button class="case-btn" onclick="runCase_INH(${i})">
+          <div class="case-icon-row"><span class="case-icon">${c.icon}</span><span class="case-tag ${c.tagClass}">${c.tag}</span></div>
+          <div class="case-title">${c.title}</div>
+          <div class="case-sub">${c.sub}</div>
+        </button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function runCase_INH(idx) {
+  const c = CASES_INH[idx];
+  ROLE = c.role;
+  ['heir','donor','ongoing'].forEach(k => {
+    const btn = document.getElementById('btn-role-'+k);
+    if (btn) btn.classList.toggle('active', k === ROLE);
+  });
+  history = []; C = {};
+  for (const ans of c.picks) {
+    const qs = getQS();
+    const q = qs[history.length];
+    if (!q) break;
+    const optIdx = q.opts.findIndex(o => o.t === ans);
+    if (optIdx < 0) break;
+    const o = q.opts[optIdx];
+    history.push({answer: o.t});
+    Object.assign(C, o.d || {});
+  }
+  render();
+  scrollToQ();
+}
+
+/* ═══════════════════════════════════════════════════
    역할별 진단 질문 정의
 ═══════════════════════════════════════════════════ */
 let ROLE = 'heir';   // 'heir' | 'donor' | 'ongoing'
@@ -600,7 +688,8 @@ function render() {
   if (pos >= qs.length) { renderResult(); return; }
 
   const q = qs[pos];
-  document.getElementById('view').innerHTML = `
+  const casesHtml = pos === 0 ? buildCasesHtml_INH() : '';
+  document.getElementById('view').innerHTML = casesHtml + `
     ${history.length>0?`<button class="back-btn" onclick="goBack()">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 3L5 8L10 13"/></svg>
       이전 항목으로

@@ -415,10 +415,23 @@ document.querySelectorAll('.flyer-thumb iframe').forEach(function(f){
   if(s) f.src = s + '?v=' + _FV;
 });
 
+const FLYER_NAMES = {
+  'flyer-ceo.html':           {ko:'아는 대표는 이미 다했다',  en:'CEOs Already Know This'},
+  'flyer-ceo-v2.html':        {ko:'아는 대표는 이미 다했다',  en:'CEOs Already Know This'},
+  'flyer-safety-all.html':    {ko:'안전조치, 그게 전부?',     en:'Safety Measures Not Enough'},
+  'flyer-safety-all-v2.html': {ko:'안전조치, 그게 전부?',     en:'Safety Measures Not Enough'},
+  'flyer-safety-only.html':   {ko:'안전조치만 했다고',        en:'Just Safety Measures?'},
+  'flyer-safety-only-v2.html':{ko:'안전조치만 했다고',        en:'Just Safety Measures?'},
+  'flyer-hard-work.html':     {ko:'열심히했는데 남는 게 없다', en:'Worked Hard, Nothing Left'},
+  'flyer-hard-work-v2.html':  {ko:'열심히했는데 남는 게 없다', en:'Worked Hard, Nothing Left'},
+};
 function openFlyer(src) {
-  document.getElementById('flyer-modal-iframe').src = 'flyers/' + src + '?v=' + _FV;
-  document.getElementById('flyer-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  const label = FLYER_NAMES[src] || {ko:'마케팅 자료', en:'Marketing Material'};
+  window.parent.postMessage({
+    type: 'wf_navigate',
+    src:  'consulting/ceo/flyers/' + src,
+    label
+  }, '*');
 }
 function closeFlyer() {
   document.getElementById('flyer-modal').classList.remove('open');

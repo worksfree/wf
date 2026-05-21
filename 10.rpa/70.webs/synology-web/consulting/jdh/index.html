@@ -81,6 +81,24 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
   display:flex;align-items:center;gap:4px;padding:0;font-family:inherit;}
 .back-btn:hover{color:var(--text);}
 
+/* ── 원클릭 사례 ── */
+.cases-wrap{max-width:680px;margin:0 auto 24px;padding:0 24px;}
+.cases-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.cases-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.cases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;}
+.case-btn{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;font-family:inherit;text-align:left;transition:border-color .12s,background .12s,transform .08s;display:flex;flex-direction:column;gap:5px;}
+.case-btn:hover{border-color:#3b82f6;background:rgba(59,130,246,.06);transform:translateY(-2px);}
+.case-icon-row{display:flex;align-items:center;gap:8px;}
+.case-icon{font-size:20px;}
+.case-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:12px;margin-left:auto;}
+.case-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4;}
+.case-sub{font-size:11px;color:var(--muted);line-height:1.4;}
+.tag-red{background:rgba(239,68,68,.12);color:#f87171;}
+.tag-blue{background:rgba(59,130,246,.12);color:#60a5fa;}
+.tag-green{background:rgba(16,185,129,.12);color:#34d399;}
+.tag-amber{background:rgba(245,158,11,.12);color:#fbbf24;}
+.tag-purple{background:rgba(139,92,246,.12);color:#a78bfa;}
+
 /* ── result ── */
 .result{max-width:760px;margin:0 auto;padding:24px;}
 
@@ -487,6 +505,56 @@ function visibleSteps(){
 function getStep(idx){ return visibleSteps()[idx]; }
 function totalSteps(){ return visibleSteps().length; }
 
+// ── 원클릭 사례 ──
+const CASES_JDH = [
+  { icon:'🏭', tag:'제조업·중위험', tagClass:'tag-red',
+    title:'50인 제조업체 — 겸직 안전관리자',
+    sub:'기계·고소 위험 / 안전관리 형식적 / 매뉴얼 없음',
+    answers:{industry:'mfg',headcount:'50to299',dispatch:'none',foreigner:'none',safetyMgr:'concurrent',healthMgr:'outsourced',riskAssess:'partial',training:'partial',hazards:['machinery','height'],accidentHistory:'none',budget:'allocated',manual:'none'} },
+  { icon:'🏗', tag:'건설·사망이력', tagClass:'tag-red',
+    title:'500인 건설현장 — 하청 다수·사망재해',
+    sub:'공사액 120억 이상 / 도급·하청 관리 미흡',
+    answers:{industry:'con',headcount:'o500',conAmt:'o120',dispatch:'sub',foreigner:'none',safetyMgr:'full',healthMgr:'full',riskAssess:'regular',training:'full',hazards:['height','confined'],accidentHistory:'fatal',subMgmt:'partial',budget:'full',manual:'current'} },
+  { icon:'💻', tag:'IT·5인미만', tagClass:'tag-blue',
+    title:'5인 미만 IT 스타트업 — 법 적용 제외',
+    sub:'중대재해처벌법 미적용 / 산안법 최소 의무 확인',
+    answers:{industry:'it',headcount:'u5',dispatch:'none',foreigner:'none',accidentHistory:'none'} },
+  { icon:'🌏', tag:'외국인·위험', tagClass:'tag-amber',
+    title:'E-9 외국인 제조업 — 화학·화재 위험',
+    sub:'5~49인 / 안전관리 미흡 / 법정교육 미이행',
+    answers:{industry:'mfg',headcount:'5to49',dispatch:'none',foreigner:'e9',safetyMgr:'outsourced',healthMgr:'noObl',riskAssess:'none',training:'none',hazards:['chem','fire'],accidentHistory:'none',budget:'none',manual:'none'} },
+  { icon:'🔄', tag:'파견·법위반', tagClass:'tag-purple',
+    title:'서비스업 파견 — 파견금지 업무 포함',
+    sub:'50~299인 / 파견법 위반 가능성 / 교육 미이행',
+    answers:{industry:'svc',headcount:'50to299',dispatch:'dispatch',dispatchType:'restricted',foreigner:'none',safetyMgr:'concurrent',healthMgr:'outsourced',riskAssess:'partial',training:'none',hazards:['musculo'],accidentHistory:'minor',budget:'allocated',manual:'none'} },
+  { icon:'⚗', tag:'화학·중상해', tagClass:'tag-red',
+    title:'화학제조업 300인 — 파견·도급·다국적 근로자',
+    sub:'유해화학물질·밀폐공간 / 중상해 이력 / 복합 리스크',
+    answers:{industry:'mfg',headcount:'300to499',dispatch:'both',dispatchType:'mixed',foreigner:'multi',safetyMgr:'full',healthMgr:'full',riskAssess:'regular',training:'full',hazards:['chem','confined','fire'],accidentHistory:'serious',subMgmt:'partial',budget:'full',manual:'current'} },
+];
+
+function buildCasesHtml_JDH() {
+  return `<div class="cases-wrap no-print">
+    <div class="cases-label">대표 사례 — 원클릭 결과 보기</div>
+    <div class="cases-grid">
+      ${CASES_JDH.map((c,i) => `
+        <button class="case-btn" onclick="runCase_JDH(${i})">
+          <div class="case-icon-row"><span class="case-icon">${c.icon}</span><span class="case-tag ${c.tagClass}">${c.tag}</span></div>
+          <div class="case-title">${c.title}</div>
+          <div class="case-sub">${c.sub}</div>
+        </button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function runCase_JDH(idx) {
+  const c = CASES_JDH[idx];
+  answers = Object.assign({}, c.answers);
+  currentStep = visibleSteps().length;
+  renderStep();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
 // ── RENDER WIZARD ──
 function showPreviewGate(){
   const steps = visibleSteps();
@@ -523,9 +591,10 @@ function renderStep(){
   }).join('');
 
   const area = document.getElementById('quiz-area');
+  const casesHtml = currentStep === 0 ? buildCasesHtml_JDH() : '';
   if(step.multi){
     multiSel = answers[step.id] ? [...answers[step.id]] : [];
-    area.innerHTML = `
+    area.innerHTML = casesHtml + `
       <div class="wizard">
         ${currentStep > 0 ? `<div class="back-row"><button class="back-btn" onclick="goBack()">◀ 이전</button></div>` : ''}
         <div class="q-num">질문 ${currentStep + 1}</div>
@@ -540,7 +609,7 @@ function renderStep(){
       </div>`;
     renderMultiOpts(step);
   } else {
-    area.innerHTML = `
+    area.innerHTML = casesHtml + `
       <div class="wizard">
         ${currentStep > 0 ? `<div class="back-row"><button class="back-btn" onclick="goBack()">◀ 이전</button></div>` : ''}
         <div class="q-num">질문 ${currentStep + 1}</div>

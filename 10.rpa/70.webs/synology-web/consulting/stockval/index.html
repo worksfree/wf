@@ -768,6 +768,17 @@ const CASES = [
     resultKey: 'result_inv_majority',
     calc: { type:'multiple', rev:2500000, ebitda:280000, shares:1000000, rmu:1.2, emu:9, dlom:0 }
   },
+  {
+    icon: '⚖', tag: '분쟁 · 법원 감정', tagClass: 'tag-purple',
+    title: '주주 간 분쟁 · 법원 감정평가 대응',
+    sub: '소수주주 배당 청구 소송 · 상증세법 기준 법원 감정',
+    path: [
+      {qId:'q0',           optIdx:5},  // 주주 간 분쟁 해결
+      {qId:'q1_dispute',   optIdx:0}   // 법원 감정 / 소송
+    ],
+    resultKey: 'result_dispute_court',
+    calc: { type:'weighted', shares:300000, ni1:80000, ni2:95000, ni3:110000, asset:650000, liab:280000 }
+  },
 ];
 
 /* ── 상태 ── */

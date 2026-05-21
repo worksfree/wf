@@ -1844,6 +1844,12 @@ const TREE = [
   },
   {
     label:{ko:'컨설팅', en:'Consulting (KR)'}, icon:'◈', consultantTag:true, children:[
+      { label:{ko:'마케팅 자료', en:'Marketing Materials'}, icon:'📄', consultantOnly:true, children:[
+        { label:{ko:'아는 대표는 이미 다했다',   en:'CEOs Already Know This'},   icon:'✦', iframe:'consulting/ceo/flyers/flyer-ceo-v2.html',         consultantOnly:true },
+        { label:{ko:'안전조치, 그게 전부?',       en:'Safety Measures Not Enough'}, icon:'✦', iframe:'consulting/ceo/flyers/flyer-safety-all-v2.html',   consultantOnly:true },
+        { label:{ko:'안전조치만 했다고',          en:'Just Safety Measures?'},     icon:'✦', iframe:'consulting/ceo/flyers/flyer-safety-only-v2.html',  consultantOnly:true },
+        { label:{ko:'열심히했는데 남는 게 없다',  en:'Worked Hard, Nothing Left'}, icon:'✦', iframe:'consulting/ceo/flyers/flyer-hard-work-v2.html',    consultantOnly:true },
+      ]},
       { label:{ko:'예비창업패키지',        en:'Pre-Startup Package'}, icon:'🚀', iframe:'consulting/prebiz/index.html', consultantOnly:true },
       { label:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'}, icon:'🏪', iframe:'consulting/soho/index.html',  consultantOnly:true },
       { label:{ko:'현장클리닉 관리',       en:'Field Clinic'},        icon:'🏥', iframe:'consulting/g1/index.html',    consultantOnly:true },
@@ -1936,6 +1942,10 @@ const DASH_CARDS = [
     title:{ko:'상속·증여 진단',       en:'Inheritance Plan'},
     desc: {ko:'상속세 20년 동결·부동산 급등 — 파트너 등급 진단', en:'Inheritance tax 20yr freeze · partner grade diagnosis'},
     iframe:'consulting/inheritance/index.html', roleOnly:'gfc', gfcTag:true },
+  { icon:'📊',
+    title:{ko:'비상장주식 가치평가',   en:'Stock Valuation'},
+    desc: {ko:'목적별 주식가치 평가법 — 세법·투자·M&A·ESOP', en:'Purpose-based stock valuation — Tax, Investment, M&A, ESOP'},
+    iframe:'consulting/stockval/index.html', roleOnly:'gfc', gfcTag:true },
   { icon:'🔑',
     title:{ko:'경영종합진단',         en:'Financial Plan'},
     desc: {ko:'기업 경영 종합 컨설팅 진단',           en:'Comprehensive business consulting diagnosis'},
@@ -2182,6 +2192,14 @@ function loadIframe(src, path=[], label='') {
   // 브라우저 히스토리에 상태 기록 → 뒤로가기 시 showHome()으로 처리
   history.pushState({ wfhub: true }, '', location.href);
 }
+
+/* ── 자식 iframe → 부모 네비게이션 요청 처리 ── */
+window.addEventListener('message', e => {
+  if (e.data?.type === 'wf_navigate' && e.data.src) {
+    const label = e.data.label || {ko:'페이지', en:'Page'};
+    loadIframe(e.data.src, [], label);
+  }
+});
 
 function showHome() {
   previewBaseSrc = null;

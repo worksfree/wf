@@ -66,6 +66,22 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 
 .back-btn{background:none;border:none;font-family:inherit;font-size:12.5px;color:var(--hint);cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;margin-bottom:14px;transition:color .12s}
 .back-btn:hover{color:var(--text)}
+.cases-wrap{margin-bottom:18px}
+.cases-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.cases-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.cases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.case-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;font-family:inherit;text-align:left;transition:border-color .12s,background .12s,transform .08s;display:flex;flex-direction:column;gap:5px}
+.case-btn:hover{border-color:var(--blue);background:rgba(59,130,246,.06);transform:translateY(-2px)}
+.case-icon-row{display:flex;align-items:center;gap:8px}
+.case-icon{font-size:20px}
+.case-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:12px;margin-left:auto}
+.case-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
+.case-sub{font-size:11px;color:var(--muted);line-height:1.4}
+.ctag-red{background:rgba(239,68,68,.12);color:#f87171}
+.ctag-blue{background:rgba(59,130,246,.12);color:#60a5fa}
+.ctag-green{background:rgba(16,185,129,.12);color:#34d399}
+.ctag-amber{background:rgba(245,158,11,.12);color:#fbbf24}
+.ctag-purple{background:rgba(139,92,246,.12);color:#a78bfa}
 
 /* ── RESULT ── */
 .result-wrap{animation:fu .3s ease}
@@ -440,6 +456,67 @@ const QS = [
 ];
 
 /* ═══════════════════════════════════════════════════
+   원클릭 사례
+═══════════════════════════════════════════════════ */
+const CASES_GFC = [
+  { icon:'🏭', tag:'제조업·승계 위험', tagClass:'ctag-red',
+    title:'제조업 법인 10년 · 100% 단독 소유 · 승계 미정',
+    sub:'이익잉여금 20~100억 / 법인세 5천만↑ / 단체보험 없음',
+    picks:['법인','제조업 / 건설업','10년 이상','30억 ~ 80억','20인 ~ 100인','100% (대표 단독 소유)','없음 — 대표만 보유','20억 ~ 100억','없음','5천만원 이상','40 ~ 55세','계획 없음 / 미정','전혀 없음','전혀 파악 못 함','전혀 없음','없음 — 퇴직금 규정도 없음','정상 근로계약 (52시간제 준수)'] },
+  { icon:'💊', tag:'의료법인·절세특수', tagClass:'ctag-purple',
+    title:'의료법인 병원 · 비영리 절세구조 점검',
+    sub:'10년 이상 안정기 / 단체보험 일부 / 외국인 고용',
+    picks:['법인','의료 / 요양 / 병원','10년 이상','80억 ~ 200억','20인 ~ 100인','50% 초과 ~ 99%','배우자/자녀에게 일부 분산','3억 ~ 20억','없음','55 ~ 65세','이미 승계 준비 중','단체보험 완비','대략 알고 있음','보험으로 준비 중','보험 연계 퇴직금 설계됨','외국인 근로자 고용 중'] },
+  { icon:'🛒', tag:'소매업·개인사업자', tagClass:'ctag-blue',
+    title:'도소매 개인사업자 · 법인 전환 검토',
+    sub:'7.5~30억 매출 / 성실신고 대상 / 포괄임금 사용 중',
+    picks:['개인사업자','5년 ~ 10년','7.5억 ~ 30억','5인 ~ 20인','정상 근로계약 (52시간제 준수)'] },
+  { icon:'🚀', tag:'IT스타트업·신설', tagClass:'ctag-green',
+    title:'IT 신설 법인 2년차 · 지분 증여 타이밍',
+    sub:'2년 미만 / 대표 100% / 이익잉여금 낮음 / 3.3% 계약',
+    picks:['법인','IT / 소프트웨어 / 컨설팅','2년 미만','7.5억 미만','5인 ~ 20인','100% (대표 단독 소유)','없음 — 대표만 보유','3억 미만','없음','40세 미만','계획 없음 / 미정','전혀 없음','전혀 파악 못 함','전혀 없음','없음 — 퇴직금 규정도 없음','3.3% 프리랜서 계약 사용'] },
+  { icon:'🍕', tag:'요식업·가지급금', tagClass:'ctag-amber',
+    title:'요식업 법인 · 가지급금 + 포괄임금 복합 위험',
+    sub:'5~10년 안정기 / 가지급금 있음 / 포괄임금 사용',
+    picks:['법인','요식업 / 숙박 / 서비스','5년 ~ 10년','7.5억 ~ 30억','5인 ~ 20인','100% (대표 단독 소유)','없음 — 대표만 보유','3억 ~ 20억','가지급금만 있음','납부 없음 (적자 또는 세액공제)','55 ~ 65세','계획 없음 / 미정','전혀 없음','전혀 파악 못 함','전혀 없음','없음 — 퇴직금 규정도 없음','포괄임금제 사용 중'] },
+  { icon:'🏗', tag:'건설업·중견법인', tagClass:'ctag-red',
+    title:'건설업 중견법인 · CEO 유고 대책 전무',
+    sub:'200억 이상 C그룹 / 100인 이상 / 승계·유고대책 없음',
+    picks:['법인','제조업 / 건설업','10년 이상','200억 이상','100인 이상','100% (대표 단독 소유)','없음 — 대표만 보유','100억 초과','양쪽 모두 있음','5천만원 이상','55 ~ 65세','계획 없음 / 미정','전혀 없음','전혀 파악 못 함','전혀 없음','없음 — 퇴직금 규정도 없음','정상 근로계약 (52시간제 준수)'] },
+];
+
+function buildCasesHtml_GFC() {
+  return `<div class="cases-wrap no-print">
+    <div class="cases-label">대표 사례 — 원클릭 결과 보기</div>
+    <div class="cases-grid">
+      ${CASES_GFC.map((c,i)=>`
+        <button class="case-btn" onclick="runCase_GFC(${i})">
+          <div class="case-icon-row"><span class="case-icon">${c.icon}</span><span class="case-tag ${c.tagClass}">${c.tag}</span></div>
+          <div class="case-title">${c.title}</div>
+          <div class="case-sub">${c.sub}</div>
+        </button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function runCase_GFC(idx) {
+  const c = CASES_GFC[idx];
+  history = []; C = {};
+  for (const ans of c.picks) {
+    const vqs = visibleQuestions();
+    const q = vqs[history.length];
+    if (!q) break;
+    const optIdx = q.opts.findIndex(o => o.t === ans);
+    if (optIdx < 0) break;
+    const o = q.opts[optIdx];
+    history.push({qIdx: q._idx, optIdx, answer: o.t});
+    Object.assign(C, o.d || {});
+  }
+  render();
+  scrollToQ();
+}
+
+/* ═══════════════════════════════════════════════════
    앱 상태
 ═══════════════════════════════════════════════════ */
 let history = [];
@@ -462,7 +539,8 @@ function render() {
 
   const q = vqs[pos];
   const view = document.getElementById('view');
-  view.innerHTML = `
+  const casesHtml = pos === 0 ? buildCasesHtml_GFC() : '';
+  view.innerHTML = casesHtml + `
     ${history.length>0?`<button class="back-btn no-print" onclick="goBack()">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 3L5 8L10 13"/></svg>
       이전 항목으로
