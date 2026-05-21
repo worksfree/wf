@@ -137,6 +137,19 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 @media(max-width:380px){.trend-grid{grid-template-columns:1fr}}
 @media print{.no-print{display:none!important}}
 
+/* ── 대표 사례 버튼 ── */
+.cases-wrap{margin-bottom:18px}
+.cases-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.cases-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.cases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.case-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:12px 14px;cursor:pointer;font-family:inherit;text-align:left;transition:border-color .12s,background .12s,transform .08s;display:flex;flex-direction:column;gap:5px}
+.case-btn:hover{border-color:var(--blue);background:var(--blue-bg);transform:translateY(-2px)}
+.case-btn:active{transform:translateY(0)}
+.cb-icon{font-size:20px;line-height:1}
+.cb-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;align-self:flex-start}
+.cb-title{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.4}
+.cb-sub{font-size:11px;color:var(--hint);line-height:1.4}
+
 /* ── 가치평가 계산기 ── */
 .calc-wrap{background:#0c1220;border:1px solid #1e3050;border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
 .calc-hd{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid #1e3050}
@@ -692,6 +705,71 @@ const RESULTS = {
   },
 };
 
+/* ── 대표 사례 ── */
+const CASES = [
+  {
+    icon: '🏭', tag: '세법 · 흑자법인', tagClass: 'tag-red',
+    title: '제조업 중소기업 자녀 지분 증여',
+    sub: '3년 흑자 · 보통주 · 가중평균법',
+    path: [
+      {qId:'q0',       optIdx:0},   // 가족·친족 간 주식 증여
+      {qId:'q1_tax',   optIdx:1},   // 3년 이상
+      {qId:'q2_tax_type', optIdx:0},// 보통주
+      {qId:'q3_tax_common', optIdx:0} // 3년 흑자
+    ],
+    resultKey: 'result_tax_profit',
+    calc: { type:'weighted', shares:200000, ni1:150000, ni2:180000, ni3:220000, asset:800000, liab:320000 }
+  },
+  {
+    icon: '🌱', tag: '세법 · 창업초기', tagClass: 'tag-amber',
+    title: '창업 2년차 IT 법인 지분 이전',
+    sub: '3년 미만 특례 · 순자산가치 100%',
+    path: [
+      {qId:'q0',     optIdx:1},  // 법인 간 지분 이동
+      {qId:'q1_tax', optIdx:0}   // 3년 미만
+    ],
+    resultKey: 'result_tax_startup',
+    calc: { type:'na', shares:100000, asset:180000, liab:70000 }
+  },
+  {
+    icon: '📉', tag: '세법 · 적자', tagClass: 'tag-red',
+    title: '코로나 적자 법인 — 절세 타이밍 증여',
+    sub: '적자 구간 순자산 최저점 활용',
+    path: [
+      {qId:'q0',          optIdx:0},  // 가족·친족 간 증여
+      {qId:'q1_tax',      optIdx:1},  // 3년 이상
+      {qId:'q2_tax_type', optIdx:0},  // 보통주
+      {qId:'q3_tax_common', optIdx:1} // 적자
+    ],
+    resultKey: 'result_tax_loss',
+    calc: { type:'na', shares:150000, asset:400000, liab:370000 }
+  },
+  {
+    icon: '🚀', tag: '투자유치 · DCF', tagClass: 'tag-blue',
+    title: 'SaaS 스타트업 시리즈A 투자 유치',
+    sub: '성장기 · 유사기업 부족 · DCF 방법론',
+    path: [
+      {qId:'q0',           optIdx:2},  // 스타트업 투자 유치
+      {qId:'q1_inv',       optIdx:1},  // 성장기
+      {qId:'q2_inv_growth',optIdx:1}   // 유사기업 부족 → DCF
+    ],
+    resultKey: 'result_inv_dcf',
+    calc: { type:'dcf', ebitda:48000, capex:8000, shares:500000, grow:35, wacc:20, tgrow:2, tax:22 }
+  },
+  {
+    icon: '🤝', tag: 'M&A · 경영권', tagClass: 'tag-green',
+    title: '안정기 식품 제조업체 경영권 매각',
+    sub: '3년 흑자 · 경영권 프리미엄 포함',
+    path: [
+      {qId:'q0',            optIdx:3},  // 회사 매각 (M&A)
+      {qId:'q1_inv',        optIdx:2},  // 안정기
+      {qId:'q2_inv_mature', optIdx:1}   // 경영권 인수
+    ],
+    resultKey: 'result_inv_majority',
+    calc: { type:'multiple', rev:2500000, ebitda:280000, shares:1000000, rmu:1.2, emu:9, dlom:0 }
+  },
+];
+
 /* ── 상태 ── */
 let path = [];   // [{qId, optIdx}]
 let result = null;
@@ -774,14 +852,71 @@ function restart() {
 }
 
 /* ── 질문 렌더링 ── */
+function buildCasesHtml() {
+  return `<div class="cases-wrap no-print">
+    <div class="cases-label">대표 사례 — 원클릭 결과 보기</div>
+    <div class="cases-grid">
+      ${CASES.map((c,i) => `
+        <button class="case-btn" onclick="runCase(${i})">
+          <span class="cb-icon">${c.icon}</span>
+          <span class="cb-tag ${c.tagClass}">${c.tag}</span>
+          <span class="cb-title">${c.title}</span>
+          <span class="cb-sub">${c.sub}</span>
+        </button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function runCase(idx) {
+  const c = CASES[idx];
+  path = [...c.path];
+  result = RESULTS[c.resultKey];
+  renderResult();
+  // 계산기 값 자동 입력 및 계산 (DOM 렌더 후 실행)
+  setTimeout(() => fillCalc(c.calc), 50);
+  scrollToQ();
+}
+
+function fillCalc(calc) {
+  const s = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  if (calc.type === 'weighted') {
+    s('c_shares', calc.shares); s('c_ni1', calc.ni1);
+    s('c_ni2', calc.ni2); s('c_ni3', calc.ni3);
+    s('c_asset', calc.asset); s('c_liab', calc.liab);
+    // 계산기 패널 열기 후 계산
+    const hd = document.querySelector('.calc-wrap .calc-hd');
+    if (hd && !hd.nextElementSibling.classList.contains('open')) toggleCalc(hd);
+    calcWeighted();
+  } else if (calc.type === 'na') {
+    s('c_shares_na', calc.shares); s('c_asset_na', calc.asset); s('c_liab_na', calc.liab);
+    const hd = document.querySelector('.calc-wrap .calc-hd');
+    if (hd && !hd.nextElementSibling.classList.contains('open')) toggleCalc(hd);
+    calcNA();
+  } else if (calc.type === 'dcf') {
+    s('d_ebitda', calc.ebitda); s('d_capex', calc.capex); s('d_shares', calc.shares);
+    s('d_grow', calc.grow); s('d_wacc', calc.wacc); s('d_tgrow', calc.tgrow); s('d_tax', calc.tax);
+    const hd = document.querySelector('.calc-wrap .calc-hd');
+    if (hd && !hd.nextElementSibling.classList.contains('open')) toggleCalc(hd);
+    calcDCF();
+  } else if (calc.type === 'multiple') {
+    s('m_rev', calc.rev); s('m_ebitda', calc.ebitda); s('m_shares', calc.shares);
+    s('m_rmu', calc.rmu); s('m_emu', calc.emu); s('m_dlom', calc.dlom);
+    const hd = document.querySelector('.calc-wrap .calc-hd');
+    if (hd && !hd.nextElementSibling.classList.contains('open')) toggleCalc(hd);
+    calcMultiple();
+  }
+}
+
 function render(qId = 'q0', _prevOpt, back = false) {
   updateProg();
   const q = TREE[qId];
   let html = '';
-  if (path.length > 0 && !back) {
+  if (path.length > 0) {
     html += `<button class="back-btn no-print" onclick="goBack()">← 이전으로</button>`;
-  } else if (path.length > 0) {
-    html += `<button class="back-btn no-print" onclick="goBack()">← 이전으로</button>`;
+  }
+  // 첫 질문에서만 대표 사례 버튼 표시
+  if (qId === 'q0' && path.length === 0) {
+    html += buildCasesHtml();
   }
   html += `<div class="q-card">
     <div class="q-step">${q.step}</div>
