@@ -1,0 +1,18 @@
+name               = "biz-db"
+main               = "worker.js"
+compatibility_date = "2025-01-01"
+account_id         = "cfa572c2bcb9f142db8430b310cf5a32"
+
+# ── 시크릿 설정 (아래 명령 실행, 값은 Supabase 대시보드에서 확인) ──────
+#
+#   wrangler secret put SUPABASE_URL --config wrangler.toml
+#   값: https://rkycwfpkzorfpcxfvaqt.supabase.co
+#
+#   wrangler secret put SUPABASE_SERVICE_KEY --config wrangler.toml
+#   값: Supabase 대시보드 → Project Settings → API → service_role 키
+#
+# ── 배포 ──────────────────────────────────────────────────────────────
+#   wrangler deploy --config wrangler.toml
+#
+# ── Supabase 테이블 초기화 ──────────────────────────────────────────
+#   supabase/bizdb_setup.sql 파일을 Supabase SQL Editor에서 실행

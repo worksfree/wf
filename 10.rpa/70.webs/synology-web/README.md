@@ -1,5 +1,5 @@
 # 시놀로지 NAS 웹서비스 완전 구축 가이드
-**최종 업데이트:** 2026년 5월 17일  
+**최종 업데이트:** 2026년 6월 2일  
 **대상 도메인:** `worksfree.kr` (예시 — 실제 운영: `worksfree.co.kr`)  
 **환경:** 시놀로지 NAS + Cloudflare Tunnel + Windows 배포 + Supabase Auth  
 **목적:** SOHO 수준의 최저 비용으로 test/staging/portal 3단계 웹서비스 + 소셜·이메일 회원가입 구축
@@ -99,13 +99,15 @@ https://cloudflare.com 무료 계정. DNS 관리 + HTTPS + Tunnel 기능 무료 
 
 **비용 구조 요약**
 
-| 항목 | 비용 |
-|------|------|
-| 시놀로지 NAS | 초기 구매비 (이후 전기료만) |
-| Cloudflare | 무료 (Free 플랜) |
-| Supabase | 무료 (Free 플랜: 50,000 MAU, 500MB DB) |
-| 도메인 | 연 22,000원~ |
-| Google/Kakao OAuth | 무료 |
+| 항목 | 비용 | 비고 |
+|------|------|------|
+| 시놀로지 NAS | 초기 구매비 (이후 전기료만) | |
+| Cloudflare | 무료 (Free 플랜) | |
+| Supabase | 무료 (Free 플랜: 50,000 MAU, 500MB DB) | |
+| 도메인 | 연 22,000원~ | |
+| Google/Kakao OAuth | 무료 | |
+| Resend (이메일 발송) | 무료 (월 3,000건) / $20~(Pro) | 마케팅 이메일 |
+| Claude Vision API | 페이지당 $0.003 | 스캔 PDF OCR (현재 비활성) |
 
 ---
 

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>중소기업 대표 현실 인식 전단지</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#222;
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh; padding:20px;
+  font-family:'Noto Sans KR', sans-serif;
+}
+.a4 {
+  width:794px; min-height:1123px;
+  background:#0c0c0c;
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  box-shadow:0 0 100px rgba(200,0,0,0.25);
+}
+
+/* ─── 헤더 띠 ─── */
+.header-band {
+  background:#b50000; padding:0 44px; height:36px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.header-band .left { display:flex; align-items:center; gap:10px; }
+.dot-blink { width:8px; height:8px; background:#fff; border-radius:50%; animation:blink 1.3s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.header-band span { font-size:10px; color:#fff; letter-spacing:3px; font-weight:700; }
+
+/* ─── HERO ─── */
+.hero { padding:32px 44px 26px; border-bottom:1px solid rgba(255,255,255,0.07); }
+.hero-label { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.hero-label .ln { width:24px; height:2px; background:#b50000; }
+.hero-label span { font-size:10px; color:#b50000; letter-spacing:3px; font-weight:700; }
+.hero-q {
+  font-family:'Noto Serif KR', serif;
+  font-size:40px; font-weight:900; color:#fff; line-height:1.18; letter-spacing:-1px; margin-bottom:8px;
+}
+.hero-q em { color:#ff3333; font-style:normal; }
+.hero-sub { font-size:13.5px; color:rgba(255,255,255,0.5); line-height:1.65; }
+
+/* ─── 설문 블록 ─── */
+.survey-section { padding:22px 44px 0; }
+.section-eyebrow { font-size:9px; color:#b50000; letter-spacing:3px; font-weight:700; margin-bottom:14px; }
+
+.survey-bars { display:flex; flex-direction:column; gap:14px; }
+.sbar-row { }
+.sbar-label { font-size:12.5px; color:rgba(255,255,255,0.8); margin-bottom:6px; display:flex; justify-content:space-between; }
+.sbar-label .pct { font-size:18px; font-weight:900; color:#ff4444; }
+.sbar-track { height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; }
+.sbar-fill { height:100%; background:linear-gradient(90deg, #b50000, #ff3333); border-radius:4px; }
+.sbar-note { font-size:10.5px; color:rgba(255,255,255,0.35); margin-top:4px; }
+
+.survey-source {
+  margin-top:12px;
+  font-size:10px; color:rgba(255,255,255,0.25);
+  font-style:italic;
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding-top:8px;
+}
+
+/* ─── 구분선 ─── */
+.divider { margin:20px 44px; height:1px; background:rgba(255,255,255,0.07); }
+
+/* ─── 현실 진단 ─── */
+.reality-section { padding:0 44px; }
+.reality-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.reality-card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px; padding:16px;
+}
+.reality-card.danger { border-color:rgba(181,0,0,0.35); background:rgba(181,0,0,0.06); }
+.rc-icon { font-size:20px; margin-bottom:8px; }
+.rc-title { font-size:13px; font-weight:700; color:#fff; margin-bottom:6px; }
+.rc-desc { font-size:11.5px; color:rgba(255,255,255,0.5); line-height:1.6; }
+.rc-num { font-size:24px; font-weight:900; color:#ff4444; margin-bottom:4px; }
+
+/* ─── 핵심 로직 흐름 ─── */
+.logic-section { padding:0 44px; margin-top:18px; }
+.logic-title { font-size:9px; color:#b50000; letter-spacing:3px; font-weight:700; margin-bottom:14px; }
+
+.logic-flow {
+  display:flex; align-items:stretch; gap:0;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px; overflow:hidden;
+}
+.lf-col {
+  flex:1; padding:14px 12px; text-align:center;
+  border-right:1px solid rgba(255,255,255,0.07);
+  position:relative;
+}
+.lf-col:last-child { border-right:none; }
+.lf-col.highlight { background:rgba(181,0,0,0.12); }
+.lf-col.success { background:rgba(39,174,96,0.1); }
+.lf-icon { font-size:18px; margin-bottom:6px; }
+.lf-title { font-size:11px; font-weight:700; color:#fff; margin-bottom:4px; }
+.lf-desc { font-size:10px; color:rgba(255,255,255,0.45); line-height:1.5; }
+.lf-arrow {
+  position:absolute; right:-10px; top:50%; transform:translateY(-50%);
+  width:20px; height:20px; z-index:2;
+  background:#0c0c0c;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; color:rgba(255,255,255,0.3);
+}
+
+.logic-vs { margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.vs-box {
+  border-radius:6px; padding:14px 16px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.vs-box.bad { background:rgba(181,0,0,0.08); border-color:rgba(181,0,0,0.3); }
+.vs-box.good { background:rgba(39,174,96,0.08); border-color:rgba(39,174,96,0.3); }
+.vs-head { font-size:10px; font-weight:700; letter-spacing:1px; margin-bottom:8px; }
+.vs-box.bad .vs-head { color:#ff6666; }
+.vs-box.good .vs-head { color:#6fcf97; }
+.vs-item { font-size:11px; color:rgba(255,255,255,0.6); margin-bottom:4px; line-height:1.5; }
+.vs-item::before { content:'→ '; color:rgba(255,255,255,0.25); }
+.vs-box.bad .vs-item.result { color:#ff6666; font-weight:700; }
+.vs-box.good .vs-item.result { color:#6fcf97; font-weight:700; }
+
+/* ─── 핵심 메시지 ─── */
+.key-msg {
+  margin:18px 44px 0;
+  background:rgba(181,0,0,0.12);
+  border:1px solid rgba(181,0,0,0.35);
+  border-radius:6px;
+  padding:18px 24px;
+}
+.km-eyebrow { font-size:9px; color:#b50000; letter-spacing:3px; font-weight:700; margin-bottom:10px; }
+.km-text {
+  font-family:'Noto Serif KR', serif;
+  font-size:17px; font-weight:700; color:#fff; line-height:1.65;
+}
+.km-text em { color:#ff4444; font-style:normal; }
+.km-sub { font-size:12px; color:rgba(255,255,255,0.5); margin-top:10px; line-height:1.6; }
+
+/* ─── 솔루션 체크리스트 ─── */
+.checklist { margin:16px 44px 0; }
+.cl-title { font-size:9px; color:#555; letter-spacing:3px; font-weight:700; margin-bottom:10px; }
+.cl-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.cl-item {
+  display:flex; align-items:flex-start; gap:10px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:4px; padding:12px 14px;
+}
+.cl-check { font-size:14px; flex-shrink:0; margin-top:1px; }
+.cl-text { font-size:11.5px; color:rgba(255,255,255,0.65); line-height:1.55; }
+.cl-text strong { color:#fff; display:block; margin-bottom:2px; }
+
+/* ─── Why Me ─── */
+.why-me {
+  margin:14px 44px 0;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:6px; padding:14px 20px;
+}
+.wm-header { margin-bottom:10px; }
+.wm-eyebrow { font-size:9px; color:#555; letter-spacing:3px; font-weight:700; margin-bottom:4px; }
+.wm-title { font-size:13px; color:rgba(255,255,255,0.7); font-weight:700; }
+.wm-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
+.wm-card { background:rgba(255,255,255,0.03); border-radius:4px; padding:10px 12px; }
+.wm-hd { font-size:11px; color:rgba(255,255,255,0.8); font-weight:700; margin-bottom:4px; }
+.wm-ds { font-size:10.5px; color:rgba(255,255,255,0.4); line-height:1.5; }
+.wm-profile { display:flex; justify-content:space-between; align-items:center; }
+.wm-role-tag { font-size:10px; color:rgba(255,255,255,0.4); }
+.wm-exp { font-size:10px; color:rgba(255,255,255,0.3); }
+
+/* ─── CTA ─── */
+.cta-full {
+  margin:14px 44px 0;
+  background:linear-gradient(135deg, #8b0000, #b50000);
+  border-radius:6px; padding:18px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.cq { font-size:16px; font-weight:900; color:#fff; margin-bottom:4px; }
+.cm { font-size:12px; color:rgba(255,255,255,0.75); }
+.cta-right-b { text-align:right; flex-shrink:0; }
+.rl { font-size:10px; color:rgba(255,255,255,0.6); letter-spacing:2px; display:block; }
+.rm { font-size:14px; font-weight:700; color:#fff; }
+
+/* ─── 푸터 ─── */
+.footer-f { margin:14px 44px 24px; display:flex; flex-direction:column; gap:4px; }
+.fc { font-size:9px; color:#333; letter-spacing:3px; font-weight:700; }
+.fd { font-size:9.5px; color:#333; line-height:1.6; }
+
+.ft { cursor:pointer; border-bottom:1.5px dashed rgba(255,190,50,.75); display:inline; }
+.ft:hover { border-bottom-color:rgba(255,190,50,1); }
+</style>
+</head>
+<body>
+<div class="a4">
+
+  <!-- 헤더 -->
+  <div class="header-band">
+    <div class="left">
+      <div class="dot-blink"></div>
+      <span>중대재해처벌법 — 중소기업 대표 현실 진단</span>
+    </div>
+    <span>2025 · 실제 설문·판결 기반</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">
+      <div class="ln"></div>
+      <span>REALITY CHECK</span>
+    </div>
+    <div class="hero-q">
+      10곳 중 <em>7곳</em>이<br>
+      "우리는 못 지킨다"고<br>
+      했습니다.
+    </div>
+    <div class="hero-sub">
+      중기중앙회 실제 설문 결과입니다. 준비가 안 된 채로 사고가 나면<br>
+      대표님이 직접 법정에 서야 합니다. 그리고 합의금을 마련해야 합니다.
+    </div>
+  </div>
+
+  <!-- 설문 데이터 -->
+  <div class="survey-section">
+    <div class="section-eyebrow">KBIZ 중소기업중앙회 실제 설문 결과</div>
+    <div class="survey-bars">
+      <div class="sbar-row">
+        <div class="sbar-label">
+          <span>"법 시행일까지 의무 준수 <strong style="color:#fff">불가능</strong>"</span>
+          <span class="pct"><span class="ft" data-fact="중기중앙회 설문: 중소기업 전체의 66.5%가 중대재해처벌법 의무를 법 시행일까지 준수하기 어렵다고 응답." data-src="중소기업중앙회 설문조사">66.5%</span></span>
+        </div>
+        <div class="sbar-track"><div class="sbar-fill" style="width:66.5%"></div></div>
+        <div class="sbar-note">중소기업 전체 응답</div>
+      </div>
+      <div class="sbar-row">
+        <div class="sbar-label">
+          <span>50~100인 미만 기업 — <strong style="color:#fff">더욱 어렵다</strong></span>
+          <span class="pct"><span class="ft" data-fact="중기중앙회 설문: 50~100인 미만 기업에서 77.3%가 준수 어렵다고 응답. 법 적용 첫 대상 규모에서 더 높은 비율." data-src="중소기업중앙회 설문조사">77.3%</span></span>
+        </div>
+        <div class="sbar-track"><div class="sbar-fill" style="width:77.3%"></div></div>
+        <div class="sbar-note">법 최초 적용 대상 규모</div>
+      </div>
+      <div class="sbar-row">
+        <div class="sbar-label">
+          <span>"고의·과실 없으면 <strong style="color:#fff">면책해야</strong>" (개선 요구)</span>
+          <span class="pct"><span class="ft" data-fact="중기중앙회 설문: 74.2%가 '고의·중과실이 없는 중대산업재해에 대한 경영책임자 처벌 면책규정 마련'을 요구." data-src="중소기업중앙회 설문조사">74.2%</span></span>
+        </div>
+        <div class="sbar-track"><div class="sbar-fill" style="width:74.2%"></div></div>
+        <div class="sbar-note">그러나 현행법은 면책규정 없음 — 사고 발생 시 원칙적 수사 대상</div>
+      </div>
+    </div>
+    <div class="survey-source">출처: 중소기업중앙회(KBIZ) 중대재해처벌법 관련 중소기업 의견조사</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 현실 진단 카드 -->
+  <div class="reality-section">
+    <div class="section-eyebrow">현실 — 준비 없이 사고가 나면</div>
+    <div class="reality-grid">
+      <div class="reality-card danger">
+        <div class="rc-num"><span class="ft" data-fact="검찰이 중대재해 수사를 마친 사건의 약 80%를 기소. 사고 발생 = 형사처벌 가능성 높음." data-src="매일경제 2024.2">80%</span></div>
+        <div class="rc-title">검찰 기소율</div>
+        <div class="rc-desc">사고 발생 후 수사가 시작되면<br>10건 중 8건은 기소됩니다</div>
+      </div>
+      <div class="reality-card danger">
+        <div class="rc-num"><span class="ft" data-fact="대형 로펌 노동팀 변호사 진술. '대표가 구속될 수 있는 만큼 중대재해 사건의 1인당 합의금은 10억원까지 뛰었다.'" data-src="매일경제 2024.2">최대 10억</div>
+        <div class="rc-title">1인당 합의금</div>
+        <div class="rc-desc">형사 소송에서 감형 받으려면<br>유족과 합의가 필수입니다</div>
+      </div>
+      <div class="reality-card">
+        <div class="rc-num"><span class="ft" data-fact="중대재해처벌법 유죄 선고 70명 중 69명이 유족과 합의. 합의 없으면 실형 가능성 크게 높아짐." data-src="경향신문 2025.12">99%</span></div>
+        <div class="rc-title">유죄자 중 합의 비율</div>
+        <div class="rc-desc">집행유예 받은 사람 거의 모두가<br>유족과 합의를 먼저 했습니다</div>
+      </div>
+      <div class="reality-card">
+        <div class="rc-num"><span class="ft" data-fact="중대재해처벌법 관련 형사소송 변호사 비용은 기본 수천만원 이상. 합의금 별도." data-src="법조계 일반">수천만원+</span></div>
+        <div class="rc-title">형사 소송 법률비용</div>
+        <div class="rc-desc">합의금과 별도로 발생하는<br>변호사·소송 대응 비용</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 핵심 로직: 보험이 합의를 가능하게 한다 -->
+  <div class="logic-section">
+    <div class="logic-title">THE LOGIC — 보험이 합의를, 합의가 감형을 만든다</div>
+    <div class="logic-vs">
+      <div class="vs-box bad">
+        <div class="vs-head">❌ 보험 없을 때</div>
+        <div class="vs-item">사고 발생</div>
+        <div class="vs-item">합의금 7억~10억 — 즉시 마련 불가</div>
+        <div class="vs-item">합의 불발</div>
+        <div class="vs-item">법원: 합의 없음 = 불리한 양형</div>
+        <div class="vs-item result">→ 실형 가능성 대폭 상승 ⬆</div>
+      </div>
+      <div class="vs-box good">
+        <div class="vs-head">✅ 보험 있을 때</div>
+        <div class="vs-item">사고 발생</div>
+        <div class="vs-item">보험사가 합의금·법률비용 지원</div>
+        <div class="vs-item">합의 달성 + 처벌불원서</div>
+        <div class="vs-item">법원: 합의 완료 = 적극적 감경사유</div>
+        <div class="vs-item result">→ 집행유예 가능성 확보 ✅</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 핵심 메시지 -->
+  <div class="key-msg">
+    <div class="km-eyebrow">BOTTOM LINE</div>
+    <div class="km-text">
+      준비를 완벽히 못 해도 괜찮습니다.<br>
+      그러나 <em>사고 후 합의금</em>은<br>반드시 준비되어 있어야 합니다.
+    </div>
+    <div class="km-sub">
+      판결문에 명시된 감경사유 1순위는 "유족과의 합의". 합의는 돈입니다. 보험이 그 돈을 대신합니다.
+    </div>
+  </div>
+
+  <!-- 솔루션 체크리스트 -->
+  <div class="checklist">
+    <div class="cl-title">PROTECTION SOLUTION</div>
+    <div class="cl-grid">
+      <div class="cl-item">
+        <div class="cl-check">⚖️</div>
+        <div class="cl-text"><strong>임원배상책임보험 (D&amp;O)</strong>형사·민사 소송 법률비용 전액<br>합의금 지원 → 감경사유 확보</div>
+      </div>
+      <div class="cl-item">
+        <div class="cl-check">🏭</div>
+        <div class="cl-text"><strong>기업중대사고배상책임보험</strong>중대재해처벌법 전용 상품<br>사망·부상 배상 직접 지원</div>
+      </div>
+      <div class="cl-item">
+        <div class="cl-check">👥</div>
+        <div class="cl-text"><strong>단체보험 (순수·환급형)</strong>임직원 보장 + 위로금 재원<br>피보험자수 기반 맞춤 설계</div>
+      </div>
+      <div class="cl-item">
+        <div class="cl-check">📋</div>
+        <div class="cl-text"><strong>안전보건관리체계 컨설팅</strong>체계 구축 = 의무이행 증명<br>불기소·무죄 가능성 확보</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Why Me -->
+  <div class="why-me">
+    <div class="wm-header">
+      <div class="wm-eyebrow">CONSULTING CAPABILITY</div>
+      <div class="wm-title">컨설팅 역량 · 협업 체계</div>
+    </div>
+    <div class="wm-grid">
+      <div class="wm-card">
+        <div class="wm-hd">공인자격 경영지도사</div>
+        <div class="wm-ds">중소기업 경영리스크 진단 및 안전보건 체계 구축 통합 솔루션</div>
+      </div>
+      <div class="wm-card">
+        <div class="wm-hd">전문가 협업 체계</div>
+        <div class="wm-ds">노무사·법무사·세무사 협업으로 보험 설계 + 법적 대응 원스톱</div>
+      </div>
+      <div class="wm-card">
+        <div class="wm-hd">삼성생명 협력 파트너</div>
+        <div class="wm-ds">D&O·단체보험·중대재해보험 맞춤 설계 · 경력 25년 8개월</div>
+      </div>
+    </div>
+    <div class="wm-profile">
+      <span class="wm-role-tag">독립 컨설턴트 · 삼성생명 협력 파트너</span>
+      <span class="wm-exp">경력 25년 8개월</span>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-full">
+    <div>
+      <div class="cq">대표님의 리스크, 지금 무료로 진단해 드립니다</div>
+      <div class="cm">기업리스크 무료 진단 · 맞춤 보험 설계 · 안전보건 컨설팅</div>
+    </div>
+    <div class="cta-right-b">
+      <span class="rl">지금 바로</span>
+      <span class="rm">→ 상담 신청</span>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <div class="footer-f">
+    <span class="fc">CORPORATE RISK CONSULTING · GFC</span>
+    <span class="fd">본 자료는 중소기업중앙회 설문조사·법원 판결문·언론 보도를 기반으로 작성되었습니다. 정보 제공 목적이며 법률·보험 전문가 상담을 권장합니다.</span>
+  </div>
+
+</div><!-- /a4 -->
+</body>
+</html>

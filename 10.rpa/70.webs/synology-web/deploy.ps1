@@ -3,10 +3,12 @@
 #  위치: D:\drive_files\10.worksfree\10.rpa\70.webs\synology-web\
 #
 #  사용법:
-#    ① deploy.bat 더블클릭       (가장 쉬움)
-#    ② PowerShell: .\deploy.ps1
+#    ① deploy.bat 더블클릭         (가장 쉬움)
+#    ② PowerShell: .\deploy.ps1    (대화형)
 #    ③ VS Code:    Ctrl+Shift+B
+#    ④ 비대화형:   .\deploy.ps1 -Target 1   (1=test, 2=staging, 3=portal, 4=g1)
 # ================================================================
+param([string]$Target = "")
 
 # 한글 콘솔 출력 (UTF-8)
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -22,7 +24,7 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.7.5.29"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.7.9.44"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -72,7 +74,12 @@ Write-Host "    [4]  g1consulting  — 현장클리닉 전용 (g1consulting.work
 Write-Host "    [Q]  취소"                                                            -ForegroundColor Gray
 Write-Host "    [R]  롤백          — 이전 배포 버전 복원"                             -ForegroundColor DarkYellow
 Write-Host ""
-$choice = Read-Host "  선택"
+if ($Target) {
+    $choice = $Target
+    Write-Host "  (비대화형 모드 — Target: $Target)" -ForegroundColor DarkGray
+} else {
+    $choice = Read-Host "  선택"
+}
 
 if ($choice -match "^[Qq]$") {
     Write-Host "`n  취소됨." -ForegroundColor Gray; Start-Sleep 1; exit 0
@@ -316,7 +323,10 @@ if ($ok) {
 
     # ── Cloudflare 캐시 퍼지 ────────────────────────────────────────
     $CF_ZONE_ID   = "b5e82c46532b06a2cd456cc5ff3b9234"
-    $CF_API_TOKEN = "cfut_t1QcLw16LQHPBUCoYL8YxVJdr7yTBmYmXH4zQ8HW9a552a28"
+    # 토큰은 secrets.ps1에서 로드 (git 제외 파일)
+    $secretsFile  = Join-Path $PSScriptRoot "secrets.ps1"
+    if (Test-Path $secretsFile) { . $secretsFile }
+    $CF_API_TOKEN = $env:CF_API_TOKEN
     Write-Host ""
     Write-Host "  ▶ Cloudflare 캐시 퍼지 중..." -ForegroundColor Gray
     try {

@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>CEO Plan — WorksFree</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="../../assets/role-content.js"></script>
 <style>
 :root{
   --bg:#0f1117;--panel:#1c2333;--border:#2a3347;--border2:#3a4a5c;
   --accent:#3b82f6;--accent2:#06b6d4;--success:#10b981;
-  --warn:#f59e0b;--danger:#ef4444;
+  --warn:#f59e0b;--danger:#ef4444;--orange:#f97316;--purple:#a855f7;
   --text:#e2e8f0;--muted:#64748b;--hint:#475569;
   --radius:8px;
 }
@@ -17,7 +18,7 @@
 body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:24px 28px 60px;}
 
 /* ── 전단지 갤러리 ── */
-.flyer-bar{display:flex;align-items:center;gap:6px;margin-bottom:18px;}
+.flyer-bar{display:flex;align-items:center;gap:6px;margin-bottom:14px;}
 .flyer-bar-lbl{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;}
 .flyer-bar-line{flex:1;height:1px;background:var(--border);}
 .flyer-row{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;}
@@ -29,14 +30,6 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 .flyer-overlay{position:absolute;inset:0;}
 .flyer-name{font-size:10px;color:var(--muted);margin-top:5px;text-align:center;line-height:1.35;transition:color .15s;font-weight:500;}
 
-/* ── 전단지 모달 ── */
-.flyer-modal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 16px;}
-.flyer-modal.open{display:flex;}
-.flyer-modal-wrap{width:794px;max-width:100%;}
-.flyer-modal-iframe{width:794px;height:1123px;border:none;display:block;max-width:100%;}
-.flyer-modal-close{position:fixed;top:12px;right:12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;z-index:10000;}
-.flyer-modal-close:hover{background:rgba(255,255,255,0.28);}
-
 /* ── 헤더 ── */
 .page-title{font-size:20px;font-weight:600;margin-bottom:4px;}
 .page-sub{font-size:15px;color:var(--muted);margin-bottom:24px;}
@@ -46,7 +39,7 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 .section-label::before{content:'';width:14px;height:2px;background:var(--accent);flex-shrink:0;}
 .divider{height:1px;background:var(--border);margin:22px 0;}
 
-/* ── 3대 가치 카드 ── */
+/* ── 3대 경영과제 카드 ── */
 .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
 @media(max-width:640px){.value-grid{grid-template-columns:1fr;}}
 .value-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;border-top:3px solid;}
@@ -59,46 +52,64 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 .value-card.green .value-num{color:var(--success);}
 .value-title{font-size:15px;font-weight:600;margin-bottom:6px;}
 .value-desc{font-size:12.5px;color:var(--muted);line-height:1.65;}
+.value-ins{font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:10px;padding-top:10px;line-height:1.6;}
+.value-ins .ins-tag{display:inline-block;font-size:10px;background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:1px 7px;margin-bottom:5px;font-weight:700;}
 .value-highlight{font-size:13px;font-weight:600;margin-top:8px;padding:4px 10px;border-radius:20px;display:inline-block;}
 .value-card.blue .value-highlight{background:rgba(59,130,246,.12);color:#93c5fd;}
 .value-card.teal .value-highlight{background:rgba(6,182,212,.12);color:#67e8f9;}
 .value-card.green .value-highlight{background:rgba(16,185,129,.12);color:#6ee7b7;}
 
-/* ── 구조 다이어그램 ── */
-.mechanism{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:22px;}
-.mech-flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin:14px 0;}
-.mech-box{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:10px 14px;text-align:center;flex:1;min-width:100px;}
-.mech-box .mb-role{font-size:10px;color:var(--muted);margin-bottom:3px;letter-spacing:.5px;}
+/* ── 보수 구조 설계 ── */
+.structure-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
+@media(max-width:640px){.structure-grid{grid-template-columns:1fr;}}
+.struct-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.struct-title{font-size:14px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.struct-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;}
+.sb-blue{background:rgba(59,130,246,.15);color:#93c5fd;}
+.sb-green{background:rgba(16,185,129,.12);color:#6ee7b7;}
+.sb-orange{background:rgba(249,115,22,.12);color:#fdba74;}
+.struct-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+.struct-row:last-child{border-bottom:none;}
+.struct-row .sr-label{color:var(--muted);}
+.struct-row .sr-val{font-weight:600;}
+.struct-row .sr-val.accent{color:var(--accent);}
+.struct-row .sr-val.success{color:var(--success);}
+.struct-row .sr-val.warn{color:var(--warn);}
+
+/* ── 구조 다이어그램 (ins) ── */
+.mechanism{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:12px;}
+.mech-flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin:12px 0 8px;}
+.mech-box{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;text-align:center;flex:1;min-width:90px;}
+.mech-box .mb-role{font-size:10px;color:var(--muted);margin-bottom:3px;}
 .mech-box .mb-name{font-size:13px;font-weight:600;}
 .mech-box .mb-name.blue{color:var(--accent);}
 .mech-box .mb-name.teal{color:var(--accent2);}
 .mech-box .mb-name.green{color:var(--success);}
-.mech-arrow{color:var(--muted);font-size:18px;padding:0 8px;flex-shrink:0;}
-.mech-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;}
+.mech-arrow{color:var(--muted);font-size:16px;padding:0 6px;flex-shrink:0;}
+.mech-note{font-size:12px;color:var(--muted);line-height:1.6;}
 .mech-note strong{color:var(--text);}
 
-/* ── 절세 계산 예시 ── */
-.calc-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;}
-.calc-header{padding:10px 16px;background:rgba(59,130,246,.08);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.5px;}
-.calc-row{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px;}
-.calc-row:last-child{border-bottom:none;}
-.calc-row .cr-label{color:var(--muted);}
-.calc-row .cr-val{font-family:'IBM Plex Mono',monospace;font-weight:600;}
-.calc-row .cr-val.accent{color:var(--accent);}
-.calc-row .cr-val.success{color:var(--success);}
-.calc-row .cr-val.warn{color:var(--warn);}
+/* ── 재무 체크포인트 ── */
+.checkpoint-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px;}
+@media(max-width:500px){.checkpoint-grid{grid-template-columns:1fr;}}
+.ck-item{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:13px 16px;display:flex;align-items:flex-start;gap:12px;}
+.ck-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.ck-body .ck-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.ck-body .ck-desc{font-size:11.5px;color:var(--muted);line-height:1.55;}
+.ck-body .ck-action{font-size:11.5px;color:var(--accent);margin-top:4px;font-weight:500;}
 
-/* ── 플랜 변천사 ── */
-.gen-list{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
-.gen-item{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;gap:14px;align-items:flex-start;}
-.gen-badge{flex-shrink:0;width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.5px;}
-.gen-badge.g1{background:rgba(100,116,139,.15);color:#94a3b8;}
-.gen-badge.g2{background:rgba(59,130,246,.12);color:var(--accent);}
-.gen-badge.g3{background:rgba(16,185,129,.12);color:var(--success);}
-.gen-body .gen-title{font-size:14px;font-weight:600;margin-bottom:4px;}
-.gen-body .gen-desc{font-size:12.5px;color:var(--muted);line-height:1.6;}
-.gen-body .gen-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.gen-tag{font-size:11px;padding:2px 8px;border-radius:12px;background:var(--bg);border:1px solid var(--border);color:var(--muted);}
+/* ── 단계별 설계 ── */
+.phase-list{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
+.phase-item{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;gap:14px;align-items:flex-start;}
+.phase-num{flex-shrink:0;width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.ph-1{background:rgba(100,116,139,.15);color:#94a3b8;}
+.ph-2{background:rgba(59,130,246,.12);color:var(--accent);}
+.ph-3{background:rgba(16,185,129,.12);color:var(--success);}
+.phase-body .ph-title{font-size:14px;font-weight:600;margin-bottom:4px;}
+.phase-body .ph-desc{font-size:12.5px;color:var(--muted);line-height:1.6;}
+.phase-body .ph-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.ph-tag{font-size:11px;padding:2px 8px;border-radius:12px;background:var(--bg);border:1px solid var(--border);color:var(--muted);}
+.ph-ins{font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:10px;padding-top:10px;line-height:1.6;}
 
 /* ── 통계 수치 ── */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
@@ -110,7 +121,7 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 .stat-card .sc-num.accent{color:var(--accent);}
 .stat-card .sc-num.success{color:var(--success);}
 .stat-card .sc-label{font-size:11.5px;color:var(--muted);line-height:1.5;}
-.stat-card .sc-change{font-size:10.5px;color:var(--danger);margin-top:4px;font-weight:600;}
+.stat-card .sc-sub{font-size:10.5px;color:var(--hint);margin-top:4px;}
 
 /* ── CTA ── */
 .cta-block{background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(6,182,212,.06));border:1px solid rgba(59,130,246,.25);border-radius:var(--radius);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
@@ -119,7 +130,10 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 .cta-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:11px 22px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
 .cta-btn:hover{opacity:.88;}
 
-/* ── 언어 분기 ── */
+/* ── 보험 섹션 구분선 ── */
+.ins-section-label{font-size:11px;font-weight:700;letter-spacing:1.2px;color:#93c5fd;text-transform:uppercase;margin:4px 0 8px;display:flex;align-items:center;gap:6px;opacity:.75;}
+.ins-section-label::before{content:'';width:10px;height:2px;background:#93c5fd;flex-shrink:0;}
+
 html[lang="en"] .ko{display:none;}
 html[lang="en"] .en{display:block;}
 .en{display:none;}
@@ -127,318 +141,391 @@ html[lang="en"] .en{display:block;}
 </head>
 <body>
 
-<!-- 전단지 썸네일 갤러리 -->
-<div class="flyer-bar">
-  <span class="flyer-bar-lbl ko">마케팅 자료</span>
-  <span class="flyer-bar-lbl en">Marketing Materials</span>
-  <div class="flyer-bar-line"></div>
-</div>
-<div class="flyer-row">
-  <div class="flyer-card" onclick="openFlyer('flyer-ceo.html')">
-    <div class="flyer-thumb">
-      <iframe src="flyers/flyer-ceo.html" scrolling="no" loading="lazy" title="아는 대표는 이미 다했다"></iframe>
-      <div class="flyer-overlay"></div>
-    </div>
-    <div class="flyer-name ko">아는 대표는<br>이미 다했다</div>
-    <div class="flyer-name en">CEOs Already<br>Know This</div>
+<!-- ══════════════════════════════
+     보험설계사 전용: 전단지 갤러리
+══════════════════════════════ -->
+<div data-ins>
+  <div class="flyer-bar">
+    <span class="flyer-bar-lbl ko">마케팅 자료</span>
+    <span class="flyer-bar-lbl en">Marketing Materials</span>
+    <div class="flyer-bar-line"></div>
   </div>
-  <div class="flyer-card" onclick="openFlyer('flyer-safety-all.html')">
-    <div class="flyer-thumb">
-      <iframe src="flyers/flyer-safety-all.html" scrolling="no" loading="lazy" title="안전조치, 그게 전부"></iframe>
-      <div class="flyer-overlay"></div>
+  <div class="flyer-row" id="flyer-row-ins">
+    <div class="flyer-card" onclick="openFlyer('flyer-ceo.html')">
+      <div class="flyer-thumb">
+        <iframe src="flyers/flyer-ceo.html" scrolling="no" loading="lazy" title="아는 대표는 이미 다했다"></iframe>
+        <div class="flyer-overlay"></div>
+      </div>
+      <div class="flyer-name ko">아는 대표는<br>이미 다했다</div>
     </div>
-    <div class="flyer-name ko">안전조치,<br>그게 전부?</div>
-    <div class="flyer-name en">Safety Measures<br>Are Not Enough</div>
-  </div>
-  <div class="flyer-card" onclick="openFlyer('flyer-safety-only.html')">
-    <div class="flyer-thumb">
-      <iframe src="flyers/flyer-safety-only.html" scrolling="no" loading="lazy" title="안전조치만 했다고"></iframe>
-      <div class="flyer-overlay"></div>
+    <div class="flyer-card" onclick="openFlyer('flyer-safety-all.html')">
+      <div class="flyer-thumb">
+        <iframe src="flyers/flyer-safety-all.html" scrolling="no" loading="lazy"></iframe>
+        <div class="flyer-overlay"></div>
+      </div>
+      <div class="flyer-name ko">안전조치,<br>그게 전부?</div>
     </div>
-    <div class="flyer-name ko">안전조치만<br>했다고</div>
-    <div class="flyer-name en">Just Safety<br>Measures?</div>
-  </div>
-  <div class="flyer-card" onclick="openFlyer('flyer-hard-work.html')">
-    <div class="flyer-thumb">
-      <iframe src="flyers/flyer-hard-work.html" scrolling="no" loading="lazy" title="열심히했는데 남는게 없다"></iframe>
-      <div class="flyer-overlay"></div>
+    <div class="flyer-card" onclick="openFlyer('flyer-safety-only.html')">
+      <div class="flyer-thumb">
+        <iframe src="flyers/flyer-safety-only.html" scrolling="no" loading="lazy"></iframe>
+        <div class="flyer-overlay"></div>
+      </div>
+      <div class="flyer-name ko">안전조치만<br>했다고</div>
     </div>
-    <div class="flyer-name ko">열심히했는데<br>남는 게 없다</div>
-    <div class="flyer-name en">Worked Hard,<br>Nothing Left</div>
-  </div>
-  <div class="flyer-card" onclick="openFlyer('flyer-ceo-v2.html')">
-    <div class="flyer-thumb">
-      <iframe src="flyers/flyer-ceo-v2.html" scrolling="no" loading="lazy" title="아는 대표는 이미 다했다 v2"></iframe>
-      <div class="flyer-overlay"></div>
+    <div class="flyer-card" onclick="openFlyer('flyer-hard-work.html')">
+      <div class="flyer-thumb">
+        <iframe src="flyers/flyer-hard-work.html" scrolling="no" loading="lazy"></iframe>
+        <div class="flyer-overlay"></div>
+      </div>
+      <div class="flyer-name ko">열심히했는데<br>남는 게 없다</div>
     </div>
-    <div class="flyer-name ko">아는 대표는<br>이미 다했다<br><span style="color:var(--accent);font-size:9px">v2</span></div>
-    <div class="flyer-name en">CEOs Already<br>Know This<br><span style="color:var(--accent);font-size:9px">v2</span></div>
-  </div>
-  <div class="flyer-card" onclick="openFlyer('flyer-safety-all-v2.html')">
-    <div class="flyer-thumb">
-      <iframe src="flyers/flyer-safety-all-v2.html" scrolling="no" loading="lazy" title="안전조치, 그게 전부 v2"></iframe>
-      <div class="flyer-overlay"></div>
-    </div>
-    <div class="flyer-name ko">안전조치,<br>그게 전부?<br><span style="color:var(--accent);font-size:9px">v2</span></div>
-    <div class="flyer-name en">Safety Measures<br>Are Not Enough<br><span style="color:var(--accent);font-size:9px">v2</span></div>
-  </div>
-  <div class="flyer-card" onclick="openFlyer('flyer-safety-only-v2.html')">
-    <div class="flyer-thumb">
-      <iframe src="flyers/flyer-safety-only-v2.html" scrolling="no" loading="lazy" title="안전조치만 했다고 v2"></iframe>
-      <div class="flyer-overlay"></div>
-    </div>
-    <div class="flyer-name ko">안전조치만<br>했다고<br><span style="color:var(--accent);font-size:9px">v2</span></div>
-    <div class="flyer-name en">Just Safety<br>Measures?<br><span style="color:var(--accent);font-size:9px">v2</span></div>
-  </div>
-  <div class="flyer-card" onclick="openFlyer('flyer-hard-work-v2.html')">
-    <div class="flyer-thumb">
-      <iframe src="flyers/flyer-hard-work-v2.html" scrolling="no" loading="lazy" title="열심히했는데 남는게 없다 v2"></iframe>
-      <div class="flyer-overlay"></div>
-    </div>
-    <div class="flyer-name ko">열심히했는데<br>남는 게 없다<br><span style="color:var(--accent);font-size:9px">v2</span></div>
-    <div class="flyer-name en">Worked Hard,<br>Nothing Left<br><span style="color:var(--accent);font-size:9px">v2</span></div>
   </div>
 </div>
 
-<!-- 헤더 -->
-<div class="page-title ko">CEO Plan — 법인 컨설팅 핵심 전략</div>
-<div class="page-title en">CEO Plan — Corporate Consulting Strategy</div>
-<div class="page-sub ko">법인이 대표를 위해 준비하는 절세 · 유동성 · 상속세 3가지 솔루션</div>
-<div class="page-sub en">3 solutions the corporation prepares for the CEO: tax savings, liquidity, and inheritance tax</div>
+<!-- ══════════════════════════════
+     경영지도사 전용: 자료 링크
+══════════════════════════════ -->
+<div data-mgmt>
+  <div class="flyer-bar">
+    <span class="flyer-bar-lbl ko">경영지도사 참고 자료</span>
+    <div class="flyer-bar-line"></div>
+  </div>
+  <div class="flyer-row" id="flyer-row-mgmt">
+    <div class="flyer-card" onclick="openFlyer('flyer-hard-work.html')">
+      <div class="flyer-thumb">
+        <iframe src="flyers/flyer-hard-work.html" scrolling="no" loading="lazy"></iframe>
+        <div class="flyer-overlay"></div>
+      </div>
+      <div class="flyer-name ko">열심히했는데<br>남는 게 없다</div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--hint);margin-bottom:24px">경영지도사용 자료는 마케팅 자료 페이지에서 확인하세요.</p>
+</div>
 
-<!-- 3대 가치 -->
-<div class="section-label ko">핵심 가치</div>
-<div class="section-label en">Core Value</div>
+<!-- ══════════════════════════════
+     공통 헤더
+══════════════════════════════ -->
+<div class="page-title ko">CEO 플랜 — 법인 경영 최적화 전략</div>
+<div class="page-title en">CEO Plan — Corporate Management Optimization</div>
+<div class="page-sub ko">법인이 대표를 위해 준비하는 3대 경영과제: 절세·이익잉여금·가업승계</div>
+<div class="page-sub en">3 core management challenges: Tax optimization, retained earnings, and business succession</div>
+
+<!-- ══════════════════════════════
+     3대 경영과제 (공통 주제 + 보험 내용 내부 삽입)
+══════════════════════════════ -->
+<div class="section-label ko">3대 경영과제</div>
+<div class="section-label en">3 Core Management Challenges</div>
 <div class="value-grid">
+
+  <!-- 01 절세 최적화 -->
   <div class="value-card blue">
-    <div class="value-num">01 · 절세</div>
-    <div class="value-title ko">임원 퇴직금 재원</div>
-    <div class="value-title en">Executive Retirement Fund</div>
-    <div class="value-desc ko">급여를 줄이고 법인이 보험료를 비용 처리하여 임원 퇴직금을 합법적으로 적립합니다. 동일 금액 기준 퇴직소득세는 근로소득세의 <strong style="color:var(--text)">약 1/10 수준</strong>입니다.</div>
-    <div class="value-desc en">The corporation pays premiums as expenses to legally accumulate executive retirement funds. Retirement income tax is approximately <strong style="color:var(--text)">1/10 of labor income tax</strong>.</div>
-    <div class="value-highlight">세율 대폭 절감</div>
+    <div class="value-num">01 · 절세 최적화</div>
+    <div class="value-title ko">대표이사 세부담 절감</div>
+    <div class="value-title en">CEO Tax Reduction</div>
+    <div class="value-desc ko">급여·배당 중심의 보수구조를 퇴직소득으로 전환하면 동일 금액 기준 실질 세율을 대폭 낮출 수 있습니다. 퇴직소득세는 근로소득세의 <strong style="color:var(--text)">약 1/10 수준</strong>입니다.</div>
+    <div class="value-desc en">Shifting from salary/dividend to retirement income significantly reduces effective tax rates. Retirement income tax is approximately <strong style="color:var(--text)">1/10 of labor income tax</strong>.</div>
+    <!-- 보험설계사 전용: 구현 수단으로 법인보험 언급 -->
+    <div class="value-ins" data-ins>
+      <span class="ins-tag">보험 활용</span><br>
+      법인이 보험료를 <strong style="color:var(--text)">전액 손금(비용) 처리</strong>하면서 임원 퇴직금 재원을 동시에 마련합니다. 경영인정기보험·임원퇴직보험이 대표적인 절세 수단입니다.
+    </div>
+    <div class="value-highlight">세율 약 1/10 절감</div>
   </div>
+
+  <!-- 02 이익잉여금 관리 -->
   <div class="value-card teal">
-    <div class="value-num">02 · 유동성</div>
-    <div class="value-title ko">대표 유고 시 회사 운영</div>
-    <div class="value-title en">Business Continuity</div>
-    <div class="value-desc ko">대표 사망 시 매출채권·임금채무 등 유동성 위기가 발생합니다. 보험금으로 <strong style="color:var(--text)">즉각적인 운영 자금</strong>을 확보하여 기업을 보호합니다.</div>
-    <div class="value-desc en">CEO death triggers a liquidity crisis with accounts receivable and payroll obligations. Insurance proceeds provide <strong style="color:var(--text)">immediate operating funds</strong>.</div>
-    <div class="value-highlight">3~4일 내 지급</div>
+    <div class="value-num">02 · 이익잉여금 관리</div>
+    <div class="value-title ko">법인 내 과도한 자금 처리</div>
+    <div class="value-title en">Retained Earnings Management</div>
+    <div class="value-desc ko">이익잉여금 과다 적립 시 배당소득세·초과유보소득세 위험이 있습니다. 배당·급여·퇴직금·비용처리 등 <strong style="color:var(--text)">합법적 분산 전략</strong>이 필요합니다.</div>
+    <div class="value-desc en">Excess retained earnings risk dividend income tax and excess retention tax. Legal distribution strategies through dividends, salary, retirement, and expenses are essential.</div>
+    <!-- 보험설계사 전용 -->
+    <div class="value-ins" data-ins>
+      <span class="ins-tag">보험 활용</span><br>
+      법인보험 보험료를 비용 처리하여 이익잉여금을 합법적으로 줄이고, 동시에 대표 퇴직금 재원을 확보합니다. <strong style="color:var(--text)">단체환급부보험</strong>이 대표적 수단입니다.
+    </div>
+    <div class="value-highlight">초과유보소득세 방어</div>
   </div>
+
+  <!-- 03 가업승계 준비 -->
   <div class="value-card green">
-    <div class="value-num">03 · 상속세</div>
+    <div class="value-num">03 · 가업승계 준비</div>
     <div class="value-title ko">기업가치 상승 대비</div>
-    <div class="value-title en">Inheritance Tax Reserve</div>
-    <div class="value-desc ko">기업가치가 오를수록 상속세 부담이 급증합니다. 30억 초과 상속재산에는 <strong style="color:var(--text)">최고 50%</strong>의 세율이 적용됩니다. 보험으로 세금 재원을 미리 준비합니다.</div>
-    <div class="value-desc en">As business value rises, inheritance tax burden surges. Estates over 3 billion won face a <strong style="color:var(--text)">maximum 50% tax rate</strong>. Prepare tax reserves in advance.</div>
-    <div class="value-highlight">최고 50% 세율 대비</div>
+    <div class="value-title en">Business Succession Planning</div>
+    <div class="value-desc ko">기업가치 상승과 함께 상속세 부담이 급증합니다. 사전 증여·주식이전·유상감자를 통해 <strong style="color:var(--text)">세금 부담 없는 승계 구조</strong>를 미리 설계해야 합니다.</div>
+    <div class="value-desc en">As business value rises, inheritance tax burden surges. Pre-transfer, stock transfer, and capital reduction must be structured in advance to minimize tax burden.</div>
+    <!-- 보험설계사 전용 -->
+    <div class="value-ins" data-ins>
+      <span class="ins-tag">보험 활용</span><br>
+      30억 초과 상속재산에 <strong style="color:var(--text)">최고 50% 세율</strong> 적용. 법인보험 사망보험금을 상속세 납부 재원으로 미리 준비하면 승계 시 유동성 위기를 방지합니다.
+    </div>
+    <div class="value-highlight">승계 세금 사전 준비</div>
   </div>
+
 </div>
 
 <div class="divider"></div>
 
-<!-- 계약 구조 -->
-<div class="section-label ko">계약 구조</div>
-<div class="section-label en">Contract Structure</div>
-<div class="mechanism">
-  <div class="mech-flow">
-    <div class="mech-box">
-      <div class="mb-role ko">계약자 · 납입</div>
-      <div class="mb-role en">Policyholder</div>
-      <div class="mb-name blue">법인</div>
+<!-- ══════════════════════════════
+     대표이사 보수 구조 최적화 (공통)
+══════════════════════════════ -->
+<div class="section-label ko">대표이사 보수 구조 최적화</div>
+<div class="section-label en">CEO Compensation Structure</div>
+<div class="structure-grid">
+
+  <div class="struct-card">
+    <div class="struct-title ko">
+      현행 고위험 구조 <span class="struct-badge sb-orange">개선 필요</span>
     </div>
-    <div class="mech-arrow">→</div>
-    <div class="mech-box">
-      <div class="mb-role ko">피보험자</div>
-      <div class="mb-role en">Insured</div>
-      <div class="mb-name teal">대표 · 임원</div>
-    </div>
-    <div class="mech-arrow">→</div>
-    <div class="mech-box">
-      <div class="mb-role ko">수익자</div>
-      <div class="mb-role en">Beneficiary</div>
-      <div class="mb-name green">법인</div>
-    </div>
-    <div class="mech-arrow">→</div>
-    <div class="mech-box">
-      <div class="mb-role ko">활용</div>
-      <div class="mb-role en">Utilization</div>
-      <div class="mb-name" style="color:var(--warn)">퇴직금 · 유동성 · 상속세</div>
-    </div>
+    <div class="struct-row"><span class="sr-label ko">급여 비중</span><span class="sr-val warn">80% 이상</span></div>
+    <div class="struct-row"><span class="sr-label ko">실질 소득세율</span><span class="sr-val warn">20~38%</span></div>
+    <div class="struct-row"><span class="sr-label ko">이익잉여금 누적</span><span class="sr-val warn">지속 증가</span></div>
+    <div class="struct-row"><span class="sr-label ko">퇴직금 재원</span><span class="sr-val warn">미준비</span></div>
+    <div class="struct-row"><span class="sr-label ko">상속세 대비</span><span class="sr-val warn">無</span></div>
   </div>
-  <div class="mech-note ko">
-    <strong>가입 요건:</strong> 설립 2년 이상 법인 · 피보험자는 대표이사·등기임원·지분 보유자 · 보장기간 90세 만기<br>
-    <strong>보험료 처리:</strong> 법인이 납입하는 보험료는 전액 손금(비용) 처리 → 법인세 절감
+
+  <div class="struct-card">
+    <div class="struct-title ko">
+      최적화 설계 구조 <span class="struct-badge sb-green">권장</span>
+    </div>
+    <div class="struct-row"><span class="sr-label ko">급여 비중 조정</span><span class="sr-val success">적정 수준 유지</span></div>
+    <div class="struct-row"><span class="sr-label ko">퇴직소득 활용</span><span class="sr-val success">세율 약 1/10</span></div>
+    <div class="struct-row"><span class="sr-label ko">이익잉여금 분산</span><span class="sr-val success">배당·비용·퇴직</span></div>
+    <div class="struct-row"><span class="sr-label ko">퇴직금 재원</span><span class="sr-val success">사전 적립</span></div>
+    <div class="struct-row"><span class="sr-label ko">가업승계 구조</span><span class="sr-val success">사전 설계</span></div>
   </div>
-  <div class="mech-note en">
-    <strong>Eligibility:</strong> Corporation incorporated 2+ years · Insured must be registered director or major shareholder · Coverage until age 90<br>
-    <strong>Premium treatment:</strong> Premiums paid by the corporation are fully deductible as expenses → reducing corporate tax
-  </div>
+
 </div>
 
-<!-- 절세 시뮬레이션 -->
-<div class="section-label ko">절세 시뮬레이션</div>
-<div class="section-label en">Tax Savings Example</div>
-<div class="calc-block">
-  <div class="calc-header ko">[ 동일 금액 기준: 연간 6천만원 ]</div>
-  <div class="calc-header en">[ Same Amount: 60M KRW/year ]</div>
-  <div class="calc-row"><span class="cr-label ko">급여로 수령 시 소득세 부담</span><span class="cr-label en">Income tax if received as salary</span><span class="cr-val warn">~20~30%</span></div>
-  <div class="calc-row"><span class="cr-label ko">퇴직금으로 수령 시 퇴직소득세</span><span class="cr-label en">Retirement income tax</span><span class="cr-val success">~2~3% 수준</span></div>
-  <div class="calc-row"><span class="cr-label ko">절세 효과 (연간 기준)</span><span class="cr-label en">Annual tax savings</span><span class="cr-val accent">수백만~수천만 원</span></div>
-  <div class="calc-row"><span class="cr-label ko">퇴직금 설정 한도</span><span class="cr-label en">Max retirement allowance</span><span class="cr-val">재직연수 × 평균급여 × 3배수</span></div>
-</div>
-
-<div class="divider"></div>
-
-<!-- 플랜 변천사 -->
-<div class="section-label ko">CEO 플랜 변천사</div>
-<div class="section-label en">CEO Plan Evolution</div>
-<div class="gen-list">
-  <div class="gen-item">
-    <div class="gen-badge g1">1세대</div>
-    <div class="gen-body">
-      <div class="gen-title ko">COPN — 퇴직금 플랜</div>
-      <div class="gen-title en">COPN — Retirement Fund Plan</div>
-      <div class="gen-desc ko">정관에 임원 퇴직금 규정을 삽입하고, 법인 명의로 보험에 가입하여 퇴직금을 적립합니다. 급여를 낮게 유지하면서 퇴직금으로 합법적 절세를 실현합니다.</div>
-      <div class="gen-desc en">Insert executive retirement provisions into articles of incorporation. Accumulate retirement funds via corporate insurance while keeping salary low for legal tax reduction.</div>
-      <div class="gen-tags">
-        <span class="gen-tag ko">퇴직금 절세</span><span class="gen-tag en">Retirement Tax Savings</span>
-        <span class="gen-tag ko">법인 비용처리</span><span class="gen-tag en">Corporate Expense</span>
-        <span class="gen-tag ko">3배수 한도</span><span class="gen-tag en">3x Multiplier Limit</span>
+<!-- 보험설계사 전용: 법인보험 계약 구조 -->
+<div data-ins>
+  <div class="mechanism">
+    <div class="ins-section-label">법인보험 활용 구조</div>
+    <div class="mech-flow">
+      <div class="mech-box">
+        <div class="mb-role ko">계약자·납입</div>
+        <div class="mb-name blue">법인</div>
+      </div>
+      <div class="mech-arrow">→</div>
+      <div class="mech-box">
+        <div class="mb-role ko">피보험자</div>
+        <div class="mb-name teal">대표·임원</div>
+      </div>
+      <div class="mech-arrow">→</div>
+      <div class="mech-box">
+        <div class="mb-role ko">수익자</div>
+        <div class="mb-name green">법인</div>
+      </div>
+      <div class="mech-arrow">→</div>
+      <div class="mech-box">
+        <div class="mb-role ko">활용</div>
+        <div class="mb-name" style="color:var(--warn)">퇴직금·이익잉여금·상속세</div>
       </div>
     </div>
-  </div>
-  <div class="gen-item">
-    <div class="gen-badge g2">2세대</div>
-    <div class="gen-body">
-      <div class="gen-title ko">퇴직금 + 유동성 + 상속세 통합</div>
-      <div class="gen-title en">Retirement + Liquidity + Inheritance Tax</div>
-      <div class="gen-desc ko">정관에 3가지 명분(퇴직금·유동성·상속세)을 명시하고, 퇴직금을 일시금 대신 연금 형태로 수령하여 소득세를 분산합니다. 대표 사망 시 보험금으로 회사 유동성과 가족 상속세 재원을 동시에 확보합니다.</div>
-      <div class="gen-desc en">Specify 3 purposes in articles of incorporation. Receive retirement as annuity to spread income tax. Insurance proceeds simultaneously secure company liquidity and family inheritance tax reserves upon CEO death.</div>
-      <div class="gen-tags">
-        <span class="gen-tag ko">3가지 명분</span><span class="gen-tag en">Triple Purpose</span>
-        <span class="gen-tag ko">연금 수령</span><span class="gen-tag en">Annuity Receipt</span>
-        <span class="gen-tag ko">상속세 재원</span><span class="gen-tag en">Inheritance Reserve</span>
-      </div>
-    </div>
-  </div>
-  <div class="gen-item">
-    <div class="gen-badge g3">3세대</div>
-    <div class="gen-body">
-      <div class="gen-title ko">유상감자 플랜 — 최적화 구조</div>
-      <div class="gen-title en">Capital Reduction Plan — Optimized Structure</div>
-      <div class="gen-desc ko">대표 생존 시 주식을 배우자·자녀에게 사전 증여한 후, 증여받은 주식을 유상감자하여 현금화합니다. 배당소득세 없이 법인 자금을 가족에게 이전하는 가장 세금 효율적인 구조입니다.</div>
-      <div class="gen-desc en">Pre-transfer shares to spouse/children during CEO's lifetime, then redeem shares through capital reduction. The most tax-efficient structure to transfer corporate funds to family without dividend income tax.</div>
-      <div class="gen-tags">
-        <span class="gen-tag ko">유상감자</span><span class="gen-tag en">Capital Reduction</span>
-        <span class="gen-tag ko">사전 증여</span><span class="gen-tag en">Pre-transfer Gift</span>
-        <span class="gen-tag ko">배당세 절감</span><span class="gen-tag en">No Dividend Tax</span>
-        <span class="gen-tag ko">가업승계 최적화</span><span class="gen-tag en">Succession Optimized</span>
-      </div>
+    <div class="mech-note ko">
+      <strong>가입 요건:</strong> 설립 2년 이상 법인 · 피보험자는 대표이사·등기임원·지분 보유자 · 보장기간 90세 만기<br>
+      <strong>보험료 처리:</strong> 법인이 납입하는 보험료는 전액 손금(비용) 처리 → 법인세 절감 + 이익잉여금 감소
     </div>
   </div>
 </div>
 
 <div class="divider"></div>
 
-<!-- 숫자로 보는 리스크 -->
-<div class="section-label ko">숫자로 보는 CEO 리스크</div>
-<div class="section-label en">CEO Risk by the Numbers</div>
+<!-- ══════════════════════════════
+     법인 재무 체크포인트 (공통)
+══════════════════════════════ -->
+<div class="section-label ko">법인 재무 체크포인트</div>
+<div class="section-label en">Corporate Finance Checkpoints</div>
+<div class="checkpoint-grid">
+  <div class="ck-item">
+    <div class="ck-icon">💰</div>
+    <div class="ck-body">
+      <div class="ck-title ko">이익잉여금 규모</div>
+      <div class="ck-title en">Retained Earnings Scale</div>
+      <div class="ck-desc ko">5억 초과 시 초과유보소득세 위험. 10억 이상이면 즉각 분산 전략 필요.</div>
+      <div class="ck-action ko">→ 배당·급여·비용 분산 검토</div>
+    </div>
+  </div>
+  <div class="ck-item">
+    <div class="ck-icon">📊</div>
+    <div class="ck-body">
+      <div class="ck-title ko">법인세 납부 규모</div>
+      <div class="ck-title en">Corporate Tax Amount</div>
+      <div class="ck-desc ko">연간 법인세가 2천만 원 이상이면 절세 최적화 여지가 충분합니다.</div>
+      <div class="ck-action ko">→ 비용처리·퇴직금 구조 설계</div>
+    </div>
+  </div>
+  <div class="ck-item">
+    <div class="ck-icon">👤</div>
+    <div class="ck-body">
+      <div class="ck-title ko">대표이사 연령</div>
+      <div class="ck-title en">CEO Age</div>
+      <div class="ck-desc ko">50대 이상이면 가업승계 설계가 시급합니다. 10년 이상 여유가 있어야 최적 구조 가능.</div>
+      <div class="ck-action ko">→ 승계 타임라인 수립</div>
+    </div>
+  </div>
+  <div class="ck-item">
+    <div class="ck-icon">🏢</div>
+    <div class="ck-body">
+      <div class="ck-title ko">지배구조·주주 구성</div>
+      <div class="ck-title en">Ownership Structure</div>
+      <div class="ck-desc ko">차명주식·분산 지분이 있으면 가업승계 및 상속 시 분쟁 위험. 지분 정리가 선행되어야 합니다.</div>
+      <div class="ck-action ko">→ 주주 구성 정비 후 승계 설계</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════
+     단계별 설계 접근 (공통 골격 + 보험 세부 삽입)
+══════════════════════════════ -->
+<div class="section-label ko">단계별 설계 접근</div>
+<div class="section-label en">Phased Design Approach</div>
+<div class="phase-list">
+
+  <div class="phase-item">
+    <div class="phase-num ph-1">진단</div>
+    <div class="phase-body">
+      <div class="ph-title ko">현황 진단 — 재무구조·세금·승계 위험도 파악</div>
+      <div class="ph-title en">Assessment — Financial, Tax & Succession Risk</div>
+      <div class="ph-desc ko">법인세·이익잉여금·대표 보수·지분 구조·가업승계 계획 여부를 종합적으로 분석합니다. DART 기업공시와 재무제표를 활용해 객관적 수치를 파악합니다.</div>
+      <div class="ph-tags">
+        <span class="ph-tag ko">재무제표 분석</span>
+        <span class="ph-tag ko">이익잉여금 규모</span>
+        <span class="ph-tag ko">법인세 납부액</span>
+        <span class="ph-tag ko">지분 구조 파악</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase-item">
+    <div class="phase-num ph-2">설계</div>
+    <div class="phase-body">
+      <div class="ph-title ko">구조 설계 — 보수체계·퇴직금·승계 플랜 수립</div>
+      <div class="ph-title en">Design — Compensation, Retirement & Succession Plan</div>
+      <div class="ph-desc ko">대표이사 급여·퇴직금 비율 최적화, 정관 정비(임원퇴직금 규정), 사전 증여·유상감자 등 가업승계 구조를 수립합니다.</div>
+      <div class="ph-tags">
+        <span class="ph-tag ko">정관 정비</span>
+        <span class="ph-tag ko">퇴직금 규정</span>
+        <span class="ph-tag ko">사전 증여 전략</span>
+        <span class="ph-tag ko">유상감자 구조</span>
+      </div>
+      <!-- 보험설계사 전용 세부 -->
+      <div class="ph-ins" data-ins>
+        <span style="color:#93c5fd;font-weight:700;font-size:10px">보험 설계 포인트 ·</span>
+        퇴직금 규정 정비 후 경영인정기보험·임원퇴직보험으로 재원을 마련하고, 보험료를 전액 비용처리하여 이익잉여금과 법인세를 동시에 절감합니다.
+      </div>
+    </div>
+  </div>
+
+  <div class="phase-item">
+    <div class="phase-num ph-3">실행</div>
+    <div class="phase-body">
+      <div class="ph-title ko">최적화 실행 — 절세·유동성·승계 동시 달성</div>
+      <div class="ph-title en">Execute — Tax Savings, Liquidity & Succession</div>
+      <div class="ph-desc ko">설계된 구조를 단계적으로 실행합니다. 배당 정책 조정, 주식 이전, 승계 타임라인 관리를 통해 세금 효율적인 법인 운영 구조를 완성합니다.</div>
+      <div class="ph-tags">
+        <span class="ph-tag ko">배당 정책 조정</span>
+        <span class="ph-tag ko">주식 이전 실행</span>
+        <span class="ph-tag ko">승계 타임라인</span>
+        <span class="ph-tag ko">연간 절세 효과 추적</span>
+      </div>
+      <!-- 보험설계사 전용 세부 -->
+      <div class="ph-ins" data-ins>
+        <span style="color:#93c5fd;font-weight:700;font-size:10px">보험 설계 포인트 ·</span>
+        대표 사망 시 법인 유동성 위기(매출채권·임금채무)를 보험금으로 즉시 해결합니다. 사망보험금 3~4일 내 지급으로 기업 연속성을 보장합니다.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════
+     핵심 지표 (공통 + 보험 통계는 ins 추가)
+══════════════════════════════ -->
+<div class="section-label ko">법인 경영 핵심 지표</div>
+<div class="section-label en">Key Corporate Management Metrics</div>
 <div class="stat-grid">
   <div class="stat-card">
-    <div class="sc-num danger">887<span style="font-size:16px">건</span></div>
-    <div class="sc-label ko">최근 3년간 중대재해 발생 건수</div>
-    <div class="sc-label en">Serious accidents in 3 years</div>
-    <div class="sc-change ko">▲ 2024년 단년 436건</div>
-    <div class="sc-change en">▲ 436 cases in 2024 alone</div>
-  </div>
-  <div class="stat-card">
-    <div class="sc-num warn">121<span style="font-size:16px">건</span></div>
-    <div class="sc-label ko">CEO·경영진 형사기소 건수</div>
-    <div class="sc-label en">CEO/executive criminal indictments</div>
-    <div class="sc-change ko">▲ 유죄율 89.3%</div>
-    <div class="sc-change en">▲ 89.3% conviction rate</div>
-  </div>
-  <div class="stat-card">
-    <div class="sc-num accent">50<span style="font-size:16px">%</span></div>
+    <div class="sc-num warn">50<span style="font-size:16px">%</span></div>
     <div class="sc-label ko">30억 초과 상속재산 최고 세율</div>
-    <div class="sc-label en">Max inheritance tax rate (>3B KRW)</div>
-    <div class="sc-change" style="color:var(--muted)">5단계 누진세율 구조</div>
+    <div class="sc-label en">Max inheritance tax (>3B KRW)</div>
+    <div class="sc-sub ko">5단계 누진 구조</div>
   </div>
   <div class="stat-card">
+    <div class="sc-num accent">24<span style="font-size:16px">%</span></div>
+    <div class="sc-label ko">법인세 최고세율 (과표 200억 초과)</div>
+    <div class="sc-label en">Max corporate tax rate</div>
+    <div class="sc-sub ko">절세 구조 설계의 핵심</div>
+  </div>
+  <!-- 보험설계사 전용 통계 -->
+  <div class="stat-card" data-ins>
+    <div class="sc-num danger">887<span style="font-size:16px">건</span></div>
+    <div class="sc-label ko">최근 3년 중대재해 발생</div>
+    <div class="sc-label en">Serious accidents in 3 years</div>
+    <div class="sc-sub ko">▲ 2024년 단년 436건</div>
+  </div>
+  <div class="stat-card" data-ins>
     <div class="sc-num success">70<span style="font-size:16px">%</span></div>
-    <div class="sc-label ko">국내 상장사 임원보험 가입률</div>
-    <div class="sc-label en">Listed company D&O insurance rate</div>
-    <div class="sc-change ko" style="color:var(--muted)">중소기업은 0.008%에 불과</div>
-    <div class="sc-change en" style="color:var(--muted)">Only 0.008% for SMEs</div>
+    <div class="sc-label ko">상장사 임원보험 가입률</div>
+    <div class="sc-label en">Listed co. exec. insurance rate</div>
+    <div class="sc-sub ko">중소기업은 0.008%</div>
+  </div>
+  <!-- 경영지도사 전용 통계 -->
+  <div class="stat-card" data-mgmt>
+    <div class="sc-num danger">68<span style="font-size:16px">%</span></div>
+    <div class="sc-label ko">중소기업 가업승계 준비율</div>
+    <div class="sc-label en">SMEs with succession plan</div>
+    <div class="sc-sub ko">준비 중인 기업 18%에 불과</div>
+  </div>
+  <div class="stat-card" data-mgmt>
+    <div class="sc-num warn">5억<span style="font-size:14px">원</span></div>
+    <div class="sc-label ko">초과유보소득세 위험 기준선</div>
+    <div class="sc-label en">Excess retention tax threshold</div>
+    <div class="sc-sub ko">이익잉여금 관리 필수 구간</div>
   </div>
 </div>
 
-<!-- CTA -->
+<!-- ══════════════════════════════
+     CTA
+══════════════════════════════ -->
 <div class="cta-block">
   <div class="cta-text">
-    <p class="ko">지금 우리 회사의 리스크는 어느 수준인지 확인해보세요</p>
-    <p class="en">Check your company's current risk exposure level</p>
-    <strong class="ko">무료 기업리스크 종합진단 → 파트너 컨설팅</strong>
-    <strong class="en">Free Corporate Risk Diagnosis → Partner Consulting</strong>
+    <p class="ko">지금 법인의 재무구조와 절세 가능성을 무료로 확인하세요</p>
+    <p class="en">Diagnose your corporation's financial structure and tax savings potential</p>
+    <strong class="ko">경영종합진단 → 법인 세금·이익잉여금·승계 종합 체크</strong>
+    <strong class="en">Business Diagnosis → Tax, Retained Earnings & Succession Check</strong>
   </div>
-  <button class="cta-btn" onclick="parent.postMessage({type:'nav',page:'gfc'},'*')">
+  <button class="cta-btn" onclick="parent.postMessage({type:'loadIframe',path:'consulting/gfc/index.html'},'*')">
     <span class="ko">진단 시작 →</span>
     <span class="en">Start Diagnosis →</span>
   </button>
 </div>
 
-<!-- 전단지 모달 -->
-<div class="flyer-modal" id="flyer-modal" onclick="if(event.target===this)closeFlyer()">
-  <div class="flyer-modal-wrap">
-    <iframe class="flyer-modal-iframe" id="flyer-modal-iframe" src="" title="전단지 전체보기"></iframe>
-  </div>
-  <button class="flyer-modal-close" onclick="closeFlyer()">✕</button>
-</div>
-
 <script>
 (function(){
-  function applyLang(l){document.documentElement.lang=l;}
-  applyLang(localStorage.getItem('wf_lang')||'ko');
-  window.addEventListener('message',function(e){
-    if(e.data&&e.data.type==='wf_lang'&&(e.data.lang==='ko'||e.data.lang==='en'))applyLang(e.data.lang);
+  function applyLang(l){ document.documentElement.lang = l; }
+  applyLang(localStorage.getItem('wf_lang') || 'ko');
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'wf_lang') applyLang(e.data.lang);
   });
 })();
 
-// 브라우저 캐시에 남은 구버전 플라이어 방지.
-// 허브가 ?v=HUB_VERSION으로 이 페이지를 로드하면 그 버전을 재사용.
-// 직접 접근 시엔 Date.now()로 항상 최신 버전을 받는다.
 const _FV = new URLSearchParams(location.search).get('v') || Date.now();
 document.querySelectorAll('.flyer-thumb iframe').forEach(function(f){
   var s = f.getAttribute('src');
   if(s) f.src = s + '?v=' + _FV;
 });
 
-const FLYER_NAMES = {
-  'flyer-ceo.html':           {ko:'아는 대표는 이미 다했다',  en:'CEOs Already Know This'},
-  'flyer-ceo-v2.html':        {ko:'아는 대표는 이미 다했다',  en:'CEOs Already Know This'},
-  'flyer-safety-all.html':    {ko:'안전조치, 그게 전부?',     en:'Safety Measures Not Enough'},
-  'flyer-safety-all-v2.html': {ko:'안전조치, 그게 전부?',     en:'Safety Measures Not Enough'},
-  'flyer-safety-only.html':   {ko:'안전조치만 했다고',        en:'Just Safety Measures?'},
-  'flyer-safety-only-v2.html':{ko:'안전조치만 했다고',        en:'Just Safety Measures?'},
-  'flyer-hard-work.html':     {ko:'열심히했는데 남는 게 없다', en:'Worked Hard, Nothing Left'},
-  'flyer-hard-work-v2.html':  {ko:'열심히했는데 남는 게 없다', en:'Worked Hard, Nothing Left'},
-};
 function openFlyer(src) {
-  const label = FLYER_NAMES[src] || {ko:'마케팅 자료', en:'Marketing Material'};
   window.parent.postMessage({
-    type: 'wf_navigate',
-    src:  'consulting/ceo/flyers/' + src,
-    label
+    type: 'loadIframe',
+    path: 'consulting/ceo/flyers/' + src
   }, '*');
 }
-function closeFlyer() {
-  document.getElementById('flyer-modal').classList.remove('open');
-  document.getElementById('flyer-modal-iframe').src = '';
-  document.body.style.overflow = '';
-}
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closeFlyer(); });
 </script>
 </body>
 </html>

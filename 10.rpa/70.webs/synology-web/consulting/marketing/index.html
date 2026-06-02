@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>마케팅 자료 — WorksFree</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--surface:#1c2333;--border:#2a3347;--border2:#3a4a5c;
+  --text:#e2e8f0;--muted:#64748b;--hint:#475569;
+  --blue:#3b82f6;--blue-bg:#0c1a30;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px;min-height:72px;position:sticky;top:0;z-index:100}
+.hdr-icon{font-size:26px;flex-shrink:0}
+.hdr-info{flex:1}
+.hdr-title{font-size:17px;font-weight:600;letter-spacing:-.2px}
+.hdr-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.hdr-r{font-size:12px;color:var(--hint);font-weight:500;margin-left:auto;flex-shrink:0}
+
+.page{max-width:860px;margin:0 auto;padding:32px 20px 72px}
+
+.section-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── 썸네일 그리드 ── */
+.flyer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px}
+
+.flyer-card{cursor:pointer;display:flex;flex-direction:column;gap:10px;border-radius:var(--r);padding:14px;border:1.5px solid var(--border);background:var(--surface);transition:border-color .15s,background .15s,transform .1s}
+.flyer-card:hover{border-color:var(--blue);background:var(--blue-bg);transform:translateY(-3px)}
+
+.flyer-thumb{border:1px solid var(--border);border-radius:6px;overflow:hidden;position:relative;width:100%;aspect-ratio:794/1123;background:#080a10}
+.flyer-thumb iframe{position:absolute;top:0;left:0;width:794px;height:1123px;border:none;pointer-events:none;transform-origin:0 0}
+.flyer-overlay{position:absolute;inset:0}
+
+.flyer-meta{display:flex;flex-direction:column;gap:3px}
+.flyer-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
+.flyer-name-en{font-size:11px;color:var(--muted);line-height:1.3}
+.flyer-open-hint{font-size:11px;color:var(--blue);display:flex;align-items:center;gap:4px;margin-top:2px;opacity:0;transition:opacity .15s}
+.flyer-card:hover .flyer-open-hint{opacity:1}
+
+/* ── 메일 발송 ── */
+.mail-tabs{display:flex;gap:8px;margin-bottom:16px}
+.mail-tab{background:var(--surface);border:1.5px solid var(--border);color:var(--muted);font-size:13px;padding:8px 18px;border-radius:20px;cursor:pointer;transition:all .15s}
+.mail-tab.active,.mail-tab:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.mail-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:12px}
+.mail-label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;margin-bottom:-4px}
+.mail-input,.mail-select,.mail-textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;padding:9px 12px;width:100%;outline:none;font-family:inherit}
+.mail-input:focus,.mail-select:focus,.mail-textarea:focus{border-color:var(--blue)}
+.mail-textarea{resize:vertical;min-height:80px}
+.mail-hint{font-size:12px;color:var(--hint)}
+.mail-send-btn{background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;padding:10px 24px;cursor:pointer;align-self:flex-start;transition:opacity .15s}
+.mail-send-btn:hover{opacity:.85}
+.mail-send-btn:disabled{opacity:.4;cursor:not-allowed}
+.mail-status{font-size:13px;padding:10px 0;min-height:24px}
+.mail-status.ok{color:#6ee7b7}
+.mail-status.error{color:#f87171}
+.mail-status.loading{color:var(--muted)}
+.csv-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.csv-table th,.csv-table td{text-align:left;padding:6px 10px;border:1px solid var(--border)}
+.csv-table th{background:var(--bg);color:var(--muted);font-weight:600}
+
+/* ── 본문 프리셋 ── */
+.msg-presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.msg-preset-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:20px;
+  border:1px solid var(--border);background:var(--bg);
+  color:var(--muted);font-size:12px;font-weight:500;
+  cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap;
+}
+.msg-preset-btn:hover{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.06);}
+.msg-preset-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.1);font-weight:700;}
+
+/* ── 발송 현황 바 ── */
+.mail-quota{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.mail-quota-row{display:flex;justify-content:space-between;align-items:center}
+.mail-quota-bar{height:5px;background:var(--border);border-radius:3px}
+.mail-quota-fill{height:100%;border-radius:3px;transition:width .4s,background .4s;min-width:0}
+.mail-quota-refresh{font-size:11px;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
+.mail-quota-refresh:hover{text-decoration:underline}
+
+/* ── 광고 이메일 법적 설정 ── */
+.legal-card{background:rgba(124,16,16,0.12);border:1.5px solid #7c1010;border-radius:var(--r);padding:16px 20px;margin-bottom:16px}
+.legal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:10px}
+.legal-check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer;user-select:none}
+.legal-check input[type=checkbox]{width:15px;height:15px;accent-color:#b50000;cursor:pointer;flex-shrink:0}
+.ad-badge{display:inline-block;font-size:10px;background:#7c1010;color:#fca5a5;padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:.05em}
+
+/* ── 수신거부 필터 결과 ── */
+.mail-status.warn{color:#fbbf24}
+.filter-result{background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.25);border-radius:8px;padding:12px 16px;margin-top:8px}
+.filter-result-title{font-size:12px;font-weight:700;color:#fbbf24;margin-bottom:8px}
+.filter-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.filter-item{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;padding:2px 0}
+.filter-item::before{content:'⊘';color:#f87171;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">📄</div>
+  <div class="hdr-info">
+    <div class="hdr-title">마케팅 자료 · Marketing Materials</div>
+    <div class="hdr-sub">고객 배포용 전단지 · 클릭하면 전체 페이지로 열립니다</div>
+  </div>
+  <div class="hdr-r">파트너 전용</div>
+</header>
+
+<div class="page">
+  <!-- 보험설계사(gfc) 전용 섹션 -->
+  <div id="section-ins" style="display:none">
+    <div class="section-label">v1 — 보험 전략 자료</div>
+    <div class="flyer-grid" id="grid-v1"></div>
+    <div class="section-label" style="margin-top:28px">신규 — 케이스 스터디 · 현실 인식</div>
+    <div class="flyer-grid" id="grid-new"></div>
+  </div>
+  <!-- 경영지도사(consultant) 전용 섹션 -->
+  <div id="section-mgmt" style="display:none">
+    <div class="section-label">경영지도사 — 법인 경영 최적화 자료</div>
+    <div class="flyer-grid" id="grid-mgmt"></div>
+    <p id="mgmt-empty" style="display:none;font-size:13px;color:var(--muted);padding:20px 0">경영지도사용 자료가 준비 중입니다.</p>
+  </div>
+  <!-- 역할 미확인 시 임시 표시 -->
+  <div id="section-loading" style="padding:30px 0;text-align:center;color:var(--muted);font-size:13px">자료를 불러오는 중...</div>
+
+  <!-- 메일 발송 -->
+  <div style="margin-top:40px">
+    <div class="section-label">메일 발송 · Email Send</div>
+
+    <!-- ⚠ 광고성 이메일 법적 준수사항 (정보통신망법) -->
+    <div class="legal-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <span class="ad-badge">⚠ 광고 이메일 법적 필수</span>
+        <span style="font-size:12px;color:var(--muted)">정보통신망법 위반 시 과태료 3천만원 이하 / 형사처벌</span>
+      </div>
+      <label class="legal-check">
+        <input type="checkbox" id="ad-prefix-check" checked disabled style="cursor:not-allowed;opacity:.7">
+        제목 앞에 <strong style="color:#fca5a5">&nbsp;(광고)&nbsp;</strong> 자동 추가
+        <span style="font-size:11px;color:var(--hint);margin-left:4px">(정보통신망법 필수)</span>
+      </label>
+      <div class="legal-grid">
+        <div>
+          <span class="mail-label">발신자 명칭</span>
+          <input id="ad-sender-name" class="mail-input" type="text" value="WorksFree 경영 컨설팅" placeholder="회사명 또는 이름" oninput="saveLegalSettings()">
+        </div>
+        <div>
+          <span class="mail-label">발신자 연락처</span>
+          <input id="ad-sender-phone" class="mail-input" type="text" placeholder="010-0000-0000" oninput="saveLegalSettings()">
+        </div>
+        <div>
+          <span class="mail-label">발신자 이메일</span>
+          <input id="ad-sender-email" class="mail-input" type="email" value="support@worksfree.co.kr" placeholder="발신자 이메일" oninput="saveLegalSettings()">
+        </div>
+        <div style="grid-column:1/-1;padding-top:4px">
+          <span class="mail-label" style="display:flex;align-items:center;gap:8px;margin-bottom:6px">수신거부 관리<span class="ad-badge" style="background:#14532d;color:#86efac;border-radius:10px;padding:2px 8px">✓ DB 자동 관리</span></span>
+          <p style="font-size:12px;color:var(--muted);line-height:1.5">수신거부 클릭 시 Supabase DB 자동 등록 · 이후 발송 시 자동 필터링됩니다</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 월별 발송 현황 -->
+    <div class="mail-quota">
+      <div class="mail-quota-row">
+        <span style="font-size:12px;font-weight:600;color:var(--muted)">이번 달 발송 현황 <span style="font-weight:400;color:var(--hint)">(Resend 월 한도 3,000건)</span></span>
+        <button class="mail-quota-refresh" onclick="loadQuota()">↻ 새로고침</button>
+      </div>
+      <div class="mail-quota-bar"><div class="mail-quota-fill" id="quota-fill" style="width:0%;background:#6ee7b7"></div></div>
+      <div class="mail-quota-row">
+        <span style="font-size:11px;color:var(--hint)" id="quota-text">Worker 배포 후 표시</span>
+        <span style="font-size:12px;font-weight:700;color:var(--text)" id="quota-remaining">—</span>
+      </div>
+    </div>
+
+    <div class="mail-tabs">
+      <button class="mail-tab active" data-tab="single" onclick="setMailTab('single')">단건 발송</button>
+      <button class="mail-tab" data-tab="bulk" onclick="setMailTab('bulk')">대량 발송 CSV</button>
+    </div>
+
+    <!-- 공통: 전단지 선택 · 제목 · 본문 -->
+    <div class="mail-card">
+      <span class="mail-label">전단지 선택</span>
+      <select id="mail-flyer" class="mail-select"></select>
+      <span class="mail-label">제목</span>
+      <input id="mail-subject" class="mail-input" type="text" placeholder="예) 세금을 줄이는 법인 운영 전략">
+      <span class="mail-label" style="display:flex;align-items:center;justify-content:space-between">
+        본문 메시지
+        <span style="font-size:11px;color:var(--hint);font-weight:400">프리셋 선택 후 수정하세요</span>
+      </span>
+      <div class="msg-presets" id="msgPresets"></div>
+      <textarea id="mail-body" class="mail-textarea" rows="5" placeholder="이메일에 포함될 메시지를 입력하세요..."></textarea>
+      <p class="mail-hint" style="margin-top:4px">✦ 본문에 <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:11px">{{기업명}}</code> <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:11px">{{대표이름}}</code> <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:11px">{{이메일}}</code> 입력 시 수신자별 자동 치환됩니다</p>
+    </div>
+
+    <!-- 단건 발송 -->
+    <div id="panel-single" class="mail-card" style="margin-top:12px">
+      <span class="mail-label">기업명 (선택)</span>
+      <input id="mail-company" class="mail-input" type="text" placeholder="주식회사 아리랑">
+      <span class="mail-label">대표이름 (선택)</span>
+      <input id="mail-name" class="mail-input" type="text" placeholder="홍길동">
+      <span class="mail-label">이메일 주소</span>
+      <input id="mail-to" class="mail-input" type="email" placeholder="example@company.com">
+      <button class="mail-send-btn" onclick="sendSingle()">발송 →</button>
+    </div>
+
+    <!-- 대량 발송 -->
+    <div id="panel-bulk" class="mail-card" style="margin-top:12px;display:none">
+      <span class="mail-label">CSV 파일 업로드</span>
+      <p class="mail-hint">B2B 이메일 DB에서 내보낸 CSV 그대로 업로드 가능 · 헤더·컬럼 수 자동 인식 · 최대 100명</p>
+      <input id="mail-csv" type="file" accept=".csv,.txt" class="mail-input" onchange="loadCsv(event)">
+      <div id="csv-preview"></div>
+      <button class="mail-send-btn" id="bulk-send-btn" onclick="sendBulk()" disabled>대량 발송 →</button>
+    </div>
+
+    <div id="mail-status" class="mail-status"></div>
+    <div id="filter-result" class="filter-result" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+const _FV = new URLSearchParams(location.search).get('v') || Date.now();
+
+const FLYERS = [
+  {
+    src: '../ceo/flyers/flyer-ceo.html',
+    nameKo: '아는 대표는\n이미 다했다',
+    nameEn: 'CEOs Already Know This',
+    label: {ko:'아는 대표는 이미 다했다', en:'CEOs Already Know This'},
+    badge: 'v1',
+    emailHero: '<div style="background:#0d1b2a;padding:28px 32px 20px"><p style="color:rgba(255,255,255,0.45);font-size:10px;font-weight:700;letter-spacing:3px;margin:0 0 16px">▶ 2025 TREND REPORT — CEO RISK DATA</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">아는 대표는<br>이미 <span style="color:#ff3333">다 했습니다.</span></h1><p style="color:rgba(255,255,255,0.6);font-size:12px;line-height:1.65;margin:0 0 14px">중대재해 기소 건수 매년 2배 증가 · 상장사 70% 이미 임원보험 가입<br>지금 이 순간도, 경쟁사 대표는 리스크를 관리하고 있습니다.</p><table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px"><tr><td style="background:rgba(255,255,255,0.05);border-radius:6px;padding:10px 6px;text-align:center;width:33%"><div style="color:#fff;font-size:20px;font-weight:900">887<span style="font-size:11px">건</span></div><div style="color:rgba(255,255,255,0.4);font-size:10px;line-height:1.4;margin-top:3px">법 시행 3년간<br>중대산업재해</div></td><td style="width:4px"></td><td style="background:rgba(255,255,255,0.05);border-radius:6px;padding:10px 6px;text-align:center;width:33%"><div style="color:#ff3333;font-size:20px;font-weight:900">121<span style="font-size:11px">건</span></div><div style="color:rgba(255,255,255,0.4);font-size:10px;line-height:1.4;margin-top:3px">CEO·경영책임자<br>기소 누적</div></td><td style="width:4px"></td><td style="background:rgba(255,255,255,0.05);border-radius:6px;padding:10px 6px;text-align:center;width:33%"><div style="color:#f0c27f;font-size:20px;font-weight:900">70<span style="font-size:11px">%</span></div><div style="color:rgba(255,255,255,0.4);font-size:10px;line-height:1.4;margin-top:3px">상장 기업<br>임원보험 가입률</div></td></tr></table></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-safety-all.html',
+    nameKo: '안전조치,\n그게 전부?',
+    nameEn: 'Safety Measures Not Enough',
+    label: {ko:'안전조치, 그게 전부?', en:'Safety Measures Not Enough'},
+    badge: 'v1',
+    emailHero: '<div style="background:#cc0000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">중대재해처벌법 — 경영자 필독</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2024 · 시행 2년차</span></div><div style="background:#0a0a0a;padding:32px 32px 24px"><p style="color:#cc0000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 18px">— SERIOUS ACCIDENTS PUNISHMENT ACT</p><h1 style="color:#fff;font-size:30px;font-weight:900;line-height:1.2;margin:0 0 14px;font-family:Georgia,serif">안전조치,<br>그게 <span style="color:#ff3333">전부</span>라고<br>생각하십니까?</h1><p style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:700;margin:0 0 8px">대표님이 모르는 리스크가 아직 남아 있습니다.</p><p style="color:#f0c27f;font-size:12px;line-height:1.65;margin:0 0 28px">완벽한 안전조치 후에도 사고는 날 수 있습니다.<br>중요한 건 사고 이후를 대비했느냐입니다.</p></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-safety-only.html',
+    nameKo: '안전조치만\n했다고',
+    nameEn: 'Just Safety Measures?',
+    label: {ko:'안전조치만 했다고', en:'Just Safety Measures?'},
+    badge: 'v1',
+    emailHero: '<div style="background:#b50000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">중대재해처벌법 — 경영자 리스크 긴급 보고서</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2025 · 최신 데이터 기준</span></div><div style="background:#0c0c0c;padding:28px 32px 20px"><p style="color:#b50000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 14px">— CEO RISK ALERT</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">안전조치를 다 했다고<br><span style="color:#ff3333">끝났다</span>고 생각하십니까?<br>아는 대표는 이미 <span style="color:#ff3333">다 했습니다.</span></h1><p style="color:rgba(255,255,255,0.65);font-size:12px;line-height:1.65;margin:0 0 10px">법 시행 3년, 기소 121건 · 유죄율 89% · 상장사 70% 이미 보험 가입<br>중소기업 대표만 아직 무방비 상태입니다.</p><p style="color:#f0c27f;font-size:12px;line-height:1.65;margin:0 0 14px">완벽한 안전조치 후에도 사고는 날 수 있습니다. 중요한 건 사고 이후를 대비했느냐입니다.</p><div style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 28px"><span style="background:rgba(181,0,0,0.3);color:#ff9090;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid rgba(181,0,0,0.5)">대표이사 형사처벌</span><span style="background:rgba(181,0,0,0.3);color:#ff9090;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid rgba(181,0,0,0.5)">징벌적 손해배상 5배</span><span style="background:rgba(181,0,0,0.3);color:#ff9090;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid rgba(181,0,0,0.5)">법률비용 수천만원</span><span style="background:rgba(181,0,0,0.3);color:#ff9090;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid rgba(181,0,0,0.5)">기업명 공개 수치</span></div></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-hard-work.html',
+    nameKo: '열심히했는데\n남는 게 없다',
+    nameEn: 'Worked Hard, Nothing Left',
+    label: {ko:'열심히했는데 남는 게 없다', en:'Worked Hard, Nothing Left'},
+    badge: 'v1',
+    emailHero: '<div style="background:#1a1a2e;padding:20px 32px 0"><div style="display:table;width:100%;padding-bottom:14px;border-bottom:1px solid rgba(200,146,42,0.3);margin-bottom:18px"><span style="display:table-cell;vertical-align:middle"><span style="display:inline-block;width:28px;height:28px;background:#c8922a;border-radius:4px;text-align:center;line-height:28px;color:#fff;font-size:10px;font-weight:900;margin-right:8px;vertical-align:middle">GFC</span><span style="color:#fff;font-size:12px;font-weight:700;letter-spacing:1px;vertical-align:middle">기업 재무 컨설팅</span></span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.35);font-size:10px;letter-spacing:2px;vertical-align:middle">CORPORATE FINANCIAL CONSULTING</span></div><p style="color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:2px;font-weight:700;margin:0 0 12px">— 제조기업 대표님께 드리는 질문</p><h1 style="color:#fff;font-size:26px;font-weight:900;line-height:1.3;margin:0 0 12px;font-family:Georgia,serif">열심히 달려왔는데,<br><span style="color:#c8922a;text-decoration:underline">남는 게 없다</span>는 느낌,<br>혹시 드신 적 있으십니까?</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 28px">매출은 늘었는데 세금도 늘고, 직원 관리는 더 어려워지고,<br>회사 돈이 내 돈 같지 않은 이 구조 — 사실 설계의 문제입니다.</p></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-ceo-v2.html',
+    nameKo: '아는 대표는\n이미 다했다',
+    nameEn: 'CEOs Already Know This',
+    label: {ko:'아는 대표는 이미 다했다', en:'CEOs Already Know This'},
+    badge: 'v2',
+    emailHero: '<div style="background:#0d1b2a;padding:28px 32px 20px"><p style="color:rgba(255,255,255,0.45);font-size:10px;font-weight:700;letter-spacing:3px;margin:0 0 16px">▶ 2025 TREND REPORT — CEO RISK DATA</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">아는 대표는<br>이미 <span style="color:#ff3333">다 했습니다.</span></h1><p style="color:rgba(255,255,255,0.6);font-size:12px;line-height:1.65;margin:0 0 14px">중대재해 기소 건수 매년 2배 증가 · 상장사 70% 이미 임원보험 가입<br>지금 이 순간도, 경쟁사 대표는 리스크를 관리하고 있습니다.</p><table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px"><tr><td style="background:rgba(255,255,255,0.05);border-radius:6px;padding:10px 6px;text-align:center;width:33%"><div style="color:#fff;font-size:20px;font-weight:900">887<span style="font-size:11px">건</span></div><div style="color:rgba(255,255,255,0.4);font-size:10px;line-height:1.4;margin-top:3px">법 시행 3년간<br>중대산업재해</div></td><td style="width:4px"></td><td style="background:rgba(255,255,255,0.05);border-radius:6px;padding:10px 6px;text-align:center;width:33%"><div style="color:#ff3333;font-size:20px;font-weight:900">121<span style="font-size:11px">건</span></div><div style="color:rgba(255,255,255,0.4);font-size:10px;line-height:1.4;margin-top:3px">CEO·경영책임자<br>기소 누적</div></td><td style="width:4px"></td><td style="background:rgba(255,255,255,0.05);border-radius:6px;padding:10px 6px;text-align:center;width:33%"><div style="color:#f0c27f;font-size:20px;font-weight:900">70<span style="font-size:11px">%</span></div><div style="color:rgba(255,255,255,0.4);font-size:10px;line-height:1.4;margin-top:3px">상장 기업<br>임원보험 가입률</div></td></tr></table></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-safety-all-v2.html',
+    nameKo: '안전조치,\n그게 전부?',
+    nameEn: 'Safety Measures Not Enough',
+    label: {ko:'안전조치, 그게 전부?', en:'Safety Measures Not Enough'},
+    badge: 'v2',
+    emailHero: '<div style="background:#cc0000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">중대재해처벌법 — 경영자 필독</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2024 · 시행 2년차</span></div><div style="background:#0a0a0a;padding:32px 32px 24px"><p style="color:#cc0000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 18px">— SERIOUS ACCIDENTS PUNISHMENT ACT</p><h1 style="color:#fff;font-size:30px;font-weight:900;line-height:1.2;margin:0 0 14px;font-family:Georgia,serif">안전조치,<br>그게 <span style="color:#ff3333">전부</span>라고<br>생각하십니까?</h1><p style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:700;margin:0 0 8px">대표님이 모르는 리스크가 아직 남아 있습니다.</p><p style="color:#f0c27f;font-size:12px;line-height:1.65;margin:0 0 28px">완벽한 안전조치 후에도 사고는 날 수 있습니다.<br>중요한 건 사고 이후를 대비했느냐입니다.</p></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-safety-only-v2.html',
+    nameKo: '안전조치만\n했다고',
+    nameEn: 'Just Safety Measures?',
+    label: {ko:'안전조치만 했다고', en:'Just Safety Measures?'},
+    badge: 'v2',
+    emailHero: '<div style="background:#b50000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">중대재해처벌법 — 경영자 리스크 긴급 보고서</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2025 · 최신 데이터 기준</span></div><div style="background:#0c0c0c;padding:28px 32px 20px"><p style="color:#b50000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 14px">— CEO RISK ALERT</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">안전조치를 다 했다고<br><span style="color:#ff3333">끝났다</span>고 생각하십니까?<br>아는 대표는 이미 <span style="color:#ff3333">다 했습니다.</span></h1><p style="color:rgba(255,255,255,0.65);font-size:12px;line-height:1.65;margin:0 0 10px">법 시행 3년, 기소 121건 · 유죄율 89% · 상장사 70% 이미 보험 가입<br>중소기업 대표만 아직 무방비 상태입니다.</p><p style="color:#f0c27f;font-size:12px;line-height:1.65;margin:0 0 14px">완벽한 안전조치 후에도 사고는 날 수 있습니다. 중요한 건 사고 이후를 대비했느냐입니다.</p><div style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 28px"><span style="background:rgba(181,0,0,0.3);color:#ff9090;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid rgba(181,0,0,0.5)">대표이사 형사처벌</span><span style="background:rgba(181,0,0,0.3);color:#ff9090;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid rgba(181,0,0,0.5)">징벌적 손해배상 5배</span><span style="background:rgba(181,0,0,0.3);color:#ff9090;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid rgba(181,0,0,0.5)">법률비용 수천만원</span><span style="background:rgba(181,0,0,0.3);color:#ff9090;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid rgba(181,0,0,0.5)">기업명 공개 수치</span></div></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-hard-work-v2.html',
+    nameKo: '열심히했는데\n남는 게 없다',
+    nameEn: 'Worked Hard, Nothing Left',
+    label: {ko:'열심히했는데 남는 게 없다', en:'Worked Hard, Nothing Left'},
+    badge: 'v2',
+    emailHero: '<div style="background:#1a1a2e;padding:20px 32px 0"><div style="display:table;width:100%;padding-bottom:14px;border-bottom:1px solid rgba(200,146,42,0.3);margin-bottom:18px"><span style="display:table-cell;vertical-align:middle"><span style="display:inline-block;width:28px;height:28px;background:#c8922a;border-radius:4px;text-align:center;line-height:28px;color:#fff;font-size:10px;font-weight:900;margin-right:8px;vertical-align:middle">GFC</span><span style="color:#fff;font-size:12px;font-weight:700;letter-spacing:1px;vertical-align:middle">기업 재무 컨설팅</span></span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.35);font-size:10px;letter-spacing:2px;vertical-align:middle">CORPORATE FINANCIAL CONSULTING</span></div><p style="color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:2px;font-weight:700;margin:0 0 12px">— 제조기업 대표님께 드리는 질문</p><h1 style="color:#fff;font-size:26px;font-weight:900;line-height:1.3;margin:0 0 12px;font-family:Georgia,serif">열심히 달려왔는데,<br><span style="color:#c8922a;text-decoration:underline">남는 게 없다</span>는 느낌,<br>혹시 드신 적 있으십니까?</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 28px">매출은 늘었는데 세금도 늘고, 직원 관리는 더 어려워지고,<br>회사 돈이 내 돈 같지 않은 이 구조 — 사실 설계의 문제입니다.</p></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-case-study.html',
+    nameKo: '이건 실제\n이야기입니다',
+    nameEn: 'Real Case Studies',
+    label: {ko:'이건 실제 이야기입니다', en:'Real Case Studies'},
+    badge: 'new',
+    emailHero: '<div style="background:#b50000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">중대재해처벌법 — 실제 판결 사례 보고서</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2022–2025 · 확인된 판결 기준</span></div><div style="background:#0c0c0c;padding:32px 32px 24px"><p style="color:#b50000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 14px">— REAL CASE STUDY</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">이건 <span style="color:#ff3333">실제 이야기</span>입니다.<br>그리고 다음 차례는<br>누구일까요.</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 28px">중대재해처벌법 시행 이후 실제 판결이 확정된 사건들입니다.<br>흔한 끼임·추락 사고 1건이 대표이사의 인생을 바꿨습니다.</p></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-ceo-fear.html',
+    nameKo: '10곳 중 7곳이\n"못 지킨다"',
+    nameEn: '70% Said They Cannot Comply',
+    label: {ko:'10곳 중 7곳이 "못 지킨다"', en:'70% Said They Cannot Comply'},
+    badge: 'new',
+    emailHero: '<div style="background:#b50000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">중대재해처벌법 — 중소기업 대표 현실 진단</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2025 · 실제 설문·판결 기반</span></div><div style="background:#0c0c0c;padding:32px 32px 24px"><p style="color:#b50000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 14px">— REALITY CHECK</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">10곳 중 <span style="color:#ff3333">7곳</span>이<br>"우리는 못 지킨다"고<br>했습니다.</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 28px">중기중앙회 실제 설문 결과입니다. 준비가 안 된 채로 사고가 나면<br>대표님이 직접 법정에 서야 합니다. 그리고 합의금을 마련해야 합니다.</p></div>'
+  },
+  {
+    src: '../ceo/flyers/flyer-group-insurance.html',
+    nameKo: '합의금 재원을\n지금 준비하라',
+    nameEn: 'Group Insurance Proposal',
+    label: {ko:'합의금 재원을 지금 준비하라', en:'Group Insurance Proposal'},
+    badge: 'new',
+    emailHero: '<div style="background:#b50000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">삼성생명 단체보험 — 합의금 재원 솔루션</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2025 · 제안서</span></div><div style="background:#0c0c0c;padding:32px 32px 24px"><p style="color:#b50000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 14px">— GROUP INSURANCE PROPOSAL</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">합의금 재원을<br><span style="color:#ff3333">지금</span> 준비하십시오.</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 28px">중대재해 1건 합의금 최대 10억 — 사고 후 마련할 수 없습니다.<br>단체보험으로 월 소액 납입, 사망위로금·합의금 재원 즉시 확보.</p></div>'
+  },
+];
+
+function openFlyer(idx) {
+  const f = FLYERS[idx];
+  window.parent.postMessage({
+    type: 'wf_navigate',
+    src: f.src.replace('../', 'consulting/'),
+    label: f.label
+  }, '*');
+}
+
+function cardHtml(f, i) {
+  const thumbSrc = f.src + '?v=' + _FV;
+  const nameLines = f.nameKo.split('\n').join('<br>');
+  const badgeBg = f.badge==='v2'?'#1e4a70':f.badge==='new'?'#7c1010':'#2a3347';
+  const badgeFg = f.badge==='v2'?'#60a5fa':f.badge==='new'?'#fca5a5':'#94a3b8';
+  const badgeHtml = f.badge ? `<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;background:${badgeBg};color:${badgeFg}">${f.badge}</span>` : '';
+  return `
+  <div class="flyer-card" onclick="openFlyer(${i})">
+    <div class="flyer-thumb">
+      <iframe src="${thumbSrc}" scrolling="no" loading="lazy" title="${f.nameEn}"></iframe>
+      <div class="flyer-overlay"></div>
+    </div>
+    <div class="flyer-meta">
+      <div class="flyer-name" style="display:flex;align-items:center;gap:6px">${nameLines} ${badgeHtml}</div>
+      <div class="flyer-name-en">${f.nameEn}</div>
+      <div class="flyer-open-hint">↗ 전체 보기</div>
+    </div>
+  </div>`;
+}
+
+/* ── 경영지도사 전용 플라이어 ────────────────────────── */
+const FLYERS_MGMT = [
+  {
+    src: '../ceo/flyers/flyer-hard-work.html',
+    nameKo: '열심히했는데\n남는 게 없다',
+    nameEn: 'Worked Hard, Nothing Left',
+    badge: 'mgmt',
+    emailHero: '<div style="background:#1a1a2e;padding:28px 32px 20px"><p style="color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:2px;font-weight:700;margin:0 0 12px">— 법인 대표님께 드리는 질문</p><h1 style="color:#fff;font-size:26px;font-weight:900;line-height:1.3;margin:0 0 12px;font-family:Georgia,serif">열심히 달려왔는데,<br><span style="color:#c8922a">남는 게 없다</span>는 느낌,<br>혹시 드신 적 있으십니까?</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 14px">매출은 늘었는데 세금도 늘고, 이익잉여금은 쌓이는데 내 돈 같지 않은 이 구조 — 사실 설계의 문제입니다.</p></div>',
+  },
+];
+
+/* ── 역할별 그리드 렌더 ──────────────────────────────── */
+let _currentRole = '';
+
+function applyMarketingRole(role) {
+  _currentRole = role;
+  document.getElementById('section-loading').style.display = 'none';
+
+  const isIns  = (role === 'gfc' || role === 'admin');
+  const isMgmt = (role === 'consultant');
+
+  document.getElementById('section-ins').style.display  = isIns  ? '' : 'none';
+  document.getElementById('section-mgmt').style.display = isMgmt ? '' : 'none';
+
+  if (isIns  && !document.getElementById('grid-v1').innerHTML)  buildGridIns();
+  if (isMgmt && !document.getElementById('grid-mgmt').innerHTML) buildGridMgmt();
+
+  buildFlyerSelect();
+  requestAnimationFrame(scaleThumbIframes);
+}
+
+function buildGrid() {
+  // 역할 수신 전에도 iframe 스케일링은 실행
+  window.addEventListener('resize', scaleThumbIframes);
+}
+
+function buildGridIns() {
+  const v1  = FLYERS.filter(f => f.badge === 'v1');
+  const nw  = FLYERS.filter(f => f.badge === 'new');
+  document.getElementById('grid-v1').innerHTML  = v1.map((f) => cardHtml(f, FLYERS.indexOf(f))).join('');
+  document.getElementById('grid-new').innerHTML = nw.map((f) => cardHtml(f, FLYERS.indexOf(f))).join('');
+}
+
+function buildGridMgmt() {
+  if (!FLYERS_MGMT.length) {
+    document.getElementById('mgmt-empty').style.display = '';
+    return;
+  }
+  // FLYERS_MGMT는 별도 인덱스 공간 (FLYERS.length + idx)
+  document.getElementById('grid-mgmt').innerHTML =
+    FLYERS_MGMT.map((f, i) => cardHtmlMgmt(f, i)).join('');
+}
+
+function cardHtmlMgmt(f, i) {
+  const thumbSrc = f.src + '?v=' + _FV;
+  const nameLines = f.nameKo.split('\n').join('<br>');
+  return `
+  <div class="flyer-card" onclick="openFlyerMgmt(${i})">
+    <div class="flyer-thumb">
+      <iframe src="${thumbSrc}" scrolling="no" loading="lazy" title="${f.nameEn}"></iframe>
+      <div class="flyer-overlay"></div>
+    </div>
+    <div class="flyer-meta">
+      <div class="flyer-name" style="display:flex;align-items:center;gap:6px">${nameLines}
+        <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;background:#0c2a1a;color:#34d399">mgmt</span>
+      </div>
+      <div class="flyer-name-en">${f.nameEn}</div>
+      <div class="flyer-open-hint">↗ 전체 보기</div>
+    </div>
+  </div>`;
+}
+
+function openFlyerMgmt(i) {
+  const f = FLYERS_MGMT[i];
+  // 발송 선택창에서도 경영지도사 자료로 설정
+  openFlyer(-(i + 1)); // 음수 인덱스로 mgmt 구분
+}
+
+// wf_role 수신
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'wf_role') applyMarketingRole(e.data.role || 'member');
+});
+// URL ?role= 직접 테스트
+var _urlRole = new URLSearchParams(location.search).get('role');
+if (_urlRole) setTimeout(function(){ applyMarketingRole(_urlRole); }, 100);
+
+function scaleThumbIframes() {
+  document.querySelectorAll('.flyer-thumb').forEach(function(thumb){
+    const w = thumb.offsetWidth;
+    const scale = w / 794;
+    const iframe = thumb.querySelector('iframe');
+    if (iframe) iframe.style.transform = 'scale(' + scale + ')';
+  });
+}
+
+const MAIL_WORKER_URL  = 'https://send-mail.worksfree.workers.dev';
+const UNSUBSCRIBE_BASE = location.origin;
+let _csvRows = [];
+
+/* ── 본문 메시지 프리셋 ─────────────────────────────────────────── */
+const MSG_PRESETS = [
+  {
+    id: 'default',
+    icon: '📋',
+    label: '기본',
+    body:
+`{{기업명}} 대표님께 도움이 될 만한 자료를 보내드립니다.
+
+바쁘신 중에 메일 열어보신 것만으로도 감사합니다.
+첨부 자료를 가볍게 훑어보신 후, 관심이 생기시면
+자료 하단의 연락처로 편하게 문의해 주세요.`,
+  },
+  {
+    id: 'hanwha',
+    icon: '🚨',
+    label: '한화에어로스페이스 사례',
+    body:
+`최근 한화에어로스페이스 부천 공장 폭발 사고로
+중대재해처벌법이 다시 주목받고 있습니다.
+
+매출 20조, 직원 2만 명의 대기업조차 피하지 못했습니다.
+{{기업명}}은 지금 어떻게 준비하고 계십니까?
+안전조치를 다 했다고 해도 사고는 발생할 수 있습니다.
+
+안정적인 기업 경영을 위해서는 사고 이후에 대한 대비도 중요합니다.
+{{기업명}}의 현황을 파악하고 지금 당장 할 수 있는
+리스크 관리 방법을 제안드리고 싶습니다.
+
+관심이 있으시면 첨부 자료 하단의 연락처로 회신 주시기 바랍니다.`,
+  },
+  {
+    id: 'urgent',
+    icon: '⚠️',
+    label: '중처법 긴급경고',
+    body:
+`중대재해처벌법 시행 이후 중소기업 대표 기소 건수가 매년 증가하고 있습니다.
+
+{{기업명}} 대표님,
+"우리 회사는 괜찮겠지"라고 생각하는 순간이 가장 위험합니다.
+
+실제 판결 사례를 보면 대부분 "설마"라고 했던 곳에서 사고가 났습니다.
+지금 당장 준비할 수 있는 방법을 첨부 자료에 담았습니다.
+
+검토 후 궁금한 점은 자료 하단의 연락처로 편하게 문의해 주세요.`,
+  },
+  {
+    id: 'insurance',
+    icon: '🛡',
+    label: '합의금 재원 제안',
+    body:
+`중대재해 1건 합의금, 최대 10억 원 — 사고가 난 뒤에는 마련할 수 없습니다.
+
+{{기업명}} 대표님,
+단체보험 하나로 월 소액 납입만으로 합의금 재원을 즉시 확보할 수 있습니다.
+준비한 기업과 그렇지 않은 기업의 차이는 사고 이후에 극명하게 드러납니다.
+
+자세한 내용을 첨부 자료에 담았습니다.
+관심이 있으시면 자료 하단의 연락처로 편하게 연락 주세요.`,
+  },
+  {
+    id: 'gfc',
+    icon: '💼',
+    label: 'GFC 재무컨설팅',
+    body:
+`{{기업명}} 대표님,
+
+매출은 늘었는데 세금도 늘고,
+회사 돈이 내 돈 같지 않은 느낌을 받으신 적 있으십니까?
+이건 노력의 문제가 아니라 구조 설계의 문제입니다.
+
+법인 운영 전략과 합법적인 절세 방법을 첨부 자료에 정리했습니다.
+궁금한 점은 자료 하단의 연락처로 편하게 문의해 주세요.`,
+  },
+];
+
+let _activePresetId = null;
+
+function buildMsgPresets() {
+  var el = document.getElementById('msgPresets');
+  if (!el) return;
+  el.innerHTML = MSG_PRESETS.map(function(p) {
+    return '<button class="msg-preset-btn" id="preset-' + p.id + '" onclick="applyMsgPreset(\'' + p.id + '\')">'
+      + p.icon + ' ' + p.label + '</button>';
+  }).join('');
+}
+
+function applyMsgPreset(id) {
+  var preset = MSG_PRESETS.find(function(p){ return p.id === id; });
+  if (!preset) return;
+  document.getElementById('mail-body').value = preset.body;
+  // 활성 버튼 표시
+  document.querySelectorAll('.msg-preset-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.getElementById('preset-' + id);
+  if (btn) btn.classList.add('active');
+  _activePresetId = id;
+  // 본문 변경 시 활성 해제 (직접 수정)
+  document.getElementById('mail-body').addEventListener('input', function clearActive() {
+    document.querySelectorAll('.msg-preset-btn').forEach(function(b){ b.classList.remove('active'); });
+    _activePresetId = null;
+    document.getElementById('mail-body').removeEventListener('input', clearActive);
+  }, { once: true });
+}
+
+/* ── 발송 크레딧 차감 확인 다이얼로그 ─────────────────────────────── */
+function showSendConfirm(count, remText) {
+  var msg = [
+    '⚠ 실제 이메일이 발송됩니다.',
+    '',
+    '발송 건수  : ' + count + '건',
+    '차감 크레딧: ' + count + '건 (Resend)',
+    remText,
+    '',
+    '월 한도(3,000건) 초과 시 발송이 중단됩니다.',
+    '계속하시겠습니까?',
+  ].join('\n');
+  return window.confirm(msg);
+}
+
+async function loadQuota() {
+  document.getElementById('quota-text').textContent = '조회 중...';
+  document.getElementById('quota-remaining').textContent = '—';
+  try {
+    var res = await fetch(MAIL_WORKER_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var d = await res.json();
+    var pct   = d.limit > 0 ? Math.min(100, Math.round(d.sent / d.limit * 100)) : 0;
+    var color = pct < 70 ? '#6ee7b7' : pct < 90 ? '#fbbf24' : '#f87171';
+    var fill  = document.getElementById('quota-fill');
+    fill.style.width      = pct + '%';
+    fill.style.background = color;
+    document.getElementById('quota-text').textContent =
+      d.period + ' · ' + d.sent.toLocaleString() + ' / ' + d.limit.toLocaleString() + '건 발송';
+    var remEl = document.getElementById('quota-remaining');
+    remEl.textContent = d.remaining.toLocaleString() + '건 남음';
+    remEl.style.color = color;
+  } catch(e) {
+    document.getElementById('quota-text').textContent = 'Worker 미배포 또는 연결 오류';
+    document.getElementById('quota-remaining').textContent = '—';
+  }
+}
+
+function setMailTab(tab) {
+  document.querySelectorAll('.mail-tab').forEach(function(el){
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  document.getElementById('panel-single').style.display = tab === 'single' ? '' : 'none';
+  document.getElementById('panel-bulk').style.display   = tab === 'bulk'   ? '' : 'none';
+}
+
+function buildFlyerSelect() {
+  var sel = document.getElementById('mail-flyer');
+  // v2 제외하고 옵션 생성 (원본 인덱스 유지)
+  sel.innerHTML = FLYERS.map(function(f, i){
+    return f.badge !== 'v2'
+      ? '<option value="' + i + '">' + f.label.ko + '</option>'
+      : '';
+  }).join('');
+  // 전단지 선택 시 이메일 제목 자동 세팅
+  sel.onchange = function() {
+    var idx = +sel.value;
+    document.getElementById('mail-subject').value = FLYERS[idx].label.ko;
+  };
+  // 초기 제목 세팅
+  sel.dispatchEvent(new Event('change'));
+}
+
+function getFlyerUrl(idx) {
+  return location.origin + '/' + FLYERS[idx].src.replace('../', 'consulting/');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getLegalOpts() {
+  return {
+    adPrefix:    true,  // 항상 true (disabled 체크박스 — 정보통신망법 필수)
+    senderName:  (document.getElementById('ad-sender-name').value  || '').trim(),
+    senderPhone: (document.getElementById('ad-sender-phone').value || '').trim(),
+    senderEmail: (document.getElementById('ad-sender-email').value || '').trim(),
+  };
+}
+
+function saveLegalSettings() {
+  try { localStorage.setItem('wf_legal', JSON.stringify(getLegalOpts())); } catch(e) {}
+}
+
+function loadLegalSettings() {
+  try {
+    var s = JSON.parse(localStorage.getItem('wf_legal') || 'null');
+    if (!s) return;
+    // adPrefix는 항상 true (disabled) 이므로 복원 불필요
+    if (s.senderName  !== undefined) document.getElementById('ad-sender-name').value  = s.senderName;
+    if (s.senderPhone !== undefined) document.getElementById('ad-sender-phone').value = s.senderPhone;
+    if (s.senderEmail !== undefined) document.getElementById('ad-sender-email').value = s.senderEmail;
+    // ad-unsub-email 필드 제거됨 (Supabase DB 자동 관리로 전환)
+  } catch(e) {}
+}
+
+function getEnv() {
+  var h = location.hostname;
+  if (h.startsWith('test.'))    return 'test';
+  if (h.startsWith('staging.')) return 'staging';
+  return 'portal';
+}
+
+function getHubUserId() {
+  try {
+    var raw = localStorage.getItem('sb-rkycwfpkzorfpcxfvaqt-auth-token');
+    if (!raw) return null;
+    return JSON.parse(raw)?.user?.id || null;
+  } catch { return null; }
+}
+
+// 로그인 사용자 정보 조회 (Supabase 세션 기반)
+function getHubUserInfo() {
+  try {
+    var raw = localStorage.getItem('sb-rkycwfpkzorfpcxfvaqt-auth-token');
+    if (!raw) return null;
+    var u = JSON.parse(raw)?.user;
+    if (!u) return null;
+    return {
+      email: u.email || null,
+      name:  (u.user_metadata?.full_name || u.user_metadata?.name) || null,
+      phone: u.phone || null,
+    };
+  } catch { return null; }
+}
+
+// 발신자 필드를 로그인 사용자 정보로 채우기
+function applyUserInfoToForm() {
+  var info = getHubUserInfo();
+  if (!info) return;
+  // 이메일: 항상 현재 세션 이메일로 (다른 계정 로그인 시 잔류 방지)
+  if (info.email) document.getElementById('ad-sender-email').value = info.email;
+  // 이름: 입력값 없을 때만 세션값 사용
+  var nameEl = document.getElementById('ad-sender-name');
+  if (!nameEl.value && info.name) nameEl.value = info.name;
+  // 연락처: 입력값 없고 세션에 phone 있으면 사용
+  var phoneEl = document.getElementById('ad-sender-phone');
+  if (!phoneEl.value && info.phone) phoneEl.value = info.phone;
+}
+
+function clearFilterResult() {
+  var el = document.getElementById('filter-result');
+  if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+}
+
+function showFilterResult(filtered) {
+  var el = document.getElementById('filter-result');
+  if (!el || !filtered || !filtered.length) return;
+  var items = filtered.map(function(f){
+    return '<li class="filter-item"><span>' + escHtml(f.email) + ' &mdash; ' + escHtml(f.reason) + '</span></li>';
+  }).join('');
+  el.innerHTML = '<div class="filter-result-title">⚠ 발송 제외된 주소 (' + filtered.length + '건)</div>'
+    + '<ul class="filter-list">' + items + '</ul>';
+  el.style.display = '';
+}
+
+function buildEmailHtml(company, ceo, message, flyerName, flyerUrl, badge, emailHero, legalOpts, recipientEmail) {
+  // 인사말: 기업명 + 대표이름 조합
+  var greetParts = [];
+  if (company) greetParts.push('<strong>' + escHtml(company) + '<\/strong>');
+  if (ceo)     greetParts.push('<strong>' + escHtml(ceo) + '<\/strong>');
+  var greetWho = greetParts.length ? greetParts.join(' ') + ' ' : '';
+  var greeting = '<p style="margin:0 0 12px">안녕하세요? ' + greetWho + '대표님,<\/p>';
+
+  // 본문 플레이스홀더 치환 ({{기업명}}, {{대표이름}}, {{이메일}})
+  var msgPersonalized = (message || '')
+    .replace(/\{\{기업명\}\}/g,   company        || '')
+    .replace(/\{\{대표이름\}\}/g, ceo            || '')
+    .replace(/\{\{이메일\}\}/g,   recipientEmail || '');
+  var msgHtml = escHtml(msgPersonalized).replace(/\n/g, '<br>');
+  var heroBlock;
+  if (emailHero) {
+    // ── 전단지 실제 히어로 사용
+    heroBlock = [
+      '<tr><td style="padding:0">',
+      emailHero,
+      '<\/td><\/tr>',
+    ].join('');
+  } else {
+    // ── 기본 제네릭 히어로
+    var badgeHtml = badge
+      ? '<p style="text-align:center;margin:0 0 14px"><span style="background:#dc2626;color:#fff;font-size:11px;font-weight:700;letter-spacing:1px;padding:3px 12px;border-radius:20px">' + escHtml(badge.toUpperCase()) + '<\/span><\/p>'
+      : '';
+    var titleLines = escHtml(flyerName).replace(/\n/g, '<br>');
+    heroBlock = [
+      '<tr><td style="background:#0f172a;padding:0">',
+      '<div style="background:#dc2626;height:5px"><\/div>',
+      '<div style="padding:28px 32px 32px;text-align:center">',
+      '<p style="color:#94a3b8;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 14px">WorksFree 경영 컨설팅<\/p>',
+      badgeHtml,
+      '<h1 style="color:#fff;font-size:28px;font-weight:800;line-height:1.35;margin:0 0 12px">' + titleLines + '<\/h1>',
+      '<\/div>',
+      '<\/td><\/tr>',
+    ].join('');
+  }
+  return [
+    '<!DOCTYPE html><html><head><meta charset="UTF-8"><\/head>',
+    '<body style="margin:0;padding:0;font-family:\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;background:#f1f5f9">',
+    '<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">',
+    '<table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">',
+    heroBlock,
+    // ── 본문
+    '<tr><td style="padding:28px 32px;color:#1e293b;font-size:15px;line-height:1.75">',
+    greeting,
+    '<p style="margin:0">' + msgHtml + '<\/p>',
+    '<p style="font-size:13px;color:#94a3b8;margin:24px 0 0;border-top:1px solid #e2e8f0;padding-top:20px">이 메일은 ' + (legalOpts && legalOpts.senderName ? escHtml(legalOpts.senderName) : 'WorksFree 경영 컨설팅') + '에서 발송했습니다.<\/p>',
+    '<\/td><\/tr>',
+    // ── 법적 준수 푸터 (발신자 정보 + 수신거부 링크 — DB 중앙 관리)
+    (function(){
+      var base = 'background:#f8fafc;padding:16px 32px;text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0';
+      var parts = [];
+      if (legalOpts) {
+        if (legalOpts.senderName)  parts.push(escHtml(legalOpts.senderName));
+        if (legalOpts.senderPhone) parts.push(escHtml(legalOpts.senderPhone));
+        if (legalOpts.senderEmail) parts.push('<a href="mailto:' + escHtml(legalOpts.senderEmail) + '" style="color:#94a3b8">' + escHtml(legalOpts.senderEmail) + '<\/a>');
+      }
+      var infoLine = parts.length
+        ? parts.join(' &nbsp;·&nbsp; ')
+        : 'WorksFree · <a href="mailto:support@worksfree.co.kr" style="color:#94a3b8">support@worksfree.co.kr<\/a>';
+      var unsubLine = '';
+      if (recipientEmail) {
+        var unsubUrl = UNSUBSCRIBE_BASE + '/consulting/unsubscribe/?e=' + encodeURIComponent(recipientEmail.toLowerCase());
+        unsubLine = '<br><br><a href="' + unsubUrl + '" style="display:inline-block;background:#ef4444;color:#fff;font-weight:700;font-size:11px;padding:5px 16px;border-radius:4px;text-decoration:none;margin-top:2px">무료 수신거부<\/a>'
+          + '<br><span style="color:#b0b8c4;font-size:10px;margin-top:4px;display:inline-block">위 버튼 클릭 시 발송 목록에서 즉시 제외됩니다<\/span>';
+      }
+      return '<tr><td style="' + base + '">' + infoLine + unsubLine + '<\/td><\/tr>';
+    })(),
+    '<\/table><\/td><\/tr><\/table><\/body><\/html>',
+  ].join('');
+}
+
+function setMailStatus(type, msg) {
+  var el = document.getElementById('mail-status');
+  el.className = 'mail-status ' + type;
+  el.textContent = msg;
+}
+
+async function sendSingle() {
+  var idx      = +document.getElementById('mail-flyer').value;
+  var subject  = document.getElementById('mail-subject').value.trim();
+  var message  = document.getElementById('mail-body').value.trim();
+  var company  = (document.getElementById('mail-company')?.value || '').trim();
+  var name     = document.getElementById('mail-name').value.trim();  // 대표이름
+  var to       = document.getElementById('mail-to').value.trim().toLowerCase();
+  var legal    = getLegalOpts();
+  var finalSubj = legal.adPrefix ? '(광고) ' + subject : subject;
+  if (!to || !subject) { setMailStatus('error', '이메일 주소와 제목을 입력하세요.'); return; }
+
+  // ⚠ 크레딧 차감 확인
+  var remaining = document.getElementById('quota-remaining').textContent.replace(/[^0-9]/g,'');
+  var remNum = parseInt(remaining) || 0;
+  var remText = remNum ? `남은 크레딧 ${remNum.toLocaleString()}건` : '남은 크레딧 확인 불가';
+  if (!showSendConfirm(1, remText)) return;
+
+  clearFilterResult();
+  setMailStatus('loading', '발송 중...');
+  try {
+    var html = buildEmailHtml(company, name, message || '대표님들에게 필요한 최신 트렌드 자료를 보내드립니다.', FLYERS[idx].label.ko, getFlyerUrl(idx), FLYERS[idx].badge, FLYERS[idx].emailHero, legal, to);
+    var meta = { senderEmail: legal.senderEmail, senderName: legal.senderName, flyerSrc: FLYERS[idx].src, flyerName: FLYERS[idx].label.ko, env: getEnv(), senderUserId: getHubUserId() };
+    var res  = await fetch(MAIL_WORKER_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({to, subject: finalSubj, html, meta}),
+    });
+    var data = await res.json();
+    if (data.success) {
+      if (data.filtered && data.filtered.length > 0) {
+        setMailStatus('warn', '⚠ 발송 건너뜀 — 수신거부 등록된 주소입니다');
+        showFilterResult(data.filtered);
+      } else {
+        setMailStatus('ok', '✓ 발송 완료');
+        loadQuota();
+      }
+    } else {
+      setMailStatus('error', '오류: ' + (data.error || 'Unknown'));
+    }
+  } catch(e) {
+    setMailStatus('error', '네트워크 오류: ' + e.message);
+  }
+}
+
+// RFC-4180 호환 CSV 행 파서 (따옴표·쉼표 포함 필드 처리)
+function parseCsvRow(line) {
+  var fields = [], field = '', inQ = false;
+  for (var i = 0; i < line.length; i++) {
+    var c = line[i];
+    if (c === '"') {
+      if (inQ && line[i+1] === '"') { field += '"'; i++; }
+      else inQ = !inQ;
+    } else if (c === ',' && !inQ) {
+      fields.push(field.trim()); field = '';
+    } else {
+      field += c;
+    }
+  }
+  fields.push(field.trim());
+  return fields;
+}
+
+function loadCsv(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    // BOM 제거 후 행 분리
+    var text  = ev.target.result.replace(/^﻿/, '');
+    var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
+    if (!lines.length) { renderCsvPreview(); return; }
+
+    var companyIdx = 0, ceoIdx = -1, emailIdx = 1, startIdx = 0;
+    var firstCols = parseCsvRow(lines[0]);
+
+    // 첫 행이 헤더인지 판별: 이메일 후보 컬럼에 "@"가 없으면 헤더
+    var isHeader = !firstCols.some(function(c){ return c.includes('@'); });
+    if (isHeader) {
+      startIdx = 1;
+      // 헤더명으로 기업명·대표이름·이메일 컬럼 인덱스 탐색
+      firstCols.forEach(function(h, i) {
+        var hl = h.toLowerCase();
+        if (hl.includes('이메일') || hl.includes('email'))                       emailIdx    = i;
+        if (hl.includes('기업명') || hl === 'name' || hl === '이름')             companyIdx  = i;
+        if (hl.includes('대표') || hl.includes('ceo') || hl.includes('대표자'))  ceoIdx      = i;
+      });
+    } else {
+      // 헤더 없음: "@" 포함한 첫 번째 컬럼을 이메일로 자동 탐지
+      firstCols.forEach(function(c, i) {
+        if (c.includes('@') && emailIdx === 1) emailIdx = i;
+      });
+      companyIdx = emailIdx === 0 ? 1 : 0;
+    }
+
+    _csvRows = lines.slice(startIdx).map(function(l) {
+      var parts = parseCsvRow(l);
+      return {
+        company: (parts[companyIdx] || '').trim(),
+        ceo:     ceoIdx >= 0 ? (parts[ceoIdx] || '').trim() : '',
+        to:      (parts[emailIdx]  || '').trim(),
+      };
+    }).filter(function(r){ return r.to.includes('@'); });
+
+    renderCsvPreview();
+    document.getElementById('bulk-send-btn').disabled = _csvRows.length === 0;
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function renderCsvPreview() {
+  var el = document.getElementById('csv-preview');
+  if (!_csvRows.length) { el.innerHTML = '<p class="mail-hint">유효한 이메일 주소가 없습니다.</p>'; return; }
+  var hasCeo = _csvRows.some(function(r){ return r.ceo; });
+  var rows = _csvRows.slice(0, 5).map(function(r){
+    var ceoCell = hasCeo ? '<td>' + escHtml(r.ceo || '—') + '</td>' : '';
+    return '<tr><td>' + escHtml(r.company || '—') + '</td>' + ceoCell + '<td>' + escHtml(r.to) + '</td></tr>';
+  }).join('');
+  var more = _csvRows.length > 5
+    ? '<tr><td colspan="' + (hasCeo ? 3 : 2) + '" style="color:var(--muted);font-size:12px">... 외 ' + (_csvRows.length - 5) + '명</td></tr>'
+    : '';
+  var ceoHeader = hasCeo ? '<th>대표이름</th>' : '';
+  el.innerHTML = '<p class="mail-hint">총 ' + _csvRows.length + '명 인식됨</p>'
+    + '<table class="csv-table"><thead><tr><th>기업명</th>' + ceoHeader + '<th>이메일</th></tr></thead><tbody>'
+    + rows + more + '</tbody></table>';
+}
+
+async function sendBulk() {
+  if (!_csvRows.length) return;
+  var idx     = +document.getElementById('mail-flyer').value;
+  var subject = document.getElementById('mail-subject').value.trim();
+  var message = document.getElementById('mail-body').value.trim();
+  if (!subject) { setMailStatus('error', '제목을 입력하세요.'); return; }
+  if (_csvRows.length > 100) { setMailStatus('error', '한 번에 최대 100명까지 발송 가능합니다.'); return; }
+
+  // ⚠ 크레딧 차감 확인
+  var remaining = document.getElementById('quota-remaining').textContent.replace(/[^0-9]/g,'');
+  var remNum = parseInt(remaining) || 0;
+  var remText = remNum ? `남은 크레딧 ${remNum.toLocaleString()}건` : '남은 크레딧 확인 불가';
+  if (!showSendConfirm(_csvRows.length, remText)) return;
+
+  clearFilterResult();
+  setMailStatus('loading', _csvRows.length + '명에게 발송 중...');
+  var flyerName      = FLYERS[idx].label.ko;
+  var flyerUrl       = getFlyerUrl(idx);
+  var flyerBadge     = FLYERS[idx].badge;
+  var flyerEmailHero = FLYERS[idx].emailHero;
+  var legal          = getLegalOpts();
+  var finalSubj      = legal.adPrefix ? '(광고) ' + subject : subject;
+  var msgText        = message || '대표님들에게 필요한 최신 트렌드 자료를 보내드립니다.';
+  var meta           = { senderEmail: legal.senderEmail, senderName: legal.senderName, flyerSrc: FLYERS[idx].src, flyerName: flyerName, env: getEnv(), senderUserId: getHubUserId() };
+  var emails = _csvRows.map(function(r){
+    var toEmail = r.to.toLowerCase();
+    return {to: toEmail, subject: finalSubj, html: buildEmailHtml(r.company, r.ceo, msgText, flyerName, flyerUrl, flyerBadge, flyerEmailHero, legal, toEmail)};
+  });
+  try {
+    var res  = await fetch(MAIL_WORKER_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({emails: emails, meta: meta}),
+    });
+    var data = await res.json();
+    if (data.success) {
+      var sentMsg = '✓ ' + data.sent + '명 발송 완료';
+      if (data.filtered && data.filtered.length > 0) {
+        setMailStatus('warn', sentMsg + ' · ' + data.filtered.length + '명 수신거부로 제외됨');
+        showFilterResult(data.filtered);
+      } else {
+        setMailStatus('ok', sentMsg);
+      }
+      if (data.sent > 0) loadQuota();
+    } else {
+      setMailStatus('error', '오류: ' + (data.error || 'Unknown'));
+    }
+  } catch(e) {
+    setMailStatus('error', '네트워크 오류: ' + e.message);
+  }
+}
+
+buildGrid();
+buildFlyerSelect();
+buildMsgPresets();
+loadQuota();
+loadLegalSettings();
+applyUserInfoToForm();
+// 기본 프리셋 적용
+applyMsgPreset('default');
+</script>
+</body>
+</html>

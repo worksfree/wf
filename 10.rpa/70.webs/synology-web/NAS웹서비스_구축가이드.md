@@ -32,6 +32,7 @@
 | 회원 가입·로그인 (Google, 카카오 등) | Supabase 인증 | 7장 |
 | 회원 정보·결제 이력·크레딧 저장 | Supabase 데이터베이스 | 8장 |
 | 온라인 결제 (카드·계좌이체) | PG사 연동 (토스페이먼츠 등) | 9장 |
+| 이메일 발송 (단건·대량, 발송 현황 추적) | Resend + Cloudflare Worker KV | 14장 |
 
 ### 이 가이드를 따라가면 만들 수 있는 것
 
@@ -870,17 +871,92 @@ http://127.0.0.1:5500/**
 > `CREATE TABLE IF NOT EXISTS`, `ALTER TABLE ADD COLUMN IF NOT EXISTS`,  
 > `CREATE OR REPLACE FUNCTION`, `DROP POLICY IF EXISTS` 패턴으로 구현합니다.
 
-**권장 파일 구조**:
+**권장 파일 구조** (2026-06-03 기준):
 
 ```
 supabase/
-├── phase1_check_before_run.sql   # 실행 전 현재 상태 진단
-└── phase1_db_setup.sql           # 실제 설정 스크립트 (멱등성 보장)
+├── complete_db_setup.sql         # ✅ Step 1 — 허브 코어 DB 전체 (v3.0, 필수)
+├── bizdb_setup.sql               # ✅ Step 2 — B2B 이메일 수집/발송 DB (필수)
+├── jobkorea_setup.sql            # ✅ Step 3 — 잡코리아 자동화 DB (선택)
+├── phase1_check_before_run.sql   # 사전 진단용 (선택 사항)
+│
+└── tmp_*.sql                     # 구버전·일회용 파일 — 참고용만, 재실행 불필요
+    ├── tmp_master_db_setup.sql           (v2.0 구버전)
+    ├── tmp_phase1_db_setup.sql           (구버전)
+    ├── tmp_phase2_email_management.sql   (구버전)
+    ├── tmp_phase3_*.sql                  (구버전 + 일회용 핫픽스)
+    ├── tmp_email_log.sql                 (complete_db_setup에 포함)
+    ├── tmp_tracking_tables.sql           (complete_db_setup에 포함)
+    ├── tmp_admin_functions.sql           (complete_db_setup에 포함)
+    └── tmp_fix_*.sql                     (일회용 핫픽스, 이미 적용됨)
 ```
 
-### 8.2 실행 전 현재 상태 진단
+> `tmp_` 접두사 파일은 이미 `complete_db_setup.sql`에 통합됐거나 일회성으로 적용된 파일입니다.  
+> 신규 구축 시 `tmp_` 파일은 실행하지 않습니다. 자세한 내용은 `supabase/README.md` 참고.
 
-스크립트를 실행하기 전에 **현재 DB 상태**를 먼저 파악합니다.  
+---
+
+### 8.2 Supabase SQL Editor 사용법
+
+> DB 스크립트를 실행하는 곳입니다. 이 섹션을 먼저 읽어두면 이후 과정이 훨씬 쉬워집니다.
+
+#### 전체 파일 실행 (가장 일반적인 방법)
+
+1. **접속**: [supabase.com](https://supabase.com) → 프로젝트 선택
+2. **SQL Editor 열기**: 왼쪽 사이드바에서 `</>  SQL Editor` 클릭
+3. **새 쿼리**: 오른쪽 상단 **"New query"** 버튼 클릭
+4. **붙여넣기**: 실행할 `.sql` 파일 전체 내용 → `Ctrl+A` → `Ctrl+C` → 편집기에 `Ctrl+V`
+5. **실행**: **"Run"** 버튼 클릭 또는 `Ctrl+Enter`
+6. **결과 확인**: 하단 Results 패널에서 섹션별 결과 확인
+
+> 오류가 발생하면 빨간 에러 메시지가 표시됩니다. 오류 내용을 복사해서 공유하면 해결책을 찾을 수 있습니다.
+
+#### 일부 블록만 선택해서 실행
+
+파일 전체가 아닌 특정 함수나 테이블만 추가하고 싶을 때:
+
+**방법 A — 해당 블록만 복사해 새 쿼리에 붙여넣기 (권장)**
+
+1. SQL Editor → **New query** 클릭
+2. 실행할 구간(예: 함수 1개)의 SQL을 복사
+3. 붙여넣기 → **Run**
+
+**방법 B — 편집기 내에서 드래그 선택 후 실행**
+
+1. 실행할 블록의 시작 줄부터 끝 줄까지 마우스로 드래그
+2. `Ctrl+Enter` → **선택 영역만** 실행됨
+
+> ⚠️ **주의**: 방법 B는 선택 범위를 잘못 잡으면 절반만 실행되어 오류가 납니다.  
+> 불확실하면 방법 A를 사용하세요.
+
+#### 예시: admin_set_user_name 함수 하나만 추가
+
+New query에 아래 내용만 붙여넣고 Run:
+
+```sql
+DROP FUNCTION IF EXISTS public.admin_set_user_name(UUID, TEXT);
+CREATE OR REPLACE FUNCTION public.admin_set_user_name(
+  target_id UUID, new_name TEXT
+)
+RETURNS TEXT LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE _caller_role TEXT;
+BEGIN
+  SELECT role INTO _caller_role FROM public.profiles WHERE id = auth.uid();
+  IF _caller_role IS DISTINCT FROM 'admin' THEN RETURN 'error: not_admin'; END IF;
+  IF new_name IS NULL OR trim(new_name) = '' THEN RETURN 'error: empty_name'; END IF;
+  UPDATE public.profiles SET name = trim(new_name) WHERE id = target_id;
+  RETURN 'ok';
+END;
+$$;
+REVOKE ALL ON FUNCTION public.admin_set_user_name(UUID, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.admin_set_user_name(UUID, TEXT) TO anon, authenticated;
+```
+
+---
+
+### 8.2-A 실행 전 현재 상태 진단 (선택 사항)
+
+처음 설정하는 경우나 기존 DB 상태가 불확실한 경우, 먼저 진단 쿼리를 실행합니다.  
 Supabase SQL Editor는 마지막 SELECT만 표시하므로 UNION ALL로 하나의 결과로 통합합니다.
 
 ```sql
@@ -936,9 +1012,116 @@ user-001 | +100  | admin_grant   | 이벤트 지급
 -----    잔액 = SUM(delta) = 550  -----
 ```
 
-### 8.4 테이블·뷰·함수 생성 (멱등 스크립트)
+---
+
+### 8.4 DB 구축 스크립트 — complete_db_setup.sql ✅ 현재 권장 (v3.0)
+
+> **신규 구축 또는 기존 DB 보완 모두 이 파일 하나로 처리합니다.**  
+> 멱등성 보장: 이미 구축된 DB에 실행해도 안전합니다.
+
+#### 포함 내용
+
+| 섹션 | 내용 |
+|------|------|
+| 1 | 확장: `pgcrypto` |
+| 2 | 테이블 6개: `profiles` · `credits` · `payments` · `email_log` · `email_unsubscribes` · `page_views` |
+| 3 | `is_admin()` 헬퍼 함수 (RLS 정책에서 참조) |
+| 4 | RLS 정책 전체 (기존 정책 정리 후 통일된 이름으로 재생성) |
+| 5 | 트리거: `on_auth_user_created` · `on_auth_user_updated` |
+| 6 | 관리자 함수 6개: `admin_set_user_role` · `admin_grant_credits` · `admin_set_user_name` · `admin_get_all_profiles` · `admin_get_user_logins` · `admin_page_view_stats` |
+| 7 | 일반 함수 3개: `get_user_credit_balance` · `deduct_credits` · `get_email_history` |
+| 8 | 뷰 2개: `credit_balance` · `page_view_stats` |
+| 9 | 기존 사용자 소급 동기화 (name/email 백필) |
+| 10 | 개발 테스트 사용자 4명 (auth.identities + instance_id 포함) |
+| 11 | 최종 검증 SELECT 쿼리 7개 |
+
+#### 실행 방법
 
 **메뉴 경로**:  
+`Supabase → SQL Editor → New query → complete_db_setup.sql 전체 내용 붙여넣기 → Run`
+
+파일 위치: `supabase/complete_db_setup.sql`
+
+실행 후 하단 결과 패널에서 아래 사항을 확인합니다:
+
+```
+=== 1. 테이블 목록 ===        → 6개 테이블 모두 표시
+=== 2. email_log 컬럼 ===     → sender_user_id 포함 전체 컬럼 목록
+=== 3. RLS 정책 ===           → 각 테이블의 정책 목록 확인
+=== 4. 함수 목록 ===          → 12개 함수 모두 표시
+=== 5. 트리거 ===             → on_auth_user_created, on_auth_user_updated 2개
+=== 6. 개발 테스트 사용자 === → 4명 (general/consultant/gfc/admin) roles 확인
+=== 7. 뷰 목록 ===            → credit_balance, page_view_stats 2개
+```
+
+#### 테이블 스키마 요약
+
+```
+profiles       → id, name, email, role, agreed_at, marketing_agreed, created_at
+credits        → id, user_id, delta, reason, app_id, ref_order_id, note, env, created_at
+payments       → id, user_id, order_id, pg, amount_krw, amount_usd, credits, status, env, created_at
+email_log      → id, sent_at, recipient_email, sender_email, sender_name,
+                  sender_user_id (FK→profiles), flyer_src, flyer_name,
+                  subject, env, status, extra
+email_unsubscribes → id, email, source, note, unsubscribed_at
+page_views     → id, user_id, page, duration_s, env, viewed_at
+```
+
+#### RLS 정책 요약
+
+| 테이블 | 정책 | 대상 |
+|--------|------|------|
+| profiles | profiles_self (ALL) | 본인 행 |
+| profiles | profiles_admin_select_all (SELECT) | 관리자 전체 조회 |
+| credits | credits_select_own (SELECT) | 본인 행 |
+| credits | credits_insert_purchase (INSERT) | 본인 충전만 허용 |
+| payments | payments_select_own, payments_insert_own | 본인 행 |
+| email_log | email_log_admin_select (SELECT) | 관리자만, INSERT는 Worker service_role |
+| email_unsubscribes | email_unsubscribes_admin (ALL) | 관리자만, Worker service_role |
+| page_views | pv_insert_own · pv_select_own · pv_update_own | 본인 행 |
+| page_views | pv_admin_select (SELECT) | 관리자 전체 조회 |
+
+> **credits·payments env 컬럼**: test/staging/portal 환경이 동일 DB를 공유할 때  
+> 결제·크레딧 데이터를 환경별로 분리하는 컬럼. 상세는 8.7절 참고.
+
+---
+
+### 8.4-A (Deprecated) 구 스크립트 목록
+
+> ⚠️ 아래 파일들은 `tmp_` 접두사로 이름이 변경됐습니다. **재실행 불필요.**  
+> 모두 `complete_db_setup.sql`에 통합됐거나 일회성으로 이미 적용된 파일입니다.  
+> 자세한 분류는 `supabase/README.md` 참고.
+
+| 파일 (현재 이름) | 분류 | 내용 |
+|------|------|------|
+| `tmp_master_db_setup.sql` | 구버전 | v2.0 통합본 → complete v3.0으로 대체 |
+| `tmp_phase1_db_setup.sql` | 구버전 | profiles·credits·payments 초기 생성 |
+| `tmp_phase2_email_management.sql` | 구버전 | email_log (status 컬럼 없음 — 버그 버전) |
+| `tmp_phase3_dev_users_and_email_mgmt.sql` | 구버전 | dev 사용자 + email status 추가 |
+| `tmp_phase2_and_3_combined.sql` | 구버전 | phase2+3 중간 합본 |
+| `tmp_email_log.sql` | 중복 | email_log 단독 생성 |
+| `tmp_tracking_tables.sql` | 중복 | page_views 테이블 단독 생성 |
+| `tmp_fix_profiles_name_sync.sql` | 중복 | profiles name 동기화 트리거 |
+| `tmp_admin_functions.sql` | 중복 | 관리자 함수 3개 단독 |
+| `tmp_setup_page_views_complete.sql` | 중복 | page_views RLS 재설정 중간본 |
+| `tmp_quick_fix_stats.sql` | 일회용 | admin_get_* 함수 긴급 추가 패치 |
+| `tmp_update_env_filter.sql` | 일회용 | admin_page_view_stats 파라미터 변경 |
+| `tmp_fix_pageviews_rls.sql` | 일회용 | pv_select_own 정책 누락 패치 |
+| `tmp_add_sender_user_id.sql` | 일회용 | email_log에 sender_user_id 추가 |
+| `tmp_fix_pageview_stats_env.sql` | 일회용 | env_filter 기본값 변경 |
+| `tmp_phase3_fix_identities.sql` | 일회용 | dev 사용자 identities 보정 |
+| `tmp_phase3_fix_instance_id.sql` | 일회용 | dev 사용자 instance_id 보정 |
+| `tmp_fix_dev_account_names.sql` | 일회용 | dev 계정 이름 보정 |
+| `tmp_fix_dev_profiles_roles.sql` | 일회용 | dev 계정 역할·동의 UPSERT 보정 |
+
+---
+
+### 8.4-B (Deprecated) 테이블·뷰·함수 생성 인라인 스크립트
+
+> ⚠️ 이 섹션의 SQL은 현재 `master_db_setup.sql`로 대체되었습니다.  
+> 참고용으로만 보관하며, 직접 실행하지 마세요.
+
+**메뉴 경로 (구버전)**:  
 `Supabase → SQL Editor → New query → 아래 내용 붙여넣기 → [Run]`
 
 ```sql
@@ -1077,6 +1260,8 @@ BEGIN
   VALUES (p_user_id, p_amount, 'admin_grant', p_note);
 END; $$;
 ```
+
+---
 
 ### 8.5 사용자 역할(role) 지정
 
@@ -2059,6 +2244,365 @@ npm run test:all
 
 ---
 
+## 14장. 이메일 발송 연동 — Resend + Cloudflare Worker
+
+### 14.1 개요 및 서비스 선택 이유
+
+웹 서비스에서 이메일을 발송하는 방법은 여러 가지이나, **Cloudflare Worker 환경**에서는 아래 이유로 **Resend**가 가장 적합합니다.
+
+| | Resend | Gmail SMTP | Gmail API |
+|---|---|---|---|
+| 월 무료 한도 | **3,000건** | ~15,000건 (500/일) | ~3,000건 환산 |
+| 커스텀 도메인 발신 | ✓ (`consulting@yourdomain.kr`) | ✗ | ✗ |
+| Worker API 키 연동 | **쉬움** (Bearer 토큰 1개) | 어려움 (SMTP) | 매우 어려움 (OAuth2) |
+| DKIM/SPF 자동 설정 | ✓ | ✗ | ✗ |
+| 스팸 분류 위험 | 낮음 | 높음 | 중간 |
+| 발송 현황 API | ✓ (KV 직접 추적) | ✗ | ✗ |
+
+> **Gmail 주의사항**: Gmail은 한도가 더 많아 보이지만 커스텀 도메인 발신이 불가능하고 Worker 연동이 복잡합니다. 수신자에게 `@gmail.com` 주소로 표시되어 전문성이 떨어지며 스팸 분류 확률도 높습니다.
+
+**구현 아키텍처:**
+```
+브라우저 (마케팅 자료 페이지)
+  │  POST {to, subject, html}
+  ▼
+Cloudflare Worker — send-mail
+  │  GET /   → KV에서 이번 달 발송 수 조회
+  │  POST /  → Resend API 호출 + KV 카운터 증가
+  ├─ Resend API (이메일 전송)
+  └─ Cloudflare KV (월별 발송 카운터 저장)
+```
+
+---
+
+### 14.2 Resend 가입 및 API 키 발급
+
+#### 14.2.1 가입
+
+1. [resend.com](https://resend.com) 접속 → **Get Started for Free** 클릭
+2. GitHub/Google 계정 또는 이메일로 가입
+
+#### 14.2.2 API 키 발급 (온보딩 화면)
+
+가입 직후 온보딩 화면이 표시됩니다:
+
+```
+① Add an API key
+   [Add API Key] 버튼 클릭 → 키 이름 입력 → 생성 → re_xxxxx... 값 복사
+
+② Send an email (테스트)
+   Node.js 예시:
+     from: 'onboarding@resend.dev'   ← 도메인 인증 없이 즉시 사용 가능
+     to:   'your@email.com'
+   [Send email] 버튼으로 본인 이메일로 테스트 발송 가능
+```
+
+> **핵심**: `onboarding@resend.dev`는 Resend가 제공하는 테스트 발신 주소입니다.  
+> 도메인 인증 없이 **즉시 사용 가능**하며 실제 수신자에게도 발송됩니다.  
+> 단, 발신자 주소가 `onboarding@resend.dev`로 표시되므로 운영 시에는 커스텀 도메인으로 교체합니다.
+
+---
+
+### 14.3 Cloudflare Worker 파일 구조
+
+```
+synology-web/
+└── service/payment/
+    ├── send-mail.js          # Worker 소스
+    └── wrangler-mail.toml    # 배포 설정 (KV 바인딩 포함)
+```
+
+#### `wrangler-mail.toml` 내용
+
+```toml
+name               = "send-mail"
+main               = "send-mail.js"
+compatibility_date = "2025-01-01"
+
+[[kv_namespaces]]
+binding = "MAIL_USAGE"
+id      = "실제_KV_네임스페이스_ID"   # STEP 3에서 생성
+```
+
+#### `send-mail.js` Worker API
+
+| 메서드 | 경로 | 역할 |
+|--------|------|------|
+| `GET`  | `/`  | 이번 달 발송 현황 반환 `{ sent, limit, remaining, period }` |
+| `POST` | `/`  | 단건 발송 `{ to, subject, html }` |
+| `POST` | `/`  | 대량 발송 `{ emails: [{to, subject, html}, ...] }` (최대 100건) |
+
+Worker 내부 동작:
+- 발송 전 월 한도(3,000건) 초과 여부 확인 → 초과 시 `429` 반환
+- 발송 성공 시 Cloudflare KV에 월별 카운터(`sent_YYYY_MM`) 증가
+- `MAIL_FROM` 미설정 시 `onboarding@resend.dev` 자동 사용
+
+---
+
+### 14.4 구축 단계별 명령어
+
+아래 명령은 모두 `synology-web/` 폴더에서 실행합니다.
+
+#### STEP 1. Resend API 키 발급
+
+Resend 대시보드 → [Add API Key] → `re_...` 값 복사
+
+#### STEP 2. API 키를 Worker 시크릿으로 등록
+
+```powershell
+# synology-web/ 폴더에서 실행
+wrangler secret put RESEND_API_KEY --config service/payment/wrangler-mail.toml
+# 프롬프트에 re_... 값 붙여넣기
+```
+
+#### STEP 3. KV 네임스페이스 생성 (발송량 추적용)
+
+```powershell
+wrangler kv namespace create MAIL_USAGE --config service/payment/wrangler-mail.toml
+# 출력 예시:
+#   id = "7998ad690cae40478465a16912369aee"
+# → 출력된 id 값을 wrangler-mail.toml의 id = "..." 에 입력
+```
+
+#### STEP 4. Worker 배포
+
+```powershell
+wrangler deploy --config service/payment/wrangler-mail.toml
+# 성공 시: https://send-mail.yourname.workers.dev
+```
+
+#### STEP 5. 동작 확인 (GET 요청으로 현황 조회)
+
+```powershell
+Invoke-RestMethod -Uri "https://send-mail.yourname.workers.dev" -Method GET
+# 정상 응답 예시:
+# { "sent": 0, "limit": 3000, "remaining": 3000, "period": "2026-05" }
+```
+
+---
+
+### 14.5 발신자 주소 전환 — 커스텀 도메인
+
+`onboarding@resend.dev`에서 `consulting@worksfree.co.kr`으로 전환하는 절차입니다.
+
+#### 14.5.1 Resend 도메인 인증
+
+1. [resend.com](https://resend.com) → 왼쪽 메뉴 **Domains** → **Add Domain** 클릭
+2. `worksfree.co.kr` 입력 후 추가
+3. Resend가 안내하는 DNS 레코드를 가비아 DNS 관리에 추가:
+
+**Domain Verification (필수)**
+
+| 타입 | 호스트 | 값 |
+|------|--------|----|
+| TXT | `resend._domainkey` | `p=MIGfMA0...` (Resend 화면에 표시된 DKIM 전체 값) |
+
+**Enable Sending — SPF (필수)**
+
+| 타입 | 호스트 | 값 | 우선순위 |
+|------|--------|-----|---------|
+| MX | `send` | `feedback-smtp.us-east-1.amazonses.com` | 10 |
+| TXT | `send` | `v=spf1 include:amazonses.com ~all` | — |
+
+> **참고**: SPF 레코드 호스트가 `@`(루트)가 아니라 `send` 서브도메인입니다.  
+> 기존 Google SPF(`@`)와 충돌하지 않으므로 별도로 추가하면 됩니다.
+
+**DMARC (선택)**
+
+| 타입 | 호스트 | 값 |
+|------|--------|----|
+| TXT | `_dmarc` | `v=DMARC1; p=none;` |
+
+4. DNS 레코드 추가 후 Resend 화면의 **확인 버튼** 클릭  
+   (버튼 라벨 예: "I've added these records" 또는 유사한 문구)
+
+5. Resend가 DNS를 자동 검증합니다.  
+   가비아 TTL이 600초(10분)이므로 보통 **10~30분** 후 인증 완료됩니다.  
+   상태가 **Verified** ✓ 로 바뀌면 완료.
+
+#### 14.5.2 Google Workspace 별칭 추가 (답장 수신용)
+
+발신 주소를 `consulting@worksfree.co.kr`로 설정하면, 수신자가 답장 시 해당 주소로 옵니다.  
+`consulting@`로 온 메일을 받으려면 Google Workspace에 별칭을 추가합니다.
+
+1. [admin.google.com](https://admin.google.com) → **사용자** → `insung.lee` 선택
+2. **사용자 정보** → **별칭** → `consulting@worksfree.co.kr` 추가
+
+이후 `consulting@`로 온 메일이 `insung.lee@worksfree.co.kr` 받은편지함에 도착합니다.
+
+#### 14.5.3 발신자 주소를 Worker에 등록
+
+```powershell
+wrangler secret put MAIL_FROM --config service/payment/wrangler-mail.toml
+# 값: WorksFree 컨설팅 <consulting@worksfree.co.kr>
+```
+
+> Worker는 `MAIL_FROM` 시크릿이 없으면 자동으로 `onboarding@resend.dev`를 사용합니다.  
+> 이 설정 이후에는 커스텀 도메인 주소로 발신됩니다.
+
+---
+
+### 14.6 프런트엔드 연동 (마케팅 자료 페이지)
+
+`consulting/marketing/index.html`에는 다음 기능이 내장되어 있습니다:
+
+#### 발송 현황 바 (자동 조회)
+
+페이지 로드 시 Worker `GET /`를 호출하여 이번 달 발송 현황을 표시합니다.
+
+```
+이번 달 발송 현황  (Resend 무료 월 3,000건)       ↻ 새로고침
+████████░░░░░░░░░░░░░░  (프로그레스 바)
+2026-05 · 234 / 3,000건 발송            2,766건 남음
+```
+
+- 0~69%: 녹색 / 70~89%: 황색 / 90%↑: 적색
+- 발송 성공 시 자동 갱신
+
+#### 단건 발송
+
+```
+전단지 선택 → 제목 → 본문 메시지 → 받는 분 이름(선택) → 이메일 주소 → [발송 →]
+```
+
+#### 대량 발송 (CSV)
+
+```
+전단지 선택 → 제목 → 본문 메시지 → CSV 파일 업로드 → [대량 발송 →]
+```
+
+CSV 형식: 헤더 없음, `이름,이메일` 또는 `이메일` 1열 (UTF-8, 최대 100행)
+
+```
+홍길동,hong@company.com
+이대표,lee@factory.kr
+김사장,kim@business.co.kr
+```
+
+---
+
+### 14.7 요금 및 업그레이드
+
+| 플랜 | 월 비용 | 월 발송 한도 | 도메인 수 |
+|------|---------|-------------|-----------|
+| Free | 무료 | 3,000건 | 1개 |
+| Pro | $20 | 50,000건 | 무제한 |
+| Business | 문의 | 무제한 | 무제한 |
+
+> **업그레이드 시점 기준**: 마케팅 메일을 월 3,000건 이상 발송해야 하는 시점.  
+> Worker 코드 변경 없이 Resend 플랜만 업그레이드하면 자동으로 한도가 증가합니다.
+
+---
+
+### 14.8 체크리스트
+
+```
+[ Resend 설정 ]
+□ resend.com 가입
+□ API 키 발급 (re_...)
+□ (선택) 커스텀 도메인 인증 완료 (DKIM/SPF/DMARC)
+
+[ Cloudflare Worker ]
+□ wrangler secret put RESEND_API_KEY
+□ wrangler kv namespace create MAIL_USAGE → id를 toml에 입력
+□ wrangler deploy --config service/payment/wrangler-mail.toml
+□ GET https://send-mail.*.workers.dev → { remaining: 3000 } 확인
+□ (선택) wrangler secret put MAIL_FROM (커스텀 도메인 전환 시)
+
+[ 동작 확인 ]
+□ 마케팅 자료 페이지 → 현황 바 표시 확인
+□ 단건 발송 테스트 → 실제 수신 확인
+□ 대량 발송 CSV 테스트 → 발송 수 카운터 증가 확인
+```
+
+---
+
+## 15장. Claude Vision API — 스캔 문서 OCR (회원 전용 유료 서비스)
+
+### 15.1 언제 필요한가
+
+| 상황 | 권장 방법 |
+|------|-----------|
+| 크레탑·DART 등 **디지털 생성 PDF** | PDF.js 텍스트 추출 (무료, 브라우저 처리) |
+| **스캔 PDF·사진 파일** | Claude Vision API (유료) |
+| 오픈소스 OCR (Tesseract 등) | 테이블 구조 인식률 ~82% → 재무 데이터에 부적합 |
+
+> **재무 데이터 한 자리 오류는 치명적**입니다. 스캔 문서에는 99%+ 정확도의 Claude Vision을 권장합니다.
+
+### 15.2 비용 구조
+
+| 단위 | 비용 |
+|------|------|
+| 페이지당 | **$0.003** (claude-sonnet-4-6 기준) |
+| 재무제표 3년치 (약 6페이지) | 약 $0.018 |
+| 월 100건 처리 시 | 약 $1.8 |
+
+> 비용은 Anthropic API 요금 정책에 따라 변동될 수 있습니다.  
+> 이 서비스는 WorksFree 크레딧을 소모합니다 (회원 전용).
+
+### 15.3 구현 아키텍처
+
+```
+사용자 (브라우저)
+  └─ PDF/이미지 업로드
+        ↓ multipart/form-data
+  Cloudflare Worker (claude-vision.worksfree.workers.dev)
+        ↓ Anthropic Files API
+  Claude Vision 모델
+        ↓ 구조화 JSON 반환 (당기순이익 3년치, 자산·부채 총계 등)
+  브라우저 계산기 자동 채우기
+```
+
+### 15.4 Cloudflare Worker 설정 (활성화 시)
+
+```toml
+# wrangler-vision.toml
+name = "claude-vision"
+main = "vision-worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://portal.worksfree.kr"
+```
+
+```bash
+wrangler secret put ANTHROPIC_API_KEY   # Anthropic Console에서 발급
+wrangler deploy --config wrangler-vision.toml
+```
+
+### 15.5 Worker 코드 골격
+
+```javascript
+// vision-worker.js (활성화 시 구현)
+export default {
+  async fetch(request, env) {
+    // 1. 크레딧 차감 확인 (Supabase service_role)
+    // 2. PDF/이미지 → Anthropic Files API 업로드
+    // 3. Claude에게 "재무제표에서 당기순이익 3년치, 자산·부채 총계를 JSON으로 추출" 지시
+    // 4. 구조화 JSON 반환
+    // 5. 크레딧 차감 기록 (deduct_credits 함수 호출)
+  }
+};
+```
+
+### 15.6 현재 상태
+
+> **현재 비활성화** — UI에서 `disabled` 버튼으로 표시됩니다.  
+> 활성화 조건: Cloudflare Worker 배포 + 크레딧 차감 로직 연동 완료.
+
+체크리스트:
+```
+[ Claude Vision 활성화 준비 ]
+□ Anthropic API 키 발급 (console.anthropic.com)
+□ wrangler secret put ANTHROPIC_API_KEY
+□ vision-worker.js 구현 및 wrangler deploy
+□ 크레딧 차감 로직 연동 (deduct_credits)
+□ stockval/index.html 의 claude-btn disabled 제거
+□ 단건 테스트 (3페이지 PDF, 예상 비용 $0.009)
+```
+
+---
+
 ## 부록 A. 전체 설정 순서 요약
 
 ```
@@ -2087,10 +2631,13 @@ npm run test:all
 18. index.html에 Supabase 클라이언트 코드 추가 → 로그인 테스트
 
 [ 데이터베이스 ]
-19. supabase/phase1_check_before_run.sql 실행 → 현재 DB 상태 진단
-20. supabase/phase1_db_setup.sql 실행 → profiles 보완 + credits/payments/credit_balance 생성
-21. Authentication → Users에서 관리자 UUID 확인 → role='gfc' 지정 + 초기 크레딧 지급
-22. 프런트엔드에서 credit_balance 뷰 조회 → 잔액 표시 확인
+19. (선택) supabase/phase1_check_before_run.sql 실행 → 현재 DB 상태 사전 진단
+20. supabase/master_db_setup.sql 실행 → 전체 DB 한 번에 구축
+    (profiles/credits/payments/email_log/page_views + 함수/트리거/RLS + 개발 테스트 사용자)
+21. 결과 패널에서 6개 테이블·10개 함수·2개 트리거 모두 표시되는지 확인
+22. Authentication → Users에서 실제 관리자 UUID 확인 → role='admin' 지정
+    → SQL Editor: UPDATE public.profiles SET role='admin' WHERE id='<UUID>';
+23. 프런트엔드에서 credit_balance 뷰 조회 → 잔액 표시 확인
 
 [ 결제 연동 ]
 21. 토스페이먼츠 가입 → 테스트 API 키 확인 (즉시 가능)
@@ -2106,15 +2653,23 @@ npm run test:all
 29. 프런트엔드 메뉴에 roleOnly / consultantOnly / memberOnly 플래그 설정
 30. 로그인 후 profiles 조회 → userRole 변수에 저장 → 렌더링 시 참조
 
+[ 이메일 발송 연동 ]
+31. resend.com 가입 → API 키 발급 (re_...)
+32. wrangler secret put RESEND_API_KEY --config service/payment/wrangler-mail.toml
+33. wrangler kv namespace create MAIL_USAGE → id를 wrangler-mail.toml에 입력
+34. wrangler deploy --config service/payment/wrangler-mail.toml
+35. GET https://send-mail.*.workers.dev → { remaining: 3000 } 확인
+36. (운영) Resend Domains에서 커스텀 도메인 인증 → wrangler secret put MAIL_FROM
+
 [ 테스트 환경 ]
-31. Supabase Project B 생성 (테스트 전용)
-32. .env.test.example → .env.test 복사 후 Project B 키 입력
-33. npm test (mock) 및 npm run test:realdb 실행 확인
+37. Supabase Project B 생성 (테스트 전용)
+38. .env.test.example → .env.test 복사 후 Project B 키 입력
+39. npm test (mock) 및 npm run test:realdb 실행 확인
 
 [ 배포 ]
-34. 배포 스크립트(deploy.ps1) 작성
-35. NAS에 SSH 무비번 로그인 설정
-36. 배포 실행 → https://portal.example.co.kr 최종 확인
+40. 배포 스크립트(deploy.ps1) 작성
+41. NAS에 SSH 무비번 로그인 설정
+42. 배포 실행 → https://portal.example.co.kr 최종 확인
 ```
 
 ---
@@ -2295,14 +2850,26 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 
 ## 부록 D. 파일 위치 참고 (WorksFree Hub 기준)
 
-| 항목 | 경로 |
-|------|------|
-| 메인 SPA | `synology-web/index.html` |
-| DB 상태 진단 | `synology-web/supabase/phase1_check_before_run.sql` |
-| DB 설정 스크립트 | `synology-web/supabase/phase1_db_setup.sql` |
-| 테스트 픽스처 | `synology-web/tests/fixtures/` |
-| 테스트 환경변수 템플릿 | `synology-web/.env.test.example` |
-| Playwright 설정 | `synology-web/playwright.config.js` |
-| 배포 스크립트 | `synology-web/deploy.ps1` |
-| DART Worker | `synology-web/consulting/dart/worker.js` |
-| 이 가이드 | `synology-web/NAS웹서비스_구축가이드.md` |
+| 항목 | 경로 | 비고 |
+|------|------|------|
+| 메인 SPA | `synology-web/index.html` | |
+| **DB 구축 스크립트 (현재 권장)** | `synology-web/supabase/master_db_setup.sql` | ✅ 신규 구축 시 이것만 실행 |
+| DB 상태 진단 | `synology-web/supabase/phase1_check_before_run.sql` | 선택 사항 |
+| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/phase1_db_setup.sql` | ⚠️ master에 통합됨 |
+| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/phase2_email_management.sql` | ⚠️ status 컬럼 없는 구버전 |
+| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/phase2_and_3_combined.sql` | ⚠️ master에 통합됨 |
+| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/email_log.sql` | ⚠️ master에 통합됨 |
+| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/tracking_tables.sql` | ⚠️ master에 통합됨 |
+| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/admin_functions.sql` | ⚠️ master에 통합됨 |
+| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/fix_profiles_name_sync.sql` | ⚠️ master에 통합됨 |
+| 테스트 픽스처 | `synology-web/tests/fixtures/` | |
+| 테스트 환경변수 템플릿 | `synology-web/.env.test.example` | |
+| Playwright 설정 | `synology-web/playwright.config.js` | |
+| 배포 스크립트 | `synology-web/deploy.ps1` | |
+| DART Worker | `synology-web/consulting/dart/worker.js` | |
+| 메일 발송 Worker | `synology-web/service/payment/send-mail.js` | |
+| 메일 Worker 배포 설정 | `synology-web/service/payment/wrangler-mail.toml` | |
+| 결제 검증 Worker | `synology-web/service/payment/toss-verify.js` | |
+| 결제 Worker 배포 설정 | `synology-web/service/payment/wrangler-toss.toml` | |
+| 마케팅 자료 페이지 | `synology-web/consulting/marketing/index.html` | |
+| 이 가이드 | `synology-web/NAS웹서비스_구축가이드.md` | |

@@ -1,6 +1,7 @@
-name = "dart-api-worker"
-main = "worker.js"
+name               = "dart-api-worker"
+main               = "worker.js"
 compatibility_date = "2025-01-01"
+account_id         = "cfa572c2bcb9f142db8430b310cf5a32"
 
 # 시크릿 키는 아래 명령으로 설정 (여기에 직접 쓰지 말 것):
 #   npx wrangler secret put DART_API_KEY

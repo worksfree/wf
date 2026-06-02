@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>비상장주식 가치평가 진단 — WorksFree</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
 :root{
@@ -149,6 +150,46 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .cb-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;align-self:flex-start}
 .cb-title{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.4}
 .cb-sub{font-size:11px;color:var(--hint);line-height:1.4}
+
+/* ── PDF 업로드 섹션 ── */
+.pdf-wrap{background:#0a1220;border:1.5px solid #1e3050;border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
+.pdf-hd{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1e3050}
+.pdf-hd-icon{font-size:20px;flex-shrink:0}
+.pdf-hd-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#38bdf8}
+.pdf-hd-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.pdf-body{padding:16px 20px}
+.pdf-source-note{font-size:11px;color:var(--hint);margin-bottom:12px;padding:7px 10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px}
+.pdf-btn-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pdf-file-btn{padding:8px 18px;border-radius:7px;border:1.5px solid #1e4a70;background:#0c1a30;color:#60a5fa;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+.pdf-file-btn:hover{border-color:#3b82f6;background:#0d2040}
+.pdf-filename{font-size:12px;color:var(--muted);font-style:italic}
+.pdf-status{font-size:12px;min-height:18px;margin-bottom:8px;line-height:1.5}
+.pdf-status.loading{color:#60a5fa}.pdf-status.ok{color:var(--green)}.pdf-status.warn{color:var(--amber)}.pdf-status.error{color:var(--red)}
+.pdf-preview{background:#07101c;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.pdf-preview-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.pdf-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pdf-row-label{font-size:11px;color:var(--muted);flex:0 0 160px}
+.pdf-row-inp{flex:1;background:#0f1a2e;border:1px solid var(--border2);border-radius:6px;padding:5px 8px;font-size:13px;font-weight:600;color:var(--text);font-family:inherit;min-width:0}
+.pdf-row-inp.found{border-color:rgba(16,185,129,.5);background:rgba(16,185,129,.05)}
+.pdf-row-inp.notfound{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.04)}
+.pdf-row-badge{font-size:9px;padding:1px 6px;border-radius:8px;font-weight:700;flex-shrink:0}
+.pdf-badge-ok{background:rgba(16,185,129,.15);color:var(--green)}
+.pdf-badge-miss{background:rgba(245,158,11,.15);color:var(--amber)}
+.pdf-unit-note{font-size:11px;color:var(--hint);margin-bottom:10px;padding:5px 8px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:6px}
+.pdf-apply-btn{padding:9px 22px;border-radius:7px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.pdf-apply-btn:hover{opacity:.85}
+.claude-divider{text-align:center;position:relative;margin:16px 0}
+.claude-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
+.claude-divider span{background:#0a1220;padding:0 10px;position:relative;font-size:11px;color:var(--hint)}
+.claude-card{border:1.5px solid var(--border);border-radius:var(--r);padding:14px;background:#070f1b}
+.claude-card.disabled{opacity:.6}
+.claude-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.claude-icon{font-size:22px;flex-shrink:0}
+.claude-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;display:flex;align-items:center;gap:7px}
+.claude-desc{font-size:11px;color:var(--muted)}
+.paid-badge{font-size:9px;font-weight:700;background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.4);padding:1px 7px;border-radius:10px;letter-spacing:.04em}
+.claude-btn{width:100%;padding:9px;border-radius:7px;border:1.5px solid var(--border);background:#0c1220;color:var(--muted);font-size:12px;font-weight:600;cursor:not-allowed;font-family:inherit;margin-bottom:8px}
+.claude-notice{font-size:11px;color:var(--hint);background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:6px;padding:7px 10px;line-height:1.6}
 
 /* ── 가치평가 계산기 ── */
 .calc-wrap{background:#0c1220;border:1px solid #1e3050;border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
@@ -1015,9 +1056,9 @@ function renderResult() {
 function buildCalc(r) {
   const id = Object.keys(RESULTS).find(k => RESULTS[k] === r) || '';
   // 세법 — 가중평균 (흑자 3년+)
-  if (id === 'result_tax_profit') return calcTaxWeighted();
+  if (id === 'result_tax_profit') return buildPdfUpload('weighted') + calcTaxWeighted();
   // 세법 — 순자산만 (창업 3년 미만, 적자, 부동산, 우선주 등)
-  if (['result_tax_startup','result_tax_loss','result_tax_realestate','result_tax_preferred'].includes(id)) return calcTaxNA();
+  if (['result_tax_startup','result_tax_loss','result_tax_realestate','result_tax_preferred'].includes(id)) return buildPdfUpload('na') + calcTaxNA();
   // 투자 — DCF
   if (['result_inv_dcf','result_inv_minority','result_inv_majority'].includes(id)) return calcInvDCF();
   // 투자 — 멀티플 (CCA, TAM)
@@ -1242,6 +1283,294 @@ function calcInvMultiple() {
       </div>
     </div>
   </div>`;
+}
+
+/* ════════════════════════════════════════════════════════
+   PDF 업로드 & 자동 파싱
+   ════════════════════════════════════════════════════════ */
+
+// PDF.js worker 설정
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// 현재 파싱 결과 (applyParsedToCalc에서 사용)
+let _parsedData = null;
+let _calcType   = 'weighted'; // 'weighted' | 'na'
+
+function buildPdfUpload(calcType) {
+  _calcType = calcType;
+  const fieldRows = calcType === 'weighted' ? `
+    <div class="pdf-row">
+      <span class="pdf-row-label">당기순이익 (3년 전)</span>
+      <input class="pdf-row-inp" id="pp-ni1" type="number" placeholder="미추출">
+      <span class="pdf-row-badge pdf-badge-miss" id="pp-ni1-b">?</span>
+    </div>
+    <div class="pdf-row">
+      <span class="pdf-row-label">당기순이익 (2년 전)</span>
+      <input class="pdf-row-inp" id="pp-ni2" type="number" placeholder="미추출">
+      <span class="pdf-row-badge pdf-badge-miss" id="pp-ni2-b">?</span>
+    </div>
+    <div class="pdf-row">
+      <span class="pdf-row-label">당기순이익 (최근년)</span>
+      <input class="pdf-row-inp" id="pp-ni3" type="number" placeholder="미추출">
+      <span class="pdf-row-badge pdf-badge-miss" id="pp-ni3-b">?</span>
+    </div>
+    <div class="pdf-row">
+      <span class="pdf-row-label">자산 총계</span>
+      <input class="pdf-row-inp" id="pp-asset" type="number" placeholder="미추출">
+      <span class="pdf-row-badge pdf-badge-miss" id="pp-asset-b">?</span>
+    </div>
+    <div class="pdf-row">
+      <span class="pdf-row-label">부채 총계</span>
+      <input class="pdf-row-inp" id="pp-liab" type="number" placeholder="미추출">
+      <span class="pdf-row-badge pdf-badge-miss" id="pp-liab-b">?</span>
+    </div>
+    <div class="pdf-row">
+      <span class="pdf-row-label">발행주식수</span>
+      <input class="pdf-row-inp" id="pp-shares" type="number" placeholder="미추출">
+      <span class="pdf-row-badge pdf-badge-miss" id="pp-shares-b">?</span>
+    </div>` : `
+    <div class="pdf-row">
+      <span class="pdf-row-label">자산 총계</span>
+      <input class="pdf-row-inp" id="pp-asset" type="number" placeholder="미추출">
+      <span class="pdf-row-badge pdf-badge-miss" id="pp-asset-b">?</span>
+    </div>
+    <div class="pdf-row">
+      <span class="pdf-row-label">부채 총계</span>
+      <input class="pdf-row-inp" id="pp-liab" type="number" placeholder="미추출">
+      <span class="pdf-row-badge pdf-badge-miss" id="pp-liab-b">?</span>
+    </div>
+    <div class="pdf-row">
+      <span class="pdf-row-label">발행주식수</span>
+      <input class="pdf-row-inp" id="pp-shares" type="number" placeholder="미추출">
+      <span class="pdf-row-badge pdf-badge-miss" id="pp-shares-b">?</span>
+    </div>`;
+
+  return `
+  <div class="pdf-wrap no-print">
+    <div class="pdf-hd">
+      <div class="pdf-hd-icon">📄</div>
+      <div>
+        <div class="pdf-hd-title">재무제표 자동 입력</div>
+        <div class="pdf-hd-sub">PDF 업로드 → 핵심 수치 자동 추출 → 계산기 자동 채우기</div>
+      </div>
+    </div>
+    <div class="pdf-body">
+      <div class="pdf-source-note">크레탑 · DART · 세무조정계산서 등 텍스트 기반 PDF 지원 &nbsp;|&nbsp; 추출 후 수치를 직접 확인하고 적용하세요</div>
+
+      <input type="file" id="pdf-file-input" accept=".pdf" onchange="onPdfSelected(event)" style="display:none">
+      <div class="pdf-btn-row">
+        <button class="pdf-file-btn" onclick="document.getElementById('pdf-file-input').click()">📁 PDF 파일 선택</button>
+        <span class="pdf-filename" id="pdf-filename"></span>
+      </div>
+      <div class="pdf-status" id="pdf-status"></div>
+
+      <div class="pdf-preview" id="pdf-preview" style="display:none">
+        <div class="pdf-preview-title">추출 결과 — 수치를 확인·수정 후 [계산기에 적용]을 누르세요</div>
+        <div class="pdf-unit-note" id="pdf-unit-note"></div>
+        ${fieldRows}
+        <button class="pdf-apply-btn" onclick="applyParsedToCalc()">↓ 계산기에 적용</button>
+      </div>
+
+      <!-- Claude Vision: 구현됨 / UI 비활성화 (유료 서비스) -->
+      <div class="claude-divider"><span>또는 스캔 문서인 경우</span></div>
+      <div class="claude-card disabled">
+        <div class="claude-card-top">
+          <span class="claude-icon">🤖</span>
+          <div>
+            <div class="claude-title">Claude Vision AI 분석 <span class="paid-badge">유료 서비스</span></div>
+            <div class="claude-desc">스캔 PDF · 사진 파일 지원 — 99%+ 정확도 · 테이블 구조 자동 이해 · 항목 자동 매핑</div>
+          </div>
+        </div>
+        <button class="claude-btn" disabled title="서비스 준비 중 — 활성화 시 API 비용 발생">
+          🔒 서비스 준비 중 (Claude Vision API)
+        </button>
+        <div class="claude-notice">
+          ⚠ <strong>회원 전용 유료 서비스</strong> — 크레딧을 소모합니다.
+          일반 텍스트 PDF는 위 PDF.js 방식으로 무료 처리됩니다.
+          스캔 문서·사진 파일 또는 PDF.js 추출 실패 시 사용을 권장합니다.
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── PDF 선택 & 텍스트 추출 ── */
+async function onPdfSelected(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  document.getElementById('pdf-filename').textContent = file.name;
+  const st = document.getElementById('pdf-status');
+  st.textContent = '⏳ PDF 텍스트 추출 중...';
+  st.className = 'pdf-status loading';
+  document.getElementById('pdf-preview').style.display = 'none';
+
+  if (typeof pdfjsLib === 'undefined') {
+    st.textContent = '❌ PDF.js 라이브러리 로드 실패 — 네트워크 연결을 확인하세요';
+    st.className = 'pdf-status error';
+    return;
+  }
+
+  try {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+
+    let fullText = '';
+    const maxPages = Math.min(pdf.numPages, 30);
+    for (let i = 1; i <= maxPages; i++) {
+      const page   = await pdf.getPage(i);
+      const items  = (await page.getTextContent()).items;
+      // 좌표 기반 정렬: y 내림차순, x 오름차순 (테이블 행 순서 보존)
+      const sorted = items.slice().sort((a, b) => {
+        const dy = Math.round(b.transform[5]) - Math.round(a.transform[5]);
+        return dy !== 0 ? dy : a.transform[4] - b.transform[4];
+      });
+      fullText += sorted.map(it => it.str).join(' ') + '\n';
+    }
+
+    // 텍스트가 없으면 스캔 PDF로 판단
+    if (fullText.replace(/\s/g, '').length < 200) {
+      st.textContent = '⚠ 스캔(이미지) PDF로 감지됩니다 — Claude Vision 사용을 권장합니다 (현재 비활성)';
+      st.className = 'pdf-status warn';
+      return;
+    }
+
+    const parsed = parseFsText(fullText);
+    _parsedData  = parsed;
+    showParsedPreview(parsed);
+    const found  = Object.values(parsed.values).filter(v => v !== null).length;
+    const total  = Object.keys(parsed.values).length;
+    st.textContent = `✅ 추출 완료 — ${found}/${total}개 항목 인식 (미인식 항목은 직접 입력하세요)`;
+    st.className = found > 0 ? 'pdf-status ok' : 'pdf-status warn';
+  } catch (err) {
+    document.getElementById('pdf-status').textContent = '❌ 오류: ' + err.message;
+    document.getElementById('pdf-status').className = 'pdf-status error';
+  }
+}
+
+/* ── 재무제표 텍스트 파싱 ── */
+function parseFsText(text) {
+  // 1. 단위 감지
+  let unitLabel = '원(추정)';
+  let toMan = 0.0001; // 원 → 만원
+  const uMatch = text.match(/단\s*위\s*[:\s]*([천백만억\d,\s]+원)/);
+  if (uMatch) {
+    const u = uMatch[1].replace(/\s/g, '');
+    if      (u.includes('백만')) { toMan = 100;      unitLabel = '백만원 → 만원 변환'; }
+    else if (u.includes('천'))   { toMan = 0.1;      unitLabel = '천원 → 만원 변환';  }
+    else if (u.includes('억'))   { toMan = 10000;    unitLabel = '억원 → 만원 변환';  }
+    else                          { toMan = 0.0001;  unitLabel = '원 → 만원 변환';    }
+  }
+
+  // 2. 숫자 파싱 헬퍼: "(1,234)" | "△1,234" | "-1,234" | "1,234"
+  function parseNum(s) {
+    if (!s) return null;
+    const neg = /^[△▲\-\(]/.test(s.trim()) || /\)$/.test(s.trim());
+    const n = parseFloat(s.replace(/[△▲,\(\)\s\-]/g, '')) || null;
+    return n !== null ? Math.round(n * toMan * (neg ? -1 : 1)) : null;
+  }
+
+  // 3. 레이블 뒤 숫자 N개 추출
+  function extract(labelRe, count = 3) {
+    const m = text.match(labelRe);
+    if (!m) return Array(count).fill(null);
+    // 레이블 이후 텍스트에서 숫자 토큰 추출
+    const after = text.slice(m.index + m[0].length, m.index + m[0].length + 300);
+    const tokens = after.match(/[-△▲(]?[\d,]+[)]?/g) || [];
+    return tokens.slice(0, count).map(parseNum);
+  }
+
+  function extractOne(labelRe) {
+    return extract(labelRe, 1)[0];
+  }
+
+  // 4. 핵심 항목 파싱
+  // 당기순이익: 손익계산서 3년치 (최신 → 과거 순서로 나타남)
+  const niNums = extract(/당\s*기\s*순\s*이\s*익/, 3);
+
+  // 자산·부채·자본 총계
+  const assetNums  = extract(/자\s*산\s*총\s*계/, 2);
+  const liabNums   = extract(/부\s*채\s*총\s*계/, 2);
+
+  // 발행주식수
+  let shares = extractOne(/발\s*행\s*주\s*식\s*수\s*[:\s]*([\d,]+)/);
+  if (!shares) shares = extractOne(/주\s*식\s*수\s*[:\s]*([\d,]+)/);
+  if (shares) shares = Math.round(shares / toMan); // 주식수는 단위변환 불필요, 역변환
+
+  const values = {
+    ni3:   niNums[0] || null,   // 최근년 (PDF에서 첫 번째로 나옴)
+    ni2:   niNums[1] || null,   // 2년 전
+    ni1:   niNums[2] || null,   // 3년 전
+    asset: assetNums[0] || null,
+    liab:  liabNums[0]  || null,
+    shares: shares || null,
+  };
+
+  return { values, unitLabel };
+}
+
+/* ── 미리보기 렌더링 ── */
+function showParsedPreview(parsed) {
+  const { values, unitLabel } = parsed;
+  document.getElementById('pdf-unit-note').textContent = '📐 단위 변환: ' + unitLabel + ' · 아래 수치는 만원 단위입니다';
+
+  function setRow(id, val) {
+    const inp = document.getElementById(id);
+    const badge = document.getElementById(id + '-b');
+    if (!inp || !badge) return;
+    if (val !== null) {
+      inp.value = val;
+      inp.className = 'pdf-row-inp found';
+      badge.textContent = '✓';
+      badge.className = 'pdf-row-badge pdf-badge-ok';
+    } else {
+      inp.value = '';
+      inp.className = 'pdf-row-inp notfound';
+      badge.textContent = '?';
+      badge.className = 'pdf-row-badge pdf-badge-miss';
+    }
+  }
+
+  setRow('pp-ni1', values.ni1);
+  setRow('pp-ni2', values.ni2);
+  setRow('pp-ni3', values.ni3);
+  setRow('pp-asset', values.asset);
+  setRow('pp-liab', values.liab);
+  setRow('pp-shares', values.shares);
+
+  document.getElementById('pdf-preview').style.display = 'block';
+}
+
+/* ── 계산기에 값 적용 ── */
+function applyParsedToCalc() {
+  const g = id => parseFloat(document.getElementById(id)?.value) || null;
+  const s = (id, val) => { if (val !== null) { const el = document.getElementById(id); if (el) el.value = val; } };
+
+  if (_calcType === 'weighted') {
+    s('c_shares', g('pp-shares'));
+    s('c_ni1',    g('pp-ni1'));
+    s('c_ni2',    g('pp-ni2'));
+    s('c_ni3',    g('pp-ni3'));
+    s('c_asset',  g('pp-asset'));
+    s('c_liab',   g('pp-liab'));
+    // 계산기 패널 열기
+    const hd = document.querySelector('.calc-wrap .calc-hd');
+    if (hd && !hd.nextElementSibling.classList.contains('open')) toggleCalc(hd);
+    calcWeighted();
+  } else {
+    s('c_shares_na', g('pp-shares'));
+    s('c_asset_na',  g('pp-asset'));
+    s('c_liab_na',   g('pp-liab'));
+    const hd = document.querySelector('.calc-wrap .calc-hd');
+    if (hd && !hd.nextElementSibling.classList.contains('open')) toggleCalc(hd);
+    calcNA();
+  }
+
+  // 계산기 위치로 스크롤
+  document.querySelector('.calc-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ── 계산기 토글 ── */

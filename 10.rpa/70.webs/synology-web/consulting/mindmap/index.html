@@ -7,6 +7,11 @@
     document.addEventListener('DOMContentLoaded', function(){
       var h = document.querySelector('header');
       if(h) h.style.display = 'none';
+      // header가 숨겨지면 맵 캔버스를 top:0으로 조정
+      var mw = document.getElementById('map-wrap');
+      var dt = document.getElementById('detail');
+      if(mw) mw.style.top = '0';
+      if(dt) dt.style.top = '0';
     });
   }
 })();
@@ -20,7 +25,7 @@
   --bg:#0a0d14;--panel:#131b2a;--surface:#1c2640;--border:#263354;
   --text:#e2e8f0;--muted:#64748b;--hint:#334155;
   --blue:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;
-  --purple:#a855f7;--teal:#14b8a6;--gold:#d97706;--pink:#ec4899;
+  --purple:#a855f7;--teal:#14b8a6;--gold:#d97706;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
@@ -29,11 +34,18 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 header{position:fixed;top:0;left:0;right:0;height:52px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:200}
 .logo{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
 .logo-dot{width:7px;height:7px;background:var(--gold);border-radius:50%}
-.hdr-r{font-size:11px;color:var(--muted)}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.hdr-hint{font-size:11px;color:var(--muted)}
+.hdr-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.hdr-btn:hover{border-color:var(--blue);color:var(--blue)}
+.hdr-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.hdr-btn.danger{border-color:var(--red);color:var(--red)}
+.hdr-btn.danger:hover{background:#3b0f0f}
 
 /* ── MAP CANVAS ── */
 #map-wrap{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab}
 #map-wrap.dragging{cursor:grabbing}
+#map-wrap.connect-mode{cursor:crosshair}
 #map-svg{width:100%;height:100%;position:absolute;top:0;left:0}
 #map-nodes{position:absolute;top:0;left:0;width:0;height:0}
 
@@ -48,17 +60,53 @@ header{position:fixed;top:0;left:0;right:0;height:52px;background:var(--panel);b
 .node-sub{font-size:10px;opacity:.65;text-align:center;margin-top:3px;white-space:nowrap}
 .node-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;display:inline-block;margin-top:5px;letter-spacing:.03em}
 
-/* CENTER NODE */
-.node-center .node-box{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.node-center .node-inner{padding:8px 10px;border-radius:50%;text-align:center}
-.node-center .node-title{font-size:13px}
+/* ── 계층별 노드 크기 ── */
+/* 1단계: 중심 — 가장 크게 */
+.node-center .node-box{width:180px;height:180px;border-radius:50%;display:flex;align-items:center;justify-content:center;border-width:3px}
+.node-center .node-inner{padding:12px 14px;border-radius:50%;text-align:center}
+.node-center .node-icon{font-size:30px;margin-bottom:8px}
+.node-center .node-title{font-size:20px;font-weight:900;letter-spacing:-.5px}
+.node-center .node-sub{font-size:12px}
 
-/* CATEGORY NODE */
-.node-cat .node-box{min-width:120px}
+/* 2단계: 카테고리 — 두꺼운 테두리로 구분 */
+.node-cat .node-box{min-width:148px;border-width:3.5px;box-shadow:0 4px 24px rgba(0,0,0,.5),0 0 12px rgba(255,255,255,.06)}
+.node-cat .node-inner{padding:16px 20px}
+.node-cat .node-icon{font-size:26px;margin-bottom:7px}
+.node-cat .node-title{font-size:14px;font-weight:700;white-space:normal}
+.node-cat .node-sub{font-size:11px}
 
-/* LEAF NODE */
+/* 3단계: 리프 — 현재 크기 유지 */
 .node-leaf .node-box{min-width:130px;max-width:160px}
 .node-leaf .node-title{white-space:normal;font-size:11px}
+
+/* ── EDIT MODE NODE STYLES ── */
+body.edit-mode .node-box{cursor:move}
+body.edit-mode .node-box:hover{outline:2px dashed var(--blue);outline-offset:3px}
+body.edit-mode .node.selected .node-box{outline:2px solid #fff;outline-offset:3px}
+.node-edit-btn{position:absolute;top:-10px;right:-10px;width:20px;height:20px;border-radius:50%;border:none;font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;font-weight:700;line-height:1}
+.node-del-btn{background:#ef4444;color:#fff}
+.node-edit-label{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);white-space:nowrap;display:none}
+body.edit-mode .node-edit-btn{display:flex}
+body.edit-mode .node-edit-label{display:block}
+
+/* ── EDGE DELETE ── */
+.edge-del-marker{cursor:pointer;fill:#ef4444;opacity:0}
+body.edit-mode .edge-del-marker{opacity:.85}
+body.edit-mode .edge-del-marker:hover{opacity:1;fill:#ff6b6b}
+body.edit-mode .edge-hit{cursor:pointer;stroke:transparent;stroke-width:12}
+
+/* ── CONNECT MODE ── */
+body.connect-mode-active .node-box{outline:1px dashed var(--amber)!important;outline-offset:2px}
+.connect-from .node-box{outline:2px solid var(--amber)!important;box-shadow:0 0 16px rgba(245,158,11,.5)!important}
+
+/* ── EDIT TOOLBAR ── */
+#edit-toolbar{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px 14px;z-index:160;display:none;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+#edit-toolbar.show{display:flex}
+.tb-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
+.tb-btn:hover{border-color:var(--blue);color:var(--blue)}
+.tb-btn.active{background:var(--amber);border-color:var(--amber);color:#000}
+.tb-sep{width:1px;height:24px;background:var(--border);margin:0 2px}
+.tb-hint{font-size:11px;color:var(--amber);max-width:200px}
 
 /* ── DETAIL PANEL ── */
 #detail{position:fixed;right:0;top:52px;bottom:0;width:360px;background:var(--panel);border-left:1px solid var(--border);transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:150;overflow-y:auto;display:flex;flex-direction:column}
@@ -71,7 +119,9 @@ header{position:fixed;top:0;left:0;right:0;height:52px;background:var(--panel);b
 .detail-sub{font-size:12.5px;color:var(--muted);line-height:1.6}
 .detail-body{padding:16px 20px;flex:1}
 .detail-section{margin-bottom:18px}
-.ds-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.ds-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.ds-edit-btn{font-size:10px;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;display:none}
+body.edit-mode .ds-edit-btn{display:inline}
 .check-list{display:flex;flex-direction:column;gap:5px}
 .check-item{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--text);opacity:.85;line-height:1.5}
 .check-dot{width:5px;height:5px;border-radius:50%;margin-top:7px;flex-shrink:0}
@@ -91,30 +141,70 @@ header{position:fixed;top:0;left:0;right:0;height:52px;background:var(--panel);b
 
 /* ── ZOOM ── */
 #zoom-ctrl{position:fixed;bottom:16px;right:380px;display:flex;gap:4px;z-index:150;transition:right .3s}
-#detail.open ~ #zoom-ctrl{right:376px}
+#detail.open~#zoom-ctrl{right:376px}
 .zoom-btn{width:34px;height:34px;background:var(--panel);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:16px;color:var(--text);display:flex;align-items:center;justify-content:center;transition:background .12s}
 .zoom-btn:hover{background:var(--surface)}
 
 /* ── TOOLTIP ── */
 #tooltip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text);z-index:300;opacity:0;transition:opacity .15s;max-width:200px;line-height:1.5}
 
-/* ── OVERVIEW PANEL ── */
+/* ── OVERVIEW ── */
 #overview{position:fixed;left:16px;top:68px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 14px;z-index:150;max-width:200px}
 .ov-title{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:7px;text-transform:uppercase}
 .ov-item{display:flex;align-items:center;gap:7px;padding:3px 0;cursor:pointer;transition:opacity .12s}
 .ov-item:hover{opacity:.7}
 .ov-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .ov-label{font-size:11.5px;color:var(--text);font-weight:500}
+
+/* ── NODE EDITOR MODAL ── */
+#node-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center}
+#node-modal.show{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;width:360px;max-height:80vh;overflow-y:auto;box-shadow:0 16px 64px rgba(0,0,0,.8)}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer}
+.modal-field{margin-bottom:12px}
+.modal-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px;display:block}
+.modal-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;font-family:inherit}
+.modal-input:focus{border-color:var(--blue)}
+.modal-textarea{min-height:80px;resize:vertical}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.modal-btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit}
+.modal-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.modal-btn:hover{opacity:.85}
+.color-picker-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.color-swatch{width:24px;height:24px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:border-color .1s}
+.color-swatch.selected{border-color:#fff}
+
+/* ── 편집 컨트롤: 항상 표시, 상세 패널 열리면 왼쪽으로 이동 ── */
+#edit-ctrl{
+  position:fixed;top:8px;right:8px;z-index:500;
+  display:flex;align-items:center;gap:6px;
+  transition:right .3s cubic-bezier(.4,0,.2,1);
+}
+#edit-ctrl #hdr-hint{font-size:11px;color:var(--muted);display:none}
+/* 상세 패널이 열리면 패널 왼쪽 경계에 붙음 (360px + 8px) */
+#detail.open ~ #edit-ctrl{right:368px}
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo"><div class="logo-dot"></div>컨설팅 전체 — 마인드맵</div>
-  <div class="hdr-r">드래그·핀치 확대 · 노드 클릭 시 상세보기</div>
+  <div class="hdr-r">
+    <span class="hdr-hint" id="hdr-hint-main">드래그·핀치 확대 · 노드 클릭 시 상세보기</span>
+  </div>
 </header>
 
-<!-- SVG 연결선 -->
+<!-- 편집 툴바 -->
+<div id="edit-toolbar">
+  <button class="tb-btn" onclick="startAddNode()">＋ 노드 추가</button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="connect-btn" onclick="toggleConnectMode()">⚡ 연결 추가</button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" onclick="saveState(true)">💾 저장</button>
+  <span class="tb-hint" id="tb-hint" style="display:none"></span>
+</div>
+
 <div id="map-wrap">
   <svg id="map-svg"></svg>
   <div id="map-nodes"></div>
@@ -138,7 +228,13 @@ header{position:fixed;top:0;left:0;right:0;height:52px;background:var(--panel);b
   </a>
 </div>
 
-<!-- 범례 -->
+<!-- 편집 컨트롤: #detail 뒤에 위치해야 CSS ~ 셀렉터 작동 -->
+<div id="edit-ctrl">
+  <span id="hdr-hint"></span>
+  <button class="hdr-btn danger" id="reset-btn" onclick="confirmReset()" style="display:none">↺ 초기화</button>
+  <button class="hdr-btn" id="edit-toggle-btn" onclick="toggleEditMode()">✏ 편집</button>
+</div>
+
 <div id="legend">
   <div class="leg-title">카테고리</div>
   <div class="leg-row"><div class="leg-dot" style="background:#3b82f6"></div>기업 컨설팅</div>
@@ -146,395 +242,91 @@ header{position:fixed;top:0;left:0;right:0;height:52px;background:var(--panel);b
   <div class="leg-row"><div class="leg-dot" style="background:#a855f7"></div>서비스·도구</div>
 </div>
 
-<!-- 개요 네비게이션 -->
 <div id="overview">
   <div class="ov-title">Quick Nav</div>
 </div>
 
-<!-- 줌 컨트롤 -->
 <div id="zoom-ctrl">
-  <button class="zoom-btn" onclick="zoom(1.2)" title="확대">+</button>
-  <button class="zoom-btn" onclick="zoom(0.83)" title="축소">−</button>
-  <button class="zoom-btn" onclick="resetView()" title="초기화">⊙</button>
+  <button class="zoom-btn" onclick="zoom(1.2)">+</button>
+  <button class="zoom-btn" onclick="zoom(0.83)">−</button>
+  <button class="zoom-btn" onclick="resetView()">⊙</button>
 </div>
 
 <div id="tooltip"></div>
 
+<!-- 노드 편집 모달 -->
+<div id="node-modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span id="modal-title-text">노드 편집</span>
+      <button class="modal-close" onclick="closeNodeModal()">✕</button>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">아이콘</label>
+      <input class="modal-input" id="m-icon" placeholder="🔑" maxlength="10">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">제목 (줄바꿈: \n)</label>
+      <input class="modal-input" id="m-title" placeholder="노드 제목">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">부제목</label>
+      <input class="modal-input" id="m-sub" placeholder="설명">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">태그 (없으면 비워두기)</label>
+      <input class="modal-input" id="m-tag" placeholder="파트너 전용">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">색상</label>
+      <div class="color-picker-row" id="m-colors">
+        <div class="color-swatch selected" data-color="#3b82f6" style="background:#3b82f6" onclick="pickColor(this,'#3b82f6')"></div>
+        <div class="color-swatch" data-color="#f97316" style="background:#f97316" onclick="pickColor(this,'#f97316')"></div>
+        <div class="color-swatch" data-color="#a855f7" style="background:#a855f7" onclick="pickColor(this,'#a855f7')"></div>
+        <div class="color-swatch" data-color="#10b981" style="background:#10b981" onclick="pickColor(this,'#10b981')"></div>
+        <div class="color-swatch" data-color="#ef4444" style="background:#ef4444" onclick="pickColor(this,'#ef4444')"></div>
+        <div class="color-swatch" data-color="#f59e0b" style="background:#f59e0b" onclick="pickColor(this,'#f59e0b')"></div>
+        <div class="color-swatch" data-color="#14b8a6" style="background:#14b8a6" onclick="pickColor(this,'#14b8a6')"></div>
+        <div class="color-swatch" data-color="#d97706" style="background:#d97706" onclick="pickColor(this,'#d97706')"></div>
+      </div>
+    </div>
+    <div class="modal-field" id="m-detail-section" style="display:none">
+      <label class="modal-label">링크 (href)</label>
+      <input class="modal-input" id="m-href" placeholder="../gfc/index.html">
+    </div>
+    <div class="modal-field" id="m-checks-section">
+      <label class="modal-label">체크리스트 항목 (한 줄에 하나)</label>
+      <textarea class="modal-input modal-textarea" id="m-checks" placeholder="항목 1&#10;항목 2&#10;항목 3"></textarea>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">노드 유형</label>
+      <select class="modal-input" id="m-type">
+        <option value="leaf">리프 (leaf)</option>
+        <option value="cat">카테고리 (cat)</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="closeNodeModal()">취소</button>
+      <button class="modal-btn primary" onclick="saveNodeModal()">저장</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════════════
-   마인드맵 데이터
+   기본 노드 데이터 (편집 초기화 기준)
 ═══════════════════════════════════════════════════ */
-const CENTER = {
-  id:'center', type:'center',
-  x:0, y:0,
-  color:'#d97706', bg:'#1c1508', border:'#4a3000',
-  icon:'◈', title:'컨설팅',
-  sub:'전체 솔루션 맵',
-};
-
-const CATEGORIES = [
-  { id:'cat-biz',   title:'기업\n컨설팅',  icon:'🏢', color:'#3b82f6', bg:'#0c1a30', border:'#1e3a6e', angle:270, r:200 },
-  { id:'cat-indiv', title:'개인\n컨설팅',  icon:'👤', color:'#f97316', bg:'#1e0d00', border:'#7a3500', angle:90,  r:200 },
-  { id:'cat-tool',  title:'서비스·\n도구', icon:'🛠', color:'#a855f7', bg:'#1e1a3f', border:'#3a2a7a', angle:180, r:200 },
-];
-
-const LEAVES = [
-  /* 기업 컨설팅 (cat-biz, angle:270=LEFT 중심 — 225~318 수직 분산) */
-  { id:'gfc-diag', cat:'cat-biz', angle:225, r:435,
-    icon:'🔑', title:'경영종합진단', sub:'13단계 체크리스트',
-    color:'#3b82f6', bg:'#0c1a30', border:'#2563eb',
-    tag:'파트너 전용', tagColor:'#1e3a6e', tagText:'#3b82f6',
-    href:'../gfc/index.html',
-    detail:{
-      badge:'파트너 전용 · 기업 컨설팅', badgeColor:'#0c1a30', badgeText:'#3b82f6',
-      title:'경영종합진단', sub:'기업 경영 전반의 세금·리스크·보험·승계를 13단계 질문으로 진단합니다.',
-      checks:['사업자 형태 (법인/개인)', '업종 및 위험율', '업력·비상장주식 평가 구간', '매출 규모 (A·B·C그룹)', '이익잉여금 및 가지급금', '법인세 납부 수준', '대표이사 연령', '가업승계 계획', '단체보험 현황'],
-      grades:['SAFE · 안전','PLAN-A · 절세최적화','PLAN-B · 시급설계','ALERT · 위험','CRITICAL · 위기'],
-      gradeColors:['#10b981','#3b82f6','#f59e0b','#ef4444','#a855f7'],
-      cta:'경영종합진단 시작', ctaSub:'13단계 인터랙티브 체크리스트',
-    }
-  },
-  { id:'ceo-plan', cat:'cat-biz', angle:247, r:425,
-    icon:'🔑', title:'CEO 플랜', sub:'법인 종합컨설팅',
-    color:'#3b82f6', bg:'#0c1a30', border:'#2563eb',
-    tag:'파트너 전용', tagColor:'#1e3a6e', tagText:'#3b82f6',
-    href:'../ceo/index.html',
-    detail:{
-      badge:'파트너 전용 · CEO 플랜', badgeColor:'#0c1a30', badgeText:'#3b82f6',
-      title:'CEO 플랜', sub:'중대재해·법인보험·퇴직설계를 통합한 CEO 전용 리스크 플랜입니다.',
-      checks:['중대재해처벌법 적용 현황', '법인 단체보험 설계 여부', '경영인정기·단체환급부보험', '퇴직소득 설계 구조', '파트너 3단계 설계 논리 적용'],
-      grades:['기업재해보장 설계','법인비용처리 구조','퇴직소득 환수 플랜'],
-      gradeColors:['#ef4444','#3b82f6','#d97706'],
-      cta:'CEO 플랜 보기', ctaSub:'플라이어·설계 자료 확인',
-    }
-  },
-  { id:'jdh', cat:'cat-biz', angle:264, r:440,
-    icon:'⚖', title:'중대재해처벌법\n자가진단', sub:'기업 의무 점검',
-    color:'#3b82f6', bg:'#0c1a30', border:'#1e3a6e',
-    tag:'컨설턴트', tagColor:'#1e2d40', tagText:'#64748b',
-    href:'../jdh/index.html',
-    detail:{
-      badge:'컨설턴트 전용 · 중대재해', badgeColor:'#0c1a30', badgeText:'#3b82f6',
-      title:'중대재해처벌법 자가진단', sub:'2022년 시행 이후 기업의 안전보건 의무 이행 수준을 체계적으로 점검합니다.',
-      checks:['5인 이상 사업장 적용 여부', '안전보건관리체계 구축 현황', '위험성 평가 실시 여부', '안전보건 교육 이행', '도급·용역·위탁 관리', '사고 발생 시 대응 플랜'],
-      grades:['이행 완료','부분 이행','미이행 — 긴급 보완 필요'],
-      gradeColors:['#10b981','#f59e0b','#ef4444'],
-      cta:'중대재해 자가진단', ctaSub:'의무 이행 체크리스트',
-    }
-  },
-  { id:'dart', cat:'cat-biz', angle:278, r:450,
-    icon:'📊', title:'기업공시 조회', sub:'DART 분석',
-    color:'#3b82f6', bg:'#0c1a30', border:'#1e4a90',
-    tag:'컨설턴트', tagColor:'#1e2d40', tagText:'#64748b',
-    href:'../dart/index.html',
-    detail:{
-      badge:'컨설턴트 전용', badgeColor:'#1e2d40', badgeText:'#64748b',
-      title:'DART 기업공시 조회', sub:'금융감독원 DART에서 기업 재무정보를 실시간 조회·분석합니다.',
-      checks:['기업 재무제표 조회', '사업보고서 분석', '주요 공시 이력 확인', '비교 기업 재무 분석'],
-      grades:['재무건전성 분석','공시 이력 검토'],
-      gradeColors:['#3b82f6','#10b981'],
-      cta:'기업공시 조회', ctaSub:'DART 실시간 연동',
-    }
-  },
-  { id:'esg', cat:'cat-biz', angle:295, r:435,
-    icon:'♻', title:'ESG 자가진단', sub:'환경·사회·지배구조',
-    color:'#14b8a6', bg:'#0d2620', border:'#1a4a3a',
-    tag:'컨설턴트', tagColor:'#1e2d40', tagText:'#64748b',
-    href:'../esg/index.html',
-    detail:{
-      badge:'컨설턴트 전용 · ESG', badgeColor:'#0d2620', badgeText:'#14b8a6',
-      title:'ESG 자가진단', sub:'기업의 환경·사회·지배구조 수준을 점검하고 개선 방향을 제시합니다.',
-      checks:['환경(E) — 탄소배출·에너지 관리', '사회(S) — 임직원 안전·다양성', '지배구조(G) — 이사회·투명성', 'ESG 등급 및 인증 현황'],
-      grades:['E 환경 점수','S 사회 점수','G 지배구조 점수','종합 ESG 등급'],
-      gradeColors:['#10b981','#3b82f6','#a855f7','#d97706'],
-      cta:'ESG 자가진단', ctaSub:'체크리스트 시작',
-    }
-  },
-  { id:'g1', cat:'cat-biz', angle:316, r:425,
-    icon:'🏥', title:'현장클리닉 관리', sub:'수진기업 진행현황',
-    color:'#3b82f6', bg:'#0c1a30', border:'#1e3a6e',
-    tag:'컨설턴트', tagColor:'#1e2d40', tagText:'#64748b',
-    href:'../g1/index.html',
-    detail:{
-      badge:'컨설턴트 전용 · 현장클리닉', badgeColor:'#0c1a30', badgeText:'#3b82f6',
-      title:'현장클리닉 관리', sub:'수진기업의 현장클리닉 진행 현황을 관리하고 보고합니다.',
-      checks:['기업 현장클리닉 일정 관리', '진행 단계별 체크리스트', '결과 보고서 생성'],
-      grades:['진행 중','완료','보완 필요'],
-      gradeColors:['#3b82f6','#10b981','#f59e0b'],
-      cta:'현장클리닉 관리', ctaSub:'수진기업 현황 확인',
-    }
-  },
-
-  /* 개인 컨설팅 (cat-indiv, angle:90=RIGHT 중심 — 44~136 수직 분산) */
-  { id:'prebiz', cat:'cat-indiv', angle:44, r:435,
-    icon:'🚀', title:'예비창업패키지', sub:'최대 1억 지원',
-    color:'#f97316', bg:'#1e0d00', border:'#7a3500',
-    tag:'정부지원', tagColor:'#2a1000', tagText:'#f97316',
-    href:'../prebiz/index.html',
-    detail:{
-      badge:'개인 컨설팅 · 창업', badgeColor:'#1e0d00', badgeText:'#f97316',
-      title:'예비창업패키지', sub:'정부 지원 최대 1억원 · 창업 교육·멘토링 패키지를 안내합니다.',
-      checks:['지원 자격 확인', '지원 금액 및 항목', '신청 일정·절차', '교육·멘토링 구성'],
-      grades:['일반형','소셜벤처형','청년 특별'],
-      gradeColors:['#f97316','#3b82f6','#a855f7'],
-      cta:'예비창업패키지 안내', ctaSub:'자격요건 및 신청 방법',
-    }
-  },
-  { id:'soho', cat:'cat-indiv', angle:88, r:445,
-    icon:'🏪', title:'소상공인·자영업자\n지원', sub:'정부지원 사업',
-    color:'#f97316', bg:'#1e0d00', border:'#7a3500',
-    tag:'정부지원', tagColor:'#2a1000', tagText:'#f97316',
-    href:'../soho/index.html',
-    detail:{
-      badge:'개인 컨설팅 · 소상공인', badgeColor:'#1e0d00', badgeText:'#f97316',
-      title:'소상공인·자영업자 정부지원', sub:'소상공진·고용부 등 주요 정부 지원 사업을 카드형으로 안내합니다.',
-      checks:['💰 금융지원 — 저금리 대출·신용보증', '👷 고용·보험 — 고용안정·두루누리', '📈 경영·판로 — 컨설팅·판로개척', '🆘 위기·폐업 — 희망리턴패키지'],
-      grades:['금융지원','고용·보험','경영·판로','위기·폐업'],
-      gradeColors:['#f59e0b','#10b981','#3b82f6','#ef4444'],
-      cta:'정부지원 사업 보기', ctaSub:'전체 지원 프로그램 확인',
-    }
-  },
-  { id:'inheritance', cat:'cat-indiv', angle:130, r:435,
-    icon:'🔑', title:'상속·증여\n종합진단', sub:'파트너 전용 등급',
-    color:'#f97316', bg:'#1e0d00', border:'#7a3500',
-    tag:'파트너 전용', tagColor:'#2a1000', tagText:'#f97316',
-    href:'../inheritance/index.html',
-    detail:{
-      badge:'파트너 전용 · 상속·증여', badgeColor:'#1e0d00', badgeText:'#f97316',
-      title:'상속·증여 종합진단', sub:'상속세 20년 동결·부동산 급등으로 급증하는 상속세 위험을 체계적으로 진단합니다.',
-      checks:['역할 확인 (상속인/피상속인/진행 중)', '총 순자산 규모 (5억~100억+)', '자산 구성 (부동산/금융/법인지분)', '법정 상속인 구성 (배우자·자녀 수)', '사전 증여 이력 (10년 합산)', '건강보험 피부양자 탈락 위험', '금융소득 종합과세 노출 여부', '상속세 납부 재원 현황', '법인 비상장 지분 평가 구조'],
-      grades:['SAFE · 부담 없음','PLAN-A · 절세 최적화','PLAN-B · 시급 설계','ALERT · 폭탄 경보','CRITICAL · 즉각 대응'],
-      gradeColors:['#10b981','#3b82f6','#f59e0b','#ef4444','#a855f7'],
-      cta:'상속·증여 진단 시작', ctaSub:'파트너 전용 5단계 등급 체계',
-    }
-  },
-
-  /* 서비스·도구 (cat-tool, angle:180=BOTTOM 중심) */
-  { id:'qr', cat:'cat-tool', angle:160, r:415,
-    icon:'◼', title:'QR 생성기', sub:'URL→QR 즉시 생성',
-    color:'#a855f7', bg:'#1e1a3f', border:'#4a2a8a',
-    tag:'무료', tagColor:'#1e1a3f', tagText:'#a855f7',
-    href:'../../service/qr/index.html',
-    detail:{
-      badge:'서비스 도구 · 무료', badgeColor:'#1e1a3f', badgeText:'#a855f7',
-      title:'QR 코드 생성기', sub:'URL을 QR 코드로 즉시 변환하고 PNG/SVG로 다운로드합니다.',
-      checks:['URL 입력 → QR 즉시 생성', 'PNG/SVG 다운로드', '크기·여백·색상 설정', '로고 삽입 지원'],
-      grades:['무료 이용'],
-      gradeColors:['#a855f7'],
-      cta:'QR 생성기 열기', ctaSub:'무료 · 회원가입 불필요',
-    }
-  },
-  { id:'norm', cat:'cat-tool', angle:180, r:435,
-    icon:'ㅇ→워', title:'파일명 자소복원', sub:'한글 파일명 복원',
-    color:'#a855f7', bg:'#1e1a3f', border:'#4a2a8a',
-    tag:'무료', tagColor:'#1e1a3f', tagText:'#a855f7',
-    href:'../../service/normalizer/index.html',
-    detail:{
-      badge:'서비스 도구 · 무료', badgeColor:'#1e1a3f', badgeText:'#a855f7',
-      title:'한글 파일명 자소복원', sub:'자소 분리된 한글 파일명을 일괄 복원합니다. macOS-Windows 간 이동 시 발생하는 한글 깨짐 해결.',
-      checks:['폴더 내 파일명 일괄 처리', '미리보기 후 적용', 'NFC↔NFD 변환'],
-      grades:['무료 이용'],
-      gradeColors:['#a855f7'],
-      cta:'자소복원 도구 열기', ctaSub:'무료',
-    }
-  },
-  { id:'cv', cat:'cat-tool', angle:202, r:415,
-    icon:'✔', title:'변환 결과 검증', sub:'파일 쌍 비교',
-    color:'#a855f7', bg:'#1e1a3f', border:'#4a2a8a',
-    tag:'무료', tagColor:'#1e1a3f', tagText:'#a855f7',
-    href:'../../service/conversion-verifier/index.html',
-    detail:{
-      badge:'서비스 도구 · 무료', badgeColor:'#1e1a3f', badgeText:'#a855f7',
-      title:'변환 결과 검증', sub:'변환 전·후 파일 쌍을 비교해 변환 누락·오류를 검증합니다.',
-      checks:['원본-변환본 쌍 매칭', '누락 파일 탐지', '보고서 내보내기'],
-      grades:['무료 이용'],
-      gradeColors:['#a855f7'],
-      cta:'변환 검증 도구 열기', ctaSub:'무료',
-    }
-  },
-];
-
-/* ═══════════════════════════════════════════════════
-   레이아웃 계산
-═══════════════════════════════════════════════════ */
-function polar(cx, cy, angleDeg, r) {
-  const rad = (angleDeg - 90) * Math.PI / 180;
+function polar(cx, cy, deg, r) {
+  const rad = (deg - 90) * Math.PI / 180;
   return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 }
 
-const CX = 0, CY = 0;   // 논리 좌표 중심
-
-// 카테고리 좌표 설정
-CATEGORIES.forEach(c => {
-  const p = polar(CX, CY, c.angle, c.r);
-  c.x = p.x; c.y = p.y;
-});
-
-// 리프 좌표 설정
-LEAVES.forEach(l => {
-  const p = polar(CX, CY, l.angle, l.r);
-  l.x = p.x; l.y = p.y;
-});
-
-/* ═══════════════════════════════════════════════════
-   뷰포트 / 변환
-═══════════════════════════════════════════════════ */
-let vx = 0, vy = 30, scale = 0.78;
-
-function worldToScreen(wx, wy) {
-  const W = window.innerWidth, H = window.innerHeight - 52;
-  return {
-    x: W/2 + (wx - vx) * scale,
-    y: H/2 + (wy - vy) * scale,
-  };
-}
-
-/* ═══════════════════════════════════════════════════
-   SVG 연결선 그리기
-═══════════════════════════════════════════════════ */
-const svg = document.getElementById('map-svg');
-
-function drawLines() {
-  svg.innerHTML = '';
-  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
-
-  // center→cat 선
-  CATEGORIES.forEach(c => {
-    const s = worldToScreen(CX, CY);
-    const e = worldToScreen(c.x, c.y);
-    const grad = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
-    grad.id = 'g-'+c.id;
-    grad.setAttribute('x1','0%'); grad.setAttribute('y1','0%');
-    grad.setAttribute('x2','100%'); grad.setAttribute('y2','0%');
-    const s1 = document.createElementNS('http://www.w3.org/2000/svg','stop');
-    s1.setAttribute('offset','0%'); s1.setAttribute('stop-color','#d97706'); s1.setAttribute('stop-opacity','0.6');
-    const s2 = document.createElementNS('http://www.w3.org/2000/svg','stop');
-    s2.setAttribute('offset','100%'); s2.setAttribute('stop-color',c.color); s2.setAttribute('stop-opacity','0.6');
-    grad.appendChild(s1); grad.appendChild(s2);
-    defs.appendChild(grad);
-
-    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1', s.x); line.setAttribute('y1', s.y);
-    line.setAttribute('x2', e.x); line.setAttribute('y2', e.y);
-    line.setAttribute('stroke', `url(#g-${c.id})`);
-    line.setAttribute('stroke-width', 1.5 * scale);
-    line.setAttribute('stroke-dasharray', `${4*scale} ${3*scale}`);
-    svg.appendChild(line);
-  });
-
-  // 중복 항목 cross-connection 헬퍼
-  function drawCross(fromCatId, toLeafId, color) {
-    const cat  = CATEGORIES.find(c => c.id === fromCatId);
-    const leaf = LEAVES.find(l => l.id === toLeafId);
-    if (!cat || !leaf) return;
-    const s = worldToScreen(cat.x, cat.y);
-    const e = worldToScreen(leaf.x, leaf.y);
-    const ln = document.createElementNS('http://www.w3.org/2000/svg','line');
-    ln.setAttribute('x1', s.x); ln.setAttribute('y1', s.y);
-    ln.setAttribute('x2', e.x); ln.setAttribute('y2', e.y);
-    ln.setAttribute('stroke', color);
-    ln.setAttribute('stroke-opacity', '0.45');
-    ln.setAttribute('stroke-width', 0.9 * scale);
-    ln.setAttribute('stroke-dasharray', `${4*scale} ${3*scale}`);
-    svg.appendChild(ln);
-  }
-  // 소상공인 — 개인 primary, 기업 secondary (소규모 법인 겹침)
-  drawCross('cat-biz', 'soho', '#3b82f6');
-  // 상속·증여 — 개인 primary, 기업 secondary (사업주 상속 설계)
-  drawCross('cat-biz', 'inheritance', '#3b82f6');
-  // 중대재해 — 기업 primary, 개인사업자 secondary
-  drawCross('cat-indiv', 'jdh', '#f97316');
-
-  // cat→leaf 선
-  LEAVES.forEach(l => {
-    const cat = CATEGORIES.find(c => c.id === l.cat);
-    if (!cat) return;
-    const s = worldToScreen(cat.x, cat.y);
-    const e = worldToScreen(l.x, l.y);
-    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1', s.x); line.setAttribute('y1', s.y);
-    line.setAttribute('x2', e.x); line.setAttribute('y2', e.y);
-    line.setAttribute('stroke', l.color);
-    line.setAttribute('stroke-opacity', '0.35');
-    line.setAttribute('stroke-width', 1 * scale);
-    svg.appendChild(line);
-  });
-
-  svg.insertBefore(defs, svg.firstChild);
-}
-
-/* ═══════════════════════════════════════════════════
-   노드 DOM 렌더
-═══════════════════════════════════════════════════ */
-const nodesEl = document.getElementById('map-nodes');
-
-function makeNode(data, nodeClass, size) {
-  const pos = worldToScreen(data.x, data.y);
-  const div = document.createElement('div');
-  div.className = `node ${nodeClass}`;
-  div.id = 'node-'+data.id;
-  div.style.left = pos.x + 'px';
-  div.style.top  = pos.y + 'px';
-
-  const titleLines = data.title.split('\n');
-
-  if (nodeClass === 'node-center') {
-    div.innerHTML = `<div class="node-box" style="background:${data.bg};border-color:${data.border||data.color};width:${size}px;height:${size}px"
-      onclick="openDetail('${data.id}')">
-      <div class="node-inner">
-        <div class="node-icon" style="font-size:16px;color:${data.color};font-weight:900">${data.icon}</div>
-        <div class="node-title" style="color:${data.color}">${titleLines.join('<br>')}</div>
-        <div class="node-sub">${data.sub}</div>
-      </div>
-    </div>`;
-  } else {
-    const tagHtml = data.tag ? `<div><span class="node-tag" style="background:${data.tagColor||data.bg};color:${data.tagText||data.color}">${data.tag}</span></div>` : '';
-    div.innerHTML = `<div class="node-box" style="background:${data.bg};border-color:${data.border||data.color}"
-      onclick="openDetail('${data.id}')"
-      onmouseenter="showTip(event,'${data.sub||''}')"
-      onmouseleave="hideTip()">
-      <div class="node-inner">
-        <div class="node-icon">${data.icon}</div>
-        <div class="node-title" style="color:${data.color}">${titleLines.join('<br>')}</div>
-        ${tagHtml}
-      </div>
-    </div>`;
-  }
-  nodesEl.appendChild(div);
-  return div;
-}
-
-function renderNodes() {
-  nodesEl.innerHTML = '';
-  makeNode(CENTER, 'node-center', Math.round(100 * scale));
-
-  CATEGORIES.forEach(c => makeNode(c, 'node-cat', 110));
-  LEAVES.forEach(l => makeNode(l, 'node-leaf', 140));
-}
-
-function updateNodePositions() {
-  [CENTER, ...CATEGORIES, ...LEAVES].forEach(d => {
-    const el = document.getElementById('node-'+d.id);
-    if (!el) return;
-    const pos = worldToScreen(d.x, d.y);
-    el.style.left = pos.x + 'px';
-    el.style.top  = pos.y + 'px';
-  });
-}
-
-function redraw() {
-  drawLines();
-  updateNodePositions();
-}
-
-/* ═══════════════════════════════════════════════════
-   상세 패널
-═══════════════════════════════════════════════════ */
-function openDetail(id) {
-  let data = null;
-  if (id === 'center') {
-    data = {
-      id:'center', detail:{
+function buildDefaults() {
+  // ── 노드 ──────────────────────────────────────────────
+  const nodes = [
+    { id:'center', type:'center', x:0, y:0,
+      icon:'◈', title:'컨설팅', sub:'전체 솔루션 맵',
+      color:'#d97706', bg:'#1c1508', border:'#4a3000', detail: {
         badge:'파트너 컨설팅', badgeColor:'#1c1508', badgeText:'#d97706',
         title:'파트너 컨설팅 맵',
         sub:'3개 카테고리, 13개 진단/서비스 노드. 각 노드를 클릭해 체크리스트를 시작하세요.',
@@ -543,153 +335,830 @@ function openDetail(id) {
         gradeColors:['#d97706','#3b82f6','#a855f7'],
         cta:'경영종합진단으로 시작', ctaSub:'가장 많이 이용하는 체크리스트',
       }, href:'../gfc/index.html',
-    };
-  } else {
-    data = LEAVES.find(l => l.id === id) || CATEGORIES.find(c => c.id === id);
+    },
+  ];
+  const catDefs = [
+    { id:'cat-biz',   deg:270, r:200, icon:'🏢', title:'기업\n컨설팅',  color:'#3b82f6', bg:'#0c1a30', border:'#1e3a6e' },
+    { id:'cat-indiv', deg:90,  r:200, icon:'👤', title:'개인\n컨설팅',  color:'#f97316', bg:'#1e0d00', border:'#7a3500' },
+    { id:'cat-tool',  deg:180, r:200, icon:'🛠', title:'서비스·\n도구', color:'#a855f7', bg:'#1e1a3f', border:'#3a2a7a' },
+  ];
+  catDefs.forEach(c => {
+    const p = polar(0,0,c.deg,c.r);
+    nodes.push({...c, type:'cat', x:p.x, y:p.y, sub:''});
+  });
+  const leafDefs = [
+    { id:'gfc-diag', cat:'cat-biz', deg:225, r:435,
+      icon:'🔑', title:'경영종합진단', sub:'13단계 체크리스트',
+      color:'#3b82f6', bg:'#0c1a30', border:'#2563eb',
+      tag:'파트너 전용', tagColor:'#1e3a6e', tagText:'#3b82f6',
+      href:'../gfc/index.html', detail:{
+        badge:'파트너 전용 · 기업 컨설팅', badgeColor:'#0c1a30', badgeText:'#3b82f6',
+        title:'경영종합진단', sub:'기업 경영 전반의 세금·리스크·보험·승계를 13단계 질문으로 진단합니다.',
+        checks:['사업자 형태 (법인/개인)', '업종 및 위험율', '업력·비상장주식 평가 구간', '매출 규모 (A·B·C그룹)', '이익잉여금 및 가지급금', '법인세 납부 수준', '대표이사 연령', '가업승계 계획', '단체보험 현황'],
+        grades:['SAFE · 안전','PLAN-A · 절세최적화','PLAN-B · 시급설계','ALERT · 위험','CRITICAL · 위기'],
+        gradeColors:['#10b981','#3b82f6','#f59e0b','#ef4444','#a855f7'],
+        cta:'경영종합진단 시작', ctaSub:'13단계 인터랙티브 체크리스트',
+      }},
+    { id:'ceo-plan', cat:'cat-biz', deg:247, r:425,
+      icon:'🔑', title:'CEO 플랜', sub:'법인 종합컨설팅',
+      color:'#3b82f6', bg:'#0c1a30', border:'#2563eb',
+      tag:'파트너 전용', tagColor:'#1e3a6e', tagText:'#3b82f6',
+      href:'../ceo/index.html', detail:{
+        badge:'파트너 전용 · CEO 플랜', badgeColor:'#0c1a30', badgeText:'#3b82f6',
+        title:'CEO 플랜', sub:'중대재해·법인보험·퇴직설계를 통합한 CEO 전용 리스크 플랜입니다.',
+        checks:['중대재해처벌법 적용 현황', '법인 단체보험 설계 여부', '경영인정기·단체환급부보험', '퇴직소득 설계 구조', '파트너 3단계 설계 논리 적용'],
+        grades:['기업재해보장 설계','법인비용처리 구조','퇴직소득 환수 플랜'],
+        gradeColors:['#ef4444','#3b82f6','#d97706'],
+        cta:'CEO 플랜 보기', ctaSub:'플라이어·설계 자료 확인',
+      }},
+    { id:'jdh', cat:'cat-biz', deg:264, r:440,
+      icon:'⚖', title:'중대재해처벌법\n자가진단', sub:'기업 의무 점검',
+      color:'#3b82f6', bg:'#0c1a30', border:'#1e3a6e',
+      tag:'컨설턴트', tagColor:'#1e2d40', tagText:'#64748b',
+      href:'../jdh/index.html', detail:{
+        badge:'컨설턴트 전용 · 중대재해', badgeColor:'#0c1a30', badgeText:'#3b82f6',
+        title:'중대재해처벌법 자가진단', sub:'2022년 시행 이후 기업의 안전보건 의무 이행 수준을 체계적으로 점검합니다.',
+        checks:['5인 이상 사업장 적용 여부', '안전보건관리체계 구축 현황', '위험성 평가 실시 여부', '안전보건 교육 이행', '도급·용역·위탁 관리', '사고 발생 시 대응 플랜'],
+        grades:['이행 완료','부분 이행','미이행 — 긴급 보완 필요'],
+        gradeColors:['#10b981','#f59e0b','#ef4444'],
+        cta:'중대재해 자가진단', ctaSub:'의무 이행 체크리스트',
+      }},
+    { id:'dart', cat:'cat-biz', deg:278, r:450,
+      icon:'📊', title:'기업공시 조회', sub:'DART 분석',
+      color:'#3b82f6', bg:'#0c1a30', border:'#1e4a90',
+      tag:'컨설턴트', tagColor:'#1e2d40', tagText:'#64748b',
+      href:'../dart/index.html', detail:{
+        badge:'컨설턴트 전용', badgeColor:'#1e2d40', badgeText:'#64748b',
+        title:'DART 기업공시 조회', sub:'금융감독원 DART에서 기업 재무정보를 실시간 조회·분석합니다.',
+        checks:['기업 재무제표 조회', '사업보고서 분석', '주요 공시 이력 확인', '비교 기업 재무 분석'],
+        grades:['재무건전성 분석','공시 이력 검토'],
+        gradeColors:['#3b82f6','#10b981'],
+        cta:'기업공시 조회', ctaSub:'DART 실시간 연동',
+      }},
+    { id:'esg', cat:'cat-biz', deg:295, r:435,
+      icon:'♻', title:'ESG 자가진단', sub:'환경·사회·지배구조',
+      color:'#14b8a6', bg:'#0d2620', border:'#1a4a3a',
+      tag:'컨설턴트', tagColor:'#1e2d40', tagText:'#64748b',
+      href:'../esg/index.html', detail:{
+        badge:'컨설턴트 전용 · ESG', badgeColor:'#0d2620', badgeText:'#14b8a6',
+        title:'ESG 자가진단', sub:'기업의 환경·사회·지배구조 수준을 점검하고 개선 방향을 제시합니다.',
+        checks:['환경(E) — 탄소배출·에너지 관리', '사회(S) — 임직원 안전·다양성', '지배구조(G) — 이사회·투명성', 'ESG 등급 및 인증 현황'],
+        grades:['E 환경 점수','S 사회 점수','G 지배구조 점수','종합 ESG 등급'],
+        gradeColors:['#10b981','#3b82f6','#a855f7','#d97706'],
+        cta:'ESG 자가진단', ctaSub:'체크리스트 시작',
+      }},
+    { id:'g1', cat:'cat-biz', deg:316, r:425,
+      icon:'🏥', title:'현장클리닉 관리', sub:'수진기업 진행현황',
+      color:'#3b82f6', bg:'#0c1a30', border:'#1e3a6e',
+      tag:'컨설턴트', tagColor:'#1e2d40', tagText:'#64748b',
+      href:'../g1/index.html', detail:{
+        badge:'컨설턴트 전용 · 현장클리닉', badgeColor:'#0c1a30', badgeText:'#3b82f6',
+        title:'현장클리닉 관리', sub:'수진기업의 현장클리닉 진행 현황을 관리하고 보고합니다.',
+        checks:['기업 현장클리닉 일정 관리', '진행 단계별 체크리스트', '결과 보고서 생성'],
+        grades:['진행 중','완료','보완 필요'],
+        gradeColors:['#3b82f6','#10b981','#f59e0b'],
+        cta:'현장클리닉 관리', ctaSub:'수진기업 현황 확인',
+      }},
+    { id:'prebiz', cat:'cat-indiv', deg:44, r:435,
+      icon:'🚀', title:'예비창업패키지', sub:'최대 1억 지원',
+      color:'#f97316', bg:'#1e0d00', border:'#7a3500',
+      tag:'정부지원', tagColor:'#2a1000', tagText:'#f97316',
+      href:'../prebiz/index.html', detail:{
+        badge:'개인 컨설팅 · 창업', badgeColor:'#1e0d00', badgeText:'#f97316',
+        title:'예비창업패키지', sub:'정부 지원 최대 1억원 · 창업 교육·멘토링 패키지를 안내합니다.',
+        checks:['지원 자격 확인', '지원 금액 및 항목', '신청 일정·절차', '교육·멘토링 구성'],
+        grades:['일반형','소셜벤처형','청년 특별'],
+        gradeColors:['#f97316','#3b82f6','#a855f7'],
+        cta:'예비창업패키지 안내', ctaSub:'자격요건 및 신청 방법',
+      }},
+    { id:'soho', cat:'cat-indiv', deg:88, r:445,
+      icon:'🏪', title:'소상공인·자영업자\n지원', sub:'정부지원 사업',
+      color:'#f97316', bg:'#1e0d00', border:'#7a3500',
+      tag:'정부지원', tagColor:'#2a1000', tagText:'#f97316',
+      href:'../soho/index.html', detail:{
+        badge:'개인 컨설팅 · 소상공인', badgeColor:'#1e0d00', badgeText:'#f97316',
+        title:'소상공인·자영업자 정부지원', sub:'소상공진·고용부 등 주요 정부 지원 사업을 카드형으로 안내합니다.',
+        checks:['💰 금융지원 — 저금리 대출·신용보증', '👷 고용·보험 — 고용안정·두루누리', '📈 경영·판로 — 컨설팅·판로개척', '🆘 위기·폐업 — 희망리턴패키지'],
+        grades:['금융지원','고용·보험','경영·판로','위기·폐업'],
+        gradeColors:['#f59e0b','#10b981','#3b82f6','#ef4444'],
+        cta:'정부지원 사업 보기', ctaSub:'전체 지원 프로그램 확인',
+      }},
+    { id:'inheritance', cat:'cat-indiv', deg:130, r:435,
+      icon:'🔑', title:'상속·증여\n종합진단', sub:'파트너 전용 등급',
+      color:'#f97316', bg:'#1e0d00', border:'#7a3500',
+      tag:'파트너 전용', tagColor:'#2a1000', tagText:'#f97316',
+      href:'../inheritance/index.html', detail:{
+        badge:'파트너 전용 · 상속·증여', badgeColor:'#1e0d00', badgeText:'#f97316',
+        title:'상속·증여 종합진단', sub:'상속세 20년 동결·부동산 급등으로 급증하는 상속세 위험을 체계적으로 진단합니다.',
+        checks:['역할 확인 (상속인/피상속인/진행 중)', '총 순자산 규모 (5억~100억+)', '자산 구성 (부동산/금융/법인지분)', '법정 상속인 구성 (배우자·자녀 수)', '사전 증여 이력 (10년 합산)', '건강보험 피부양자 탈락 위험', '금융소득 종합과세 노출 여부', '상속세 납부 재원 현황', '법인 비상장 지분 평가 구조'],
+        grades:['SAFE · 부담 없음','PLAN-A · 절세 최적화','PLAN-B · 시급 설계','ALERT · 폭탄 경보','CRITICAL · 즉각 대응'],
+        gradeColors:['#10b981','#3b82f6','#f59e0b','#ef4444','#a855f7'],
+        cta:'상속·증여 진단 시작', ctaSub:'파트너 전용 5단계 등급 체계',
+      }},
+    { id:'qr', cat:'cat-tool', deg:160, r:415,
+      icon:'◼', title:'QR 생성기', sub:'URL→QR 즉시 생성',
+      color:'#a855f7', bg:'#1e1a3f', border:'#4a2a8a',
+      tag:'무료', tagColor:'#1e1a3f', tagText:'#a855f7',
+      href:'../../service/qr/index.html', detail:{
+        badge:'서비스 도구 · 무료', badgeColor:'#1e1a3f', badgeText:'#a855f7',
+        title:'QR 코드 생성기', sub:'URL을 QR 코드로 즉시 변환하고 PNG/SVG로 다운로드합니다.',
+        checks:['URL 입력 → QR 즉시 생성', 'PNG/SVG 다운로드', '크기·여백·색상 설정', '로고 삽입 지원'],
+        grades:['무료 이용'], gradeColors:['#a855f7'],
+        cta:'QR 생성기 열기', ctaSub:'무료 · 회원가입 불필요',
+      }},
+    { id:'norm', cat:'cat-tool', deg:180, r:435,
+      icon:'ㅇ→워', title:'파일명 자소복원', sub:'한글 파일명 복원',
+      color:'#a855f7', bg:'#1e1a3f', border:'#4a2a8a',
+      tag:'무료', tagColor:'#1e1a3f', tagText:'#a855f7',
+      href:'../../service/normalizer/index.html', detail:{
+        badge:'서비스 도구 · 무료', badgeColor:'#1e1a3f', badgeText:'#a855f7',
+        title:'한글 파일명 자소복원', sub:'자소 분리된 한글 파일명을 일괄 복원합니다.',
+        checks:['폴더 내 파일명 일괄 처리', '미리보기 후 적용', 'NFC↔NFD 변환'],
+        grades:['무료 이용'], gradeColors:['#a855f7'],
+        cta:'자소복원 도구 열기', ctaSub:'무료',
+      }},
+    { id:'cv', cat:'cat-tool', deg:202, r:415,
+      icon:'✔', title:'변환 결과 검증', sub:'파일 쌍 비교',
+      color:'#a855f7', bg:'#1e1a3f', border:'#4a2a8a',
+      tag:'무료', tagColor:'#1e1a3f', tagText:'#a855f7',
+      href:'../../service/conversion-verifier/index.html', detail:{
+        badge:'서비스 도구 · 무료', badgeColor:'#1e1a3f', badgeText:'#a855f7',
+        title:'변환 결과 검증', sub:'변환 전·후 파일 쌍을 비교해 변환 누락·오류를 검증합니다.',
+        checks:['원본-변환본 쌍 매칭', '누락 파일 탐지', '보고서 내보내기'],
+        grades:['무료 이용'], gradeColors:['#a855f7'],
+        cta:'변환 검증 도구 열기', ctaSub:'무료',
+      }},
+  ];
+  leafDefs.forEach(l => {
+    const p = polar(0,0,l.deg,l.r);
+    nodes.push({...l, type:'leaf', x:p.x, y:p.y});
+  });
+
+  // ── 엣지 ──────────────────────────────────────────────
+  const edges = [
+    // center → cat
+    {id:'e0', from:'center', to:'cat-biz',   style:'main'},
+    {id:'e1', from:'center', to:'cat-indiv', style:'main'},
+    {id:'e2', from:'center', to:'cat-tool',  style:'main'},
+    // cat-biz → leaves
+    {id:'e3',  from:'cat-biz', to:'gfc-diag', style:'main'},
+    {id:'e4',  from:'cat-biz', to:'ceo-plan', style:'main'},
+    {id:'e5',  from:'cat-biz', to:'jdh',      style:'main'},
+    {id:'e6',  from:'cat-biz', to:'dart',     style:'main'},
+    {id:'e7',  from:'cat-biz', to:'esg',      style:'main'},
+    {id:'e8',  from:'cat-biz', to:'g1',       style:'main'},
+    // cat-indiv → leaves
+    {id:'e9',  from:'cat-indiv', to:'prebiz',      style:'main'},
+    {id:'e10', from:'cat-indiv', to:'soho',        style:'main'},
+    {id:'e11', from:'cat-indiv', to:'inheritance', style:'main'},
+    // cat-tool → leaves
+    {id:'e12', from:'cat-tool', to:'qr',   style:'main'},
+    {id:'e13', from:'cat-tool', to:'norm', style:'main'},
+    {id:'e14', from:'cat-tool', to:'cv',   style:'main'},
+    // cross connections
+    {id:'e15', from:'cat-biz',   to:'soho',        style:'cross', color:'#3b82f6'},
+    {id:'e16', from:'cat-biz',   to:'inheritance', style:'cross', color:'#3b82f6'},
+    {id:'e17', from:'cat-indiv', to:'jdh',         style:'cross', color:'#f97316'},
+  ];
+  return { nodes, edges };
+}
+
+/* ═══════════════════════════════════════════════════
+   상태
+═══════════════════════════════════════════════════ */
+let NODES = [], EDGES = [];
+let _nodeId = 100; // auto-increment for new nodes
+
+function saveState(showToast) {
+  localStorage.setItem('wf_mindmap_v2', JSON.stringify({ nodes: NODES, edges: EDGES, _nodeId }));
+  if (showToast) showToastMsg('저장됐습니다 💾');
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('wf_mindmap_v2');
+    if (!s) { const d = buildDefaults(); NODES = d.nodes; EDGES = d.edges; return; }
+    const d = JSON.parse(s);
+    NODES = d.nodes; EDGES = d.edges; _nodeId = d._nodeId || 100;
+  } catch { const d = buildDefaults(); NODES = d.nodes; EDGES = d.edges; }
+}
+
+function confirmReset() {
+  if (!confirm('마인드맵을 기본값으로 초기화하시겠습니까? 모든 변경사항이 삭제됩니다.')) return;
+  localStorage.removeItem('wf_mindmap_v2');
+  const d = buildDefaults(); NODES = d.nodes; EDGES = d.edges; _nodeId = 100;
+  fullRender();
+  showToastMsg('초기화 완료');
+}
+
+/* ═══════════════════════════════════════════════════
+   뷰포트
+═══════════════════════════════════════════════════ */
+let vx = 0, vy = 30, scale = 0.78;
+
+function worldToScreen(wx, wy) {
+  const W = window.innerWidth, H = window.innerHeight - 52;
+  return { x: W/2 + (wx - vx) * scale, y: H/2 + (wy - vy) * scale };
+}
+function screenToWorld(sx, sy) {
+  const W = window.innerWidth, H = window.innerHeight - 52;
+  return { x: (sx - W/2) / scale + vx, y: (sy - H/2 + 52) / scale + vy };
+}
+
+/* ═══════════════════════════════════════════════════
+   SVG 연결선
+═══════════════════════════════════════════════════ */
+const svg = document.getElementById('map-svg');
+
+function getNode(id) { return NODES.find(n => n.id === id); }
+
+function drawLines() {
+  svg.innerHTML = '';
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+
+  EDGES.forEach(edge => {
+    const fromN = getNode(edge.from);
+    const toN   = getNode(edge.to);
+    if (!fromN || !toN) return;
+
+    const s = worldToScreen(fromN.x, fromN.y);
+    const e = worldToScreen(toN.x,   toN.y);
+    const mid = { x: (s.x+e.x)/2, y: (s.y+e.y)/2 };
+
+    if (edge.style === 'main') {
+      // 계층별 선 굵기: center→cat(굵게), cat→leaf(중간)
+      const isCenterEdge = edge.from === 'center';
+      const lineW = isCenterEdge ? 2.5*scale : 1.5*scale;
+      const opacity = isCenterEdge ? 0.75 : 0.5;
+      const dash = isCenterEdge ? `${5*scale} ${3*scale}` : `${4*scale} ${3*scale}`;
+
+      const gid = 'g-'+edge.id;
+      const grad = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
+      grad.id = gid;
+      grad.setAttribute('x1','0%'); grad.setAttribute('y1','0%');
+      grad.setAttribute('x2','100%'); grad.setAttribute('y2','0%');
+      ['0%','100%'].forEach((off,i) => {
+        const st = document.createElementNS('http://www.w3.org/2000/svg','stop');
+        st.setAttribute('offset', off);
+        st.setAttribute('stop-color', i===0 ? fromN.color||'#d97706' : toN.color||'#3b82f6');
+        st.setAttribute('stop-opacity', opacity);
+        grad.appendChild(st);
+      });
+      defs.appendChild(grad);
+      const line = makeSvgLine(s,e,`url(#${gid})`,lineW,dash);
+      svg.appendChild(line);
+    } else {
+      // cross 선: 얇게
+      const line = makeSvgLine(s,e,edge.color||'#888',0.9*scale,`${4*scale} ${3*scale}`,0.4);
+      svg.appendChild(line);
+    }
+
+    // 편집 모드: 히트영역 + 삭제 버튼
+    if (editMode) {
+      const hit = makeSvgLine(s,e,'transparent',12*scale,'none',0.01);
+      hit.setAttribute('data-edge-id', edge.id);
+      hit.classList.add('edge-hit');
+      hit.addEventListener('click', (ev) => { ev.stopPropagation(); deleteEdge(edge.id); });
+      svg.appendChild(hit);
+
+      // 중간 × 마커
+      const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      circle.setAttribute('cx', mid.x); circle.setAttribute('cy', mid.y);
+      circle.setAttribute('r', 7*scale);
+      circle.classList.add('edge-del-marker');
+      circle.setAttribute('data-edge-id', edge.id);
+      circle.addEventListener('click', (ev) => { ev.stopPropagation(); deleteEdge(edge.id); });
+      svg.appendChild(circle);
+
+      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x', mid.x); txt.setAttribute('y', mid.y+4*scale);
+      txt.setAttribute('text-anchor','middle');
+      txt.setAttribute('font-size', 9*scale);
+      txt.setAttribute('fill','#fff');
+      txt.setAttribute('pointer-events','none');
+      txt.textContent = '×';
+      svg.appendChild(txt);
+    }
+  });
+
+  // 연결 모드: 미리보기 선
+  if (connectMode && connectFrom && connectPreview) {
+    const fn = getNode(connectFrom);
+    if (fn) {
+      const s = worldToScreen(fn.x, fn.y);
+      const line = makeSvgLine(s, connectPreview, '#f59e0b', 1.5*scale, `${5*scale} ${3*scale}`, 0.8);
+      svg.appendChild(line);
+    }
   }
+
+  svg.insertBefore(defs, svg.firstChild);
+}
+
+function makeSvgLine(s, e, stroke, width, dashArr, opacity=1) {
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1',s.x); line.setAttribute('y1',s.y);
+  line.setAttribute('x2',e.x); line.setAttribute('y2',e.y);
+  line.setAttribute('stroke',stroke);
+  line.setAttribute('stroke-width',width);
+  line.setAttribute('stroke-dasharray',dashArr);
+  line.setAttribute('stroke-opacity',opacity);
+  return line;
+}
+
+/* ═══════════════════════════════════════════════════
+   노드 렌더
+═══════════════════════════════════════════════════ */
+const nodesEl = document.getElementById('map-nodes');
+
+function makeNodeEl(data) {
+  const pos = worldToScreen(data.x, data.y);
+  const div = document.createElement('div');
+  div.className = `node node-${data.type}`;
+  div.id = 'node-'+data.id;
+  div.style.left = pos.x+'px';
+  div.style.top  = pos.y+'px';
+
+  const titleLines = (data.title||'').split('\n');
+  const tagHtml = data.tag ? `<div><span class="node-tag" style="background:${data.tagColor||data.bg};color:${data.tagText||data.color}">${data.tag}</span></div>` : '';
+
+  if (data.type === 'center') {
+    const sz = Math.round(180 * scale);
+    div.innerHTML = `<div class="node-box" style="background:${data.bg};border-color:${data.border||data.color};width:${sz}px;height:${sz}px">
+      <div class="node-inner">
+        <div class="node-icon" style="color:${data.color};font-weight:900">${data.icon||'◈'}</div>
+        <div class="node-title" style="color:${data.color}">${titleLines.join('<br>')}</div>
+        <div class="node-sub">${data.sub||''}</div>
+      </div>
+    </div>`;
+  } else {
+    div.innerHTML = `<div class="node-box" style="background:${data.bg};border-color:${data.border||data.color}"
+      onmouseenter="showTip(event,'${(data.sub||'').replace(/'/g,'')}')"
+      onmouseleave="hideTip()">
+      <div class="node-inner">
+        <div class="node-icon">${data.icon||'●'}</div>
+        <div class="node-title" style="color:${data.color}">${titleLines.join('<br>')}</div>
+        ${tagHtml}
+      </div>
+    </div>
+    <button class="node-edit-btn node-del-btn" onclick="deleteNode('${data.id}')" title="삭제">✕</button>
+    <span class="node-edit-label">더블클릭 편집</span>`;
+  }
+
+  // 클릭 핸들러
+  div.querySelector('.node-box').addEventListener('click', (e) => {
+    if (nodeDragging) return;
+    if (connectMode) { handleConnectClick(data.id); return; }
+    if (!editMode) { openDetail(data.id); return; }
+    // 편집 모드에서 단순 클릭은 아무것도 안 함 (더블클릭으로 편집)
+  });
+  div.querySelector('.node-box').addEventListener('dblclick', (e) => {
+    if (editMode) { e.stopPropagation(); openNodeModal(data.id); }
+  });
+
+  // 노드 드래그 (편집 모드)
+  div.querySelector('.node-box').addEventListener('mousedown', (e) => {
+    if (!editMode || connectMode) return;
+    e.stopPropagation();
+    startNodeDrag(e, data.id);
+  });
+
+  nodesEl.appendChild(div);
+  return div;
+}
+
+function renderNodes() {
+  nodesEl.innerHTML = '';
+  NODES.forEach(n => makeNodeEl(n));
+}
+
+function updateNodePositions() {
+  NODES.forEach(n => {
+    const el = document.getElementById('node-'+n.id);
+    if (!el) return;
+    const pos = worldToScreen(n.x, n.y);
+    el.style.left = pos.x+'px';
+    el.style.top  = pos.y+'px';
+  });
+}
+
+function redraw() { drawLines(); updateNodePositions(); }
+function fullRender() { renderNodes(); drawLines(); buildOverview(); }
+
+/* ═══════════════════════════════════════════════════
+   편집 모드
+═══════════════════════════════════════════════════ */
+let editMode = false;
+
+function toggleEditMode() {
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  document.getElementById('edit-toggle-btn').classList.toggle('active', editMode);
+  document.getElementById('edit-toggle-btn').textContent = editMode ? '✓ 완료' : '✏ 편집';
+  document.getElementById('reset-btn').style.display = editMode ? '' : 'none';
+  document.getElementById('edit-toolbar').classList.toggle('show', editMode);
+  const hint = document.getElementById('hdr-hint');
+  hint.textContent = editMode ? '더블클릭: 편집  드래그: 이동  ✕: 삭제' : '';
+  hint.style.display = editMode ? '' : 'none';
+  if (!editMode) { saveState(false); setConnectMode(false); }
+  fullRender();
+}
+
+/* ── 노드 드래그 ── */
+let nodeDragging = false;
+let nodeDragId = null, nodeDragStartX, nodeDragStartY, nodeDragOrigX, nodeDragOrigY;
+
+function startNodeDrag(e, id) {
+  nodeDragging = false; // will set true on first move
+  nodeDragId = id;
+  nodeDragStartX = e.clientX;
+  nodeDragStartY = e.clientY;
+  const n = getNode(id);
+  nodeDragOrigX = n.x; nodeDragOrigY = n.y;
+}
+
+window.addEventListener('mousemove', e => {
+  if (nodeDragId) {
+    const dx = e.clientX - nodeDragStartX;
+    const dy = e.clientY - nodeDragStartY;
+    if (!nodeDragging && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) nodeDragging = true;
+    if (nodeDragging) {
+      const n = getNode(nodeDragId);
+      if (n) { n.x = nodeDragOrigX + dx / scale; n.y = nodeDragOrigY + dy / scale; redraw(); }
+    }
+  }
+});
+window.addEventListener('mouseup', () => {
+  if (nodeDragId) { if (nodeDragging) saveState(false); nodeDragId = null; setTimeout(()=>{ nodeDragging=false; },50); }
+});
+
+/* ═══════════════════════════════════════════════════
+   연결 추가/삭제
+═══════════════════════════════════════════════════ */
+let connectMode = false, connectFrom = null, connectPreview = null;
+
+function toggleConnectMode() {
+  setConnectMode(!connectMode);
+}
+
+function setConnectMode(on) {
+  connectMode = on;
+  connectFrom = null;
+  connectPreview = null;
+  document.getElementById('connect-btn').classList.toggle('active', on);
+  document.getElementById('map-wrap').classList.toggle('connect-mode', on);
+  document.body.classList.toggle('connect-mode-active', on);
+  const hint = document.getElementById('tb-hint');
+  if (on) { hint.style.display=''; hint.textContent='첫 번째 노드 클릭 → 두 번째 노드 클릭'; }
+  else { hint.style.display='none'; }
+  drawLines();
+}
+
+function handleConnectClick(id) {
+  if (!connectFrom) {
+    connectFrom = id;
+    document.getElementById('node-'+id)?.classList.add('connect-from');
+    document.getElementById('tb-hint').textContent = '두 번째 노드를 클릭하세요 (ESC 취소)';
+  } else {
+    if (id === connectFrom) { cancelConnect(); return; }
+    // 이미 존재하는 엣지인지 확인
+    const exists = EDGES.some(e => (e.from===connectFrom&&e.to===id)||(e.from===id&&e.to===connectFrom));
+    if (!exists) {
+      const fromN = getNode(connectFrom);
+      EDGES.push({ id:'e-u-'+(++_nodeId), from:connectFrom, to:id, style:'cross', color:fromN?.color||'#888' });
+      saveState(false);
+    }
+    cancelConnect();
+    drawLines();
+  }
+}
+
+function cancelConnect() {
+  if (connectFrom) document.getElementById('node-'+connectFrom)?.classList.remove('connect-from');
+  setConnectMode(false);
+}
+
+function deleteEdge(edgeId) {
+  if (!confirm('연결선을 삭제하시겠습니까?')) return;
+  EDGES = EDGES.filter(e => e.id !== edgeId);
+  saveState(false);
+  drawLines();
+}
+
+// 연결 모드에서 마우스 이동 → 미리보기 선
+document.getElementById('map-wrap').addEventListener('mousemove', e => {
+  if (connectMode && connectFrom) {
+    connectPreview = { x: e.clientX, y: e.clientY - 52 + 52 }; // adjust for header
+    connectPreview = { x: e.clientX, y: e.clientY };
+    drawLines();
+  }
+});
+
+/* ═══════════════════════════════════════════════════
+   노드 추가/삭제
+═══════════════════════════════════════════════════ */
+let addingNode = false;
+
+function startAddNode() {
+  if (addingNode) { addingNode=false; document.getElementById('map-wrap').style.cursor=''; return; }
+  addingNode = true;
+  document.getElementById('map-wrap').style.cursor = 'cell';
+  showToastMsg('캔버스를 클릭해 노드를 배치하세요');
+}
+
+document.getElementById('map-wrap').addEventListener('click', e => {
+  if (!addingNode) return;
+  if (e.target.closest('.node-box')) return;
+  addingNode = false;
+  document.getElementById('map-wrap').style.cursor = '';
+  const wp = screenToWorld(e.clientX, e.clientY - 52);
+  const newId = 'user-'+(++_nodeId);
+  const newNode = {
+    id: newId, type:'leaf', x: wp.x, y: wp.y,
+    icon:'●', title:'새 노드', sub:'',
+    color:'#3b82f6', bg:'#0c1a30', border:'#2563eb',
+    tag:'', tagColor:'', tagText:'',
+    href:'', detail:{ badge:'', badgeColor:'#0c1a30', badgeText:'#3b82f6',
+      title:'새 노드', sub:'', checks:[], grades:[], gradeColors:[],
+      cta:'열기', ctaSub:'',
+    }
+  };
+  NODES.push(newNode);
+  saveState(false);
+  fullRender();
+  openNodeModal(newId);
+});
+
+function deleteNode(id) {
+  if (!editMode) return;
+  if (!confirm('이 노드를 삭제하시겠습니까?')) return;
+  NODES = NODES.filter(n => n.id !== id);
+  EDGES = EDGES.filter(e => e.from !== id && e.to !== id);
+  const el = document.getElementById('node-'+id);
+  if (el) el.remove();
+  saveState(false);
+  drawLines();
+}
+
+/* ═══════════════════════════════════════════════════
+   노드 편집 모달
+═══════════════════════════════════════════════════ */
+let editingNodeId = null;
+let pickedColor = '#3b82f6';
+
+function pickColor(el, color) {
+  pickedColor = color;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function openNodeModal(id) {
+  editingNodeId = id;
+  const n = getNode(id);
+  if (!n) return;
+  document.getElementById('modal-title-text').textContent = n.id.startsWith('user-') ? '노드 편집' : '노드 편집';
+  document.getElementById('m-icon').value = n.icon||'';
+  document.getElementById('m-title').value = n.title||'';
+  document.getElementById('m-sub').value = n.sub||'';
+  document.getElementById('m-tag').value = n.tag||'';
+  document.getElementById('m-href').value = n.href||'';
+  document.getElementById('m-type').value = n.type==='cat' ? 'cat' : 'leaf';
+  document.getElementById('m-detail-section').style.display = '';
+  const checks = n.detail?.checks || [];
+  document.getElementById('m-checks').value = checks.join('\n');
+
+  pickedColor = n.color||'#3b82f6';
+  document.querySelectorAll('.color-swatch').forEach(s => {
+    s.classList.toggle('selected', s.dataset.color === pickedColor);
+  });
+  document.getElementById('node-modal').classList.add('show');
+}
+
+function closeNodeModal() {
+  document.getElementById('node-modal').classList.remove('show');
+  editingNodeId = null;
+}
+
+function saveNodeModal() {
+  const n = getNode(editingNodeId);
+  if (!n) { closeNodeModal(); return; }
+
+  n.icon  = document.getElementById('m-icon').value.trim() || n.icon;
+  n.title = document.getElementById('m-title').value.trim() || n.title;
+  n.sub   = document.getElementById('m-sub').value.trim();
+  n.tag   = document.getElementById('m-tag').value.trim();
+  n.href  = document.getElementById('m-href').value.trim();
+  n.type  = document.getElementById('m-type').value;
+  n.color  = pickedColor;
+  n.border = pickedColor;
+  n.tagColor = pickedColor+'33';
+  n.tagText  = pickedColor;
+
+  const checksRaw = document.getElementById('m-checks').value;
+  const checks = checksRaw.split('\n').map(s=>s.trim()).filter(Boolean);
+  if (!n.detail) n.detail = {};
+  n.detail.checks = checks;
+  n.detail.title  = n.title.replace('\n',' ');
+
+  saveState(false);
+  closeNodeModal();
+  const el = document.getElementById('node-'+n.id);
+  if (el) el.remove();
+  makeNodeEl(n);
+  drawLines();
+}
+
+document.getElementById('node-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('node-modal')) closeNodeModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('node-modal').classList.contains('show')) { closeNodeModal(); return; }
+    if (connectMode) { cancelConnect(); return; }
+    if (addingNode) { addingNode=false; document.getElementById('map-wrap').style.cursor=''; }
+  }
+});
+
+/* ═══════════════════════════════════════════════════
+   상세 패널 (뷰 모드)
+═══════════════════════════════════════════════════ */
+function openDetail(id) {
+  const data = NODES.find(n => n.id === id);
   if (!data || !data.detail) return;
-
   const D = data.detail;
-  document.getElementById('d-badge').textContent = D.badge;
-  document.getElementById('d-badge').style.background = D.badgeColor;
-  document.getElementById('d-badge').style.color = D.badgeText;
-  document.getElementById('d-title').textContent = D.title;
-  document.getElementById('d-sub').textContent = D.sub;
 
+  document.getElementById('d-badge').textContent = D.badge||'';
+  document.getElementById('d-badge').style.background = D.badgeColor||data.bg||'#1c2640';
+  document.getElementById('d-badge').style.color = D.badgeText||data.color||'#3b82f6';
+  document.getElementById('d-title').textContent = D.title||data.title||'';
+  document.getElementById('d-sub').textContent   = D.sub||data.sub||'';
+
+  const col = data.color||'#3b82f6';
   const checksHtml = (D.checks||[]).map(c=>`
     <div class="check-item">
-      <div class="check-dot" style="background:${data.color||'#3b82f6'}"></div>
-      <span>${c}</span>
+      <div class="check-dot" style="background:${col}"></div><span>${c}</span>
     </div>`).join('');
-
   const gradesHtml = (D.grades||[]).map((g,i)=>`
-    <span class="grade-pill" style="background:${(D.gradeColors[i]||'#3b82f6')}22;color:${D.gradeColors[i]||'#3b82f6'}">${g}</span>
-  `).join('');
+    <span class="grade-pill" style="background:${(D.gradeColors[i]||col)}22;color:${D.gradeColors[i]||col}">${g}</span>`).join('');
 
   document.getElementById('d-body').innerHTML = `
-    ${D.checks?.length ? `<div class="detail-section">
-      <div class="ds-label">체크리스트 항목</div>
+    ${D.checks?.length?`<div class="detail-section">
+      <div class="ds-label">체크리스트 항목
+        <button class="ds-edit-btn" onclick="openNodeModal('${id}')">✏ 편집</button>
+      </div>
       <div class="check-list">${checksHtml}</div>
-    </div>` : ''}
-    ${D.grades?.length ? `<div class="detail-section">
-      <div class="ds-label">${D.grades.length > 2 ? '등급 체계' : '분류 구분'}</div>
+    </div>`:''}
+    ${D.grades?.length?`<div class="detail-section">
+      <div class="ds-label">${D.grades.length>2?'등급 체계':'분류 구분'}</div>
       <div class="grade-pills">${gradesHtml}</div>
-    </div>` : ''}
-  `;
+    </div>`:''}`;
 
   const cta = document.getElementById('d-cta');
-  cta.style.background = (data.color||'#3b82f6')+'22';
-  cta.style.borderColor = (data.color||'#3b82f6')+'88';
-  document.getElementById('d-cta-icon').style.color = data.color||'#3b82f6';
-  document.getElementById('d-cta-main').textContent = D.cta;
-  document.getElementById('d-cta-main').style.color = data.color||'#3b82f6';
-  document.getElementById('d-cta-sub').textContent = D.ctaSub;
+  cta.style.background = col+'22';
+  cta.style.borderColor = col+'88';
+  document.getElementById('d-cta-icon').style.color = col;
+  document.getElementById('d-cta-main').textContent = D.cta||'열기';
+  document.getElementById('d-cta-main').style.color = col;
+  document.getElementById('d-cta-sub').textContent = D.ctaSub||'';
 
-  // href — iframe 부모에서 로드 or 새탭
   const inIframe = window.self !== window.top;
   if (inIframe && data.href) {
     cta.href = '#';
-    cta.onclick = (e) => {
-      e.preventDefault();
-      try {
-        const base = window.location.href.replace(/\/consulting\/mindmap\/index\.html.*/, '/');
-        const abs = new URL(data.href, window.location.href).pathname;
-        window.parent.postMessage({ type:'loadIframe', path: data.href }, '*');
-      } catch(ex) { window.open(data.href, '_blank'); }
+    cta.onclick = ev => {
+      ev.preventDefault();
+      try { window.parent.postMessage({ type:'loadIframe', path: data.href }, '*'); } catch { window.open(data.href,'_blank'); }
     };
   } else if (data.href) {
-    cta.href = data.href;
-    cta.onclick = null;
-    cta.target = '_blank';
-  }
+    cta.href = data.href; cta.onclick = null; cta.target = '_blank';
+  } else { cta.style.display='none'; }
 
   document.getElementById('detail').classList.add('open');
 }
 
-function closeDetail() {
-  document.getElementById('detail').classList.remove('open');
-}
+function closeDetail() { document.getElementById('detail').classList.remove('open'); }
 
 /* ═══════════════════════════════════════════════════
-   드래그·줌
+   캔버스 드래그·줌
 ═══════════════════════════════════════════════════ */
-let dragging = false, lastX, lastY;
+let canvasDragging = false, lastX, lastY;
 const wrap = document.getElementById('map-wrap');
 
 wrap.addEventListener('mousedown', e => {
+  if (nodeDragId) return;
   if (e.target.closest('.node-box')) return;
-  dragging = true; lastX = e.clientX; lastY = e.clientY;
+  if (connectMode) return;
+  canvasDragging = true; lastX = e.clientX; lastY = e.clientY;
   wrap.classList.add('dragging');
 });
 window.addEventListener('mousemove', e => {
-  if (!dragging) return;
+  if (!canvasDragging) return;
   vx -= (e.clientX - lastX) / scale;
   vy -= (e.clientY - lastY) / scale;
   lastX = e.clientX; lastY = e.clientY;
   redraw();
 });
-window.addEventListener('mouseup', () => { dragging = false; wrap.classList.remove('dragging'); });
+window.addEventListener('mouseup', () => { canvasDragging = false; wrap.classList.remove('dragging'); });
 
 wrap.addEventListener('wheel', e => {
   e.preventDefault();
-  const factor = e.deltaY < 0 ? 1.1 : 0.91;
-  scale = Math.max(0.3, Math.min(2.5, scale * factor));
+  const f = e.deltaY < 0 ? 1.1 : 0.91;
+  scale = Math.max(0.3, Math.min(2.5, scale * f));
   redraw();
 }, {passive:false});
 
-// 터치
 let lastPinchDist = null;
 wrap.addEventListener('touchstart', e => {
-  if (e.touches.length === 1) { dragging = true; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; }
-  if (e.touches.length === 2) { lastPinchDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); }
+  if (e.touches.length===1) { canvasDragging=true; lastX=e.touches[0].clientX; lastY=e.touches[0].clientY; }
+  if (e.touches.length===2) lastPinchDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
 }, {passive:true});
 wrap.addEventListener('touchmove', e => {
-  if (e.touches.length === 1 && dragging) {
+  if (e.touches.length===1 && canvasDragging) {
     vx -= (e.touches[0].clientX - lastX) / scale;
     vy -= (e.touches[0].clientY - lastY) / scale;
-    lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
-    redraw();
+    lastX=e.touches[0].clientX; lastY=e.touches[0].clientY; redraw();
   }
-  if (e.touches.length === 2 && lastPinchDist) {
+  if (e.touches.length===2 && lastPinchDist) {
     const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
     scale = Math.max(0.3, Math.min(2.5, scale * d / lastPinchDist));
-    lastPinchDist = d;
-    redraw();
+    lastPinchDist = d; redraw();
   }
 }, {passive:true});
-wrap.addEventListener('touchend', () => { dragging = false; lastPinchDist = null; });
+wrap.addEventListener('touchend', () => { canvasDragging=false; lastPinchDist=null; });
 
 function zoom(f) { scale = Math.max(0.3, Math.min(2.5, scale * f)); redraw(); }
-function resetView() { vx = 0; vy = 30; scale = 0.78; redraw(); }
+function resetView() { fitAll(); }
+
+function fitAll() {
+  if (!NODES.length) return;
+  const HEADER = 52;
+  const W = window.innerWidth;
+  const H = window.innerHeight - HEADER;
+  const PAD_NODE = 100; // 노드 크기 여유분
+  const MARGIN   = 60;  // 화면 가장자리 여백
+
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  NODES.forEach(n => {
+    minX = Math.min(minX, n.x - PAD_NODE);
+    maxX = Math.max(maxX, n.x + PAD_NODE);
+    minY = Math.min(minY, n.y - PAD_NODE);
+    maxY = Math.max(maxY, n.y + PAD_NODE);
+  });
+
+  const contentW = maxX - minX;
+  const contentH = maxY - minY;
+  const scaleX = (W - MARGIN * 2) / contentW;
+  const scaleY = (H - MARGIN * 2) / contentH;
+  scale = Math.max(0.2, Math.min(1.5, Math.min(scaleX, scaleY)));
+
+  vx = (minX + maxX) / 2;
+  vy = (minY + maxY) / 2;
+  redraw();
+}
 
 /* ── 툴팁 ── */
 function showTip(e, txt) {
-  if (!txt) return;
+  if (!txt || editMode) return;
   const tip = document.getElementById('tooltip');
-  tip.textContent = txt; tip.style.opacity = '1';
-  tip.style.left = (e.clientX + 10) + 'px';
-  tip.style.top  = (e.clientY + 10) + 'px';
+  tip.textContent = txt; tip.style.opacity='1';
+  tip.style.left = (e.clientX+10)+'px'; tip.style.top = (e.clientY+10)+'px';
 }
-function hideTip() { document.getElementById('tooltip').style.opacity = '0'; }
+function hideTip() { document.getElementById('tooltip').style.opacity='0'; }
+
+/* ── 토스트 ── */
+function showToastMsg(msg) {
+  let t = document.getElementById('toast-msg');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c2640;color:#e2e8f0;border:1px solid #263354;border-radius:8px;padding:8px 18px;font-size:13px;z-index:9999;transition:opacity .3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._to); t._to = setTimeout(()=>{ t.style.opacity='0'; },2000);
+}
 
 /* ── Overview nav ── */
 function buildOverview() {
   const ov = document.getElementById('overview');
-  CATEGORIES.forEach(c => {
+  ov.innerHTML = '<div class="ov-title">Quick Nav</div>';
+  NODES.filter(n=>n.type==='cat').forEach(c => {
     const div = document.createElement('div');
     div.className = 'ov-item';
     div.innerHTML = `<div class="ov-dot" style="background:${c.color}"></div><span class="ov-label">${c.title.replace('\n',' ')}</span>`;
-    div.onclick = () => { vx = c.x; vy = c.y; scale = 0.9; redraw(); };
+    div.onclick = () => { vx=c.x; vy=c.y; scale=0.9; redraw(); };
     ov.appendChild(div);
   });
 }
 
-/* ── 초기화 ── */
-renderNodes();
-drawLines();
-buildOverview();
+/* ─── iframe 메시지 ─── */
+window.addEventListener('message', e => {
+  if (e.data?.type==='wf_lang' || e.data?.type==='wf_role') return;
+});
 
-window.addEventListener('resize', redraw);
+/* ── 초기화 ── */
+loadState();
+fullRender();
+fitAll();
+window.addEventListener('resize', () => { fitAll(); });
 </script>
 </body>
 </html>

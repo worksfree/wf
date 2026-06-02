@@ -251,23 +251,22 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
         <div class="ts-label">사망사고 법인 최대 벌금액<br>(중대재해처벌법 제11조)</div>
       </div>
       <div class="trend-stat">
-        <div class="ts-val">5인↑</div>
-        <div class="ts-label">2024년 1월 전면 확대<br>5인 이상 전 사업장 적용</div>
+        <div class="ts-val">1,300일</div>
+        <div class="ts-label">국가 산재보험 최대 보상 범위<br>초과분은 100% 민사배상 책임</div>
       </div>
       <div class="trend-stat">
-        <div class="ts-val">800+</div>
-        <div class="ts-label">연간 산업재해 사망자<br>(2023년 829명, 중대재해 포함)</div>
+        <div class="ts-val">68.8%</div>
+        <div class="ts-label">50인 미만 사업장<br>산업재해 발생 비율</div>
       </div>
       <div class="trend-stat">
-        <div class="ts-val">2018</div>
-        <div class="ts-label">출퇴근 재해 산재 인정 원년<br>(산재보험법 개정, 2018.1.1 시행)</div>
+        <div class="ts-val">2026</div>
+        <div class="ts-label">포괄임금·3.3% 프리랜서<br>집중 근로감독 시행 연도</div>
       </div>
     </div>
     <div class="trend-note">
-      <strong>핵심 문제:</strong> 2022년 1월 시행 이후 건설·제조업을 중심으로 경영책임자 기소 사례가 잇따르고 있습니다.
-      2024년 1월부터 <strong>5인 이상 모든 사업장</strong>으로 전면 확대되어 소규모 사업체 대표도
-      안전보건관리체계 미비 시 1년 이상 징역 또는 10억 원 이하 벌금의 형사처벌 대상이 됩니다.
-      또한 <strong>2018년부터는 출퇴근 중 발생한 사고도 산재로 인정</strong>되어 사업주의 산재보험 관리 부담이 커졌습니다.
+      <strong>핵심 문제:</strong> 산재보험은 1,300일치 급여까지만 보상합니다. 그 이상의 민사배상 — 남은 정년·가동연한 소득 전액 — 은 대표가 <strong>100% 개인 부담</strong>합니다. 직원 1명 사망사고 하나로 회사 문을 닫는 경우가 현장에서 실제로 발생합니다.
+      <strong>산재보험 = 자동차 책임보험, 단체보험 = 자동차 종합보험</strong>입니다.
+      2026년부터는 포괄임금제·3.3% 프리랜서 계약·외국인 고용 사업장에 대한 집중 근로감독이 예고되어 있어 추가 리스크가 급증하고 있습니다.
     </div>
   </div>
 </div>
@@ -507,29 +506,29 @@ function totalSteps(){ return visibleSteps().length; }
 
 // ── 원클릭 사례 ──
 const CASES_JDH = [
-  { icon:'🏭', tag:'제조업·중위험', tagClass:'tag-red',
-    title:'50인 제조업체 — 겸직 안전관리자',
-    sub:'기계·고소 위험 / 안전관리 형식적 / 매뉴얼 없음',
-    answers:{industry:'mfg',headcount:'50to299',dispatch:'none',foreigner:'none',safetyMgr:'concurrent',healthMgr:'outsourced',riskAssess:'partial',training:'partial',hazards:['machinery','height'],accidentHistory:'none',budget:'allocated',manual:'none'} },
-  { icon:'🏗', tag:'건설·사망이력', tagClass:'tag-red',
-    title:'500인 건설현장 — 하청 다수·사망재해',
-    sub:'공사액 120억 이상 / 도급·하청 관리 미흡',
+  { icon:'🏭', tag:'제조업·사망사고', tagClass:'tag-red',
+    title:'20인 공장 산재 사망 — 민사배상 수억 청구',
+    sub:'산재보험은 1,300일치 급여만 지급 / 나머지 수억은 대표 개인 부담 / 결국 폐업 위기',
+    answers:{industry:'mfg',headcount:'5to49',dispatch:'none',foreigner:'none',safetyMgr:'outsourced',healthMgr:'noObl',riskAssess:'partial',training:'partial',hazards:['machinery','height'],accidentHistory:'fatal',budget:'none',manual:'none'} },
+  { icon:'🏗', tag:'건설·하청사망', tagClass:'tag-red',
+    title:'대형 건설현장 하청 사망 — 도급인 연대책임',
+    sub:'공사액 120억 이상 / 도급·수급인 관리 미흡 / 경영책임자 기소 위험',
     answers:{industry:'con',headcount:'o500',conAmt:'o120',dispatch:'sub',foreigner:'none',safetyMgr:'full',healthMgr:'full',riskAssess:'regular',training:'full',hazards:['height','confined'],accidentHistory:'fatal',subMgmt:'partial',budget:'full',manual:'current'} },
   { icon:'💻', tag:'IT·5인미만', tagClass:'tag-blue',
-    title:'5인 미만 IT 스타트업 — 법 적용 제외',
-    sub:'중대재해처벌법 미적용 / 산안법 최소 의무 확인',
+    title:'5인 미만 IT 스타트업 — 적용 제외 범위 확인',
+    sub:'중대재해처벌법 미적용 / 산안법 최소 의무는 여전히 존재',
     answers:{industry:'it',headcount:'u5',dispatch:'none',foreigner:'none',accidentHistory:'none'} },
-  { icon:'🌏', tag:'외국인·위험', tagClass:'tag-amber',
-    title:'E-9 외국인 제조업 — 화학·화재 위험',
-    sub:'5~49인 / 안전관리 미흡 / 법정교육 미이행',
+  { icon:'🌏', tag:'외국인·언어장벽', tagClass:'tag-amber',
+    title:'E-9 외국인 제조업 — 모국어 교육 전무',
+    sub:'5~49인 / 언어 장벽으로 안전교육 사실상 불가 / 화학물질 MSDS 미이해',
     answers:{industry:'mfg',headcount:'5to49',dispatch:'none',foreigner:'e9',safetyMgr:'outsourced',healthMgr:'noObl',riskAssess:'none',training:'none',hazards:['chem','fire'],accidentHistory:'none',budget:'none',manual:'none'} },
-  { icon:'🔄', tag:'파견·법위반', tagClass:'tag-purple',
-    title:'서비스업 파견 — 파견금지 업무 포함',
-    sub:'50~299인 / 파견법 위반 가능성 / 교육 미이행',
+  { icon:'💼', tag:'포괄임금·2026단속', tagClass:'tag-purple',
+    title:'서비스업 포괄임금제 — 2026년 집중 근로감독 대상',
+    sub:'초과근무 일괄지급 계약 / 사실상 위법 / 적발 시 과태료·형사처벌',
     answers:{industry:'svc',headcount:'50to299',dispatch:'dispatch',dispatchType:'restricted',foreigner:'none',safetyMgr:'concurrent',healthMgr:'outsourced',riskAssess:'partial',training:'none',hazards:['musculo'],accidentHistory:'minor',budget:'allocated',manual:'none'} },
-  { icon:'⚗', tag:'화학·중상해', tagClass:'tag-red',
-    title:'화학제조업 300인 — 파견·도급·다국적 근로자',
-    sub:'유해화학물질·밀폐공간 / 중상해 이력 / 복합 리스크',
+  { icon:'📋', tag:'3.3%가짜프리랜서', tagClass:'tag-red',
+    title:'제조업 3.3% 프리랜서 계약 — 4대보험 5년치 소급 폭탄',
+    sub:'근로자를 사업소득자로 위장 / 국세청-고용부 정보공유로 적발 강화 / 소급 납부 위험',
     answers:{industry:'mfg',headcount:'300to499',dispatch:'both',dispatchType:'mixed',foreigner:'multi',safetyMgr:'full',healthMgr:'full',riskAssess:'regular',training:'full',hazards:['chem','confined','fire'],accidentHistory:'serious',subMgmt:'partial',budget:'full',manual:'current'} },
 ];
 

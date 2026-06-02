@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>중대재해 실제 사례 전단지</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#222;
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh; padding:20px;
+  font-family:'Noto Sans KR', sans-serif;
+}
+.a4 {
+  width:794px; min-height:1123px;
+  background:#0c0c0c;
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  box-shadow:0 0 100px rgba(200,0,0,0.25);
+}
+
+/* ─── 헤더 띠 ─── */
+.header-band {
+  background:#b50000;
+  padding:0 44px;
+  height:36px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.header-band .left { display:flex; align-items:center; gap:10px; }
+.dot-blink { width:8px; height:8px; background:#fff; border-radius:50%; animation:blink 1.3s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.header-band span { font-size:10px; color:#fff; letter-spacing:3px; font-weight:700; }
+
+/* ─── HERO ─── */
+.hero {
+  padding:32px 44px 26px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.hero-label { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.hero-label .ln { width:24px; height:2px; background:#b50000; }
+.hero-label span { font-size:10px; color:#b50000; letter-spacing:3px; font-weight:700; }
+.hero-q {
+  font-family:'Noto Serif KR', serif;
+  font-size:42px; font-weight:900;
+  color:#fff; line-height:1.15; letter-spacing:-1px;
+  margin-bottom:8px;
+}
+.hero-q em { color:#ff3333; font-style:normal; }
+.hero-sub { font-size:13.5px; color:rgba(255,255,255,0.5); line-height:1.65; }
+
+/* ─── 케이스 그리드 ─── */
+.cases { padding:24px 44px; display:flex; flex-direction:column; gap:16px; }
+
+.case-card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-left:4px solid #b50000;
+  border-radius:6px;
+  padding:18px 22px;
+  position:relative;
+}
+.case-card.gold { border-left-color:#c8922a; }
+.case-card.orange { border-left-color:#e05c00; }
+.case-card.gray { border-left-color:#555; }
+
+.case-no {
+  font-size:9px; color:#b50000; letter-spacing:3px; font-weight:700;
+  margin-bottom:6px;
+}
+.case-card.gold .case-no { color:#c8922a; }
+.case-card.orange .case-no { color:#e05c00; }
+.case-card.gray .case-no { color:#888; }
+
+.case-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:10px; }
+.case-title { font-size:16px; font-weight:900; color:#fff; line-height:1.3; }
+.case-title small { font-size:11px; color:rgba(255,255,255,0.45); font-weight:400; display:block; margin-top:2px; }
+.case-cost {
+  flex-shrink:0;
+  text-align:right;
+}
+.case-cost .cost-num { font-size:22px; font-weight:900; color:#ff3333; line-height:1; }
+.case-card.gold .case-cost .cost-num { color:#e0a840; }
+.case-card.orange .case-cost .cost-num { color:#ff7722; }
+.case-card.gray .case-cost .cost-num { color:#aaa; }
+.case-cost .cost-label { font-size:9px; color:rgba(255,255,255,0.4); letter-spacing:1px; margin-top:2px; }
+
+.case-pills { display:flex; flex-wrap:wrap; gap:6px; }
+.cpill {
+  font-size:10.5px; color:rgba(255,255,255,0.75);
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  padding:3px 10px; border-radius:20px;
+}
+.cpill.red { background:rgba(181,0,0,0.2); border-color:rgba(181,0,0,0.5); color:#ff8080; }
+.cpill.yellow { background:rgba(200,146,42,0.2); border-color:rgba(200,146,42,0.5); color:#e0c070; }
+.cpill.orange { background:rgba(224,92,0,0.2); border-color:rgba(224,92,0,0.5); color:#ffaa66; }
+
+.case-note { font-size:11px; color:rgba(255,255,255,0.35); margin-top:10px; font-style:italic; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px; }
+
+/* ─── 중간 배너: 트렌드 수치 ─── */
+.mid-band {
+  margin:4px 44px 0;
+  background:rgba(181,0,0,0.12);
+  border:1px solid rgba(181,0,0,0.3);
+  border-radius:6px;
+  padding:16px 22px;
+  display:flex; gap:0; align-items:stretch;
+}
+.mb-item { flex:1; text-align:center; }
+.mb-item + .mb-item { border-left:1px solid rgba(181,0,0,0.25); }
+.mb-num { font-size:26px; font-weight:900; color:#ff4444; line-height:1; }
+.mb-unit { font-size:12px; color:rgba(255,255,255,0.55); margin-top:4px; }
+
+/* ─── 인사이트 박스 ─── */
+.insight { margin:16px 44px 0; }
+.insight-box {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:6px;
+  padding:16px 22px;
+}
+.insight-title { font-size:11px; color:#b50000; letter-spacing:2px; font-weight:700; margin-bottom:10px; }
+.insight-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.insight-row:last-child { margin-bottom:0; }
+.ins-icon { font-size:14px; flex-shrink:0; }
+.ins-text { font-size:12.5px; color:rgba(255,255,255,0.72); line-height:1.5; }
+.ins-text strong { color:#fff; }
+
+/* ─── 솔루션 ─── */
+.solution { margin:14px 44px 0; }
+.sol-label { font-size:9px; color:#555; letter-spacing:3px; font-weight:700; margin-bottom:10px; }
+.sol-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.sol-card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-top:3px solid #b50000;
+  border-radius:4px;
+  padding:14px 16px;
+}
+.sol-card.green { border-top-color:#27ae60; }
+.sol-icon { font-size:18px; margin-bottom:6px; }
+.sol-title { font-size:13px; font-weight:700; color:#fff; margin-bottom:4px; }
+.sol-desc { font-size:11.5px; color:rgba(255,255,255,0.5); line-height:1.55; }
+
+/* ─── Why Me ─── */
+.why-me {
+  margin:14px 44px 0;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:6px;
+  padding:16px 20px;
+}
+.wm-header { margin-bottom:12px; }
+.wm-eyebrow { font-size:9px; color:#555; letter-spacing:3px; font-weight:700; margin-bottom:4px; }
+.wm-title { font-size:13px; color:rgba(255,255,255,0.7); font-weight:700; }
+.wm-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px; }
+.wm-card { background:rgba(255,255,255,0.03); border-radius:4px; padding:10px 12px; }
+.wm-hd { font-size:11px; color:rgba(255,255,255,0.8); font-weight:700; margin-bottom:4px; }
+.wm-ds { font-size:10.5px; color:rgba(255,255,255,0.4); line-height:1.5; }
+.wm-profile { display:flex; justify-content:space-between; align-items:center; }
+.wm-role-tag { font-size:10px; color:rgba(255,255,255,0.4); }
+.wm-exp { font-size:10px; color:rgba(255,255,255,0.3); }
+
+/* ─── CTA ─── */
+.cta-full {
+  margin:14px 44px 0;
+  background:linear-gradient(135deg, #8b0000, #b50000);
+  border-radius:6px;
+  padding:18px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.cq { font-size:16px; font-weight:900; color:#fff; margin-bottom:4px; }
+.cm { font-size:12px; color:rgba(255,255,255,0.75); }
+.cta-right-b { text-align:right; flex-shrink:0; }
+.rl { font-size:10px; color:rgba(255,255,255,0.6); letter-spacing:2px; display:block; }
+.rm { font-size:14px; font-weight:700; color:#fff; }
+
+/* ─── 푸터 ─── */
+.footer-f {
+  margin:14px 44px 24px;
+  display:flex; flex-direction:column; gap:4px;
+}
+.fc { font-size:9px; color:#333; letter-spacing:3px; font-weight:700; }
+.fd { font-size:9.5px; color:#333; line-height:1.6; }
+
+/* ─── fact tooltip ─── */
+.ft { cursor:pointer; border-bottom:1.5px dashed rgba(255,190,50,.75); display:inline; }
+.ft:hover { border-bottom-color:rgba(255,190,50,1); }
+</style>
+</head>
+<body>
+<div class="a4">
+
+  <!-- 헤더 -->
+  <div class="header-band">
+    <div class="left">
+      <div class="dot-blink"></div>
+      <span>중대재해처벌법 — 실제 판결 사례 보고서</span>
+    </div>
+    <span>2022–2025 · 확인된 판결 기준</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">
+      <div class="ln"></div>
+      <span>REAL CASE STUDY</span>
+    </div>
+    <div class="hero-q">
+      이건 <em>실제 이야기</em>입니다.<br>
+      그리고 다음 차례는<br>누구일까요.
+    </div>
+    <div class="hero-sub">
+      중대재해처벌법 시행 이후 실제 판결이 확정된 사건들입니다.<br>
+      흔한 끼임·추락 사고 1건이 대표이사의 인생을 바꿨습니다.
+    </div>
+  </div>
+
+  <!-- 케이스 카드 -->
+  <div class="cases">
+
+    <!-- CASE 01: 아리셀 -->
+    <div class="case-card">
+      <div class="case-no">CASE 01 · 2024 · 경기 화성 · 리튬전지 제조업</div>
+      <div class="case-top">
+        <div class="case-title">
+          아리셀 화재 참사
+          <small>공장 화재 · 사망 23명 (이주노동자 포함)</small>
+        </div>
+        <div class="case-cost">
+          <div class="cost-num">60억+</div>
+          <div class="cost-label">확인된 비용 합계</div>
+        </div>
+      </div>
+      <div class="case-pills">
+        <span class="cpill red">대표 징역 15년 (1심 · 역대 최고)</span>
+        <span class="cpill red">법인 벌금 8억원</span>
+        <span class="cpill">방산청 손해배상 합의 52억원</span>
+        <span class="cpill">유족 20명 이상 개별 합의</span>
+      </div>
+      <div class="case-note">
+        출처: 경향신문 2025.09.23 · worklaw.co.kr 2025.10 · 2심(2026.04) 징역 4년으로 감형 — 합의·공탁이 감경사유로 작용
+      </div>
+    </div>
+
+    <!-- CASE 02: 울산 제조업체 -->
+    <div class="case-card orange">
+      <div class="case-no">CASE 02 · 2024 · 울산 · 제조업 (블로우 성형기)</div>
+      <div class="case-top">
+        <div class="case-title">
+          울산 제조업체 끼임 사망
+          <small>사전 위험 지적 수차례 — 모두 무시</small>
+        </div>
+        <div class="case-cost">
+          <div class="cost-num" style="color:#ff7722">20억</div>
+          <div class="cost-label">법인 벌금 (역대 최고)</div>
+        </div>
+      </div>
+      <div class="case-pills">
+        <span class="cpill orange">대표이사 징역 2년 실형 · 법정구속</span>
+        <span class="cpill orange">법인 벌금 역대 최고 20억원</span>
+        <span class="cpill">외부 위험지적 수차례 → 개선 미이행</span>
+      </div>
+      <div class="case-note">
+        출처: safechem.co.kr 중대재해처벌법 처벌 사례 총정리 2022–2025 · "사전 위험지적 무시"가 핵심 가중요인
+      </div>
+    </div>
+
+    <!-- CASE 03: SPL (SPC 계열) -->
+    <div class="case-card gold">
+      <div class="case-no">CASE 03 · 2025 · 경기 평택 · 식품 제조업 (SPC 계열 SPL)</div>
+      <div class="case-top">
+        <div class="case-title">
+          SPL 제빵공장 기계 끼임 사망
+          <small>합의 없음 · 연속 산재에도 집행유예 논란</small>
+        </div>
+        <div class="case-cost">
+          <div class="cost-num" style="color:#e0a840">1억+</div>
+          <div class="cost-label">법인 벌금 + 소송비용</div>
+        </div>
+      </div>
+      <div class="case-pills">
+        <span class="cpill yellow">대표이사 강동석 징역 1년 집행유예 2년</span>
+        <span class="cpill yellow">법인(SPL) 벌금 1억원</span>
+        <span class="cpill">검찰 구형 징역 3년 → 대폭 감형</span>
+        <span class="cpill">SPC 허영인 회장은 불기소 (경영책임자 해당 안 됨)</span>
+      </div>
+      <div class="case-note">
+        출처: 수원지법 평택지원 2025.1.21 선고 · 검찰 구형 대비 감형 → 초범·시정조치가 감경사유
+      </div>
+    </div>
+
+    <!-- CASE 04: LDS산업개발 -->
+    <div class="case-card gray">
+      <div class="case-no">CASE 04 · 2022 · 대구 · 건설업 (공장 신축현장) · 중처법 14호 판결</div>
+      <div class="case-top">
+        <div class="case-title">
+          LDS산업개발 고소작업대 추락 사망
+          <small>11m 추락 · 안전대 미착용 · 하청 근로자</small>
+        </div>
+        <div class="case-cost">
+          <div class="cost-num" style="color:#aaa">7.8억</div>
+          <div class="cost-label">합의금+벌금 합계</div>
+        </div>
+      </div>
+      <div class="case-pills">
+        <span class="cpill">대표이사 징역 1년 집행유예 2년</span>
+        <span class="cpill">법인 벌금 8,000만원</span>
+        <span class="cpill red">유족 형사합의금 <strong style="color:#ff8080">7억원</strong></span>
+      </div>
+      <div class="case-note">
+        출처: 대구지방법원 서부지원 2024.2.7 선고 2022고단2940 · 합의금이 집행유예 핵심 감경사유로 명시
+      </div>
+    </div>
+
+  </div><!-- /cases -->
+
+  <!-- 트렌드 수치 배너 -->
+  <div class="mid-band">
+    <div class="mb-item">
+      <div class="mb-num"><span class="ft" data-fact="검찰이 수사를 마친 중대재해처벌법 위반 사건 중 약 80%를 기소. 사고 발생 시 형사처벌 가능성 매우 높음." data-src="서울경제·매일경제 2024.2 보도">80%</span></div>
+      <div class="mb-unit">검찰 기소율</div>
+    </div>
+    <div class="mb-item">
+      <div class="mb-num"><span class="ft" data-fact="중대재해처벌법 유죄 선고 70명 중 69명이 유족과 합의. 합의가 사실상 집행유예의 핵심 조건." data-src="경향신문 2025.12.16">99%</span></div>
+      <div class="mb-unit">유죄자 중 합의 비율</div>
+    </div>
+    <div class="mb-item">
+      <div class="mb-num"><span class="ft" data-fact="대형 로펌 노동팀 변호사 진술. '대표가 구속될 수 있는 중대재해 사건의 1인당 합의금은 최대 10억원까지 뛰었다.'" data-src="매일경제 2024.2.2">10억</div>
+      <div class="mb-unit">1인당 합의금 (최대)</div>
+    </div>
+    <div class="mb-item">
+      <div class="mb-num"><span class="ft" data-fact="중대재해처벌법 위반 유죄 선고 중 실형 비율 약 8%. 92%는 집행유예 — 합의 여부가 가장 큰 변수." data-src="경향신문 2025.12">8%</span></div>
+      <div class="mb-unit">실형 선고 비율</div>
+    </div>
+  </div>
+
+  <!-- 인사이트 -->
+  <div class="insight">
+    <div class="insight-box">
+      <div class="insight-title">WHAT THE DATA TELLS US</div>
+      <div class="insight-row">
+        <div class="ins-icon">⚖️</div>
+        <div class="ins-text"><strong>합의 = 집행유예의 열쇠</strong> — 유죄 선고자 99%가 합의했고, 합의금은 평균 수억~최대 10억원. 준비 없이 낼 수 있는 돈이 아닙니다.</div>
+      </div>
+      <div class="insight-row">
+        <div class="ins-icon">🏭</div>
+        <div class="ins-text"><strong>흔한 사고가 최대 위협</strong> — 끼임·추락·화재. 제조업에서 매일 일어나는 이 사고가 대표이사를 법정에 세웁니다.</div>
+      </div>
+      <div class="insight-row">
+        <div class="ins-icon">💸</div>
+        <div class="ins-text"><strong>보험이 합의를 가능하게 합니다</strong> — 보험사가 합의금과 법률비용을 지원 → 합의 달성 → 감경사유 확보. 보험 없이는 합의도 어렵습니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 솔루션 -->
+  <div class="solution">
+    <div class="sol-label">RISK SOLUTION</div>
+    <div class="sol-grid">
+      <div class="sol-card">
+        <div class="sol-icon">⚖️</div>
+        <div class="sol-title">임원배상책임보험 (D&amp;O)</div>
+        <div class="sol-desc">형사·민사 소송 법률비용 전액<br>합의금 지원 → 감경사유 확보<br>대표이사 개인 보호</div>
+      </div>
+      <div class="sol-card green">
+        <div class="sol-icon">🛡️</div>
+        <div class="sol-title">기업중대사고배상책임보험</div>
+        <div class="sol-desc">중대재해처벌법 전용 보험<br>사망·부상 배상 직접 지원<br>연 보험료 수백만원 수준</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Why Me -->
+  <div class="why-me">
+    <div class="wm-header">
+      <div class="wm-eyebrow">CONSULTING CAPABILITY</div>
+      <div class="wm-title">컨설팅 역량 · 협업 체계</div>
+    </div>
+    <div class="wm-grid">
+      <div class="wm-card">
+        <div class="wm-hd">공인자격 경영지도사</div>
+        <div class="wm-ds">중소기업 리스크 진단 및 안전보건 체계 구축 통합 솔루션 제공</div>
+      </div>
+      <div class="wm-card">
+        <div class="wm-hd">전문가 협업 체계</div>
+        <div class="wm-ds">노무사·세무사·법무사·행정사 협업으로 최적 맞춤 설계 지원</div>
+      </div>
+      <div class="wm-card">
+        <div class="wm-hd">삼성생명 협력 파트너</div>
+        <div class="wm-ds">보험 설계부터 안전보건 컨설팅까지 원스톱 솔루션</div>
+      </div>
+    </div>
+    <div class="wm-profile">
+      <span class="wm-role-tag">독립 컨설턴트 · 삼성생명 협력 파트너</span>
+      <span class="wm-exp">경력 25년 8개월</span>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-full">
+    <div>
+      <div class="cq">우리 회사에는 합의금이 준비되어 있습니까?</div>
+      <div class="cm">무료 기업리스크 진단 · 맞춤 보험 설계 상담</div>
+    </div>
+    <div class="cta-right-b">
+      <span class="rl">지금 바로</span>
+      <span class="rm">→ 상담 신청</span>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <div class="footer-f">
+    <span class="fc">CORPORATE RISK CONSULTING · GFC</span>
+    <span class="fd">본 자료는 법원 판결문·언론 보도·보험연구원 공개 통계를 기반으로 작성되었습니다. 정보 제공 목적이며 법률·보험 전문가 상담을 권장합니다.</span>
+  </div>
+
+</div><!-- /a4 -->
+</body>
+</html>

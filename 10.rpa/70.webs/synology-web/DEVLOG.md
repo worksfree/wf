@@ -346,4 +346,186 @@ CSV 파일의 UTF-8 BOM 문제에서 배웠다.
 
 ---
 
-*마지막 업데이트: 2026년 5월 14일*
+---
+
+## Session 3 (2026년 6월 2일): 채용 자동화 정비 + 비상장주식 PDF 파싱
+
+### 배경 — 왜 이 세션을 "구축 3"으로 명명했나
+
+이전 세션들에서 기능이 `consulting/jobkorea/`에 임시 배치되어 있었다.  
+기능이 늘면서 "컨설팅 페이지에 왜 관리자 전용 자동화 도구가 있지?"라는 혼선이 생겼다.  
+이번 세션의 첫 번째 과제는 **기능을 역할에 맞는 위치로 재배치**하는 것이었다.
+
+### 1. 채용 관리 → admin/recruit 이전
+
+**결정 배경**:  
+잡코리아 포지션 제안 자동화는 어드민만 쓰는 내부 도구다.  
+`consulting/` 하위가 아닌 `admin/` 하위가 맞다는 판단.
+
+```
+이전: consulting/jobkorea/index.html  (consultantOnly)
+이후: admin/recruit/index.html        (adminOnly)
+```
+
+**파일 구성**:
+- `admin/recruit/index.html` — Hub 어드민 UI (잡코리아 실행/로그 + 발송 이력 2탭)
+- `admin/recruit/jobkorea_auto.py` — Playwright 기반 포지션 제안 자동화
+- `admin/recruit/local_server.py` — Flask API 서버 (포트 8765, Hub ↔ Python 브릿지)
+- `admin/recruit/requirements.txt` — 의존성
+- `admin/recruit/.env.example` — 환경변수 템플릿
+
+**어드민 접근 제어 패턴**:  
+HTML 페이지 내부에서 Supabase `profiles.role === 'admin'` 확인 후 `#main-content` 표시.  
+부모 허브의 `adminOnly:true` 플래그와 이중 보호.
+
+### 2. jobkorea_dev.ipynb — 셀 단위 개발 방법론
+
+**문제 인식**:  
+`jobkorea_auto.py`는 완성된 스크립트 형태라 DOM 셀렉터 검증이 어렵다.  
+잡코리아 UI는 수시로 바뀌므로 셀렉터를 확인하면서 개발해야 한다.
+
+**해결 — Notebook 단계별 개발 → 통합 워크플로**:
+```
+jobkorea_dev.ipynb  (개발·검증)
+  └─ CONFIRMED_SELECTORS 딕셔너리 완성
+         ↓
+  jobkorea_auto.py 에 확정 셀렉터 반영
+         ↓
+  local_server.py + admin/recruit UI 에서 운영
+```
+
+노트북 핵심 설계:
+- `JK` 전역 딕셔너리로 브라우저 인스턴스를 셀 간 공유 (`JK['page']`)
+- `nest_asyncio.apply()` — Playwright sync API의 Jupyter 이벤트 루프 충돌 방지
+- Playwright `slow_mo=500` — 개발 중 각 동작을 눈으로 확인
+- 셀렉터 탐색 헬퍼 패턴: 후보 셀렉터 목록 → 실제 발견된 것만 ✅ 출력
+
+**이메일 수집·발송과 잡코리아의 분리**:  
+이번 세션에서 명확히 정리됐다.
+- 잡코리아: 사이트 내 포지션 제안 기능 (이메일 직접 발송 아님)
+- 이메일 수집: `consulting/bizdb/` (B2B 기업 이메일 DB)
+- 이메일 발송: `consulting/marketing/` (Resend + Cloudflare Worker)
+
+### 3. 비상장주식 가치평가 — PDF 파싱 + Claude Vision
+
+**기존 stockval 페이지**:  
+결정 트리(체크리스트)로 평가 방법론을 안내하고,  
+결과에 맞는 계산기(상증세법 가중평균 / 순자산 / DCF / 멀티플)를 제공.
+
+**이번에 추가한 것**:  
+세법 결과 화면에 **재무제표 PDF 자동 입력 섹션** 추가.  
+체크리스트 → PDF 파싱 → 계산기 자동 채우기의 원스톱 흐름.
+
+**PDF.js 파싱 구조**:
+```javascript
+// 1. PDF.js로 텍스트 추출 (디지털 PDF → 텍스트 레이어 있음)
+const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+
+// 2. 좌표 기반 정렬 (테이블 행 순서 보존)
+const sorted = items.sort((a, b) => {
+  const dy = Math.round(b.transform[5]) - Math.round(a.transform[5]);
+  return dy !== 0 ? dy : a.transform[4] - b.transform[4];
+});
+
+// 3. 단위 자동 감지 + 만원 변환
+// 4. 레이블 뒤 숫자 N개 추출 (3년치 처리)
+// 5. 음수 처리: △1,234 / (1,234) / -1,234 모두 인식
+```
+
+**크레탑·DART 등 디지털 PDF** → PDF.js로 충분 (무료, 브라우저 내 처리).  
+**스캔 PDF·사진 파일** → OCR 필요.
+
+**오픈소스 OCR vs Claude Vision 검토**:
+
+| 방식 | 정확도 | 한계 |
+|------|--------|------|
+| Tesseract.js | ~82% | 테이블 구조 인식 취약 |
+| PaddleOCR | ~95% | Python 서버 필요 |
+| **Claude Vision** | ~99% | 유료 (페이지당 $0.003) |
+
+재무 데이터는 숫자 하나가 틀려도 치명적이므로  
+오픈소스 OCR → 후처리 로직 구현 공수 vs Claude Vision 비용 검토.  
+**결론**: Claude Vision 방식 채택. 단, 현재는 비활성화 상태로 구현.
+
+**Claude Vision 비활성화 구현 패턴**:
+```html
+<button class="claude-btn" disabled title="서비스 준비 중">
+  🔒 서비스 준비 중 (Claude Vision API)
+</button>
+<div class="claude-notice">
+  ⚠ 회원 전용 유료 서비스 — 크레딧을 소모합니다.
+</div>
+```
+
+활성화 시 Cloudflare Worker 경유로 Claude Files API 호출 예정.  
+크레딧 차감 로직은 기존 `deduct_credits` 함수 재사용.
+
+### 이번 세션에서 발견한 패턴
+
+**이중 보호 패턴 (admin 페이지)**:
+```
+Hub 사이드바: adminOnly:true → 비관리자에게 노드 숨김
+페이지 자체: Supabase role 확인 → admin이 아니면 #admin-gate 표시
+```
+직접 URL 접근 시에도 차단되므로 두 레이어 모두 필요.
+
+**비활성 유료 기능 표시 패턴**:  
+구현은 완료하되 UI에서만 비활성화. `disabled` 속성 + 안내 문구.  
+나중에 Worker + 크레딧 연동만 추가하면 바로 활성화 가능한 상태로 유지.
+
+---
+
+## 주 7 (6월 2일): Dev UX 개선 + 결제 live/test 분리 + 관리자 페이지 개선
+
+### 1. Dev 로그인 → 실제 Supabase 세션 연동
+
+**기존 문제**: `devLogin()`이 모의 세션(UI 우회)만 생성 → iframe 내 컨설팅 페이지가 실제 Supabase 세션 없어 role 인식 불가.
+
+**해결**: `devLogin()`에 실제 `signInWithPassword()` 시도 추가. 성공 시 `onAuthStateChange(SIGNED_IN)` 자동 발화, 실패 시 UI 우회 폴백으로 하향.
+
+**필수 사전 조건**: `fix_dev_profiles_roles.sql` 실행 — dev 계정 UUID를 고정 형식으로 profiles 테이블에 UPSERT.
+```
+d0000001-...: test@worksfree.co.kr     (general)
+d0000002-...: consultant@worksfree.co.kr (consultant)
+d0000003-...: gfc@worksfree.co.kr       (gfc)
+d0000004-...: admin@worksfree.co.kr     (admin)
+```
+
+**_devLoginReal 플래그**: 실제 Supabase 세션 여부 → `updateDevStatus()`에서 페이지뷰 추적 상태 표시.
+
+### 2. 결제 환경 test/live 분리
+
+**PAYMENT_MODE**: `portal` → `'live'`, 그 외 → `'test'`.
+
+**Toss Worker** (`toss-verify.js`): `env` 파라미터로 `TOSS_SECRET_KEY_TEST` / `TOSS_SECRET_KEY_LIVE` 선택.  
+> `TOSS_SECRET_KEY_LIVE`는 Toss 라이브 발급 후 `wrangler secret put` 필요 — 미설정 시 Worker가 500 반환.
+
+**결제 모달 배너**: 테스트 환경 → 노란 경고 배너, portal → 초록 실결제 배너.
+
+### 3. 비밀번호 표시/숨기기 (눈 아이콘)
+
+로그인 / 회원가입(2개) / 프로필 비밀번호 변경(2개) — 총 5개 인풋에 `togglePw()` 추가.
+
+### 4. 잠금 카드 UI
+
+`consultantOnly` 또는 `memberOnly` 카드 — 아이콘·설명 영역에 blur 오버레이 + 🔒 배지 표시.  
+제목은 상단에 노출, hover 색상 변화 없음.
+
+### 5. 어드민 사용자 관리 페이지 (`admin/users/index.html`) 전면 개선
+
+- **탭 구조**: 회원 목록 / 역할 관리 / 크레딧 지급
+- **회원 목록**: 검색·필터·정렬, 로그인 상태 도트(7일·30일 활성 집계)
+- **편집 모달**: 이름 + 역할 즉시 변경 (`admin_set_user_name` / `admin_set_user_role` RPC)
+- **크레딧 지급**: 이메일 검색 → `admin_grant_credits` RPC
+- **로그인 이력**: `admin_get_user_logins` RPC 폴백 포함
+
+### 6. 마인드맵 편집 모드 (`consulting/mindmap/index.html`)
+
+- **Edit Mode**: 노드 드래그·생성·삭제, 연결선 connect mode
+- **노드 편집 모달**: 아이콘·제목·설명·태그·href·색상 수정, 체크리스트 편집
+- **localStorage 저장/복원 + Undo/Redo**
+- **fitAll()**: 전체 노드가 화면에 맞게 초기 뷰 자동 조정
+
+---
+
+*마지막 업데이트: 2026년 6월 2일*

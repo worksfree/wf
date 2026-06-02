@@ -1,10 +1,13 @@
 /**
  * Cloudflare Worker — Toss Payments 결제 검증
  *
- * 배포: wrangler deploy (또는 Cloudflare 대시보드에서 직접 붙여넣기)
- * 환경 변수 (Cloudflare → Workers → Settings → Variables):
- *   TOSS_SECRET_KEY  : Toss 대시보드 → 개발 → API 키 → 테스트 시크릿 키
- *                      형식: test_sk_... (테스트) / live_sk_... (실서비스)
+ * 배포: wrangler deploy --config wrangler-toss.toml
+ *
+ * 환경 변수 설정 (Cloudflare → Workers → toss-verify → Settings → Variables):
+ *   TOSS_SECRET_KEY : 시크릿 키 (test_sk_... 또는 live_sk_...)
+ *
+ * CLI로 설정:
+ *   wrangler secret put TOSS_SECRET_KEY --config wrangler-toss.toml
  *
  * 요청: POST /
  *   { orderId: string, paymentKey: string, amount: number }

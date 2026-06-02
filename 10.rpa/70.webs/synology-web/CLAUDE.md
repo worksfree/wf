@@ -454,3 +454,85 @@ www를 추가해도 NAS nginx의 `server_name`에 `www.worksfree.kr`이 없으�
 ```nginx
 server_name portal.worksfree.kr www.worksfree.kr;
 ```
+
+## 어드민 페이지 패턴
+
+### 위치 규칙
+
+```
+admin/
+├── users/index.html      # 사용자·역할·크레딧 관리
+├── monitor/index.html    # 시스템 모니터
+├── content/index.html    # 콘텐츠 관리
+└── recruit/index.html    # 채용 관리 (잡코리아 포지션 제안)
+```
+
+어드민 전용 기능은 `consulting/` 하위가 아닌 `admin/` 하위에 배치한다.
+
+### 이중 보호 패턴
+
+어드민 페이지는 두 레이어로 접근을 제한한다.
+
+**레이어 1 — Hub 사이드바**: `adminOnly:true` 플래그 → 비관리자에게 노드 자체를 숨김.
+
+**레이어 2 — 페이지 내부**: Supabase `profiles.role` 확인 → admin이 아니면 `#admin-gate` 표시.
+
+```javascript
+// 페이지 최상단에서 실행
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    const { data: p } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+    if (p?.role === 'admin') { boot(); return; }
+  }
+  document.getElementById('admin-gate').classList.add('visible');
+})();
+```
+
+레이어 2가 없으면 직접 URL 접근으로 우회 가능하므로 **반드시 두 레이어 모두 필요**.
+
+## 비활성 유료 서비스 UI 패턴
+
+구현은 완료하되 UI에서만 비활성화하는 패턴. 나중에 인프라 연동만 완료하면 바로 활성화 가능.
+
+```html
+<!-- disabled 속성 + 안내 문구 -->
+<button class="claude-btn" disabled title="서비스 준비 중">
+  🔒 서비스 준비 중 (Claude Vision API)
+</button>
+<div class="claude-notice">
+  ⚠ <strong>회원 전용 유료 서비스</strong> — 크레딧을 소모합니다.
+  일반 텍스트 PDF는 위 PDF.js 방식으로 무료 처리됩니다.
+</div>
+```
+
+CSS:
+```css
+.claude-card.disabled { opacity: .6; }
+.claude-btn:disabled  { cursor: not-allowed; }
+.paid-badge { background: rgba(239,68,68,.2); color: #fca5a5; }
+```
+
+## PDF 파싱 — PDF.js 클라이언트사이드
+
+디지털 생성 PDF(크레탑·DART 등)는 서버 없이 브라우저에서 텍스트 추출 가능.
+
+```javascript
+// CDN
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// 텍스트 추출 (좌표 기반 정렬로 테이블 행 순서 보존)
+const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+for (let i = 1; i <= pdf.numPages; i++) {
+  const items = (await (await pdf.getPage(i)).getTextContent()).items;
+  const sorted = items.sort((a, b) => {
+    const dy = Math.round(b.transform[5]) - Math.round(a.transform[5]);
+    return dy !== 0 ? dy : a.transform[4] - b.transform[4];
+  });
+  text += sorted.map(it => it.str).join(' ') + '\n';
+}
+```
+
+스캔 PDF 감지: 텍스트 추출 후 200자 미만이면 스캔 문서로 판단 → Claude Vision 권장.

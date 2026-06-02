@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>콘텐츠 관리 — WorksFree O&M</title>
+<title>콘텐츠 관리 — WorksFree O&amp;M</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root {
   --bg:#0f1117; --surface:#1a1d27; --surface2:#222536; --border:#2d3047;
   --text:#e2e8f0; --muted:#94a3b8; --hint:#64748b;
   --blue:#3b82f6; --green:#10b981; --yellow:#f59e0b; --red:#ef4444; --purple:#8b5cf6;
+  --orange:#f97316;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
@@ -18,19 +19,30 @@ header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12p
 .hdr-sub{font-size:12px;color:var(--hint)}
 .btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:12px;transition:.15s}
 .btn:hover{border-color:var(--blue);color:var(--blue)}
-.page{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.danger{border-color:var(--red);color:var(--red)}.btn.danger:hover{background:#3b0f0f}
+.btn.success{border-color:var(--green);color:var(--green)}.btn.success:hover{background:#052e16}
+
+/* ── 탭 ── */
+.tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 20px;background:var(--surface);position:sticky;top:57px;z-index:99}
+.tab-btn{padding:10px 20px;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.page{max-width:1080px;margin:0 auto;padding:20px 16px 60px}
 .section{margin-bottom:28px}
-.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
 
-/* Search bar */
-.search-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-.search-input{flex:1;min-width:160px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none}
-.search-input:focus{border-color:var(--blue)}
-.search-input::placeholder{color:var(--hint)}
-.filter-btn{padding:5px 12px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;transition:.15s;white-space:nowrap}
-.filter-btn.active,.filter-btn:hover{border-color:var(--blue);color:var(--blue);background:#1e3a5f30}
+/* ── 통계 카드 ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:4px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.sc-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.sc-val{font-size:26px;font-weight:700;line-height:1}
+.sc-sub{font-size:11px;color:var(--hint);margin-top:4px}
 
-/* Table */
+/* ── 테이블 ── */
 .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead th{background:var(--surface);padding:10px 14px;text-align:left;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
@@ -38,27 +50,60 @@ tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--surface)}
 td{padding:10px 14px;vertical-align:middle}
+.empty-row td{text-align:center;padding:32px;color:var(--hint);font-size:13px}
 
-/* Role badge */
+/* ── 뱃지 ── */
 .badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
 .badge-general{background:#1e2535;color:var(--muted);border:1px solid var(--border)}
 .badge-consultant{background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb40}
 .badge-gfc{background:#2d1d5a;color:#c4b5fd;border:1px solid #7c3aed40}
 .badge-admin{background:#3b0f0f;color:#fca5a5;border:1px solid #dc262640}
+.status-sent{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600;background:#0c2a1a;color:#34d399;border:1px solid #10b98140}
+.status-filtered{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600;background:#2a1a08;color:#fbbf24;border:1px solid #f59e0b40}
 
-/* Role select */
+/* ── 필터·검색 ── */
+.toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.filter-btn{padding:4px 12px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;transition:.15s}
+.filter-btn.active,.filter-btn:hover{border-color:var(--blue);color:var(--blue);background:#1e3a5f30}
+.search-input{flex:1;min-width:160px;padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none}
+.search-input:focus{border-color:var(--blue)}
+.search-input::placeholder{color:var(--hint)}
+.status-bar{font-size:11px;color:var(--hint);text-align:right;margin-bottom:6px}
+
+/* ── 역할 관리 ── */
 .role-select{padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;cursor:pointer}
 .role-select:hover{border-color:var(--blue)}
+.credit-chip{font-size:11px;color:var(--blue);background:#1e3a5f30;border-radius:10px;padding:2px 8px}
+/* ── 정렬 헤더 ── */
+thead th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
+thead th.sortable:hover{color:var(--text)}
+.sort-icon{font-size:10px;color:var(--hint);margin-left:3px;display:inline-block;min-width:10px}
+thead th.sort-active .sort-icon{color:var(--blue);opacity:1}
 
-/* Toast */
+/* ── 폼 박스 ── */
+.form-box{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+.form-grid{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end}
+.form-label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.form-input{width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none}
+.form-input:focus{border-color:var(--blue)}
+.form-note{font-size:12px;color:var(--muted);margin-bottom:12px}
+
+/* ── env 뱃지 ── */
+.env-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.env-portal{background:#0c2a1a;color:#34d399;border:1px solid #10b98140}
+.env-staging{background:#1e2a3b;color:#60a5fa;border:1px solid #3b82f640}
+.env-test{background:#2a2208;color:#fbbf24;border:1px solid #f59e0b40}
+.env-dev{background:#1e1e2e;color:var(--muted);border:1px solid var(--border)}
+
+/* ── Toast ── */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
 #toast.ok{background:#0c2a1a;color:#34d399;border:1px solid #10b98150}
 #toast.err{background:#2a0808;color:#fca5a5;border:1px solid #ef444450}
 #toast.show{opacity:1}
 
-/* Modal */
+/* ── 모달 ── */
 .modal-bg{position:fixed;inset:0;background:#00000088;display:flex;align-items:center;justify-content:center;z-index:9000;display:none}
-.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;max-width:400px;width:90%}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;max-width:420px;width:90%}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:8px}
 .modal-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
 .modal-btns{display:flex;gap:8px;justify-content:flex-end}
@@ -67,11 +112,10 @@ td{padding:10px 14px;vertical-align:middle}
 .modal-confirm:hover{background:#2563eb}
 .modal-confirm.danger{background:var(--red)}.modal-confirm.danger:hover{background:#b91c1c}
 
-.status-bar{font-size:11px;color:var(--hint);text-align:right;margin-bottom:6px}
+/* ── Loading · Denied · Screen ── */
 .screen{display:flex;align-items:center;justify-content:center;min-height:300px}
 .denied-box{text-align:center}.denied-icon{font-size:44px;margin-bottom:12px}
-.empty-row td{text-align:center;padding:32px;color:var(--hint)}
-.credit-chip{font-size:11px;color:var(--blue);background:#1e3a5f30;border-radius:10px;padding:2px 8px}
+.dev-note{font-size:12px;color:var(--yellow);padding:10px 14px;background:#2a2208;border-radius:8px;border:1px solid #78350f;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -80,12 +124,18 @@ td{padding:10px 14px;vertical-align:middle}
   <div class="hdr-icon">📝</div>
   <div class="hdr-title">콘텐츠 관리</div>
   <div class="hdr-sub" id="last-updated"></div>
-  <button class="btn" onclick="loadData()">↻ 새로고침</button>
+  <button class="btn" id="hdr-refresh" onclick="refreshCurrent()">↻ 새로고침</button>
 </header>
 
-<div id="loading" class="screen"><span style="color:var(--muted)">데이터 로딩 중…</span></div>
+<!-- 탭 네비게이션 -->
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="stats"  onclick="switchTab('stats')">📊 페이지 통계</button>
+  <button class="tab-btn"        data-tab="email"  onclick="switchTab('email')">📧 이메일 발송</button>
+  <button class="tab-btn"        data-tab="unsub"  onclick="switchTab('unsub')">🚫 수신거부</button>
+</nav>
 
-<div id="denied" class="screen" style="display:none">
+<div id="loading" class="screen"><span style="color:var(--muted)">데이터 로딩 중…</span></div>
+<div id="denied"  class="screen" style="display:none">
   <div class="denied-box">
     <div class="denied-icon">🔒</div>
     <div style="font-size:15px;font-weight:600;margin-bottom:8px">관리자 전용 페이지</div>
@@ -93,77 +143,241 @@ td{padding:10px 14px;vertical-align:middle}
   </div>
 </div>
 
-<div id="app" class="page" style="display:none">
+<div id="app" style="display:none">
 
-  <!-- 역할 관리 -->
-  <div class="section">
-    <div class="section-title">회원 역할 관리</div>
-    <div class="search-bar">
-      <input class="search-input" id="search-input" placeholder="User ID 또는 역할로 검색…" oninput="filterUsers()">
-      <button class="filter-btn active" data-role="all"        onclick="filterRole('all')">전체</button>
-      <button class="filter-btn" data-role="general"           onclick="filterRole('general')">일반회원</button>
-      <button class="filter-btn" data-role="consultant"        onclick="filterRole('consultant')">컨설턴트</button>
-      <button class="filter-btn" data-role="gfc"               onclick="filterRole('gfc')">파트너</button>
-    </div>
-    <div class="status-bar" id="status-bar"></div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>현재 역할</th>
-            <th>동의일</th>
-            <th>크레딧 잔액</th>
-            <th>역할 변경</th>
-            <th>User ID</th>
-          </tr>
-        </thead>
-        <tbody id="user-tbody"></tbody>
-      </table>
-    </div>
-  </div>
+  <!-- ══ TAB 1: 페이지 통계 ══ -->
+  <div id="tab-stats" class="tab-panel active page">
 
-  <!-- 크레딧 지급 -->
-  <div class="section">
-    <div class="section-title">수동 크레딧 지급</div>
-    <div style="padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:14px">특정 회원에게 크레딧을 수동으로 지급합니다. User ID를 정확히 입력하세요.</div>
-      <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end;flex-wrap:wrap">
-        <div>
-          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">User ID</label>
-          <input class="search-input" id="credit-uid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="width:100%">
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">지급량</label>
-          <input class="search-input" id="credit-amount" type="number" min="1" max="99999" value="100" style="width:100px">
-        </div>
-        <button class="btn" style="border-color:var(--green);color:var(--green);padding:8px 16px" onclick="openCreditModal()">✚ 지급</button>
+    <div id="stats-dev-note" class="dev-note" style="display:none">
+      ⚠ dev/test 환경의 데이터는 집계에서 제외됩니다.
+    </div>
+
+    <!-- 요약 통계 -->
+    <div class="section">
+      <div class="section-title">페이지뷰 요약</div>
+      <div class="stats">
+        <div class="stat-card"><div class="sc-label">전체 뷰</div><div class="sc-val" id="st-total" style="color:var(--blue)">—</div><div class="sc-sub">건</div></div>
+        <div class="stat-card"><div class="sc-label">최근 7일</div><div class="sc-val" id="st-7d" style="color:var(--green)">—</div><div class="sc-sub">건</div></div>
+        <div class="stat-card"><div class="sc-label">최근 30일</div><div class="sc-val" id="st-30d" style="color:var(--purple)">—</div><div class="sc-sub">건</div></div>
+        <div class="stat-card"><div class="sc-label">고유 페이지</div><div class="sc-val" id="st-pages">—</div><div class="sc-sub">종류</div></div>
+        <div class="stat-card"><div class="sc-label">고유 사용자</div><div class="sc-val" id="st-users" style="color:var(--yellow)">—</div><div class="sc-sub">명</div></div>
       </div>
     </div>
-  </div>
 
-</div>
+    <!-- 인기 페이지 -->
+    <div class="section">
+      <div class="section-title">
+        인기 콘텐츠
+        <span id="stats-env-label"
+          style="font-size:10px;font-weight:500;background:#1e3a5f30;color:var(--blue);padding:2px 8px;border-radius:10px;text-transform:none;letter-spacing:0"></span>
+        <select id="stats-period" class="search-input" style="max-width:120px;margin-left:auto;font-size:11px;padding:3px 8px" onchange="loadStatsData()">
+          <option value="7">최근 7일</option>
+          <option value="30" selected>최근 30일</option>
+          <option value="90">최근 90일</option>
+          <option value="365">전체 1년</option>
+        </select>
+      </div>
+      <div class="status-bar" id="stats-status"></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th>
+            <th>페이지</th>
+            <th style="text-align:right">뷰 수</th>
+            <th style="text-align:right">고유 사용자</th>
+            <th style="text-align:right">평균 체류(초)</th>
+            <th style="text-align:right">체류 측정률</th>
+          </tr></thead>
+          <tbody id="stats-tbody"></tbody>
+        </table>
+      </div>
+    </div>
 
-<!-- 역할 변경 확인 모달 -->
-<div class="modal-bg" id="role-modal">
+    <!-- 최근 뷰 이력 -->
+    <div class="section">
+      <div class="section-title">최근 접속 이력 <span id="recent-count" style="font-size:11px;color:var(--hint);font-weight:400;text-transform:none;letter-spacing:0"></span></div>
+      <!-- 사용자 필터 활성 표시 -->
+      <div id="user-filter-bar" style="display:none;background:#1e3a5f30;border:1px solid #3b82f640;border-radius:8px;padding:8px 14px;margin-bottom:8px;align-items:center;gap:10px">
+        <span style="font-size:12px;color:var(--blue)">👤 사용자 필터:</span>
+        <strong id="user-filter-label" style="font-size:12px;color:var(--text)"></strong>
+        <button onclick="clearUserFilter()" style="margin-left:auto;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:11px">✕ 전체 보기</button>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" id="recent-search" placeholder="이름 · 이메일 · 페이지 검색…" oninput="renderRecentTable()">
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>#</th><th>시각</th><th>페이지</th><th>사용자</th><th style="text-align:right">체류(초)</th><th>환경</th></tr></thead>
+          <tbody id="recent-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab-stats -->
+
+  <!-- ══ TAB 2: 이메일 발송 ══ -->
+  <div id="tab-email" class="tab-panel page">
+
+    <div id="email-dev-note" class="dev-note" style="display:none">
+      ⚠ 개발 모드(dev)에서는 이메일 데이터를 직접 조회할 수 없습니다.
+      test.worksfree.kr에서 관리자로 로그인 후 이용하세요.
+    </div>
+
+    <!-- Resend 월 발송 한도 현황 -->
+    <div class="section">
+      <div class="section-title">
+        Resend 월 발송 현황
+        <span id="em-resend-period" style="font-size:10px;font-weight:400;color:var(--hint);text-transform:none;letter-spacing:0;margin-left:4px"></span>
+      </div>
+      <div class="stats">
+        <div class="stat-card"><div class="sc-label">이번 달 발송</div><div class="sc-val" id="em-resend-sent" style="color:var(--blue)">—</div><div class="sc-sub">건</div></div>
+        <div class="stat-card"><div class="sc-label">이번 달 잔여</div><div class="sc-val" id="em-resend-remaining" style="color:var(--green)">—</div><div class="sc-sub">건 남음</div></div>
+        <div class="stat-card"><div class="sc-label">월 한도</div><div class="sc-val" id="em-resend-limit" style="color:var(--muted)">—</div><div class="sc-sub">건</div></div>
+      </div>
+    </div>
+
+    <!-- 발송 통계 (Supabase 이력 기반) -->
+    <div class="section">
+      <div class="section-title">이메일 발송 현황 <span style="font-size:10px;font-weight:400;color:var(--hint);text-transform:none;letter-spacing:0">(Supabase 이력)</span></div>
+      <div class="stats">
+        <div class="stat-card"><div class="sc-label">이번 달 발송</div><div class="sc-val" id="em-month-sent" style="color:var(--green)">—</div><div class="sc-sub">건</div></div>
+        <div class="stat-card"><div class="sc-label">이번 달 필터링</div><div class="sc-val" id="em-month-filtered" style="color:var(--yellow)">—</div><div class="sc-sub">건 (수신거부)</div></div>
+        <div class="stat-card"><div class="sc-label">누적 발송</div><div class="sc-val" id="em-total-sent" style="color:var(--blue)">—</div><div class="sc-sub">건</div></div>
+        <div class="stat-card"><div class="sc-label">고유 수신자</div><div class="sc-val" id="em-unique-recv">—</div><div class="sc-sub">명</div></div>
+        <div class="stat-card"><div class="sc-label">컨설턴트</div><div class="sc-val" id="em-unique-sender">—</div><div class="sc-sub">명 발송</div></div>
+      </div>
+    </div>
+
+    <!-- 발송 이력 테이블 -->
+    <div class="section">
+      <div class="section-title">발송 이력 <span id="em-count" style="font-size:11px;color:var(--hint);font-weight:400;text-transform:none;letter-spacing:0"></span></div>
+      <div class="toolbar">
+        <button class="filter-btn active" data-estatus="all"      onclick="filterEmail('all')">전체</button>
+        <button class="filter-btn"        data-estatus="sent"     onclick="filterEmail('sent')">✓ 발송됨</button>
+        <button class="filter-btn"        data-estatus="filtered" onclick="filterEmail('filtered')">⊘ 필터링</button>
+        <input class="search-input" id="email-search" placeholder="수신자 / 발신자 / 전단지 검색…" oninput="renderEmailTable()">
+        <select id="email-period" class="search-input" style="max-width:130px" onchange="loadEmailData()">
+          <option value="30">최근 30일</option>
+          <option value="90">최근 90일</option>
+          <option value="0">전체</option>
+        </select>
+      </div>
+      <div class="status-bar" id="email-status"></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>발송일시</th>
+              <th>전단지</th>
+              <th>발신자</th>
+              <th>회원</th>
+              <th>수신자</th>
+              <th>상태</th>
+              <th>환경</th>
+            </tr>
+          </thead>
+          <tbody id="email-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 가장 많이 보낸 전단지 -->
+    <div class="section">
+      <div class="section-title">전단지별 발송 현황</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>전단지</th><th style="text-align:right">발송</th><th style="text-align:right">필터링</th><th style="text-align:right">합계</th></tr></thead>
+          <tbody id="flyer-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab-email -->
+
+  <!-- ══ TAB 3: 수신거부 ══ -->
+
+  <div id="tab-unsub" class="tab-panel page">
+
+    <div id="unsub-dev-note" class="dev-note" style="display:none">
+      ⚠ 개발 모드(dev)에서는 수신거부 데이터를 직접 조회할 수 없습니다.
+      test.worksfree.kr에서 관리자로 로그인 후 이용하세요.
+    </div>
+
+    <!-- 수신거부 통계 -->
+    <div class="section">
+      <div class="section-title">수신거부 현황</div>
+      <div class="stats">
+        <div class="stat-card"><div class="sc-label">총 수신거부</div><div class="sc-val" id="us-total" style="color:var(--red)">—</div><div class="sc-sub">건</div></div>
+        <div class="stat-card"><div class="sc-label">링크 클릭</div><div class="sc-val" id="us-link" style="color:var(--orange)">—</div><div class="sc-sub">건</div></div>
+        <div class="stat-card"><div class="sc-label">수동 등록</div><div class="sc-val" id="us-manual" style="color:var(--yellow)">—</div><div class="sc-sub">건</div></div>
+        <div class="stat-card"><div class="sc-label">이번 달 신규</div><div class="sc-val" id="us-month" style="color:var(--muted)">—</div><div class="sc-sub">건</div></div>
+      </div>
+    </div>
+
+    <!-- 수동 등록 폼 -->
+    <div class="section">
+      <div class="section-title">수동 수신거부 등록</div>
+      <div class="form-box" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <label class="form-label">이메일 주소</label>
+          <input class="form-input" id="unsub-add-email" type="email" placeholder="block@example.com">
+        </div>
+        <div style="flex:2;min-width:200px">
+          <label class="form-label">사유 (선택)</label>
+          <input class="form-input" id="unsub-add-note" placeholder="예) 고객 직접 요청, 반복 불만 등">
+        </div>
+        <button class="btn danger" style="padding:8px 18px;white-space:nowrap" onclick="openUnsubAddModal()">+ 수신거부 등록</button>
+      </div>
+    </div>
+
+    <!-- 수신거부 목록 -->
+    <div class="section">
+      <div class="section-title">수신거부 목록 <span id="us-count" style="font-size:11px;color:var(--hint);font-weight:400;text-transform:none;letter-spacing:0"></span></div>
+      <div class="toolbar">
+        <input class="search-input" id="unsub-search" placeholder="이메일 검색…" oninput="renderUnsubTable()">
+        <button class="filter-btn active" data-usrc="all"    onclick="filterUnsub('all')">전체</button>
+        <button class="filter-btn" data-usrc="link"          onclick="filterUnsub('link')">링크 클릭</button>
+        <button class="filter-btn" data-usrc="manual"        onclick="filterUnsub('manual')">수동 등록</button>
+      </div>
+      <div class="status-bar" id="unsub-status"></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>이메일</th><th>수신거부일시</th><th>구분</th><th>사유</th>
+              <th>발송 이력</th><th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="unsub-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab-unsub -->
+
+</div><!-- /app -->
+
+<!-- 수신거부 등록 모달 -->
+<div class="modal-bg" id="unsub-add-modal">
   <div class="modal-box">
-    <div class="modal-title">역할 변경 확인</div>
-    <div class="modal-desc" id="role-modal-desc"></div>
+    <div class="modal-title">수신거부 등록 확인</div>
+    <div class="modal-desc" id="unsub-add-desc"></div>
     <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeModal('role-modal')">취소</button>
-      <button class="modal-confirm" id="role-modal-ok" onclick="confirmRoleChange()">변경</button>
+      <button class="modal-cancel" onclick="closeModal('unsub-add-modal')">취소</button>
+      <button class="modal-confirm danger" onclick="confirmUnsubAdd()">등록</button>
     </div>
   </div>
 </div>
 
-<!-- 크레딧 지급 확인 모달 -->
-<div class="modal-bg" id="credit-modal">
+<!-- 수신거부 해제 모달 -->
+<div class="modal-bg" id="unsub-del-modal">
   <div class="modal-box">
-    <div class="modal-title">크레딧 지급 확인</div>
-    <div class="modal-desc" id="credit-modal-desc"></div>
+    <div class="modal-title">수신거부 해제 확인</div>
+    <div class="modal-desc" id="unsub-del-desc"></div>
     <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeModal('credit-modal')">취소</button>
-      <button class="modal-confirm" style="background:var(--green)" onclick="confirmCreditGrant()">지급</button>
+      <button class="modal-cancel" onclick="closeModal('unsub-del-modal')">취소</button>
+      <button class="modal-confirm" onclick="confirmUnsubDel()">해제</button>
     </div>
   </div>
 </div>
@@ -175,186 +389,568 @@ const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-let allProfiles = [];
-let credMap     = {};
-let curFilter   = 'all';
-let pendingRoleChange = null;
+// wf_dev_session=admin 이더라도 실제 Supabase 로그인 성공 시 init()에서 false로 전환됨
+let IS_DEV_SESSION = localStorage.getItem('wf_dev_session') === 'admin';
 
+// Resend 메일 Worker URL
+const MAIL_WORKER_URL = 'https://send-mail.worksfree.workers.dev';
+
+// Supabase thenable → real Promise (.catch 사용 가능하게)
+const safeQ = (q, fallback = {data: [], error: null}) =>
+  Promise.resolve(q).catch(e => { console.warn('[safeQ]', e?.message || e); return fallback; });
+
+/* ─────────────────────────────────────────────
+   조회 환경 결정
+   index.html의 _getEnv() 기준:
+     test.worksfree.kr    → 데이터 기록 env = 'test'
+     staging.worksfree.kr → 데이터 기록 env = 'staging'
+     portal.worksfree.kr  → 데이터 기록 env = 'portal'
+
+   어드민 조회 범위:
+     test     → ['test', 'staging']  (개발 + 스테이징 통합 확인)
+     staging  → ['staging']          (스테이징 단독)
+     portal   → ['portal']           (실서비스 단독)
+───────────────────────────────────────────── */
+function getQueryEnvs() {
+  const h = location.hostname;
+  if (h.startsWith('portal.') || h === 'www.worksfree.kr') return ['portal'];
+  if (h.startsWith('staging.')) return ['staging'];
+  return ['test', 'staging'];   // test 사이트: test+staging 통합 조회
+}
+function getQueryEnvLabel() {
+  return getQueryEnvs().join(' + ');
+}
+
+/* ─────────────────────────────────────────────
+   상태
+───────────────────────────────────────────── */
+let activeTab = 'stats';
+
+// 프로필 (stats tab의 사용자 이름/이메일 표기용)
+let allProfiles    = [];
+let selectedUserId = null;   // 클릭 드릴다운 — null=전체
+
+// 페이지 통계
+let allPageStats    = [];
+let allRecentViews  = [];
+
+// 이메일 발송
+let allEmailLogs    = [];
+let curEmailStatus  = 'all';
+
+// 수신거부
+let allUnsubs       = [];
+let curUnsubFilter  = 'all';
+let pendingUnsubAdd = null;
+let pendingUnsubDel = null;
+
+/* ─────────────────────────────────────────────
+   공통
+───────────────────────────────────────────── */
 function show(id) {
   ['loading','denied','app'].forEach(i =>
     document.getElementById(i).style.display = i === id ? '' : 'none'
   );
 }
-
 function toast(msg, type='ok') {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `${type} show`;
-  setTimeout(() => { el.classList.remove('show'); }, 3000);
+  el.textContent = msg; el.className = `${type} show`;
+  setTimeout(() => el.classList.remove('show'), 3000);
 }
-
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 function openModal(id)  { document.getElementById(id).style.display = 'flex'; }
-
-function roleBadge(role) {
-  const lbl = {general:'일반',consultant:'컨설턴트',gfc:'파트너',admin:'관리자'};
-  return `<span class="badge badge-${role||'general'}">${lbl[role]||role||'—'}</span>`;
-}
+function fmtDt(iso)   { return iso ? iso.replace('T',' ').slice(0,16) : '—'; }
 function fmtDate(iso) { return iso ? iso.slice(0,10) : '—'; }
-function shortId(id)  { return id ? `<span title="${id}">${id.slice(0,8)}…</span>` : '—'; }
 function num(n)       { return (n||0).toLocaleString(); }
-
-function filterRole(role) {
-  curFilter = role;
-  document.querySelectorAll('[data-role]').forEach(b =>
-    b.classList.toggle('active', b.dataset.role === role)
-  );
-  renderTable();
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function filterUsers() { renderTable(); }
+/* ─────────────────────────────────────────────
+   탭 전환
+───────────────────────────────────────────── */
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === tab)
+  );
+  document.querySelectorAll('.tab-panel').forEach(p =>
+    p.classList.toggle('active', p.id === 'tab-' + tab)
+  );
+  // 탭 최초 진입 시 데이터 로드
+  if (tab === 'stats' && allPageStats.length === 0) loadStatsData();
+  if (tab === 'email' && allEmailLogs.length === 0) loadEmailData();
+  if (tab === 'unsub' && allUnsubs.length === 0)    loadUnsubData();
+}
 
-function renderTable() {
-  const q = document.getElementById('search-input').value.toLowerCase().trim();
-  let rows = curFilter === 'all' ? allProfiles : allProfiles.filter(p => p.role === curFilter);
-  if (q) rows = rows.filter(p => p.id.toLowerCase().includes(q) || (p.role||'').includes(q));
+function refreshCurrent() {
+  if (activeTab === 'stats') loadStatsData();
+  if (activeTab === 'email') loadEmailData();
+  if (activeTab === 'unsub') loadUnsubData();
+}
 
-  document.getElementById('status-bar').textContent =
-    `${rows.length}명 표시 · ${allProfiles.length}명 전체`;
+/* ─────────────────────────────────────────────
+   TAB 1: 페이지 통계 (하단 loadStatsData 참조)
+───────────────────────────────────────────── */
 
-  const tbody = document.getElementById('user-tbody');
-  if (!rows.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">회원 없음</td></tr>';
-    return;
+/* ─────────────────────────────────────────────
+   TAB 1: 페이지 통계
+───────────────────────────────────────────── */
+// 페이지 경로를 사람이 읽기 쉬운 이름으로 변환
+const PAGE_LABELS = {
+  'service/qr/index.html':                            'QR 생성기',
+  'service/normalizer/index.html':                    '파일명 자소복원',
+  'service/conversion-verifier/index.html':           '변환 결과 검증',
+  'board/index.html':                                 '앱 요청 게시판',
+  'consulting/mindmap/index.html':                    '컨설팅 마인드맵',
+  'consulting/prebiz/index.html':                     '예비창업패키지',
+  'consulting/soho/index.html':                       '소상공인·자영업자 지원',
+  'consulting/g1/index.html':                         '현장클리닉 관리',
+  'consulting/jdh/index.html':                        '중대재해처벌법',
+  'consulting/esg/index.html':                        'ESG 자가진단',
+  'consulting/dart/index.html':                       '기업공시 조회',
+  'consulting/marketing/index.html':                  '마케팅 자료',
+  'consulting/inheritance/index.html':                '상속·증여 진단',
+  'consulting/stockval/index.html':                   '비상장주식 가치평가',
+  'consulting/gfc/index.html':                        '경영종합진단',
+  'consulting/ceo/index.html':                        'CEO 플랜',
+  'app-store/solidworks/bom-exporter/index.html':     'BOM 추출',
+  'app-store/solidworks/attribute-reset/index.html':  '속성 초기화',
+  'app-store/etc/dwg-batch-print/index.html':         '도면 출력 자동화',
+  'app-store/web/naver-blog-commenter/index.html':    'Naver Blog Commenter',
+};
+function pageLabel(p) {
+  // query string 제거, ?v=... 무시
+  const base = (p || '').split('?')[0];
+  return PAGE_LABELS[base] || base;
+}
+
+async function loadStatsData() {
+  const days = parseInt(document.getElementById('stats-period').value);
+  const envs = getQueryEnvs();
+  document.getElementById('stats-status').textContent = '로딩 중…';
+  document.getElementById('stats-env-label').textContent = getQueryEnvLabel() + ' 데이터';
+
+  // 페이지 통계 + 최근 이력 병렬 조회
+  const [statsRes, recentRes] = await Promise.all([
+    safeQ(sb.rpc('admin_page_view_stats', { days, env_filter: envs })),
+    safeQ(sb.from('page_views')
+      .select('id,page,viewed_at,duration_s,env,user_id')
+      .in('env', envs)
+      .order('viewed_at', { ascending: false })
+      .limit(200)),
+  ]);
+
+  // 프로필: admin_get_all_profiles 시도 → 실패하면 직접 쿼리
+  let profRes = await safeQ(sb.rpc('admin_get_all_profiles'));
+  if (!profRes.data?.length) {
+    profRes = await safeQ(sb.from('profiles').select('id,name,email,role').order('name'));
   }
 
-  tbody.innerHTML = rows.map((p, i) => {
-    const cr  = credMap[p.id] || {};
-    const bal = cr.balance || 0;
-    const isAdmin = p.role === 'admin';
-    const roleOpts = ['general','consultant','gfc']
-      .filter(r => r !== p.role)
-      .map(r => {
-        const lbl = {general:'일반',consultant:'컨설턴트',gfc:'파트너'};
-        return `<option value="${r}">${lbl[r]}</option>`;
-      }).join('');
+  if (statsRes.error) {
+    document.getElementById('stats-status').textContent = '오류: ' + statsRes.error.message;
+    return;
+  }
+  allPageStats   = statsRes.data  || [];
+  allRecentViews = recentRes.data || [];
+  allProfiles    = profRes.data   || [];
+  console.log('[content] profiles loaded:', allProfiles.length, '명');
 
+  // 요약 통계
+  const totalViews = allPageStats.reduce((s, r) => s + Number(r.views), 0);
+  // 7일/30일은 raw 데이터로 계산
+  const now = new Date();
+  const d7  = new Date(now - 7  * 86400000).toISOString();
+  const d30 = new Date(now - 30 * 86400000).toISOString();
+  const v7  = allRecentViews.filter(r => r.viewed_at >= d7).length;
+  const v30 = allRecentViews.filter(r => r.viewed_at >= d30).length;
+  document.getElementById('st-total').textContent = num(totalViews);
+  document.getElementById('st-7d').textContent    = num(v7);
+  document.getElementById('st-30d').textContent   = num(v30);
+  document.getElementById('st-pages').textContent = allPageStats.length;
+  const uniqUsers = new Set(allRecentViews.map(r => r.user_id)).size;
+  document.getElementById('st-users').textContent = num(uniqUsers);
+
+  document.getElementById('last-updated').textContent = new Date().toLocaleTimeString() + ' 기준';
+  renderStatsTable();
+  renderRecentTable();
+}
+
+function renderStatsTable() {
+  const tbody = document.getElementById('stats-tbody');
+  if (!allPageStats.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${getQueryEnvLabel()} 환경에 페이지뷰 데이터가 없습니다.</td></tr>`;
+    document.getElementById('stats-status').textContent = '';
+    return;
+  }
+  tbody.innerHTML = allPageStats.map((r, i) => {
+    const label  = pageLabel(r.page);
+    const avgSec = r.avg_sec ? `${r.avg_sec}s` : '—';
+    const pct    = r.pct_with_dur ? `${r.pct_with_dur}%` : '—';
     return `<tr>
       <td style="color:var(--hint)">${i+1}</td>
-      <td>${roleBadge(p.role)}</td>
-      <td style="color:var(--muted)">${fmtDate(p.agreed_at)}</td>
-      <td>${bal > 0 ? `<span class="credit-chip">${num(bal)} cr</span>` : '<span style="color:var(--hint)">—</span>'}</td>
-      <td>${isAdmin
-        ? '<span style="color:var(--hint);font-size:12px">변경 불가</span>'
-        : `<div style="display:flex;align-items:center;gap:6px">
-            <select class="role-select" id="sel-${p.id}" onchange="">
-              <option value="${p.role}" selected>${{general:'일반',consultant:'컨설턴트',gfc:'파트너'}[p.role]}</option>
-              ${roleOpts}
-            </select>
-            <button class="btn" style="padding:4px 10px;font-size:11px"
-              onclick="openRoleModal('${p.id}','${p.role}')">적용</button>
-          </div>`
-      }</td>
-      <td style="color:var(--hint);font-family:monospace;font-size:12px">${shortId(p.id)}</td>
+      <td>
+        <div style="font-size:13px;font-weight:500">${escHtml(label)}</div>
+        <div style="font-size:11px;color:var(--hint)">${escHtml(r.page)}</div>
+      </td>
+      <td style="text-align:right;font-weight:600;color:var(--blue)">${num(r.views)}</td>
+      <td style="text-align:right;color:var(--green)">${num(r.unique_users)}</td>
+      <td style="text-align:right;color:var(--muted)">${avgSec}</td>
+      <td style="text-align:right;color:var(--hint)">${pct}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('stats-status').textContent =
+    `${allPageStats.length}개 페이지 · 총 ${num(allPageStats.reduce((s,r)=>s+Number(r.views),0))}뷰`;
+}
+
+function renderRecentTable() {
+  const q = (document.getElementById('recent-search').value || '').toLowerCase();
+  const profileMap = {};
+  allProfiles.forEach(p => { profileMap[p.id] = p; });
+
+  // ── 사용자 필터 배너 업데이트 ──
+  const filterBar = document.getElementById('user-filter-bar');
+  if (selectedUserId) {
+    const prof  = profileMap[selectedUserId] || {};
+    const label = (prof.name ? prof.name + ' · ' : '') + (prof.email || selectedUserId.slice(0,8) + '…');
+    document.getElementById('user-filter-label').textContent = label;
+    filterBar.style.display = 'flex';
+  } else {
+    filterBar.style.display = 'none';
+  }
+
+  let rows = allRecentViews;
+  if (selectedUserId) rows = rows.filter(r => r.user_id === selectedUserId);
+  if (q) rows = rows.filter(r => {
+    const prof = profileMap[r.user_id] || {};
+    return (prof.email || '').toLowerCase().includes(q)
+        || (prof.name  || '').toLowerCase().includes(q)
+        || (r.page     || '').toLowerCase().includes(q);
+  });
+
+  document.getElementById('recent-count').textContent = `(${rows.length}건)`;
+  const tbody = document.getElementById('recent-tbody');
+  if (!rows.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">이력이 없습니다.</td></tr>'; return; }
+
+  tbody.innerHTML = rows.slice(0, 100).map((r, i) => {
+    const prof  = profileMap[r.user_id] || {};
+    const name  = prof.name  || '';
+    const email = prof.email || (r.user_id ? r.user_id.slice(0,8) + '…' : '—');
+    const isMe  = r.user_id === selectedUserId;
+    return `<tr style="${isMe ? 'background:var(--hover)' : ''}">
+      <td style="color:var(--hint)">${i+1}</td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDt(r.viewed_at)}</td>
+      <td style="font-size:12px">
+        <div style="font-weight:500">${escHtml(pageLabel(r.page))}</div>
+        <div style="font-size:11px;color:var(--hint)">${escHtml((r.page||'').split('?')[0])}</div>
+      </td>
+      <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer"
+          onclick="selectUser('${escHtml(r.user_id || '')}')"
+          title="클릭 → 이 사용자 이력만 보기">
+        ${name ? `<div style="font-weight:500;color:var(--text)">${escHtml(name)}</div>` : ''}
+        <div style="color:var(--blue);text-decoration:underline dotted;font-size:11px">${escHtml(email)}</div>
+      </td>
+      <td style="text-align:right;font-size:12px;color:var(--muted)">${r.duration_s != null ? r.duration_s + 's' : '—'}</td>
+      <td><span class="env-badge env-${r.env||'portal'}">${r.env||'portal'}</span></td>
     </tr>`;
   }).join('');
 }
 
-function openRoleModal(userId, curRole) {
-  const sel    = document.getElementById(`sel-${userId}`);
-  const newRole = sel ? sel.value : curRole;
-  if (newRole === curRole) { toast('동일한 역할입니다.', 'err'); return; }
-  const lbl = {general:'일반회원',consultant:'컨설턴트',gfc:'파트너'};
-  pendingRoleChange = { userId, curRole, newRole };
-  document.getElementById('role-modal-desc').innerHTML =
-    `User ID: <code style="font-size:12px;color:var(--blue)">${userId.slice(0,12)}…</code><br><br>` +
-    `<strong>${lbl[curRole]||curRole}</strong> → <strong style="color:var(--blue)">${lbl[newRole]||newRole}</strong><br><br>` +
-    `<span style="color:var(--yellow)">⚠ 역할 변경 시 해당 회원의 서비스 접근 권한이 즉시 변경됩니다.</span>`;
-  openModal('role-modal');
+function selectUser(userId) {
+  if (!userId) return;
+  selectedUserId = (selectedUserId === userId) ? null : userId;  // 토글
+  renderRecentTable();
 }
 
-async function confirmRoleChange() {
-  if (!pendingRoleChange) return;
-  const { userId, newRole } = pendingRoleChange;
-  closeModal('role-modal');
+function clearUserFilter() {
+  selectedUserId = null;
+  renderRecentTable();
+}
 
-  const { error } = await sb.from('profiles')
-    .update({ role: newRole })
-    .eq('id', userId);
-
-  if (error) {
-    toast(`오류: ${error.message}`, 'err');
-  } else {
-    toast('역할이 변경되었습니다.', 'ok');
-    await loadData();
+/* ─────────────────────────────────────────────
+   Resend 발송 현황 (Worker GET /)
+───────────────────────────────────────────── */
+async function loadResendStats() {
+  try {
+    const res = await fetch(MAIL_WORKER_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+    document.getElementById('em-resend-sent').textContent      = num(d.sent      ?? '—');
+    document.getElementById('em-resend-remaining').textContent = num(d.remaining ?? '—');
+    document.getElementById('em-resend-limit').textContent     = num(d.limit     || 3000);
+    document.getElementById('em-resend-period').textContent    = d.period ? '· ' + d.period : '';
+  } catch (e) {
+    console.warn('[mail-worker] GET 실패:', e.message);
+    // 실패해도 UI 그대로 유지 (Worker 미배포 등 상황 대응)
   }
-  pendingRoleChange = null;
 }
 
-function openCreditModal() {
-  const uid    = document.getElementById('credit-uid').value.trim();
-  const amount = parseInt(document.getElementById('credit-amount').value);
-  if (!uid || uid.length < 20) { toast('User ID를 정확히 입력하세요.', 'err'); return; }
-  if (!amount || amount < 1)   { toast('지급량을 입력하세요.', 'err'); return; }
-  document.getElementById('credit-modal-desc').innerHTML =
-    `User ID: <code style="font-size:12px;color:var(--blue)">${uid.slice(0,12)}…</code><br><br>` +
-    `<strong style="color:var(--green);font-size:18px">+${amount.toLocaleString()} 크레딧</strong> 을 지급합니다.`;
-  openModal('credit-modal');
+/* ─────────────────────────────────────────────
+   TAB 3: 이메일 발송 이력
+───────────────────────────────────────────── */
+function filterEmail(status) {
+  curEmailStatus = status;
+  document.querySelectorAll('[data-estatus]').forEach(b =>
+    b.classList.toggle('active', b.dataset.estatus === status)
+  );
+  renderEmailTable();
 }
 
-async function confirmCreditGrant() {
-  const uid    = document.getElementById('credit-uid').value.trim();
-  const amount = parseInt(document.getElementById('credit-amount').value);
-  closeModal('credit-modal');
+function renderEmailTable() {
+  const q = (document.getElementById('email-search').value||'').toLowerCase();
+  let rows = curEmailStatus === 'all' ? allEmailLogs : allEmailLogs.filter(r => r.status === curEmailStatus);
+  if (q) rows = rows.filter(r =>
+    (r.recipient_email||'').includes(q) ||
+    (r.sender_email||'').includes(q) ||
+    (r.sender_name||'').toLowerCase().includes(q) ||
+    (r.flyer_name||'').toLowerCase().includes(q)
+  );
 
-  const env = (() => {
-    const h = location.hostname;
-    if (h.startsWith('test.'))    return 'test';
-    if (h.startsWith('staging.')) return 'staging';
-    return 'portal';
-  })();
+  document.getElementById('email-status').textContent = `${rows.length}건 표시 · 전체 ${allEmailLogs.length}건`;
+  document.getElementById('em-count').textContent = `(${allEmailLogs.length}건)`;
 
-  const { error } = await sb.from('credits').insert({
-    user_id:    uid,
-    amount:     amount,
-    type:       'manual_grant',
-    description:'관리자 수동 지급',
-    env,
-    created_at: new Date().toISOString(),
+  const tbody = document.getElementById('email-tbody');
+  if (!rows.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">발송 이력이 없습니다.</td></tr>'; return; }
+
+  const pMap = {};
+  allProfiles.forEach(p => { pMap[p.id] = p; });
+
+  tbody.innerHTML = rows.map((r, i) => {
+    const member = r.sender_user_id ? (pMap[r.sender_user_id] || null) : null;
+    const memberHtml = member
+      ? `<div style="font-weight:500;font-size:12px;color:var(--text)">${escHtml(member.name||'')}</div>
+         <div style="font-size:11px;color:var(--hint)">${escHtml(member.email||'')}</div>`
+      : (r.sender_user_id
+          ? `<span style="font-size:11px;color:var(--hint)">${r.sender_user_id.slice(0,8)}…</span>`
+          : '<span style="color:var(--hint)">—</span>');
+    return `<tr>
+      <td style="color:var(--hint)">${i+1}</td>
+      <td style="color:var(--muted);font-size:12px">${fmtDt(r.sent_at)}</td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${escHtml(r.flyer_name)}">${escHtml(r.flyer_name)||'<span style="color:var(--hint)">—</span>'}</td>
+      <td style="font-size:12px">
+        <div style="color:var(--text)">${escHtml(r.sender_name)||'<span style="color:var(--hint)">—</span>'}</div>
+        <div style="color:var(--hint)">${escHtml(r.sender_email)||''}</div>
+      </td>
+      <td style="max-width:150px">${memberHtml}</td>
+      <td style="font-size:12px;color:var(--muted)">${escHtml(r.recipient_email)}</td>
+      <td>${r.status === 'sent'
+        ? '<span class="status-sent">✓ 발송됨</span>'
+        : '<span class="status-filtered">⊘ 수신거부</span>'}</td>
+      <td><span style="font-size:11px;color:var(--hint)">${r.env||'—'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderFlyerStats() {
+  const map = {};
+  allEmailLogs.forEach(r => {
+    const k = r.flyer_name || '(미지정)';
+    if (!map[k]) map[k] = { sent:0, filtered:0 };
+    if (r.status === 'sent')     map[k].sent++;
+    else if (r.status === 'filtered') map[k].filtered++;
   });
+  const rows = Object.entries(map).sort((a,b) => (b[1].sent+b[1].filtered) - (a[1].sent+a[1].filtered));
+  const tbody = document.getElementById('flyer-tbody');
+  if (!rows.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="4">데이터 없음</td></tr>'; return; }
+  tbody.innerHTML = rows.map(([name, s]) =>
+    `<tr>
+      <td style="font-size:13px">${escHtml(name)}</td>
+      <td style="text-align:right;color:var(--green)">${num(s.sent)}</td>
+      <td style="text-align:right;color:var(--yellow)">${num(s.filtered)}</td>
+      <td style="text-align:right;font-weight:600">${num(s.sent+s.filtered)}</td>
+    </tr>`
+  ).join('');
+}
+
+async function loadEmailData() {
+  loadResendStats();   // Resend 현황은 항상 조회 (Worker 직접 호출)
+  if (IS_DEV_SESSION) {
+    document.getElementById('email-dev-note').style.display = '';
+    document.getElementById('em-month-sent').textContent     = '—';
+    document.getElementById('em-month-filtered').textContent = '—';
+    document.getElementById('em-total-sent').textContent     = '—';
+    document.getElementById('em-unique-recv').textContent    = '—';
+    document.getElementById('em-unique-sender').textContent  = '—';
+    document.getElementById('email-tbody').innerHTML = '<tr class="empty-row"><td colspan="7">dev 모드에서는 데이터를 조회할 수 없습니다</td></tr>';
+    document.getElementById('flyer-tbody').innerHTML = '<tr class="empty-row"><td colspan="4">—</td></tr>';
+    return;
+  }
+
+  const days   = parseInt(document.getElementById('email-period').value);
+  const envs   = getQueryEnvs();
+  const since  = days > 0
+    ? new Date(Date.now() - days * 86400000).toISOString()
+    : '2000-01-01T00:00:00Z';
+
+  let query = sb.from('email_log')
+    .select('id,sent_at,recipient_email,sender_email,sender_name,sender_user_id,flyer_name,subject,env,status')
+    .in('env', envs)                          // 환경별 분리
+    .gte('sent_at', since)
+    .order('sent_at', {ascending:false})
+    .limit(500);
+
+  const { data, error } = await query;
 
   if (error) {
-    toast(`오류: ${error.message}`, 'err');
-  } else {
-    toast(`${amount.toLocaleString()} 크레딧이 지급되었습니다.`, 'ok');
-    document.getElementById('credit-uid').value = '';
-    await loadData();
+    document.getElementById('email-status').textContent = '오류: ' + error.message;
+    return;
   }
+
+  allEmailLogs = data || [];
+
+  // 통계
+  const now      = new Date();
+  const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const thisMonth = allEmailLogs.filter(r => (r.sent_at||'').startsWith(monthStr));
+  document.getElementById('em-month-sent').textContent     = num(thisMonth.filter(r=>r.status==='sent').length);
+  document.getElementById('em-month-filtered').textContent = num(thisMonth.filter(r=>r.status==='filtered').length);
+  document.getElementById('em-total-sent').textContent     = num(allEmailLogs.filter(r=>r.status==='sent').length);
+  document.getElementById('em-unique-recv').textContent    = num(new Set(allEmailLogs.map(r=>r.recipient_email)).size);
+  document.getElementById('em-unique-sender').textContent  = num(new Set(allEmailLogs.filter(r=>r.sender_email).map(r=>r.sender_email)).size);
+
+  renderEmailTable();
+  renderFlyerStats();
+  document.getElementById('last-updated').textContent = new Date().toLocaleTimeString() + ' 기준';
 }
 
-async function loadData() {
-  const [profRes, credRes] = await Promise.all([
-    sb.from('profiles').select('id,role,agreed_at').order('agreed_at',{ascending:false}),
-    sb.from('credit_balance').select('user_id,balance'),
-  ]);
-
-  credMap     = {};
-  (credRes.data||[]).forEach(c => { credMap[c.user_id] = c; });
-  allProfiles = (profRes.data||[]).filter(p => p.role !== 'admin');
-
-  document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
-  renderTable();
+/* ─────────────────────────────────────────────
+   TAB 3: 수신거부 관리
+───────────────────────────────────────────── */
+function filterUnsub(src) {
+  curUnsubFilter = src;
+  document.querySelectorAll('[data-usrc]').forEach(b =>
+    b.classList.toggle('active', b.dataset.usrc === src)
+  );
+  renderUnsubTable();
 }
 
+function renderUnsubTable() {
+  const q = (document.getElementById('unsub-search').value||'').toLowerCase();
+  let rows = curUnsubFilter === 'all' ? allUnsubs : allUnsubs.filter(u => u.source === curUnsubFilter);
+  if (q) rows = rows.filter(u => (u.email||'').includes(q) || (u.note||'').toLowerCase().includes(q));
+
+  document.getElementById('unsub-status').textContent = `${rows.length}건 표시 · 전체 ${allUnsubs.length}건`;
+  document.getElementById('us-count').textContent = `(${allUnsubs.length}건)`;
+
+  const tbody = document.getElementById('unsub-tbody');
+  if (!rows.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">수신거부 목록이 없습니다.</td></tr>'; return; }
+
+  tbody.innerHTML = rows.map((u, i) => {
+    // 이 이메일의 발송 이력 수 (캐시된 email_log에서)
+    const sentCount = allEmailLogs.filter(e => e.recipient_email === u.email && e.status === 'sent').length;
+    return `<tr>
+      <td style="color:var(--hint)">${i+1}</td>
+      <td style="font-size:13px;font-weight:500">${escHtml(u.email)}</td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDt(u.unsubscribed_at)}</td>
+      <td><span class="${u.source==='link'?'status-filtered':'badge badge-consultant'}">${u.source==='link'?'링크 클릭':'수동 등록'}</span></td>
+      <td style="font-size:12px;color:var(--hint)">${escHtml(u.note)||'—'}</td>
+      <td style="text-align:right">
+        ${sentCount > 0
+          ? `<span style="font-size:12px;color:var(--blue)">${num(sentCount)}건</span>`
+          : '<span style="color:var(--hint);font-size:12px">—</span>'}
+      </td>
+      <td>
+        <button class="btn" style="padding:3px 10px;font-size:11px;border-color:var(--green);color:var(--green)"
+          onclick="openUnsubDelModal('${escHtml(u.email)}')">해제</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openUnsubAddModal() {
+  const email = document.getElementById('unsub-add-email').value.trim();
+  const note  = document.getElementById('unsub-add-note').value.trim();
+  if (!email || !email.includes('@')) { toast('유효한 이메일 주소를 입력하세요.', 'err'); return; }
+  pendingUnsubAdd = { email, note };
+  document.getElementById('unsub-add-desc').innerHTML =
+    `<strong style="color:var(--red)">${escHtml(email)}</strong><br><br>` +
+    (note ? `사유: ${escHtml(note)}<br><br>` : '') +
+    `이 주소를 수신거부 목록에 등록합니다. 이후 모든 발송에서 자동 제외됩니다.`;
+  openModal('unsub-add-modal');
+}
+async function confirmUnsubAdd() {
+  if (!pendingUnsubAdd) return;
+  const { email, note } = pendingUnsubAdd;
+  closeModal('unsub-add-modal');
+  const { error } = await sb.from('email_unsubscribes').upsert(
+    { email: email.toLowerCase(), source: 'manual', note: note || null },
+    { onConflict: 'email' }
+  );
+  if (error) toast(`오류: ${error.message}`, 'err');
+  else { toast(`수신거부 등록됨: ${email}`, 'ok'); document.getElementById('unsub-add-email').value = ''; document.getElementById('unsub-add-note').value = ''; await loadUnsubData(); }
+  pendingUnsubAdd = null;
+}
+
+function openUnsubDelModal(email) {
+  pendingUnsubDel = email;
+  document.getElementById('unsub-del-desc').innerHTML =
+    `<strong>${escHtml(email)}</strong><br><br>` +
+    `수신거부를 해제하면 이후 발송 시 다시 메일을 받을 수 있습니다.`;
+  openModal('unsub-del-modal');
+}
+async function confirmUnsubDel() {
+  if (!pendingUnsubDel) return;
+  const email = pendingUnsubDel;
+  closeModal('unsub-del-modal');
+  const { error } = await sb.from('email_unsubscribes').delete().eq('email', email.toLowerCase());
+  if (error) toast(`오류: ${error.message}`, 'err');
+  else { toast(`수신거부 해제됨: ${email}`, 'ok'); await loadUnsubData(); }
+  pendingUnsubDel = null;
+}
+
+async function loadUnsubData() {
+  if (IS_DEV_SESSION) {
+    document.getElementById('unsub-dev-note').style.display = '';
+    ['us-total','us-link','us-manual','us-month'].forEach(id =>
+      document.getElementById(id).textContent = '—'
+    );
+    document.getElementById('unsub-tbody').innerHTML = '<tr class="empty-row"><td colspan="7">dev 모드에서는 데이터를 조회할 수 없습니다</td></tr>';
+    return;
+  }
+
+  const { data, error } = await sb
+    .from('email_unsubscribes')
+    .select('id,email,unsubscribed_at,source,note')
+    .order('unsubscribed_at', {ascending:false});
+
+  if (error) { document.getElementById('unsub-status').textContent = '오류: ' + error.message; return; }
+
+  allUnsubs = data || [];
+
+  const now      = new Date();
+  const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('us-total').textContent  = num(allUnsubs.length);
+  document.getElementById('us-link').textContent   = num(allUnsubs.filter(u=>u.source==='link').length);
+  document.getElementById('us-manual').textContent = num(allUnsubs.filter(u=>u.source==='manual').length);
+  document.getElementById('us-month').textContent  = num(allUnsubs.filter(u=>(u.unsubscribed_at||'').startsWith(monthStr)).length);
+
+  renderUnsubTable();
+  document.getElementById('last-updated').textContent = new Date().toLocaleTimeString() + ' 기준';
+}
+
+/* ─────────────────────────────────────────────
+   초기화
+───────────────────────────────────────────── */
 async function init() {
-  if (localStorage.getItem('wf_dev_session') === 'admin') {
-    show('app'); await loadData(); return;
+  if (IS_DEV_SESSION) {
+    // devLogin 실제 로그인 성공 시 IS_DEV_SESSION 해제
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.user) {
+        const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+        if (prof?.role === 'admin') IS_DEV_SESSION = false;
+      }
+    } catch (_) {}
+    show('app');
+    await loadStatsData();
+    return;
   }
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { show('denied'); return; }
   const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
   if (!prof || prof.role !== 'admin') { show('denied'); return; }
-  show('app'); await loadData();
+  show('app');
+  await loadStatsData();
 }
 init();
 </script>

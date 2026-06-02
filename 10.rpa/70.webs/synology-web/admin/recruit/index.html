@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>채용 관리 — WorksFree O&amp;M</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root {
+  --bg:#0f1117; --surface:#1a1d27; --surface2:#222536; --border:#2d3047;
+  --text:#e2e8f0; --muted:#94a3b8; --hint:#64748b;
+  --blue:#3b82f6; --green:#10b981; --yellow:#f59e0b; --red:#ef4444;
+  --purple:#8b5cf6; --orange:#f97316;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
+
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.hdr-icon{font-size:22px}.hdr-title{font-size:16px;font-weight:600;flex:1}.hdr-sub{font-size:12px;color:var(--hint)}
+.admin-badge{font-size:10px;font-weight:700;background:#3b0f0f;color:#fca5a5;border:1px solid rgba(220,38,38,.4);border-radius:10px;padding:2px 9px;letter-spacing:.04em}
+
+.tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 20px;background:var(--surface);position:sticky;top:57px;z-index:99}
+.tab-btn{padding:10px 20px;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+.page{max-width:1080px;margin:0 auto;padding:20px 16px 60px}
+.section{margin-bottom:24px}
+.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.sc-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.sc-val{font-size:24px;font-weight:700;line-height:1}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--surface);padding:10px 14px;text-align:left;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface)}
+td{padding:9px 14px;vertical-align:middle}
+.empty-row td{text-align:center;padding:32px;color:var(--hint)}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.b-sent{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.b-error{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.b-skip{background:rgba(100,116,139,.15);color:var(--muted);border:1px solid rgba(100,116,139,.3)}
+.b-kw{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+
+.btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:12px;font-family:inherit;transition:.15s}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-green{background:var(--green);border-color:var(--green);color:#fff !important}
+.btn-green:hover{opacity:.85}
+.btn-red{border-color:var(--red);color:var(--red)}
+.btn-red:hover{background:#3b0f0f}
+
+/* ── 잡코리아 탭 ── */
+.jk-status-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:16px}
+.jk-dot{width:10px;height:10px;border-radius:50%;background:var(--hint);flex-shrink:0}
+.jk-dot.running{background:var(--green);box-shadow:0 0 8px rgba(16,185,129,.6);animation:pulse 1.2s ease-in-out infinite}
+.jk-dot.stopped{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.jk-status-text{font-size:13px;font-weight:500;flex:1}
+.jk-started{font-size:11px;color:var(--hint)}
+
+.config-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+.config-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px}
+.config-label{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.config-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 10px;font-size:13px;font-family:inherit;outline:none}
+.config-input:focus{border-color:var(--blue)}
+.config-check{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-top:8px}
+.config-check input{width:15px;height:15px;accent-color:var(--blue)}
+
+.log-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#94a3b8;max-height:360px;overflow-y:auto;white-space:pre-wrap;line-height:1.6}
+.server-warn{padding:12px 16px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;font-size:12px;color:#fbbf24;margin-bottom:14px;line-height:1.7}
+
+.ctrl-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+
+.filter-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit;transition:.15s}
+.filter-btn.active,.filter-btn:hover{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.08)}
+
+.pagination{display:flex;align-items:center;gap:8px;margin-top:12px}
+.pg-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.pg-btn:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.pg-btn:disabled{opacity:.35;cursor:default}
+.pg-info{font-size:12px;color:var(--hint);margin:0 6px}
+
+/* ── 어드민 게이트 ── */
+#admin-gate{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center}
+#admin-gate.visible{display:flex}
+.gate-icon{font-size:48px}
+.gate-title{font-size:18px;font-weight:600}
+.gate-desc{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div id="admin-gate">
+  <div class="gate-icon">🔒</div>
+  <div class="gate-title">관리자 전용 페이지</div>
+  <div class="gate-desc">이 페이지는 관리자 계정으로만 접근할 수 있습니다.</div>
+</div>
+
+<div id="main-content" style="display:none">
+
+<header>
+  <div class="hdr-icon">👔</div>
+  <div class="hdr-title">채용 관리 · Recruit Admin</div>
+  <span class="admin-badge">🔒 ADMIN</span>
+  <div class="hdr-sub" style="margin-left:8px">잡코리아 포지션 제안 자동화</div>
+</header>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('jk')">⚙ 잡코리아 자동화</button>
+  <button class="tab-btn" onclick="switchTab('history')">📋 발송 이력</button>
+</div>
+
+<!-- ══ TAB 1: 잡코리아 자동화 ══ -->
+<div id="tab-jk" class="tab-panel active">
+<div class="page">
+
+  <div class="server-warn">
+    <strong>⚠ 로컬 서버 필요</strong> — 이 탭은 <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:3px;font-family:monospace">local_server.py</code>가 실행 중일 때만 동작합니다.<br>
+    PowerShell: <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:3px;font-family:monospace">python synology-web/admin/recruit/local_server.py</code> (포트 8765)
+  </div>
+
+  <!-- 상태 -->
+  <div class="jk-status-bar">
+    <div class="jk-dot" id="jk-dot"></div>
+    <div class="jk-status-text" id="jk-status-text">서버 확인 중...</div>
+    <div class="jk-started" id="jk-started"></div>
+    <button class="btn" onclick="refreshStatus()">↻ 새로고침</button>
+  </div>
+
+  <!-- 통계 -->
+  <div class="stats" style="margin-bottom:20px">
+    <div class="stat-card"><div class="sc-label">전체 발송</div><div class="sc-val" id="st-total" style="color:var(--blue)">—</div></div>
+    <div class="stat-card"><div class="sc-label">이번 주</div><div class="sc-val" id="st-week" style="color:var(--green)">—</div></div>
+    <div class="stat-card"><div class="sc-label">이번 달</div><div class="sc-val" id="st-month" style="color:var(--yellow)">—</div></div>
+    <div class="stat-card"><div class="sc-label">오류</div><div class="sc-val" id="st-error" style="color:var(--red)">—</div></div>
+  </div>
+
+  <!-- 실행 설정 -->
+  <div class="section">
+    <div class="section-title">실행 설정</div>
+    <div class="config-grid">
+      <div class="config-card">
+        <div class="config-label">검색 키워드</div>
+        <input id="cfg-keywords" class="config-input" type="text" placeholder="법인영업,GFC (콤마 구분)">
+      </div>
+      <div class="config-card">
+        <div class="config-label">최대 발송 건수</div>
+        <input id="cfg-limit" class="config-input" type="number" min="0" placeholder="0 = 무제한" value="0">
+      </div>
+      <div class="config-card" style="display:flex;flex-direction:column;justify-content:flex-end">
+        <label class="config-check">
+          <input type="checkbox" id="cfg-dryrun">
+          Dry-run (발송 없이 수집만)
+        </label>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <button class="btn btn-green" id="btn-run" onclick="runJk()">▶ 실행</button>
+      <button class="btn btn-red"   id="btn-stop" onclick="stopJk()" disabled>■ 중지</button>
+      <button class="btn" onclick="clearLog()">🗑 로그 초기화</button>
+      <span style="font-size:12px;color:var(--hint);margin-left:auto" id="log-meta"></span>
+    </div>
+  </div>
+
+  <!-- 로그 -->
+  <div class="section">
+    <div class="section-title">실행 로그 <span style="font-weight:400;color:var(--hint)">(최근 80줄)</span></div>
+    <div class="log-box" id="jk-log"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ TAB 2: 발송 이력 ══ -->
+<div id="tab-history" class="tab-panel">
+<div class="page">
+
+  <div class="stats" style="margin-bottom:20px">
+    <div class="stat-card"><div class="sc-label">전체 발송</div><div class="sc-val" id="h-total" style="color:var(--blue)">—</div></div>
+    <div class="stat-card"><div class="sc-label">이번 주</div><div class="sc-val" id="h-week" style="color:var(--green)">—</div></div>
+    <div class="stat-card"><div class="sc-label">이번 달</div><div class="sc-val" id="h-month" style="color:var(--yellow)">—</div></div>
+    <div class="stat-card"><div class="sc-label">오류</div><div class="sc-val" id="h-error" style="color:var(--red)">—</div></div>
+    <div class="stat-card"><div class="sc-label">스킵</div><div class="sc-val" id="h-skip" style="color:var(--hint)">—</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">잡코리아 포지션 제안 이력</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+      <button class="filter-btn active" data-st="all"     onclick="filterHistory('all')">전체</button>
+      <button class="filter-btn"        data-st="sent"    onclick="filterHistory('sent')">발송 완료</button>
+      <button class="filter-btn"        data-st="error"   onclick="filterHistory('error')">오류</button>
+      <button class="filter-btn"        data-st="skipped" onclick="filterHistory('skipped')">스킵</button>
+      <input id="h-search" style="margin-left:auto;width:200px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:12px;font-family:inherit;outline:none" type="text" placeholder="이름/키워드 검색" oninput="renderHistory()">
+      <button class="btn" onclick="loadHistory()">↻</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>이름</th><th>경력 요약</th><th>키워드</th><th>상태</th><th>발송일</th><th>메모</th>
+        </tr></thead>
+        <tbody id="h-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <button class="pg-btn" id="h-prev" onclick="hPage(-1)" disabled>‹</button>
+      <span class="pg-info" id="h-info"></span>
+      <button class="pg-btn" id="h-next" onclick="hPage(1)" disabled>›</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</div><!-- /main-content -->
+
+<script>
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const LOCAL_URL     = 'http://localhost:8765';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── 어드민 게이트 ────────────────────────────────────────────────────
+(async () => {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: p } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+      if (p?.role === 'admin') { boot(); return; }
+    }
+  } catch {}
+  document.getElementById('admin-gate').classList.add('visible');
+})();
+
+function boot() {
+  document.getElementById('main-content').style.display = 'block';
+  refreshStatus();
+  loadStats();
+  loadHistory();
+  setInterval(pollIfRunning, 5000);
+}
+
+// ── 탭 전환 ─────────────────────────────────────────────────────────
+function switchTab(id) {
+  ['jk','history'].forEach((t, i) => {
+    document.querySelectorAll('.tab-btn')[i].classList.toggle('active', t === id);
+    document.getElementById('tab-' + t).classList.remove('active');
+  });
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  잡코리아 자동화
+// ════════════════════════════════════════════════════════════════════
+let _running = false;
+
+async function refreshStatus() {
+  const dot = document.getElementById('jk-dot');
+  const txt = document.getElementById('jk-status-text');
+  const ts  = document.getElementById('jk-started');
+  try {
+    const r = await fetch(LOCAL_URL + '/status', { signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    _running = d.running;
+    dot.className = 'jk-dot' + (d.running ? ' running' : d.status === 'stopped' ? ' stopped' : '');
+    txt.textContent = d.running ? '실행 중' : d.status === 'stopped' ? '중지됨' : '대기 중';
+    ts.textContent  = d.started_at ? '시작: ' + new Date(d.started_at).toLocaleString('ko') : '';
+    document.getElementById('btn-run').disabled  = d.running;
+    document.getElementById('btn-stop').disabled = !d.running;
+    if (d.running) loadLog();
+  } catch {
+    dot.className = 'jk-dot';
+    txt.textContent = '로컬 서버 오프라인 — local_server.py를 먼저 실행하세요';
+    ts.textContent  = '';
+    document.getElementById('btn-run').disabled  = true;
+    document.getElementById('btn-stop').disabled = true;
+  }
+}
+
+async function loadLog() {
+  try {
+    const r = await fetch(LOCAL_URL + '/log?n=80', { signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    const box = document.getElementById('jk-log');
+    box.textContent = d.lines.join('\n');
+    box.scrollTop = box.scrollHeight;
+    document.getElementById('log-meta').textContent = '총 ' + d.total + '줄';
+  } catch {}
+}
+
+async function pollIfRunning() {
+  await refreshStatus();
+  if (_running) loadLog();
+}
+
+async function runJk() {
+  const keywords = document.getElementById('cfg-keywords').value.trim();
+  const limit    = parseInt(document.getElementById('cfg-limit').value) || 0;
+  const dry_run  = document.getElementById('cfg-dryrun').checked;
+  try {
+    const r = await fetch(LOCAL_URL + '/run', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ keywords, limit, dry_run }),
+      signal: AbortSignal.timeout(5000)
+    });
+    const d = await r.json();
+    if (!d.ok) { alert('실행 실패: ' + d.error); return; }
+    await refreshStatus();
+    setTimeout(loadLog, 1500);
+  } catch (e) {
+    alert('로컬 서버에 연결할 수 없습니다. local_server.py를 먼저 실행하세요.\n' + e.message);
+  }
+}
+
+async function stopJk() {
+  if (!confirm('실행 중인 작업을 중지하시겠습니까?')) return;
+  try {
+    await fetch(LOCAL_URL + '/stop', { method: 'POST', signal: AbortSignal.timeout(5000) });
+    await refreshStatus();
+    await loadLog();
+  } catch (e) { alert('중지 실패: ' + e.message); }
+}
+
+async function clearLog() {
+  try {
+    await fetch(LOCAL_URL + '/clear-log', { method: 'POST', signal: AbortSignal.timeout(3000) });
+    document.getElementById('jk-log').textContent = '';
+    document.getElementById('log-meta').textContent = '';
+  } catch {}
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  Supabase 통계 & 발송 이력
+// ════════════════════════════════════════════════════════════════════
+async function loadStats() {
+  try {
+    const { data } = await sb.from('jobkorea_stats').select('*').single();
+    if (!data) return;
+    document.getElementById('st-total').textContent = data.total_sent    ?? '0';
+    document.getElementById('st-week').textContent  = data.this_week     ?? '0';
+    document.getElementById('st-month').textContent = data.this_month    ?? '0';
+    document.getElementById('st-error').textContent = data.total_error   ?? '0';
+    document.getElementById('h-total').textContent  = data.total_sent    ?? '0';
+    document.getElementById('h-week').textContent   = data.this_week     ?? '0';
+    document.getElementById('h-month').textContent  = data.this_month    ?? '0';
+    document.getElementById('h-error').textContent  = data.total_error   ?? '0';
+    document.getElementById('h-skip').textContent   = data.total_skipped ?? '0';
+  } catch {}
+}
+
+let _allHistory = [], _hFilter = 'all', _hPage = 0;
+const H_PER = 25;
+
+async function loadHistory() {
+  const { data } = await sb
+    .from('jobkorea_proposals')
+    .select('*')
+    .order('sent_at', { ascending: false })
+    .limit(1000);
+  _allHistory = data || [];
+  _hPage = 0;
+  renderHistory();
+}
+
+function filterHistory(st) {
+  _hFilter = st;
+  _hPage = 0;
+  document.querySelectorAll('[data-st]').forEach(b => b.classList.toggle('active', b.dataset.st === st));
+  renderHistory();
+}
+
+function renderHistory() {
+  const q    = (document.getElementById('h-search')?.value || '').toLowerCase();
+  const rows = _allHistory.filter(r => {
+    const stOk = _hFilter === 'all' || r.status === _hFilter;
+    const qOk  = !q || (r.name||'').toLowerCase().includes(q) || (r.keyword||'').toLowerCase().includes(q);
+    return stOk && qOk;
+  });
+  const start = _hPage * H_PER;
+  const page  = rows.slice(start, start + H_PER);
+  const tbody = document.getElementById('h-tbody');
+  const statusBadge = s => ({
+    sent:    '<span class="badge b-sent">발송</span>',
+    error:   '<span class="badge b-error">오류</span>',
+    skipped: '<span class="badge b-skip">스킵</span>',
+  }[s] || `<span class="badge">${esc(s)}</span>`);
+  tbody.innerHTML = page.length
+    ? page.map((r, i) => `<tr>
+        <td style="color:var(--hint)">${start+i+1}</td>
+        <td>${esc(r.name||'—')}</td>
+        <td style="color:var(--muted);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.career||'')}</td>
+        <td><span class="badge b-kw">${esc(r.keyword||'')}</span></td>
+        <td>${statusBadge(r.status)}</td>
+        <td style="color:var(--hint);font-size:12px;white-space:nowrap">${fmtDate(r.sent_at)}</td>
+        <td style="color:var(--muted);font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.notes||'')}</td>
+      </tr>`).join('')
+    : '<tr class="empty-row"><td colspan="7">이력이 없습니다.</td></tr>';
+  document.getElementById('h-info').textContent = `${start+1}–${Math.min(start+H_PER, rows.length)} / ${rows.length}건`;
+  document.getElementById('h-prev').disabled = _hPage === 0;
+  document.getElementById('h-next').disabled = start + H_PER >= rows.length;
+}
+function hPage(d) { _hPage = Math.max(0, _hPage + d); renderHistory(); }
+
+// ── 유틸 ────────────────────────────────────────────────────────────
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtDate = iso => iso ? new Date(iso).toLocaleString('ko', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+</script>
+</body>
+</html>

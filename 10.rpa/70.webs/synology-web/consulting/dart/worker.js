@@ -7,6 +7,7 @@ const PROXY_EPS = new Set([
   'company.json',
   'fnlttSinglAcntAll.json',  // 단일회사 전체 재무제표
   'fnlttSinglAcnt.json',     // 단일회사 주요 재무제표
+  'list.json',               // 공시목록 (B2B 기업 수집용)
 ]);
 
 addEventListener('fetch', event => {

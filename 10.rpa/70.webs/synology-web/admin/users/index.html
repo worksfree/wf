@@ -3,62 +3,146 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>사용자 현황 — WorksFree O&M</title>
+<title>사용자 관리 — WorksFree O&amp;M</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root {
   --bg:#0f1117; --surface:#1a1d27; --surface2:#222536; --border:#2d3047;
   --text:#e2e8f0; --muted:#94a3b8; --hint:#64748b;
-  --blue:#3b82f6; --green:#10b981; --yellow:#f59e0b; --red:#ef4444; --purple:#8b5cf6;
+  --blue:#3b82f6; --green:#10b981; --yellow:#f59e0b; --red:#ef4444;
+  --purple:#8b5cf6; --orange:#f97316;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
+
+/* ── Header ── */
 header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
-.hdr-icon{font-size:22px}.hdr-title{font-size:16px;font-weight:600;flex:1}
-.hdr-sub{font-size:12px;color:var(--hint)}
+.hdr-icon{font-size:22px}.hdr-title{font-size:16px;font-weight:600;flex:1}.hdr-sub{font-size:12px;color:var(--hint)}
 .btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:12px;transition:.15s}
 .btn:hover{border-color:var(--blue);color:var(--blue)}
-.page{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.success{border-color:var(--green);color:var(--green)}.btn.success:hover{background:#052e16}
+
+/* ── Tabs ── */
+.tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 20px;background:var(--surface);position:sticky;top:57px;z-index:99}
+.tab-btn{padding:10px 20px;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* ── Layout ── */
+.page{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
 .section{margin-bottom:28px}
-.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+
+/* ── Stat cards ── */
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:4px}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
 .sc-label{font-size:11px;color:var(--muted);margin-bottom:6px}
 .sc-val{font-size:26px;font-weight:700;line-height:1}
 .sc-sub{font-size:11px;color:var(--hint);margin-top:4px}
+
+/* ── Table ── */
 .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead th{background:var(--surface);padding:10px 14px;text-align:left;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+thead th.sortable{cursor:pointer;user-select:none}
+thead th.sortable:hover{color:var(--text)}
+thead th.sort-active .sort-icon{color:var(--blue)}
+.sort-icon{font-size:10px;color:var(--hint);margin-left:3px;display:inline-block;min-width:10px}
 tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--surface)}
 td{padding:10px 14px;vertical-align:middle}
+.empty-row td{text-align:center;padding:32px;color:var(--hint);font-size:13px}
+.dev-row td{opacity:.6}
+
+/* ── Badges ── */
 .badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
 .badge-general{background:#1e2535;color:var(--muted);border:1px solid var(--border)}
 .badge-consultant{background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb40}
 .badge-gfc{background:#2d1d5a;color:#c4b5fd;border:1px solid #7c3aed40}
+.badge-ceo{background:#1a2e1a;color:#86efac;border:1px solid #16a34a40}
+.badge-staff{background:#1e2a3b;color:#7dd3fc;border:1px solid #0ea5e940}
 .badge-admin{background:#3b0f0f;color:#fca5a5;border:1px solid #dc262640}
-.status-bar{font-size:11px;color:var(--hint);text-align:right;margin-bottom:6px}
-.err-note{font-size:12px;color:var(--yellow);padding:10px 14px;background:#2a2208;border-radius:8px;border:1px solid #78350f;margin-bottom:12px}
-.screen{display:flex;align-items:center;justify-content:center;min-height:300px}
-.denied-box{text-align:center}.denied-icon{font-size:44px;margin-bottom:12px}
-.empty-row td{text-align:center;padding:32px;color:var(--hint)}
-.filter-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+
+/* ── Login status ── */
+.login-dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.login-active{background:var(--green);box-shadow:0 0 5px #10b98160}
+.login-recent{background:var(--blue)}
+.login-idle{background:var(--border)}
+
+/* ── Filter / Search / Toolbar ── */
+.toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
 .filter-btn{padding:4px 12px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;transition:.15s}
 .filter-btn.active,.filter-btn:hover{border-color:var(--blue);color:var(--blue);background:#1e3a5f30}
+.search-input{flex:1;min-width:160px;padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none}
+.search-input:focus{border-color:var(--blue)}
+.search-input::placeholder{color:var(--hint)}
+.status-bar{font-size:11px;color:var(--hint);text-align:right;margin-bottom:6px}
+.role-select{padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;cursor:pointer}
+.role-select:hover{border-color:var(--blue)}
+.credit-chip{font-size:11px;color:var(--blue);background:#1e3a5f30;border-radius:10px;padding:2px 8px}
+.edit-btn{padding:3px 9px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--hint);cursor:pointer;font-size:11px;transition:.15s;white-space:nowrap}
+.edit-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── Form box (credit grant) ── */
+.form-box{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+.form-label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.form-input{width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none}
+.form-input:focus{border-color:var(--blue)}
+.form-note{font-size:12px;color:var(--muted);margin-bottom:12px}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
+#toast.ok{background:#0c2a1a;color:#34d399;border:1px solid #10b98150}
+#toast.err{background:#2a0808;color:#fca5a5;border:1px solid #ef444450}
+#toast.show{opacity:1}
+
+/* ── Modals (confirm) ── */
+.modal-bg{position:fixed;inset:0;background:#00000088;display:none;align-items:center;justify-content:center;z-index:9000}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;max-width:420px;width:90%}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:8px}
+.modal-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.modal-cancel{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px}
+.modal-confirm{padding:8px 16px;border-radius:8px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:13px;font-weight:500}
+.modal-confirm:hover{background:#2563eb}
+.modal-confirm.success{background:var(--green)}.modal-confirm.success:hover{background:#059669}
+
+/* ── Edit modal ── */
+.editbg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:8000;display:none;align-items:center;justify-content:center}
+.editbox{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;width:360px;max-width:94vw}
+.editbox-title{font-size:14px;font-weight:700;margin-bottom:16px}
+.editbox-field{margin-bottom:12px}
+.editbox-label{font-size:11px;color:var(--muted);margin-bottom:5px}
+.editbox-hint{font-size:12px;color:var(--hint);padding:4px 0}
+.editbox-input,.editbox-select{width:100%;padding:8px 10px;background:#0f1117;border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none}
+.editbox-input:focus,.editbox-select:focus{border-color:var(--blue)}
+.editbox-select option{background:#1a1d27}
+.editbox-actions{display:flex;gap:8px;margin-top:16px}
+.editbox-save{flex:1;padding:9px;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+.editbox-save:hover{opacity:.88}
+.editbox-cancel{padding:9px 16px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px}
+.editbox-cancel:hover{color:var(--text)}
+.editbox-msg{font-size:11px;text-align:center;margin-top:8px;min-height:16px}
+.editbox-msg.ok{color:var(--green)}.editbox-msg.err{color:var(--red)}
+
+/* ── Screen states ── */
+.screen{display:flex;align-items:center;justify-content:center;min-height:300px}
+.denied-box{text-align:center}.denied-icon{font-size:44px;margin-bottom:12px}
 </style>
 </head>
 <body>
 
 <header>
   <div class="hdr-icon">👥</div>
-  <div class="hdr-title">사용자 현황</div>
+  <div class="hdr-title">사용자 관리</div>
   <div class="hdr-sub" id="last-updated"></div>
   <button class="btn" onclick="loadData()">↻ 새로고침</button>
 </header>
 
 <div id="loading" class="screen"><span style="color:var(--muted)">데이터 로딩 중…</span></div>
-
 <div id="denied" class="screen" style="display:none">
   <div class="denied-box">
     <div class="denied-icon">🔒</div>
@@ -67,158 +151,670 @@ td{padding:10px 14px;vertical-align:middle}
   </div>
 </div>
 
-<div id="app" class="page" style="display:none">
+<nav class="tab-nav" id="main-tabs" style="display:none">
+  <button class="tab-btn active" data-tab="members" onclick="switchTab('members')">👤 회원 목록</button>
+  <button class="tab-btn"        data-tab="roles"   onclick="switchTab('roles')">🔑 역할 · 크레딧</button>
+</nav>
 
-  <div class="section">
-    <div class="section-title">회원 현황</div>
-    <div class="stats">
-      <div class="stat-card"><div class="sc-label">총 회원</div><div class="sc-val" id="cnt-total">—</div></div>
-      <div class="stat-card"><div class="sc-label">일반회원</div><div class="sc-val" id="cnt-general" style="color:var(--muted)">—</div></div>
-      <div class="stat-card"><div class="sc-label">컨설턴트</div><div class="sc-val" id="cnt-consultant" style="color:var(--blue)">—</div></div>
-      <div class="stat-card"><div class="sc-label">파트너</div><div class="sc-val" id="cnt-gfc" style="color:var(--purple)">—</div></div>
-      <div class="stat-card"><div class="sc-label">관리자</div><div class="sc-val" id="cnt-admin" style="color:var(--red)">—</div></div>
+<div id="app" style="display:none">
+
+  <!-- ══ TAB 1: 회원 목록 ══ -->
+  <div id="tab-members" class="tab-panel active page">
+
+    <!-- 회원 현황 -->
+    <div class="section">
+      <div class="section-title">회원 현황</div>
+      <div class="stats">
+        <div class="stat-card"><div class="sc-label">총 회원</div><div class="sc-val" id="cnt-total">—</div></div>
+        <div class="stat-card"><div class="sc-label">일반회원</div><div class="sc-val" id="cnt-general" style="color:var(--muted)">—</div></div>
+        <div class="stat-card"><div class="sc-label">컨설턴트</div><div class="sc-val" id="cnt-consultant" style="color:var(--blue)">—</div></div>
+        <div class="stat-card"><div class="sc-label">파트너</div><div class="sc-val" id="cnt-gfc" style="color:var(--purple)">—</div></div>
+        <div class="stat-card"><div class="sc-label">관리자</div><div class="sc-val" id="cnt-admin" style="color:var(--red)">—</div></div>
+        <div class="stat-card">
+          <div class="sc-label">7일 이내 활성</div>
+          <div class="sc-val" id="cnt-active7" style="color:var(--green)">—</div>
+          <div class="sc-sub">명</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">30일 이내 활성</div>
+          <div class="sc-val" id="cnt-active30" style="color:var(--blue)">—</div>
+          <div class="sc-sub">명</div>
+        </div>
+      </div>
     </div>
+
+    <!-- 크레딧 현황 -->
+    <div class="section">
+      <div class="section-title">크레딧 현황</div>
+      <div class="stats">
+        <div class="stat-card"><div class="sc-label">총 충전</div><div class="sc-val" id="cr-charged" style="color:var(--green)">—</div><div class="sc-sub">크레딧</div></div>
+        <div class="stat-card"><div class="sc-label">총 잔액</div><div class="sc-val" id="cr-balance" style="color:var(--blue)">—</div><div class="sc-sub">크레딧</div></div>
+        <div class="stat-card"><div class="sc-label">총 사용</div><div class="sc-val" id="cr-used" style="color:var(--yellow)">—</div><div class="sc-sub">크레딧</div></div>
+        <div class="stat-card"><div class="sc-label">잔액 보유</div><div class="sc-val" id="cr-holders">—</div><div class="sc-sub">명</div></div>
+      </div>
+    </div>
+
+    <!-- 회원 목록 테이블 -->
+    <div class="section">
+      <div class="section-title">회원 목록</div>
+      <div class="toolbar">
+        <button class="filter-btn active" data-mf="all"        onclick="filterMembers('all')">전체</button>
+        <button class="filter-btn"        data-mf="general"    onclick="filterMembers('general')">일반회원</button>
+        <button class="filter-btn"        data-mf="consultant" onclick="filterMembers('consultant')">컨설턴트</button>
+        <button class="filter-btn"        data-mf="gfc"        onclick="filterMembers('gfc')">파트너</button>
+        <button class="filter-btn"        data-mf="admin"      onclick="filterMembers('admin')">관리자</button>
+        <input class="search-input" id="member-search" placeholder="이름 또는 이메일 검색…"
+               oninput="renderMembersTable()" style="max-width:240px;margin-left:auto">
+      </div>
+      <div class="status-bar" id="member-status"></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>역할</th>
+            <th>동의일</th>
+            <th>최근 로그인</th>
+            <th style="text-align:right">크레딧</th>
+            <th>편집</th>
+          </tr></thead>
+          <tbody id="member-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab-members -->
+
+  <!-- ══ TAB 2: 역할 · 크레딧 ══ -->
+  <div id="tab-roles" class="tab-panel page">
+
+    <!-- 역할 관리 -->
+    <div class="section">
+      <div class="section-title">회원 역할 관리</div>
+      <div class="toolbar">
+        <button class="filter-btn active" data-rf="all"        onclick="filterRole('all')">전체</button>
+        <button class="filter-btn"        data-rf="general"    onclick="filterRole('general')">일반회원</button>
+        <button class="filter-btn"        data-rf="consultant" onclick="filterRole('consultant')">컨설턴트</button>
+        <button class="filter-btn"        data-rf="gfc"        onclick="filterRole('gfc')">파트너</button>
+        <input class="search-input" id="role-search" placeholder="이름 또는 이메일 검색…"
+               oninput="renderRoleTable()" style="max-width:240px;margin-left:auto">
+      </div>
+      <div class="status-bar" id="role-status"></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th class="sortable" onclick="toggleSort('seq')">#<span class="sort-icon" id="si-seq"> ↕</span></th>
+            <th class="sortable" onclick="toggleSort('name')">이름<span class="sort-icon" id="si-name"> ↕</span></th>
+            <th class="sortable" onclick="toggleSort('email')">이메일<span class="sort-icon" id="si-email"> ↕</span></th>
+            <th class="sortable" onclick="toggleSort('role')">현재 역할<span class="sort-icon" id="si-role"> ↕</span></th>
+            <th class="sortable" onclick="toggleSort('agreed_at')">동의일<span class="sort-icon" id="si-agreed_at"> ↕</span></th>
+            <th class="sortable" onclick="toggleSort('balance')" style="text-align:right">크레딧<span class="sort-icon" id="si-balance"> ↕</span></th>
+            <th>역할 변경</th>
+          </tr></thead>
+          <tbody id="role-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 수동 크레딧 지급 -->
+    <div class="section">
+      <div class="section-title">수동 크레딧 지급</div>
+      <div class="form-box">
+        <p class="form-note">이메일로 회원을 검색한 후 크레딧을 지급합니다.</p>
+        <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px">
+          <div style="flex:1">
+            <label class="form-label">이메일 검색</label>
+            <input class="form-input" id="credit-email-input" type="email" placeholder="user@example.com"
+              onkeydown="if(event.key==='Enter')searchUserForCredit()">
+          </div>
+          <button class="btn" style="padding:8px 14px" onclick="searchUserForCredit()">🔍 검색</button>
+        </div>
+        <div id="credit-user-info" style="display:none;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div><div style="font-size:11px;color:var(--muted)">이름</div><div id="crd-name" style="font-size:13px;font-weight:500"></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">이메일</div><div id="crd-email" style="font-size:12px;color:var(--muted)"></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">역할</div><div id="crd-role"></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">현재 잔액</div><div id="crd-balance" style="font-size:13px;color:var(--blue);font-weight:600"></div></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div>
+            <label class="form-label">지급량</label>
+            <input class="form-input" id="credit-amount" type="number" min="1" max="99999" value="100" style="width:110px">
+          </div>
+          <button class="btn success" id="credit-grant-btn" style="padding:8px 16px" onclick="openCreditModal()" disabled>✚ 지급</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-roles -->
+
+</div><!-- /app -->
+
+<!-- ── 사용자 편집 모달 ── -->
+<div id="editbg" class="editbg" onclick="if(event.target===this)closeEdit()">
+  <div class="editbox">
+    <div class="editbox-title">✏️ 사용자 편집</div>
+    <div class="editbox-field">
+      <div class="editbox-label">이메일</div>
+      <div class="editbox-hint" id="edit-email"></div>
+    </div>
+    <div class="editbox-field">
+      <div class="editbox-label">이름</div>
+      <input class="editbox-input" id="edit-name" type="text" placeholder="이름 입력"
+             onkeydown="if(event.key==='Enter')saveEdit()">
+    </div>
+    <div class="editbox-field">
+      <div class="editbox-label">역할</div>
+      <select class="editbox-select" id="edit-role-sel">
+        <option value="general">일반회원</option>
+        <option value="consultant">컨설턴트</option>
+        <option value="gfc">파트너 (GFC)</option>
+        <option value="ceo">CEO</option>
+        <option value="staff">스태프</option>
+      </select>
+    </div>
+    <div class="editbox-actions">
+      <button class="editbox-cancel" onclick="closeEdit()">취소</button>
+      <button class="editbox-save"   onclick="saveEdit()">저장</button>
+    </div>
+    <div class="editbox-msg" id="edit-msg"></div>
   </div>
-
-  <div class="section">
-    <div class="section-title">크레딧 요약</div>
-    <div class="stats">
-      <div class="stat-card"><div class="sc-label">총 충전</div><div class="sc-val" id="cr-charged" style="color:var(--green)">—</div><div class="sc-sub">크레딧</div></div>
-      <div class="stat-card"><div class="sc-label">총 잔액</div><div class="sc-val" id="cr-balance" style="color:var(--blue)">—</div><div class="sc-sub">크레딧</div></div>
-      <div class="stat-card"><div class="sc-label">총 사용</div><div class="sc-val" id="cr-used" style="color:var(--yellow)">—</div><div class="sc-sub">크레딧</div></div>
-      <div class="stat-card"><div class="sc-label">잔액 보유 회원</div><div class="sc-val" id="cr-holders">—</div></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">회원 목록</div>
-    <div id="err-note" class="err-note" style="display:none"></div>
-    <div class="filter-row">
-      <button class="filter-btn active" data-role="all"   onclick="filterRole('all')">전체</button>
-      <button class="filter-btn" data-role="general"      onclick="filterRole('general')">일반회원</button>
-      <button class="filter-btn" data-role="consultant"   onclick="filterRole('consultant')">컨설턴트</button>
-      <button class="filter-btn" data-role="gfc"          onclick="filterRole('gfc')">파트너</button>
-      <button class="filter-btn" data-role="admin"        onclick="filterRole('admin')">관리자</button>
-    </div>
-    <div class="status-bar" id="status-bar"></div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th>역할</th><th>동의일</th>
-            <th style="text-align:right">크레딧 잔액</th>
-            <th style="text-align:right">총 충전</th>
-            <th style="text-align:right">총 사용</th>
-            <th>User ID</th>
-          </tr>
-        </thead>
-        <tbody id="user-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
 </div>
+
+<!-- ── 역할 변경 확인 모달 ── -->
+<div class="modal-bg" id="role-modal">
+  <div class="modal-box">
+    <div class="modal-title">역할 변경 확인</div>
+    <div class="modal-desc" id="role-modal-desc"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel"  onclick="closeModal('role-modal')">취소</button>
+      <button class="modal-confirm" onclick="confirmRoleChange()">변경</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 크레딧 지급 확인 모달 ── -->
+<div class="modal-bg" id="credit-modal">
+  <div class="modal-box">
+    <div class="modal-title">크레딧 지급 확인</div>
+    <div class="modal-desc" id="credit-modal-desc"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel"               onclick="closeModal('credit-modal')">취소</button>
+      <button class="modal-confirm success"       onclick="confirmCreditGrant()">지급</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
 
 <script>
 const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-let allProfiles = [];
-let credMap     = {};
-let curFilter   = 'all';
+/* dev 테스트 계정 UUID 목록 */
+const DEV_IDS = new Set([
+  'd0000001-0000-4000-8000-000000000000',
+  'd0000002-0000-4000-8000-000000000000',
+  'd0000003-0000-4000-8000-000000000000',
+  'd0000004-0000-4000-8000-000000000000',
+]);
 
+/* ── 상태 ── */
+let activeTab        = 'members';
+let allProfiles      = [];
+let credMap          = {};    // user_id → { balance, total_charged, total_used }
+let loginMap         = {};    // user_id → last_sign_in_at (ISO string | null)
+let curMemberFilter  = 'all';
+let curRoleFilter    = 'all';
+let sortCol          = null;
+let sortDir          = 'asc';
+let pendingRole      = null;
+let creditTarget     = null;
+let _editId          = null;
+let _editOrigName    = '';
+let _editOrigRole    = '';
+
+/* ── 유틸 ── */
 function show(id) {
   ['loading','denied','app'].forEach(i =>
     document.getElementById(i).style.display = i === id ? '' : 'none'
   );
+  document.getElementById('main-tabs').style.display = id === 'app' ? '' : 'none';
 }
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `${type} show`;
+  setTimeout(() => el.classList.remove('show'), 3200);
+}
+function openModal(id)  { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function fmtDate(iso)   { return iso ? iso.slice(0,10) : '—'; }
+function fmtDt(iso)     { return iso ? iso.replace('T',' ').slice(0,16) : '—'; }
+function num(n)         { return (n||0).toLocaleString(); }
+function escHtml(s)     { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function roleBadge(role) {
-  const lbl = {general:'일반',consultant:'컨설턴트',gfc:'파트너',admin:'관리자'};
+  const lbl = { general:'일반', consultant:'컨설턴트', gfc:'파트너', admin:'관리자', ceo:'CEO', staff:'스태프' };
   return `<span class="badge badge-${role||'general'}">${lbl[role]||role||'—'}</span>`;
 }
 
-function fmtDate(iso) { return iso ? iso.slice(0,10) : '—'; }
-function shortId(id)  { return id ? id.slice(0,8)+'…' : '—'; }
-function num(n)       { return (n||0).toLocaleString(); }
-
-function filterRole(role) {
-  curFilter = role;
-  document.querySelectorAll('.filter-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.role === role)
-  );
-  renderTable();
+/* 로그인 상태 표시
+   7일 이내  → 녹색 (active), 상대시간 표기
+   30일 이내 → 청색 (recent), 상대시간 표기
+   이상      → 회색 (idle),   절대날짜 표기
+   null      → 회색, '—'
+*/
+function loginInfo(last) {
+  if (!last) return { dotCls:'login-idle', text:'—' };
+  const diff = Date.now() - new Date(last).getTime();
+  const days = Math.floor(diff / 86400000);
+  let text;
+  if (days < 1)       text = '오늘';
+  else if (days === 1) text = '어제';
+  else if (days < 7)   text = `${days}일 전`;
+  else if (days < 30)  text = `${days}일 전`;
+  else                 text = fmtDate(last);
+  const dotCls = days < 7 ? 'login-active' : days < 30 ? 'login-recent' : 'login-idle';
+  return { dotCls, text };
 }
 
-function renderTable() {
-  const tbody = document.getElementById('user-tbody');
-  const rows  = curFilter === 'all'
+/* ── 탭 전환 ── */
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === tab)
+  );
+  document.querySelectorAll('.tab-panel').forEach(p =>
+    p.classList.toggle('active', p.id === 'tab-' + tab)
+  );
+}
+
+/* ══════════════════════════════════
+   TAB 1: 회원 목록
+══════════════════════════════════ */
+function filterMembers(f) {
+  curMemberFilter = f;
+  document.querySelectorAll('[data-mf]').forEach(b =>
+    b.classList.toggle('active', b.dataset.mf === f)
+  );
+  renderMembersTable();
+}
+
+function renderMembersTable() {
+  const q = (document.getElementById('member-search').value||'').toLowerCase().trim();
+  let rows = curMemberFilter === 'all'
     ? allProfiles
-    : allProfiles.filter(p => p.role === curFilter);
+    : allProfiles.filter(p => p.role === curMemberFilter);
+  if (q) rows = rows.filter(p =>
+    (p.email||'').toLowerCase().includes(q) || (p.name||'').toLowerCase().includes(q)
+  );
+  document.getElementById('member-status').textContent =
+    `${rows.length}명 표시 · 전체 ${allProfiles.length}명`;
 
-  document.getElementById('status-bar').textContent =
-    `${rows.length}명 표시 · 마지막 갱신: ${new Date().toLocaleTimeString()}`;
-
+  const tbody = document.getElementById('member-tbody');
   if (!rows.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">해당 역할의 회원이 없습니다.</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">해당 조건의 회원이 없습니다.</td></tr>';
     return;
   }
 
   tbody.innerHTML = rows.map((p, i) => {
-    const cr = credMap[p.id] || {};
-    return `<tr>
+    const cr    = credMap[p.id] || {};
+    const li    = loginInfo(loginMap[p.id] || null);
+    const isDev = DEV_IDS.has(p.id);
+    const sn    = escHtml(p.name  || '');
+    const se    = escHtml(p.email || '');
+    return `<tr class="${isDev ? 'dev-row' : ''}">
       <td style="color:var(--hint)">${i+1}</td>
+      <td style="font-size:13px;font-weight:500;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${sn}">
+        ${p.name || '<span style="color:var(--hint)">—</span>'}
+        ${isDev ? ' <span style="font-size:10px;color:var(--hint)">(dev)</span>' : ''}
+      </td>
+      <td style="font-size:12px;color:var(--muted);max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${se}">${se || '<span style="color:var(--hint)">—</span>'}</td>
       <td>${roleBadge(p.role)}</td>
       <td style="color:var(--muted)">${fmtDate(p.agreed_at)}</td>
-      <td style="text-align:right;color:var(--blue)">${num(cr.balance)}</td>
-      <td style="text-align:right;color:var(--green)">${num(cr.total_charged)}</td>
-      <td style="text-align:right;color:var(--hint)">${num(cr.total_used)}</td>
-      <td style="color:var(--hint);font-family:monospace;font-size:12px">${shortId(p.id)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="login-dot ${li.dotCls}"></span>
+          <span style="font-size:12px;color:var(--muted)">${li.text}</span>
+        </div>
+      </td>
+      <td style="text-align:right">
+        ${(cr.balance||0) > 0
+          ? `<span class="credit-chip">${num(cr.balance)} cr</span>`
+          : '<span style="color:var(--hint)">—</span>'}
+      </td>
+      <td>
+        <button class="edit-btn"
+          onclick="openEdit('${p.id}','${sn}','${p.role||'general'}','${se}')">✏ 편집</button>
+      </td>
     </tr>`;
   }).join('');
 }
 
-async function loadData() {
-  document.getElementById('status-bar').textContent = '로딩 중…';
-  document.getElementById('err-note').style.display = 'none';
+/* ══════════════════════════════════
+   TAB 2: 역할 · 크레딧
+══════════════════════════════════ */
+function filterRole(f) {
+  curRoleFilter = f;
+  document.querySelectorAll('[data-rf]').forEach(b =>
+    b.classList.toggle('active', b.dataset.rf === f)
+  );
+  renderRoleTable();
+}
 
-  const [profRes, credRes] = await Promise.all([
-    sb.from('profiles').select('id,role,agreed_at').order('agreed_at', {ascending:false}),
-    sb.from('credit_balance').select('user_id,balance,total_charged,total_used'),
-  ]);
+function toggleSort(col) {
+  if (col === 'seq') {
+    sortCol = null; sortDir = 'asc';
+  } else if (col === sortCol) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col; sortDir = 'asc';
+  }
+  ['seq','name','email','role','agreed_at','balance'].forEach(c => {
+    const el = document.getElementById('si-' + c);
+    if (!el) return;
+    const th = el.closest('th');
+    if (c === 'seq') {
+      el.textContent = !sortCol ? ' ↕' : '';
+      th.classList.remove('sort-active');
+    } else if (sortCol === c) {
+      el.textContent = sortDir === 'asc' ? ' ▲' : ' ▼';
+      th.classList.add('sort-active');
+    } else {
+      el.textContent = ' ↕';
+      th.classList.remove('sort-active');
+    }
+  });
+  renderRoleTable();
+}
 
-  // Credit map
-  credMap = {};
-  (credRes.data || []).forEach(c => { credMap[c.user_id] = c; });
+function renderRoleTable() {
+  const q = (document.getElementById('role-search').value||'').toLowerCase().trim();
+  // 역할 탭에서는 admin 제외
+  let rows = allProfiles.filter(p => p.role !== 'admin');
+  if (curRoleFilter !== 'all') rows = rows.filter(p => p.role === curRoleFilter);
+  if (q) rows = rows.filter(p =>
+    (p.email||'').toLowerCase().includes(q) || (p.name||'').toLowerCase().includes(q)
+  );
 
-  // Profile stats
-  allProfiles = profRes.data || [];
-  if (profRes.error) {
-    const note = document.getElementById('err-note');
-    note.textContent = `데이터 로드 오류: ${profRes.error.message} — RLS 정책에서 admin 역할에 SELECT 권한을 부여해야 합니다.`;
-    note.style.display = '';
+  if (sortCol) {
+    const ORDER = { general:0, consultant:1, gfc:2, ceo:3, staff:4 };
+    rows = [...rows].sort((a, b) => {
+      let va, vb, cmp;
+      switch (sortCol) {
+        case 'name':      va=(a.name||'').toLowerCase(); vb=(b.name||'').toLowerCase(); cmp=va<vb?-1:va>vb?1:0; break;
+        case 'email':     va=(a.email||'').toLowerCase(); vb=(b.email||'').toLowerCase(); cmp=va<vb?-1:va>vb?1:0; break;
+        case 'role':      va=ORDER[a.role]??9; vb=ORDER[b.role]??9; cmp=va-vb; break;
+        case 'agreed_at': va=a.agreed_at||''; vb=b.agreed_at||''; cmp=va<vb?-1:va>vb?1:0; break;
+        case 'balance':   va=(credMap[a.id]||{}).balance||0; vb=(credMap[b.id]||{}).balance||0; cmp=va-vb; break;
+        default: cmp=0;
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
   }
 
-  const byRole = {};
-  allProfiles.forEach(p => { byRole[p.role] = (byRole[p.role]||0)+1; });
-  document.getElementById('cnt-total').textContent      = allProfiles.length;
-  document.getElementById('cnt-general').textContent    = byRole.general    || 0;
-  document.getElementById('cnt-consultant').textContent = byRole.consultant  || 0;
-  document.getElementById('cnt-gfc').textContent        = byRole.gfc        || 0;
-  document.getElementById('cnt-admin').textContent      = byRole.admin      || 0;
+  const total = allProfiles.filter(p => p.role !== 'admin').length;
+  document.getElementById('role-status').textContent =
+    `${rows.length}명 표시 · 전체 ${total}명`;
 
-  // Credit summary
-  const creds = credRes.data || [];
+  const tbody = document.getElementById('role-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">회원 없음</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map((p, i) => {
+    const cr  = credMap[p.id] || {};
+    const bal = cr.balance || 0;
+    const LABELS = { general:'일반', consultant:'컨설턴트', gfc:'파트너' };
+    const opts = ['general','consultant','gfc'].filter(r => r !== p.role)
+      .map(r => `<option value="${r}">${LABELS[r]}</option>`).join('');
+    return `<tr>
+      <td style="color:var(--hint)">${i+1}</td>
+      <td style="font-size:12px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(p.name)||'<span style="color:var(--hint)">—</span>'}</td>
+      <td style="font-size:12px;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(p.email)||'<span style="color:var(--hint)">—</span>'}</td>
+      <td>${roleBadge(p.role)}</td>
+      <td style="color:var(--muted)">${fmtDate(p.agreed_at)}</td>
+      <td style="text-align:right">
+        ${bal > 0 ? `<span class="credit-chip">${num(bal)} cr</span>` : '<span style="color:var(--hint)">—</span>'}
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <select class="role-select" id="rsel-${p.id}">
+            <option value="${p.role}">${LABELS[p.role]||p.role}</option>
+            ${opts}
+          </select>
+          <button class="btn" style="padding:4px 10px;font-size:11px"
+            onclick="openRoleModal('${p.id}','${p.role}')">적용</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openRoleModal(userId, curRole) {
+  const sel     = document.getElementById(`rsel-${userId}`);
+  const newRole = sel ? sel.value : curRole;
+  if (newRole === curRole) { toast('동일한 역할입니다.', 'err'); return; }
+  const LBL = { general:'일반회원', consultant:'컨설턴트', gfc:'파트너' };
+  pendingRole = { userId, curRole, newRole };
+  document.getElementById('role-modal-desc').innerHTML =
+    `<strong>${LBL[curRole]||curRole}</strong> → <strong style="color:var(--blue)">${LBL[newRole]||newRole}</strong><br><br>` +
+    `<span style="color:var(--yellow)">⚠ 역할 변경 시 서비스 접근 권한이 즉시 변경됩니다.</span>`;
+  openModal('role-modal');
+}
+
+async function confirmRoleChange() {
+  if (!pendingRole) return;
+  const { userId, newRole } = pendingRole;
+  closeModal('role-modal');
+  const { data, error } = await sb.rpc('admin_set_user_role', { target_id: userId, new_role: newRole });
+  if (error) { toast(`오류: ${error.message}`, 'err'); }
+  else if (data === 'ok') {
+    toast('역할이 변경되었습니다.', 'ok');
+    const p = allProfiles.find(u => u.id === userId);
+    if (p) p.role = newRole;
+    renderMembersTable();
+    renderRoleTable();
+  } else { toast(`오류: ${data}`, 'err'); }
+  pendingRole = null;
+}
+
+async function searchUserForCredit() {
+  const email = (document.getElementById('credit-email-input').value||'').trim().toLowerCase();
+  if (!email || !email.includes('@')) { toast('이메일 주소를 입력하세요.', 'err'); return; }
+  creditTarget = null;
+  document.getElementById('credit-user-info').style.display = 'none';
+  document.getElementById('credit-grant-btn').disabled = true;
+
+  const { data, error } = await sb.from('profiles')
+    .select('id,name,email,role').eq('email', email).maybeSingle();
+  if (error) { toast(`검색 오류: ${error.message}`, 'err'); return; }
+  if (!data)  { toast('해당 이메일의 회원을 찾을 수 없습니다.', 'err'); return; }
+
+  const { data: cr } = await sb.from('credit_balance')
+    .select('balance').eq('user_id', data.id).maybeSingle();
+  creditTarget = data;
+  document.getElementById('crd-name').textContent    = data.name  || '—';
+  document.getElementById('crd-email').textContent   = data.email || '';
+  document.getElementById('crd-role').innerHTML      = roleBadge(data.role);
+  document.getElementById('crd-balance').textContent = num(cr?.balance || 0) + ' cr';
+  document.getElementById('credit-user-info').style.display = '';
+  document.getElementById('credit-grant-btn').disabled = false;
+}
+
+function openCreditModal() {
+  if (!creditTarget) { toast('먼저 회원을 검색하세요.', 'err'); return; }
+  const amount = parseInt(document.getElementById('credit-amount').value);
+  if (!amount || amount < 1) { toast('지급량을 입력하세요.', 'err'); return; }
+  document.getElementById('credit-modal-desc').innerHTML =
+    `<strong>${escHtml(creditTarget.name||'—')}</strong>` +
+    `<div style="font-size:12px;color:var(--muted);margin-top:2px">${escHtml(creditTarget.email)}</div><br>` +
+    `<strong style="color:var(--green);font-size:18px">+${amount.toLocaleString()} 크레딧</strong> 을 지급합니다.`;
+  openModal('credit-modal');
+}
+
+async function confirmCreditGrant() {
+  if (!creditTarget) return;
+  const amount = parseInt(document.getElementById('credit-amount').value);
+  closeModal('credit-modal');
+  const h   = location.hostname;
+  const env = h === 'localhost' || h === '127.0.0.1' ? 'dev'
+            : h.startsWith('test.')    ? 'test'
+            : h.startsWith('staging.') ? 'staging'
+            : 'portal';
+  const { data, error } = await sb.rpc('admin_grant_credits', {
+    target_id: creditTarget.id, amount, env_name: env,
+  });
+  if (error) { toast(`오류: ${error.message}`, 'err'); return; }
+  if (data !== 'ok') { toast(`오류: ${data}`, 'err'); return; }
+
+  toast(`${amount.toLocaleString()} 크레딧이 지급되었습니다.`, 'ok');
+  document.getElementById('credit-email-input').value = '';
+  document.getElementById('credit-user-info').style.display = 'none';
+  document.getElementById('credit-grant-btn').disabled = true;
+  creditTarget = null;
+  // 크레딧 잔액 갱신
+  const { data: cr } = await sb.from('credit_balance').select('user_id,balance,total_charged,total_used');
+  credMap = {};
+  (cr||[]).forEach(c => { credMap[c.user_id] = c; });
+  updateCreditStats(cr||[]);
+  renderRoleTable();
+}
+
+/* ══════════════════════════════════
+   편집 모달 (이름 + 역할)
+══════════════════════════════════ */
+function openEdit(userId, name, role, email) {
+  _editId       = userId;
+  _editOrigName = name;
+  _editOrigRole = role;
+  document.getElementById('edit-email').textContent = email || '—';
+  document.getElementById('edit-name').value        = name  || '';
+  document.getElementById('edit-role-sel').value    = role  || 'general';
+  const msg = document.getElementById('edit-msg');
+  msg.textContent = ''; msg.className = 'editbox-msg';
+  document.getElementById('editbg').style.display = 'flex';
+  setTimeout(() => document.getElementById('edit-name').focus(), 80);
+}
+function closeEdit() {
+  document.getElementById('editbg').style.display = 'none';
+  _editId = null;
+}
+async function saveEdit() {
+  if (!_editId) return;
+  const newName = document.getElementById('edit-name').value.trim();
+  const newRole = document.getElementById('edit-role-sel').value;
+  const msg     = document.getElementById('edit-msg');
+  if (newName === _editOrigName && newRole === _editOrigRole) {
+    msg.textContent = '변경사항이 없습니다.'; msg.className = 'editbox-msg'; return;
+  }
+  msg.textContent = '저장 중…'; msg.className = 'editbox-msg';
+
+  const calls = [];
+  if (newName !== _editOrigName) calls.push(sb.rpc('admin_set_user_name', { target_id:_editId, new_name:newName }));
+  if (newRole !== _editOrigRole) calls.push(sb.rpc('admin_set_user_role', { target_id:_editId, new_role:newRole }));
+
+  const results = await Promise.all(calls);
+  const failed  = results.find(r => r.error || (typeof r.data==='string' && r.data.startsWith('error')));
+  if (failed) {
+    msg.textContent = '오류: ' + (failed.error?.message || failed.data);
+    msg.className = 'editbox-msg err'; return;
+  }
+  const p = allProfiles.find(u => u.id === _editId);
+  if (p) {
+    if (newName !== _editOrigName) p.name = newName;
+    if (newRole !== _editOrigRole) p.role = newRole;
+  }
+  msg.textContent = '저장 완료 ✓'; msg.className = 'editbox-msg ok';
+  renderMembersTable();
+  renderRoleTable();
+  setTimeout(closeEdit, 700);
+}
+
+/* ══════════════════════════════════
+   데이터 로딩
+══════════════════════════════════ */
+function updateCreditStats(creds) {
   document.getElementById('cr-charged').textContent = num(creds.reduce((s,c)=>s+(c.total_charged||0),0));
   document.getElementById('cr-balance').textContent = num(creds.reduce((s,c)=>s+(c.balance||0),0));
   document.getElementById('cr-used').textContent    = num(creds.reduce((s,c)=>s+(c.total_used||0),0));
   document.getElementById('cr-holders').textContent = creds.filter(c=>c.balance>0).length;
-
-  document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
-  renderTable();
 }
 
+/* Supabase v2 쿼리 빌더는 PromiseLike(then만 있음)이므로
+   .catch()를 직접 호출하면 TypeError. Promise.resolve()로 변환 필요 */
+const safeQ = (q, fallback) =>
+  Promise.resolve(q).catch(e => {
+    console.warn('[safeQ]', e?.message || e);
+    return fallback;
+  });
+
+async function loadData() {
+  document.getElementById('member-status').textContent = '로딩 중…';
+
+  const [profRes, credRes, loginRes] = await Promise.all([
+    safeQ(sb.rpc('admin_get_all_profiles'),
+          { data:null, error:{message:'admin_get_all_profiles 함수 없음 — SQL 실행 필요'} }),
+    safeQ(sb.from('credit_balance').select('user_id,balance,total_charged,total_used'),
+          { data:[], error:null }),
+    safeQ(sb.rpc('admin_get_user_logins'),
+          { data:[], error:null }),
+  ]);
+
+  /* 프로필 — 함수 미존재 시 폴백: 직접 쿼리 */
+  if (profRes.error || !profRes.data) {
+    console.warn('[users] admin_get_all_profiles 실패, 직접 쿼리 폴백:', profRes.error?.message);
+    const fallback = await sb.from('profiles').select('id,role,agreed_at,email,name').order('agreed_at',{ascending:false});
+    if (fallback.error) {
+      document.getElementById('member-status').textContent =
+        '⚠ 데이터 로드 실패: ' + fallback.error.message;
+      console.error('[users] profiles 직접 쿼리도 실패:', fallback.error);
+      return;
+    }
+    allProfiles = fallback.data || [];
+  } else {
+    allProfiles = profRes.data || [];
+  }
+
+  /* 크레딧 */
+  credMap = {};
+  (credRes.data||[]).forEach(c => { credMap[c.user_id] = c; });
+
+  /* 로그인 이력 */
+  loginMap = {};
+  (loginRes.data||[]).forEach(u => { loginMap[u.id] = u.last_sign_in_at; });
+
+  /* 요약 통계 */
+  const byRole = {};
+  allProfiles.forEach(p => { byRole[p.role] = (byRole[p.role]||0)+1; });
+  document.getElementById('cnt-total').textContent      = allProfiles.length;
+  document.getElementById('cnt-general').textContent    = byRole.general     || 0;
+  document.getElementById('cnt-consultant').textContent = byRole.consultant   || 0;
+  document.getElementById('cnt-gfc').textContent        = byRole.gfc         || 0;
+  document.getElementById('cnt-admin').textContent      = byRole.admin        || 0;
+
+  /* 활성 사용자 집계 */
+  const now  = Date.now();
+  const d7   = now - 7  * 86400000;
+  const d30  = now - 30 * 86400000;
+  const a7   = allProfiles.filter(p => loginMap[p.id] && new Date(loginMap[p.id]).getTime() >= d7).length;
+  const a30  = allProfiles.filter(p => loginMap[p.id] && new Date(loginMap[p.id]).getTime() >= d30).length;
+  document.getElementById('cnt-active7').textContent  = a7;
+  document.getElementById('cnt-active30').textContent = a30;
+
+  /* 크레딧 집계 */
+  updateCreditStats(credRes.data || []);
+
+  document.getElementById('last-updated').textContent = new Date().toLocaleTimeString() + ' 기준';
+  renderMembersTable();
+  renderRoleTable();
+}
+
+/* ── 초기화 ── */
 async function init() {
   if (localStorage.getItem('wf_dev_session') === 'admin') {
     show('app'); await loadData(); return;

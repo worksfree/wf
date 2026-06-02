@@ -4,3 +4,4 @@ test-results/
 .playwright/
 .env.test
 **/.claude/worktrees/
+secrets.ps1

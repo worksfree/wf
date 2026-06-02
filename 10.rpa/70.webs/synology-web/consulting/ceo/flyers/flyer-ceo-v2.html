@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>중대재해 트렌드 전단지</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#111;
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh; padding:20px;
+  font-family:'Noto Sans KR', sans-serif;
+}
+.a4 {
+  width:794px; min-height:1123px;
+  background:#f5f0e8;
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  box-shadow:0 0 80px rgba(0,0,0,0.6);
+}
+
+/* 상단 진한 네이비 블록 */
+.top-block {
+  background:#0d1b2a;
+  padding:44px 48px 36px;
+  position:relative;
+  overflow:hidden;
+}
+.top-block::after {
+  content:'';
+  position:absolute;
+  bottom:-24px; left:0; right:0;
+  height:48px;
+  background:#f5f0e8;
+  clip-path: polygon(0 100%, 100% 0%, 100% 100%);
+  z-index:2;
+}
+.top-block::before {
+  content:'2025';
+  position:absolute;
+  right:40px; top:20px;
+  font-size:120px; font-weight:900;
+  color:rgba(255,255,255,0.04);
+  font-family:'Noto Serif KR', serif;
+  line-height:1;
+}
+
+.tag-line {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(220,50,50,0.2);
+  border:1px solid rgba(220,50,50,0.5);
+  padding:5px 14px;
+  margin-bottom:22px;
+}
+.tag-line span {
+  color:#ff6b6b; font-size:11px; font-weight:700; letter-spacing:3px;
+}
+
+.headline {
+  font-family:'Noto Serif KR', serif;
+  font-size:52px; font-weight:900;
+  color:#ffffff; line-height:1.15;
+  margin-bottom:14px; letter-spacing:-1px;
+}
+.headline em {
+  color:#ff4444; font-style:normal;
+  border-bottom:3px solid #ff4444;
+}
+
+.sub-headline {
+  font-size:17px; color:rgba(255,255,255,0.65);
+  font-weight:300; line-height:1.6;
+  margin-bottom:8px;
+}
+
+/* 메인 콘텐츠 */
+.content {
+  padding:52px 48px 40px;
+  flex:1; display:flex; flex-direction:column; gap:28px;
+}
+
+/* 큰 숫자 스탯 3개 */
+.stats-row {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;
+}
+.stat-box {
+  background:#0d1b2a;
+  padding:22px 20px;
+  position:relative;
+  overflow:hidden;
+}
+.stat-box::before {
+  content:'';
+  position:absolute; top:0; left:0;
+  width:3px; height:100%;
+  background:#ff4444;
+}
+.stat-box .big-num {
+  font-family:'Noto Serif KR', serif;
+  font-size:44px; font-weight:900;
+  color:#ffffff; line-height:1;
+  margin-bottom:6px;
+}
+.stat-box .big-num span { font-size:22px; color:#ff4444; }
+.stat-box .label {
+  font-size:12px; color:rgba(255,255,255,0.5);
+  line-height:1.5; letter-spacing:0.5px;
+}
+.stat-box .change {
+  margin-top:8px;
+  font-size:11px; font-weight:700;
+  color:#ff6b6b; letter-spacing:1px;
+}
+
+/* 구분 타이틀 */
+.section-title {
+  display:flex; align-items:center; gap:12px;
+}
+.section-title .bar { width:4px; height:20px; background:#0d1b2a; flex-shrink:0; }
+.section-title span {
+  font-size:13px; font-weight:700; color:#0d1b2a; letter-spacing:2px;
+}
+
+/* 타임라인 기소 증가 */
+.timeline {
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.1);
+  padding:22px 24px;
+}
+.timeline-title {
+  font-size:13px; font-weight:700; color:#0d1b2a;
+  letter-spacing:1px; margin-bottom:16px;
+  display:flex; align-items:center; gap:10px;
+}
+.timeline-title::before {
+  content:''; width:20px; height:2px; background:#ff4444;
+}
+.bar-chart {
+  display:flex; align-items:flex-end; gap:8px; height:80px;
+}
+.bar-item {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.bar-fill {
+  width:100%;
+  background:linear-gradient(to top, #0d1b2a, #1e3a5f);
+  border-radius:2px 2px 0 0;
+  position:relative;
+  display:flex; align-items:flex-start; justify-content:center;
+}
+.bar-fill.highlight {
+  background:linear-gradient(to top, #cc0000, #ff4444);
+}
+.bar-fill .val {
+  position:absolute; top:-20px;
+  font-size:12px; font-weight:900; color:#0d1b2a;
+  white-space:nowrap;
+}
+.bar-fill.highlight .val { color:#cc0000; }
+.bar-label {
+  font-size:11px; color:rgba(0,0,0,0.5);
+}
+
+/* 가입률 대비 박스 */
+.compare-box {
+  display:grid; grid-template-columns:1fr 1fr; gap:0;
+  border:1px solid rgba(0,0,0,0.12);
+}
+.compare-item {
+  padding:22px 24px;
+  position:relative;
+}
+.compare-item:first-child {
+  background:#0d1b2a;
+  border-right:none;
+}
+.compare-item:last-child {
+  background:#fff;
+  border-left:3px solid #ff4444;
+}
+.compare-item .c-label {
+  font-size:11px; letter-spacing:2px; margin-bottom:10px;
+}
+.compare-item:first-child .c-label { color:rgba(255,255,255,0.5); }
+.compare-item:last-child .c-label { color:rgba(0,0,0,0.4); }
+.compare-item .c-num {
+  font-family:'Noto Serif KR', serif;
+  font-size:52px; font-weight:900; line-height:1;
+  margin-bottom:8px;
+}
+.compare-item:first-child .c-num { color:#fff; }
+.compare-item:last-child .c-num { color:#cc0000; }
+.compare-item .c-desc {
+  font-size:12.5px; line-height:1.6;
+}
+.compare-item:first-child .c-desc { color:rgba(255,255,255,0.6); }
+.compare-item:last-child .c-desc { color:rgba(0,0,0,0.6); }
+.arrow-badge {
+  position:absolute;
+  right:-18px; top:50%;
+  transform:translateY(-50%);
+  width:36px; height:36px;
+  background:#ff4444;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; color:#fff; font-weight:900;
+  z-index:10;
+}
+
+/* 핵심 메시지 강조 박스 */
+.message-box {
+  background:#0d1b2a;
+  padding:28px 32px;
+  position:relative; overflow:hidden;
+  border-left:5px solid #ff4444;
+}
+.message-box::after {
+  content:'"';
+  position:absolute; right:24px; bottom:-30px;
+  font-size:180px; color:rgba(255,255,255,0.04);
+  font-family:'Noto Serif KR', serif; line-height:1;
+}
+.message-box p {
+  font-family:'Noto Serif KR', serif;
+  font-size:22px; font-weight:700;
+  color:#fff; line-height:1.6;
+  position:relative; z-index:1;
+}
+.message-box p em {
+  color:#ff4444; font-style:normal;
+}
+.message-box .source {
+  margin-top:10px; font-size:11px;
+  color:rgba(255,255,255,0.35); letter-spacing:1px;
+}
+
+/* CTA 하단 */
+.cta-bar {
+  background:#ff4444;
+  padding:20px 48px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.cta-bar .cta-left p {
+  font-size:11px; color:rgba(255,255,255,0.7); letter-spacing:1px; margin-bottom:3px;
+}
+.cta-bar .cta-left strong {
+  font-size:20px; color:#fff; font-weight:900;
+}
+.cta-bar .cta-right {
+  background:#fff;
+  padding:12px 28px;
+  font-size:15px; font-weight:700; color:#cc0000;
+  letter-spacing:1px; cursor:pointer;
+}
+
+.footer2 {
+  background:#0d1b2a;
+  padding:12px 48px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.footer2 span { font-size:10px; color:rgba(255,255,255,0.25); letter-spacing:1px; }
+
+/* ─── 왜 이 컨설턴트인가 ─── */
+.why-me{margin:0;padding:24px 48px 28px;background:rgba(13,27,42,.04);border-top:2px solid rgba(13,27,42,.1)}
+.wm-header{text-align:center;margin-bottom:16px}
+.wm-eyebrow{font-size:10px;font-weight:700;letter-spacing:.15em;color:rgba(13,27,42,.4);text-transform:uppercase;margin-bottom:5px}
+.wm-title{font-size:15px;font-weight:900;color:#0d1b2a;font-family:'Noto Serif KR',serif}
+.wm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.wm-card{background:#fff;border-radius:6px;padding:13px 12px;border:1px solid rgba(13,27,42,.1)}
+.wm-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;color:#ff4444;margin-bottom:5px}
+.wm-hd{font-size:13px;font-weight:700;color:#fff;background:#c0392b;margin:-13px -12px 10px;padding:8px 12px;border-radius:6px 6px 0 0;line-height:1.3;text-align:center}
+.wm-ds{font-size:11px;color:#555;line-height:1.55}
+.wm-profile{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(13,27,42,.08)}
+.wm-nm{font-size:14px;font-weight:700;color:#0d1b2a}
+.wm-role-tag{font-size:11.5px;color:#666}
+.wm-exp{font-size:11px;font-weight:700;color:#ff4444;background:rgba(255,68,68,.1);padding:2px 9px;border-radius:20px}
+/* ── v2: 2단계 구조 ── */
+.layer2-toggle{display:block;width:100%;margin:18px 0 0;padding:12px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.03em;transition:background .15s}
+.layer2-toggle:hover{background:#1e4a70}
+.layer2-toggle .arr{display:inline-block;transition:transform .25s;margin-left:6px}
+.layer2-toggle.open .arr{transform:rotate(180deg)}
+.layer2-body{display:none;margin-top:14px}
+.layer2-body.open{display:block}
+@media print{.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<div class="a4">
+
+  <!-- 상단 블록 -->
+  <div class="top-block">
+    <div class="tag-line"><span>▶ 2025 TREND REPORT — CEO RISK DATA</span></div>
+    <div class="headline">
+      아는 대표는<br>
+      이미 <em>다 했습니다.</em>
+    </div>
+    <div class="sub-headline">
+      중대재해 기소 건수 매년 2배 증가 · 상장사 70% 이미 임원보험 가입<br>
+      지금 이 순간도, 경쟁사 대표는 리스크를 관리하고 있습니다.
+    </div>
+  </div>
+
+  <!-- Layer2 토글 -->
+  <div class="no-print" style="padding:0 28px">
+    <button class="layer2-toggle" onclick="toggleL2(this)">상세 정보 보기 <span class="arr">▼</span></button>
+  </div>
+  <div class="layer2-body no-print" id="ceo-l2">
+  <!-- 메인 콘텐츠 -->
+  <div class="content">
+
+    <!-- 3대 핵심 수치 -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="big-num"><span class="ft" data-fact="중대재해처벌법 시행 이후 3년간(2022~2024) 발생한 중대산업재해 누적 건수. 사망 1명 이상 또는 동일 사고 부상 2명 이상 등 법령 기준 충족 재해." data-src="고용노동부 산업재해현황 통계" data-url="https://www.moel.go.kr/info/publicdata/mainstats/industrial.do">887</span><span>건</span></div>
+        <div class="label">법 시행 3년간<br>중대산업재해 발생 건수</div>
+        <div class="change">▲ 2024년 단독 <span class="ft" data-fact="2024년 중대산업재해 발생 436건. 전년(약 239건) 대비 약 82% 증가. 2024년 1월 27일 50인 미만 사업장까지 법 적용 확대 영향 포함." data-src="고용노동부 산업재해현황 통계" data-url="https://www.moel.go.kr/info/publicdata/mainstats/industrial.do">436건</span></div>
+      </div>
+      <div class="stat-box">
+        <div class="big-num"><span class="ft" data-fact="중대재해처벌법 위반으로 검찰에 기소된 CEO·경영책임자 누적 건수 121건 (2025.08 기준). 매일노동뉴스 전수조사." data-src="매일노동뉴스 중대재해 전수조사 (2025.08)" data-url="https://www.labortoday.co.kr">121</span><span>건</span></div>
+        <div class="label">CEO·경영책임자<br>기소 누적 건수</div>
+        <div class="change">▲ 유죄율 <span class="ft" data-fact="기소된 중대재해처벌법 위반 사건의 1심 유죄 판결 비율 89.3% (집행유예 포함). 2025.08 전수조사 기준." data-src="매일노동뉴스 중대재해 전수조사 (2025.08)" data-url="https://www.labortoday.co.kr">89.3%</span></div>
+      </div>
+      <div class="stat-box">
+        <div class="big-num"><span class="ft" data-fact="국내 상장기업의 임원배상책임보험(D&O) 가입률. 2003년 31%에서 2023년 70%로 상승. 금감원·보험개발원 통계." data-src="보험개발원·금융감독원 보험업감독통계" data-url="https://www.kidi.or.kr">70</span><span>%</span></div>
+        <div class="label">국내 상장 기업<br>임원보험 가입률</div>
+        <div class="change">▲ 2003년 대비 2배↑</div>
+      </div>
+    </div>
+
+    <!-- 기소 건수 증가 차트 -->
+    <div class="timeline">
+      <div class="timeline-title">연도별 중대재해처벌법 기소 건수 추이</div>
+      <div class="bar-chart">
+        <div class="bar-item">
+          <div class="bar-fill" style="height:22%"><span class="val ft" data-fact="2022년 중대재해처벌법 시행 첫해 CEO·경영책임자 기소 건수 11건." data-src="매일노동뉴스 전수조사 (2025.08)" data-url="https://www.labortoday.co.kr">11</span></div>
+          <div class="bar-label">2022</div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-fill" style="height:44%"><span class="val ft" data-fact="2023년 CEO·경영책임자 기소 건수 22건. 전년(11건) 대비 2배 증가." data-src="매일노동뉴스 전수조사 (2025.08)" data-url="https://www.labortoday.co.kr">22</span></div>
+          <div class="bar-label">2023</div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-fill" style="height:82%"><span class="val ft" data-fact="2024년 CEO·경영책임자 기소 건수 41건. 전년(22건) 대비 약 2배. 50인 미만 사업장 확대 적용 첫해." data-src="매일노동뉴스 전수조사 (2025.08)" data-url="https://www.labortoday.co.kr">41</span></div>
+          <div class="bar-label">2024</div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-fill highlight" style="height:96%"><span class="val ft" data-fact="2025년 상반기(1~6월) 기소 47건. 2024년 전체(41건)를 이미 초과. 연말까지 역대 최고치 전망." data-src="매일노동뉴스 전수조사 (2025.08)" data-url="https://www.labortoday.co.kr">47건↑</span></div>
+          <div class="bar-label" style="color:#cc0000;font-weight:700">2025 상반기</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:11.5px;color:rgba(0,0,0,0.45);line-height:1.6">
+        ※ 2025년 상반기 기소 47건 — 이미 전년도 전체(41건)를 초과. 하반기까지 합산 시 역대 최고치 전망.<br>
+        ※ 출처: 매일노동뉴스 중대재해 전수조사(2025.08), 고용노동부
+      </div>
+    </div>
+
+    <!-- 상장사 vs 중소기업 대비 -->
+    <div>
+      <div class="section-title" style="margin-bottom:14px">
+        <div class="bar"></div>
+        <span>가입률 현황 비교 — 당신은 어디에 있습니까</span>
+      </div>
+      <div class="compare-box">
+        <div class="compare-item">
+          <div class="c-label">상장 대기업</div>
+          <div class="c-num"><span class="ft" data-fact="국내 상장기업 임원배상책임보험(D&O) 가입률 70% (2023년 기준). 2003년 31%에서 지속 상승." data-src="보험개발원·금융감독원 보험업감독통계" data-url="https://www.kidi.or.kr">70%</span></div>
+          <div class="c-desc">국내 상장사 10곳 중 7곳<br>임원배상책임보험 기가입<br>(2003년 31% → 2023년 70%)</div>
+          <div class="arrow-badge">VS</div>
+        </div>
+        <div class="compare-item">
+          <div class="c-label">중소기업 (제조업 전체)</div>
+          <div class="c-num"><span class="ft" data-fact="보험연구원(2024.5.2) 제조업 중소기업 1,001개 설문조사. 임원배상책임보험(D&O) 가입률 2.2% (전체 제조업 중소기업). 상장 대기업 70% 대비 30배 이상 격차." data-src="보험연구원 국내 중소기업 보험시장 현황과 이슈 세미나 (2024.5.2)" data-url="">2.2%</span></div>
+          <div class="c-desc">임원배상책임보험(D&O) 가입률<br>상장사 대비 30배 이상 격차<br>(보험연구원, 2024.5)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 핵심 메시지 -->
+    <div class="message-box">
+      <p>
+        대기업 대표는 이미 <em>보험으로 리스크를 관리</em>합니다.<br>
+        중소기업 대표만, 아직 <em>무방비 상태</em>로 남아 있습니다.<br>
+        사고는 회사 규모를 가리지 않습니다.
+      </p>
+      <div class="source">출처: 금융감독원, 보험개발원, 고용노동부, 매일노동뉴스 (2024~2025)</div>
+    </div>
+
+  </div>
+
+  <!-- 왜 이 컨설턴트인가 -->
+  <div class="why-me">
+    <div class="wm-header">
+      <div class="wm-eyebrow">CONSULTING CAPABILITY</div>
+      <div class="wm-title">컨설팅 역량 · 협업 체계</div>
+    </div>
+    <div class="wm-grid">
+      <div class="wm-card">
+        <div class="wm-hd">공인자격 경영지도사</div>
+        <div class="wm-ds">중소기업 AX/DX 경영 진단 및 각종 인증, ESG 진단 등 통합 솔루션 제공</div>
+      </div>
+      <div class="wm-card">
+        <div class="wm-hd">전문가 협업 체계</div>
+        <div class="wm-ds">노무사·세무사·법무사·행정사 협업체계로 최적의 맞춤 설계 지원</div>
+      </div>
+      <div class="wm-card">
+        <div class="wm-hd">업무자동화 전문가</div>
+        <div class="wm-ds">업무 프로세스 개선으로 20 MD→1 MD 절감<br>데이터 공유 서버 구축 등 생산성 혁신 전문가</div>
+      </div>
+    </div>
+    <div class="wm-profile">
+      <span class="wm-role-tag">삼성생명 협력 파트너 · 독립 컨설턴트</span>
+      <span class="wm-exp">경력 25년 8개월</span>
+    </div>
+  </div>
+
+  </div><!-- /layer2-body -->
+  <!-- CTA 바 -->
+  <div class="cta-bar">
+    <div class="cta-left">
+      <p>지금 바로 시작하세요</p>
+      <strong>무료 기업리스크 진단 상담</strong>
+    </div>
+    <div class="cta-right">→ 상담 신청</div>
+  </div>
+
+  <div class="footer2">
+    <span>CORPORATE RISK CONSULTING · GFC</span>
+    <span>본 자료는 공개된 정부·언론 통계를 기반으로 작성되었습니다.</span>
+  </div>
+
+</div>
+<style>
+.ft{cursor:pointer;border-bottom:1.5px dashed rgba(255,190,50,.75);display:inline}
+.ft:hover{border-bottom-color:rgba(255,190,50,1)}
+#ft-pop{display:none;position:fixed;z-index:99999;max-width:300px;background:rgba(6,8,18,.97);border:1px solid rgba(255,190,50,.3);border-left:3px solid rgba(255,190,50,.7);border-radius:4px;padding:12px 14px 10px;font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.65;color:rgba(255,255,255,.9);box-shadow:0 8px 32px rgba(0,0,0,.75);pointer-events:none;white-space:normal}
+#ft-pop .fp-src{margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:rgba(255,190,50,.8);line-height:1.5}
+#ft-pop .fp-hint{font-size:10px;color:rgba(255,255,255,.3);margin-top:3px}
+</style>
+<script>
+function toggleL2(btn){var body=btn.parentNode.nextElementSibling;var open=body.classList.toggle('open');btn.classList.toggle('open',open);btn.querySelector('.arr').textContent=open?'▲':'▼';btn.querySelector('span:first-child').textContent=open?'상세 정보 접기 ':'상세 정보 보기 ';}
+</script>
+<script>
+!function(){var p=document.createElement('div');p.id='ft-pop';p.innerHTML='<div class="fp-bd"></div><div class="fp-src"></div><div class="fp-hint">클릭 → 원본 자료 열기</div>';document.body.appendChild(p);var u='';document.querySelectorAll('.ft').forEach(function(e){e.addEventListener('mouseenter',function(ev){p.querySelector('.fp-bd').textContent=e.dataset.fact||'';p.querySelector('.fp-src').textContent='출처: '+(e.dataset.src||'');u=e.dataset.url||'';p.querySelector('.fp-hint').style.display=u?'':'none';p.style.display='block';mv(ev);});e.addEventListener('mousemove',mv);e.addEventListener('mouseleave',function(){p.style.display='none';});e.addEventListener('click',function(ev){if(u){ev.stopPropagation();window.open(u,'_blank');}});});function mv(ev){var pw=p.offsetWidth||300,ph=p.offsetHeight||80,x=ev.clientX+14,y=ev.clientY+14;if(x+pw>window.innerWidth-8)x=ev.clientX-pw-6;if(y+ph>window.innerHeight-8)y=ev.clientY-ph-6;p.style.left=x+'px';p.style.top=y+'px';}}();
+</script>
+</body>
+</html>
