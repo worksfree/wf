@@ -148,7 +148,7 @@ async function handleStats(env) {
 /* ── /contacts GET ───────────────────────────────────────────────── */
 async function handleGetContacts(env, searchParams) {
   const page   = Math.max(1, parseInt(searchParams.get('page')  || '1'));
-  const limit  = Math.min(200, parseInt(searchParams.get('limit') || '50'));
+  const limit  = Math.min(5000, parseInt(searchParams.get('limit') || '50'));
   const offset = (page - 1) * limit;
   const status     = searchParams.get('status')     || '';
   const induty     = searchParams.get('induty')     || '';
@@ -215,6 +215,42 @@ async function handleDeleteContacts(env, body) {
   return jsonRes({ deleted: ids.length });
 }
 
+/* ── /contacts/export (전체 내보내기) ───────────────────────────── */
+// Supabase PostgREST max-rows 제한을 우회하기 위해 내부에서 페이징하여 전체 반환
+async function handleExportContacts(env, searchParams) {
+  const status     = searchParams.get('status')     || '';
+  const induty     = searchParams.get('induty')     || '';
+  const indutyName = searchParams.get('induty_name')|| '';
+  const q          = searchParams.get('q')          || '';
+
+  let filterQs = '';
+  if (status === 'active')        filterQs += '&email=not.is.null&email_status=neq.unsubscribed';
+  else if (status === 'no_email') filterQs += '&email=is.null';
+  else if (status === 'unsub')    filterQs += '&email_status=eq.unsubscribed';
+  if (indutyName) filterQs += `&induty_name=eq.${encodeURIComponent(indutyName)}`;
+  else if (induty) filterQs += `&induty_code=like.${encodeURIComponent(induty + '*')}`;
+  if (q)          filterQs += `&corp_name=ilike.${encodeURIComponent('*' + q + '*')}`;
+
+  // 전체 건수 확인
+  const countRes = await sbFetch(env, '/biz_contacts?select=count' + filterQs).catch(() => null);
+  const total = parseInt(countRes?.[0]?.count || 0);
+
+  // Supabase max-rows에 맞게 배치 단위로 전체 수집
+  const BATCH = 1000;
+  const allData = [];
+  let offset = 0;
+
+  while (allData.length < total) {
+    const qs = `?select=*&order=created_at.desc&limit=${BATCH}&offset=${offset}` + filterQs;
+    const batch = await sbFetch(env, '/biz_contacts' + qs);
+    if (!batch || !batch.length) break;
+    allData.push(...batch);
+    offset += batch.length; // 실제 반환된 건수만큼 offset 전진 (Supabase cap 대응)
+  }
+
+  return jsonRes({ data: allData, total: allData.length });
+}
+
 /* ── /sendlist ───────────────────────────────────────────────────── */
 async function handleSendList(env, searchParams) {
   const month = searchParams.get('month') || monthKey();
@@ -268,6 +304,7 @@ export default {
     try {
       if (path === '/scrape'   && request.method === 'GET')    return handleScrape(url.searchParams);
       if (path === '/stats'    && request.method === 'GET')    return handleStats(env);
+      if (path === '/contacts/export' && request.method === 'GET') return handleExportContacts(env, url.searchParams);
       if (path === '/contacts' && request.method === 'GET')    return handleGetContacts(env, url.searchParams);
       if (path === '/contacts' && request.method === 'POST')   return handleUpsertContacts(env, await request.json());
       if (path === '/contacts' && request.method === 'DELETE') return handleDeleteContacts(env, await request.json());

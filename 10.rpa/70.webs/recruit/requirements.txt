@@ -1,0 +1,17 @@
+# ============================================================
+# requirements.txt  — 잡코리아 자동화 (Playwright + Supabase)
+# ============================================================
+# 설치: pip install -r requirements.txt
+# Playwright 브라우저 설치: playwright install chromium
+
+playwright>=1.44.0
+python-dotenv>=1.0.0
+httpx>=0.27.0
+
+# 로컬 서버 (Hub 연동용)
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# 기존 Selenium 의존성 (job_fair.ipynb 유지를 위해 남김)
+selenium>=4.20.0
+webdriver-manager>=4.0.1

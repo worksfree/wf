@@ -77,7 +77,8 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 /* ══ 화면 컨테이너 ══ */
 #screens{flex:1;position:relative;overflow:hidden;}
 .screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .3s;overflow-y:auto;padding:14px;}
-.screen.active{opacity:1;pointer-events:all;}
+/* active 시 flex column → 각 screen이 flex:1로 정확히 채우면 100vh 의존 불필요 */
+.screen.active{opacity:1;pointer-events:all;display:flex;flex-direction:column;}
 
 /* ══ 공통 ══ */
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);}
@@ -92,13 +93,30 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .badge-teal{background:rgba(20,184,166,.15);color:#2dd4bf;border:1px solid rgba(20,184,166,.25);}
 
 /* ══ SCREEN A ══ */
-#screen-a{display:grid;grid-template-columns:1fr 330px;grid-template-rows:auto 1fr;gap:12px;min-height:calc(100vh - 84px);}
-.a-header{grid-column:1/-1;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;}
+#screen-a{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;}
+.a-header{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;}
+.a-body{display:flex;flex:1;min-height:0;gap:0;}
 .ah-kpis{display:flex;gap:22px;}
 .ah-kpi-val{font-size:18px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;}
 .ah-kpi-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
-.map-panel{padding:14px 16px;display:flex;flex-direction:column;}
-#leaflet-map{flex:1;border-radius:8px;min-height:380px;}
+.map-panel{padding:14px 16px;display:flex;flex-direction:column;min-height:0;overflow:hidden;flex:1;}
+#leaflet-map{flex:1;border-radius:8px;min-height:200px;}
+
+/* 지도 너비 리사이즈 핸들 */
+.map-resize-handle{
+  width:6px;cursor:col-resize;background:var(--border);
+  border-radius:3px;margin:0 4px;flex-shrink:0;
+  position:relative;transition:background .15s;
+}
+.map-resize-handle::after{
+  content:'···';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(90deg);
+  font-size:10px;letter-spacing:-1px;color:var(--border2);line-height:1;
+}
+.map-resize-handle:hover,.map-resize-handle.dragging{background:rgba(99,102,241,.35);}
+.map-resize-handle:hover::after,.map-resize-handle.dragging::after{color:var(--accent2);}
+
+/* 오른쪽 패널: 너비는 JS(localStorage)로 제어 */
+.right-col{flex-shrink:0;display:flex;flex-direction:column;gap:10px;overflow-y:auto;min-height:0;}
 .leaflet-container{background:#070d1a!important;}
 .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.82) saturate(.7) contrast(.9);}
 /* Leaflet 클리핑 해제 — 설명선 카드가 지도 밖으로 넘치지 않도록 허용 */
@@ -110,7 +128,8 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 /* 설명선 마커 컨테이너 */
 .store-leader-icon{pointer-events:none!important;overflow:visible!important;}
 .store-leader-icon *{font-family:'Segoe UI','Noto Sans KR',sans-serif;}
-.right-col{display:flex;flex-direction:column;gap:12px;}
+/* 오른쪽 패널: 그리드 셀 높이에 맞게 축소 + 내부 스크롤 */
+.right-col{display:flex;flex-direction:column;gap:12px;min-height:0;overflow-y:auto;}
 .alert-panel{padding:13px 14px;}
 .alert-item{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border-radius:9px;border:1px solid transparent;margin-bottom:6px;cursor:pointer;transition:all .2s;}
 .alert-item:last-child{margin-bottom:0;}
@@ -136,7 +155,7 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .scm-qty{margin-left:auto;color:var(--orange);}
 
 /* ══ SCREEN B ══ */
-#screen-b{display:flex;flex-direction:column;gap:12px;min-height:calc(100vh - 84px);}
+#screen-b{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;}
 .kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;}
 .kpi-card{padding:13px 15px;}
 .kpi-lbl{font-size:10px;color:var(--muted);margin-bottom:5px;}
@@ -144,9 +163,13 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .kpi-sub{font-size:10px;color:var(--text3);margin-top:3px;}
 .kpi-bar{height:3px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden;}
 .kpi-bar-fill{height:100%;border-radius:2px;transition:width .9s cubic-bezier(.34,1.56,.64,1);}
-.b-mid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.me-panel{padding:15px 17px;}
-.me-chart-wrap{position:relative;}
+/* b-mid: flex:1 로 남은 높이 채움 → ME 매트릭스가 컨테이너에 꽉 참 */
+.b-mid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-height:0;}
+.me-panel{padding:15px 17px;display:flex;flex-direction:column;}
+.me-chart-wrap{position:relative;flex:1;min-height:0;}
+#meSvg{width:100%;display:block;}  /* height는 JS가 컨테이너 크기 읽어 동적 설정 */
+.b-mid-right{display:flex;flex-direction:column;gap:10px;min-height:0;}
+.achieve-panel{padding:14px 16px;flex:1;min-height:0;overflow-y:auto;}
 .me-tooltip{position:absolute;background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:9px 13px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:50;min-width:155px;box-shadow:0 8px 24px rgba(0,0,0,.6);}
 .me-tt-name{font-size:12px;font-weight:700;margin-bottom:6px;}
 .me-tt-row{display:flex;justify-content:space-between;gap:12px;margin-top:2px;}
@@ -181,7 +204,7 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .ach-pct{font-size:11px;font-weight:700;min-width:34px;text-align:right;}
 
 /* ══ SCREEN C ══ */
-#screen-c{display:flex;flex-direction:column;gap:12px;min-height:calc(100vh - 84px);}
+#screen-c{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0;overflow-y:auto;}
 
 /* 맥락 바 */
 .ctx-bar{padding:11px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
@@ -190,13 +213,13 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .ctx-tag{font-size:11px;padding:4px 10px;border-radius:9px;background:var(--panel2);border:1px solid var(--border);color:var(--text2);}
 
 /* ── 목표 × 지점 매트릭스 ── */
-.matrix-wrap{padding:16px 18px;overflow-x:auto;}
+.matrix-wrap{padding:16px 18px;overflow-x:visible;}
 .matrix-table{width:100%;border-collapse:separate;border-spacing:5px;}
-.matrix-col-hdr{font-size:11px;font-weight:700;padding:8px 10px;text-align:center;border-radius:8px;border:1.5px solid;white-space:nowrap;}
-.matrix-row-hdr{font-size:11px;font-weight:700;padding:8px 12px;border-radius:8px;white-space:nowrap;vertical-align:middle;width:120px;}
+.matrix-col-hdr{font-size:11px;font-weight:700;padding:6px 8px;text-align:center;border-radius:8px;border:1.5px solid;white-space:normal;word-break:keep-all;}
+.matrix-row-hdr{font-size:11px;font-weight:700;padding:6px 10px;border-radius:8px;white-space:normal;word-break:keep-all;vertical-align:middle;width:90px;}
 .matrix-cell{
   background:var(--panel2);border:1.5px solid var(--border);border-radius:10px;
-  padding:10px 12px;cursor:pointer;transition:all .2s;vertical-align:top;min-width:150px;
+  padding:8px 10px;cursor:pointer;transition:all .2s;vertical-align:top;min-width:0;
 }
 .matrix-cell:hover{border-color:var(--hover-color,var(--accent));transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.4);}
 .matrix-cell.selected{border-color:var(--hover-color,var(--accent));box-shadow:0 0 0 2px color-mix(in srgb,var(--hover-color,var(--accent)) 30%,transparent);}
@@ -244,6 +267,52 @@ body{display:flex;flex-direction:column;overflow:hidden;}
   padding-top:7px;border-top:1px solid var(--border);margin-top:1px;
 }
 .tl-impact{font-size:10px;color:var(--text2);flex:1;}
+
+/* ══ AUTO DEMO UI ══ */
+.demo-pill{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+  z-index:900;display:none;align-items:center;gap:10px;
+  background:rgba(8,12,20,.92);border:1px solid rgba(99,102,241,.45);
+  border-radius:99px;padding:9px 18px 9px 15px;
+  backdrop-filter:blur(14px);
+  box-shadow:0 6px 32px rgba(0,0,0,.6),0 0 50px rgba(99,102,241,.12);
+  opacity:0;transition:opacity .5s;
+}
+.demo-pill.visible{display:flex!important;opacity:1;}
+.demo-pill-label{font-size:10px;font-weight:800;color:#a5b4fc;letter-spacing:.07em;white-space:nowrap;}
+.demo-pill-dots{display:flex;gap:5px;}
+.demo-pill-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .35s;}
+.demo-pill-dot.active{background:var(--accent);box-shadow:0 0 10px rgba(99,102,241,.9);transform:scale(1.25);}
+.demo-pill-dot.done{background:var(--green);}
+.demo-pill-sep{width:1px;height:16px;background:var(--border);margin:0 2px;}
+.demo-stop-btn{
+  font-size:11px;font-weight:700;color:#fff;white-space:nowrap;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  border:none;border-radius:99px;padding:5px 13px;cursor:pointer;font-family:inherit;
+}
+.demo-stop-btn:hover{opacity:.85;}
+
+.demo-callout{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:78px;z-index:899;
+  background:linear-gradient(135deg,rgba(10,17,30,.97),rgba(18,28,52,.97));
+  border:1px solid rgba(99,102,241,.5);
+  border-radius:18px;padding:20px 26px 17px;
+  box-shadow:0 16px 56px rgba(0,0,0,.75),0 0 80px rgba(99,102,241,.14);
+  min-width:310px;max-width:400px;text-align:center;
+  pointer-events:none;display:none;
+}
+.demo-callout.dc-in {animation:dcIn .42s cubic-bezier(.34,1.56,.64,1) forwards;}
+.demo-callout.dc-out{animation:dcOut .28s ease-in forwards;}
+@keyframes dcIn  {from{opacity:0;transform:translateX(-50%) translateY(14px) scale(.94)}
+                  to  {opacity:1;transform:translateX(-50%) translateY(0)    scale(1)}}
+@keyframes dcOut {from{opacity:1;transform:translateX(-50%) translateY(0)}
+                  to  {opacity:0;transform:translateX(-50%) translateY(-8px)}}
+.demo-callout-icon {font-size:34px;line-height:1;margin-bottom:10px;}
+.demo-callout-title{font-size:17px;font-weight:800;color:#e2e8f0;line-height:1.35;white-space:pre-line;letter-spacing:-.3px;margin-bottom:6px;}
+.demo-callout-sub  {font-size:12px;color:#94a3b8;line-height:1.55;}
+.demo-callout-bar  {height:2px;background:rgba(255,255,255,.08);border-radius:1px;margin-top:15px;overflow:hidden;}
+.demo-callout-fill {height:100%;border-radius:1px;width:0%;background:linear-gradient(90deg,#6366f1,#8b5cf6);}
 .tl-impact strong{color:var(--green);font-weight:700;}
 .tl-exec-btn{
   font-size:10px;font-weight:700;color:var(--accent);
@@ -375,11 +444,13 @@ body{display:flex;flex-direction:column;overflow:hidden;}
       <div><div class="ah-kpi-val" style="color:var(--red);" id="hq-alerts">3</div><div class="ah-kpi-lbl">조치 필요</div></div>
     </div>
   </div>
+  <div class="a-body">
   <div class="map-panel panel">
     <div class="ptitle">매장 위치 및 상태 <span class="badge badge-blue">실시간</span></div>
-    <div id="leaflet-map" style="flex:1;min-height:400px;border-radius:8px;"></div>
+    <div id="leaflet-map"></div>
   </div>
-  <div class="right-col">
+  <div class="map-resize-handle" id="mapResizeHandle"></div>
+  <div class="right-col" id="rightCol">
     <div class="alert-panel panel">
       <div class="ptitle">매장별 현황 <span class="badge badge-red">3건</span></div>
       <div class="alert-item crit" onclick="selectStoreAndGo('pankyo','c')">
@@ -416,9 +487,20 @@ body{display:flex;flex-direction:column;overflow:hidden;}
         <div class="scm-desc">광안점 라임 38개 과잉. 마가리타 2+1 이벤트로 당일 소진 목표.</div>
         <div class="scm-route"><span style="color:var(--text2);">예상 소진</span><span style="color:var(--muted);">→</span><span class="scm-to">라임 25개</span><span class="scm-qty">+8만원</span></div>
       </div>
+      <div class="scm-card" style="border-color:rgba(234,179,8,.4);background:rgba(234,179,8,.06);">
+        <div class="scm-top"><div class="scm-icon">💰</div><div class="scm-title" style="color:#eab308;">고마진 판촉 — 마가리타 세트 전략</div></div>
+        <div class="scm-desc">익선점 마가리타 라지세트 마진율 <strong style="color:#eab308;">71.3%</strong> (전 지점 최고). 이번 주말 여의도 축제 기간 배달앱 메인 노출 · SNS 쿠폰 발행 시 일 판매 +23건, 마진 +19만원 예상.</div>
+        <div class="scm-route">
+          <span style="color:var(--text2);">대상 메뉴</span>
+          <span style="color:var(--muted);">→</span>
+          <span class="scm-to" style="background:rgba(234,179,8,.15);color:#eab308;border-color:rgba(234,179,8,.3);">마가리타 라지 세트</span>
+          <span class="scm-qty" style="color:#eab308;">마진율 71.3%</span>
+        </div>
+      </div>
       <button onclick="showKakao('scm')" style="width:100%;padding:9px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:12px;font-weight:700;border:none;border-radius:8px;cursor:pointer;">📱 매니저에게 알림 발송</button>
     </div>
-  </div>
+  </div><!-- /right-col -->
+  </div><!-- /a-body -->
 </div>
 
 <!-- ══ SCREEN B: 성과 대시보드 ══ -->
@@ -454,7 +536,7 @@ body{display:flex;flex-direction:column;overflow:hidden;}
       </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="b-mid-right">
       <div class="hour-panel panel">
         <div class="ptitle">시간대별 매출 추이 <span class="badge badge-teal">오늘</span></div>
         <div class="hour-chart" id="hourChart"></div>
@@ -496,9 +578,7 @@ body{display:flex;flex-direction:column;overflow:hidden;}
   <!-- 목표 × 지점 매트릭스 -->
   <div class="matrix-wrap panel">
     <div class="ptitle">전략 매트릭스 — 목표 × 지점 <span class="badge badge-purple">클릭하여 실행</span></div>
-    <div style="overflow-x:auto;">
-      <table class="matrix-table" id="stratMatrix"></table>
-    </div>
+    <table class="matrix-table" id="stratMatrix"></table>
   </div>
 
   <!-- 타임라인 실행 계획 -->
@@ -824,8 +904,14 @@ function renderAchieveSection() {
 
 /* ME 매트릭스 */
 function renderMeMatrix() {
-  const svg = document.getElementById('meSvg');
-  const W=560, H=270, PAD=48;
+  const svg  = document.getElementById('meSvg');
+  const wrap = svg.parentElement;  // .me-chart-wrap
+  const W    = 560;
+  // 컨테이너 실제 높이로 SVG 높이 결정 (최소 220, 최대 제한 없음)
+  const H    = Math.max(220, wrap.clientHeight || 270);
+  svg.setAttribute('viewBox', '0 0 '+W+' '+H);
+  svg.setAttribute('height', H);
+  const PAD=48;
   const IW=W-PAD*2, IH=H-PAD*2;
   svg.innerHTML='';
   const ns='http://www.w3.org/2000/svg';
@@ -1063,10 +1149,243 @@ function showKakao(type) {
 /* ══════════════════════════════════════════════════════
    초기화
 ══════════════════════════════════════════════════════ */
+/* ── 지도 패널 너비 리사이즈 (비율 기반, localStorage 저장/복원) ──
+   - 기본값: 지도 40% / 오른쪽 패널 60%
+   - 저장 형식: 비율(0.0~1.0) → 화면 크기 달라도 동일 비율 유지
+   - 창 크기 변경 시에도 비율 자동 재계산
+   ─────────────────────────────────────────────────────────────── */
+const MAP_RIGHT_PCT_KEY = 'taco_right_col_pct';
+const MAP_RIGHT_PCT_DEF = 0.50;  // 기본 50% (지도 50% : 패널 50%)
+const MAP_RIGHT_PCT_MIN = 0.20;  // 최소 20%
+const MAP_RIGHT_PCT_MAX = 0.78;  // 최대 78%
+
+function initMapResize() {
+  const rightCol = document.getElementById('rightCol');
+  const handle   = document.getElementById('mapResizeHandle');
+  const aBody    = document.querySelector('.a-body');
+  if (!rightCol || !handle || !aBody) return;
+
+  // 컨테이너 너비 기준 비율 → 픽셀 계산 후 적용
+  function applyRatio() {
+    const containerW = aBody.offsetWidth || (window.innerWidth - 32);
+    const raw = parseFloat(localStorage.getItem(MAP_RIGHT_PCT_KEY));
+    const pct = (raw >= MAP_RIGHT_PCT_MIN && raw <= MAP_RIGHT_PCT_MAX) ? raw : MAP_RIGHT_PCT_DEF;
+    rightCol.style.width = Math.round(containerW * pct) + 'px';
+  }
+
+  applyRatio();
+  // 창 크기 변경 시에도 동일 비율 유지
+  window.addEventListener('resize', applyRatio);
+
+  let startX, startW;
+
+  handle.addEventListener('mousedown', function(e) {
+    startX = e.clientX;
+    startW = rightCol.offsetWidth;
+    handle.classList.add('dragging');
+    document.documentElement.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    function onMove(e) {
+      const containerW = aBody.offsetWidth;
+      const newW = Math.max(
+        Math.round(containerW * MAP_RIGHT_PCT_MIN),
+        Math.min(
+          Math.round(containerW * MAP_RIGHT_PCT_MAX),
+          startW + (startX - e.clientX)
+        )
+      );
+      rightCol.style.width = newW + 'px';
+    }
+    function onUp() {
+      // 픽셀 → 비율로 변환 후 저장
+      const pct = rightCol.offsetWidth / aBody.offsetWidth;
+      localStorage.setItem(MAP_RIGHT_PCT_KEY, pct.toFixed(4));
+      handle.classList.remove('dragging');
+      document.documentElement.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    e.preventDefault();
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   AUTO DEMO — 페이지 로드 후 자동 시작
+   3개 화면을 순환하며 핵심 가치 전달
+   사용자가 화면 클릭 시 데모 종료 → 직접 사용 모드
+══════════════════════════════════════════════════════ */
+const DEMO = {
+  active: false,
+  step: 0,
+  timer: null,
+  _clickHandler: null,
+
+  steps: [
+    {
+      screen:'a', icon:'🗺',
+      title:'전국 4개 매장\n실시간 모니터링',
+      sub:'AI가 매장별 상황을 자동으로 감지하고 이상 신호를 즉시 알립니다',
+      duration:4000,
+    },
+    {
+      screen:'a', icon:'⚡',
+      title:'재고 위기를 AI가\n자동으로 포착',
+      sub:'아보카도 D-2 소진 불가 → 연남점 이동 권장 · 손실 최소화 자동 실행',
+      duration:3500,
+    },
+    {
+      screen:'b', icon:'📊',
+      title:'매출 1,420만 · 마진 63.2%\n핵심 KPI 한눈에',
+      sub:'목표 달성률 · 객단가 · 배달 비중 · 재고 효율 실시간 추적',
+      duration:4000,
+    },
+    {
+      screen:'b', icon:'💎',
+      title:'메뉴 엔지니어링으로\n고마진 전략 시각화',
+      sub:'스타 · 프리미엄 · 주력 · 조정 — 메뉴별 수익 포지션 한눈에',
+      duration:3500,
+    },
+    {
+      screen:'c', icon:'🧠',
+      title:'AI 전략 매트릭스\n목표 × 지점 최적 조합',
+      sub:'클릭 한 번으로 맞춤 전략과 3단계 실행 계획이 자동 생성됩니다',
+      duration:4000,
+    },
+    {
+      screen:'c', icon:'🚀',
+      title:'전략 선택 즉시\n오늘 · 주간 · 월간 로드맵',
+      sub:'선택한 전략이 실행 계획으로 즉시 변환 · 카카오 알림으로 자동 발송',
+      autoClick:true,
+      duration:3500,
+    },
+  ],
+
+  start() {
+    this.active = true;
+    this.step   = 0;
+    this._buildUI();
+    const pill = document.getElementById('demoPill');
+    if (pill) pill.classList.add('visible');
+    this._runStep();
+    // 화면 클릭 → 데모 종료
+    this._clickHandler = (e) => {
+      if (!e.target.closest('#demoCallout') && !e.target.closest('#demoPill')) {
+        this.stop();
+      }
+    };
+    document.addEventListener('click', this._clickHandler, true);
+  },
+
+  stop() {
+    this.active = false;
+    clearTimeout(this.timer);
+    if (this._clickHandler) {
+      document.removeEventListener('click', this._clickHandler, true);
+      this._clickHandler = null;
+    }
+    const pill    = document.getElementById('demoPill');
+    const callout = document.getElementById('demoCallout');
+    if (pill)    { pill.style.opacity = '0'; setTimeout(() => pill.classList.remove('visible'), 450); }
+    if (callout) {
+      callout.classList.remove('dc-in');
+      callout.classList.add('dc-out');
+      setTimeout(() => { callout.style.display = 'none'; callout.classList.remove('dc-out'); }, 300);
+    }
+  },
+
+  _buildUI() {
+    if (document.getElementById('demoPill')) return;
+
+    // Callout
+    const calloutEl = document.createElement('div');
+    calloutEl.id = 'demoCallout';
+    calloutEl.className = 'demo-callout';
+    calloutEl.innerHTML =
+      '<div class="demo-callout-icon" id="demoIcon"></div>' +
+      '<div class="demo-callout-title" id="demoTitle"></div>' +
+      '<div class="demo-callout-sub" id="demoSub"></div>' +
+      '<div class="demo-callout-bar"><div class="demo-callout-fill" id="demoFill"></div></div>';
+    document.body.appendChild(calloutEl);
+
+    // Pill
+    const pillEl  = document.createElement('div');
+    pillEl.id     = 'demoPill';
+    pillEl.className = 'demo-pill';
+    const dots    = this.steps.map((_, i) =>
+      '<div class="demo-pill-dot" id="dd' + i + '"></div>').join('');
+    pillEl.innerHTML =
+      '<span class="demo-pill-label">🎬 AUTO DEMO</span>' +
+      '<div class="demo-pill-dots">' + dots + '</div>' +
+      '<div class="demo-pill-sep"></div>' +
+      '<button class="demo-stop-btn" onclick="DEMO.stop();event.stopPropagation();">직접 사용하기 →</button>';
+    document.body.appendChild(pillEl);
+  },
+
+  _runStep() {
+    if (!this.active) return;
+    const s = this.steps[this.step];
+
+    // 화면 전환
+    gotoScreen(s.screen);
+
+    // AI 전략 매트릭스 자동 클릭
+    if (s.autoClick) {
+      setTimeout(() => {
+        const cells = document.querySelectorAll('.matrix-cell');
+        if (cells[3]) cells[3].click();
+      }, 700);
+    }
+
+    // 진행 점 업데이트
+    this.steps.forEach((_, i) => {
+      const dot = document.getElementById('dd' + i);
+      if (!dot) return;
+      dot.classList.toggle('done',   i < this.step);
+      dot.classList.toggle('active', i === this.step);
+    });
+
+    // Callout 업데이트
+    const callout = document.getElementById('demoCallout');
+    const fill    = document.getElementById('demoFill');
+    if (callout) {
+      callout.classList.remove('dc-in', 'dc-out');
+      callout.style.display = 'block';
+      void callout.offsetWidth;                       // reflow
+      callout.classList.add('dc-in');
+      document.getElementById('demoIcon').textContent  = s.icon;
+      document.getElementById('demoTitle').textContent = s.title;
+      document.getElementById('demoSub').textContent   = s.sub;
+      // progress bar
+      if (fill) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          fill.style.transition = 'width ' + s.duration + 'ms linear';
+          fill.style.width = '100%';
+        }));
+      }
+    }
+
+    // 다음 스텝 예약
+    this.timer = setTimeout(() => {
+      if (!this.active) return;
+      this.step = (this.step + 1) % this.steps.length;
+      this._runStep();
+    }, s.duration);
+  },
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
+  initMapResize();
   renderScreenB();
   renderScreenC();
+  // 1.2초 후 데모 자동 시작
+  setTimeout(() => DEMO.start(), 1200);
 });
 </script>
 </body>

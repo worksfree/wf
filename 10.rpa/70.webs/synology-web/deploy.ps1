@@ -24,7 +24,7 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.7.9.44"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.8.0.10"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -32,6 +32,7 @@ $TARGETS = @{
     "2" = @{ Name="staging";          Path="/volume1/web/staging";      URL="https://staging.worksfree.kr";       Color="Cyan";   SubDir=$null }
     "3" = @{ Name="portal (prod)";    Path="/volume1/web/portal";       URL="https://portal.worksfree.kr";        Color="Green";  SubDir=$null }
     "4" = @{ Name="g1consulting";     Path="/volume1/web/g1consulting"; URL="https://g1consulting.worksfree.kr";  Color="Magenta"; SubDir="consulting/g1" }
+    "5" = @{ Name="el";              Path="/volume1/web/el";           URL="https://el.worksfree.kr";           Color="Cyan";   SubDir="consulting/tacomanager" }
 }
 
 # 배포 제외 목록
@@ -71,6 +72,7 @@ Write-Host "    [1]  test          — 기능 검증용     (test.worksfree.kr)"
 Write-Host "    [2]  staging       — 최종 점검용    (staging.worksfree.kr)"       -ForegroundColor Cyan
 Write-Host "    [3]  portal        — 실 서비스 배포  (portal.worksfree.kr)"       -ForegroundColor Green
 Write-Host "    [4]  g1consulting  — 현장클리닉 전용 (g1consulting.worksfree.kr)"    -ForegroundColor Magenta
+Write-Host "    [5]  el           — 타코매니저 AI 전용 (el.worksfree.kr)"           -ForegroundColor Cyan
 Write-Host "    [Q]  취소"                                                            -ForegroundColor Gray
 Write-Host "    [R]  롤백          — 이전 배포 버전 복원"                             -ForegroundColor DarkYellow
 Write-Host ""
@@ -94,6 +96,7 @@ if ($choice -match "^[Rr]$") {
     Write-Host "    [2]  staging" -ForegroundColor Cyan
     Write-Host "    [3]  portal (prod)" -ForegroundColor Green
     Write-Host "    [4]  g1consulting" -ForegroundColor Magenta
+    Write-Host "    [5]  el" -ForegroundColor Cyan
     Write-Host ""
     $envChoice = Read-Host "  선택"
     if (-not $TARGETS.ContainsKey($envChoice)) {
@@ -144,15 +147,55 @@ if (-not $TARGETS.ContainsKey($choice)) {
     if ($fromBat) { Read-Host "  Enter 키로 종료" }; exit 1
 }
 
-# ── 버전 자동 증가 (환경별: test·g1=4번째 0-99, staging=3번째, portal=2번째) ──
+$T = $TARGETS[$choice]
+
+# ── portal / g1consulting 이중 확인 (버전 증가보다 먼저 실행) ────
+# 버전은 확인 이후에만 증가해야 취소/실패 시 중복 bump 방지
+if ($choice -eq "3") {
+    Write-Host ""
+    Write-Host "  ⚠️  portal(production) 배포 — 실 서비스에 즉시 반영됩니다." -ForegroundColor Red
+    if ($Target) {
+        Write-Host "  (비대화형 모드 — -Target 3 지정 시 자동 승인)" -ForegroundColor DarkGray
+    } else {
+        $confirm = Read-Host "  계속하려면 'yes' 입력"
+        if ($confirm -ne "yes") {
+            Write-Host "`n  취소됨." -ForegroundColor Gray; Start-Sleep 1; exit 0
+        }
+    }
+}
+if ($choice -eq "4") {
+    Write-Host ""
+    Write-Host "  ℹ️  g1consulting 전용 배포: consulting/g1/ → /volume1/web/g1consulting/" -ForegroundColor Magenta
+    Write-Host "     (NAS 디렉터리가 없으면 자동 생성됩니다)" -ForegroundColor Gray
+    if (-not $Target) {
+        $confirm = Read-Host "  계속하려면 Enter, 취소는 Q"
+        if ($confirm -match "^[Qq]$") {
+            Write-Host "`n  취소됨." -ForegroundColor Gray; Start-Sleep 1; exit 0
+        }
+    }
+}
+if ($choice -eq "5") {
+    Write-Host ""
+    Write-Host "  ℹ️  el 전용 배포: consulting/tacomanager/ → /volume1/web/el/" -ForegroundColor Cyan
+    Write-Host "     (타코매니저 AI 로그인 없는 단독 사이트 — el.worksfree.kr)" -ForegroundColor Gray
+    if (-not $Target) {
+        $confirm = Read-Host "  계속하려면 Enter, 취소는 Q"
+        if ($confirm -match "^[Qq]$") {
+            Write-Host "`n  취소됨." -ForegroundColor Gray; Start-Sleep 1; exit 0
+        }
+    }
+}
+
+# ── 버전 자동 증가 (확인 통과 후 실행) ──────────────────────────
+# 규칙: test·g1=4번째 자연 증가, staging=3번째↑+4번째 리셋, portal=2번째↑+3·4번째 리셋
 if ($scriptContent -match '\$VERSION\s*=\s*"(\d+)\.(\d+)\.(\d+)\.(\d+)"') {
     $p = @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4])
     switch ($choice) {
-        "2" {        # staging: 3번째↑, 4번째 리셋
+        "2" {        # staging: 3번째↑, 4번째 리셋, 자릿수 올림
             $p[2]++; $p[3] = 0
             for ($i = 2; $i -gt 0; $i--) { if ($p[$i] -ge 10) { $p[$i] = 0; $p[$i-1]++ } }
         }
-        "3" {        # portal:  2번째↑, 3·4번째 리셋
+        "3" {        # portal: 2번째↑, 3·4번째 리셋
             $p[1]++; $p[2] = 0; $p[3] = 0
             if ($p[1] -ge 10) { $p[1] = 0; $p[0]++ }
         }
@@ -172,27 +215,6 @@ if ($scriptContent -match '\$VERSION\s*=\s*"(\d+)\.(\d+)\.(\d+)\.(\d+)"') {
     }
 }
 # ─────────────────────────────────────────────────────────────────
-
-$T = $TARGETS[$choice]
-
-# ── portal / g1consulting 이중 확인 ─────────────────────────────
-if ($choice -eq "3") {
-    Write-Host ""
-    Write-Host "  ⚠️  portal(production) 배포 — 실 서비스에 즉시 반영됩니다." -ForegroundColor Red
-    $confirm = Read-Host "  계속하려면 'yes' 입력"
-    if ($confirm -ne "yes") {
-        Write-Host "`n  취소됨." -ForegroundColor Gray; Start-Sleep 1; exit 0
-    }
-}
-if ($choice -eq "4") {
-    Write-Host ""
-    Write-Host "  ℹ️  g1consulting 전용 배포: consulting/g1/ → /volume1/web/g1consulting/" -ForegroundColor Magenta
-    Write-Host "     (NAS 디렉터리가 없으면 자동 생성됩니다)" -ForegroundColor Gray
-    $confirm = Read-Host "  계속하려면 Enter, 취소는 Q"
-    if ($confirm -match "^[Qq]$") {
-        Write-Host "`n  취소됨." -ForegroundColor Gray; Start-Sleep 1; exit 0
-    }
-}
 
 # ── 배포 항목 목록 ───────────────────────────────────────────────
 Write-Host ""

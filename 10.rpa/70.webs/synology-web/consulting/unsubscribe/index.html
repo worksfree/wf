@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>수신거부 — Unsubscribe | WorksFree</title>
+<style>
+:root{--bg:#0f1117;--surface:#1c2333;--border:#2a3347;--text:#e2e8f0;--muted:#64748b;--hint:#475569;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;line-height:1.65}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:40px 32px;max-width:480px;width:100%;text-align:center}
+.logo{font-size:11px;font-weight:700;letter-spacing:.18em;color:var(--hint);margin-bottom:36px;text-transform:uppercase}
+.logo span{color:var(--muted)}
+.icon{font-size:52px;margin-bottom:22px;display:block;transition:transform .3s}
+h1{font-size:22px;font-weight:700;line-height:1.35;margin-bottom:10px}
+.subtitle{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.7}
+.subtitle .en{display:block;margin-top:4px;font-size:12px;color:var(--hint)}
+.email-badge{display:inline-block;background:rgba(59,130,246,0.08);border:1.5px solid rgba(59,130,246,0.25);color:#93c5fd;padding:10px 22px;border-radius:8px;font-size:15px;font-family:'Courier New',monospace;margin-bottom:28px;word-break:break-all;max-width:100%}
+.btn{display:inline-block;background:#ef4444;color:#fff;border:none;padding:13px 36px;border-radius:7px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s,background .15s;font-family:inherit;letter-spacing:.01em}
+.btn:hover{background:#dc2626}
+.btn:disabled{opacity:.4;cursor:not-allowed;background:#ef4444}
+.msg{margin-top:18px;font-size:13px;min-height:22px;line-height:1.6}
+.msg.ok{color:#6ee7b7}
+.msg.error{color:#f87171}
+.divider{width:40px;height:2px;background:var(--border);margin:28px auto;border-radius:1px}
+.note{font-size:11px;color:var(--hint);line-height:1.7}
+.note .en{display:block;margin-top:3px;color:#374151}
+/* 완료 상태 */
+.done .icon{transform:scale(1.1)}
+.done h1{color:#6ee7b7}
+/* 오류 상태 */
+.invalid .email-badge{border-color:rgba(248,113,113,0.3);color:#f87171;background:rgba(248,113,113,0.05)}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="logo">WORKS<span>FREE</span></div>
+  <span class="icon" id="icon">🚫</span>
+  <h1 id="title">수신거부 · Unsubscribe</h1>
+  <p class="subtitle" id="subtitle">
+    아래 이메일의 광고성 메일 수신을 즉시 중단합니다.
+    <span class="en">No more marketing emails will be sent to the address below.</span>
+  </p>
+  <div class="email-badge" id="email-display">확인 중...</div>
+  <br>
+  <button class="btn" id="btn-unsub" onclick="doUnsub()" disabled>
+    수신거부 완료 &nbsp;·&nbsp; Confirm Unsubscribe
+  </button>
+  <div class="msg" id="msg"></div>
+  <div class="divider"></div>
+  <p class="note" id="note">
+    요청 처리 후 워크스프리 마케팅 발송 목록에서 즉시 제외됩니다.
+    <span class="en">Your email will be immediately removed from our mailing list after confirmation.</span>
+  </p>
+</div>
+
+<script>
+const WORKER_URL = 'https://send-mail.worksfree.workers.dev';
+
+// URL 파라미터에서 이메일 추출
+// 형식: /consulting/unsubscribe/?e=URL_ENCODED_EMAIL
+var params     = new URLSearchParams(location.search);
+var emailParam = params.get('e') || '';
+var targetEmail = '';
+
+try {
+  targetEmail = decodeURIComponent(emailParam).toLowerCase().trim();
+} catch (e) {
+  targetEmail = '';
+}
+
+var display = document.getElementById('email-display');
+var btn     = document.getElementById('btn-unsub');
+var msg     = document.getElementById('msg');
+
+if (targetEmail && targetEmail.includes('@') && targetEmail.includes('.')) {
+  display.textContent = targetEmail;
+  btn.disabled = false;
+} else {
+  display.textContent = '이메일 주소를 인식할 수 없습니다';
+  document.getElementById('card').classList.add('invalid');
+  document.getElementById('icon').textContent = '⚠️';
+  document.getElementById('title').textContent = '링크 오류 · Invalid Link';
+  document.getElementById('subtitle').innerHTML =
+    '링크가 올바르지 않습니다. 이메일 본문에서 다시 클릭해 주세요.'
+    + '<span class="en">The link is invalid. Please click the unsubscribe button from the original email.</span>';
+  btn.style.display = 'none';
+}
+
+async function doUnsub() {
+  btn.disabled = true;
+  btn.textContent = '처리 중... / Processing...';
+  msg.className = 'msg';
+  msg.textContent = '';
+
+  try {
+    var res = await fetch(WORKER_URL + '/unsubscribe', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email: targetEmail }),
+    });
+
+    var data;
+    try { data = await res.json(); } catch (e) { data = {}; }
+
+    if (res.ok && (data.success !== false)) {
+      // 성공
+      document.getElementById('card').classList.add('done');
+      document.getElementById('icon').textContent  = '✅';
+      document.getElementById('title').textContent = '수신거부 완료 · Unsubscribed';
+      document.getElementById('subtitle').innerHTML =
+        '이 이메일 주소로는 더 이상 광고성 메일을 수신하지 않습니다.'
+        + '<span class="en">You will no longer receive marketing emails at this address.</span>';
+      document.getElementById('note').innerHTML =
+        '실수로 등록하셨다면 담당 컨설턴트에게 연락하여 해제를 요청하세요.'
+        + '<span class="en">If this was a mistake, contact your consultant to re-subscribe.</span>';
+      msg.className    = 'msg ok';
+      msg.textContent  = '✓ 완료되었습니다 — Done';
+      btn.style.display = 'none';
+    } else {
+      throw new Error(data.error || 'Server error (' + res.status + ')');
+    }
+  } catch (e) {
+    btn.disabled    = false;
+    btn.textContent = '수신거부 완료 · Confirm Unsubscribe';
+    msg.className   = 'msg error';
+    msg.innerHTML   = '오류가 발생했습니다. 다시 시도해 주세요.'
+      + '<br><span style="font-size:11px;color:var(--hint)">' + e.message + '</span>';
+  }
+}
+</script>
+</body>
+</html>

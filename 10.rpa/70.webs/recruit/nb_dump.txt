@@ -1,0 +1,627 @@
+=== Cell 1 (markdown) ===
+# 잡코리아 인재검색 & 입사제안 자동화
+
+## ✅ 세션 유지 방식
+- `--user-data-dir` 로 Chrome 프로필을 로컬에 저장
+- **첫 실행**: 자동 로그인 후 세션 저장
+- **이후 실행**: 저장된 세션 재사용 → 로그인 불필요
+
+## 📋 실행 순서
+1. `[셀1]` 설정 & 라이브러리
+2. `[셀2]` Chrome 드라이버 시작
+3. `[셀3]` 로그인 상태 확인 & 자동 로그인
+4. `[셀4]` 인재검색 이동
+5. `[셀5]` 검색 조건 설정 & 후보자 수집
+6. `[셀6]` 입사제안 발송
+7. `[셀7]` 드라이버 종료
+
+=== Cell 2 (code) ===
+# ============================================================
+# [셀1] 라이브러리 임포트 & 설정
+# ============================================================
+import os
+import time
+from pathlib import Path
+from dotenv import load_dotenv
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import InvalidSessionIdException, WebDriverException
+from webdriver_manager.chrome import ChromeDriverManager
+
+# .env 로드 (같은 폴더의 .env 파일)
+env_path = Path('__file__').parent / '.env'
+load_dotenv(dotenv_path=env_path, override=True)
+
+JOBKOREA_ID = os.getenv('JOBKOREA_ID', '')
+JOBKOREA_PW = os.getenv('JOBKOREA_PW', '')
+
+# ★ 세션 유지용 Chrome 프로필 경로
+# 이 폴더에 쿠키/세션이 저장되어 다음 실행 시 로그인 불필요
+PROFILE_DIR = str(Path.home() / '.jobkorea_profile')
+
+# 검증
+assert JOBKOREA_ID, '❌ .env 파일에 JOBKOREA_ID가 없습니다'
+assert JOBKOREA_PW, '❌ .env 파일에 JOBKOREA_PW가 없습니다'
+
+print(f'✅ 설정 완료')
+print(f'   ID      : {JOBKOREA_ID[:3]}***')
+print(f'   프로필  : {PROFILE_DIR}')
+
+=== Cell 3 (code) ===
+# ============================================================
+# [셀2] Chrome 드라이버 시작 (세션 유지)
+# ============================================================
+# 브라우저가 안 보이거나 엉뚱한 창을 재사용하면 True로 둔 채 [셀2]부터 다시 실행하세요.
+# 새 브라우저가 정상적으로 보이기 시작하면 False로 바꿔 재사용할 수 있습니다.
+FORCE_NEW_DRIVER = True
+
+
+def create_driver(profile_dir: str) -> webdriver.Chrome:
+    """세션 유지 Chrome 드라이버 생성"""
+    options = Options()
+    options.page_load_strategy = 'eager'
+
+    # 동일한 프로필 디렉토리를 사용하면 쿠키/세션 유지
+    options.add_argument(f'--user-data-dir={profile_dir}')
+    options.add_argument('--profile-directory=Default')
+
+    # 봇 탐지 우회
+    options.add_argument('--disable-blink-features=AutomationControlled')
+    options.add_experimental_option('excludeSwitches', ['enable-automation'])
+    options.add_experimental_option('useAutomationExtension', False)
+    options.add_argument('--start-maximized')
+    options.add_argument('--no-first-run')
+    options.add_argument('--no-default-browser-check')
+
+    service = Service(ChromeDriverManager().install())
+    drv = webdriver.Chrome(service=service, options=options)
+
+    drv.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
+        'source': 'Object.defineProperty(navigator, "webdriver", {get: () => undefined})'
+    })
+    return drv
+
+
+def is_driver_alive(drv: webdriver.Chrome | None) -> bool:
+    """ChromeDriver 세션이 실제로 살아있는지 확인"""
+    if drv is None:
+        return False
+    try:
+        _ = drv.current_window_handle
+        return True
+    except (InvalidSessionIdException, WebDriverException):
+        return False
+
+
+def bring_driver_to_front(drv: webdriver.Chrome):
+    """Selenium 창을 최대화해서 눈에 보이게 시도"""
+    try:
+        drv.switch_to.window(drv.current_window_handle)
+        drv.maximize_window()
+    except Exception as e:
+        print(f'⚠️ 브라우저 창 활성화 실패: {type(e).__name__}: {e}')
+
+
+def show_driver_status(drv: webdriver.Chrome, label: str = '드라이버 상태'):
+    """현재 Selenium이 붙어 있는 브라우저 정보를 출력"""
+    try:
+        print(f'🧭 {label}')
+        print(f'   창 개수 : {len(drv.window_handles)}')
+        print(f'   제목   : {drv.title}')
+        print(f'   URL    : {drv.current_url}')
+    except Exception as e:
+        print(f'⚠️ 드라이버 상태 확인 실패: {type(e).__name__}: {e}')
+
+
+def ensure_driver(existing_driver: webdriver.Chrome | None = None) -> webdriver.Chrome:
+    """죽은 세션이면 같은 프로필로 새 드라이버를 생성"""
+    if FORCE_NEW_DRIVER and is_driver_alive(existing_driver):
+        print('🔄 FORCE_NEW_DRIVER=True: 기존 드라이버를 종료하고 새로 시작합니다.')
+        try:
+            existing_driver.quit()
+        except Exception:
+            pass
+
+    if not FORCE_NEW_DRIVER and is_driver_alive(existing_driver):
+        print('♻️  기존 드라이버 재사용')
+        bring_driver_to_front(existing_driver)
+        show_driver_status(existing_driver, '재사용 중인 브라우저')
+        return existing_driver
+
+    print('🧹 새 ChromeDriver 브라우저를 시작합니다.')
+    new_driver = create_driver(PROFILE_DIR)
+    bring_driver_to_front(new_driver)
+    show_driver_status(new_driver, '새로 시작한 브라우저')
+    return new_driver
+
+
+# 이미 driver가 있으면 재사용, 없거나 세션이 죽었으면 새로 생성
+print(f'🔧 FORCE_NEW_DRIVER: {FORCE_NEW_DRIVER}')
+driver = ensure_driver(globals().get('driver'))
+print('✅ 드라이버 준비 완료')
+
+=== Cell 4 (code) ===
+# ============================================================
+# [셀3] 로그인 상태 확인 & 자동 로그인
+# ============================================================
+
+PATCH_VERSION = 'visible-driver-login-diagnostics-v3-2026-05-26'
+print(f'🔧 PATCH_VERSION: {PATCH_VERSION}')
+
+
+def handle_alert(drv: webdriver.Chrome, accept: bool = True) -> str | None:
+    """브라우저 alert가 있으면 닫고 문구를 반환"""
+    try:
+        alert = drv.switch_to.alert
+        text = alert.text
+        if accept:
+            alert.accept()
+        else:
+            alert.dismiss()
+        return text
+    except Exception:
+        return None
+
+
+def print_page_state(drv: webdriver.Chrome, label: str):
+    """디버깅용 현재 페이지 상태 출력"""
+    try:
+        print(f'🧭 {label}')
+        print(f'   제목: {drv.title}')
+        print(f'   URL : {drv.current_url}')
+    except Exception as e:
+        print(f'⚠️ 페이지 상태 확인 실패: {type(e).__name__}: {e}')
+
+
+def find_first_element(drv: webdriver.Chrome, selectors: list[tuple[str, str]], timeout: int = 5):
+    """여러 selector 중 처음 발견되는 요소 반환"""
+    wait = WebDriverWait(drv, timeout)
+    last_error = None
+    for by, value in selectors:
+        try:
+            return wait.until(EC.presence_of_element_located((by, value)))
+        except Exception as e:
+            last_error = e
+    raise last_error or Exception('요소를 찾지 못했습니다.')
+
+
+def is_logged_in(drv: webdriver.Chrome) -> bool:
+    """로그인 여부 확인: 알림이 뜨는 인재검색 URL 대신 로그인 페이지 상태로 판단"""
+    alert_text = handle_alert(drv)
+    if alert_text:
+        print(f'  ⚠️ 기존 알림창 닫음: {alert_text}')
+
+    drv.get('https://www.jobkorea.co.kr/User/LogOn/LogOn')
+    time.sleep(2)
+    alert_text = handle_alert(drv)
+    if alert_text:
+        print(f'  ⚠️ 알림창 닫음: {alert_text}')
+
+    print_page_state(drv, '로그인 상태 확인 페이지')
+
+    current_url = drv.current_url.lower()
+    if 'logon' not in current_url and 'login' not in current_url:
+        return True
+
+    for field_id in ['M_ID', 'M_PWD']:
+        try:
+            if drv.find_element(By.ID, field_id).is_displayed():
+                return False
+        except Exception:
+            pass
+
+    page_text = drv.page_source
+    if '로그아웃' in page_text or '회원정보' in page_text:
+        return True
+    return False
+
+
+def close_popups(drv: webdriver.Chrome):
+    """팝업 닫기 (있을 경우만)"""
+    popup_selectors = [
+        'button[aria-label="닫기"]',
+        '.popup-close',
+        '.btn-close',
+        '.modal-close',
+        '#modalClose',
+    ]
+    for sel in popup_selectors:
+        try:
+            btns = drv.find_elements(By.CSS_SELECTOR, sel)
+            for btn in btns:
+                if btn.is_displayed():
+                    btn.click()
+                    time.sleep(0.3)
+        except Exception:
+            pass
+
+
+def do_login(drv: webdriver.Chrome, uid: str, pw: str) -> bool:
+    """잡코리아 기업회원 로그인"""
+    try:
+        alert_text = handle_alert(drv)
+        if alert_text:
+            print(f'  ⚠️ 기존 알림창 닫음: {alert_text}')
+
+        drv.get('https://www.jobkorea.co.kr/User/LogOn/LogOn')
+        time.sleep(2)
+        alert_text = handle_alert(drv)
+        if alert_text:
+            print(f'  ⚠️ 알림창 닫음: {alert_text}')
+        close_popups(drv)
+        print_page_state(drv, '로그인 시도 페이지')
+
+        # 기업회원 탭 클릭. 사이트 구조가 바뀔 수 있어 여러 후보를 시도합니다.
+        company_tab_selectors = [
+            (By.XPATH, '//*[@id="devMemTab"]/li[2]/a'),
+            (By.XPATH, '//*[contains(text(), "기업회원")]'),
+            (By.CSS_SELECTOR, 'a[href*="Co"], button[data-tab*="co"]'),
+        ]
+        try:
+            company_tab = find_first_element(drv, company_tab_selectors, timeout=3)
+            company_tab.click()
+            time.sleep(1)
+            print('  → 기업회원 탭 선택')
+        except Exception:
+            print('  → 기업회원 탭 없음 또는 이미 기업회원 화면일 수 있음')
+
+        id_field = find_first_element(drv, [
+            (By.ID, 'M_ID'),
+            (By.NAME, 'M_ID'),
+            (By.CSS_SELECTOR, 'input[type="text"]'),
+            (By.CSS_SELECTOR, 'input[name*="id" i]'),
+        ], timeout=8)
+        id_field.clear()
+        id_field.send_keys(uid)
+
+        pw_field = find_first_element(drv, [
+            (By.ID, 'M_PWD'),
+            (By.NAME, 'M_PWD'),
+            (By.CSS_SELECTOR, 'input[type="password"]'),
+            (By.CSS_SELECTOR, 'input[name*="pw" i]'),
+        ], timeout=8)
+        pw_field.clear()
+        pw_field.send_keys(pw)
+
+        login_btn = find_first_element(drv, [
+            (By.XPATH, '//*[@id="login-form"]/fieldset/section[3]/button'),
+            (By.CSS_SELECTOR, 'button[type="submit"]'),
+            (By.CSS_SELECTOR, 'input[type="submit"]'),
+            (By.XPATH, '//button[contains(., "로그인")]'),
+            (By.XPATH, '//input[@value="로그인"]'),
+        ], timeout=8)
+        login_btn.click()
+        time.sleep(3)
+
+        alert_text = handle_alert(drv)
+        if alert_text:
+            print(f'  ⚠️ 알림창 닫음: {alert_text}')
+
+        return is_logged_in(drv)
+
+    except Exception as e:
+        print(f'  ❌ 로그인 실패: {type(e).__name__}: {e}')
+        print_page_state(drv, '로그인 실패 시점')
+        try:
+            print('  입력 후보 확인:')
+            print(f'    text inputs     : {len(drv.find_elements(By.CSS_SELECTOR, "input[type=\"text\"]"))}')
+            print(f'    password inputs : {len(drv.find_elements(By.CSS_SELECTOR, "input[type=\"password\"]"))}')
+            print(f'    buttons         : {len(drv.find_elements(By.CSS_SELECTOR, "button, input[type=\"submit\"]"))}')
+        except Exception:
+            pass
+        return False
+
+
+# ─── 실행 ───
+driver = ensure_driver(globals().get('driver'))
+print('🔍 로그인 상태 확인 중...')
+logged_in = is_logged_in(driver)
+
+if logged_in:
+    print('✅ 이미 로그인 상태 — 로그인 스킵')
+else:
+    print('🔑 로그인 필요. 자동 로그인 시도...')
+    success = do_login(driver, JOBKOREA_ID, JOBKOREA_PW)
+    if success:
+        print('✅ 로그인 성공!')
+        print('   👉 다음 실행부터는 로그인 없이 바로 사용 가능합니다.')
+    else:
+        print('❌ 로그인 실패 — 위의 현재 제목/URL과 입력 후보 개수를 확인하세요.')
+
+=== Cell 5 (code) ===
+# ============================================================
+# [셀4] 인재검색 페이지 이동
+# ============================================================
+
+TALENT_SEARCH_URL = 'https://www.jobkorea.co.kr/Recruit/Co_Read/C/personsearch'
+
+driver = ensure_driver(globals().get('driver'))
+alert_text = handle_alert(driver)
+if alert_text:
+    print(f'⚠️ 기존 알림창 닫음: {alert_text}')
+driver.get(TALENT_SEARCH_URL)
+time.sleep(2)
+alert_text = handle_alert(driver)
+if alert_text:
+    print(f'⚠️ 인재검색 페이지 알림창 닫음: {alert_text}')
+    print('   로그인 문제가 아니라 계정의 기업정보/인재검색 접근 권한 문제일 수 있습니다.')
+close_popups(driver)
+
+print(f'✅ 현재 페이지 : {driver.title}')
+print(f'   URL        : {driver.current_url}')
+
+=== Cell 6 (code) ===
+# ============================================================
+# [셀5] 검색 조건 설정 & 후보자 수집
+# ============================================================
+# ✏️  아래 SEARCH_CONFIG 값을 원하는 조건으로 수정하세요
+
+SEARCH_CONFIG = {
+    'keyword'  : '법인영업',   # 검색 키워드
+    'max_pages': 3,            # 수집할 최대 페이지 수
+}
+
+
+def collect_candidates(drv: webdriver.Chrome, config: dict) -> list[dict]:
+    """후보자 목록 수집"""
+    wait = WebDriverWait(drv, 10)
+    candidates = []
+
+    # 검색창 찾기 (여러 셀렉터 시도)
+    search_box = None
+    for sel in ['input[name="stext"]', '#searchText', 'input[type="search"]']:
+        try:
+            search_box = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, sel)))
+            break
+        except Exception:
+            continue
+
+    if not search_box:
+        print('❌ 검색창을 찾을 수 없습니다. 페이지 셀렉터를 확인하세요.')
+        return []
+
+    # 키워드 입력
+    search_box.clear()
+    search_box.send_keys(config['keyword'])
+    search_box.send_keys(Keys.RETURN)
+    time.sleep(2)
+    print(f"🔍 '{config['keyword']}' 검색 실행")
+
+    # 페이지별 수집
+    for page in range(1, config['max_pages'] + 1):
+        time.sleep(1.5)
+
+        # 후보자 항목 셀렉터 (잡코리아 인재검색 결과 목록)
+        item_selectors = [
+            '.resumeBox',          # 이력서 카드
+            '.person-list-item',   # 인물 목록 항목
+            '.list-item',          # 일반 목록 항목
+            'li.item',
+        ]
+        items = []
+        for sel in item_selectors:
+            items = drv.find_elements(By.CSS_SELECTOR, sel)
+            if items:
+                break
+
+        if not items:
+            print(f'  페이지 {page}: 결과 없음 — 수집 종료')
+            break
+
+        page_count = 0
+        for item in items:
+            try:
+                c = {'name': '', 'career': '', 'title': '', 'url': '', 'element': item}
+
+                # 이름
+                for sel in ['.name', 'h3', '.title', '.tit']:
+                    try:
+                        c['name'] = item.find_element(By.CSS_SELECTOR, sel).text.strip()
+                        if c['name']:
+                            break
+                    except Exception:
+                        pass
+
+                # 경력/직무
+                for sel in ['.career', '.exp', '.info', '.summary', 'p']:
+                    try:
+                        c['career'] = item.find_element(By.CSS_SELECTOR, sel).text.strip()
+                        if c['career']:
+                            break
+                    except Exception:
+                        pass
+
+                # 희망직무
+                for sel in ['.hope-job', '.job-title', '.career-title']:
+                    try:
+                        c['title'] = item.find_element(By.CSS_SELECTOR, sel).text.strip()
+                        if c['title']:
+                            break
+                    except Exception:
+                        pass
+
+                # 프로필 URL
+                try:
+                    link = item.find_element(By.CSS_SELECTOR, 'a')
+                    c['url'] = link.get_attribute('href')
+                except Exception:
+                    pass
+
+                if c['name']:  # 이름이 있는 항목만 추가
+                    candidates.append(c)
+                    page_count += 1
+
+            except Exception:
+                continue
+
+        print(f'  페이지 {page}: {page_count}명 수집 (누적: {len(candidates)}명)')
+
+        # 다음 페이지
+        try:
+            next_btn = drv.find_element(By.CSS_SELECTOR, '.next, .paging-next, a.next')
+            classes = next_btn.get_attribute('class') or ''
+            if 'disabled' in classes or 'inactive' in classes:
+                print('  → 마지막 페이지')
+                break
+            next_btn.click()
+        except Exception:
+            print('  → 다음 페이지 없음')
+            break
+
+    return candidates
+
+
+# ─── 실행 ───
+driver = ensure_driver(globals().get('driver'))
+candidates = collect_candidates(driver, SEARCH_CONFIG)
+print(f'\n📋 총 {len(candidates)}명 수집 완료')
+for i, c in enumerate(candidates[:5]):
+    print(f'  [{i+1}] {c["name"]} | {c["career"][:40]}')
+
+=== Cell 7 (code) ===
+# ============================================================
+# [셀6] 입사제안 발송
+# ============================================================
+# ✏️  제안 메시지 & 발송 범위를 수정하세요
+
+PROPOSAL_TEMPLATE = """\
+안녕하세요, {name}님!
+
+삼성생명(주)에서 채용의뢰를 받은 용산HR 이인성 팀장입니다.
+
+{name}님의 {career_short} 경험이 매우 인상적이어서 연락드립니다.
+
+현재 삼성생명 법인영업(GFC) 포지션을 모집 중입니다.
+기업 CEO를 대상으로 세무·재무·리스크 컨설팅을 담당하는 전문직으로,
+입사 후 13개월간 세무사·회계사·노무사 강의와 1:1 멘토링을 제공합니다.
+
+10분 정도 편하신 시간에 통화 가능할까요?
+
+이인성 팀장 | 삼성생명 용산HR
+"""
+
+# 발송 대상 범위 (candidates 리스트에서 슬라이싱)
+# 예: candidates[:5]  → 상위 5명
+#     candidates        → 전체
+SEND_TARGETS = candidates[:3]   # ← 테스트: 처음 3명만
+
+
+def send_proposal(drv: webdriver.Chrome, candidate: dict, template: str) -> bool:
+    """후보자 프로필 페이지에서 입사제안 발송"""
+    if not candidate.get('url'):
+        print(f'  ⚠️  {candidate["name"]} — URL 없음, 건너뜀')
+        return False
+
+    wait = WebDriverWait(drv, 10)
+
+    try:
+        # 1. 프로필 페이지 이동
+        drv.get(candidate['url'])
+        time.sleep(2)
+        close_popups(drv)
+
+        # 2. 입사제안 버튼 클릭
+        propose_btn = None
+        for sel in [
+            'a.btn-propose', 'button.btn-propose',
+            'a[class*="propose"]', 'button[class*="propose"]',
+            '.offerBtn', '#btnOffer',
+            'a[href*="offer"]', 'a[href*="propose"]',
+        ]:
+            try:
+                propose_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, sel)))
+                break
+            except Exception:
+                continue
+
+        if not propose_btn:
+            print(f'  ⚠️  {candidate["name"]} — 제안 버튼 없음')
+            return False
+
+        propose_btn.click()
+        time.sleep(2)
+
+        # 3. 메시지 입력 (팝업/모달 내)
+        career_short = candidate.get('career', '')[:30]
+        message = template.format(
+            name=candidate['name'],
+            career_short=career_short,
+        )
+
+        msg_area = None
+        for sel in [
+            'textarea[name="message"]',
+            '#proposalMessage', '#offerMessage',
+            'textarea.message', 'textarea',
+        ]:
+            try:
+                msg_area = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, sel)))
+                break
+            except Exception:
+                continue
+
+        if msg_area:
+            msg_area.clear()
+            msg_area.send_keys(message)
+
+        # 4. 발송 버튼
+        for sel in [
+            'button.btn-submit', 'input[type="submit"]',
+            'button[type="submit"]', '.btn-send',
+        ]:
+            try:
+                submit_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, sel)))
+                submit_btn.click()
+                time.sleep(2)
+                break
+            except Exception:
+                continue
+
+        # 5. 완료 알림 처리
+        try:
+            drv.switch_to.alert.accept()
+        except Exception:
+            pass
+
+        return True
+
+    except Exception as e:
+        print(f'  ❌ {candidate["name"]} 오류: {e}')
+        return False
+
+
+# ─── 실행 ───
+driver = ensure_driver(globals().get('driver'))
+print(f'💌 입사제안 발송 시작 ({len(SEND_TARGETS)}명 대상)\n')
+
+success_list, fail_list = [], []
+for i, candidate in enumerate(SEND_TARGETS, 1):
+    print(f'[{i}/{len(SEND_TARGETS)}] {candidate["name"]} 처리 중...')
+    ok = send_proposal(driver, candidate, PROPOSAL_TEMPLATE)
+    (success_list if ok else fail_list).append(candidate['name'])
+    print(f'  {"✅ 성공" if ok else "❌ 실패"}')
+    time.sleep(1.5)
+
+print(f'\n📊 결과 요약')
+print(f'  성공: {len(success_list)}명 {success_list}')
+print(f'  실패: {len(fail_list)}명 {fail_list}')
+
+=== Cell 8 (code) ===
+# ============================================================
+# [셀7] 드라이버 종료
+# ============================================================
+# ℹ️  종료하지 않으면 브라우저가 열린 채 세션이 유지됩니다.
+#    다음 셀을 실행하면 드라이버가 종료됩니다.
+# ⚠️  종료 후 재실행 시: [셀2]부터 다시 실행하세요.
+
+# driver.quit()
+# print('✅ 드라이버 종료')
+
+print('💡 드라이버가 아직 실행 중입니다.')
+print('   종료하려면 위 주석(# driver.quit())을 해제하고 실행하세요.')
+

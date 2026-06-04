@@ -1,0 +1,54 @@
+name               = "send-mail"
+main               = "send-mail.js"
+compatibility_date = "2025-01-01"
+account_id         = "cfa572c2bcb9f142db8430b310cf5a32"
+
+# ════════════════════════════════════════════════════════════════════
+#  구축 가이드 (최초 1회)
+# ════════════════════════════════════════════════════════════════════
+#
+# ── STEP 1. Resend 가입 & API 키 발급 ────────────────────────────────
+#   https://resend.com → 가입 → 대시보드 온보딩 화면에서
+#   [Add API Key] 클릭 → 키 이름 입력 → 생성 → re_... 값 복사
+#
+# ── STEP 2. API 키 등록 ───────────────────────────────────────────────
+#   (아래 명령어를 synology-web/service/payment/ 폴더에서 실행)
+#
+#   wrangler secret put RESEND_API_KEY --config wrangler-mail.toml
+#   → 프롬프트에 re_... 값 붙여넣기
+#
+# ── STEP 3. KV 네임스페이스 생성 (발송량 추적) ────────────────────────
+#
+#   wrangler kv:namespace create MAIL_USAGE --config wrangler-mail.toml
+#   → 출력 예시: { id: "abc123...", title: "send-mail-MAIL_USAGE" }
+#   → 출력된 id 값을 아래 [[kv_namespaces]] 섹션의 id = "..." 에 붙여넣기
+#
+# ── STEP 4. Supabase 시크릿 등록 (수신거부 + 발송 이력 관리) ──────────
+#
+#   wrangler secret put SUPABASE_URL         --config wrangler-mail.toml
+#   → 값: https://rkycwfpkzorfpcxfvaqt.supabase.co
+#
+#   wrangler secret put SUPABASE_SERVICE_KEY --config wrangler-mail.toml
+#   → 값: .env.test 파일의 TEST_SUPABASE_SERVICE_KEY 값 붙여넣기
+#
+#   ⚠ Supabase DB에 먼저 phase2_email_management.sql 실행 필요
+#
+# ── STEP 5. 배포 ─────────────────────────────────────────────────────
+#
+#   wrangler deploy --config wrangler-mail.toml
+#
+# ── STEP 6. 발신자 주소 설정 ─────────────────────────────────────────
+#   [테스트] 도메인 인증 없이 즉시 발송 가능 (기본값 — 설정 불필요)
+#     from: WorksFree 컨설팅 <onboarding@resend.dev>
+#
+#   [운영] worksfree.kr 도메인 인증 후 아래 명령으로 전환
+#     Resend 대시보드 → Domains → Add Domain → worksfree.kr
+#     DNS 레코드(DKIM/SPF/DMARC) 추가 후 인증 완료
+#     wrangler secret put MAIL_FROM --config wrangler-mail.toml
+#     → 값: WorksFree 컨설팅 <consulting@worksfree.kr>
+#
+# ════════════════════════════════════════════════════════════════════
+
+[[kv_namespaces]]
+binding = "MAIL_USAGE"
+id      = "7998ad690cae40478465a16912369aee"

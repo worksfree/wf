@@ -864,9 +864,12 @@ function loadCsv(e) {
     if (isHeader) {
       startIdx = 1;
       // 헤더명으로 기업명·대표이름·이메일 컬럼 인덱스 탐색
+      // 주의: '이메일상태' 같은 컬럼이 '이메일'보다 뒤에 오면 덮어쓰지 않도록 상태·status 제외
       firstCols.forEach(function(h, i) {
-        var hl = h.toLowerCase();
-        if (hl.includes('이메일') || hl.includes('email'))                       emailIdx    = i;
+        var hl = h.toLowerCase().trim();
+        if ((hl === '이메일' || hl === 'email') ||
+            ((hl.includes('이메일') || hl.includes('email')) &&
+             !hl.includes('상태') && !hl.includes('status')))                    emailIdx    = i;
         if (hl.includes('기업명') || hl === 'name' || hl === '이름')             companyIdx  = i;
         if (hl.includes('대표') || hl.includes('ceo') || hl.includes('대표자'))  ceoIdx      = i;
       });
@@ -895,17 +898,22 @@ function loadCsv(e) {
 
 function renderCsvPreview() {
   var el = document.getElementById('csv-preview');
-  if (!_csvRows.length) { el.innerHTML = '<p class="mail-hint">유효한 이메일 주소가 없습니다.</p>'; return; }
+  if (!_csvRows.length) {
+    el.innerHTML = '<p class="mail-hint" style="color:#f87171">⚠ 유효한 이메일 주소가 없습니다. 파일 형식을 확인하세요.</p>';
+    return;
+  }
   var hasCeo = _csvRows.some(function(r){ return r.ceo; });
-  var rows = _csvRows.slice(0, 5).map(function(r){
+  var PREVIEW = 3;
+  var rows = _csvRows.slice(0, PREVIEW).map(function(r){
     var ceoCell = hasCeo ? '<td>' + escHtml(r.ceo || '—') + '</td>' : '';
     return '<tr><td>' + escHtml(r.company || '—') + '</td>' + ceoCell + '<td>' + escHtml(r.to) + '</td></tr>';
   }).join('');
-  var more = _csvRows.length > 5
-    ? '<tr><td colspan="' + (hasCeo ? 3 : 2) + '" style="color:var(--muted);font-size:12px">... 외 ' + (_csvRows.length - 5) + '명</td></tr>'
+  var more = _csvRows.length > PREVIEW
+    ? '<tr><td colspan="' + (hasCeo ? 3 : 2) + '" style="color:var(--muted);font-size:12px;text-align:center">... 외 ' + (_csvRows.length - PREVIEW) + '건</td></tr>'
     : '';
-  var ceoHeader = hasCeo ? '<th>대표이름</th>' : '';
-  el.innerHTML = '<p class="mail-hint">총 ' + _csvRows.length + '명 인식됨</p>'
+  var ceoHeader = hasCeo ? '<th>대표자</th>' : '';
+  el.innerHTML =
+    '<p class="mail-hint" style="color:#4ade80;font-weight:600">✅ 총 ' + _csvRows.length + '건 로드됨 (이메일 주소 확인 완료)</p>'
     + '<table class="csv-table"><thead><tr><th>기업명</th>' + ceoHeader + '<th>이메일</th></tr></thead><tbody>'
     + rows + more + '</tbody></table>';
 }
