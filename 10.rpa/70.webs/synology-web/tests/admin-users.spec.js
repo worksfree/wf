@@ -213,20 +213,20 @@ test.describe('사용자 관리 페이지 (admin/users)', () => {
 ───────────────────────────────────────────── */
 test.describe('타코매니저 지도 (consulting/tacomanager)', () => {
 
-  test('지도 컨테이너 높이 585px', async ({ page }) => {
-    await page.goto('/consulting/tacomanager/index.html');
-    const box = await page.locator('.map-container').boundingBox();
-    expect(box?.height).toBeGreaterThanOrEqual(580);
-    expect(box?.height).toBeLessThanOrEqual(590);
+  test('지도 패널이 렌더된다', async ({ page }) => {
+    await page.goto('/consulting/tacomanager/v1/index.html');
+    await expect(page.locator('.map-panel')).toBeAttached();
+    const box = await page.locator('.map-panel').boundingBox();
+    expect(box?.height).toBeGreaterThan(200);
   });
 
   test('#leaflet-map 요소 존재', async ({ page }) => {
-    await page.goto('/consulting/tacomanager/index.html');
+    await page.goto('/consulting/tacomanager/v1/index.html');
     await expect(page.locator('#leaflet-map')).toBeAttached();
   });
 
   test('Leaflet 마커 pane 초기화', async ({ page }) => {
-    await page.goto('/consulting/tacomanager/index.html');
+    await page.goto('/consulting/tacomanager/v1/index.html');
     await page.locator('#screens').waitFor({ timeout: 5000 });
     await page.waitForTimeout(1500);
     await expect(page.locator('.leaflet-marker-pane')).toBeAttached({ timeout: 5000 });

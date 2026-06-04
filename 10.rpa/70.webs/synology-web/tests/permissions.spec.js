@@ -33,7 +33,7 @@ async function mockSiteConfig(page, rules = {}) {
 
 async function loginDevRole(page, role) {
   const btnId = {
-    general:    '#dev-btn-user',
+    general:    '#dev-btn-general',
     consultant: '#dev-btn-consultant',
     gfc:        '#dev-btn-gfc',
     admin:      '#dev-btn-admin',
@@ -41,7 +41,7 @@ async function loginDevRole(page, role) {
 
   await gotoDevPage(page);
   await page.click(btnId);
-  if (role === 'admin') {
+  if (role === 'admin' || role === 'gfc') {
     try {
       await page.waitForSelector('#dev-pw-modal', { state: 'visible', timeout: 2000 });
       await page.click('#dev-pw-modal button:text("확인")');
