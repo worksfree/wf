@@ -24,7 +24,7 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.8.3.0"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.8.3.5"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -73,6 +73,7 @@ Write-Host "    [2]  staging       — 최종 점검용    (staging.worksfree.kr
 Write-Host "    [3]  portal        — 실 서비스 배포  (portal.worksfree.kr)"       -ForegroundColor Green
 Write-Host "    [4]  g1consulting  — 현장클리닉 전용 (g1consulting.worksfree.kr)"    -ForegroundColor Magenta
 Write-Host "    [5]  el           — 타코매니저 AI 전용 (el.worksfree.kr)"           -ForegroundColor Cyan
+Write-Host "    [6]  test + el   — 같은 버전으로 동시 배포 (test + el)"              -ForegroundColor Yellow
 Write-Host "    [Q]  취소"                                                            -ForegroundColor Gray
 Write-Host "    [R]  롤백          — 이전 배포 버전 복원"                             -ForegroundColor DarkYellow
 Write-Host ""
@@ -142,12 +143,12 @@ if ($choice -match "^[Rr]$") {
 }
 # ─────────────────────────────────────────────────────────────────
 
-if (-not $TARGETS.ContainsKey($choice)) {
+if ($choice -ne "6" -and -not $TARGETS.ContainsKey($choice)) {
     Write-Host "`n  [오류] 잘못된 선택." -ForegroundColor Red
     if ($fromBat) { Read-Host "  Enter 키로 종료" }; exit 1
 }
 
-$T = $TARGETS[$choice]
+$T = if ($choice -eq "6") { $TARGETS["1"] } else { $TARGETS[$choice] }
 
 # ── portal / g1consulting 이중 확인 (버전 증가보다 먼저 실행) ────
 # 버전은 확인 이후에만 증가해야 취소/실패 시 중복 bump 방지
@@ -185,6 +186,17 @@ if ($choice -eq "5") {
         }
     }
 }
+if ($choice -eq "6") {
+    Write-Host ""
+    Write-Host "  ℹ️  test + el 동시 배포 — 같은 버전으로 순차 전송" -ForegroundColor Yellow
+    Write-Host "     test.worksfree.kr (전체) + el.worksfree.kr (tacomanager)" -ForegroundColor Gray
+    if (-not $Target) {
+        $confirm = Read-Host "  계속하려면 Enter, 취소는 Q"
+        if ($confirm -match "^[Qq]$") {
+            Write-Host "`n  취소됨." -ForegroundColor Gray; Start-Sleep 1; exit 0
+        }
+    }
+}
 
 # ── 버전 자동 증가 (확인 통과 후 실행) ──────────────────────────
 # 규칙: test·g1=4번째 자연 증가, staging=3번째↑+4번째 리셋, portal=2번째↑+3·4번째 리셋
@@ -215,6 +227,13 @@ if ($scriptContent -match '\$VERSION\s*=\s*"(\d+)\.(\d+)\.(\d+)\.(\d+)"') {
     }
 }
 # ─────────────────────────────────────────────────────────────────
+
+# 배포 대상 목록 — "6"이면 test(1) + el(5) 순서로 순차 실행
+$deployList = if ($choice -eq "6") { @("1","5") } else { @($choice) }
+$allOk      = $true
+
+foreach ($deployKey in $deployList) {
+$T = $TARGETS[$deployKey]
 
 # ── 배포 항목 목록 ───────────────────────────────────────────────
 Write-Host ""
@@ -315,9 +334,6 @@ if ($ok) {
     Write-Host "  ╚════════════════════════════════════════╝" -ForegroundColor $T.Color
 
     # ── NAS 파일 검증 ─────────────────────────────────────────────
-    # 배포 후 SSH로 NAS에 접속해 파일이 실제로 기록됐는지 확인.
-    # consulting/ 타임스탬프와 /volume1/web/wfhub/ 존재 여부도 함께 출력해
-    # 웹서버가 잘못된 경로를 서빙 중인지 진단한다.
     Write-Host ""
     Write-Host "  ▶ NAS 파일 검증 중..." -ForegroundColor Gray
     $tPath = $T.Path
@@ -338,14 +354,32 @@ if ($ok) {
     Write-Host $verifyResult -ForegroundColor DarkCyan
     if ($verifyResult -match 'FAIL:') {
         Write-Host "  ⚠️  일부 파일 전송 실패. 배포를 다시 시도하세요." -ForegroundColor Red
+        $allOk = $false
     }
     if ($verifyResult -match 'WARN:') {
         Write-Host "  ⚠️  .claude 폴더가 NAS에 남아있습니다. 수동으로 삭제하세요." -ForegroundColor Yellow
     }
+} else {
+    $allOk = $false
+    Write-Host "  ╔════════════════════════════════════════╗" -ForegroundColor Red
+    Write-Host "  ║  ❌ 배포 실패                           ║" -ForegroundColor Red
+    Write-Host "  ╚════════════════════════════════════════╝" -ForegroundColor Red
+    Write-Host ""
+    Write-Host $result -ForegroundColor DarkRed
+    Write-Host ""
+    Write-Host "  체크리스트:" -ForegroundColor Yellow
+    Write-Host "    1. NAS IP 확인          : $NAS_IP"           -ForegroundColor Yellow
+    Write-Host "    2. SSH 활성화 확인       : DSM → 제어판 → 터미널 및 SNMP" -ForegroundColor Yellow
+    Write-Host "    3. 최초 1회 SSH 키 등록 :" -ForegroundColor Yellow
+    Write-Host "       > ssh-keygen -t ed25519" -ForegroundColor Gray
+    Write-Host "       > ssh-copy-id ${NAS_USER}@${NAS_IP}" -ForegroundColor Gray
+}
 
-    # ── Cloudflare 캐시 퍼지 ────────────────────────────────────────
+} # end foreach deployList
+
+# ── Cloudflare 캐시 퍼지 (전체 배포 완료 후 1회) ────────────────
+if ($allOk) {
     $CF_ZONE_ID   = "b5e82c46532b06a2cd456cc5ff3b9234"
-    # 토큰은 secrets.ps1에서 로드 (git 제외 파일)
     $secretsFile  = Join-Path $PSScriptRoot "secrets.ps1"
     if (Test-Path $secretsFile) { . $secretsFile }
     $CF_API_TOKEN = $env:CF_API_TOKEN
@@ -366,21 +400,8 @@ if ($ok) {
     } catch {
         Write-Host "    ⚠️  Cloudflare 퍼지 오류: $_" -ForegroundColor Yellow
     }
-    # ────────────────────────────────────────────────────────────────
-} else {
-    Write-Host "  ╔════════════════════════════════════════╗" -ForegroundColor Red
-    Write-Host "  ║  ❌ 배포 실패                           ║" -ForegroundColor Red
-    Write-Host "  ╚════════════════════════════════════════╝" -ForegroundColor Red
-    Write-Host ""
-    Write-Host $result -ForegroundColor DarkRed
-    Write-Host ""
-    Write-Host "  체크리스트:" -ForegroundColor Yellow
-    Write-Host "    1. NAS IP 확인          : $NAS_IP"           -ForegroundColor Yellow
-    Write-Host "    2. SSH 활성화 확인       : DSM → 제어판 → 터미널 및 SNMP" -ForegroundColor Yellow
-    Write-Host "    3. 최초 1회 SSH 키 등록 :" -ForegroundColor Yellow
-    Write-Host "       > ssh-keygen -t ed25519" -ForegroundColor Gray
-    Write-Host "       > ssh-copy-id ${NAS_USER}@${NAS_IP}" -ForegroundColor Gray
 }
+# ────────────────────────────────────────────────────────────────
 
 Write-Host ""
 if ($fromBat) { Read-Host "  Enter 키로 종료" }
