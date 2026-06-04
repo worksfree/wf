@@ -50,11 +50,13 @@ async function sbFetch(env, path, opts = {}) {
 const EMAIL_RE = /([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/g;
 
 const NOISE_DOMAINS = [
-  'example.com','test.com','domain.com','sample.com',
+  // 명백한 더미/테스트 도메인
+  'example.com','test.com','domain.com','sample.com','localhost',
+  // 글로벌 대형 플랫폼 (기업 이메일로 사용하지 않음)
   'sentry.io','w3.org','schema.org','github.com','google.com',
   'apple.com','microsoft.com','adobe.com','amazon.com',
-  'facebook.com','twitter.com','instagram.com','kakao.com',
-  'naver.com','daum.net',
+  'facebook.com','twitter.com','instagram.com',
+  // naver.com / kakao.com / daum.net 제거 — 일부 한국 기업이 사용
 ];
 const NOISE_PREFIXES = ['noreply','no-reply','mailer-daemon','bounces','postmaster','donotreply','do-not-reply'];
 const GOOD_PREFIXES  = ['info','contact','admin','cs','sales','help','support','biz','mail','pr','hr','manager'];
@@ -109,6 +111,21 @@ async function handleScrape(searchParams) {
   let rawUrl = searchParams.get('url') || '';
   if (!rawUrl) return jsonRes({ emails: [], error: 'url 파라미터 필요' }, 400);
 
+  // SSRF 방지 — 프로토콜·내부 IP 검증
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(rawUrl.startsWith('http') ? rawUrl : 'https://' + rawUrl);
+  } catch {
+    return jsonRes({ emails: [], error: '유효하지 않은 URL' }, 400);
+  }
+  if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+    return jsonRes({ emails: [], error: '허용되지 않는 프로토콜' }, 400);
+  }
+  const host = parsedUrl.hostname;
+  if (/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)/.test(host)) {
+    return jsonRes({ emails: [], error: '내부 네트워크 접근 불가' }, 403);
+  }
+
   const baseUrl = rawUrl.startsWith('http') ? rawUrl.replace(/\/$/, '') : 'https://' + rawUrl.replace(/\/$/, '');
 
   // 1차: 메인 페이지
@@ -147,18 +164,28 @@ async function handleStats(env) {
 
 /* ── /contacts GET ───────────────────────────────────────────────── */
 async function handleGetContacts(env, searchParams) {
-  const page   = Math.max(1, parseInt(searchParams.get('page')  || '1'));
-  const limit  = Math.min(5000, parseInt(searchParams.get('limit') || '50'));
-  const offset = (page - 1) * limit;
-  const status     = searchParams.get('status')     || '';
-  const induty     = searchParams.get('induty')     || '';
-  const indutyName = searchParams.get('induty_name')|| ''; // 업종명 필터 (숫자 KSIC코드 대응)
-  const q          = searchParams.get('q')          || '';
+  const page        = Math.max(1, parseInt(searchParams.get('page')   || '1'));
+  const limit       = Math.min(5000, parseInt(searchParams.get('limit') || '50'));
+  // raw offset 지원 (skipSet 페이징용) — page보다 우선
+  const rawOffset   = searchParams.get('offset');
+  const offset      = rawOffset !== null ? Math.max(0, parseInt(rawOffset)) : (page - 1) * limit;
+  const status      = searchParams.get('status')      || '';
+  const induty      = searchParams.get('induty')      || '';
+  const indutyName  = searchParams.get('induty_name') || '';
+  const q           = searchParams.get('q')           || '';
+  const scrapeStatus = searchParams.get('scrape_status') || ''; // "done" | "no_email" | "in.(done,no_email)"
+  // select 커스텀 (skipSet 로드 시 corp_code,scrape_status만 요청 가능)
+  const selectCols  = searchParams.get('select') || '*';
 
-  let qs = `?select=*&order=created_at.desc&limit=${limit}&offset=${offset}`;
+  let qs = `?select=${encodeURIComponent(selectCols)}&order=created_at.desc&limit=${limit}&offset=${offset}`;
   if (status === 'active')        qs += '&email=not.is.null&email_status=neq.unsubscribed';
   else if (status === 'no_email') qs += '&email=is.null';
   else if (status === 'unsub')    qs += '&email_status=eq.unsubscribed';
+  // scrape_status 필터 (단일값 또는 in.(v1,v2) 형식)
+  if (scrapeStatus) {
+    if (scrapeStatus.startsWith('in.(')) qs += `&scrape_status=${encodeURIComponent(scrapeStatus)}`;
+    else                                  qs += `&scrape_status=eq.${encodeURIComponent(scrapeStatus)}`;
+  }
   // induty_name 우선, 없으면 induty_code (알파벳 코드)로 fallback
   if (indutyName) qs += `&induty_name=eq.${encodeURIComponent(indutyName)}`;
   else if (induty) qs += `&induty_code=like.${encodeURIComponent(induty + '*')}`;
@@ -169,6 +196,10 @@ async function handleGetContacts(env, searchParams) {
   if (status === 'active')        filterQs += '&email=not.is.null&email_status=neq.unsubscribed';
   else if (status === 'no_email') filterQs += '&email=is.null';
   else if (status === 'unsub')    filterQs += '&email_status=eq.unsubscribed';
+  if (scrapeStatus) {
+    if (scrapeStatus.startsWith('in.(')) filterQs += `&scrape_status=${encodeURIComponent(scrapeStatus)}`;
+    else                                  filterQs += `&scrape_status=eq.${encodeURIComponent(scrapeStatus)}`;
+  }
   if (indutyName) filterQs += `&induty_name=eq.${encodeURIComponent(indutyName)}`;
   else if (induty) filterQs += `&induty_code=like.${encodeURIComponent(induty + '*')}`;
   if (q)      filterQs += `&corp_name=ilike.${encodeURIComponent('*' + q + '*')}`;
@@ -216,7 +247,8 @@ async function handleDeleteContacts(env, body) {
 }
 
 /* ── /contacts/export (전체 내보내기) ───────────────────────────── */
-// Supabase PostgREST max-rows 제한을 우회하기 위해 내부에서 페이징하여 전체 반환
+// 최대 50,000건 — Worker 메모리(128MB) 보호 + 배치 페이징 처리
+const EXPORT_MAX = 50000;
 async function handleExportContacts(env, searchParams) {
   const status     = searchParams.get('status')     || '';
   const induty     = searchParams.get('induty')     || '';
@@ -235,20 +267,20 @@ async function handleExportContacts(env, searchParams) {
   const countRes = await sbFetch(env, '/biz_contacts?select=count' + filterQs).catch(() => null);
   const total = parseInt(countRes?.[0]?.count || 0);
 
-  // Supabase max-rows에 맞게 배치 단위로 전체 수집
   const BATCH = 1000;
+  const cap   = Math.min(total, EXPORT_MAX); // 최대 50,000건
   const allData = [];
   let offset = 0;
 
-  while (allData.length < total) {
+  while (allData.length < cap) {
     const qs = `?select=*&order=created_at.desc&limit=${BATCH}&offset=${offset}` + filterQs;
     const batch = await sbFetch(env, '/biz_contacts' + qs);
     if (!batch || !batch.length) break;
     allData.push(...batch);
-    offset += batch.length; // 실제 반환된 건수만큼 offset 전진 (Supabase cap 대응)
+    offset += batch.length;
   }
 
-  return jsonRes({ data: allData, total: allData.length });
+  return jsonRes({ data: allData, total: allData.length, capped: total > EXPORT_MAX });
 }
 
 /* ── /sendlist ───────────────────────────────────────────────────── */
@@ -281,9 +313,25 @@ async function handleSendLog(env, body) {
   return jsonRes({ ok: true, logged: rows.length });
 }
 
+/* ── /sent-emails GET — 발송 이력 이메일 조회 ───────────────────── */
+// since=YYYY-MM 이후 발송된 이메일 목록 반환 (CSV 발송 이력 체크용)
+async function handleSentEmails(env, searchParams) {
+  const since = searchParams.get('since') || '';
+  let qs = `/biz_send_log?select=email,sent_at&limit=50000&order=sent_at.desc`;
+  if (since) qs += `&batch_month=gte.${since}`;
+  const rows = await sbFetch(env, qs);
+  // 이메일별 최근 발송일 맵
+  const map = new Map();
+  (rows || []).forEach(r => { if (r.email && !map.has(r.email)) map.set(r.email, r.sent_at); });
+  const emails = [];
+  map.forEach((sent_at, email) => emails.push({ email, sent_at }));
+  return jsonRes({ emails, count: emails.length });
+}
+
 /* ── 유틸 ────────────────────────────────────────────────────────── */
 function monthKey() {
-  const d = new Date();
+  // KST(UTC+9) 기준 월 키 — Worker는 UTC 실행이므로 +9시간 보정
+  const d = new Date(Date.now() + 9 * 3600 * 1000);
   return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0');
 }
 function jsonRes(data, status = 200) {
@@ -311,8 +359,9 @@ export default {
       if (/^\/contacts\/[^/]+$/.test(path) && request.method === 'PATCH') {
         return handlePatchContact(env, path.split('/')[2], await request.json());
       }
-      if (path === '/sendlist' && request.method === 'GET')    return handleSendList(env, url.searchParams);
-      if (path === '/sendlog'  && request.method === 'POST')   return handleSendLog(env, await request.json());
+      if (path === '/sendlist'    && request.method === 'GET')  return handleSendList(env, url.searchParams);
+      if (path === '/sendlog'     && request.method === 'POST') return handleSendLog(env, await request.json());
+      if (path === '/sent-emails' && request.method === 'GET')  return handleSentEmails(env, url.searchParams);
 
       return jsonRes({ error: 'Not found', path }, 404);
     } catch (e) {

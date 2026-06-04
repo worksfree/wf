@@ -64,8 +64,8 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .tag-gray{background:var(--gray-bg);color:var(--gray)}
 .tag-teal{background:var(--teal-bg);color:var(--teal)}
 
-.back-btn{background:none;border:none;font-family:inherit;font-size:12.5px;color:var(--hint);cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;margin-bottom:14px;transition:color .12s}
-.back-btn:hover{color:var(--text)}
+.back-btn{background:var(--surface);border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12.5px;color:var(--muted);cursor:pointer;padding:5px 12px;display:flex;align-items:center;gap:4px;margin-bottom:14px;transition:all .12s}
+.back-btn:hover{color:var(--text);border-color:var(--blue)}
 .cases-wrap{margin-bottom:18px}
 .cases-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .cases-label::after{content:'';flex:1;height:1px;background:var(--border)}
@@ -235,6 +235,46 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 </div>
 
 <script>
+/* ── 역할 수신 (hub postMessage) ─────────────────────────────────── */
+let hubRole = 'member';
+const isGfcView = () => hubRole === 'gfc' || hubRole === 'admin';
+
+window.addEventListener('message', e => {
+  if (e.data?.type === 'wf_role') {
+    hubRole = e.data.role || 'member';
+    // 이미 결과 화면 렌더링 중이면 다시 렌더
+    if (typeof renderResult === 'function' && document.querySelector('.result-wrap')) renderResult();
+  }
+});
+
+/* ── 역할 기반 텍스트 변환 ──────────────────────────────────────── */
+// 비파트너 화면에서 보험 관련 용어를 중립적 표현으로 전환
+function sanitizeRole(text) {
+  if (!text || isGfcView()) return text;
+  return text
+    .replace(/경영인정기보험 비용처리 — 법인세 /g, '파트너 상담 설계 — 법인세 ')
+    .replace(/경영인정기보험 비용처리/g, '파트너 상담 설계')
+    .replace(/경영인정기보험/g, '파트너 상담 플랜')
+    .replace(/법인 종신보험 — 상속세 재원 마련 유일한 방법/g, '파트너 상담 필요')
+    .replace(/법인 종신보험/g, '유고 대비 파트너 솔루션')
+    .replace(/경영인정기/g, '파트너 상담')
+    .replace(/단체 재해보장보험/g, '중대재해 보장 솔루션')
+    .replace(/단체보험/g, '임직원 보장')
+    .replace(/법인보험/g, '파트너 솔루션')
+    .replace(/종신보험/g, '파트너 상담 플랜')
+    .replace(/보험 연계 퇴직금/g, '파트너 연계 퇴직금')
+    .replace(/보험 연계/g, '파트너 연계')
+    .replace(/보험 가입 가능 기간과 보험료 수준/g, '컨설팅 플랜 수립 조건')
+    .replace(/보험료/g, '플랜 비용')
+    .replace(/보험으로 준비/g, '파트너 상담으로 준비')
+    .replace(/보험으로/g, '파트너 상담으로')
+    .replace(/보험이 없는/g, '리스크 대비가 없는')
+    .replace(/보험이/g, '파트너 솔루션이')
+    .replace(/보험을/g, '파트너 솔루션을')
+    .replace(/보험과/g, '파트너 솔루션과')
+    .replace(/보험/g, '파트너 상담');
+}
+
 /* ═══════════════════════════════════════════════════
    진단 질문 정의 (17문항)
    skip(c): 수집된 데이터 기준으로 이 질문 건너뛸지 여부
@@ -557,15 +597,15 @@ function render() {
       이전 항목으로
     </button>`:''}
     <div class="q-card">
-      <div class="q-step">체크포인트 ${pos+1} / ${vqs.length} &nbsp;—&nbsp; ${q.step}</div>
-      <div class="q-text">${q.q}</div>
-      ${q.sub?`<div class="q-sub">${q.sub}</div>`:''}
+      <div class="q-step">체크포인트 ${pos+1} / ${vqs.length} &nbsp;—&nbsp; ${sanitizeRole(q.step)}</div>
+      <div class="q-text">${sanitizeRole(q.q)}</div>
+      ${q.sub?`<div class="q-sub">${sanitizeRole(q.sub)}</div>`:''}
       <div class="options">
         ${q.opts.map((o,i)=>`
           <button class="opt" onclick="selectOpt(${pos},${i})">
             <div class="opt-l">
-              <div class="opt-main">${o.t}</div>
-              ${o.sub?`<div class="opt-sub">${o.sub}</div>`:''}
+              <div class="opt-main">${sanitizeRole(o.t)}</div>
+              ${o.sub?`<div class="opt-sub">${sanitizeRole(o.sub)}</div>`:''}
             </div>
             ${o.tag?`<span class="opt-tag tag-${tagColor(o.tag)}">${o.tag}</span>`:`<span class="opt-arr">›</span>`}
           </button>
@@ -778,9 +818,13 @@ function buildResult() {
   /* 7. 경영인정기 법인세 절감 */
   if (!isIndiv && !isMedical && taxHigh) taxPoints.push({
     pri:'기회', priC:'#0d2620', priTC:'#34d399',
-    title:`경영인정기보험 비용처리 — 법인세 ${C.taxLabel||''} 절감`,
-    desc:'경영인정기보험 보험료 전액을 법인 비용으로 처리 가능. 법인세율 22% 적용 시 보험료의 22%가 절세됩니다. 15년차 이후 환급률 100% — 사실상 무비용으로 보장을 받는 구조입니다.',
-    link:'→ 경영인정기 1안·2안 비교 설계 제시'
+    title: isGfcView()
+      ? `경영인정기보험 비용처리 — 법인세 ${C.taxLabel||''} 절감`
+      : `법인 절세 구조 설계 — 파트너 상담으로 법인세 ${C.taxLabel||''} 절감`,
+    desc: isGfcView()
+      ? '경영인정기보험 보험료 전액을 법인 비용으로 처리 가능. 법인세율 22% 적용 시 보험료의 22%가 절세됩니다. 15년차 이후 환급률 100% — 사실상 무비용으로 보장을 받는 구조입니다.'
+      : '법인 비용처리를 통한 절세 구조 설계로 법인세를 최적화합니다. 구체적인 설계 방식과 시뮬레이션은 파트너 상담을 통해 맞춤 안내를 받으세요.',
+    link: isGfcView() ? '→ 경영인정기 1안·2안 비교 설계 제시' : '→ 법인 절세 구조 파트너 상담으로 진행'
   });
 
   /* 8. 의료업 특화 */
@@ -804,9 +848,15 @@ function buildResult() {
     pri: ceoNoInsurance ? '긴급' : '주의',
     priC: ceoNoInsurance ? '#2d1515' : '#2d1f08',
     priTC: ceoNoInsurance ? '#f87171' : '#fbbf24',
-    title:'CEO 유고 대비 법인 종신보험 — 상속세 재원 마련 유일한 방법',
-    desc:'CEO 사망 시 법인 지분 전체가 상속세 대상입니다. 상속세 납부 기한(6개월) 내 현금을 마련하지 못하면 법인을 청산해야 합니다. 현금 이체로는 상속세 재원 마련이 불가능합니다. 계약자·보험료 납부=법인(비용처리), 피보험자=CEO, 수익자=상속인 구조의 법인 종신보험이 유일한 해결책입니다.',
-    link:'→ 법인 종신보험 설계 (상속세 재원 + 법인세 절감 이중 효과)'
+    title: isGfcView()
+      ? 'CEO 유고 대비 법인 종신보험 — 상속세 재원 마련 유일한 방법'
+      : 'CEO 유고 대비 법인 재무리스크 관리를 위해 파트너 상담 필요',
+    desc: isGfcView()
+      ? 'CEO 사망 시 법인 지분 전체가 상속세 대상입니다. 상속세 납부 기한(6개월) 내 현금을 마련하지 못하면 법인을 청산해야 합니다. 현금 이체로는 상속세 재원 마련이 불가능합니다. 계약자·보험료 납부=법인(비용처리), 피보험자=CEO, 수익자=상속인 구조의 법인 종신보험이 유일한 해결책입니다.'
+      : 'CEO 유고 시 상속세 납부 재원이 없으면 법인 청산을 강제당할 수 있습니다. 상속세 재원 마련 등 구체적인 대응 방안은 파트너 상담을 통해 맞춤 솔루션을 설계하세요.',
+    link: isGfcView()
+      ? '→ 법인 종신보험 설계 (상속세 재원 + 법인세 절감 이중 효과)'
+      : '→ 파트너 상담을 통해 CEO 유고 대비 맞춤 솔루션 안내'
   });
 
   /* 11. 임원 퇴직금 미설계 */
@@ -816,7 +866,7 @@ function buildResult() {
     priTC: retireNone ? '#f87171' : '#fbbf24',
     title:'임원 퇴직금 미설계 — 이익잉여금 출구 & 최대 절세 기회 방치',
     desc:'임원 퇴직금은 이익잉여금을 합법적으로 줄이는 가장 효과적인 수단입니다. 정관에 퇴직금 지급 규정 설정 → 법인 비용처리(법인세 절감) + 퇴직금 재원 동시 확보가 가능합니다. 가지급금 해소 수단으로도 활용할 수 있습니다.',
-    link:'→ 임원 퇴직급여 규정 + 보험 연계 퇴직금 시뮬레이션'
+    link: isGfcView() ? '→ 임원 퇴직급여 규정 + 보험 연계 퇴직금 시뮬레이션' : '→ 임원 퇴직급여 규정 + 파트너 연계 퇴직금 시뮬레이션'
   });
 
   /* 12. M&A 매각 전략 */
@@ -863,7 +913,7 @@ function buildResult() {
   const riskItems = [];
 
   if (isHighRisk && (giNone||giPartial))
-    riskItems.push({lv:'red',text:`<strong>산업재해 리스크</strong> — ${C.indLabel||''}업종은 위험율이 높습니다. 50인 미만 사업장에서 산재사고의 68.8%가 발생합니다. 단체 재해보장보험이 없거나 미흡하면 중대재해처벌법 적용 시 법인 존속 위기로 이어질 수 있습니다.`});
+    riskItems.push({lv:'red',text:`<strong>산업재해 리스크</strong> — ${C.indLabel||''}업종은 위험율이 높습니다. 50인 미만 사업장에서 산재사고의 68.8%가 발생합니다. ${isGfcView() ? '단체 재해보장보험이 없거나 미흡하면' : '중대재해 보장 대비가 없거나 미흡하면'} 중대재해처벌법 적용 시 법인 존속 위기로 이어질 수 있습니다.`});
 
   if (frReceivable)
     riskItems.push({lv:'red',text:'<strong>매출 누락 리스크</strong> — 가수금 잔액은 세무조사 시 매출 누락으로 간주될 가능성이 매우 높습니다. 전액 추징 시 기업 존속에 심각한 위협이 됩니다.'});
@@ -872,10 +922,12 @@ function buildResult() {
     riskItems.push({lv:'red',text:'<strong>상속세 무방비 상태</strong> — 지분 100%에 승계 계획 없이 대표 사망 시 법인 전체가 상속세 대상입니다. 상속세 납부 재원 부재로 법인 청산 위기.'});
 
   if (!isIndiv && ceoNoInsurance && (stake100 || isMature))
-    riskItems.push({lv:'red',text:'<strong>CEO 유고 기업 존속 위기</strong> — 대표 사망 시 상속세 납부 재원(현금)이 전혀 없습니다. 상속세는 현금 이체로 사전 준비가 불가능합니다. 법인 종신보험 미가입 상태에서 대표 유고 시 법인 청산을 강제당할 수 있습니다.'});
+    riskItems.push({lv:'red',text:isGfcView()
+      ? '<strong>CEO 유고 기업 존속 위기</strong> — 대표 사망 시 상속세 납부 재원(현금)이 전혀 없습니다. 상속세는 현금 이체로 사전 준비가 불가능합니다. 법인 종신보험 미가입 상태에서 대표 유고 시 법인 청산을 강제당할 수 있습니다.'
+      : '<strong>CEO 유고 기업 존속 위기</strong> — 대표 사망 시 상속세 납부 재원(현금)이 전혀 없습니다. 재무리스크 대책 없이 대표 유고 시 법인 청산을 강제당할 수 있습니다. 파트너 상담을 통해 사전 대응 방안을 마련하세요.'});
 
   if (ageSenior && giNone)
-    riskItems.push({lv:'amber',text:`<strong>Key Person 리스크</strong> — 대표(${C.ageLabel||''})가 핵심 인물인 상황에서 보험이 없는 경우, 대표 유고 시 기업 운영 자금 확보가 불가합니다.`});
+    riskItems.push({lv:'amber',text:`<strong>Key Person 리스크</strong> — 대표(${C.ageLabel||''})가 핵심 인물인 상황에서 ${isGfcView() ? '보험이 없는 경우' : '리스크 대비가 없는 경우'}, 대표 유고 시 기업 운영 자금 확보가 불가합니다.`});
 
   if (reVhigh && relatedNone)
     riskItems.push({lv:'amber',text:'<strong>이익잉여금 과다 + 지분 미분산</strong> — 주식가치 급등 상태에서 지분이 한 명에게 집중된 구조는 상속세 리스크가 극대화됩니다.'});
@@ -888,8 +940,8 @@ function buildResult() {
   else if (laborPoggwal)
     riskItems.push({lv:'amber',text:'<strong>포괄임금제 단속 리스크</strong> — 2026년 집중 단속 예고. 개인별 근무시간 기록 미흡 시 소급 초과수당 청구 + 과태료 위험.'});
 
-  if (!isIndiv && giNone && !riskItems.find(r=>r.text.includes('단체')))
-    riskItems.push({lv:'amber',text:'<strong>임직원 보장 공백</strong> — 단체보험 미가입 상태로 업무 중 사고 발생 시 회사 직접 배상 리스크가 있습니다.'});
+  if (!isIndiv && giNone && !riskItems.find(r=>r.text.includes('단체')||r.text.includes('보장')))
+    riskItems.push({lv:'amber',text:`<strong>임직원 보장 공백</strong> — ${isGfcView() ? '단체보험 미가입 상태로' : '임직원 보장 대책 없이'} 업무 중 사고 발생 시 회사 직접 배상 리스크가 있습니다.`});
 
   /* ═══════════════════════════════════════════════════
      로드맵 Phase 구성
@@ -904,36 +956,58 @@ function buildResult() {
   if (!isIndiv && isNew && relatedNone)
     phase1Items.push('비상장주식 액면가 구간 내 자녀/배우자 증여 실행 (3년 이내 최적 타이밍)');
   if (!isIndiv && !isMedical && taxHigh)
-    phase1Items.push('경영인정기보험 비용처리 구조 설계 — 1안·2안 보험료 시뮬레이션 제시');
+    phase1Items.push(isGfcView()
+      ? '경영인정기보험 비용처리 구조 설계 — 1안·2안 보험료 시뮬레이션 제시'
+      : '법인 절세 구조 설계 — 파트너 상담으로 시뮬레이션 진행');
   if (isIndiv && !revLow)
     phase1Items.push('개인 vs 법인 세부담 비교 시뮬레이션 작성 후 법인전환 착수');
   if (!isIndiv && isMedical)
-    phase1Items.push('대표 개인 소득세 절감 플랜 (퇴직금 사전 설계, 연금 보험 구조)');
+    phase1Items.push(isGfcView()
+      ? '대표 개인 소득세 절감 플랜 (퇴직금 사전 설계, 연금 보험 구조)'
+      : '대표 개인 소득세 절감 플랜 (퇴직금 사전 설계, 연금 구조)');
   if (!isIndiv && (stockUnaware||stockApprox) && (isGrow||isMature))
     phase1Items.push('비상장주식 전문 가치평가 의뢰 — 증여 가능 시점 선제 파악');
   if (laborRiskFlag)
     phase1Items.push('근로 실태 전수 점검 (포괄임금제·3.3%·외국인 해당 항목) — 2026년 단속 전 자체 개선');
   if (phase1Items.length === 0)
     phase1Items.push('재무제표 기반 절세 포인트 전수 점검 (한신평 신용조회 포함)');
-  phase1Items.push('단체보험 현황 전면 점검 — 보장분석 보고서 제작 (비교설계 포함)');
+  phase1Items.push(isGfcView()
+    ? '단체보험 현황 전면 점검 — 보장분석 보고서 제작 (비교설계 포함)'
+    : '임직원 보장 현황 전면 점검 — 파트너 상담으로 보장분석 진행');
 
-  /* Phase 2: 보험 연계 설계 (2~6개월) */
+  /* Phase 2: 파트너/보험 연계 설계 (2~6개월) */
   if (!isIndiv && !isMedical && taxHigh)
-    phase2Items.push('경영인정기보험 계약 — 비용처리 후 실질 납입 부담 = (보험료 × 78%) 구조 확정');
+    phase2Items.push(isGfcView()
+      ? '경영인정기보험 계약 — 비용처리 후 실질 납입 부담 = (보험료 × 78%) 구조 확정'
+      : '법인 절세 플랜 실행 — 파트너와 함께 비용처리 구조 확정');
   if (!isIndiv && ceoNoContingency)
-    phase2Items.push('법인 종신보험 설계 (계약자=법인, 피보험자=CEO, 수익자=상속인) — 상속세 재원 마련');
+    phase2Items.push(isGfcView()
+      ? '법인 종신보험 설계 (계약자=법인, 피보험자=CEO, 수익자=상속인) — 상속세 재원 마련'
+      : 'CEO 유고 대비 재무 솔루션 설계 — 파트너 상담으로 진행');
   if (!isIndiv && retireWeak)
-    phase2Items.push('임원 퇴직급여 지급 규정 정관 반영 + 보험 연계 퇴직금 설계 (이익잉여금 출구 겸용)');
+    phase2Items.push(isGfcView()
+      ? '임원 퇴직급여 지급 규정 정관 반영 + 보험 연계 퇴직금 설계 (이익잉여금 출구 겸용)'
+      : '임원 퇴직급여 지급 규정 정관 반영 + 파트너 연계 퇴직금 설계 (이익잉여금 출구 겸용)');
   if (isHighRisk || giNone)
-    phase2Items.push(`단체 재해보장보험 신규 설계 (${C.empLabel||''}규모 맞춤, 인당 5~10만원 설계)`);
+    phase2Items.push(isGfcView()
+      ? `단체 재해보장보험 신규 설계 (${C.empLabel||''}규모 맞춤, 인당 5~10만원 설계)`
+      : `임직원 재해보장 솔루션 신규 설계 (${C.empLabel||''}규모 맞춤, 파트너 상담으로 진행)`);
   if (giPartial)
-    phase2Items.push('기가입 단체보험 비교분석 — 경쟁사 대비 합리성 점검 후 업그레이드 설계');
+    phase2Items.push(isGfcView()
+      ? '기가입 단체보험 비교분석 — 경쟁사 대비 합리성 점검 후 업그레이드 설계'
+      : '기가입 임직원 보장 비교분석 — 파트너 상담으로 업그레이드 설계');
   if (reHigh || (stake100 && isMature))
-    phase2Items.push('이익잉여금 출구전략: 임원 퇴직금 사전 설계 + 법인 종신보험 상속세 재원 마련');
+    phase2Items.push(isGfcView()
+      ? '이익잉여금 출구전략: 임원 퇴직금 사전 설계 + 법인 종신보험 상속세 재원 마련'
+      : '이익잉여금 출구전략: 임원 퇴직금 사전 설계 + 파트너 상담으로 상속세 재원 마련');
   if (ageSenior)
-    phase2Items.push(`대표이사(${C.ageLabel||''}) 긴급 Key Person 보험 가입 — 연령 상승 전 빠른 실행`);
-  if (!phase2Items.find(i=>i.includes('단체')))
-    phase2Items.push('임직원 복지 단체보험 패키지 설계 (재해+건강 분리 설계, 월별 분산 계약으로 할인 적용)');
+    phase2Items.push(isGfcView()
+      ? `대표이사(${C.ageLabel||''}) 긴급 Key Person 보험 가입 — 연령 상승 전 빠른 실행`
+      : `대표이사(${C.ageLabel||''}) Key Person 리스크 — 파트너 상담으로 빠른 솔루션 실행`);
+  if (!phase2Items.find(i=>i.includes('단체')||i.includes('임직원')))
+    phase2Items.push(isGfcView()
+      ? '임직원 복지 단체보험 패키지 설계 (재해+건강 분리 설계, 월별 분산 계약으로 할인 적용)'
+      : '임직원 복지 보장 패키지 설계 (파트너 상담으로 맞춤 설계)');
 
   /* Phase 3: 장기 플랜 (6~24개월) */
   if (!isIndiv && stakeHigh && succNone)
@@ -943,12 +1017,16 @@ function buildResult() {
   if (succSale)
     phase3Items.push('M&A 전 기업 가치 극대화 — 재무구조 정상화, 이익잉여금 출구, 대표 퇴직금 최대화');
   if (!isIndiv && reHigh)
-    phase3Items.push('이익잉여금 장기 출구전략 확정 — 배당·퇴직금·보험 3가지 시나리오 연간 실행');
+    phase3Items.push(isGfcView()
+      ? '이익잉여금 장기 출구전략 확정 — 배당·퇴직금·보험 3가지 시나리오 연간 실행'
+      : '이익잉여금 장기 출구전략 확정 — 배당·퇴직금·파트너 솔루션 3가지 시나리오 연간 실행');
   if (!isIndiv && (stockUnaware||stockApprox) && isMature)
     phase3Items.push('비상장주식 연간 평가 체계 구축 — 증여 타이밍 모니터링 + 10년 상속 플랜 수립');
   phase3Items.push('연간 컨설팅 리뷰 체계 구축 — 매출 변화 시 그룹 재분류 및 전략 업데이트');
   if (!isIndiv)
-    phase3Items.push('추가 법인보험 포트폴리오 — 화재·배상책임·기업휴지 종합 점검');
+    phase3Items.push(isGfcView()
+      ? '추가 법인보험 포트폴리오 — 화재·배상책임·기업휴지 종합 점검'
+      : '추가 법인 리스크 관리 — 파트너 상담으로 화재·배상책임·기업휴지 종합 점검');
 
   return { group, groupLabel, accentColor, badgeClass, riskLevel, riskColor, riskScore, maxScore, taxPoints, riskItems, phase1Items, phase2Items, phase3Items };
 }
@@ -989,7 +1067,7 @@ function renderResult() {
   `).join('');
 
   const phaseColor = (n)=>[['#0c1a30','#60a5fa'],['#0d1f18','#34d399'],['#1a1530','#a855f7']][n-1];
-  const phaseLabel = ['즉시 절세 실행','보험 연계 설계','장기 플랜'];
+  const phaseLabel = ['즉시 절세 실행', isGfcView() ? '보험 연계 설계' : '파트너 연계 설계', '장기 플랜'];
 
   function phaseHtml(n, items) {
     const [bg,tc] = phaseColor(n);
@@ -1015,7 +1093,7 @@ function renderResult() {
           <div>
             <div class="r-badge ${R.badgeClass}">${R.groupLabel}</div>
             <div class="r-title">기업 종합 컨설팅 진단 완료</div>
-            <div class="r-desc">발굴된 절세 포인트 <strong>${R.taxPoints.length}개</strong> · 리스크 항목 <strong>${R.riskItems.length}개</strong><br>아래 로드맵 순서대로 절세 먼저 실행 후 보험으로 연계하세요.</div>
+            <div class="r-desc">발굴된 절세 포인트 <strong>${R.taxPoints.length}개</strong> · 리스크 항목 <strong>${R.riskItems.length}개</strong><br>아래 로드맵 순서대로 절세 먼저 실행 후 ${isGfcView() ? '보험으로' : '파트너와'} 연계하세요.</div>
           </div>
           <div class="risk-score">
             <div class="risk-label">종합 리스크</div>
@@ -1101,47 +1179,70 @@ function renderResult() {
       <div class="section">
         <div class="section-hd">
           <div class="section-hd-icon" style="background:#1a0c2e;color:#c084fc">⚠</div>
-          <div class="section-hd-title" style="color:#c084fc">위험관리 — 전반 및 보험 권고</div>
+          <div class="section-hd-title" style="color:#c084fc">${isGfcView() ? '위험관리 — 전반 및 보험 권고' : '위험관리 — 전반 및 파트너 상담 권고'}</div>
         </div>
         ${(()=>{
           const insItems = [];
-          // 경영인정기보험 — 법인세 절감 + 보장
           if (C.bizType !== 'indiv') {
-            insItems.push({
+            insItems.push(isGfcView() ? {
               name:'경영인정기보험 (법인)',
               urgency: C.age === 'senior' ? '🔴 즉시 가입 권고' : C.age === 'mid' ? '🟡 조기 가입 권고' : '🟢 검토 권고',
               desc:`보험료 100% 법인 비용처리(법인세 절감) + 만기 환급(환급률 100%). 대표 유고 시 운영자금 확보. ${C.age==='senior'?'현재 연령('+C.ageLabel+')에서 가입 지체 시 보험료 급등 및 가입 불가 위험 있음.':''}`
+            } : {
+              name:'법인 절세 파트너 상담 플랜',
+              urgency: C.age === 'senior' ? '🔴 즉시 상담 권고' : '🟡 조기 상담 권고',
+              desc:`법인 비용처리를 통한 절세 구조 설계. 대표 유고 시 운영자금 확보 방안을 포함합니다. 파트너와 함께 구체적인 플랜을 설계하세요. ${C.age==='senior'?'현재 연령('+C.ageLabel+')에서 지체 시 조건이 불리해질 수 있습니다.':''}`
             });
-            insItems.push({
+            insItems.push(isGfcView() ? {
               name:'법인 종신보험 (상속세 재원)',
               urgency: C.ceoCont === 'none' ? '🔴 즉시 설계 권고' : '🟡 병행 검토',
               desc:'계약자·납입=법인(비용처리), 피보험자=CEO, 수익자=상속인. 대표 사망 시 지분 상속세(최고 65%) 납부 재원 마련. 현금 이체로는 사전 준비 불가.'
+            } : {
+              name:'CEO 유고 재무 솔루션 (파트너 상담)',
+              urgency: C.ceoCont === 'none' ? '🔴 즉시 상담 권고' : '🟡 병행 상담 권고',
+              desc:'대표 사망 시 지분 상속세(최고 65%) 납부 재원 마련이 필요합니다. 현금 이체로는 사전 준비가 불가합니다. 파트너 상담을 통해 법인 재무구조에 맞는 솔루션을 설계하세요.'
             });
           } else {
-            insItems.push({
+            insItems.push(isGfcView() ? {
               name:'개인 종신보험 / 정기보험',
               urgency:'🟡 우선 검토',
               desc:'개인사업주 유고 시 가족 생활비·부채 상환 재원. 소득세 절감 효과(연금저축 연계 구조) 병행 설계.'
+            } : {
+              name:'개인사업주 유고 리스크 대비 (파트너 상담)',
+              urgency:'🟡 우선 검토',
+              desc:'개인사업주 유고 시 가족 생활비·부채 상환 재원 마련이 필요합니다. 소득세 절감 방안을 병행하여 파트너 상담을 통해 설계하세요.'
             });
           }
           if (C.gi !== 'full') {
-            insItems.push({
+            insItems.push(isGfcView() ? {
               name:'임직원 단체 재해보장보험',
               urgency: C.gi === 'none' ? '🔴 즉시 가입 필요' : '🟡 보완 설계 권고',
               desc:`중대재해처벌법 대응 핵심 수단. 50인 미만 사업장에서 산재사고의 68.8% 발생. 미가입 시 업무 사고 발생 시 기업 직접 배상 리스크. 인당 월 5~10만원 설계 가능.`
+            } : {
+              name:'임직원 재해보장 솔루션',
+              urgency: C.gi === 'none' ? '🔴 즉시 파트너 상담 필요' : '🟡 보완 파트너 상담 권고',
+              desc:`중대재해처벌법 대응을 위한 임직원 보장 솔루션이 필요합니다. 50인 미만 사업장에서 산재사고의 68.8%가 발생합니다. 파트너 상담을 통해 규모에 맞는 솔루션을 설계하세요.`
             });
           }
           if (C.retire !== 'insured') {
-            insItems.push({
+            insItems.push(isGfcView() ? {
               name:'임원 퇴직급여 + 보험 연계 퇴직금',
               urgency:'🟡 6개월 내 실행 권고',
               desc:'이익잉여금 출구전략으로 활용. 정관에 임원 퇴직급여 지급 규정 반영 + 법인 보험 납입으로 퇴직금 재원 사전 적립. 법인세 절감 효과 겸용.'
+            } : {
+              name:'임원 퇴직급여 + 파트너 연계 퇴직금',
+              urgency:'🟡 6개월 내 실행 권고',
+              desc:'이익잉여금 출구전략으로 활용. 정관에 임원 퇴직급여 지급 규정 반영 후 파트너와 함께 퇴직금 재원 사전 적립 구조를 설계합니다. 법인세 절감 효과 겸용.'
             });
           }
-          insItems.push({
+          insItems.push(isGfcView() ? {
             name:'기업배상책임 / 화재·휴지 보험',
             urgency:'🟢 포트폴리오 점검',
             desc:'제품·서비스·시설로 인한 제3자 배상 리스크 커버. 화재 발생 시 복구 비용과 영업중단 손실을 함께 보장. 기존 가입 보험 갱신 시 비교 설계 필수.'
+          } : {
+            name:'기업 리스크 관리 (파트너 상담)',
+            urgency:'🟢 포트폴리오 점검',
+            desc:'제품·서비스·시설로 인한 제3자 배상 리스크 커버가 필요합니다. 화재·영업중단 리스크에 대한 대응 방안을 파트너 상담을 통해 검토하세요.'
           });
           return `<div style="padding:4px 22px 16px;">
             ${insItems.map(it=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);">

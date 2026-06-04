@@ -170,9 +170,8 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
         <button class="mail-quota-refresh" onclick="loadQuota()">↻ 새로고침</button>
       </div>
       <div class="mail-quota-bar"><div class="mail-quota-fill" id="quota-fill" style="width:0%;background:#6ee7b7"></div></div>
-      <div class="mail-quota-row">
-        <span style="font-size:11px;color:var(--hint)" id="quota-text">Worker 배포 후 표시</span>
-        <span style="font-size:12px;font-weight:700;color:var(--text)" id="quota-remaining">—</span>
+      <div style="text-align:center;padding:4px 0 2px">
+        <span style="font-size:12px;font-weight:600" id="quota-text">Worker 배포 후 표시</span>
       </div>
     </div>
 
@@ -210,7 +209,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
     <!-- 대량 발송 -->
     <div id="panel-bulk" class="mail-card" style="margin-top:12px;display:none">
       <span class="mail-label">CSV 파일 업로드</span>
-      <p class="mail-hint">B2B 이메일 DB에서 내보낸 CSV 그대로 업로드 가능 · 헤더·컬럼 수 자동 인식 · 최대 100명</p>
+      <p class="mail-hint">B2B 이메일 DB에서 내보낸 CSV 그대로 업로드 가능 · 헤더·컬럼 수 자동 인식 · 월 한도(3,000건) 이내 제한 없음</p>
       <input id="mail-csv" type="file" accept=".csv,.txt" class="mail-input" onchange="loadCsv(event)">
       <div id="csv-preview"></div>
       <button class="mail-send-btn" id="bulk-send-btn" onclick="sendBulk()" disabled>대량 발송 →</button>
@@ -440,8 +439,11 @@ function scaleThumbIframes() {
 }
 
 const MAIL_WORKER_URL  = 'https://send-mail.worksfree.workers.dev';
+const BIZDB_WORKER_URL = localStorage.getItem('bizdb_worker_url') || 'https://biz-db.worksfree.workers.dev';
 const UNSUBSCRIBE_BASE = location.origin;
 let _csvRows = [];
+let _sentEmailMap = null; // { email → sent_at } — CSV 업로드 시 1회 로드
+let _quotaRemaining = 0;  // loadQuota() 호출 시 갱신
 
 /* ── 본문 메시지 프리셋 ─────────────────────────────────────────── */
 const MSG_PRESETS = [
@@ -547,41 +549,27 @@ function applyMsgPreset(id) {
   }, { once: true });
 }
 
-/* ── 발송 크레딧 차감 확인 다이얼로그 ─────────────────────────────── */
-function showSendConfirm(count, remText) {
-  var msg = [
-    '⚠ 실제 이메일이 발송됩니다.',
-    '',
-    '발송 건수  : ' + count + '건',
-    '차감 크레딧: ' + count + '건 (Resend)',
-    remText,
-    '',
-    '월 한도(3,000건) 초과 시 발송이 중단됩니다.',
-    '계속하시겠습니까?',
-  ].join('\n');
-  return window.confirm(msg);
-}
+/* showSendConfirm 제거 — confirm 팝업 없이 바로 발송 */
 
 async function loadQuota() {
   document.getElementById('quota-text').textContent = '조회 중...';
-  document.getElementById('quota-remaining').textContent = '—';
+  document.getElementById('quota-text').style.color = 'var(--muted)';
   try {
     var res = await fetch(MAIL_WORKER_URL);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var d = await res.json();
     var pct   = d.limit > 0 ? Math.min(100, Math.round(d.sent / d.limit * 100)) : 0;
     var color = pct < 70 ? '#6ee7b7' : pct < 90 ? '#fbbf24' : '#f87171';
-    var fill  = document.getElementById('quota-fill');
-    fill.style.width      = pct + '%';
-    fill.style.background = color;
-    document.getElementById('quota-text').textContent =
-      d.period + ' · ' + d.sent.toLocaleString() + ' / ' + d.limit.toLocaleString() + '건 발송';
-    var remEl = document.getElementById('quota-remaining');
-    remEl.textContent = d.remaining.toLocaleString() + '건 남음';
-    remEl.style.color = color;
+    document.getElementById('quota-fill').style.width      = pct + '%';
+    document.getElementById('quota-fill').style.background = color;
+    // 중앙 정렬 단일 라인: "YYYY-MM / N건 발송 / M건 남음"
+    _quotaRemaining = d.remaining;
+    var quotaEl = document.getElementById('quota-text');
+    quotaEl.textContent = d.period + ' / ' + d.sent.toLocaleString() + '건 발송 / ' + d.remaining.toLocaleString() + '건 남음';
+    quotaEl.style.color = color;
   } catch(e) {
     document.getElementById('quota-text').textContent = 'Worker 미배포 또는 연결 오류';
-    document.getElementById('quota-remaining').textContent = '—';
+    document.getElementById('quota-text').style.color = 'var(--hint)';
   }
 }
 
@@ -784,7 +772,10 @@ function setMailStatus(type, msg) {
   el.textContent = msg;
 }
 
+var _sending = false; // 중복 발송 방지 플래그
+
 async function sendSingle() {
+  if (_sending) return;
   var idx      = +document.getElementById('mail-flyer').value;
   var subject  = document.getElementById('mail-subject').value.trim();
   var message  = document.getElementById('mail-body').value.trim();
@@ -795,12 +786,8 @@ async function sendSingle() {
   var finalSubj = legal.adPrefix ? '(광고) ' + subject : subject;
   if (!to || !subject) { setMailStatus('error', '이메일 주소와 제목을 입력하세요.'); return; }
 
-  // ⚠ 크레딧 차감 확인
-  var remaining = document.getElementById('quota-remaining').textContent.replace(/[^0-9]/g,'');
-  var remNum = parseInt(remaining) || 0;
-  var remText = remNum ? `남은 크레딧 ${remNum.toLocaleString()}건` : '남은 크레딧 확인 불가';
-  if (!showSendConfirm(1, remText)) return;
-
+  _sending = true;
+  document.querySelector('.mail-send-btn').disabled = true;
   clearFilterResult();
   setMailStatus('loading', '발송 중...');
   try {
@@ -821,10 +808,13 @@ async function sendSingle() {
         loadQuota();
       }
     } else {
-      setMailStatus('error', '오류: ' + (data.error || 'Unknown'));
+      setMailStatus('error', '발송 실패: ' + (data.error || '서버 오류'));
     }
   } catch(e) {
-    setMailStatus('error', '네트워크 오류: ' + e.message);
+    setMailStatus('error', '연결 오류 — 잠시 후 다시 시도하세요');
+  } finally {
+    _sending = false;
+    document.querySelector('.mail-send-btn').disabled = false;
   }
 }
 
@@ -846,9 +836,26 @@ function parseCsvRow(line) {
   return fields;
 }
 
+async function loadSentHistory() {
+  if (_sentEmailMap !== null) return; // 이미 로드됨
+  _sentEmailMap = {};
+  try {
+    // 최근 12개월 발송 이력 로드
+    var since = (function(){ var d=new Date(); d.setMonth(d.getMonth()-12); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); })();
+    var res = await fetch(BIZDB_WORKER_URL + '/sent-emails?since=' + since);
+    if (res.ok) {
+      var data = await res.json();
+      (data.emails || []).forEach(function(item) {
+        if (item.email) _sentEmailMap[item.email.toLowerCase()] = item.sent_at || '';
+      });
+    }
+  } catch(e) { /* worker 미배포 시 무시 */ }
+}
+
 function loadCsv(e) {
   var file = e.target.files[0];
   if (!file) return;
+  _sentEmailMap = null; // 파일 변경 시 이력 캐시 초기화
   var reader = new FileReader();
   reader.onload = function(ev) {
     // BOM 제거 후 행 분리
@@ -892,6 +899,8 @@ function loadCsv(e) {
 
     renderCsvPreview();
     document.getElementById('bulk-send-btn').disabled = _csvRows.length === 0;
+    // 발송 이력 비동기 로드 후 미리보기 갱신
+    loadSentHistory().then(function(){ renderCsvPreview(); });
   };
   reader.readAsText(file, 'UTF-8');
 }
@@ -903,37 +912,44 @@ function renderCsvPreview() {
     return;
   }
   var hasCeo = _csvRows.some(function(r){ return r.ceo; });
-  var PREVIEW = 3;
+  var sentMap = _sentEmailMap || {};
+  var alreadySentCount = _csvRows.filter(function(r){ return sentMap[r.to.toLowerCase()]; }).length;
+  var PREVIEW = 5;
   var rows = _csvRows.slice(0, PREVIEW).map(function(r){
     var ceoCell = hasCeo ? '<td>' + escHtml(r.ceo || '—') + '</td>' : '';
-    return '<tr><td>' + escHtml(r.company || '—') + '</td>' + ceoCell + '<td>' + escHtml(r.to) + '</td></tr>';
+    var sentDate = sentMap[r.to.toLowerCase()];
+    var sentBadge = sentDate
+      ? '<span style="font-size:10px;background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:1px 6px;margin-left:5px;white-space:nowrap">이미 발송 ' + sentDate.slice(0,7) + '</span>'
+      : '';
+    return '<tr><td>' + escHtml(r.company || '—') + '</td>' + ceoCell
+      + '<td style="white-space:nowrap">' + escHtml(r.to) + sentBadge + '</td></tr>';
   }).join('');
   var more = _csvRows.length > PREVIEW
     ? '<tr><td colspan="' + (hasCeo ? 3 : 2) + '" style="color:var(--muted);font-size:12px;text-align:center">... 외 ' + (_csvRows.length - PREVIEW) + '건</td></tr>'
     : '';
   var ceoHeader = hasCeo ? '<th>대표자</th>' : '';
+  var alreadyNote = alreadySentCount > 0
+    ? '<p class="mail-hint" style="color:#fbbf24;margin-top:4px">⚠ ' + alreadySentCount + '건은 과거 발송 이력이 있습니다 (재발송됩니다)</p>'
+    : (_sentEmailMap !== null ? '<p class="mail-hint" style="color:var(--muted);margin-top:4px">✓ 발송 이력 없음 (신규 수신처)</p>' : '');
   el.innerHTML =
     '<p class="mail-hint" style="color:#4ade80;font-weight:600">✅ 총 ' + _csvRows.length + '건 로드됨 (이메일 주소 확인 완료)</p>'
+    + alreadyNote
     + '<table class="csv-table"><thead><tr><th>기업명</th>' + ceoHeader + '<th>이메일</th></tr></thead><tbody>'
     + rows + more + '</tbody></table>';
 }
 
 async function sendBulk() {
-  if (!_csvRows.length) return;
+  if (!_csvRows.length || _sending) return;
   var idx     = +document.getElementById('mail-flyer').value;
   var subject = document.getElementById('mail-subject').value.trim();
   var message = document.getElementById('mail-body').value.trim();
   if (!subject) { setMailStatus('error', '제목을 입력하세요.'); return; }
-  if (_csvRows.length > 100) { setMailStatus('error', '한 번에 최대 100명까지 발송 가능합니다.'); return; }
+  if (_csvRows.length > 3000) { setMailStatus('error', '월 한도(3,000건)를 초과했습니다.'); return; }
 
-  // ⚠ 크레딧 차감 확인
-  var remaining = document.getElementById('quota-remaining').textContent.replace(/[^0-9]/g,'');
-  var remNum = parseInt(remaining) || 0;
-  var remText = remNum ? `남은 크레딧 ${remNum.toLocaleString()}건` : '남은 크레딧 확인 불가';
-  if (!showSendConfirm(_csvRows.length, remText)) return;
-
+  _sending = true;
+  document.getElementById('bulk-send-btn').disabled = true;
   clearFilterResult();
-  setMailStatus('loading', _csvRows.length + '명에게 발송 중...');
+  setMailStatus('loading', `📤 ${_csvRows.length}명에게 발송 중... (100건씩 순차 발송)`);
   var flyerName      = FLYERS[idx].label.ko;
   var flyerUrl       = getFlyerUrl(idx);
   var flyerBadge     = FLYERS[idx].badge;
@@ -946,6 +962,13 @@ async function sendBulk() {
     var toEmail = r.to.toLowerCase();
     return {to: toEmail, subject: finalSubj, html: buildEmailHtml(r.company, r.ceo, msgText, flyerName, flyerUrl, flyerBadge, flyerEmailHero, legal, toEmail)};
   });
+
+  // ── 관리자 확인 사본 (대량 발송 시 항상 1건 추가) ──────────────────
+  var OWNER_EMAIL = 'insung.lee@worksfree.co.kr';
+  var ownerSubj   = '[발송 확인 ' + _csvRows.length + '건] ' + subject;
+  var ownerHtml   = buildEmailHtml('발송 확인 사본', '', msgText, flyerName, flyerUrl, flyerBadge, flyerEmailHero, legal, OWNER_EMAIL);
+  emails = [{to: OWNER_EMAIL, subject: ownerSubj, html: ownerHtml}].concat(emails);
+
   try {
     var res  = await fetch(MAIL_WORKER_URL, {
       method: 'POST',
@@ -954,7 +977,9 @@ async function sendBulk() {
     });
     var data = await res.json();
     if (data.success) {
-      var sentMsg = '✓ ' + data.sent + '명 발송 완료';
+      // data.sent에는 owner 사본 1건 포함 — 실제 수신자 수는 -1
+      var actualSent = Math.max(0, data.sent - 1);
+      var sentMsg = '✓ ' + actualSent + '명 발송 완료 (확인 사본 → ' + OWNER_EMAIL + ')';
       if (data.filtered && data.filtered.length > 0) {
         setMailStatus('warn', sentMsg + ' · ' + data.filtered.length + '명 수신거부로 제외됨');
         showFilterResult(data.filtered);
@@ -963,10 +988,13 @@ async function sendBulk() {
       }
       if (data.sent > 0) loadQuota();
     } else {
-      setMailStatus('error', '오류: ' + (data.error || 'Unknown'));
+      setMailStatus('error', '발송 실패: ' + (data.error || '서버 오류'));
     }
   } catch(e) {
-    setMailStatus('error', '네트워크 오류: ' + e.message);
+    setMailStatus('error', '연결 오류 — 잠시 후 다시 시도하세요');
+  } finally {
+    _sending = false;
+    document.getElementById('bulk-send-btn').disabled = _csvRows.length === 0;
   }
 }
 

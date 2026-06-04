@@ -94,6 +94,27 @@ td{padding:9px 14px;vertical-align:middle}
 .gate-icon{font-size:48px}
 .gate-title{font-size:18px;font-weight:600}
 .gate-desc{font-size:13px;color:var(--muted)}
+
+/* ── 향후 개발 예정 오버레이 ── */
+/* 발송 이력 탭(#tab-history)은 블러 제외 — 읽기 전용으로 사용 가능 */
+#main-content header,
+#main-content .tab-nav,
+#main-content #tab-jk{filter:blur(4px);pointer-events:none;user-select:none}
+#future-overlay{
+  display:none;position:fixed;top:0;left:0;right:0;height:120px;z-index:500;
+  flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(15,17,23,.7);backdrop-filter:blur(3px);
+}
+#future-overlay.visible{display:flex}
+.fo-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:16px;padding:44px 52px;text-align:center;
+  max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+.fo-icon{font-size:52px;margin-bottom:18px;line-height:1}
+.fo-title{font-size:20px;font-weight:700;margin-bottom:10px;letter-spacing:-.3px}
+.fo-title-en{font-size:13px;color:var(--muted);font-weight:400;margin-bottom:16px}
+.fo-desc{font-size:13px;color:var(--muted);line-height:1.7}
 </style>
 </head>
 <body>
@@ -114,12 +135,12 @@ td{padding:9px 14px;vertical-align:middle}
 </header>
 
 <div class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('jk')">⚙ 잡코리아 자동화</button>
-  <button class="tab-btn" onclick="switchTab('history')">📋 발송 이력</button>
+  <button class="tab-btn" onclick="switchTab('jk')" style="display:none">⚙ 잡코리아 자동화</button>
+  <button class="tab-btn active" onclick="switchTab('history')">📋 발송 이력</button>
 </div>
 
 <!-- ══ TAB 1: 잡코리아 자동화 ══ -->
-<div id="tab-jk" class="tab-panel active">
+<div id="tab-jk" class="tab-panel">
 <div class="page">
 
   <div class="server-warn">
@@ -180,31 +201,34 @@ td{padding:9px 14px;vertical-align:middle}
 </div>
 
 <!-- ══ TAB 2: 발송 이력 ══ -->
-<div id="tab-history" class="tab-panel">
+<div id="tab-history" class="tab-panel active">
 <div class="page">
 
   <div class="stats" style="margin-bottom:20px">
     <div class="stat-card"><div class="sc-label">전체 발송</div><div class="sc-val" id="h-total" style="color:var(--blue)">—</div></div>
     <div class="stat-card"><div class="sc-label">이번 주</div><div class="sc-val" id="h-week" style="color:var(--green)">—</div></div>
     <div class="stat-card"><div class="sc-label">이번 달</div><div class="sc-val" id="h-month" style="color:var(--yellow)">—</div></div>
-    <div class="stat-card"><div class="sc-label">오류</div><div class="sc-val" id="h-error" style="color:var(--red)">—</div></div>
-    <div class="stat-card"><div class="sc-label">스킵</div><div class="sc-val" id="h-skip" style="color:var(--hint)">—</div></div>
+    <div class="stat-card"><div class="sc-label">3개월 이내</div><div class="sc-val" id="h-recent" style="color:var(--purple)">—</div></div>
+  </div>
+
+  <div id="h-server-warn" class="server-warn" style="display:none">
+    <strong>⚠ 로컬 서버 오프라인</strong> — 이력을 불러오려면 <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:3px;font-family:monospace">local_server.py</code>를 실행하세요.<br>
+    PowerShell: <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:3px;font-family:monospace">python synology-web/admin/recruit/local_server.py</code>
   </div>
 
   <div class="section">
     <div class="section-title">잡코리아 포지션 제안 이력</div>
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
-      <button class="filter-btn active" data-st="all"     onclick="filterHistory('all')">전체</button>
-      <button class="filter-btn"        data-st="sent"    onclick="filterHistory('sent')">발송 완료</button>
-      <button class="filter-btn"        data-st="error"   onclick="filterHistory('error')">오류</button>
-      <button class="filter-btn"        data-st="skipped" onclick="filterHistory('skipped')">스킵</button>
-      <input id="h-search" style="margin-left:auto;width:200px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:12px;font-family:inherit;outline:none" type="text" placeholder="이름/키워드 검색" oninput="renderHistory()">
+      <button class="filter-btn active" data-dt="all"   onclick="filterHistory('all')">전체</button>
+      <button class="filter-btn"        data-dt="month" onclick="filterHistory('month')">이번 달</button>
+      <button class="filter-btn"        data-dt="week"  onclick="filterHistory('week')">이번 주</button>
+      <input id="h-search" style="margin-left:auto;width:200px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:12px;font-family:inherit;outline:none" type="text" placeholder="이력서 번호(rNo) 검색" oninput="renderHistory()">
       <button class="btn" onclick="loadHistory()">↻</button>
     </div>
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th>#</th><th>이름</th><th>경력 요약</th><th>키워드</th><th>상태</th><th>발송일</th><th>메모</th>
+          <th>#</th><th>이력서 rNo</th><th>발송일</th><th>페이지</th><th>순번</th><th>상태</th>
         </tr></thead>
         <tbody id="h-tbody"></tbody>
       </table>
@@ -220,6 +244,15 @@ td{padding:9px 14px;vertical-align:middle}
 </div>
 
 </div><!-- /main-content -->
+
+<div id="future-overlay">
+  <div class="fo-card">
+    <div class="fo-icon">🚧</div>
+    <div class="fo-title">향후 개발 예정</div>
+    <div class="fo-title-en">Under Development · Coming Soon</div>
+    <div class="fo-desc">채용 자동화 기능은 현재 개발 중입니다.<br>발송 이력 조회는 아래에서 바로 사용 가능합니다.</div>
+  </div>
+</div>
 
 <script>
 const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
@@ -241,18 +274,16 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 function boot() {
   document.getElementById('main-content').style.display = 'block';
-  refreshStatus();
-  loadStats();
+  document.getElementById('future-overlay').classList.add('visible');
   loadHistory();
-  setInterval(pollIfRunning, 5000);
 }
 
 // ── 탭 전환 ─────────────────────────────────────────────────────────
 function switchTab(id) {
-  ['jk','history'].forEach((t, i) => {
-    document.querySelectorAll('.tab-btn')[i].classList.toggle('active', t === id);
-    document.getElementById('tab-' + t).classList.remove('active');
-  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  ['jk','history'].forEach(t => document.getElementById('tab-' + t).classList.remove('active'));
+  const btn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick') === `switchTab('${id}')`);
+  if (btn) btn.classList.add('active');
   document.getElementById('tab-' + id).classList.add('active');
 }
 
@@ -337,72 +368,104 @@ async function clearLog() {
 }
 
 // ════════════════════════════════════════════════════════════════════
-//  Supabase 통계 & 발송 이력
+//  발송 이력 (recruit_history.json → local_server.py /history)
 // ════════════════════════════════════════════════════════════════════
-async function loadStats() {
-  try {
-    const { data } = await sb.from('jobkorea_stats').select('*').single();
-    if (!data) return;
-    document.getElementById('st-total').textContent = data.total_sent    ?? '0';
-    document.getElementById('st-week').textContent  = data.this_week     ?? '0';
-    document.getElementById('st-month').textContent = data.this_month    ?? '0';
-    document.getElementById('st-error').textContent = data.total_error   ?? '0';
-    document.getElementById('h-total').textContent  = data.total_sent    ?? '0';
-    document.getElementById('h-week').textContent   = data.this_week     ?? '0';
-    document.getElementById('h-month').textContent  = data.this_month    ?? '0';
-    document.getElementById('h-error').textContent  = data.total_error   ?? '0';
-    document.getElementById('h-skip').textContent   = data.total_skipped ?? '0';
-  } catch {}
-}
-
 let _allHistory = [], _hFilter = 'all', _hPage = 0;
 const H_PER = 25;
 
+function _rNoFromUrl(url) {
+  try { return new URL(url).searchParams.get('rNo') || '—'; } catch { return '—'; }
+}
+
+function _calcStats(data) {
+  const now   = new Date();
+  const today = now.toISOString().slice(0, 10);
+  const mon   = today.slice(0, 7);
+
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  const weekStr = weekStart.toISOString().slice(0, 10);
+
+  const cutoff90 = new Date(now);
+  cutoff90.setDate(now.getDate() - 90);
+  const cutoff90Str = cutoff90.toISOString().slice(0, 10);
+
+  let total = data.length, week = 0, month = 0, recent = 0;
+  data.forEach(r => {
+    const d = r.sent_at || '';
+    if (d >= weekStr)    week++;
+    if (d.startsWith(mon)) month++;
+    if (d > cutoff90Str)   recent++;
+  });
+  document.getElementById('h-total').textContent  = total;
+  document.getElementById('h-week').textContent   = week;
+  document.getElementById('h-month').textContent  = month;
+  document.getElementById('h-recent').textContent = recent;
+}
+
 async function loadHistory() {
-  const { data } = await sb
-    .from('jobkorea_proposals')
-    .select('*')
-    .order('sent_at', { ascending: false })
-    .limit(1000);
-  _allHistory = data || [];
+  const warn = document.getElementById('h-server-warn');
+  try {
+    const r = await fetch(LOCAL_URL + '/history', { signal: AbortSignal.timeout(4000) });
+    const d = await r.json();
+    warn.style.display = 'none';
+    _allHistory = (d.data || []).slice().reverse(); // 최신순 정렬
+    _calcStats(d.data || []);
+  } catch {
+    warn.style.display = 'block';
+    _allHistory = [];
+    ['h-total','h-week','h-month','h-recent'].forEach(id => {
+      document.getElementById(id).textContent = '—';
+    });
+  }
   _hPage = 0;
   renderHistory();
 }
 
-function filterHistory(st) {
-  _hFilter = st;
+function filterHistory(dt) {
+  _hFilter = dt;
   _hPage = 0;
-  document.querySelectorAll('[data-st]').forEach(b => b.classList.toggle('active', b.dataset.st === st));
+  document.querySelectorAll('[data-dt]').forEach(b => b.classList.toggle('active', b.dataset.dt === dt));
   renderHistory();
 }
 
 function renderHistory() {
-  const q    = (document.getElementById('h-search')?.value || '').toLowerCase();
+  const q   = (document.getElementById('h-search')?.value || '').toLowerCase();
+  const now = new Date();
+  const mon = now.toISOString().slice(0, 7);
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  const weekStr = weekStart.toISOString().slice(0, 10);
+
   const rows = _allHistory.filter(r => {
-    const stOk = _hFilter === 'all' || r.status === _hFilter;
-    const qOk  = !q || (r.name||'').toLowerCase().includes(q) || (r.keyword||'').toLowerCase().includes(q);
-    return stOk && qOk;
+    const d   = r.sent_at || '';
+    const dtOk = _hFilter === 'all'
+               || (_hFilter === 'month' && d.startsWith(mon))
+               || (_hFilter === 'week'  && d >= weekStr);
+    const rNo = _rNoFromUrl(r.url || '');
+    const qOk = !q || rNo.includes(q) || (r.url||'').toLowerCase().includes(q);
+    return dtOk && qOk;
   });
   const start = _hPage * H_PER;
   const page  = rows.slice(start, start + H_PER);
   const tbody = document.getElementById('h-tbody');
-  const statusBadge = s => ({
-    sent:    '<span class="badge b-sent">발송</span>',
-    error:   '<span class="badge b-error">오류</span>',
-    skipped: '<span class="badge b-skip">스킵</span>',
-  }[s] || `<span class="badge">${esc(s)}</span>`);
   tbody.innerHTML = page.length
-    ? page.map((r, i) => `<tr>
-        <td style="color:var(--hint)">${start+i+1}</td>
-        <td>${esc(r.name||'—')}</td>
-        <td style="color:var(--muted);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.career||'')}</td>
-        <td><span class="badge b-kw">${esc(r.keyword||'')}</span></td>
-        <td>${statusBadge(r.status)}</td>
-        <td style="color:var(--hint);font-size:12px;white-space:nowrap">${fmtDate(r.sent_at)}</td>
-        <td style="color:var(--muted);font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.notes||'')}</td>
-      </tr>`).join('')
-    : '<tr class="empty-row"><td colspan="7">이력이 없습니다.</td></tr>';
-  document.getElementById('h-info').textContent = `${start+1}–${Math.min(start+H_PER, rows.length)} / ${rows.length}건`;
+    ? page.map((r, i) => {
+        const rNo = _rNoFromUrl(r.url || '');
+        return `<tr>
+          <td style="color:var(--hint)">${start+i+1}</td>
+          <td><a href="${esc(r.url||'#')}" target="_blank" rel="noopener"
+                 style="color:var(--blue);text-decoration:none;font-family:monospace;font-size:12px">${esc(rNo)}</a></td>
+          <td style="color:var(--hint);font-size:12px;white-space:nowrap">${esc(r.sent_at||'—')}</td>
+          <td style="color:var(--muted);text-align:center">${esc(String(r.page??'—'))}</td>
+          <td style="color:var(--muted);text-align:center">${esc(String(r.skip_idx??'—'))}</td>
+          <td><span class="badge b-sent">발송</span></td>
+        </tr>`;
+      }).join('')
+    : '<tr class="empty-row"><td colspan="6">이력이 없습니다.</td></tr>';
+  document.getElementById('h-info').textContent = rows.length
+    ? `${start+1}–${Math.min(start+H_PER, rows.length)} / ${rows.length}건`
+    : '0건';
   document.getElementById('h-prev').disabled = _hPage === 0;
   document.getElementById('h-next').disabled = start + H_PER >= rows.length;
 }

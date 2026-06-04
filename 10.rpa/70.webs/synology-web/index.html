@@ -306,7 +306,42 @@
     position:absolute; inset:0;
     width:100%; height:100%;
     border:none;
+    transition:filter .3s;
   }
+  /* 페이지 접근 제한 오버레이 */
+  #access-overlay {
+    display:none; position:absolute; inset:0; z-index:10;
+    flex-direction:column; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  #access-overlay.active { display:flex; }
+  /* blur 모드 — iframe 흐릿 + 중앙 카드 */
+  #frame-container.access-blur iframe { filter:blur(8px); pointer-events:none; }
+  #frame-container.access-blur #access-overlay { pointer-events:auto; }
+  /* readonly 모드 — 선명하게 보이지만 클릭 불가 */
+  #frame-container.access-readonly iframe { pointer-events:none; }
+  .ao-card {
+    background:rgba(15,17,23,.88);
+    border:1px solid rgba(139,92,246,.5);
+    border-radius:14px; padding:28px 36px;
+    text-align:center; backdrop-filter:blur(4px);
+    box-shadow:0 8px 32px rgba(0,0,0,.6); max-width:380px;
+  }
+  .ao-icon { font-size:40px; margin-bottom:12px; }
+  .ao-title { font-size:16px; font-weight:700; color:#c4b5fd; margin-bottom:8px; }
+  .ao-desc  { font-size:13px; color:rgba(255,255,255,.6); line-height:1.6; }
+  .ao-btn   { margin-top:16px; background:#7c3aed; border:none; border-radius:8px;
+              color:#fff; font-size:13px; font-weight:600; padding:8px 22px;
+              cursor:pointer; font-family:inherit; }
+  .ao-btn:hover { background:#6d28d9; }
+  /* readonly 배너 (상단) */
+  #access-readonly-banner {
+    display:none; position:absolute; top:0; left:0; right:0; z-index:10;
+    background:rgba(30,27,75,.92); border-bottom:1px solid rgba(99,102,241,.4);
+    padding:7px 16px; font-size:12px; color:#a5b4fc;
+    align-items:center; gap:8px;
+  }
+  #frame-container.access-readonly #access-readonly-banner { display:flex; }
 
   /* ── 미리보기 모드 상단 배너 ────────────────────────── */
   #preview-overlay {
@@ -1426,6 +1461,20 @@
   <!-- iframe 영역 (콘텐츠 로드 시 표시) -->
   <div id="frame-container" style="display:none;">
     <iframe id="contentFrame" title="콘텐츠"></iframe>
+    <!-- 페이지 권한 제한 오버레이 -->
+    <div id="access-overlay">
+      <div class="ao-card">
+        <div class="ao-icon">🔐</div>
+        <div class="ao-title" id="ao-title">파트너 전용 기능</div>
+        <div class="ao-desc" id="ao-desc">이 기능은 파트너(GFC) 계정에서만 사용할 수 있습니다.<br>파트너 가입 또는 권한 승인이 필요합니다.</div>
+        <button class="ao-btn" onclick="showHome()">홈으로 돌아가기</button>
+      </div>
+    </div>
+    <!-- 읽기 전용 배너 -->
+    <div id="access-readonly-banner">
+      <span>👁</span>
+      <span id="ao-readonly-msg">읽기 전용 — 이 페이지는 파트너 계정에서만 직접 사용할 수 있습니다.</span>
+    </div>
     <div id="preview-overlay">
       <div class="preview-card">
         <div class="preview-icon">👁</div>
@@ -1909,7 +1958,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.0.10';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.3.0';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -1992,6 +2041,7 @@ const TREE = [
       { label:{ko:'사용자 관리',    en:'User Mgmt'},       icon:'👥', iframe:'admin/users/index.html' },
       { label:{ko:'시스템 모니터', en:'System Monitor'}, icon:'📊', iframe:'admin/monitor/index.html' },
       { label:{ko:'콘텐츠 관리',  en:'Content Mgmt'},   icon:'📝', iframe:'admin/content/index.html' },
+      { label:{ko:'페이지 권한',   en:'Page Access'},    icon:'🔐', iframe:'admin/permissions/index.html' },
       { label:{ko:'채용 관리',     en:'Recruit Mgmt'},   icon:'👔', iframe:'admin/recruit/index.html' },
     ]
   },
@@ -2390,19 +2440,31 @@ function loadIframe(src, path=[], label='') {
   closeSidebar();
   currentPath  = path;
   currentLabel = label;
-  // 새로고침 후 복원용 — showHome() 호출 시 지워짐
   sessionStorage.setItem('wf_last_page', JSON.stringify({ src, path, label }));
+
+  // ── 페이지 접근 레벨 확인 ────────────────────────────────────────
+  const accessLevel = getAccessLevel(src);
+  if (accessLevel === 'hidden') {
+    showDenied();
+    return;
+  }
+
   document.getElementById('home-screen').style.display = 'none';
   const fc = document.getElementById('frame-container');
   fc.style.display = 'block';
   const iframe = document.getElementById('contentFrame');
   iframe.src = src + '?v=' + HUB_VERSION;
   setBreadcrumb(path, label);
-  // 로드 후 현재 언어·역할 전파
+
+  // 접근 제한 오버레이 적용
+  applyAccessOverlay(accessLevel);
+
+  // 로드 후 현재 언어·역할·접근레벨 전파
   iframe.onload = () => {
     if (iframe.contentWindow) {
-      iframe.contentWindow.postMessage({ type:'wf_lang', lang }, '*');
-      iframe.contentWindow.postMessage({ type:'wf_role', role: userRole }, '*');
+      iframe.contentWindow.postMessage({ type:'wf_lang',   lang }, '*');
+      iframe.contentWindow.postMessage({ type:'wf_role',   role: userRole }, '*');
+      iframe.contentWindow.postMessage({ type:'wf_access', level: accessLevel }, '*');
     }
   };
   // 브라우저 히스토리에 상태 기록 → 뒤로가기 시 showHome()으로 처리
@@ -2420,9 +2482,12 @@ window.addEventListener('message', e => {
 function showHome() {
   previewBaseSrc = null;
   hidePreviewOverlay();
-  sessionStorage.removeItem('wf_last_page');  // 홈으로 명시 이동 → 복원 취소
+  sessionStorage.removeItem('wf_last_page');
   document.getElementById('home-screen').style.display = 'block';
-  document.getElementById('frame-container').style.display = 'none';
+  const fc = document.getElementById('frame-container');
+  fc.style.display = 'none';
+  fc.classList.remove('access-blur', 'access-readonly');
+  document.getElementById('access-overlay')?.classList.remove('active');
   document.getElementById('contentFrame').src = '';
   document.getElementById('bc-trail').innerHTML = '';
   if (activeLabel) { activeLabel.classList.remove('active'); activeLabel = null; }
@@ -2479,6 +2544,58 @@ let authUser  = null;  // 현재 로그인 사용자 (null = 비로그인)
 let _sbReady  = false; // Supabase 초기화 성공 여부
 let userRole  = 'general'; // 사용자 역할: ceo | staff | consultant | gfc | general
 let _isIntentionalSignOut = false; // signOut() 호출 시 true → SIGNED_OUT 즉시 처리 (재로그인 방지)
+
+/* ── 페이지 접근 규칙 ──────────────────────────────────────────────
+   Supabase site_config(key='page_access_rules')에서 로드.
+   없으면 DEFAULT_ACCESS_RULES 사용.
+   형식: { "iframeSrc": { "role": "full"|"blur"|"readonly"|"hidden" } }
+── */
+const DEFAULT_ACCESS_RULES = {
+  'consulting/gfc/index.html': {
+    general: 'hidden', member: 'hidden',
+    consultant: 'blur',  // 컨설턴트: 블러로 표시
+    gfc: 'full', admin: 'full'
+  }
+};
+let pageAccessRules = { ...DEFAULT_ACCESS_RULES };
+
+async function loadPageAccessRules() {
+  if (!_sbReady || !_sb) return;
+  try {
+    const { data } = await _sb
+      .from('site_config')
+      .select('value')
+      .eq('key', 'page_access_rules')
+      .maybeSingle();
+    if (data?.value) pageAccessRules = { ...DEFAULT_ACCESS_RULES, ...data.value };
+  } catch {}
+}
+
+function getAccessLevel(src) {
+  // src는 iframe에 넣는 상대경로 (HUB_VERSION query 제외)
+  const clean = src.split('?')[0];
+  const rule  = pageAccessRules[clean];
+  if (!rule) return 'full';
+  const role = authUser ? userRole : 'general';
+  // 알 수 없는 역할(member 등)은 general 규칙으로 폴백
+  return rule[role] ?? rule['general'] ?? 'full';
+}
+
+function applyAccessOverlay(level) {
+  const fc      = document.getElementById('frame-container');
+  const overlay = document.getElementById('access-overlay');
+  if (!fc || !overlay) return;
+  // 클래스 초기화
+  fc.classList.remove('access-blur', 'access-readonly');
+  overlay.classList.remove('active');
+  if (level === 'blur') {
+    fc.classList.add('access-blur');
+    overlay.classList.add('active');
+  } else if (level === 'readonly') {
+    fc.classList.add('access-readonly');
+  }
+  // full / hidden은 이미 loadIframe 호출 전에 처리됨
+}
 
 // ── 직렬화 큐: INITIAL_SESSION+TOKEN_REFRESHED 동시 발화 시 순차 처리 보장 ──
 let _authChain = Promise.resolve();
@@ -2670,12 +2787,13 @@ let _devLoginReal   = false;
 function onAuthComplete() {
   IS_GFC = userRole === 'gfc' || userRole === 'admin';
   hidePreviewOverlay();
-  localStorage.setItem('wf_last_login', '1'); // 재방문 감지 — 다음 방문 시 로그인 탭 기본
+  localStorage.setItem('wf_last_login', '1');
   updateAuthUI();
   refreshTreeAndCards();
   updateDevStatus();
-  loadCreditBalance();   // 드롭다운 크레딧 잔액 갱신
-  initPaymentResult(); // 결제 리다이렉트 파라미터 처리
+  loadCreditBalance();
+  loadPageAccessRules(); // 페이지 접근 규칙 로드
+  initPaymentResult();
   if (previewBaseSrc) {
     const src = previewBaseSrc;
     previewBaseSrc = null;

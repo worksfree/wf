@@ -313,6 +313,66 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .demo-callout-sub  {font-size:12px;color:#94a3b8;line-height:1.55;}
 .demo-callout-bar  {height:2px;background:rgba(255,255,255,.08);border-radius:1px;margin-top:15px;overflow:hidden;}
 .demo-callout-fill {height:100%;border-radius:1px;width:0%;background:linear-gradient(90deg,#6366f1,#8b5cf6);}
+
+/* ── 데모 하이라이트 (callout 주제어와 화면 요소 연결) ── */
+.demo-hl{
+  outline:2px solid rgba(99,102,241,.9)!important;
+  outline-offset:5px;
+  box-shadow:0 0 0 8px rgba(99,102,241,.12),0 0 40px rgba(99,102,241,.28)!important;
+  animation:demoHL 1.6s ease-in-out infinite;
+  position:relative;z-index:8;
+}
+@keyframes demoHL{
+  0%,100%{box-shadow:0 0 0 8px rgba(99,102,241,.12),0 0 40px rgba(99,102,241,.28)}
+  50%    {box-shadow:0 0 0 11px rgba(99,102,241,.22),0 0 65px rgba(99,102,241,.48)}
+}
+
+/* ── Screen B 간소화: 매장 실적 순위 ── */
+.store-rank-panel{padding:13px 14px;display:flex;flex-direction:column;min-height:0;overflow-y:auto;}
+.src-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:8px;cursor:pointer;transition:all .18s;}
+.src-card:last-child{margin-bottom:0;}
+.src-card:hover{border-color:var(--border2);transform:translateX(3px);}
+.src-top{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.src-rank{font-size:15px;min-width:22px;}
+.src-name{font-size:13px;font-weight:700;flex:1;}
+.src-pct{font-size:13px;font-weight:800;}
+.src-bar-wrap{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:5px;}
+.src-bar{height:100%;border-radius:2px;transition:width .9s cubic-bezier(.34,1.56,.64,1);}
+.src-sub{font-size:11px;color:var(--text3);}
+
+/* ── Screen C 간소화: 목표 탭 ── */
+.goal-tabs-wrap{padding:14px 16px;}
+.goal-tab-row{display:flex;gap:9px;margin-top:10px;}
+.goal-tab{
+  flex:1;padding:14px 10px;border-radius:12px;cursor:pointer;
+  border:2px solid var(--border);background:var(--panel2);
+  font-size:12px;font-weight:700;color:var(--text2);font-family:inherit;
+  transition:all .22s;text-align:center;line-height:1.45;
+}
+.goal-tab:hover{border-color:var(--border2);color:var(--text);}
+.goal-tab.active{color:#fff;background:color-mix(in srgb,var(--gtc,#6366f1) 18%,var(--panel2));border-color:var(--gtc,#6366f1);box-shadow:0 0 0 3px color-mix(in srgb,var(--gtc,#6366f1) 18%,transparent);}
+.goal-tab-icon{font-size:22px;display:block;margin-bottom:5px;}
+
+/* ── Screen C 간소화: 지점별 액션 카드 ── */
+.action-grid-c{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.action-card-c{padding:13px 14px;cursor:pointer;transition:all .2s;}
+.action-card-c:hover{transform:translateY(-2px);border-color:var(--border2);}
+.ac-top{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.ac-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ac-store{font-size:12px;font-weight:700;flex:1;}
+.ac-period{font-size:10px;color:var(--text3);font-weight:600;background:var(--panel3);padding:2px 7px;border-radius:7px;}
+.ac-action{font-size:12.5px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:8px;}
+.ac-mets{display:flex;gap:10px;}
+.ac-met{font-size:11px;font-weight:800;}
+
+/* ── Screen C 간소화: 실행 계획 ── */
+.exec-plan-wrap{padding:13px 16px;}
+.exec-plan-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px;}
+.ep-col{display:flex;flex-direction:column;gap:6px;}
+.ep-head{font-size:11px;font-weight:800;padding:7px 10px;border-radius:8px;display:flex;align-items:center;gap:5px;}
+.ep-item{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:flex-start;gap:7px;}
+.ep-tag{font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.ep-text{font-size:11px;color:var(--text2);line-height:1.4;}
 .tl-impact strong{color:var(--green);font-weight:700;}
 .tl-exec-btn{
   font-size:10px;font-weight:700;color:var(--accent);

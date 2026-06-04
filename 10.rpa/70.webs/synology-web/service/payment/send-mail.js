@@ -28,7 +28,8 @@ const CORS_HEADERS = {
 const MONTHLY_LIMIT = 3000;
 
 function monthKey() {
-  const d = new Date();
+  // KST(UTC+9) 기준 월 키
+  const d = new Date(Date.now() + 9 * 3600 * 1000);
   return 'sent_' + d.getUTCFullYear() + '_' + String(d.getUTCMonth() + 1).padStart(2, '0');
 }
 
@@ -136,8 +137,7 @@ export default {
     const emails = Array.isArray(body.emails) ? body.emails : [body];
     const meta   = body.meta || {};
 
-    if (!emails.length)      return json({ error: 'No emails specified' }, 400);
-    if (emails.length > 100) return json({ error: 'Max 100 emails per request' }, 400);
+    if (!emails.length) return json({ error: 'No emails specified' }, 400);
 
     for (const e of emails) {
       if (!e.to || !e.subject || !e.html) {
@@ -160,14 +160,11 @@ export default {
 
     // 모두 필터링된 경우 — 발송 없이 바로 반환
     if (toSend.length === 0) {
-      const key      = monthKey();
-      const curSent  = parseInt((await env.MAIL_USAGE.get(key)) || '0');
+      const key     = monthKey();
+      const curSent = parseInt((await env.MAIL_USAGE.get(key)) || '0');
       return json({
-        success:   true,
-        sent:      0,
-        filtered,
-        totalSent: curSent,
-        remaining: Math.max(0, MONTHLY_LIMIT - curSent),
+        success: true, sent: 0, filtered,
+        totalSent: curSent, remaining: Math.max(0, MONTHLY_LIMIT - curSent),
       });
     }
 
@@ -180,38 +177,45 @@ export default {
       }, 429);
     }
 
-    // ── Resend API 호출 ──────────────────────────────────────────
-    const auth = 'Bearer ' + env.RESEND_API_KEY;
-    let resendRes;
+    // ── Resend API 호출 (100건씩 청크 — Resend batch 단건 제한) ──────
+    const auth      = 'Bearer ' + env.RESEND_API_KEY;
+    const CHUNK     = 100;
+    let   sentCount = 0;
+    const sendErrors = [];
 
-    if (toSend.length === 1) {
-      resendRes = await fetch('https://api.resend.com/emails', {
-        method:  'POST',
-        headers: { Authorization: auth, 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
-          from,
-          to:      [toSend[0].to],
-          subject: toSend[0].subject,
-          html:    toSend[0].html,
-        }),
-      });
-    } else {
-      resendRes = await fetch('https://api.resend.com/emails/batch', {
-        method:  'POST',
-        headers: { Authorization: auth, 'Content-Type': 'application/json' },
-        body:    JSON.stringify(
-          toSend.map(e => ({ from, to: [e.to], subject: e.subject, html: e.html }))
-        ),
-      });
+    for (let i = 0; i < toSend.length; i += CHUNK) {
+      const chunk = toSend.slice(i, i + CHUNK);
+      let resendRes;
+
+      if (chunk.length === 1) {
+        resendRes = await fetch('https://api.resend.com/emails', {
+          method:  'POST',
+          headers: { Authorization: auth, 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ from, to: [chunk[0].to], subject: chunk[0].subject, html: chunk[0].html }),
+        });
+      } else {
+        resendRes = await fetch('https://api.resend.com/emails/batch', {
+          method:  'POST',
+          headers: { Authorization: auth, 'Content-Type': 'application/json' },
+          body:    JSON.stringify(chunk.map(e => ({ from, to: [e.to], subject: e.subject, html: e.html }))),
+        });
+      }
+
+      const resendData = await resendRes.json();
+      if (!resendRes.ok) {
+        // 청크 실패: 나머지 청크는 시도하지 않고 지금까지 발송된 건수로 응답
+        sendErrors.push(resendData.message || 'Resend API error');
+        break;
+      }
+      sentCount += chunk.length;
     }
 
-    const resendData = await resendRes.json();
-    if (!resendRes.ok) {
-      return json({ error: resendData.message || 'Resend API error', detail: resendData }, 400);
+    if (sentCount === 0 && sendErrors.length > 0) {
+      return json({ error: sendErrors[0] }, 400);
     }
 
-    // 발송 성공 → KV 카운터 업데이트
-    const newTotal = currentSent + toSend.length;
+    // 발송 성공 → KV 카운터 업데이트 (실제 발송된 건수만)
+    const newTotal = currentSent + sentCount;
     await env.MAIL_USAGE.put(key, String(newTotal));
 
     // ── Supabase 발송 이력 기록 (비동기 — 실패해도 응답 차단 없음) ──
@@ -223,8 +227,8 @@ export default {
     const envTag       = meta.env          || 'portal';
     const senderUserId = meta.senderUserId || null;
 
-    // 발송 성공 로그
-    const logRows = toSend.map(e => ({
+    // 발송 성공 로그 (실제 발송된 건만)
+    const logRows = toSend.slice(0, sentCount).map(e => ({
       sent_at:          now,
       recipient_email:  e.to.toLowerCase(),
       sender_email:     senderEmail,
@@ -257,10 +261,11 @@ export default {
 
     return json({
       success:   true,
-      sent:      toSend.length,
+      sent:      sentCount,
       filtered,
       totalSent: newTotal,
       remaining: Math.max(0, MONTHLY_LIMIT - newTotal),
+      ...(sendErrors.length > 0 ? { partial_error: sendErrors[0] } : {}),
     });
   },
 };

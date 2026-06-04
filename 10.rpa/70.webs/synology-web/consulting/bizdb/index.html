@@ -203,6 +203,12 @@ td{padding:8px 12px;vertical-align:middle;max-width:220px;overflow:hidden;text-o
 <div class="tab-panel active" id="tab-collect">
   <div class="sec-label" style="margin-top:4px">수집 조건</div>
 
+  <!-- Worker 연결 오류 배너 — 수집 시작 전에도 보임 -->
+  <div id="worker-warn" style="display:none;background:#2a1408;border:1px solid #7c2d12;border-radius:7px;padding:8px 14px;margin-bottom:10px;font-size:12px;color:#fbbf24;">
+    ⚠ Worker 연결 오류가 연속 발생하고 있습니다. Worker가 다운됐을 수 있습니다.
+    <button class="btn" onclick="diagWorkers()" style="padding:2px 8px;font-size:11px;margin-left:8px;">🔍 Worker 진단</button>
+  </div>
+
   <div class="ctrl-row">
     <select class="ctrl-sel" id="sel-induty">
       <option value="">전체 업종</option>
@@ -257,9 +263,9 @@ td{padding:8px 12px;vertical-align:middle;max-width:220px;overflow:hidden;text-o
   <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;flex-wrap:wrap">
     <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer">
       <input type="checkbox" id="chk-skip-existing" checked style="accent-color:var(--blue)">
-      <span>기수집 스킵 <span style="color:var(--hint)">(corp_code 기준 — scrape_status=done/no_email 제외)</span></span>
+      <span>이미 수집한 기업 건너뛰기 <span style="color:var(--hint)">(중복 수집 방지 — 권장)</span></span>
     </label>
-    <div id="worker-diag" style="font-size:11px;color:var(--hint)"></div>
+    <div id="worker-diag" style="font-size:12px;font-weight:500;padding:4px 10px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:none"></div>
   </div>
 
   <!-- 예약 시작 패널 -->
@@ -296,12 +302,11 @@ td{padding:8px 12px;vertical-align:middle;max-width:220px;overflow:hidden;text-o
   <div id="dart-limit-banner" style="display:none;background:#2a1208;border:1.5px solid #b45309;border-radius:9px;padding:13px 16px;margin-bottom:10px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
       <span style="font-size:15px">⚠️</span>
-      <span style="font-size:13px;font-weight:700;color:#fbbf24">DART API 일일 조회 한도 초과 — 수집이 자동 중지됐습니다</span>
+      <span style="font-size:13px;font-weight:700;color:#fbbf24">기업 정보 수집 한도 도달 — 내일 자동으로 재시작됩니다</span>
     </div>
     <div style="font-size:12px;color:#d97706;margin-bottom:8px" id="dart-limit-msg"></div>
     <div style="font-size:12px;color:#fde68a">
-      ⏰ 한도 리셋 시각(<span id="dart-limit-time" style="font-weight:700"></span>)에 자동으로 수집이 재시작됩니다.
-      탭을 열어두면 자동 진행됩니다.
+      ⏰ <span id="dart-limit-time" style="font-weight:700"></span>에 자동 재시작 예약됨 — 탭을 열어두면 자동 진행됩니다.
     </div>
     <button class="btn" onclick="document.getElementById('dart-limit-banner').style.display='none'" style="margin-top:8px;padding:4px 10px;font-size:11px">닫기</button>
   </div>
@@ -350,10 +355,7 @@ td{padding:8px 12px;vertical-align:middle;max-width:220px;overflow:hidden;text-o
         <div style="font-size:10px;color:var(--muted);margin-top:2px">오류/제외</div>
       </div>
     </div>
-    <!-- Worker 경고 배너 -->
-    <div id="worker-warn" style="display:none;background:#2a1408;border:1px solid #7c2d12;border-radius:7px;padding:8px 14px;margin-bottom:10px;font-size:12px;color:#fbbf24;">
-      ⚠ Worker 연결 오류가 연속 발생하고 있습니다. Worker가 다운됐을 수 있습니다. <button class="btn" onclick="diagWorkers()" style="padding:2px 8px;font-size:11px;margin-left:8px;">🔍 Worker 진단</button>
-    </div>
+    <!-- Worker 경고 배너 (overall-prog 안에 남기되 duplicate는 밖에도 생성) -->
     <div style="font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between">
       <span id="ov-label">—</span><span id="ov-pct">0%</span>
     </div>
@@ -671,9 +673,10 @@ function handleDartRateLimit(message) {
   if (collectAbort) return; // 이미 중지된 경우 중복 처리 방지
   collectAbort = true;      // 수집 즉시 중지
 
-  // 다음 자정 00:01:00 계산 (1분 여유)
+  // 다음 날 자정 00:01:00 계산 (명시적으로 내일 날짜)
   const midnight = new Date();
-  midnight.setHours(24, 1, 0, 0);
+  midnight.setDate(midnight.getDate() + 1);
+  midnight.setHours(0, 1, 0, 0);
   const timeStr = midnight.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
   const dateStr = midnight.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
 
@@ -688,6 +691,39 @@ function handleDartRateLimit(message) {
   // 자동으로 자정 예약 설정
   _applySchedule(midnight, true);
   toast(`⚠ DART 한도 초과 — ${dateStr} ${timeStr}에 자동 재시작 예약됨`);
+}
+
+/* ── 전체 자동 수집 전 DART API 사전 확인 ──────────────────────────
+   1개 기업 목록만 조회해서 한도 초과 여부를 즉시 파악.
+   상태 코드·메시지를 있는 그대로 반환.
+── */
+async function preflightDartCheck() {
+  const year = document.getElementById('sel-year').value;
+  const cls  = document.getElementById('sel-cls').value;
+  const [baseYear, mStart, mEnd] = year.split('-');
+  const bgn = baseYear + mStart + '01';
+  const endDate = new Date(parseInt(baseYear), parseInt(mEnd), 0);
+  const end = baseYear + mEnd + String(endDate.getDate()).padStart(2, '0');
+
+  try {
+    const url = new URL(getDart());
+    url.searchParams.set('ep',         'list.json');
+    url.searchParams.set('reprt_code', '11011');
+    url.searchParams.set('bgn_de',     bgn);
+    url.searchParams.set('end_de',     end);
+    url.searchParams.set('page_no',    '1');
+    url.searchParams.set('page_count', '1');
+    if (cls) url.searchParams.set('corp_cls', cls);
+
+    const d = await (await fetch(url.toString())).json();
+    if (d.status !== '000') {
+      const rawMsg = `[DART ${d.status}] ${d.message || '오류'}`;
+      return { ok: false, isRateLimit: isDartRateLimit(d.status, d.message), rawMsg };
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, isRateLimit: false, rawMsg: `Worker 연결 실패: ${e.message}` };
+  }
 }
 
 /* ── 예약 시작 ───────────────────────────────────────────────────── */
@@ -708,7 +744,8 @@ function setSchedule(autoAll) {
 function setMidnightSchedule() {
   if (hubRole !== 'admin') { toast('⚠ 관리자 로그인이 필요합니다.'); return; }
   const midnight = new Date();
-  midnight.setHours(24, 0, 30, 0); // 자정 +30초 (API 리셋 여유)
+  midnight.setDate(midnight.getDate() + 1);
+  midnight.setHours(0, 0, 30, 0); // 다음날 자정 +30초 (API 리셋 여유)
   // datetime-local 입력값도 동기화
   const pad = n => String(n).padStart(2, '0');
   const localStr = midnight.getFullYear() + '-' + pad(midnight.getMonth()+1) + '-' + pad(midnight.getDate())
@@ -824,9 +861,9 @@ function _markError(isFetchFail) {
       const w = document.getElementById('worker-warn');
       if (w) w.style.display = '';
     }
-    // 30건 이상 연속 fetch 실패 → DART 한도 초과 의심 → 자동 자정 예약
-    if (_consecErrors === 30) {
-      handleDartRateLimit('연속 오류 30건 — DART API 한도 초과 가능성 (Worker 미응답)');
+    // 8건 연속 실패 시 DART 한도 의심 → 자동 자정 예약 (배너와 동일 임계값)
+    if (_consecErrors === 8) {
+      handleDartRateLimit('연속 오류 8건 — Worker 미응답 또는 DART API 한도 초과 가능성');
     }
   } else {
     _consecErrors = 0;
@@ -874,9 +911,11 @@ function updateOverall() {
   document.getElementById('ov-label').textContent = label;
 }
 
-const LS_LAST_PAGE = 'bizdb_last_page';       // 마지막 완료 페이지
-const LS_LAST_YEAR = 'bizdb_last_year';       // 마지막 분기 조건
-const LS_LAST_CLS  = 'bizdb_last_cls';        // 마지막 상장구분
+const LS_LAST_PAGE = 'bizdb_last_page';
+const LS_LAST_YEAR = 'bizdb_last_year';
+const LS_LAST_CLS  = 'bizdb_last_cls';
+const LS_LAST_TIME = 'bizdb_last_time'; // 저장 시각 (오래된 이어받기 방지)
+const RESUME_MAX_AGE_MS = 7 * 24 * 3600 * 1000; // 7일 이내만 이어받기
 
 function saveLastPage(page) {
   const year = document.getElementById('sel-year').value;
@@ -884,21 +923,22 @@ function saveLastPage(page) {
   localStorage.setItem(LS_LAST_PAGE, String(page));
   localStorage.setItem(LS_LAST_YEAR, year);
   localStorage.setItem(LS_LAST_CLS,  cls);
+  localStorage.setItem(LS_LAST_TIME, String(Date.now()));
 }
 
 function clearLastPage() {
-  localStorage.removeItem(LS_LAST_PAGE);
-  localStorage.removeItem(LS_LAST_YEAR);
-  localStorage.removeItem(LS_LAST_CLS);
+  [LS_LAST_PAGE, LS_LAST_YEAR, LS_LAST_CLS, LS_LAST_TIME].forEach(k => localStorage.removeItem(k));
 }
 
 function checkResumable() {
   const savedPage = parseInt(localStorage.getItem(LS_LAST_PAGE) || '0');
   const savedYear = localStorage.getItem(LS_LAST_YEAR) || '';
   const savedCls  = localStorage.getItem(LS_LAST_CLS)  || '';
+  const savedTime = parseInt(localStorage.getItem(LS_LAST_TIME) || '0');
   const curYear   = document.getElementById('sel-year').value;
   const curCls    = document.getElementById('sel-cls').value;
-  // 같은 조건일 때만 이어서 제안
+  // 7일 초과된 이어받기는 무시 (DART 데이터 변경 가능성)
+  if (savedTime && Date.now() - savedTime > RESUME_MAX_AGE_MS) { clearLastPage(); return null; }
   if (savedPage > 1 && savedYear === curYear && savedCls === curCls) return savedPage;
   return null;
 }
@@ -1017,20 +1057,23 @@ async function startCollection(autoAll = false, unattended = false) {
   collecting = true; collectAbort = false;
   _collectSeq = 0; // 이번 세션 순번 초기화
 
-  // 기수집 corp_code 로드 (스킵 옵션 ON 일 때)
+  // 기수집 corp_code 로드 — 페이징으로 전체 조회 (200K 하드코딩 제거)
   skipSet = new Set();
   if (document.getElementById('chk-skip-existing')?.checked) {
     try {
-      const r = await fetch(getBizdb() + '/contacts?limit=200000&select=corp_code,scrape_status');
-      if (r.ok) {
+      const PAGE = 5000;
+      let offset = 0, done = false;
+      setProgress(0, '기수집 목록 로드 중...', '');
+      while (!done) {
+        const r = await fetch(`${getBizdb()}/contacts?limit=${PAGE}&offset=${offset}&select=corp_code,scrape_status&scrape_status=in.(done,no_email)`);
+        if (!r.ok) break;
         const d = await r.json();
-        (d.data || d).forEach(row => {
-          if (row.corp_code && (row.scrape_status === 'done' || row.scrape_status === 'no_email')) {
-            skipSet.add(row.corp_code);
-          }
-        });
-        toast(`기수집 ${skipSet.size.toLocaleString()}개사 스킵 목록 로드 완료`);
+        const rows = d.data || d;
+        rows.forEach(row => { if (row.corp_code) skipSet.add(row.corp_code); });
+        if (rows.length < PAGE) done = true;
+        else offset += PAGE;
       }
+      toast(`기수집 ${skipSet.size.toLocaleString()}개사 스킵 목록 로드 완료`);
     } catch (e) { console.warn('[skip] 기수집 목록 로드 실패:', e.message); }
   }
 
@@ -1060,6 +1103,23 @@ async function startCollection(autoAll = false, unattended = false) {
   if (autoAll) document.getElementById('overall-prog').style.display = '';
 
   if (autoAll) {
+    // 전체 자동 수집 전 DART API 사전 확인 (한도 초과 즉시 감지)
+    document.getElementById('collect-prog').style.display = '';
+    setProgress(0, '⚡ DART API 사전 확인 중 (일일 한도 소진 여부)...', '1건만 시험 조회합니다');
+    const pf = await preflightDartCheck();
+    if (!pf.ok) {
+      if (pf.isRateLimit) {
+        handleDartRateLimit(pf.rawMsg);
+      } else {
+        setProgress(0, `DART 연결 실패 — 수집을 시작할 수 없습니다`, pf.rawMsg);
+        toast(`⚠ DART 연결 실패: ${pf.rawMsg}`);
+      }
+      finish();
+      return;
+    }
+    setProgress(2, 'DART API 정상 확인 — 전체 수집을 시작합니다', '');
+    toast('✅ DART API 정상');
+
     await runCollectionLoop(startPage, Infinity);
     if (!collectAbort) {
       clearLastPage(); // 정상 완료 시 이어서 위치 초기화
@@ -1145,12 +1205,12 @@ async function runOnePage(pageNo) {
     const listData = await (await fetch(listUrl.toString())).json();
 
     if (listData.status !== '000') {
-      const msg = listData.message || 'DART 오류';
-      if (isDartRateLimit(listData.status, msg)) {
-        handleDartRateLimit(`DART ${listData.status}: ${msg}`);
+      const rawMsg = `[DART ${listData.status}] ${listData.message || 'API 오류'}`;
+      if (isDartRateLimit(listData.status, listData.message)) {
+        handleDartRateLimit(rawMsg);
         return false;
       }
-      setProgress(0, '오류: ' + msg, '');
+      setProgress(0, rawMsg, 'DART 응답을 확인하세요');
       return false;
     }
 
@@ -1254,14 +1314,13 @@ async function runOnePage(pageNo) {
 
         // 오류: 휴폐업·특수법인 또는 일일 한도 초과
         if (info.status !== '000' || !info.corp_code) {
-          const errMsg = `DART ${info.status||'?'}: ${info.message || 'corp_info 없음'}`;
-          // 한도 초과 감지 → 수집 중단 + 자정 자동 예약
+          const rawMsg = `[DART ${info.status||'?'}] ${info.message || 'corp_info 없음'}`;
           if (isDartRateLimit(info.status, info.message)) {
             updateRow(rowId, {name: filing.corp_name, induty: '—', email: '', status: 'error', note: '⚠ 일일 한도 초과'});
-            handleDartRateLimit(errMsg);
+            handleDartRateLimit(rawMsg);
             errors++; processed++; showProgress(); return;
           }
-          updateRow(rowId, {name: filing.corp_name, induty: '—', email: '', status: 'error', note: errMsg});
+          updateRow(rowId, {name: filing.corp_name, induty: '—', email: '', status: 'error', note: rawMsg});
           errors++; processed++; showProgress(); return;
         }
 
@@ -1393,8 +1452,13 @@ function updateRow(rowId, { name, induty, email, status, note = '' }) {
   };
   row.querySelector('.cr-name').textContent   = name;
   row.querySelector('.cr-induty').textContent = induty;
+  // 이메일 마스킹 (개인정보 보호 — 화면 노출 최소화)
+  function maskEmail(e) {
+    const [u, d] = e.split('@');
+    return u.slice(0, 2) + '***@' + d;
+  }
   row.querySelector('.cr-email').innerHTML    = email
-    ? `<span style="color:#60a5fa">${email}</span>`
+    ? `<span style="color:#60a5fa" title="${email}">${maskEmail(email)}</span>`
     : '<span style="color:var(--hint)">—</span>';
   row.querySelector('.cr-status').innerHTML   = statusMap[status] || status;
   const noteEl = row.querySelector('.cr-note');
@@ -1433,7 +1497,11 @@ async function diagWorkers() {
   // DART Worker
   try {
     const t0 = Date.now();
-    const r = await fetch(getDart() + '?ep=list.json&reprt_code=11011&bgn_de=20240101&end_de=20240110&page_no=1&page_count=1', { signal: AbortSignal.timeout(8000) });
+    // 최근 30일 범위로 동적 날짜 사용 (고정 날짜 방지)
+    const _d1 = new Date(); _d1.setDate(_d1.getDate() - 30);
+    const _d2 = new Date(); _d2.setDate(_d2.getDate() - 20);
+    const _fmt = d => d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+    const r = await fetch(getDart() + `?ep=list.json&reprt_code=11011&bgn_de=${_fmt(_d1)}&end_de=${_fmt(_d2)}&page_no=1&page_count=1`, { signal: AbortSignal.timeout(8000) });
     const ms = Date.now() - t0;
     const txt = await r.text();
     let d; try { d = JSON.parse(txt); } catch { d = null; }
@@ -1458,8 +1526,10 @@ async function diagWorkers() {
     results.push(`Bizdb ✅ ${ms}ms (총 ${(d.total||0).toLocaleString()}개사 · 이메일 ${(d.with_email||0).toLocaleString()}건)`);
   } catch (e) { results.push(`Bizdb ❌ ${e.message?.slice(0,40)}`); }
 
-  el.textContent = results.join('  |  ');
-  el.style.color = results.some(r => r.includes('❌')) ? 'var(--red)' : results.some(r => r.includes('⚠')) ? 'var(--amber)' : 'var(--green)';
+  el.textContent = results.join('  ·  ');
+  el.style.display = '';
+  el.style.color      = results.some(r => r.includes('❌')) ? 'var(--red)' : results.some(r => r.includes('⚠')) ? 'var(--yellow)' : 'var(--green)';
+  el.style.borderColor = results.some(r => r.includes('❌')) ? 'rgba(239,68,68,.3)' : results.some(r => r.includes('⚠')) ? 'rgba(245,158,11,.3)' : 'rgba(16,185,129,.3)';
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1682,7 +1752,11 @@ async function loadSendHistory() {
     </div>`;
 }
 
+let _preparingList = false;
 async function prepareSendList() {
+  if (_preparingList) return;
+  _preparingList = true;
+  document.querySelectorAll('[onclick*="prepareSendList"]').forEach(b => { b.disabled = true; });
   toast('이번달 발송 목록 생성 중...');
   try {
     const month = monthKey();
@@ -1706,6 +1780,10 @@ async function prepareSendList() {
     a.click();
     toast(`✅ ${contacts.length}건 CSV 생성 완료 — 마케팅 자료 > 대량 발송에 업로드하세요`);
   } catch (e) { toast('❌ 오류: ' + e.message); }
+  finally {
+    _preparingList = false;
+    document.querySelectorAll('[onclick*="prepareSendList"]').forEach(b => { b.disabled = false; });
+  }
 }
 
 /* ── 설정 ─────────────────────────────────────────────────────────── */

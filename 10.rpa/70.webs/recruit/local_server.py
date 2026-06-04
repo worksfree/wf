@@ -25,10 +25,11 @@ from flask_cors import CORS
 app    = Flask(__name__)
 CORS(app, origins=['*'])  # Hub 도메인 허용
 
-BASE_DIR   = Path(__file__).parent
-LOG_FILE   = BASE_DIR / 'jobkorea_run.log'
-PID_FILE   = BASE_DIR / 'jobkorea.pid'
-STATE_FILE = BASE_DIR / 'jobkorea_state.json'
+BASE_DIR      = Path(__file__).parent
+LOG_FILE      = BASE_DIR / 'jobkorea_run.log'
+PID_FILE      = BASE_DIR / 'jobkorea.pid'
+STATE_FILE    = BASE_DIR / 'jobkorea_state.json'
+HISTORY_FILE  = BASE_DIR / 'recruit_history.json'
 
 _proc: subprocess.Popen | None = None
 _lock = threading.Lock()
@@ -144,6 +145,16 @@ def log():
 def clear_log():
     LOG_FILE.write_text('', encoding='utf-8')
     return jsonify({'ok': True})
+
+@app.route('/history', methods=['GET'])
+def history():
+    try:
+        data = json.loads(HISTORY_FILE.read_text(encoding='utf-8'))
+        return jsonify({'ok': True, 'data': data, 'total': len(data)})
+    except FileNotFoundError:
+        return jsonify({'ok': True, 'data': [], 'total': 0})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500
 
 
 if __name__ == '__main__':
