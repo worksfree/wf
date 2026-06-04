@@ -514,60 +514,50 @@ body{display:flex;flex-direction:column;overflow:hidden;}
     <div class="alert-panel panel">
       <div class="ptitle">매장별 현황 <span class="badge badge-red">3건</span></div>
       <div class="alert-item crit" onclick="selectStoreAndGo('pankyo','c')">
-        <div class="ai-icon">📉</div>
-        <div class="ai-body"><div class="ai-store">판교점</div><div class="ai-msg">어제 저녁 피크 객단가 -8% · Stars 메뉴 주문율 하락 · 배달앱 노출 최적화 필요</div></div>
-        <span class="badge badge-red">기회</span>
+        <div class="ai-icon">🥑</div>
+        <div class="ai-body"><div class="ai-store">판교점</div><div class="ai-msg">아보카도 20kg 과잉 · D-2 · 비 예보 -23%</div></div>
+        <span class="badge badge-red">위험</span>
       </div>
       <div class="alert-item warn" onclick="selectStoreAndGo('gwangan','c')">
-        <div class="ai-icon">🎯</div>
-        <div class="ai-body"><div class="ai-store">광안점</div><div class="ai-msg">목표 달성률 87% · 마가리타 세트 배달앱 상단 노출 시 마진 +5.1%p 예상</div></div>
+        <div class="ai-icon">🍋</div>
+        <div class="ai-body"><div class="ai-store">광안점</div><div class="ai-msg">라임 과잉 · 해피아워 이벤트 필요 · 달성률 87%</div></div>
         <span class="badge badge-yellow">주의</span>
       </div>
       <div class="alert-item warn" onclick="selectStoreAndGo('ikseong','c')">
-        <div class="ai-icon">💎</div>
-        <div class="ai-body"><div class="ai-store">익선점</div><div class="ai-msg">고마진 메뉴 미판촉 — 코로나 세트 마진 73% · 배달앱 프리미엄 탭 이동 권장</div></div>
-        <span class="badge badge-yellow">기회</span>
+        <div class="ai-icon">🍹</div>
+        <div class="ai-body"><div class="ai-store">익선점</div><div class="ai-msg">마가리타 믹스 3일분 · 주말 전 발주 권장</div></div>
+        <span class="badge badge-yellow">주의</span>
       </div>
       <div class="alert-item ok" onclick="selectStoreAndGo('yeonnam','b')">
         <div class="ai-icon">✅</div>
-        <div class="ai-body"><div class="ai-store">연남점</div><div class="ai-msg">목표 104% 초과 · 마진율 최고 · 오늘의 타코 추가 판촉 권장</div></div>
+        <div class="ai-body"><div class="ai-store">연남점</div><div class="ai-msg">목표 104% 초과 · 마진율 최고 · 정상</div></div>
         <span class="badge badge-green">양호</span>
       </div>
     </div>
     <div class="scm-panel panel">
-      <div class="ptitle">AI 일일 보고서 <span class="badge badge-purple">새벽 분석 완료</span></div>
-      <div class="scm-chip">✦ POS 마감 데이터 기반 · 오전 6:30 발행</div>
-      <div class="scm-card" style="border-color:rgba(99,102,241,.35);background:rgba(99,102,241,.05);">
-        <div class="scm-top"><div class="scm-icon">📊</div><div class="scm-title" style="color:#a5b4fc;">어제 전체 성과 요약</div></div>
-        <div class="scm-desc">매출 1,420만 (목표 94.7%) · 마진 63.2% · 익선점 목표 초과(111%) · 판교점 저녁 피크 객단가 -8% 원인 분석 완료</div>
-        <div class="scm-route">
-          <span style="color:var(--text2);">핵심 이슈</span>
-          <span style="color:var(--muted);">→</span>
-          <span class="scm-to" style="background:rgba(239,68,68,.12);color:#f87171;border-color:rgba(239,68,68,.3);">판교점 객단가 -8%</span>
-          <span class="scm-qty" style="color:#f87171;">원인 3가지 도출</span>
-        </div>
+      <div class="ptitle">AI 공급망 추천 <span class="badge badge-purple">SCM</span></div>
+      <div class="scm-chip">✦ AI 분석 완료</div>
+      <div class="scm-card">
+        <div class="scm-top"><div class="scm-icon">🥑</div><div class="scm-title">재고 이동 — 즉시 실행 권장</div></div>
+        <div class="scm-desc">비 예보 판교 방문객 -23%. 아보카도 D-2 소진 불가. 연남 부족 예상.</div>
+        <div class="scm-route"><span class="scm-from">판교점</span><span style="color:var(--muted);">→</span><span class="scm-to">연남점</span><span class="scm-qty">아보카도 15kg</span></div>
+      </div>
+      <div class="scm-card">
+        <div class="scm-top"><div class="scm-icon">🍋</div><div class="scm-title">라임 해피아워 — 오늘 17~19시</div></div>
+        <div class="scm-desc">광안점 라임 38개 과잉. 마가리타 2+1 이벤트로 당일 소진 목표.</div>
+        <div class="scm-route"><span style="color:var(--text2);">예상 소진</span><span style="color:var(--muted);">→</span><span class="scm-to">라임 25개</span><span class="scm-qty">+8만원</span></div>
       </div>
       <div class="scm-card" style="border-color:rgba(234,179,8,.4);background:rgba(234,179,8,.06);">
-        <div class="scm-top"><div class="scm-icon">🌮</div><div class="scm-title" style="color:#eab308;">오늘의 타코 — AI 선정</div></div>
-        <div class="scm-desc">아보카도 치킨 볼 · 재고 소진(아보카도 잔여 12kg) + 마진율 72% + 우천 시 따뜻한 볼 선호 데이터 반영. 직원 권유 스크립트 자동 생성.</div>
+        <div class="scm-top"><div class="scm-icon">💰</div><div class="scm-title" style="color:#eab308;">고마진 판촉 — 마가리타 세트 전략</div></div>
+        <div class="scm-desc">익선점 마가리타 라지세트 마진율 <strong style="color:#eab308;">71.3%</strong> (전 지점 최고). 이번 주말 여의도 축제 기간 배달앱 메인 노출 · SNS 쿠폰 발행 시 일 판매 +23건, 마진 +19만원 예상.</div>
         <div class="scm-route">
-          <span style="color:var(--text2);">예상 효과</span>
+          <span style="color:var(--text2);">대상 메뉴</span>
           <span style="color:var(--muted);">→</span>
-          <span class="scm-to" style="background:rgba(234,179,8,.15);color:#eab308;border-color:rgba(234,179,8,.3);">객단가 +3,200원</span>
-          <span class="scm-qty" style="color:#eab308;">마진 72%</span>
+          <span class="scm-to" style="background:rgba(234,179,8,.15);color:#eab308;border-color:rgba(234,179,8,.3);">마가리타 라지 세트</span>
+          <span class="scm-qty" style="color:#eab308;">마진율 71.3%</span>
         </div>
       </div>
-      <div class="scm-card" style="border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.05);">
-        <div class="scm-top"><div class="scm-icon">📲</div><div class="scm-title" style="color:#60a5fa;">오늘의 실행 가이드</div></div>
-        <div class="scm-desc">배달앱 메뉴 노출 순서 변경 3건 · 태블릿 POS 우선순위 조정 2건 · 오늘의 타코 전 매장 등록</div>
-        <div class="scm-route">
-          <span style="color:var(--text2);">예상 효과</span>
-          <span style="color:var(--muted);">→</span>
-          <span class="scm-to">마진율 +2.8%p</span>
-          <span class="scm-qty" style="color:#60a5fa;">월 +340만원</span>
-        </div>
-      </div>
-      <button onclick="showKakao('report')" style="width:100%;padding:9px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:12px;font-weight:700;border:none;border-radius:8px;cursor:pointer;">📱 대표에게 보고서 발송</button>
+      <button onclick="showKakao('scm')" style="width:100%;padding:9px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:12px;font-weight:700;border:none;border-radius:8px;cursor:pointer;">📱 매니저에게 알림 발송</button>
     </div>
   </div><!-- /right-col -->
   </div><!-- /a-body -->
@@ -737,10 +727,10 @@ const MATRIX = {
 /* 타임라인 실행 계획 */
 const TIMELINE = {
   today: [
-    { store:'all',     action:'오늘의 타코(아보카도 치킨 볼) 전 매장 배달앱 상단 등록',                  tag:'판촉', impact:'객단가 +3,200원 예상' },
-    { store:'pankyo',  action:'배달앱 Stars 메뉴 노출 순서 재조정 (치킨·비프·쉬림프 타코 1~3위)',         tag:'매출', impact:'+12% 예상' },
-    { store:'gwangan', action:'마가리타 세트 태블릿 POS 1번 슬롯 + 배달앱 상단 노출',                    tag:'마진', impact:'+5.1%p' },
-    { store:'ikseong', action:'코로나 세트 배달앱 프리미엄 카테고리 이동 + 판촉 문구 업데이트',           tag:'마진', impact:'+2.8%p' },
+    { store:'pankyo',  action:'아보카도 15kg → 연남점 이동',          tag:'재고', impact:'+2만원 손실 절감' },
+    { store:'gwangan', action:'라임 해피아워 17~19시 실행',            tag:'소진', impact:'+8만원 매출' },
+    { store:'all',     action:'저녁 세트 특가 배달 앱 등록 (16시)',     tag:'매출', impact:'+22% 예상' },
+    { store:'ikseong', action:'마가리타 믹스 발주 오늘 처리',           tag:'재고', impact:'3일분 확보' },
   ],
   week: [
     { store:'all',     action:'배달 앱 마가리타 세트 1위 목표',        tag:'마진', impact:'+3.2%p' },
@@ -757,7 +747,7 @@ const TIMELINE = {
 };
 
 const TAG_COLORS = {
-  매출:'#3b82f6', 재고:'#22c55e', 소진:'#f97316', 마진:'#eab308', 판촉:'#8b5cf6',
+  매출:'#3b82f6', 재고:'#22c55e', 소진:'#f97316', 마진:'#eab308',
 };
 
 let currentStore = 'all';
@@ -1150,7 +1140,7 @@ function renderTimeline() {
       currentStore === 'all' ? true : c.store === currentStore
     );
     const goalKey = tag =>
-      tag === '매출' ? 'revenue' : (tag === '재고' || tag === '소진') ? 'clear' : tag === '판촉' ? 'revenue' : 'margin';
+      tag === '매출' ? 'revenue' : (tag === '재고' || tag === '소진') ? 'clear' : 'margin';
 
     return `<div class="tl-phase">
       <div class="tl-phase-hdr" style="background:${sec.bg};border:1px solid ${sec.border};">
@@ -1201,9 +1191,9 @@ function closeKakao() {
 }
 
 function showSuccess() {
-  document.getElementById('sucTitle').textContent = '실행 가이드 전송 완료!';
-  document.getElementById('sucDesc').textContent = '배달앱 메뉴 노출 순서 변경, 태블릿 POS 우선순위 업데이트, 오늘의 타코 등록 가이드가 전송되었습니다.';
-  document.getElementById('sucChips').innerHTML = ['📱 배달앱 메뉴 순서', '🖥 태블릿 POS 우선순위', '🌮 오늘의 타코 등록'].map(c=>`<span class="suc-chip">${c}</span>`).join('');
+  document.getElementById('sucTitle').textContent = '전략 실행 완료!';
+  document.getElementById('sucDesc').textContent = '키오스크 팝업 및 배달 앱 노출이 자동으로 적용됩니다.';
+  document.getElementById('sucChips').innerHTML = ['🖥 키오스크 팝업', '📱 배달 앱 등록', '💬 카카오 알림'].map(c=>`<span class="suc-chip">${c}</span>`).join('');
   document.getElementById('success-overlay').classList.add('show');
 }
 
@@ -1211,13 +1201,8 @@ function closeSuccess() { document.getElementById('success-overlay').classList.r
 function showKakao(type) {
   const now=new Date();
   document.getElementById('kakaoTime').textContent=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-  if (type === 'report') {
-    document.getElementById('kakaoBody').textContent='📋 AI 일일 보고서\n\n■ 어제 전체 매출 1,420만 (목표 94.7%)\n■ 판교점 저녁 피크 객단가 -8% → 대응 가이드 첨부\n■ 오늘의 타코: 아보카도 치킨 볼 (마진 72%)\n■ 오늘 실행 가이드 3건: 배달앱 노출 순서 조정·태블릿 메뉴 우선순위·오늘의 타코 등록';
-    document.getElementById('kakaoChips').innerHTML=['전체 매장','오늘의 타코','배달앱 가이드'].map(c=>`<span class="kakao-chip">${c}</span>`).join('');
-  } else {
-    document.getElementById('kakaoBody').textContent='📲 실행 가이드 발송\n\n오늘의 전략 실행 가이드를 전송합니다.\n배달앱 메뉴 순서 변경 및 태블릿 POS 우선순위를 업데이트하세요.';
-    document.getElementById('kakaoChips').innerHTML=['배달앱 노출 순서','태블릿 메뉴','오늘의 타코'].map(c=>`<span class="kakao-chip">${c}</span>`).join('');
-  }
+  document.getElementById('kakaoBody').textContent='🥑 긴급 재고 이동 요청\n\n판교점 아보카도 15kg → 연남점 이동 부탁드립니다.\n오전 중 완료 필요합니다.';
+  document.getElementById('kakaoChips').innerHTML=['판교점','연남점'].map(c=>`<span class="kakao-chip">${c}</span>`).join('');
   document.getElementById('kakao-overlay').classList.add('show');
 }
 
@@ -1301,41 +1286,41 @@ const DEMO = {
 
   steps: [
     {
-      screen:'a', icon:'📋',
-      title:'POS 일일 마감 데이터 분석\n출근 전 보고서 완성',
-      sub:'전날 23:00 POS 마감 → 새벽 자동 분석 → 대표 출근 전 매장별 성과·이슈 보고서 발송',
-      duration:4500,
-    },
-    {
-      screen:'a', icon:'🔍',
-      title:'어제 판교점에서\n놓친 기회 3가지',
-      sub:'저녁 피크 객단가 -8% · Stars 메뉴 주문율 하락 · 배달앱 노출 미최적화 — AI가 원인과 대응 가이드 제시',
+      screen:'a', icon:'🗺',
+      title:'전국 4개 매장\n실시간 모니터링',
+      sub:'AI가 매장별 상황을 자동으로 감지하고 이상 신호를 즉시 알립니다',
       duration:4000,
     },
     {
-      screen:'b', icon:'⭐',
-      title:'Stars 메뉴 집중 판촉\n마진율 +2.8%p 시뮬레이션',
-      sub:'익선점 상위 3개 메뉴가 매출 71% 차지 · 판교·광안점 동일 전략 적용 시 월 +340만원 추정',
+      screen:'a', icon:'⚡',
+      title:'재고 위기를 AI가\n자동으로 포착',
+      sub:'아보카도 D-2 소진 불가 → 연남점 이동 권장 · 손실 최소화 자동 실행',
+      duration:3500,
+    },
+    {
+      screen:'b', icon:'📊',
+      title:'매출 1,420만 · 마진 63.2%\n핵심 KPI 한눈에',
+      sub:'목표 달성률 · 객단가 · 배달 비중 · 재고 효율 실시간 추적',
       duration:4000,
     },
     {
-      screen:'b', icon:'🌮',
-      title:'오늘의 타코 — Daily Special\n재고 소진 × 고마진 × 판촉 자동 설계',
-      sub:'AI가 재고·요일·날씨 분석 → 오늘의 메뉴 자동 선정 · 직원 권유 스크립트 + 배달앱 노출 권고까지 자동 완성',
-      duration:4500,
+      screen:'b', icon:'💎',
+      title:'메뉴 엔지니어링으로\n고마진 전략 시각화',
+      sub:'스타 · 프리미엄 · 주력 · 조정 — 메뉴별 수익 포지션 한눈에',
+      duration:3500,
     },
     {
-      screen:'c', icon:'📲',
-      title:'일일 전략 수립 완료\n배달앱 · 태블릿 메뉴 즉시 반영',
-      sub:'배달앱 메뉴 노출 순서 변경 · 태블릿 POS 메뉴 우선순위 조정 · 오늘의 타코 등록 — 실행 가이드 3가지 자동 완성',
+      screen:'c', icon:'🧠',
+      title:'AI 전략 매트릭스\n목표 × 지점 최적 조합',
+      sub:'클릭 한 번으로 맞춤 전략과 3단계 실행 계획이 자동 생성됩니다',
       duration:4000,
+    },
+    {
+      screen:'c', icon:'🚀',
+      title:'전략 선택 즉시\n오늘 · 주간 · 월간 로드맵',
+      sub:'선택한 전략이 실행 계획으로 즉시 변환 · 카카오 알림으로 자동 발송',
       autoClick:true,
-    },
-    {
-      screen:'c', icon:'📈',
-      title:'객단가 +3,200원\n테이블 회전율 상관관계 분석',
-      sub:'Stars 메뉴 주문 비율 +10% → 조리 시간 단축 → 회전율 +12% · 백종원·맥도날드 공통 원칙 현장 적용',
-      duration:4000,
+      duration:3500,
     },
   ],
 

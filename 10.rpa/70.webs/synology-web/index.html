@@ -1958,7 +1958,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.3.0';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.3.1';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2013,7 +2013,8 @@ const TREE = [
       { label:{ko:'비상장주식 가치평가',    en:'Stock Valuation'},     icon:'📊', iframe:'consulting/stockval/index.html',  consultantOnly:true },
       { label:{ko:'경영종합진단',          en:'Financial Plan'},      icon:'📈', iframe:'consulting/gfc/index.html',   consultantOnly:true },
       { label:{ko:'CEO 플랜',             en:'CEO Plan'},            icon:'👔', iframe:'consulting/ceo/index.html',   consultantOnly:true },
-      { label:{ko:'타코매니저 AI',        en:'Taco Manager AI'},     icon:'🌮', iframe:'consulting/tacomanager/index.html', consultantOnly:true },
+      { label:{ko:'타코매니저 AI',         en:'Taco Manager AI'},     icon:'🌮', iframe:'consulting/tacomanager/index.html',    consultantOnly:true },
+      { label:{ko:'타코매니저 AI v2',      en:'Taco Manager AI v2'},  icon:'🌮', iframe:'consulting/tacomanager/v2/index.html', consultantOnly:true },
     ]
   },
   {
