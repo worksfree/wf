@@ -400,7 +400,9 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .kakao-body{font-size:13px;color:#191919;line-height:1.6;white-space:pre-line;}
 .kakao-chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
 .kakao-chip{background:#191919;color:#FEE500;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;}
-.kakao-close{display:block;width:100%;margin-top:14px;background:#191919;color:#FEE500;font-size:13px;font-weight:700;border:none;border-radius:10px;padding:10px;cursor:pointer;}
+.kakao-chat-btn{display:block;width:100%;margin-top:14px;background:#191919;color:#FEE500;font-size:13px;font-weight:700;border-radius:10px;padding:11px;text-align:center;text-decoration:none;cursor:pointer;transition:opacity .15s;letter-spacing:-.2px;}
+.kakao-chat-btn:hover{opacity:.82;}
+.kakao-close{display:block;width:100%;margin-top:7px;background:rgba(0,0,0,.1);color:#3d3d3d;font-size:12px;font-weight:500;border:none;border-radius:10px;padding:8px;cursor:pointer;}
 #success-overlay{position:fixed;inset:0;z-index:7100;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;}
 #success-overlay.show{opacity:1;pointer-events:all;}
 .success-card{background:var(--panel);border:2px solid var(--green);border-radius:20px;padding:26px 32px;max-width:340px;width:90%;text-align:center;transform:scale(.88);transition:transform .35s cubic-bezier(.34,1.56,.64,1);}
@@ -474,7 +476,8 @@ body{display:flex;flex-direction:column;overflow:hidden;}
     </div>
     <div class="kakao-body" id="kakaoBody"></div>
     <div class="kakao-chips" id="kakaoChips"></div>
-    <button class="kakao-close" onclick="closeKakao()">확인</button>
+    <a class="kakao-chat-btn" href="https://pf.kakao.com/_Fxbryn/chat" target="_blank" rel="noopener">💬 카카오톡으로 바로 상담하기</a>
+    <button class="kakao-close" onclick="closeKakao()">닫기</button>
   </div>
 </div>
 <!-- 성공 -->
