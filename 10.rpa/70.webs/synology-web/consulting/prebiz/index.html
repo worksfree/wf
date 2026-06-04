@@ -493,14 +493,31 @@ function focusNode(id) {
   document.querySelectorAll('.pz-node').forEach(n => n.classList.remove('focused'));
   el.classList.add('focused');
 }
+let _navBusy = false;
+
 function prevNode() {
-  if (curIdx <= 0)            { showOverview(); return; }
-  focusNode(SEQ[curIdx - 1]);
+  if (_navBusy) return;
+  if (curIdx <= 0) { showOverview(); return; }
+  _bridgeTo(SEQ[curIdx - 1]);
 }
 function nextNode() {
+  if (_navBusy) return;
   if (curIdx < 0)             { focusNode(SEQ[0]); return; }
   if (curIdx >= SEQ.length-1) { showOverview(); return; }
-  focusNode(SEQ[curIdx + 1]);
+  _bridgeTo(SEQ[curIdx + 1]);
+}
+// 전체보기를 스치듯 지나가며 다음 노드로 이동
+function _bridgeTo(targetId) {
+  _navBusy = true;
+  const f = fitVal();
+  applyTF(f.tx, f.ty, f.s, 340);          // 빠른 줌아웃 (340ms)
+  document.querySelectorAll('.pz-node').forEach(n => n.classList.remove('focused'));
+  curIdx = -1;
+  updateNav();
+  setTimeout(() => {
+    focusNode(targetId);
+    _navBusy = false;
+  }, 370);                                  // 30ms 여유 후 타깃으로 줌인
 }
 function updateNav() {
   ctrEl.textContent = curIdx < 0
