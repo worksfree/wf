@@ -1958,7 +1958,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.3.10';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.3.11';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2160,6 +2160,8 @@ function buildTree(nodes, depth=0, path=[]) {
     if (node.adminOnly && userRole !== 'admin') return;
     // roleOnly: 지정 역할 + 관리자(모든 권한)가 아니면 숨김
     if (node.roleOnly && userRole !== 'admin' && userRole !== node.roleOnly) return;
+    // 페이지 접근 규칙: hidden → 트리에서 완전 숨김
+    if (node.iframe && getAccessLevel(node.iframe) === 'hidden') return;
 
     const isGfcItem = !!node.gfcOnly;
 
@@ -2283,6 +2285,8 @@ function renderDashCards() {
   DASH_CARDS.forEach(card => {
     // adminOnly 카드는 비관리자에게 완전히 숨김
     if (card.adminOnly && userRole !== 'admin') return;
+    // 페이지 접근 규칙: hidden → 대시보드에서 완전 숨김
+    if (card.iframe && getAccessLevel(card.iframe) === 'hidden') return;
 
     const isLocked =
       (card.gfcOnly        && !IS_GFC) ||
@@ -2570,7 +2574,9 @@ async function loadPageAccessRules() {
     ]);
     if (rulesRes.data?.value) pageAccessRules = { ...DEFAULT_ACCESS_RULES, ...rulesRes.data.value };
     if (orderRes.data?.value && Array.isArray(orderRes.data.value)) {
-      applyPageNodeOrder(orderRes.data.value);
+      applyPageNodeOrder(orderRes.data.value); // 내부에서 refreshTreeAndCards() 호출
+    } else {
+      refreshTreeAndCards(); // 순서 변경 없어도 hidden 필터 반영을 위해 재렌더
     }
   } catch {}
 }
