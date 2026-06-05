@@ -136,20 +136,20 @@ const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// 설정 가능한 페이지 목록 (consultantOnly / gfcOnly 대상)
+// 설정 가능한 페이지 목록 — 왼쪽 트리 노드와 동일한 순서 유지
 const CONFIGURABLE_PAGES = [
-  { label:'경영종합진단 (GFC)',        path:'consulting/gfc/index.html' },
-  { label:'CEO 플랜',                 path:'consulting/ceo/index.html' },
-  { label:'상속·증여 진단',            path:'consulting/inheritance/index.html' },
-  { label:'비상장주식 가치평가',        path:'consulting/stockval/index.html' },
-  { label:'B2B 이메일 DB',            path:'consulting/bizdb/index.html' },
-  { label:'마케팅 자료',               path:'consulting/marketing/index.html' },
   { label:'컨설팅 마인드맵',           path:'consulting/mindmap/index.html' },
   { label:'예비창업패키지',             path:'consulting/prebiz/index.html' },
   { label:'소상공인·자영업자 지원',     path:'consulting/soho/index.html' },
   { label:'중대재해처벌법',             path:'consulting/jdh/index.html' },
   { label:'ESG 자가진단',             path:'consulting/esg/index.html' },
   { label:'기업공시 조회',             path:'consulting/dart/index.html' },
+  { label:'B2B 이메일 DB',            path:'consulting/bizdb/index.html' },
+  { label:'마케팅 자료',               path:'consulting/marketing/index.html' },
+  { label:'상속·증여 진단',            path:'consulting/inheritance/index.html' },
+  { label:'비상장주식 가치평가',        path:'consulting/stockval/index.html' },
+  { label:'경영종합진단 (GFC)',        path:'consulting/gfc/index.html' },
+  { label:'CEO 플랜',                 path:'consulting/ceo/index.html' },
   { label:'타코매니저 AI (v1)',        path:'consulting/tacomanager/v1/index.html' },
   { label:'타코매니저 AI (v2)',        path:'consulting/tacomanager/v2/index.html' },
   { label:'타코매니저 AI (v3)',        path:'consulting/tacomanager/v3/index.html' },
