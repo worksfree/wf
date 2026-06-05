@@ -324,7 +324,7 @@ function openFlyer(idx) {
 }
 
 function cardHtml(f, i) {
-  const thumbSrc = f.src + '?v=' + _FV;
+  const thumbSrc = f.src + '?v=' + _FV + '&role=' + (_currentRole || 'gfc');
   const nameLines = f.nameKo.split('\n').join('<br>');
   const badgeBg = f.badge==='v2'?'#1e4a70':f.badge==='new'?'#7c1010':'#2a3347';
   const badgeFg = f.badge==='v2'?'#60a5fa':f.badge==='new'?'#fca5a5':'#94a3b8';
@@ -361,14 +361,13 @@ function applyMarketingRole(role) {
   _currentRole = role;
   document.getElementById('section-loading').style.display = 'none';
 
-  const isIns  = (role === 'gfc' || role === 'admin');
-  const isMgmt = (role === 'consultant');
+  // consultant도 전체 플라이어 노출 (역할에 따라 보험 용어 자동 치환)
+  const showFlyers = (role === 'gfc' || role === 'admin' || role === 'consultant');
 
-  document.getElementById('section-ins').style.display  = isIns  ? '' : 'none';
-  document.getElementById('section-mgmt').style.display = isMgmt ? '' : 'none';
+  document.getElementById('section-ins').style.display  = showFlyers ? '' : 'none';
+  document.getElementById('section-mgmt').style.display = 'none'; // section-ins로 통합
 
-  if (isIns  && !document.getElementById('grid-v1').innerHTML)  buildGridIns();
-  if (isMgmt && !document.getElementById('grid-mgmt').innerHTML) buildGridMgmt();
+  if (showFlyers && !document.getElementById('grid-v1').innerHTML) buildGridIns();
 
   buildFlyerSelect();
   requestAnimationFrame(scaleThumbIframes);

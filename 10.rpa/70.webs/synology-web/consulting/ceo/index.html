@@ -17,18 +17,6 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:24px 28px 60px;}
 
-/* ── 전단지 갤러리 ── */
-.flyer-bar{display:flex;align-items:center;gap:6px;margin-bottom:14px;}
-.flyer-bar-lbl{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;}
-.flyer-bar-line{flex:1;height:1px;background:var(--border);}
-.flyer-row{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;}
-.flyer-card{cursor:pointer;width:120px;flex:0 0 120px;min-width:0;}
-.flyer-card:hover .flyer-thumb{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
-.flyer-card:hover .flyer-name{color:var(--text);}
-.flyer-thumb{border:1px solid var(--border);border-radius:6px;overflow:hidden;position:relative;width:120px;height:170px;background:#080a10;transition:border-color .15s,box-shadow .15s;}
-.flyer-thumb iframe{position:absolute;top:0;left:0;width:794px;height:1123px;transform:scale(0.1511);transform-origin:0 0;border:none;pointer-events:none;}
-.flyer-overlay{position:absolute;inset:0;}
-.flyer-name{font-size:10px;color:var(--muted);margin-top:5px;text-align:center;line-height:1.35;transition:color .15s;font-weight:500;}
 
 /* ── 헤더 ── */
 .page-title{font-size:20px;font-weight:600;margin-bottom:4px;}
@@ -140,67 +128,6 @@ html[lang="en"] .en{display:block;}
 </style>
 </head>
 <body>
-
-<!-- ══════════════════════════════
-     보험설계사 전용: 전단지 갤러리
-══════════════════════════════ -->
-<div data-ins>
-  <div class="flyer-bar">
-    <span class="flyer-bar-lbl ko">마케팅 자료</span>
-    <span class="flyer-bar-lbl en">Marketing Materials</span>
-    <div class="flyer-bar-line"></div>
-  </div>
-  <div class="flyer-row" id="flyer-row-ins">
-    <div class="flyer-card" onclick="openFlyer('flyer-ceo.html')">
-      <div class="flyer-thumb">
-        <iframe src="flyers/flyer-ceo.html" scrolling="no" loading="lazy" title="아는 대표는 이미 다했다"></iframe>
-        <div class="flyer-overlay"></div>
-      </div>
-      <div class="flyer-name ko">아는 대표는<br>이미 다했다</div>
-    </div>
-    <div class="flyer-card" onclick="openFlyer('flyer-safety-all.html')">
-      <div class="flyer-thumb">
-        <iframe src="flyers/flyer-safety-all.html" scrolling="no" loading="lazy"></iframe>
-        <div class="flyer-overlay"></div>
-      </div>
-      <div class="flyer-name ko">안전조치,<br>그게 전부?</div>
-    </div>
-    <div class="flyer-card" onclick="openFlyer('flyer-safety-only.html')">
-      <div class="flyer-thumb">
-        <iframe src="flyers/flyer-safety-only.html" scrolling="no" loading="lazy"></iframe>
-        <div class="flyer-overlay"></div>
-      </div>
-      <div class="flyer-name ko">안전조치만<br>했다고</div>
-    </div>
-    <div class="flyer-card" onclick="openFlyer('flyer-hard-work.html')">
-      <div class="flyer-thumb">
-        <iframe src="flyers/flyer-hard-work.html" scrolling="no" loading="lazy"></iframe>
-        <div class="flyer-overlay"></div>
-      </div>
-      <div class="flyer-name ko">열심히했는데<br>남는 게 없다</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════
-     경영지도사 전용: 자료 링크
-══════════════════════════════ -->
-<div data-mgmt>
-  <div class="flyer-bar">
-    <span class="flyer-bar-lbl ko">경영지도사 참고 자료</span>
-    <div class="flyer-bar-line"></div>
-  </div>
-  <div class="flyer-row" id="flyer-row-mgmt">
-    <div class="flyer-card" onclick="openFlyer('flyer-hard-work.html')">
-      <div class="flyer-thumb">
-        <iframe src="flyers/flyer-hard-work.html" scrolling="no" loading="lazy"></iframe>
-        <div class="flyer-overlay"></div>
-      </div>
-      <div class="flyer-name ko">열심히했는데<br>남는 게 없다</div>
-    </div>
-  </div>
-  <p style="font-size:12px;color:var(--hint);margin-bottom:24px">경영지도사용 자료는 마케팅 자료 페이지에서 확인하세요.</p>
-</div>
 
 <!-- ══════════════════════════════
      공통 헤더
@@ -514,18 +441,6 @@ html[lang="en"] .en{display:block;}
   });
 })();
 
-const _FV = new URLSearchParams(location.search).get('v') || Date.now();
-document.querySelectorAll('.flyer-thumb iframe').forEach(function(f){
-  var s = f.getAttribute('src');
-  if(s) f.src = s + '?v=' + _FV;
-});
-
-function openFlyer(src) {
-  window.parent.postMessage({
-    type: 'loadIframe',
-    path: 'consulting/ceo/flyers/' + src
-  }, '*');
-}
 </script>
 </body>
 </html>

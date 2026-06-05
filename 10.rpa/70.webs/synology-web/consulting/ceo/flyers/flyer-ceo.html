@@ -425,5 +425,44 @@ body {
 <script>
 !function(){var p=document.createElement('div');p.id='ft-pop';p.innerHTML='<div class="fp-bd"></div><div class="fp-src"></div><div class="fp-hint">클릭 → 원본 자료 열기</div>';document.body.appendChild(p);var u='';document.querySelectorAll('.ft').forEach(function(e){e.addEventListener('mouseenter',function(ev){p.querySelector('.fp-bd').textContent=e.dataset.fact||'';p.querySelector('.fp-src').textContent='출처: '+(e.dataset.src||'');u=e.dataset.url||'';p.querySelector('.fp-hint').style.display=u?'':'none';p.style.display='block';mv(ev);});e.addEventListener('mousemove',mv);e.addEventListener('mouseleave',function(){p.style.display='none';});e.addEventListener('click',function(ev){if(u){ev.stopPropagation();window.open(u,'_blank');}});});function mv(ev){var pw=p.offsetWidth||300,ph=p.offsetHeight||80,x=ev.clientX+14,y=ev.clientY+14;if(x+pw>window.innerWidth-8)x=ev.clientX-pw-6;if(y+ph>window.innerHeight-8)y=ev.clientY-ph-6;p.style.left=x+'px';p.style.top=y+'px';}}();
 </script>
+<script>
+/* ── 역할별 보험 용어 자동 치환 (gfc/admin: 원문, 그 외: 중립 표현) ── */
+(function(){
+  var role = new URLSearchParams(location.search).get('role') || 'gfc';
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'wf_role'){
+      role = e.data.role || 'gfc';
+      if(role !== 'gfc' && role !== 'admin') sanitize(document.body);
+    }
+  });
+  function replace(t){
+    return t
+      .replace(/경영인정기보험 비용처리/g, '파트너 상담 절세 설계')
+      .replace(/경영인정기보험/g,           '파트너 상담 플랜')
+      .replace(/법인 종신보험/g,            '파트너 솔루션')
+      .replace(/종신보험/g,                 '파트너 상담 플랜')
+      .replace(/단체 재해보장보험/g,        '중대재해 보장 솔루션')
+      .replace(/단체보험/g,                 '임직원 보장')
+      .replace(/법인보험/g,                 '파트너 솔루션')
+      .replace(/임원보험/g,                 '임원 리스크 대비 솔루션')
+      .replace(/보험료/g,                   '플랜 비용')
+      .replace(/보험 가입/g,               '파트너 솔루션 적용')
+      .replace(/보험으로/g,                '파트너 상담으로')
+      .replace(/보험이/g,                  '리스크 솔루션이')
+      .replace(/보험을/g,                  '리스크 솔루션을')
+      .replace(/보험과/g,                  '리스크 솔루션과')
+      .replace(/보험/g,                    '파트너 상담');
+  }
+  function sanitize(n){
+    if(n.nodeType === 3){ n.textContent = replace(n.textContent); }
+    else if(n.nodeType === 1 && n.tagName !== 'SCRIPT' && n.tagName !== 'STYLE'){
+      Array.from(n.childNodes).forEach(sanitize);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    if(role !== 'gfc' && role !== 'admin') sanitize(document.body);
+  });
+})();
+</script>
 </body>
 </html>
