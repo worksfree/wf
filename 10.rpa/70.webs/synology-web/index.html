@@ -1958,7 +1958,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.3.8';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.3.10';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2564,13 +2564,30 @@ let pageAccessRules = { ...DEFAULT_ACCESS_RULES };
 async function loadPageAccessRules() {
   if (!_sbReady || !_sb) return;
   try {
-    const { data } = await _sb
-      .from('site_config')
-      .select('value')
-      .eq('key', 'page_access_rules')
-      .maybeSingle();
-    if (data?.value) pageAccessRules = { ...DEFAULT_ACCESS_RULES, ...data.value };
+    const [rulesRes, orderRes] = await Promise.all([
+      _sb.from('site_config').select('value').eq('key','page_access_rules').maybeSingle(),
+      _sb.from('site_config').select('value').eq('key','page_node_order').maybeSingle(),
+    ]);
+    if (rulesRes.data?.value) pageAccessRules = { ...DEFAULT_ACCESS_RULES, ...rulesRes.data.value };
+    if (orderRes.data?.value && Array.isArray(orderRes.data.value)) {
+      applyPageNodeOrder(orderRes.data.value);
+    }
   } catch {}
+}
+
+function applyPageNodeOrder(orderedPaths) {
+  // 컨설팅 섹션을 찾아 하위 노드를 저장된 순서로 재정렬
+  const consulting = TREE.find(t =>
+    Array.isArray(t.children) && t.children.some(c => c.iframe?.startsWith('consulting/'))
+  );
+  if (!consulting) return;
+  const children = consulting.children;
+  // orderedPaths에 있는 것 먼저(저장 순), 없는 것은 원래 상대 순서 유지
+  consulting.children = [
+    ...orderedPaths.map(p => children.find(c => c.iframe === p)).filter(Boolean),
+    ...children.filter(c => !orderedPaths.includes(c.iframe)),
+  ];
+  refreshTreeAndCards();
 }
 
 function getAccessLevel(src) {
