@@ -226,14 +226,26 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .demo-stop-btn{font-size:11px;font-weight:700;color:var(--text2);background:var(--panel2);
   border:1px solid var(--border);border-radius:12px;padding:4px 12px;cursor:pointer;font-family:inherit;}
 .demo-stop-btn:hover{color:var(--text);}
-.demo-callout{display:none;position:fixed;right:28px;bottom:80px;z-index:4900;
+.demo-callout{
+  display:none;position:fixed;
+  left:50%;transform:translateX(-50%);
+  bottom:80px;z-index:4900;
   background:rgba(15,22,35,.95);border:1px solid var(--border2);border-radius:16px;
-  padding:20px 22px;max-width:300px;backdrop-filter:blur(16px);
-  box-shadow:0 12px 40px rgba(0,0,0,.7);}
-@keyframes dcIn{from{opacity:0;transform:translateY(12px) scale(.94)}to{opacity:1;transform:none}}
-@keyframes dcOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(8px) scale(.96)}}
+  padding:20px 24px;width:360px;max-width:calc(100vw - 48px);
+  backdrop-filter:blur(16px);box-shadow:0 12px 40px rgba(0,0,0,.7);}
+@keyframes dcIn{from{opacity:0;transform:translateX(-50%) translateY(14px) scale(.94)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+@keyframes dcOut{from{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}to{opacity:0;transform:translateX(-50%) translateY(8px) scale(.96)}}
 .demo-callout.dc-in{animation:dcIn .42s cubic-bezier(.34,1.56,.64,1) forwards;}
 .demo-callout.dc-out{animation:dcOut .28s ease-in forwards;}
+.demo-callout-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.demo-callout-step{font-size:10px;font-weight:800;color:var(--accent2);letter-spacing:.1em;
+  background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);
+  border-radius:10px;padding:3px 10px;}
+.demo-callout-close{width:24px;height:24px;border-radius:50%;border:1px solid var(--border2);
+  background:var(--panel2);color:var(--text3);font-size:13px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-family:inherit;transition:all .15s;flex-shrink:0;}
+.demo-callout-close:hover{border-color:var(--red);color:var(--red);}
 .demo-callout-icon{font-size:34px;line-height:1;margin-bottom:10px;}
 .demo-callout-title{font-size:17px;font-weight:800;color:#e2e8f0;line-height:1.35;
   white-space:pre-line;letter-spacing:-.3px;margin-bottom:6px;}
@@ -853,7 +865,12 @@ const DEMO = {
     if (document.getElementById('demoCallout')) return;
     const c = document.createElement('div');
     c.id = 'demoCallout'; c.className = 'demo-callout';
-    c.innerHTML = '<div class="demo-callout-icon" id="demoIcon"></div>' +
+    c.innerHTML =
+      '<div class="demo-callout-header">' +
+        '<span class="demo-callout-step" id="demoStep">STEP 1 / ' + this.steps.length + '</span>' +
+        '<button class="demo-callout-close" onclick="DEMO.stop();event.stopPropagation();" title="데모 종료">✕</button>' +
+      '</div>' +
+      '<div class="demo-callout-icon" id="demoIcon"></div>' +
       '<div class="demo-callout-title" id="demoTitle"></div>' +
       '<div class="demo-callout-sub" id="demoSub"></div>' +
       '<div class="demo-callout-bar"><div class="demo-callout-fill" id="demoFill"></div></div>';
@@ -884,6 +901,7 @@ const DEMO = {
       callout.style.display = 'block';
       void callout.offsetWidth;
       callout.classList.add('dc-in');
+      document.getElementById('demoStep').textContent  = 'STEP ' + (this.step + 1) + ' / ' + this.steps.length;
       document.getElementById('demoIcon').textContent  = s.icon;
       document.getElementById('demoTitle').textContent = s.title;
       document.getElementById('demoSub').textContent   = s.sub;
