@@ -86,21 +86,30 @@ body{display:flex;}
   <div class="sb-section">버전 선택</div>
 
   <div class="sb-node active" id="node-v1" onclick="switchTo('v1')">
-    <div class="sb-node-icon">✦</div>
+    <div class="sb-node-icon">📊</div>
     <div class="sb-node-info">
-      <div class="sb-node-label">일일 보고서형</div>
-      <div class="sb-node-desc">POS 분석 · 오늘의 타코</div>
+      <div class="sb-node-label">자동 판촉전략형</div>
+      <div class="sb-node-desc">ERP·POS·BOM 자동 분석</div>
     </div>
     <span class="sb-badge sb-badge-new">NEW</span>
   </div>
 
   <div class="sb-node" id="node-v2" onclick="switchTo('v2')">
+    <div class="sb-node-icon">✦</div>
+    <div class="sb-node-info">
+      <div class="sb-node-label">일일 보고서형</div>
+      <div class="sb-node-desc">POS 분석 · 오늘의 타코</div>
+    </div>
+    <span class="sb-badge sb-badge-v2">v2</span>
+  </div>
+
+  <div class="sb-node" id="node-v3" onclick="switchTo('v3')">
     <div class="sb-node-icon">🗺</div>
     <div class="sb-node-info">
       <div class="sb-node-label">실시간 관제형</div>
       <div class="sb-node-desc">재고 · SCM · 매트릭스</div>
     </div>
-    <span class="sb-badge sb-badge-v2">v2</span>
+    <span class="sb-badge sb-badge-v2">v3</span>
   </div>
 
   <div class="sb-footer">
@@ -112,8 +121,9 @@ body{display:flex;}
 
 <script>
 function switchTo(ver) {
-  document.getElementById('node-v1').classList.toggle('active', ver === 'v1');
-  document.getElementById('node-v2').classList.toggle('active', ver === 'v2');
+  ['v1','v2','v3'].forEach(v =>
+    document.getElementById('node-'+v).classList.toggle('active', v === ver)
+  );
   document.getElementById('content').src = ver + '/index.html';
 }
 </script>
