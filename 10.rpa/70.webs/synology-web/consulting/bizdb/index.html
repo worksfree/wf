@@ -855,19 +855,14 @@ const OV = {
 // 연속 오류 카운터 (Worker 다운 감지)
 let _consecErrors = 0;
 function _markError(isFetchFail) {
+  const w = document.getElementById('worker-warn');
   if (isFetchFail) {
     _consecErrors++;
-    if (_consecErrors >= 8) {
-      const w = document.getElementById('worker-warn');
-      if (w) w.style.display = '';
-    }
-    // 8건 연속 실패 시 DART 한도 의심 → 자동 자정 예약 (배너와 동일 임계값)
-    if (_consecErrors === 8) {
-      handleDartRateLimit('연속 오류 8건 — Worker 미응답 또는 DART API 한도 초과 가능성');
-    }
+    if (w && _consecErrors >= 8) w.style.display = '';
+    // ※ handleDartRateLimit은 여기서 호출하지 않음
+    //   → DART가 명시적으로 010/013 반환할 때만 자정 예약이 트리거됨
   } else {
     _consecErrors = 0;
-    const w = document.getElementById('worker-warn');
     if (w) w.style.display = 'none';
   }
 }
@@ -1202,7 +1197,7 @@ async function runOnePage(pageNo) {
     listUrl.searchParams.set('page_count', '100');
     if (cls) listUrl.searchParams.set('corp_cls', cls);
 
-    const listData = await (await fetch(listUrl.toString())).json();
+    const listData = await (await fetch(listUrl.toString(), { signal: AbortSignal.timeout(20000) })).json();
 
     if (listData.status !== '000') {
       const rawMsg = `[DART ${listData.status}] ${listData.message || 'API 오류'}`;
@@ -1293,11 +1288,18 @@ async function runOnePage(pageNo) {
         infoUrl.searchParams.set('corp_code', filing.corp_code);
 
         // HTTP 응답과 본문을 분리해서 실제 오류 내용 확인
+        // 타임아웃(12초) — 특정 법인 유형에서 DART API가 응답을 반환하지 않는 케이스 대응
         let infoRes;
         try {
-          infoRes = await fetch(infoUrl.toString());
+          infoRes = await fetch(infoUrl.toString(), { signal: AbortSignal.timeout(12000) });
         } catch (netErr) {
-          throw new Error(`Worker 미응답 (${netErr.message || 'Failed to fetch'})`);
+          // 타임아웃 / 네트워크 오류 → 한도 초과 아님, 스킵 처리 후 수집 계속
+          const reason = netErr.name === 'AbortError' || netErr.name === 'TimeoutError'
+            ? '응답 없음 (12s timeout)'
+            : netErr.message || 'Failed to fetch';
+          updateRow(rowId, {name: filing.corp_name, induty: '—', email: '', status: 'skip',
+            note: `연결 실패 스킵: ${reason}`});
+          processed++; showProgress(); return;
         }
         let info;
         const rawText = await infoRes.text();
@@ -1368,11 +1370,11 @@ async function runOnePage(pageNo) {
         }
 
       } catch (e) {
-        const note = e.message?.slice(0,300) || '네트워크 오류';
+        // 여기에 도달하는 경우: JSON 파싱 실패, HTTP 오류 등 (네트워크/타임아웃은 위 inner catch에서 처리됨)
+        const note = e.message?.slice(0, 200) || '오류';
         updateRow(rowId, {name: filing.corp_name, induty: '—', email: '', status: 'error', note});
-        // "Failed to fetch" = Worker 다운 감지
-        _markError(note.includes('fetch') || note.includes('network') || note.includes('Failed'));
         errors++;
+        // _markError 호출 안함 — 한도초과 예약은 DART 명시적 코드(010/013)일 때만 작동
       }
       processed++;
       showProgress();
