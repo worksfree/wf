@@ -1,88 +1,96 @@
 # Supabase DB 구축 가이드
 
 > **프로젝트**: WorksFree Hub — `portal.worksfree.kr`  
-> **마지막 업데이트**: 2026-06-05
+> **마지막 업데이트**: 2026-06-16  
+> **책 참조**: 8장. Supabase 데이터베이스 — 회원 정보·결제·크레딧 저장
 
 ---
 
-## 파일 구조
+## 파일 구조 (현행)
 
 ```
 supabase/
-├── 10_extensions_tables.sql  ← [1단계] 확장 + 핵심 테이블 + 인덱스
-├── 20_security_rls.sql       ← [2단계] RLS 정책
-├── 30_triggers.sql           ← [3단계] 트리거
-├── 40_functions.sql          ← [4단계] DB 함수
-├── 50_views.sql              ← [5단계] 뷰
-├── 60_external_dbs.sql       ← [6단계] 외부 서비스 DB (BizDB + 잡코리아 + 사이트설정)
-├── 70_seed_dev.sql           ← [7단계] 개발용 시드 데이터 (프로덕션 실행 금지)
+├── complete_db_setup.sql     ← [8장 필수] 코어 DB 전체 (v3.0) — 1회 실행
+├── 99_seed_dev.sql           ← [개발 전용] 테스트 계정 4개 (프로덕션 실행 금지)
 │
-├── schema.sql                ← 전체 마스터 스키마 (신규 DB 단독 생성용, 1~7 통합본)
 ├── README.md                 ← 이 파일
 │
-├── migration/                ← 증분 마이그레이션 이력 (기존 DB 패치용)
-│   ├── migration_bizdb_v2.sql       biz_send_batches 추가 + email_source CHECK 확장
-│   └── migration_site_config.sql   site_config 테이블 추가
+├── deprecate_01_auth_profiles.sql    ← (구버전) Stage 분리 파일 → complete로 통합됨
+├── deprecate_02_credits_payments.sql
+├── deprecate_03_email_marketing.sql
+├── deprecate_04_admin_analytics.sql
+├── deprecate_schema.sql              ← (구버전) 통합 마스터 스키마
+├── deprecate_10_extensions_tables.sql
+├── deprecate_20_security_rls.sql
+├── deprecate_30_triggers.sql
+├── deprecate_40_functions.sql
+├── deprecate_50_views.sql
+├── deprecate_60_external_dbs.sql
+├── deprecate_70_seed_dev.sql
 │
-└── archive/                  ← 레거시 파일 (이미 10~60에 통합됨, 재실행 불필요)
-    ├── bizdb_setup.sql              → 60_external_dbs.sql (A절)로 대체
-    ├── jobkorea_setup.sql           → 60_external_dbs.sql (B절)로 대체
-    ├── create_early_adopters.ps1    일회용 스크립트
-    ├── early_adopters_result_*.csv  실행 결과 데이터
-    └── temp_*.sql                   레거시 패치 (이미 schema.sql에 반영됨)
+├── deprecate_archive/        ← 레거시 패치 파일 (이미 반영됨, 재실행 불필요)
+└── deprecate_migration/      ← 구버전 마이그레이션 이력
 ```
 
 ---
 
-## DB 테이블 목록
+## complete_db_setup.sql 포함 내용 (8장)
 
-| 단계 | 파일 | 테이블 / 객체 |
-|------|------|--------------|
-| 1 | 10_extensions_tables.sql | `profiles`, `credits`, `payments`, `email_log`, `email_unsubscribes`, `page_views` |
-| 2 | 20_security_rls.sql | 위 테이블 RLS 정책 |
-| 3 | 30_triggers.sql | `on_auth_user_created`, `sync_profile_name` |
-| 4 | 40_functions.sql | `handle_new_user`, `deduct_credits`, `refund_credits`, `admin_*` (5개), `log_page_view`, `get_credit_balance` 등 |
-| 5 | 50_views.sql | `credit_balance` |
-| 6 | 60_external_dbs.sql | `biz_contacts`, `biz_send_log`, `biz_send_batches`, `jobkorea_proposals`, `jobkorea_stats`, `site_config` |
-| 7 | 70_seed_dev.sql | dev 테스트 계정 4개 (auth.users · profiles) |
+| 섹션 | 내용 |
+|------|------|
+| 1 | 확장: `pgcrypto` |
+| 2 | 테이블 6개: `profiles` · `credits` · `payments` · `email_log` · `email_unsubscribes` · `page_views` |
+| 3 | `is_admin()` 헬퍼 함수 (RLS 정책 전체에서 사용) |
+| 4 | RLS 정책 전체 (기존 정책 정리 후 통일된 이름으로 재생성) |
+| 5 | 트리거: `on_auth_user_created` · `on_auth_user_updated` |
+| 6 | 관리자 함수 6개: `admin_set_user_role` · `admin_grant_credits` · `admin_set_user_name` · `admin_get_all_profiles` · `admin_get_user_logins` · `admin_page_view_stats` |
+| 7 | 일반 함수 3개: `get_user_credit_balance` · `deduct_credits` · `get_email_history` |
+| 8 | 뷰 2개: `credit_balance` · `page_view_stats` |
+| 9 | 기존 사용자 소급 동기화 (name/email 백필) |
+| 10 | 최종 검증 SELECT 쿼리 |
 
 ---
 
-## 처음부터 DB 재구축 방법
+## 실행 방법
 
 **Supabase 대시보드 → SQL Editor에서 순서대로 실행**
 
 ```
-1) 10_extensions_tables.sql
-2) 20_security_rls.sql
-3) 30_triggers.sql
-4) 40_functions.sql
-5) 50_views.sql
-6) 60_external_dbs.sql
-7) 70_seed_dev.sql   ← dev 환경만. 프로덕션 실행 금지
+# Step 1 — 코어 DB 구축 (8장)
+complete_db_setup.sql
+
+# Step 2 — 개발 테스트 계정 생성 (dev 환경만, 프로덕션 실행 금지)
+99_seed_dev.sql
 ```
 
-> **단축**: `schema.sql` 한 파일이 1~6을 모두 포함합니다.  
-> 신규 DB라면 `schema.sql` → `70_seed_dev.sql` (dev만) 순서로만 실행해도 됩니다.
+**메뉴 경로**: Supabase → SQL Editor → New query → `.sql` 전체 내용 붙여넣기 → Run
+
+> **멱등성**: 모든 파일은 반복 실행해도 안전합니다 (`CREATE ... IF NOT EXISTS`, `OR REPLACE`).
 
 ---
 
-## 기존 DB에 패치 적용 (마이그레이션)
+## 실행 후 검증 포인트
 
-이미 운영 중인 DB에 부분 변경을 적용할 때만 사용합니다.
+`complete_db_setup.sql` 실행 후 Results 패널에서 확인:
 
-| 파일 | 적용 내용 | 실행 여부 확인 방법 |
-|------|----------|-------------------|
-| `migration/migration_bizdb_v2.sql` | `biz_send_batches` 테이블 신규 + `biz_send_log` 컬럼 추가 + `email_source` CHECK 확장 | `SELECT * FROM biz_send_batches LIMIT 1;` 오류 없으면 이미 적용됨 |
-| `migration/migration_site_config.sql` | `site_config` 테이블 신규 + RLS + 기본값 | `SELECT * FROM site_config;` 결과 있으면 이미 적용됨 |
+| 섹션 | 기대 결과 |
+|------|-----------|
+| `=== 1. 테이블 목록 ===` | 6개 테이블 모두 표시 |
+| `=== 2. email_log 컬럼 ===` | `sender_user_id` 포함 전체 컬럼 목록 |
+| `=== 3. RLS 정책 ===` | 각 테이블의 정책 목록 확인 |
+| `=== 4. 함수 목록 ===` | 12개 함수 모두 표시 |
+| `=== 5. 트리거 ===` | `on_auth_user_created`, `on_auth_user_updated` 2개 |
+| `=== 7. 뷰 목록 ===` | `credit_balance`, `page_view_stats` 2개 |
 
-> 모든 파일은 멱등성(idempotent)으로 작성되어 있어 **중복 실행해도 안전**합니다.
+`99_seed_dev.sql` 실행 후:
+
+| 항목 | 기대 결과 |
+|------|-----------|
+| `=== 6. 개발 테스트 사용자 ===` | 4명 (general/consultant/gfc/admin) roles 확인 |
 
 ---
 
-## Dev 테스트 계정
-
-`70_seed_dev.sql` 실행 시 자동 생성됩니다.
+## Dev 테스트 계정 (`99_seed_dev.sql` 실행 후)
 
 | 이메일 | 역할 | UUID |
 |--------|------|------|
@@ -91,25 +99,57 @@ supabase/
 | `gfc@worksfree.co.kr` | gfc | `d0000003-0000-4000-8000-000000000000` |
 | `admin@worksfree.co.kr` | admin | `d0000004-0000-4000-8000-000000000000` |
 
-비밀번호: Hub Dev 툴바에서 로그인 시 자동 입력 (`DEV_CREDS` 상수 참고).
+비밀번호: `TestPassword123!` (관리자: `AdminPassword123!`)
 
 ---
 
-## Supabase 환경 변수
+## 테이블 스키마 요약
 
-`index.html` 상단 하드코딩:
+```
+profiles          → id, name, email, role, agreed_at, marketing_agreed, created_at
+credits           → id, user_id, delta, reason, app_id, ref_order_id, note, env, created_at
+payments          → id, user_id, order_id, pg, amount_krw, amount_usd, credits, status, env, created_at
+email_log         → id, sent_at, recipient_email, sender_email, sender_name,
+                    sender_user_id (FK→profiles), flyer_src, flyer_name, subject, env, status, extra
+email_unsubscribes → id, email, source, note, unsubscribed_at
+page_views        → id, user_id, page, duration_s, env, viewed_at
+```
+
+---
+
+## RLS 정책 요약
+
+| 테이블 | 정책 | 대상 |
+|--------|------|------|
+| profiles | `profiles_self` (ALL) | 본인 행 |
+| profiles | `profiles_admin_select_all` (SELECT) | 관리자 전체 조회 |
+| credits | `credits_select_own` (SELECT) | 본인 행 |
+| credits | `credits_insert_purchase` (INSERT) | 본인 충전만 허용 |
+| payments | `payments_select_own`, `payments_insert_own` | 본인 행 |
+| email_log | `email_log_admin_select` (SELECT) | 관리자만, INSERT는 Worker service_role |
+| email_unsubscribes | `email_unsubscribes_admin` (ALL) | 관리자만 |
+| page_views | `pv_insert_own` · `pv_select_own` · `pv_update_own` | 본인 행 |
+| page_views | `pv_admin_select` (SELECT) | 관리자 전체 조회 |
+
+> `credits`·`payments` env 컬럼: test/staging/portal 환경이 동일 DB를 공유할 때 결제·크레딧 데이터를 환경별로 분리하는 컬럼.
+
+---
+
+## 환경 변수 설정
+
+`index.html` 상단:
 ```javascript
-const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_URL  = 'https://<your-project>.supabase.co';
 const SUPABASE_ANON = 'eyJ...';  // anon 키 (RLS 보호, 브라우저 노출 의도적)
 ```
 
 Cloudflare Workers Secrets (브라우저 비노출):
 ```bash
-# biz-db Worker
-wrangler secret put SUPABASE_URL         --config consulting/bizdb/wrangler.toml
-wrangler secret put SUPABASE_SERVICE_KEY --config consulting/bizdb/wrangler.toml
-
-# send-mail Worker
+# send-mail Worker (이메일 발송)
 wrangler secret put SUPABASE_URL         --config service/payment/wrangler-mail.toml
 wrangler secret put SUPABASE_SERVICE_KEY --config service/payment/wrangler-mail.toml
+
+# biz-db Worker (DART 조회)
+wrangler secret put SUPABASE_URL         --config consulting/bizdb/wrangler.toml
+wrangler secret put SUPABASE_SERVICE_KEY --config consulting/bizdb/wrangler.toml
 ```
