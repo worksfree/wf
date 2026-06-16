@@ -180,19 +180,35 @@ export default {
     // ── Resend API 호출 (100건씩 청크 — Resend batch 단건 제한) ──────
     const auth      = 'Bearer ' + env.RESEND_API_KEY;
     const CHUNK     = 100;
-    let   sentCount = 0;
+    const sentEmails = [];
+    const failed = [];
     const sendErrors = [];
+
+    async function sendOne(e) {
+      const res = await fetch('https://api.resend.com/emails', {
+        method:  'POST',
+        headers: { Authorization: auth, 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ from, to: [e.to], subject: e.subject, html: e.html }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Resend API error');
+      return data;
+    }
 
     for (let i = 0; i < toSend.length; i += CHUNK) {
       const chunk = toSend.slice(i, i + CHUNK);
       let resendRes;
 
       if (chunk.length === 1) {
-        resendRes = await fetch('https://api.resend.com/emails', {
-          method:  'POST',
-          headers: { Authorization: auth, 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ from, to: [chunk[0].to], subject: chunk[0].subject, html: chunk[0].html }),
-        });
+        try {
+          await sendOne(chunk[0]);
+          sentEmails.push(chunk[0]);
+        } catch (err) {
+          const msg = err.message || 'Resend API error';
+          failed.push({ email: chunk[0].to, reason: msg });
+          sendErrors.push(msg);
+        }
+        continue;
       } else {
         resendRes = await fetch('https://api.resend.com/emails/batch', {
           method:  'POST',
@@ -203,14 +219,28 @@ export default {
 
       const resendData = await resendRes.json();
       if (!resendRes.ok) {
-        // 청크 실패: 나머지 청크는 시도하지 않고 지금까지 발송된 건수로 응답
-        sendErrors.push(resendData.message || 'Resend API error');
-        break;
+        const chunkMsg = resendData.message || 'Resend API error';
+        const errorMsg = `${i + 1}-${i + chunk.length}번째 묶음 실패: ${chunkMsg}. (묶음 내 잘못된 이메일 주소가 있는지 확인하세요.)`;
+        sendErrors.push(errorMsg);
+        // 개별 재시도 로직 제거 - 전체 묶음을 실패 처리하고 다음 묶음으로 이동
+        chunk.forEach(e => failed.push({ email: e.to, reason: `${chunkMsg}일괄 발송 실패` }));
+        // // Batch는 한 주소 오류로 전체 묶음이 실패할 수 있어, 실패 묶음만 개별 재시도한다.
+        // for (const e of chunk) {
+        //   try {
+        //     await sendOne(e);
+        //     sentEmails.push(e);
+        //   } catch (err) {
+        //     const msg = err.message || chunkMsg;
+        //     failed.push({ email: e.to, reason: msg });
+        //   }
+        // }
+        continue;
       }
-      sentCount += chunk.length;
+      sentEmails.push(...chunk);
     }
 
-    if (sentCount === 0 && sendErrors.length > 0) {
+    const sentCount = sentEmails.length;
+    if (sentCount === 0 && (sendErrors.length > 0 || failed.length > 0)) {
       return json({ error: sendErrors[0] }, 400);
     }
 
@@ -228,7 +258,7 @@ export default {
     const senderUserId = meta.senderUserId || null;
 
     // 발송 성공 로그 (실제 발송된 건만)
-    const logRows = toSend.slice(0, sentCount).map(e => ({
+    const logRows = sentEmails.map(e => ({
       sent_at:          now,
       recipient_email:  e.to.toLowerCase(),
       sender_email:     senderEmail,
@@ -263,9 +293,10 @@ export default {
       success:   true,
       sent:      sentCount,
       filtered,
+      failed,
       totalSent: newTotal,
       remaining: Math.max(0, MONTHLY_LIMIT - newTotal),
-      ...(sendErrors.length > 0 ? { partial_error: sendErrors[0] } : {}),
+      ...(sendErrors.length > 0 || failed.length > 0 ? { partial_error: sendErrors[0] || failed[0].reason } : {}),
     });
   },
 };

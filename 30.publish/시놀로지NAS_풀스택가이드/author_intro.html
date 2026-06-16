@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>저자소개 — 시놀로지 NAS 풀스택 인프라 구축 완전 가이드</title>
+  <style>
+    @font-face { font-family: 'Noto Sans KR'; src: local('Noto Sans KR'), local('NotoSansKR'), local('Noto_Sans_KR'); }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    }
+    .page {
+      width: 560px;
+      height: 840px;
+      position: relative;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── 헤더 ── */
+    .page-header {
+      position: relative;
+      height: 80px;
+      background: #0B1628;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .page-header svg {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+    }
+    .header-label {
+      position: absolute;
+      bottom: 16px;
+      left: 36px;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+    .header-accent {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #1A9FD4 0%, #29B6F6 50%, transparent 100%);
+    }
+
+    /* ── 본문 ── */
+    .page-body {
+      flex: 1;
+      padding: 32px 36px 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* 저자 헤로 */
+    .author-hero {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1.5px solid #1A9FD4;
+    }
+    .author-avatar {
+      width: 90px;
+      height: 110px;
+      border: 1.5px solid #B3D9F0;
+      border-radius: 4px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .author-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+
+    .author-name-block { flex: 1; padding-top: 2px; }
+    .author-name-ko {
+      font-size: 30px;
+      font-weight: 900;
+      color: #0B1628;
+      letter-spacing: -1px;
+      margin-bottom: 3px;
+    }
+    .author-name-en {
+      font-size: 13px;
+      color: #999;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .author-role {
+      display: inline-block;
+      background: #0B1628;
+      color: #1A9FD4;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 2px;
+      letter-spacing: 1px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #1A9FD4;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* 이력 리스트 */
+    .career-list {
+      list-style: none;
+      margin-bottom: 22px;
+    }
+    .career-list li {
+      font-size: 12.5px;
+      color: #333;
+      line-height: 1.65;
+      padding: 6px 0 6px 18px;
+      border-bottom: 1px solid #f3f3f3;
+      position: relative;
+    }
+    .career-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 13px;
+      width: 6px;
+      height: 6px;
+      background: #1A9FD4;
+      border-radius: 50%;
+    }
+
+    .intro-box {
+      background: #F0F7FD;
+      border-left: 3px solid #1A9FD4;
+      padding: 8px 16px;
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 10px;
+    }
+    .intro-box p {
+      font-size: 12.5px;
+      color: #444;
+      line-height: 1.85;
+    }
+    .intro-box em { font-style: normal; color: #0B7BAD; font-weight: 700; }
+
+    /* 연락처 */
+    .contact-block {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 24px;
+    }
+    .contact-item { font-size: 11px; color: #888; }
+    .contact-item strong { color: #1A9FD4; margin-right: 5px; font-size: 9px; letter-spacing: 1px; }
+
+    /* ── 하단 ── */
+    .page-footer {
+      height: 34px;
+      background: #0B1628;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 36px;
+      flex-shrink: 0;
+    }
+    .footer-pub { font-size: 10px; color: #1A9FD4; font-weight: 700; letter-spacing: 2px; }
+    .footer-page { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
+
+    @page { size: 148mm 210mm; margin: 0; }
+    @media print {
+      body { background: none; padding: 0; }
+      .page { width: 148mm; height: 210mm; box-shadow: none; overflow: hidden; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 헤더 -->
+  <div class="page-header">
+    <svg viewBox="0 0 560 80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+          <circle cx="14" cy="14" r="1" fill="rgba(26,159,212,0.25)"/>
+        </pattern>
+      </defs>
+      <rect width="560" height="80" fill="url(#dots)"/>
+      <line x1="0" y1="40" x2="200" y2="40" stroke="rgba(26,159,212,0.2)" stroke-width="0.5"/>
+      <polygon points="460,0 560,0 560,80" fill="rgba(26,159,212,0.06)"/>
+      <polygon points="500,0 560,0 560,50" fill="rgba(26,159,212,0.08)"/>
+    </svg>
+    <div class="header-label">저자 소개</div>
+    <div class="header-accent"></div>
+  </div>
+
+  <!-- 본문 -->
+  <div class="page-body">
+
+    <div class="author-hero">
+      <div class="author-avatar">
+        <img src="author_photo.jpg" alt="이인성">
+      </div>
+      <div class="author-name-block">
+        <div class="author-name-ko">이인성</div>
+        <div class="author-name-en">Lee Insung</div>
+        <div class="author-role">웍스프리 대표</div>
+      </div>
+    </div>
+
+    <div class="section-label">Career &amp; Expertise</div>
+    <ul class="career-list">
+      <li>경영지도사 생산관리분야</li>
+      <li>자동화 장비 제조업 프로세스 개선 내부 컨설팅 경력</li>
+      <li>제조업 설계 및 MCT 단순 반복 업무 자동화(RPA) 프로그램 개발</li>
+      <li>소프트웨어 분야 개발 및 PM 경력</li>
+      <li>프로젝트 관리 전문가 (PMP, PMI)</li>
+      <li>IITP 평가위원, NIPA 평가위원</li>
+      <li>KOIIA DX/AX 진단 컨설팅 위원</li>
+      <li>2025년 예비창업패키지 사업자 선정 및 1·2단계 수행</li>
+      <li>웍스프리(WorksFree) 창업 및 대표 운영</li>
+    </ul>
+
+    <div class="intro-box">
+      <p>
+        <em>"비싼 클라우드 서버 대신 집에 있는 NAS로 실제 서비스를 운영할 수 있다"</em>는 것을
+        직접 증명하고, 그 과정을 이 책에 담았습니다.<br>
+        WorksFree Hub(www.worksfree.kr)가 바로 이 가이드의 실제 구현 사례입니다.
+      </p>
+    </div>
+
+    <div class="contact-block">
+      <div class="contact-item"><strong>E-MAIL</strong>insung.lee@worksfree.co.kr</div>
+      <div class="contact-item"><strong>WEB</strong>www.worksfree.kr</div>
+    </div>
+
+  </div>
+
+  <!-- 하단 -->
+  <div class="page-footer">
+    <span class="footer-pub">WORKSFREE</span>
+    <span class="footer-page">ii</span>
+  </div>
+
+</div>
+</body>
+</html>

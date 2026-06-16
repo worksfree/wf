@@ -24,7 +24,7 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.8.3.5"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.8.3.26"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -382,7 +382,7 @@ if ($allOk) {
     $CF_ZONE_ID   = "b5e82c46532b06a2cd456cc5ff3b9234"
     $secretsFile  = Join-Path $PSScriptRoot "secrets.ps1"
     if (Test-Path $secretsFile) { . $secretsFile }
-    $CF_API_TOKEN = $env:CF_API_TOKEN
+    $CF_API_TOKEN = $env:CF_CACHE_PURGE_TOKEN
     Write-Host ""
     Write-Host "  ▶ Cloudflare 캐시 퍼지 중..." -ForegroundColor Gray
     try {

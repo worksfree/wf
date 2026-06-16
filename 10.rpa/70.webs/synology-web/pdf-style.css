@@ -1,0 +1,30 @@
+/* 코드 블록 중간에 페이지가 잘리는 것 원천 차단 */
+pre, code, .code-block, blockquote {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+/* 표(Table) 내부 행이 반으로 쪼개져서 출력되는 것 방지 */
+tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+/* 챕터 제목(H1, H2, H3)이 페이지 최하단에 홀로 덩그러니 남는 현상 방지 */
+h1, h2, h3, h4 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+}
+
+/* 코드 블록 내 글자가 가로로 너무 길 때 잘리지 않고 예쁘게 줄바꿈 처리 */
+code, pre {
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+    font-size: 0.88em !important; /* 본문 대비 가독성 좋은 코드 폰트 크기 */
+    font-family: 'D2Coding', 'Consolas', monospace !important;
+}
+
+/* 표가 다음 페이지로 넘어갈 때 상단 제목 행(Header) 자동 반복 */
+thead { 
+    display: table-header-group !important; 
+}

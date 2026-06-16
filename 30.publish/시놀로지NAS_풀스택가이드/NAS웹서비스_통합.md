@@ -1,43 +1,23 @@
-<!-- ================================================================
-     전자책 표지 · 책소개 · 저자소개 · 판권 (HTML 섹션)
-     ================================================================ -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+---
+title: "시놀로지 NAS 풀스택 인프라 구축 완전 가이드"
+author: "이인성"
+lang: ko
+---
+
 <style>
-/* ==== 전자책 페이지 공통 래퍼 ==== */
-.ebook-wrapper {
-  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  background: #111;
-  padding: 40px 0;
-}
-.ebook-page {
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+/* ── HTML 페이지 컨테이너 (표지·책소개·저자소개·판권) ── */
+.html-page {
   width: 560px;
-  margin: 0 auto 48px;
-  page-break-after: always;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.4);
-  position: relative;
+  height: 840px;
   overflow: hidden;
+  page-break-after: always;
+  break-after: page;
+  position: relative;
 }
-@media print {
-  .ebook-wrapper { background: none !important; padding: 0 !important; }
-  .ebook-page { width: 148mm; height: 210mm; box-shadow: none; margin: 0; }
-}
-
-
-/* ── cover ── */
-
-    .ebook-page * { margin: 0; padding: 0; box-sizing: border-box; }
-    .ebook-page {
-      background: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 30px;
-      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
-    }
-
-    .cover {
+/* ── 표지 CSS ── */
+@font-face { font-family: 'Noto Sans KR'; src: local('Noto Sans KR'), local('NotoSansKR'), local('Noto_Sans_KR'); }
+.page-cover .cover {
       width: 560px;
       height: 840px;
       position: relative;
@@ -46,8 +26,7 @@
       /* 추출된 전체 배경 이미지 */
       background: url('bg_0_X4.png') center top / cover no-repeat;
     }
-
-    /* 네트워크 비주얼 — 하단에 레이어 */
+.page-cover /* 네트워크 비주얼 — 하단에 레이어 */
     .network-layer {
       position: absolute;
       bottom: 0;
@@ -58,14 +37,12 @@
       object-fit: cover;
       object-position: center bottom;
     }
-
-    /* 텍스트 레이어 */
+.page-cover /* 텍스트 레이어 */
     .text-layer {
       position: absolute;
       inset: 0;
     }
-
-    /* 상단 소제목 */
+.page-cover /* 상단 소제목 */
     .subtitle-top {
       position: absolute;
       top: 52px;
@@ -77,8 +54,7 @@
       letter-spacing: 2.5px;
       line-height: 2.1;
     }
-
-    /* 메인 타이틀 블록 */
+.page-cover /* 메인 타이틀 블록 */
     .title-block {
       position: absolute;
       top: 20%;
@@ -86,7 +62,7 @@
       text-align: center;
       padding: 0 20px;
     }
-    .main-title {
+.page-cover .main-title {
       font-size: 60px;
       font-weight: 700;
       color: #ffffff;
@@ -95,12 +71,12 @@
       margin-bottom: 16px;
       text-shadow: 0 2px 24px rgba(0,0,0,0.5);
     }
-    .nas-en {
+.page-cover .nas-en {
       font-family: 'Arial Black', Impact, Arial, sans-serif;
       font-weight: 900;
       letter-spacing: -1px;
     }
-    .sub1 {
+.page-cover .sub1 {
       font-size: 38px;
       font-weight: 700;
       color: #ffffff;
@@ -109,7 +85,7 @@
       margin-bottom: 4px;
       text-shadow: 0 2px 20px rgba(0,0,0,0.5);
     }
-    .sub2 {
+.page-cover .sub2 {
       font-size: 38px;
       font-weight: 700;
       color: #ffffff;
@@ -117,29 +93,27 @@
       line-height: 1.45;
       text-shadow: 0 2px 20px rgba(0,0,0,0.5);
     }
-
-    /* 하단 정보 — 원본 (시인성 낮음, 원복 시 아래 개선안 주석 처리 후 이 블록 활성화)
+.page-cover /* 하단 정보 — 원본 (시인성 낮음, .page-cover 원복 시 아래 개선안 주석 처리 후 이 블록 활성화)
     .bottom-block {
       position: absolute;
       bottom: 32px;
       left: 0; right: 0;
       text-align: center;
     }
-    .tagline {
+.page-cover .tagline {
       font-size: 11.5px;
       font-weight: 300;
       color: rgba(255,255,255,0.50);
       letter-spacing: 3px;
       margin-bottom: 10px;
     }
-    .author-pub {
+.page-cover .author-pub {
       font-size: 12px;
       font-weight: 400;
       color: rgba(255,255,255,0.65);
       letter-spacing: 2.5px;
     }
-    */
-
+.page-cover */
     /* 하단 정보 — 개선안: 반투명 바 + 밝은 텍스트 */
     .bottom-block {
       position: absolute;
@@ -153,583 +127,119 @@
         rgba(4, 12, 28, 0) 100%
       );
     }
-    .tagline {
+.page-cover .tagline {
       font-size: 12px;
       font-weight: 400;
       color: rgba(255,255,255,0.80);
       letter-spacing: 3px;
       margin-bottom: 10px;
     }
-    .author-pub {
+.page-cover .author-pub {
       font-size: 13px;
       font-weight: 700;
       color: #ffffff;
       letter-spacing: 3px;
     }
-
-    @media print {
-      .ebook-page { background: none; padding: 0; }
-      .cover { width: 148mm; height: 210mm; box-shadow: none; }
-    }
-  
-/* ── book_intro ── */
-
-    .ebook-page * { margin: 0; padding: 0; box-sizing: border-box; }
-    .ebook-page {
-      background: #1a1a2e;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 30px;
-      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
-    }
-    .page {
-      width: 560px;
-      height: 840px;
-      position: relative;
-      overflow: hidden;
-      background: #ffffff;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── 상단 헤더 ── */
-    .page-header {
-      position: relative;
-      height: 80px;
-      background: #0B1628;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    /* 테크 패턴 오버레이 */
-    .page-header svg {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-    }
-    .header-label {
-      position: absolute;
-      bottom: 16px;
-      left: 36px;
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-    }
-    .header-accent {
-      position: absolute;
-      bottom: 0;
-      left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #1A9FD4 0%, #29B6F6 50%, transparent 100%);
-    }
-
-    /* ── 본문 ── */
-    .page-.ebook-page {
-      flex: 1;
-      padding: 28px 36px 20px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .book-title-block {
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1.5px solid #1A9FD4;
-    }
-    .book-main-title {
-      font-size: 20px;
-      font-weight: 900;
-      color: #0B1628;
-      line-height: 1.35;
-      margin-bottom: 5px;
-      letter-spacing: -0.3px;
-    }
-    .book-main-title span { color: #1A9FD4; }
-    .book-sub-title {
-      font-size: 11px;
-      color: #999;
-      letter-spacing: 0.2px;
-      line-height: 1.6;
-    }
-
-    .section-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: #1A9FD4;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin: 18px 0 8px;
-    }
-    .body-text {
-      font-size: 12.5px;
-      color: #444;
-      line-height: 1.85;
-    }
-
-    .highlight-box {
-      background: #F0F7FD;
-      border-left: 3px solid #1A9FD4;
-      padding: 11px 14px;
-      margin: 12px 0;
-      border-radius: 0 4px 4px 0;
-    }
-    .highlight-box p {
-      font-size: 11.5px;
-      color: #333;
-      line-height: 1.85;
-    }
-    .highlight-box strong { color: #0B7BAD; }
-
-    /* 태그 */
-    .tag-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 6px;
-    }
-    .tag {
-      background: #EAF4FB;
-      color: #0B7BAD;
-      font-size: 10.5px;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 12px;
-      border: 1px solid #B3D9F0;
-      letter-spacing: 0.3px;
-    }
-
-    /* 목차 그리드 */
-    .toc-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0 16px;
-      margin-top: 6px;
-    }
-    .toc-item {
-      font-size: 11.5px;
-      color: #444;
-      padding: 5px 0;
-      border-bottom: 1px solid #f0f0f0;
-      line-height: 1.5;
-    }
-    .toc-ch {
-      display: inline-block;
-      color: #1A9FD4;
-      font-weight: 700;
-      font-size: 10px;
-      min-width: 32px;
-      letter-spacing: 0.3px;
-    }
-
-    /* ── 하단 ── */
-    .page-footer {
-      height: 34px;
-      background: #0B1628;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 36px;
-      flex-shrink: 0;
-    }
-    .footer-pub { font-size: 10px; color: #1A9FD4; font-weight: 700; letter-spacing: 2px; }
-    .footer-page { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
-
-    @media print {
-      .ebook-page { background: none; padding: 0; }
-      .page { width: 148mm; height: 210mm; box-shadow: none; }
-    }
-  
-/* ── author ── */
-
-    .ebook-page * { margin: 0; padding: 0; box-sizing: border-box; }
-    .ebook-page {
-      background: #1a1a2e;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 30px;
-      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
-    }
-    .page {
-      width: 560px;
-      height: 840px;
-      position: relative;
-      overflow: hidden;
-      background: #ffffff;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── 헤더 ── */
-    .page-header {
-      position: relative;
-      height: 80px;
-      background: #0B1628;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    .page-header svg {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-    }
-    .header-label {
-      position: absolute;
-      bottom: 16px;
-      left: 36px;
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-    }
-    .header-accent {
-      position: absolute;
-      bottom: 0;
-      left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #1A9FD4 0%, #29B6F6 50%, transparent 100%);
-    }
-
-    /* ── 본문 ── */
-    .page-.ebook-page {
-      flex: 1;
-      padding: 32px 36px 20px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* 저자 헤로 */
-    .author-hero {
-      display: flex;
-      align-items: flex-start;
-      gap: 24px;
-      margin-bottom: 24px;
-      padding-bottom: 22px;
-      border-bottom: 1.5px solid #1A9FD4;
-    }
-    .author-avatar {
-      width: 90px;
-      height: 110px;
-      border: 1.5px solid #B3D9F0;
-      border-radius: 4px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .author-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center top;
-      display: block;
-    }
-
-    .author-name-block { flex: 1; padding-top: 2px; }
-    .author-name-ko {
-      font-size: 30px;
-      font-weight: 900;
-      color: #0B1628;
-      letter-spacing: -1px;
-      margin-bottom: 3px;
-    }
-    .author-name-en {
-      font-size: 13px;
-      color: #999;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-    .author-role {
-      display: inline-block;
-      background: #0B1628;
-      color: #1A9FD4;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 2px;
-      letter-spacing: 1px;
-    }
-
-    .section-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: #1A9FD4;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    /* 이력 리스트 */
-    .career-list {
-      list-style: none;
-      margin-bottom: 22px;
-    }
-    .career-list li {
-      font-size: 12.5px;
-      color: #333;
-      line-height: 1.65;
-      padding: 6px 0 6px 18px;
-      border-bottom: 1px solid #f3f3f3;
-      position: relative;
-    }
-    .career-list li::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 13px;
-      width: 6px;
-      height: 6px;
-      background: #1A9FD4;
-      border-radius: 50%;
-    }
-
-    .intro-box {
-      background: #F0F7FD;
-      border-left: 3px solid #1A9FD4;
-      padding: 13px 16px;
-      border-radius: 0 4px 4px 0;
-      margin-bottom: 20px;
-    }
-    .intro-box p {
-      font-size: 12.5px;
-      color: #444;
-      line-height: 1.85;
-    }
-    .intro-box em { font-style: normal; color: #0B7BAD; font-weight: 700; }
-
-    /* 연락처 */
-    .contact-block {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid #eee;
-      display: flex;
-      gap: 24px;
-    }
-    .contact-item { font-size: 11px; color: #888; }
-    .contact-item strong { color: #1A9FD4; margin-right: 5px; font-size: 9px; letter-spacing: 1px; }
-
-    /* ── 하단 ── */
-    .page-footer {
-      height: 34px;
-      background: #0B1628;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 36px;
-      flex-shrink: 0;
-    }
-    .footer-pub { font-size: 10px; color: #1A9FD4; font-weight: 700; letter-spacing: 2px; }
-    .footer-page { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
-
-    @media print {
-      .ebook-page { background: none; padding: 0; }
-      .page { width: 148mm; height: 210mm; box-shadow: none; }
-    }
-  
-/* ── copyright ── */
-
-    .ebook-page * { margin: 0; padding: 0; box-sizing: border-box; }
-    .ebook-page {
-      background: #1a1a2e;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 30px;
-      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
-    }
-    .page {
-      width: 560px;
-      height: 840px;
-      position: relative;
-      overflow: hidden;
-      background: #ffffff;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── 헤더 ── */
-    .page-header {
-      position: relative;
-      height: 80px;
-      background: #0B1628;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    .page-header svg {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-    }
-    .header-label {
-      position: absolute;
-      bottom: 16px;
-      left: 36px;
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-    }
-    .header-accent {
-      position: absolute;
-      bottom: 0;
-      left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #1A9FD4 0%, #29B6F6 50%, transparent 100%);
-    }
-
-    /* ── 본문 ── */
-    .page-.ebook-page {
-      flex: 1;
-      padding: 40px 48px 28px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .title-block { margin-bottom: 36px; }
-    .title-kr {
-      font-size: 20px;
-      font-weight: 900;
-      color: #0B1628;
-      line-height: 1.4;
-      margin-bottom: 8px;
-      letter-spacing: -0.3px;
-    }
-    .title-kr span { color: #1A9FD4; }
-    .title-en {
-      font-size: 11px;
-      color: #aaa;
-      line-height: 1.7;
-    }
-
-    /* 정보 테이블 */
-    .info-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 32px;
-    }
-    .info-table tr { border-bottom: 1px solid #f0f0f0; }
-    .info-table tr:first-child { border-top: 1px solid #ddd; }
-    .info-table td {
-      padding: 10px 0;
-      font-size: 12.5px;
-      vertical-align: top;
-    }
-    .info-label {
-      color: #1A9FD4;
-      font-weight: 700;
-      width: 88px;
-      font-size: 11px;
-      letter-spacing: 0.5px;
-    }
-    .info-value { color: #333; line-height: 1.6; }
-
-    /* 저작권 */
-    .copyright-block {
-      margin-top: auto;
-      padding-top: 24px;
-      border-top: 1px solid #e8e8e8;
-    }
-    .copyright-text {
-      font-size: 11px;
-      color: #888;
-      line-height: 1.95;
-      margin-bottom: 24px;
-    }
-
-    /* 출판사 하단 */
-    .publisher-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .pub-logo-block { display: flex; flex-direction: column; }
-    .pub-logo-name {
-      font-size: 20px;
-      font-weight: 900;
-      color: #0B1628;
-      letter-spacing: 1px;
-    }
-    .pub-logo-name span { color: #1A9FD4; }
-    .pub-logo-tagline {
-      font-size: 9.5px;
-      color: #aaa;
-      letter-spacing: 0.5px;
-      margin-top: 3px;
-    }
-
-    /* ── 하단 ── */
-    .page-footer {
-      height: 34px;
-      background: #0B1628;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 36px;
-      flex-shrink: 0;
-    }
-    .footer-pub { font-size: 10px; color: #1A9FD4; font-weight: 700; letter-spacing: 2px; }
-    .footer-page { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
-
-    @media print {
-      .ebook-page { background: none; padding: 0; }
-      .page { width: 148mm; height: 210mm; box-shadow: none; }
-    }
-  
+/* ── 책소개 CSS ── */
+@font-face { font-family: 'Noto Sans KR'; src: local('Noto Sans KR'), local('NotoSansKR'), local('Noto_Sans_KR'); }
+/* ── 저자소개 CSS ── */
+@font-face { font-family: 'Noto Sans KR'; src: local('Noto Sans KR'), local('NotoSansKR'), local('Noto_Sans_KR'); }
+/* ── 판권 CSS ── */
+@font-face { font-family: 'Noto Sans KR'; src: local('Noto Sans KR'), local('NotoSansKR'), local('Noto_Sans_KR'); }
+/* ── A5 페이지 / 여백 ── */
+@page { size: 148mm 210mm; margin: 0; }
+/* ── 가이드 본문 기본 ── */
+body {
+  font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.75;
+  color: #222;
+  margin: 0; padding: 0;
+}
+/* HTML 페이지(표지·책소개 등)가 아닌 일반 콘텐츠에 좌우 여백 부여 */
+h1, h2, h3, h4, h5, h6, p, pre, blockquote, ul, ol, hr {
+  margin-left: 20mm;
+  margin-right: 15mm;
+}
+h1 {
+  font-size: 20pt; color: #0B1628;
+  margin-top: 0.8em; margin-bottom: 0.4em;
+  page-break-before: always;
+}
+h1:first-of-type { page-break-before: avoid; }
+h2 {
+  font-size: 14pt; color: #0B1628;
+  margin-top: 1em; margin-bottom: 0.3em;
+  border-bottom: 1.5px solid #1A9FD4; padding-bottom: 4px;
+  break-after: avoid; page-break-after: avoid;
+}
+h3 { font-size: 12pt; margin-top: 0.8em; margin-bottom: 0.2em;
+     break-after: avoid; page-break-after: avoid; }
+h4 { font-size: 10.5pt; margin-top: 0.6em; margin-bottom: 0.2em; }
+pre {
+  background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 4px;
+  padding: 10px 12px; font-size: 8.5pt;
+  white-space: pre-wrap; word-break: break-all;
+  font-family: 'D2Coding', 'Consolas', 'Courier New', monospace;
+  page-break-inside: avoid;
+}
+code {
+  font-family: 'D2Coding', 'Consolas', monospace; font-size: 8.5pt;
+  background: #f0f0f0; padding: 1px 4px; border-radius: 3px;
+}
+pre code { background: none; padding: 0; }
+table {
+  border-collapse: collapse; width: calc(100% - 35mm);
+  margin: 1em 15mm 1em 20mm;
+  font-size: 9.5pt; page-break-inside: avoid;
+}
+th, td { border: 1px solid #ddd; padding: 5px 8px; }
+th { background: #0B1628; color: white; font-weight: 700; }
+tr:nth-child(even) td { background: #f9f9f9; }
+blockquote {
+  border-left: 3px solid #1A9FD4; background: #F0F7FD;
+  padding: 10px 16px; border-radius: 0 4px 4px 0;
+}
+hr { border: none; border-top: 1px solid #eee; margin-top: 1.5em; margin-bottom: 1.5em; }
+img { max-width: 100%; }
 </style>
 
-<div class="ebook-wrapper">
-
-<div class="ebook-page">
+<!-- 표지 -->
+<div class="html-page page-cover">
 <div class="cover">
-
   <!-- 네트워크 레이어 (텍스트 없는 순수 배경) -->
   <img class="network-layer" src="bg_1_X6.png" alt="">
-
   <!-- 텍스트 -->
   <div class="text-layer">
-
     <div class="subtitle-top">
       Cloudflare Tunnel부터<br>Supabase까지
     </div>
-
     <div class="title-block">
       <div class="main-title">시놀로지&ensp;<span class="nas-en">NAS</span></div>
       <div class="sub1">풀스택 인프라 구축</div>
       <div class="sub2">완전 가이드</div>
     </div>
-
     <div class="bottom-block">
       <div class="tagline">결제 연동, 배포 자동화까지</div>
       <div class="author-pub">이인성 저 &nbsp;·&nbsp; 웍스프리</div>
     </div>
-
   </div>
 </div>
 </div>
 
-<div class="ebook-page">
+<!-- 책소개 -->
+<div class="html-page page-book">
 <div class="page">
-
   <!-- 헤더 -->
   <div class="page-header">
     <svg viewBox="0 0 560 80" xmlns="http://www.w3.org/2000/svg">
       <!-- 배경 닷 그리드 패턴 -->
       <defs>
-        <pattern id="dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+        <pattern id="dots-book" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
           <circle cx="14" cy="14" r="1" fill="rgba(26,159,212,0.25)"/>
         </pattern>
       </defs>
-      <rect width="560" height="80" fill="url(#dots)"/>
+      <rect width="560" height="80" fill="url(#dots-book)"/>
       <!-- 수평 라인 -->
       <line x1="0" y1="40" x2="200" y2="40" stroke="rgba(26,159,212,0.2)" stroke-width="0.5"/>
       <line x1="280" y1="40" x2="560" y2="40" stroke="rgba(26,159,212,0.15)" stroke-width="0.5"/>
@@ -740,10 +250,8 @@
     <div class="header-label">책 소개</div>
     <div class="header-accent"></div>
   </div>
-
   <!-- 본문 -->
   <div class="page-body">
-
     <div class="book-title-block">
       <div class="book-main-title">
         시놀로지 <span>NAS</span> 풀스택 인프라 구축 완전 가이드
@@ -752,7 +260,6 @@
         Gabia · Cloudflare Tunnel/Worker · Supabase 인증·DB · 역할 기반 접근 제어 · 온라인 결제까지 원스톱
       </div>
     </div>
-
     <div class="section-label">이 책에 대하여</div>
     <p class="body-text">
       집이나 사무실의 Synology NAS와 도메인 하나만으로, 로그인·결제·데이터베이스를 갖춘
@@ -760,7 +267,6 @@
       클라우드 서버 비용 없이 자체 인프라로 서비스를 구축하고 싶은 개인·소기업 운영자를
       위한 실전 가이드입니다.
     </p>
-
     <div class="highlight-box">
       <p>
         <strong>대상 독자</strong> — 자체 도메인과 Synology NAS를 보유한 개인·소기업 운영자<br>
@@ -768,7 +274,6 @@
         <strong>실제 구현 사례</strong> — WorksFree Hub (portal.worksfree.kr) 기반
       </p>
     </div>
-
     <div class="section-label">이 책으로 만들 수 있는 것</div>
     <div class="tag-list">
       <span class="tag">커스텀 도메인 웹사이트</span>
@@ -780,7 +285,6 @@
       <span class="tag">역할 기반 접근 제어</span>
       <span class="tag">3단계 배포 환경</span>
     </div>
-
     <div class="section-label">목차 요약</div>
     <div class="toc-grid">
       <div class="toc-item"><span class="toc-ch">1장</span>가비아 — 도메인 구입</div>
@@ -798,30 +302,27 @@
       <div class="toc-item"><span class="toc-ch">13장</span>어드민 페이지</div>
       <div class="toc-item"><span class="toc-ch">14장</span>이메일 발송 시스템</div>
     </div>
-
   </div>
-
   <!-- 하단 -->
   <div class="page-footer">
     <span class="footer-pub">WORKSFREE</span>
     <span class="footer-page">ii</span>
   </div>
-
 </div>
 </div>
 
-<div class="ebook-page">
+<!-- 저자소개 -->
+<div class="html-page page-author">
 <div class="page">
-
   <!-- 헤더 -->
   <div class="page-header">
     <svg viewBox="0 0 560 80" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <pattern id="dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+        <pattern id="dots-author" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
           <circle cx="14" cy="14" r="1" fill="rgba(26,159,212,0.25)"/>
         </pattern>
       </defs>
-      <rect width="560" height="80" fill="url(#dots)"/>
+      <rect width="560" height="80" fill="url(#dots-author)"/>
       <line x1="0" y1="40" x2="200" y2="40" stroke="rgba(26,159,212,0.2)" stroke-width="0.5"/>
       <polygon points="460,0 560,0 560,80" fill="rgba(26,159,212,0.06)"/>
       <polygon points="500,0 560,0 560,50" fill="rgba(26,159,212,0.08)"/>
@@ -829,10 +330,8 @@
     <div class="header-label">저자 소개</div>
     <div class="header-accent"></div>
   </div>
-
   <!-- 본문 -->
   <div class="page-body">
-
     <div class="author-hero">
       <div class="author-avatar">
         <img src="author_photo.jpg" alt="이인성">
@@ -843,7 +342,6 @@
         <div class="author-role">웍스프리 대표</div>
       </div>
     </div>
-
     <div class="section-label">Career &amp; Expertise</div>
     <ul class="career-list">
       <li>경영지도사 생산관리분야</li>
@@ -855,11 +353,7 @@
       <li>KOIIA DX/AX 진단 컨설팅 위원</li>
       <li>2025년 예비창업패키지 사업자 선정 및 1·2단계 수행</li>
       <li>웍스프리(WorksFree) 창업 및 대표 운영</li>
-      <li>Synology NAS 기반 자체 인프라 서비스 설계·운영</li>
-      <li>Cloudflare Tunnel / Worker · Supabase 풀스택 구축 실무</li>
-      <li>PG사(토스페이먼츠) 결제 시스템 연동 및 크레딧 아키텍처 설계</li>
     </ul>
-
     <div class="intro-box">
       <p>
         <em>"비싼 클라우드 서버 대신 집에 있는 NAS로 실제 서비스를 운영할 수 있다"</em>는 것을
@@ -867,123 +361,27 @@
         WorksFree Hub(portal.worksfree.kr)가 바로 이 가이드의 실제 구현 사례입니다.
       </p>
     </div>
-
     <div class="contact-block">
       <div class="contact-item"><strong>E-MAIL</strong>insung.lee@worksfree.co.kr</div>
       <div class="contact-item"><strong>WEB</strong>portal.worksfree.kr</div>
     </div>
-
   </div>
-
   <!-- 하단 -->
   <div class="page-footer">
     <span class="footer-pub">WORKSFREE</span>
     <span class="footer-page">iii</span>
   </div>
-
 </div>
 </div>
 
-<div class="ebook-page">
-<div class="page">
+# Synology NAS 웹서비스 구축 완전 가이드
 
-  <!-- 헤더 -->
-  <div class="page-header">
-    <svg viewBox="0 0 560 80" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
-          <circle cx="14" cy="14" r="1" fill="rgba(26,159,212,0.25)"/>
-        </pattern>
-      </defs>
-      <rect width="560" height="80" fill="url(#dots)"/>
-      <line x1="0" y1="40" x2="200" y2="40" stroke="rgba(26,159,212,0.2)" stroke-width="0.5"/>
-      <polygon points="460,0 560,0 560,80" fill="rgba(26,159,212,0.06)"/>
-      <polygon points="500,0 560,0 560,50" fill="rgba(26,159,212,0.08)"/>
-    </svg>
-    <div class="header-label">판권</div>
-    <div class="header-accent"></div>
-  </div>
+*Gabia · Cloudflare Tunnel/Worker · Supabase 인증·DB · 역할 기반 접근 제어 · 온라인 결제까지 원스톱*
 
-  <!-- 본문 -->
-  <div class="page-body">
-
-    <div class="title-block">
-      <div class="title-kr">
-        시놀로지 <span>NAS</span> 풀스택 인프라 구축 완전 가이드
-      </div>
-      <div class="title-en">
-        Synology NAS Full-Stack Infrastructure Complete Guide<br>
-        Gabia · Cloudflare Tunnel/Worker · Supabase Auth·DB · RBAC · Online Payment
-      </div>
-    </div>
-
-    <table class="info-table">
-      <tr>
-        <td class="info-label">저&emsp;자</td>
-        <td class="info-value">이인성</td>
-      </tr>
-      <tr>
-        <td class="info-label">발&emsp;행</td>
-        <td class="info-value">2026년</td>
-      </tr>
-      <tr>
-        <td class="info-label">출판사</td>
-        <td class="info-value">웍스프리 (WorksFree)</td>
-      </tr>
-      <tr>
-        <td class="info-label">이메일</td>
-        <td class="info-value">insung.lee@worksfree.co.kr</td>
-      </tr>
-      <tr>
-        <td class="info-label">웹사이트</td>
-        <td class="info-value">portal.worksfree.kr</td>
-      </tr>
-      <tr>
-        <td class="info-label">전자책 ISBN</td>
-        <td class="info-value">979-11-000000-00-0 (PDF)</td>
-      </tr>
-    </table>
-
-    <div class="copyright-block">
-      <p class="copyright-text">
-        Copyright © 2026 이인성, 웍스프리. All rights reserved.<br><br>
-        이 전자책의 저작권은 저자와 웍스프리에 있습니다. 저작권법에 의해 보호를 받는
-        저작물이므로 무단 전재와 무단 복제를 금합니다. 이 책의 일부 또는 전부를 이용하려면
-        반드시 저작권자의 서면 동의를 받아야 합니다.<br><br>
-        이 가이드의 실제 구현 사례는 WorksFree Hub(portal.worksfree.kr)를 기반으로 하며,
-        예시 코드 및 설정값은 학습 목적으로만 활용하시기 바랍니다.
-      </p>
-
-      <div class="publisher-footer">
-        <div class="pub-logo-block">
-          <div class="pub-logo-name">웍스<span>프리</span></div>
-          <div class="pub-logo-tagline">Your Study Makes You Free</div>
-        </div>
-        <!-- 로고 아이콘 -->
-        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="24,2 46,13 46,35 24,46 2,35 2,13" fill="none" stroke="#e0e0e0" stroke-width="1.5"/>
-          <polygon points="24,2 46,13 24,24" fill="#29B6F6" opacity="0.8"/>
-          <polygon points="46,13 46,35 24,24" fill="#1A9FD4" opacity="0.9"/>
-          <polygon points="46,35 24,46 24,24" fill="#0B7BAD" opacity="0.9"/>
-          <polygon points="24,46 2,35 24,24"  fill="#085F8A" opacity="0.85"/>
-          <polygon points="2,35 2,13 24,24"   fill="#0E8FC0" opacity="0.8"/>
-          <polygon points="2,13 24,2 24,24"   fill="#29B6F6" opacity="0.65"/>
-        </svg>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- 하단 -->
-  <div class="page-footer">
-    <span class="footer-pub">WORKSFREE</span>
-    <span class="footer-page">iv</span>
-  </div>
-
-</div>
-</div>
-
-</div>
+> **대상 독자**: 자체 도메인과 Synology NAS를 보유한 개인·소기업 운영자  
+> **전제 조건**: DSM 7.x, Cloudflare Free 플랜, Supabase Free 플랜  
+> **예시 도메인**: `example.co.kr` (실제 작업 시 자신의 도메인으로 교체)  
+> **실제 구현 사례**: WorksFree Hub (`portal.worksfree.kr`) — 이 가이드의 실례는 이 프로젝트를 기준으로 합니다.
 
 ---
 
@@ -1025,89 +423,25 @@
 
 ## 전체 구성도 — 각 서비스가 하는 역할
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  방문자 브라우저                                              │
-│  (portal.example.co.kr 접속, 로그인, 결제 등)                │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Cloudflare                                                  │
-│  ① 도메인 주소를 실제 서버로 연결해주는 안내원               │
-│  ② 악성 트래픽을 걸러주는 보안 검문소                        │
-│  ③ 터널·워커 등 부가 기능 제공                               │
-└──────────┬──────────────────────────────┬───────────────────┘
-           │ 일반 웹페이지 요청           │ 외부 API 요청
-           │ (터널로 NAS에 전달)          │ (Worker가 대신 처리)
-           ▼                              ▼
-┌──────────────────────┐    ┌─────────────────────────────────┐
-│  Cloudflare Tunnel   │    │  Cloudflare Worker               │
-│  NAS와 인터넷을      │    │  DART 등 외부 API를 대신         │
-│  연결하는 비밀 통로  │    │  호출하는 심부름꾼               │
-└──────────┬───────────┘    └─────────────────────────────────┘
-           │
-           ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Synology NAS                                                │
-│  실제 웹 파일(HTML/CSS/JS)이 저장된 내 서버                  │
-│  /volume1/web/portal  /volume1/web/test  등                  │
-└──────────┬──────────────────────────────┬───────────────────┘
-           │ 로그인·회원 확인             │ 결제 요청
-           ▼                              ▼
-┌──────────────────────┐    ┌─────────────────────────────────┐
-│  Supabase 인증       │    │  PG사 (결제대행사)               │
-│  Google·카카오 로그인│    │  토스페이먼츠(국내)              │
-│  회원 가입·탈퇴 처리 │    │  Stripe(해외)                   │
-└──────────┬───────────┘    └─────────────┬───────────────────┘
-           │                              │ 결제 완료 통보
-           ▼                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Supabase 데이터베이스 (PostgreSQL)                          │
-│  · 회원 프로필 (이름, 가입일, 동의 여부)                     │
-│  · 결제 이력 (결제일, 금액, 결제수단)                        │
-│  · 크레딧 잔액 및 사용 내역                                   │
-└─────────────────────────────────────────────────────────────┘
-
----
-
-### Mermaid 다이어그램 (개선안)
-
 ```mermaid
-graph TD
-    subgraph "사용자"
-        A["방문자 브라우저<br/>(portal.example.co.kr 접속,<br/>로그인, 결제 등)"]
-    end
+flowchart TD
+    Browser["방문자 브라우저\nportal.example.co.kr 접속 · 로그인 · 결제"]
+    CF["Cloudflare\n① 도메인 주소 → 실제 서버 연결 안내원\n② 악성 트래픽 차단 보안 검문소\n③ 터널 · 워커 등 부가 기능"]
+    Tunnel["Cloudflare Tunnel\nNAS와 인터넷을 연결하는 비밀 통로"]
+    Worker["Cloudflare Worker\nDART 등 외부 API를 대신 호출하는 심부름꾼"]
+    NAS["Synology NAS\n실제 웹 파일(HTML · CSS · JS) 저장 서버\n/volume1/web/portal  /volume1/web/test 등"]
+    Auth["Supabase 인증\nGoogle · 카카오 로그인\n회원 가입 · 탈퇴 처리"]
+    PG["PG사 결제대행사\n토스페이먼츠(국내) · Stripe(해외)"]
+    DB[("Supabase 데이터베이스\nPostgreSQL\n· 회원 프로필 · 결제 이력 · 크레딧 잔액")]
 
-    subgraph "Cloudflare"
-        B["Cloudflare<br/>① 도메인 주소를 실제 서버로 연결<br/>② 악성 트래픽을 걸러주는 보안 검문소<br/>③ 터널·워커 등 부가 기능 제공"]
-        C["Cloudflare Tunnel<br/>NAS와 인터넷을<br/>연결하는 비밀 통로"]
-        D["Cloudflare Worker<br/>DART 등 외부 API를 대신<br/>호출하는 심부름꾼"]
-    end
-
-    subgraph "자체 서버"
-        E["Synology NAS<br/>실제 웹 파일(HTML/CSS/JS) 저장<br/>/volume1/web/portal 등"]
-    end
-
-    subgraph "외부 연동 서비스"
-        F["Supabase 인증<br/>Google·카카오 로그인<br/>회원 가입·탈퇴 처리"]
-        G["PG사 (결제대행사)<br/>토스페이먼츠(국내)<br/>Stripe(해외)"]
-        H[("Supabase 데이터베이스 (PostgreSQL)<br/>· 회원 프로필, 결제 이력<br/>· 크레딧 잔액 및 사용 내역")]
-    end
-
-    A -- "웹사이트 접속" --> B
-    B -- "일반 웹페이지 요청<br/>(터널로 NAS에 전달)" --> C
-    B -- "외부 API 요청<br/>(Worker가 대신 처리)" --> D
-    C --> E
-    E -- "로그인·회원 확인" --> F
-    E -- "결제 요청" --> G
-    G -- "결제 완료 통보" --> H
-    F -- "회원 데이터 연동" --> H
-```
-
-> **[중요] 렌더링 안내:** Mermaid 다이어그램은 GitHub, GitLab 또는 VS Code에 [Mermaid 확장 기능](https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid)을 설치해야 자동으로 이미지로 변환됩니다. 만약 위 내용이 그냥 코드로 보인다면, 현재 사용 중인 마크다운 뷰어가 Mermaid를 지원하지 않는 것입니다.
-
-
+    Browser --> CF
+    CF -->|"일반 웹페이지 요청\n터널로 NAS에 전달"| Tunnel
+    CF -->|"외부 API 요청\nWorker가 대신 처리"| Worker
+    Tunnel --> NAS
+    NAS -->|"로그인 · 회원 확인"| Auth
+    NAS -->|"결제 요청"| PG
+    Auth --> DB
+    PG -->|"결제 완료 통보"| DB
 ```
 
 > **요약**: 방문자는 도메인 주소 하나로 접속합니다.  
@@ -1776,7 +1110,7 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 3. 앱 이름, 회사명, 카테고리 입력 → **[저장]**
 4. 생성된 앱 클릭 → **앱 키** 섹션에서 **REST API 키** 복사
 
-#### ② 카카오 로그인 활성화 및 Redirect URI 등록
+#### ② 카카오 로그인 활성화 및 리디렉션 URI 등록
 
 **메뉴 경로**:  
 `앱 → 왼쪽 메뉴 [제품 설정] → [카카오 로그인]`
@@ -1793,7 +1127,7 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 
 - 사이트 도메인: `https://portal.example.co.kr` → **[저장]**
 
-#### ② - 동의항목 설정 (KOE205 오류 방지)
+#### ③ 동의항목 설정 (KOE205 오류 방지)
 
 **메뉴 경로**:  
 `앱 → [제품 설정] → [카카오 로그인] → [동의항목]`
@@ -1809,7 +1143,7 @@ Supabase가 요청하는 scope에 해당하는 항목을 **필수 동의** 또�
 > **주의**: 이 항목을 설정하지 않으면 로그인 시 **KOE205 오류**("요청하신 기능을 사용할 수 없습니다")가 발생합니다.  
 > 신규 앱은 기본적으로 모든 동의항목이 비활성 상태입니다.
 
-#### ③ Supabase에 Kakao 정보 입력
+#### ④ Supabase에 Kakao 정보 입력
 
 **메뉴 경로**:  
 `Supabase 프로젝트 → [Authentication] → [Providers] → [Kakao]`
@@ -1892,7 +1226,7 @@ http://127.0.0.1:5500/**
 
 **권장 파일 구조** (2026-06-03 기준):
 
-```
+```text
 supabase/
 ├── complete_db_setup.sql         # ✅ Step 1 — 허브 코어 DB 전체 (v3.0, 필수)
 ├── bizdb_setup.sql               # ✅ Step 2 — B2B 이메일 수집/발송 DB (필수)
@@ -2021,7 +1355,7 @@ SELECT category, item, detail FROM (
 
 **권장: 원장 방식** (`delta` 기반). 충전·사용·환불의 모든 내역이 남아 분쟁 대응이 가능합니다.
 
-```
+```text
 credits 테이블 예시:
 user_id  | delta | reason        | note
 ---------|-------|---------------|------------------
@@ -2063,7 +1397,7 @@ user-001 | +100  | admin_grant   | 이벤트 지급
 
 실행 후 하단 결과 패널에서 아래 사항을 확인합니다:
 
-```
+```text
 === 1. 테이블 목록 ===        → 6개 테이블 모두 표시
 === 2. email_log 컬럼 ===     → sender_user_id 포함 전체 컬럼 목록
 === 3. RLS 정책 ===           → 각 테이블의 정책 목록 확인
@@ -2075,7 +1409,7 @@ user-001 | +100  | admin_grant   | 이벤트 지급
 
 #### 테이블 스키마 요약
 
-```
+```text
 profiles       → id, name, email, role, agreed_at, marketing_agreed, created_at
 credits        → id, user_id, delta, reason, app_id, ref_order_id, note, env, created_at
 payments       → id, user_id, order_id, pg, amount_krw, amount_usd, credits, status, env, created_at
@@ -2428,7 +1762,7 @@ DELETE FROM payments WHERE env = 'portal';
 
 ### 결제 흐름 이해하기
 
-```
+```text
 사용자: [크레딧 충전 버튼 클릭]
       │
       ▼
@@ -2898,7 +2232,7 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 
 ## 10장. 웹사이트 코드와 Supabase 연결
 
-### 8.1 HTML 파일에 Supabase 클라이언트 추가
+### 10.1 HTML 파일에 Supabase 클라이언트 추가
 
 ```html
 <!-- index.html <head> 안에 추가 -->
@@ -2910,7 +2244,7 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 </script>
 ```
 
-### 8.2 Google 로그인 버튼
+### 10.2 Google 로그인 버튼
 
 ```javascript
 async function signInWithGoogle() {
@@ -2924,7 +2258,7 @@ async function signInWithGoogle() {
 }
 ```
 
-### 8.3 Kakao 로그인 버튼
+### 10.3 Kakao 로그인 버튼
 
 ```javascript
 async function signInWithKakao() {
@@ -2938,7 +2272,7 @@ async function signInWithKakao() {
 }
 ```
 
-### 8.4 로그인 상태 감지
+### 10.4 로그인 상태 감지
 
 ```javascript
 _sb.auth.onAuthStateChange((event, session) => {
@@ -2961,7 +2295,7 @@ _sb.auth.onAuthStateChange((event, session) => {
 
 ### 11.1 3단계 배포 흐름
 
-```
+```text
 로컬 편집
    ↓  deploy.ps1 실행
 버전 자동 증가 (환경별)
@@ -2979,7 +2313,7 @@ NAS에서 index.html 존재 확인 (배포 검증)
 
 정적 웹사이트 배포 시 캐시는 세 단계에 걸쳐 동작한다.
 
-```
+```text
 [사용자 브라우저 캐시]  ← URL이 같으면 네트워크 요청 자체를 건너뜀
         ↓
 [Cloudflare Edge 캐시] ← purge_everything으로 초기화 가능
@@ -3077,7 +2411,7 @@ Invoke-RestMethod -Uri "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/p
 - **프런트엔드**: 로그인 후 profiles를 조회해 `userRole` 변수에 저장, UI 렌더링 시 참조
 - **숨기기 vs 잠그기**: 완전히 숨기는 항목(`roleOnly`)과 보이지만 클릭 차단(`consultantOnly`)을 구분
 
-```
+```text
 사용자 유형    role 값       볼 수 있는 것
 ─────────────────────────────────────────────────────
 비로그인        —            공개 + 미리보기(preview) 모드
@@ -3162,7 +2496,7 @@ function renderMenu(node) {
 
 ### 13.2 테스트 계층 구조
 
-```
+```text
 tests/
 ├── fixtures.js            # 공통 픽스처 — 외부 API 모킹, 로그인 헬퍼
 ├── global-setup.js        # realdb 전용 — 테스트 계정 생성
@@ -3263,6 +2597,8 @@ npm run test:all
 
 ---
 
+<!--  14장·15장 PDF 발행 제외 (작업 중 — 출판 시 주석 해제)
+
 ## 14장. 이메일 발송 연동 — Resend + Cloudflare Worker
 
 ### 14.1 개요 및 서비스 선택 이유
@@ -3281,7 +2617,7 @@ npm run test:all
 > **Gmail 주의사항**: Gmail은 한도가 더 많아 보이지만 커스텀 도메인 발신이 불가능하고 Worker 연동이 복잡합니다. 수신자에게 `@gmail.com` 주소로 표시되어 전문성이 떨어지며 스팸 분류 확률도 높습니다.
 
 **구현 아키텍처:**
-```
+```text
 브라우저 (마케팅 자료 페이지)
   │  POST {to, subject, html}
   ▼
@@ -3305,7 +2641,7 @@ Cloudflare Worker — send-mail
 
 가입 직후 온보딩 화면이 표시됩니다:
 
-```
+```text
 ① Add an API key
    [Add API Key] 버튼 클릭 → 키 이름 입력 → 생성 → re_xxxxx... 값 복사
 
@@ -3469,7 +2805,7 @@ wrangler secret put MAIL_FROM --config service/payment/wrangler-mail.toml
 
 페이지 로드 시 Worker `GET /`를 호출하여 이번 달 발송 현황을 표시합니다.
 
-```
+```text
 이번 달 발송 현황  (Resend 무료 월 3,000건)       ↻ 새로고침
 ████████░░░░░░░░░░░░░░  (프로그레스 바)
 2026-05 · 234 / 3,000건 발송            2,766건 남음
@@ -3480,19 +2816,19 @@ wrangler secret put MAIL_FROM --config service/payment/wrangler-mail.toml
 
 #### 단건 발송
 
-```
+```text
 전단지 선택 → 제목 → 본문 메시지 → 받는 분 이름(선택) → 이메일 주소 → [발송 →]
 ```
 
 #### 대량 발송 (CSV)
 
-```
+```text
 전단지 선택 → 제목 → 본문 메시지 → CSV 파일 업로드 → [대량 발송 →]
 ```
 
 CSV 형식: 헤더 없음, `이름,이메일` 또는 `이메일` 1열 (UTF-8, 최대 100행)
 
-```
+```csv
 홍길동,hong@company.com
 이대표,lee@factory.kr
 김사장,kim@business.co.kr
@@ -3515,7 +2851,7 @@ CSV 형식: 헤더 없음, `이름,이메일` 또는 `이메일` 1열 (UTF-8, �
 
 ### 14.8 체크리스트
 
-```
+```text
 [ Resend 설정 ]
 □ resend.com 가입
 □ API 키 발급 (re_...)
@@ -3561,7 +2897,7 @@ CSV 형식: 헤더 없음, `이름,이메일` 또는 `이메일` 1열 (UTF-8, �
 
 ### 15.3 구현 아키텍처
 
-```
+```text
 사용자 (브라우저)
   └─ PDF/이미지 업로드
         ↓ multipart/form-data
@@ -3610,7 +2946,7 @@ export default {
 > 활성화 조건: Cloudflare Worker 배포 + 크레딧 차감 로직 연동 완료.
 
 체크리스트:
-```
+```text
 [ Claude Vision 활성화 준비 ]
 □ Anthropic API 키 발급 (console.anthropic.com)
 □ wrangler secret put ANTHROPIC_API_KEY
@@ -3620,11 +2956,13 @@ export default {
 □ 단건 테스트 (3페이지 PDF, 예상 비용 $0.009)
 ```
 
+-->
+
 ---
 
 ## 부록 A. 전체 설정 순서 요약
 
-```
+```text
 [ 기초: 도메인·서버·인터넷 연결 ]
  1. 가비아에서 도메인 구매
  2. Cloudflare 계정 생성 → 도메인 추가 → 네임서버 주소 확인
@@ -3659,36 +2997,28 @@ export default {
 23. 프런트엔드에서 credit_balance 뷰 조회 → 잔액 표시 확인
 
 [ 결제 연동 ]
-21. 토스페이먼츠 가입 → 테스트 API 키 확인 (즉시 가능)
-22. Stripe 가입 → 테스트 API 키 확인 (즉시 가능)
-23. 결제 검증 Cloudflare Worker 생성 및 배포 (toss-verify, stripe-session)
-24. Worker 환경 변수에 시크릿 키 등록 (Encrypt 체크)
-25. 결제 후 크레딧 DB 업데이트 로직 연결
-26. 테스트 카드로 전체 흐름 반복 검증 (9.4 체크리스트)
-27. 사업자 인증 완료 → 실서비스 키로 교체 → 실결제 점검 (9.5 체크리스트)
+24. 토스페이먼츠 가입 → 테스트 API 키 확인 (즉시 가능)
+25. Stripe 가입 → 테스트 API 키 확인 (즉시 가능)
+26. 결제 검증 Cloudflare Worker 생성 및 배포 (toss-verify, stripe-session)
+27. Worker 환경 변수에 시크릿 키 등록 (Encrypt 체크)
+28. 결제 후 크레딧 DB 업데이트 로직 연결
+29. 테스트 카드로 전체 흐름 반복 검증 (9.4 체크리스트)
+30. 사업자 인증 완료 → 실서비스 키로 교체 → 실결제 점검 (9.5 체크리스트)
 
 [ 역할 기반 접근 제어 ]
-28. profiles.role 컬럼에 역할 값 정의 (general / consultant / gfc 등)
-29. 프런트엔드 메뉴에 roleOnly / consultantOnly / memberOnly 플래그 설정
-30. 로그인 후 profiles 조회 → userRole 변수에 저장 → 렌더링 시 참조
-
-[ 이메일 발송 연동 ]
-31. resend.com 가입 → API 키 발급 (re_...)
-32. wrangler secret put RESEND_API_KEY --config service/payment/wrangler-mail.toml
-33. wrangler kv namespace create MAIL_USAGE → id를 wrangler-mail.toml에 입력
-34. wrangler deploy --config service/payment/wrangler-mail.toml
-35. GET https://send-mail.*.workers.dev → { remaining: 3000 } 확인
-36. (운영) Resend Domains에서 커스텀 도메인 인증 → wrangler secret put MAIL_FROM
+31. profiles.role 컬럼에 역할 값 정의 (general / consultant / gfc 등)
+32. 프런트엔드 메뉴에 roleOnly / consultantOnly / memberOnly 플래그 설정
+33. 로그인 후 profiles 조회 → userRole 변수에 저장 → 렌더링 시 참조
 
 [ 테스트 환경 ]
-37. Supabase Project B 생성 (테스트 전용)
-38. .env.test.example → .env.test 복사 후 Project B 키 입력
-39. npm test (mock) 및 npm run test:realdb 실행 확인
+34. Supabase Project B 생성 (테스트 전용)
+35. .env.test.example → .env.test 복사 후 Project B 키 입력
+36. npm test (mock) 및 npm run test:realdb 실행 확인
 
 [ 배포 ]
-40. 배포 스크립트(deploy.ps1) 작성
-41. NAS에 SSH 무비번 로그인 설정
-42. 배포 실행 → https://portal.example.co.kr 최종 확인
+37. 배포 스크립트(deploy.ps1) 작성
+38. NAS에 SSH 무비번 로그인 설정
+39. 배포 실행 → https://portal.example.co.kr 최종 확인
 ```
 
 ---
@@ -3892,3 +3222,95 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 | 결제 Worker 배포 설정 | `synology-web/service/payment/wrangler-toss.toml` | |
 | 마케팅 자료 페이지 | `synology-web/consulting/marketing/index.html` | |
 | 이 가이드 | `synology-web/NAS웹서비스_구축가이드.md` | |
+
+
+<!-- 판권 -->
+<div class="html-page page-cr">
+<div class="page">
+  <!-- 헤더 -->
+  <div class="page-header">
+    <svg viewBox="0 0 560 80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="dots-cr" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+          <circle cx="14" cy="14" r="1" fill="rgba(26,159,212,0.25)"/>
+        </pattern>
+      </defs>
+      <rect width="560" height="80" fill="url(#dots-cr)"/>
+      <line x1="0" y1="40" x2="200" y2="40" stroke="rgba(26,159,212,0.2)" stroke-width="0.5"/>
+      <polygon points="460,0 560,0 560,80" fill="rgba(26,159,212,0.06)"/>
+      <polygon points="500,0 560,0 560,50" fill="rgba(26,159,212,0.08)"/>
+    </svg>
+    <div class="header-label">판권</div>
+    <div class="header-accent"></div>
+  </div>
+  <!-- 본문 -->
+  <div class="page-body">
+    <div class="title-block">
+      <div class="title-kr">
+        시놀로지 <span>NAS</span> 풀스택 인프라 구축 완전 가이드
+      </div>
+      <div class="title-en">
+        Synology NAS Full-Stack Infrastructure Complete Guide<br>
+        Gabia · Cloudflare Tunnel/Worker · Supabase Auth·DB · RBAC · Online Payment
+      </div>
+    </div>
+    <table class="info-table">
+      <tr>
+        <td class="info-label">저&emsp;자</td>
+        <td class="info-value">이인성</td>
+      </tr>
+      <tr>
+        <td class="info-label">발&emsp;행</td>
+        <td class="info-value">2026년</td>
+      </tr>
+      <tr>
+        <td class="info-label">출판사</td>
+        <td class="info-value">웍스프리 (WorksFree)</td>
+      </tr>
+      <tr>
+        <td class="info-label">이메일</td>
+        <td class="info-value">insung.lee@worksfree.co.kr</td>
+      </tr>
+      <tr>
+        <td class="info-label">웹사이트</td>
+        <td class="info-value">portal.worksfree.kr</td>
+      </tr>
+      <tr>
+        <td class="info-label">전자책 ISBN</td>
+        <td class="info-value">979-11-000000-00-0 (PDF)</td>
+      </tr>
+    </table>
+    <div class="copyright-block">
+      <p class="copyright-text">
+        Copyright © 2026 이인성, 웍스프리. All rights reserved.<br><br>
+        이 전자책의 저작권은 저자와 웍스프리에 있습니다. 저작권법에 의해 보호를 받는
+        저작물이므로 무단 전재와 무단 복제를 금합니다. 이 책의 일부 또는 전부를 이용하려면
+        반드시 저작권자의 서면 동의를 받아야 합니다.<br><br>
+        이 가이드의 실제 구현 사례는 WorksFree Hub(portal.worksfree.kr)를 기반으로 하며,
+        예시 코드 및 설정값은 학습 목적으로만 활용하시기 바랍니다.
+      </p>
+      <div class="publisher-footer">
+        <div class="pub-logo-block">
+          <div class="pub-logo-name">웍스<span>프리</span></div>
+          <div class="pub-logo-tagline">Your Study Makes You Free</div>
+        </div>
+        <!-- 로고 아이콘 -->
+        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="24,2 46,13 46,35 24,46 2,35 2,13" fill="none" stroke="#e0e0e0" stroke-width="1.5"/>
+          <polygon points="24,2 46,13 24,24" fill="#29B6F6" opacity="0.8"/>
+          <polygon points="46,13 46,35 24,24" fill="#1A9FD4" opacity="0.9"/>
+          <polygon points="46,35 24,46 24,24" fill="#0B7BAD" opacity="0.9"/>
+          <polygon points="24,46 2,35 24,24"  fill="#085F8A" opacity="0.85"/>
+          <polygon points="2,35 2,13 24,24"   fill="#0E8FC0" opacity="0.8"/>
+          <polygon points="2,13 24,2 24,24"   fill="#29B6F6" opacity="0.65"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <!-- 하단 -->
+  <div class="page-footer">
+    <span class="footer-pub">WORKSFREE</span>
+    <span class="footer-page">iv</span>
+  </div>
+</div>
+</div>

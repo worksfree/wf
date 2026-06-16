@@ -1,0 +1,385 @@
+﻿/* ══════════════════════════════════════════════════════════
+   NAS 풀스택 가이드 — 본문 인쇄용 CSS (pandoc HTML → Edge PDF)
+   대상: A5 (148mm × 210mm) 종이책 출판 레이아웃 v2
+   기반: pdf-style.css (Markdown PDF 검증 설정) + 출판 확장
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 페이지 설정 (A5, 제본 내측 여백 좌측 우선) ── */
+@page {
+  size: 148mm 210mm;
+  margin: 20mm 17mm 22mm 20mm; /* top right bottom left */
+}
+
+/* ── 리셋 ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── 기본 타이포그래피 ── */
+html, body {
+  margin: 0; padding: 0;
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.78;
+  color: #1a1a1a;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+body { max-width: none; padding: 0; }
+
+/* ── H1 (장 제목) — 항상 새 페이지 ── */
+h1 {
+  font-size: 22pt;
+  font-weight: 900;
+  color: #0B1628;
+  line-height: 1.3;
+  margin: 0 0 6mm 0;
+  padding: 8mm 0 5mm 0;
+  border-bottom: 2px solid #1A9FD4;
+  page-break-before: always;
+  break-before: page;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+h1:first-child, h1.title {
+  page-break-before: avoid; break-before: avoid;
+}
+
+/* ── H2 (절) ── */
+h2 {
+  font-size: 14pt;
+  font-weight: 700;
+  color: #0B1628;
+  margin: 7mm 0 3mm 0;
+  padding-bottom: 2mm;
+  border-bottom: 1.5px solid #1A9FD4;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+
+/* ── H3 (소절) ── */
+h3 {
+  font-size: 11.5pt;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 5mm 0 2mm 0;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+
+/* ── H4 ── */
+h4 {
+  font-size: 10.5pt;
+  font-weight: 700;
+  color: #333;
+  margin: 4mm 0 1.5mm 0;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+
+/* ── 단락 ── */
+p {
+  margin: 0 0 3.5mm 0;
+  orphans: 3; widows: 3;
+  text-align: justify;
+}
+
+/* ── 목록 ── */
+ul, ol {
+  margin: 2mm 0 3.5mm 5mm;
+  padding-left: 5mm;
+}
+li {
+  margin-bottom: 1.5mm;
+  line-height: 1.72;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+li > ul, li > ol { margin-top: 1mm; }
+
+/* ── 코드 블록 (pdf-style.css 검증 + 출판 확장) ── */
+/* blockquote·코드블록 모두 auto: avoid는 빈 공간 발생 원인 */
+div.sourceCode, pre {
+  background: #f5f6f8;
+  border: 1px solid #d8dde6;
+  border-left: 3px solid #1A9FD4;
+  border-radius: 0 4px 4px 0;
+  padding: 3mm 4mm;
+  margin: 3mm 0 4mm 0;
+  font-size: 8.5pt;
+  line-height: 1.55;
+  overflow-x: hidden;
+  white-space: pre-wrap !important;
+  word-break: break-all !important;
+  page-break-inside: auto;
+  break-inside: auto;
+}
+code {
+  font-family: 'D2Coding', 'Consolas', 'Courier New', monospace !important;
+  font-size: 8.5pt !important;
+  background: #eef0f4;
+  padding: 0.5px 3px;
+  border-radius: 3px;
+  color: #0B5394;
+}
+pre code, div.sourceCode code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* ── 표 (큰 표는 페이지 분리 허용, thead 반복, 행 단위만 차단) ── */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 3mm 0 4mm 0;
+  font-size: 9.5pt;
+  page-break-inside: auto;
+  break-inside: auto;
+}
+thead {
+  display: table-header-group !important;
+}
+tr {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+th, td {
+  border: 1px solid #c8cdd5;
+  padding: 2mm 3mm;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: #0B1628;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 9pt;
+}
+tr:nth-child(even) td { background: #f7f8fa; }
+
+/* ── 인용/노트 블록 ── */
+blockquote {
+  border-left: 3px solid #1A9FD4;
+  background: #EFF6FD;
+  margin: 3mm 0 4mm 0;
+  padding: 3mm 4mm;
+  border-radius: 0 4px 4px 0;
+  color: #2a3a4a;
+  page-break-inside: auto;
+  break-inside: auto;
+}
+blockquote p { margin-bottom: 1.5mm; text-align: left; }
+blockquote p:last-child { margin-bottom: 0; }
+
+/* ── 이미지 / 그림 ── */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 3mm auto;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+figure {
+  margin: 3mm 0;
+  text-align: center;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+figcaption {
+  font-size: 9pt;
+  color: #666;
+  margin-top: 1.5mm;
+  text-align: center;
+}
+
+/* ── 구분선 ── */
+hr {
+  border: none;
+  border-top: 1px solid #d0d5dd;
+  margin: 5mm 0;
+}
+
+/* ── 전체 목차 숨김 (단일 페이지 요약 목차로 대체) ── */
+nav#TOC { display: none !important; }
+
+/* ── 요약 목차 (1페이지) ── */
+.toc-summary {
+  page-break-after: always;
+  break-after: page;
+  padding: 0;
+}
+.toc-summary h2 {
+  font-size: 18pt;
+  font-weight: 900;
+  color: #0B1628;
+  border-bottom: 2px solid #1A9FD4;
+  padding-bottom: 3mm;
+  margin: 0 0 6mm 0;
+  page-break-before: avoid;
+  break-before: avoid;
+  page-break-after: avoid;
+  break-after: avoid;
+  border-top: none;
+}
+.toc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10pt;
+  line-height: 1.6;
+  border: 1px solid #dde5ee;
+}
+.toc-table td {
+  border-bottom: 1px solid #eef1f5;
+}
+.toc-table tr:last-child td {
+  border-bottom: none;
+}
+.toc-table tr {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+.toc-table tr.toc-part {
+  border-bottom: 1.5px solid #e0e8f0;
+  margin-top: 2mm;
+}
+.toc-table td.toc-num {
+  width: 28mm;
+  color: #1A9FD4;
+  font-weight: 700;
+  padding: 1.5mm 2mm 1.5mm 0;
+  white-space: nowrap;
+  vertical-align: top;
+}
+.toc-table td.toc-title {
+  color: #1a1a1a;
+  padding: 1.5mm 2mm;
+  vertical-align: top;
+}
+.toc-table td.toc-page {
+  width: 10mm;
+  text-align: right;
+  color: #555;
+  font-size: 9.5pt;
+  padding: 1.5mm 0 1.5mm 2mm;
+  white-space: nowrap;
+  vertical-align: top;
+}
+.toc-table tr.toc-appendix td.toc-num {
+  font-size: 9pt;
+  color: #888;
+  font-weight: 400;
+}
+.toc-table tr.toc-appendix td.toc-title {
+  font-size: 9.5pt;
+  color: #555;
+}
+.toc-table tr.toc-appendix td.toc-page {
+  color: #888;
+}
+
+/* ── 구 목차 스타일 (숨겨지므로 미사용) ── */
+nav#TOC h2, nav#TOC > p > strong {
+  font-size: 18pt;
+  font-weight: 900;
+  color: #0B1628;
+  border-bottom: 2px solid #1A9FD4;
+  padding-bottom: 3mm;
+  margin: 0 0 5mm 0;
+}
+nav#TOC ul { list-style: none; padding-left: 0; margin: 0; }
+nav#TOC > ul > li {
+  margin-bottom: 2.5mm;
+  font-weight: 700;
+  font-size: 10.5pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+nav#TOC > ul > li > ul {
+  padding-left: 5mm;
+  margin-top: 1mm;
+}
+nav#TOC > ul > li > ul > li {
+  font-weight: 400;
+  font-size: 9.5pt;
+  margin-bottom: 1mm;
+}
+nav#TOC > ul > li > ul > li > ul {
+  padding-left: 4mm;
+}
+nav#TOC > ul > li > ul > li > ul > li {
+  font-weight: 400;
+  font-size: 8.5pt;
+  color: #444;
+  margin-bottom: 0.5mm;
+}
+nav#TOC a { color: #0B1628; text-decoration: none; }
+nav#TOC a:hover { color: #1A9FD4; }
+nav#TOC h2, nav#TOC > p > strong {
+  font-size: 18pt;
+  font-weight: 900;
+  color: #0B1628;
+  border-bottom: 2px solid #1A9FD4;
+  padding-bottom: 3mm;
+  margin: 0 0 5mm 0;
+}
+nav#TOC ul { list-style: none; padding-left: 0; margin: 0; }
+nav#TOC > ul > li {
+  margin-bottom: 2.5mm;
+  font-weight: 700;
+  font-size: 10.5pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+nav#TOC > ul > li > ul {
+  padding-left: 5mm;
+  margin-top: 1mm;
+}
+nav#TOC > ul > li > ul > li {
+  font-weight: 400;
+  font-size: 9.5pt;
+  margin-bottom: 1mm;
+}
+nav#TOC > ul > li > ul > li > ul {
+  padding-left: 4mm;
+}
+nav#TOC > ul > li > ul > li > ul > li {
+  font-weight: 400;
+  font-size: 8.5pt;
+  color: #444;
+  margin-bottom: 0.5mm;
+}
+nav#TOC a { color: #0B1628; text-decoration: none; }
+nav#TOC a:hover { color: #1A9FD4; }
+
+/* ── 제목 블록 (pandoc title block) ── */
+h1.title {
+  font-size: 18pt;
+  text-align: center;
+  border: none;
+  padding-top: 20mm;
+  margin-bottom: 4mm;
+  page-break-before: avoid;
+  break-before: avoid;
+}
+p.author, p.date {
+  text-align: center;
+  color: #555;
+  font-size: 10pt;
+  margin: 1.5mm 0;
+}
+
+/* ── 섹션 번호 (--number-sections) ── */
+.header-section-number {
+  color: #1A9FD4;
+  margin-right: 5px;
+  font-weight: inherit;
+}
+nav#TOC .header-section-number {
+  color: #1A9FD4;
+  font-size: 0.88em;
+}
+
+/* ── 강조 ── */
+strong { font-weight: 700; color: #0B1628; }
+em { font-style: normal; color: #1a6ea8; font-weight: 600; }

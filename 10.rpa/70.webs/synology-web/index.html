@@ -1958,7 +1958,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.3.11';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.3.26';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2441,7 +2441,28 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') _flushDuration();
 });
 
+function normalizeIframeSrc(src) {
+  if (!src) return '';
+  let s = String(src).trim();
+  try {
+    if (/^https?:\/\//i.test(s)) {
+      const u = new URL(s);
+      if (u.origin === location.origin) s = u.pathname + u.search + u.hash;
+    }
+  } catch (_) {}
+
+  s = s.split('#')[0].split('?')[0].replace(/\\/g, '/').replace(/^\/+/, '');
+  const appDir = location.pathname
+    .replace(/\\/g, '/')
+    .replace(/\/[^\/]*$/, '/')
+    .replace(/^\/+/, '');
+
+  if (appDir && s.startsWith(appDir)) s = s.slice(appDir.length);
+  return s.replace(/^\/+/, '');
+}
+
 function loadIframe(src, path=[], label='') {
+  src = normalizeIframeSrc(src);
   trackPageView(src);
   closeSidebar();
   currentPath  = path;
@@ -3365,7 +3386,7 @@ const DEV_USER_GFC = {
 };
 const DEV_USER_ADMIN = {
   id: 'd0000004-0000-4000-8000-000000000000',
-  email: 'admin@worksfree.co.kr',
+  email: 'insung.lee@worksfree.co.kr',
   user_metadata: { full_name: '관리자 테스터', avatar_url: '' }
 };
 
@@ -3454,7 +3475,7 @@ const DEV_CREDS = {
   general:    { email: 'test@worksfree.co.kr',       pw: 'TestPassword123!'  },
   consultant: { email: 'consultant@worksfree.co.kr', pw: 'TestPassword123!'  },
   gfc:        { email: 'gfc@worksfree.co.kr',        pw: 'TestPassword123!'  },
-  admin:      { email: 'admin@worksfree.co.kr',      pw: 'AdminPassword123!' },
+  admin:      { email: 'insung.lee@worksfree.co.kr',      pw: 'AdminPassword123!' },
 };
 
 async function devLogin(role = 'general') {

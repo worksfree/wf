@@ -1,14 +1,14 @@
-<!-- ================================================================
+﻿<!-- ================================================================
      전자책 표지 · 책소개 · 저자소개 · 판권 (HTML 섹션)
+     브라우저/PDF 뷰어에서 렌더링됩니다.
      ================================================================ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
+
 /* ==== 전자책 페이지 공통 래퍼 ==== */
 .ebook-wrapper {
   font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  background: #111;
-  padding: 40px 0;
 }
 .ebook-page {
   width: 560px;
@@ -19,15 +19,16 @@
   overflow: hidden;
 }
 @media print {
-  .ebook-wrapper { background: none !important; padding: 0 !important; }
+  body { background: none !important; padding: 0 !important; }
   .ebook-page { width: 148mm; height: 210mm; box-shadow: none; margin: 0; }
+  .ebook-wrapper { background: none; }
 }
 
 
 /* ── cover ── */
 
-    .ebook-page * { margin: 0; padding: 0; box-sizing: border-box; }
-    .ebook-page {
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
       background: #333;
       display: flex;
       justify-content: center;
@@ -168,14 +169,14 @@
     }
 
     @media print {
-      .ebook-page { background: none; padding: 0; }
+      body { background: none; padding: 0; }
       .cover { width: 148mm; height: 210mm; box-shadow: none; }
     }
   
 /* ── book_intro ── */
 
-    .ebook-page * { margin: 0; padding: 0; box-sizing: border-box; }
-    .ebook-page {
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
       background: #1a1a2e;
       display: flex;
       justify-content: center;
@@ -228,7 +229,7 @@
     }
 
     /* ── 본문 ── */
-    .page-.ebook-page {
+    .page-body {
       flex: 1;
       padding: 28px 36px 20px;
       display: flex;
@@ -340,14 +341,14 @@
     .footer-page { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
 
     @media print {
-      .ebook-page { background: none; padding: 0; }
+      body { background: none; padding: 0; }
       .page { width: 148mm; height: 210mm; box-shadow: none; }
     }
   
 /* ── author ── */
 
-    .ebook-page * { margin: 0; padding: 0; box-sizing: border-box; }
-    .ebook-page {
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
       background: #1a1a2e;
       display: flex;
       justify-content: center;
@@ -399,7 +400,7 @@
     }
 
     /* ── 본문 ── */
-    .page-.ebook-page {
+    .page-body {
       flex: 1;
       padding: 32px 36px 20px;
       display: flex;
@@ -529,14 +530,14 @@
     .footer-page { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
 
     @media print {
-      .ebook-page { background: none; padding: 0; }
+      body { background: none; padding: 0; }
       .page { width: 148mm; height: 210mm; box-shadow: none; }
     }
   
 /* ── copyright ── */
 
-    .ebook-page * { margin: 0; padding: 0; box-sizing: border-box; }
-    .ebook-page {
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
       background: #1a1a2e;
       display: flex;
       justify-content: center;
@@ -588,7 +589,7 @@
     }
 
     /* ── 본문 ── */
-    .page-.ebook-page {
+    .page-body {
       flex: 1;
       padding: 40px 48px 28px;
       display: flex;
@@ -681,10 +682,12 @@
     .footer-page { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
 
     @media print {
-      .ebook-page { background: none; padding: 0; }
+      body { background: none; padding: 0; }
       .page { width: 148mm; height: 210mm; box-shadow: none; }
     }
   
+/* 페이지 미리보기용 배경 */
+.ebook-wrapper { background: #111; padding: 40px 0; }
 </style>
 
 <div class="ebook-wrapper">
