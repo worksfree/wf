@@ -47,6 +47,9 @@ const STEP_VUS     = parseInt(__ENV.STEP_VUS   || '10');
 const STEP_HOLD_S  = parseInt(__ENV.STEP_HOLD  || '60');
 const MAX_VUS      = parseInt(__ENV.MAX_VUS    || '200');
 const P95_LIMIT_MS = parseInt(__ENV.P95_LIMIT  || '3000');
+// STRESS=true: sleep 제거 → VU수 = 실제 동시 연결수 (서버 한계 탐색)
+// 기본(false): sleep 1~2s → 실 사용자 패턴 시뮬레이션
+const STRESS_MODE  = (__ENV.STRESS || 'false') === 'true';
 
 // Cloudflare 경유 여부 자동 감지
 const VIA_CF = TARGET_URL.startsWith('https://') && !TARGET_URL.includes('192.168');
@@ -153,7 +156,9 @@ export default function () {
     );
   }
 
-  sleep(1 + Math.random());
+  // 일반 모드: 실 사용자처럼 1~2초 대기 (VU수 ≠ 동시연결수)
+  // 스트레스 모드(STRESS=true): sleep 없음 → VU수 = 동시연결수
+  if (!STRESS_MODE) sleep(1 + Math.random());
 }
 
 // ── 최종 보고서 ───────────────────────────────────────────────────────
@@ -202,6 +207,9 @@ export function handleSummary(data) {
   const p95pct   = Math.min((dur['p(95)'] || 0) / P95_LIMIT_MS, 1);
   const p95bar   = bar(p95pct, 30);
 
+  const modeNote = STRESS_MODE
+    ? '  ※ STRESS 모드: sleep 없음 — VU수 = 실제 동시 연결수'
+    : '  ※ 일반 모드: sleep 1~2s — 실 사용자 패턴 (VU수 ≠ 동시 연결수)';
   const cfNote = VIA_CF
     ? (CACHE_BUST
         ? '  ※ Cloudflare 경유 + 캐시 무효화 (Origin 부하 측정)'
@@ -216,6 +224,7 @@ export function handleSummary(data) {
     `  일시   : ${ts}`,
     `  대상   : ${TARGET_URL}`,
     cfNote,
+    modeNote,
     '',
     div,
     '  [ 결과 ]',
