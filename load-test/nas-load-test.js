@@ -1,15 +1,23 @@
 /**
- * WorksFree Hub — NAS 동접자 부하 테스트
- * =========================================
- * 목적: Synology NAS nginx가 몇 명 동접까지 처리 가능한지 측정
- *       (Supabase / Cloudflare Worker 와 무관한 순수 정적 파일 서빙 테스트)
+ * WorksFree Hub — NAS / Cloudflare 동접자 부하 테스트
+ * =====================================================
  *
- * 실행:
- *   k6 run --env TARGET_URL=http://192.168.x.x nas-load-test.js
+ * [내부망 직접] NAS 하드웨어 한계 측정 (Cloudflare CDN 우회)
+ *   k6 run --env TARGET_ENV=internal nas-load-test.js
  *
- * 고급 옵션:
+ * [Cloudflare 경유] 실 사용자 경험 측정 (CDN 캐시 포함)
+ *   k6 run --env TARGET_ENV=cloudflare nas-load-test.js
+ *
+ * [Cloudflare 경유 + 캐시 무효화] Origin까지 도달하는 실 부하 측정
+ *   k6 run --env TARGET_ENV=cloudflare --env CACHE_BUST=true nas-load-test.js
+ *
+ * [직접 URL 지정]
+ *   k6 run --env TARGET_URL=http://192.168.100.38:8081 nas-load-test.js
+ *
+ * [전체 옵션]
  *   k6 run \
- *     --env TARGET_URL=http://192.168.1.100 \
+ *     --env TARGET_ENV=cloudflare \
+ *     --env CACHE_BUST=true \
  *     --env STEP_VUS=10 \
  *     --env STEP_HOLD=60 \
  *     --env MAX_VUS=200 \
@@ -17,21 +25,33 @@
  *     nas-load-test.js
  */
 
-import http       from 'k6/http';
+import http         from 'k6/http';
 import { check, sleep } from 'k6';
-import { Rate, Counter, Trend, Gauge } from 'k6/metrics';
-import exec       from 'k6/execution';
+import { Rate, Counter, Gauge } from 'k6/metrics';
+import exec         from 'k6/execution';
 
-// ── 설정 ──────────────────────────────────────────────────────────────
-// 내부망: http://192.168.100.38  (포트 80 → 443 리다이렉트 자동 추적)
-// 외부망: https://hub.worksfree.co.kr
-const TARGET_URL   = __ENV.TARGET_URL  || 'http://192.168.100.38';
-const STEP_VUS     = parseInt(__ENV.STEP_VUS   || '10');   // 단계별 증가 인원
-const STEP_HOLD_S  = parseInt(__ENV.STEP_HOLD  || '60');   // 각 단계 유지(초)
-const MAX_VUS      = parseInt(__ENV.MAX_VUS    || '200');  // 최대 가상 유저
-const P95_LIMIT_MS = parseInt(__ENV.P95_LIMIT  || '3000'); // 중단 기준 (ms)
+// ── 환경 프리셋 ───────────────────────────────────────────────────────
+const ENV_PRESETS = {
+  'internal':      'http://192.168.100.38:8082',   // www (NAS 직접, 내부망)
+  'internal-test': 'http://192.168.100.38:8081',   // test (NAS 직접, 내부망)
+  'internal-stg':  'http://192.168.100.38:8080',   // staging (NAS 직접, 내부망)
+  'cloudflare':    'https://portal.worksfree.kr',  // www (Cloudflare 경유)
+  'cloudflare-stg':'https://staging.worksfree.kr', // staging (Cloudflare 경유)
+  'cloudflare-test':'https://test.worksfree.kr',   // test (Cloudflare 경유)
+};
 
-// 테스트 대상 경로 (정적 파일 — JS 실행 없음, Supabase 호출 없음)
+const TARGET_ENV   = __ENV.TARGET_ENV  || 'internal';
+const TARGET_URL   = __ENV.TARGET_URL  || ENV_PRESETS[TARGET_ENV] || ENV_PRESETS.internal;
+const CACHE_BUST   = (__ENV.CACHE_BUST || 'false') === 'true'; // ?_=ts 쿼리로 캐시 무효화
+const STEP_VUS     = parseInt(__ENV.STEP_VUS   || '10');
+const STEP_HOLD_S  = parseInt(__ENV.STEP_HOLD  || '60');
+const MAX_VUS      = parseInt(__ENV.MAX_VUS    || '200');
+const P95_LIMIT_MS = parseInt(__ENV.P95_LIMIT  || '3000');
+
+// Cloudflare 경유 여부 자동 감지
+const VIA_CF = TARGET_URL.startsWith('https://') && !TARGET_URL.includes('192.168');
+
+// 테스트 대상 경로
 const PATHS = [
   '/',
   '/index.html',
@@ -39,37 +59,34 @@ const PATHS = [
 ];
 
 // ── 스테이지 자동 생성 ─────────────────────────────────────────────────
-// 10→20→30→...→MAX_VUS, 각 단계 10초 램프업 + STEP_HOLD_S 유지
 function buildStages() {
   const stages = [];
   for (let vus = STEP_VUS; vus <= MAX_VUS; vus += STEP_VUS) {
-    stages.push({ duration: '10s',            target: vus }); // 램프업
-    stages.push({ duration: `${STEP_HOLD_S}s`, target: vus }); // 유지
+    stages.push({ duration: '10s',             target: vus });
+    stages.push({ duration: `${STEP_HOLD_S}s`, target: vus });
   }
   return stages;
 }
 
 const ALL_STAGES       = buildStages();
-const STAGE_DURATION_S = 10 + STEP_HOLD_S; // 단계당 총 시간(초)
+const STAGE_DURATION_S = 10 + STEP_HOLD_S;
 
 // ── k6 옵션 ───────────────────────────────────────────────────────────
 export const options = {
   scenarios: {
     nas_ramp: {
-      executor:          'ramping-vus',
-      startVUs:          0,
-      stages:            ALL_STAGES,
-      gracefulRampDown:  '10s',
+      executor:         'ramping-vus',
+      startVUs:         0,
+      stages:           ALL_STAGES,
+      gracefulRampDown: '10s',
     },
   },
   thresholds: {
-    // P95 응답 시간이 기준 초과하면 15초 후 테스트 중단
     http_req_duration: [{
       threshold:      `p(95)<${P95_LIMIT_MS}`,
       abortOnFail:    true,
       delayAbortEval: '15s',
     }],
-    // 오류율 10% 초과해도 중단
     http_req_failed: [{
       threshold:      'rate<0.10',
       abortOnFail:    true,
@@ -80,196 +97,200 @@ export const options = {
 };
 
 // ── 커스텀 메트릭 ─────────────────────────────────────────────────────
-const slowRate    = new Rate('req_slow_rate');     // 3초 초과 비율
-const slowCount   = new Counter('req_slow_count'); // 3초 초과 건수
-const under1s     = new Rate('req_under_1s');      // 1초 미만 비율
-const peakVUs     = new Gauge('peak_active_vus');  // 최대 동접자 스냅샷
-const stageMetric = new Gauge('current_stage_vus'); // 현재 단계 VU 수
+const slowRate  = new Rate('req_slow_rate');
+const slowCount = new Counter('req_slow_count');
+const under1s   = new Rate('req_under_1s');
+const peakVUs   = new Gauge('peak_active_vus');
+
+// ── 실시간 로그 헬퍼 ──────────────────────────────────────────────────
+function speedIcon(ms) {
+  if (ms <  500) return 'FAST  ';
+  if (ms < 1500) return 'OK    ';
+  if (ms < 2500) return 'SLOW  ';
+  return             'DANGER';
+}
 
 // ── 메인 테스트 로직 ──────────────────────────────────────────────────
 export default function () {
   const vusNow   = exec.instance.vusActive;
-  const stageVUs = Math.ceil(vusNow / STEP_VUS) * STEP_VUS;
-  const path     = PATHS[Math.floor(Math.random() * PATHS.length)];
-  const url      = TARGET_URL + path;
+  const stepVUs  = Math.ceil(vusNow / STEP_VUS) * STEP_VUS;
+  const pathIdx  = Math.floor(Math.random() * PATHS.length);
+  const path     = PATHS[pathIdx];
+
+  // 캐시 버스팅: Cloudflare CDN을 건너뛰고 Origin까지 요청 전달
+  const cacheBustParam = CACHE_BUST ? `?_=${Date.now()}` : '';
+  const url = TARGET_URL + path + cacheBustParam;
 
   peakVUs.add(vusNow);
-  stageMetric.add(stageVUs);
 
-  const res = http.get(url, {
-    timeout: '12s',
-    tags: {
-      path:      path,
-      vu_bucket: String(stageVUs), // 10단위 버킷 태그
-    },
-    redirects: 5,
-  });
-
+  const res    = http.get(url, { timeout: '12s', tags: { path, vu_bucket: String(stepVUs) }, redirects: 5 });
   const dur    = res.timings.duration;
   const ok     = res.status >= 200 && res.status < 400;
   const isSlow = dur > P95_LIMIT_MS;
 
   check(res, {
-    '✓ 상태코드 2xx/3xx':   (r) => r.status >= 200 && r.status < 400,
-    '✓ 응답 < 1초':          (r) => r.timings.duration < 1000,
-    '✓ 응답 < 3초 (기준선)': (r) => r.timings.duration < P95_LIMIT_MS,
+    'status 2xx/3xx':        (r) => r.status >= 200 && r.status < 400,
+    'response < 1s':         (r) => r.timings.duration < 1000,
+    `response < ${P95_LIMIT_MS}ms`: (r) => r.timings.duration < P95_LIMIT_MS,
   });
 
   slowRate.add(isSlow);
   if (isSlow) slowCount.add(1);
   under1s.add(dur < 1000);
 
-  // 실제 사용자 패턴: 1~2초 사이 랜덤 대기 (페이지 읽는 시간)
+  // ── 실시간 진행 로그 (VU 1 전담, 매 이터레이션) ──────────────────
+  if (exec.vu.idInTest === 1) {
+    const icon   = ok ? 'OK' : 'ERR';
+    const speed  = speedIcon(dur);
+    const vuStr  = String(vusNow).padStart(3);
+    const stepNo = Math.ceil(vusNow / STEP_VUS);
+    const durStr = String(Math.round(dur)).padStart(5);
+    console.log(
+      `[Step ${String(stepNo).padStart(2)}/${MAX_VUS / STEP_VUS}] ` +
+      `VU: ${vuStr}명 | ` +
+      `응답: ${durStr}ms [${speed}] | ` +
+      `${icon} ${path}`
+    );
+  }
+
   sleep(1 + Math.random());
 }
 
-// ── 결과 요약 보고서 ──────────────────────────────────────────────────
+// ── 최종 보고서 ───────────────────────────────────────────────────────
 export function handleSummary(data) {
   const m   = data.metrics;
-  const dur = m.http_req_duration?.values  || {};
-  const req = m.http_reqs?.values          || {};
-  const err = m.http_req_failed?.values    || {};
-  const slw = m.req_slow_count?.values     || {};
-  const slr = m.req_slow_rate?.values      || {};
-  const u1s = m.req_under_1s?.values       || {};
+  const dur = m.http_req_duration?.values || {};
+  const req = m.http_reqs?.values         || {};
+  const err = m.http_req_failed?.values   || {};
+  const slw = m.req_slow_count?.values    || {};
+  const slr = m.req_slow_rate?.values     || {};
+  const u1s = m.req_under_1s?.values      || {};
 
-  // 테스트 실행 시간으로 임계점 VU 수 계산
-  const elapsedS    = (data.state.testRunDurationMs || 0) / 1000;
+  const elapsedS     = (data.state.testRunDurationMs || 0) / 1000;
   const stagesPassed = Math.floor(elapsedS / STAGE_DURATION_S);
   const breakingVUs  = Math.min((stagesPassed + 1) * STEP_VUS, MAX_VUS);
   const stableVUs    = Math.max(0, breakingVUs - STEP_VUS);
-
-  // 테스트가 최대 VU에 도달하기 전에 중단됐는지
-  const totalDurationS = ALL_STAGES.reduce((s, st) => s + parseFloat(st.duration), 0);
-  const aborted        = elapsedS < totalDurationS - 5;
+  const totalDurS    = ALL_STAGES.reduce((s, st) => s + parseFloat(st.duration), 0);
+  const aborted      = elapsedS < totalDurS - 5;
 
   const ts  = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-  const sep = '═'.repeat(62);
-  const div = '─'.repeat(62);
+  const sep = '═'.repeat(64);
+  const div = '─'.repeat(64);
 
-  // ── 텍스트 보고서 ──────────────────────────────────────────────────
+  // ── 응답속도 시각화 바 ────────────────────────────────────────────
+  function bar(ratio, width) {
+    const filled = Math.round(ratio * width);
+    return '[' + '█'.repeat(filled) + '░'.repeat(width - filled) + ']';
+  }
+
+  // 단계별 통과/실패 시각화
+  const totalSteps = MAX_VUS / STEP_VUS;
+  const passedSteps = aborted ? stagesPassed : totalSteps;
+  const stepsBar = Array.from({ length: totalSteps }, (_, i) => {
+    const vus = (i + 1) * STEP_VUS;
+    if (aborted && vus > breakingVUs) return '·';
+    if (aborted && vus === breakingVUs) return '✗';
+    return '✓';
+  }).join('');
+
+  // 결과 판정
+  const resultLine = aborted
+    ? `FAIL  P95 ${P95_LIMIT_MS}ms 초과 → ${breakingVUs}명에서 중단`
+    : `PASS  ${MAX_VUS}명 동접까지 P95 < ${P95_LIMIT_MS}ms 모두 통과`;
+
+  const p95val   = (dur['p(95)'] || 0).toFixed(0);
+  const p95pct   = Math.min((dur['p(95)'] || 0) / P95_LIMIT_MS, 1);
+  const p95bar   = bar(p95pct, 30);
+
+  const cfNote = VIA_CF
+    ? (CACHE_BUST
+        ? '  ※ Cloudflare 경유 + 캐시 무효화 (Origin 부하 측정)'
+        : '  ※ Cloudflare 경유 (CDN 캐시 포함 — 실 사용자 경험 측정)')
+    : '  ※ NAS 직접 연결 (Cloudflare 우회 — 하드웨어 한계 측정)';
+
   const lines = [
+    '',
     sep,
-    '  WorksFree Hub — NAS 동접자 부하 테스트 결과 보고서',
+    '  WorksFree Hub 부하 테스트 결과',
     sep,
-    `  실행 일시    : ${ts}`,
-    `  대상 URL    : ${TARGET_URL}`,
-    `  결과        : ${aborted ? '⚡ 임계점 도달 — 조기 중단' : '✅ 최대 VU까지 기준 통과'}`,
+    `  일시   : ${ts}`,
+    `  대상   : ${TARGET_URL}`,
+    cfNote,
     '',
     div,
-    '  [ 핵심 결과 ]',
+    '  [ 결과 ]',
     div,
-    aborted
-      ? [
-          `  ⚡ 임계점 동접자   : ${breakingVUs}명`,
-          `     (P95 응답 ${P95_LIMIT_MS}ms 초과 시점)`,
-          `  ✅ 안정 동접자     : ${stableVUs}명 이하에서 기준 충족`,
-        ].join('\n')
-      : `  ✅ ${MAX_VUS}명 동접까지 P95 < ${P95_LIMIT_MS}ms 기준 모두 통과`,
+    `  ${resultLine}`,
     '',
-    div,
-    '  [ 테스트 설정 ]',
-    div,
-    `  가상 유저 증가 단위 : ${STEP_VUS}명`,
-    `  단계별 유지 시간   : ${STEP_HOLD_S}초 (+ 10초 램프업)`,
-    `  최대 가상 유저     : ${MAX_VUS}명`,
-    `  응답시간 기준(P95) : ${P95_LIMIT_MS}ms`,
-    `  총 테스트 시간     : ${elapsedS.toFixed(1)}초`,
+    `  단계별 결과  (각 ${STEP_VUS}명씩 / ${STEP_HOLD_S}초 유지)`,
+    `  ${stepsBar}  ← ${MAX_VUS}명`,
+    `  ${Array.from({ length: totalSteps }, (_, i) => (i + 1) % 5 === 0 ? String((i + 1) * STEP_VUS).padStart(3) : '   ').join('')}`,
     '',
-    div,
-    '  [ 응답 시간 분포 (ms) ]',
-    div,
-    `  최솟값  (min) : ${(dur.min   || 0).toFixed(1)} ms`,
-    `  중앙값  (med) : ${(dur.med   || 0).toFixed(1)} ms`,
-    `  평균    (avg) : ${(dur.avg   || 0).toFixed(1)} ms`,
-    `  P75          : ${(dur['p(75)'] || 0).toFixed(1)} ms`,
-    `  P90          : ${(dur['p(90)'] || 0).toFixed(1)} ms`,
-    `  P95  ← 기준  : ${(dur['p(95)'] || 0).toFixed(1)} ms  (기준: ${P95_LIMIT_MS}ms)`,
-    `  P99          : ${(dur['p(99)'] || 0).toFixed(1)} ms`,
-    `  최댓값  (max) : ${(dur.max   || 0).toFixed(1)} ms`,
-    '',
-    div,
-    '  [ 요청 통계 ]',
-    div,
-    `  총 요청 수         : ${(req.count || 0).toLocaleString()} 건`,
-    `  초당 요청 (RPS)    : ${(req.rate  || 0).toFixed(2)} req/s`,
-    `  오류율             : ${((err.rate || 0) * 100).toFixed(2)} %`,
-    `  3초 초과 요청      : ${(slw.count || 0).toLocaleString()} 건 (${((slr.rate || 0) * 100).toFixed(1)}%)`,
-    `  1초 미만 요청      : ${((u1s.rate || 0) * 100).toFixed(1)} %`,
-    '',
-    div,
-    '  [ 단계별 진행 계획 ]',
-    div,
-    ...Array.from({ length: MAX_VUS / STEP_VUS }, (_, i) => {
-      const vus     = (i + 1) * STEP_VUS;
-      const isBreak = aborted && vus === breakingVUs;
-      const passed  = !aborted || vus < breakingVUs;
-      const marker  = isBreak ? '  ← ⚡ 임계점' : (passed ? '  ✓' : '  ·');
-      return `    ${String(vus).padStart(4)}명 × ${STEP_HOLD_S}초${marker}`;
-    }),
-    '',
-    div,
-    '  [ 권장 사항 ]',
-    div,
     ...(aborted ? [
-      `  현재 NAS는 약 ${stableVUs}명까지 안정적으로 처리 가능합니다.`,
-      `  ${breakingVUs}명에서 P95 응답이 ${P95_LIMIT_MS}ms를 초과했습니다.`,
-      '',
-      '  성능 개선 방안:',
-      '  1. nginx.conf → worker_processes auto; worker_connections 4096;',
-      '  2. 정적 파일 Cloudflare CDN 캐시 설정으로 NAS 직접 요청 감소',
-      '  3. gzip/brotli 압축 활성화 (텍스트 파일 전송량 감소)',
-      '  4. Synology 리소스 모니터에서 테스트 중 CPU/RAM 확인',
-      '  5. nginx access_log off; 설정으로 디스크 I/O 감소',
+      `  ✓ 안정 구간  : ~${stableVUs}명  (P95 기준 이내)`,
+      `  ✗ 임계점     : ${breakingVUs}명  (P95 ${p95val}ms → ${P95_LIMIT_MS}ms 초과)`,
     ] : [
-      `  ${MAX_VUS}명 동접에서도 P95 응답이 ${P95_LIMIT_MS}ms 이내입니다.`,
-      '  MAX_VUS 값을 늘려 더 높은 동접을 테스트해보세요.',
-      `  예: k6 run --env MAX_VUS=500 --env TARGET_URL=${TARGET_URL} nas-load-test.js`,
+      `  ✓ 전 구간 통과 : ${MAX_VUS}명까지 P95 ${p95val}ms (기준 ${P95_LIMIT_MS}ms)`,
     ]),
     '',
+    div,
+    '  [ 응답 시간 ]',
+    div,
+    `  P95 ${p95bar} ${p95val}ms / ${P95_LIMIT_MS}ms`,
+    '',
+    `  Min  ${(dur.min         || 0).toFixed(0).padStart(6)} ms`,
+    `  Med  ${(dur.med         || 0).toFixed(0).padStart(6)} ms`,
+    `  Avg  ${(dur.avg         || 0).toFixed(0).padStart(6)} ms`,
+    `  P75  ${(dur['p(75)']   || 0).toFixed(0).padStart(6)} ms`,
+    `  P90  ${(dur['p(90)']   || 0).toFixed(0).padStart(6)} ms`,
+    `  P95  ${(dur['p(95)']   || 0).toFixed(0).padStart(6)} ms  ← 중단 기준`,
+    `  P99  ${(dur['p(99)']   || 0).toFixed(0).padStart(6)} ms`,
+    `  Max  ${(dur.max         || 0).toFixed(0).padStart(6)} ms`,
+    '',
+    div,
+    '  [ 트래픽 ]',
+    div,
+    `  총 요청    : ${(req.count || 0).toLocaleString()} 건`,
+    `  RPS        : ${(req.rate  || 0).toFixed(1)} req/s`,
+    `  오류율     : ${((err.rate || 0) * 100).toFixed(2)} %`,
+    `  1초 이내   : ${((u1s.rate || 0) * 100).toFixed(1)} %`,
+    `  3초 초과   : ${(slw.count || 0).toLocaleString()} 건 (${((slr.rate || 0) * 100).toFixed(1)} %)`,
+    '',
+    ...(aborted ? [
+      div,
+      '  [ 성능 개선 제안 ]',
+      div,
+      `  · NAS nginx: worker_processes auto; worker_connections 4096;`,
+      `  · Cloudflare 캐시 TTL 연장으로 Origin 요청 비율 낮추기`,
+      `  · gzip/brotli 압축 활성화 (HTML/JS/CSS 전송량 감소)`,
+      `  · DSM 리소스 모니터에서 테스트 중 CPU/RAM/Network 확인`,
+      '',
+    ] : [
+      `  → MAX_VUS를 늘려 상한을 탐색하세요:`,
+      `    k6 run --env MAX_VUS=500 --env TARGET_URL=${TARGET_URL} nas-load-test.js`,
+      '',
+    ]),
     sep,
-    `  보고서 파일: nas-load-test-report.json`,
-    sep,
+    '',
   ];
 
   const report = lines.join('\n');
 
-  // JSON 데이터
   const jsonReport = {
-    meta: {
-      timestamp:    ts,
-      target_url:   TARGET_URL,
-      test_aborted: aborted,
-    },
-    config: {
-      step_vus:     STEP_VUS,
-      hold_seconds: STEP_HOLD_S,
-      max_vus:      MAX_VUS,
-      p95_limit_ms: P95_LIMIT_MS,
-    },
-    result: {
-      status:           aborted ? 'ABORTED_AT_THRESHOLD' : 'PASSED',
-      breaking_vus:     aborted ? breakingVUs : null,
-      stable_vus:       aborted ? stableVUs   : MAX_VUS,
-      test_duration_s:  parseFloat(elapsedS.toFixed(1)),
-    },
-    response_time_ms: {
-      min:  parseFloat((dur.min          || 0).toFixed(1)),
-      med:  parseFloat((dur.med          || 0).toFixed(1)),
-      avg:  parseFloat((dur.avg          || 0).toFixed(1)),
-      p75:  parseFloat((dur['p(75)']     || 0).toFixed(1)),
-      p90:  parseFloat((dur['p(90)']     || 0).toFixed(1)),
-      p95:  parseFloat((dur['p(95)']     || 0).toFixed(1)),
-      p99:  parseFloat((dur['p(99)']     || 0).toFixed(1)),
-      max:  parseFloat((dur.max          || 0).toFixed(1)),
+    meta:     { timestamp: ts, target_url: TARGET_URL, via_cloudflare: VIA_CF, cache_bust: CACHE_BUST },
+    config:   { step_vus: STEP_VUS, hold_seconds: STEP_HOLD_S, max_vus: MAX_VUS, p95_limit_ms: P95_LIMIT_MS },
+    result:   { status: aborted ? 'ABORTED' : 'PASSED', breaking_vus: aborted ? breakingVUs : null, stable_vus: aborted ? stableVUs : MAX_VUS, duration_s: parseFloat(elapsedS.toFixed(1)) },
+    response_ms: {
+      min: parseFloat((dur.min || 0).toFixed(1)), med: parseFloat((dur.med || 0).toFixed(1)),
+      avg: parseFloat((dur.avg || 0).toFixed(1)), p75: parseFloat((dur['p(75)'] || 0).toFixed(1)),
+      p90: parseFloat((dur['p(90)'] || 0).toFixed(1)), p95: parseFloat((dur['p(95)'] || 0).toFixed(1)),
+      p99: parseFloat((dur['p(99)'] || 0).toFixed(1)), max: parseFloat((dur.max || 0).toFixed(1)),
     },
     requests: {
-      total:       req.count || 0,
-      rps:         parseFloat((req.rate || 0).toFixed(2)),
-      error_rate:  parseFloat(((err.rate || 0) * 100).toFixed(2)),
-      slow_count:  slw.count || 0,
-      slow_rate:   parseFloat(((slr.rate || 0) * 100).toFixed(1)),
-      under_1s:    parseFloat(((u1s.rate || 0) * 100).toFixed(1)),
+      total: req.count || 0, rps: parseFloat((req.rate || 0).toFixed(2)),
+      error_rate: parseFloat(((err.rate || 0) * 100).toFixed(2)),
+      slow_count: slw.count || 0, slow_pct: parseFloat(((slr.rate || 0) * 100).toFixed(1)),
+      under_1s_pct: parseFloat(((u1s.rate || 0) * 100).toFixed(1)),
     },
   };
 
