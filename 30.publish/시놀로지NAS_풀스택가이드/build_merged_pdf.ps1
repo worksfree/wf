@@ -99,7 +99,7 @@ if ($LASTEXITCODE -ne 0) { Write-Host "ERROR: MD extract failed" -ForegroundColo
 Write-Host "  pandoc: MD -> HTML..." -ForegroundColor Yellow
 $pandocArgs = @(
     $bodyMd,
-    "--from=markdown+raw_html+smart",
+    "--from=markdown+raw_html+smart+markdown_in_html_blocks",
     "--to=html5",
     "--standalone",
     "--embed-resources",
@@ -134,10 +134,10 @@ html = re.sub(
 )
 
 # Replace mermaid code blocks with 3-step setup workflow (no CDN, guaranteed rendering)
-BOX_P = 'border:1.5px solid #8E5CE0;border-radius:5px;background:#F0EAFF;padding:9px 14px;text-align:center;font-size:13.5px;font-weight:700;min-width:115px;line-height:1.55;color:#222;'
-BOX_B = 'border:1.5px solid #1A9FD4;border-radius:5px;background:#E8F6FB;padding:9px 14px;text-align:center;font-size:13.5px;font-weight:700;min-width:115px;line-height:1.55;color:#222;'
-SUB_P = 'font-size:11px;font-weight:400;color:#666;'
-ARR   = 'font-size:10.5px;color:#555;padding:0 8px;white-space:nowrap;'
+BOX_P = 'border:1.5px solid #8E5CE0;border-radius:5px;background:#F0EAFF;padding:8px 8px;text-align:center;font-size:12.5px;font-weight:700;min-width:88px;line-height:1.55;color:#222;'
+BOX_B = 'border:1.5px solid #1A9FD4;border-radius:5px;background:#E8F6FB;padding:8px 8px;text-align:center;font-size:12.5px;font-weight:700;min-width:88px;line-height:1.55;color:#222;'
+SUB_P = 'font-size:10px;font-weight:400;color:#666;'
+ARR   = 'font-size:10px;color:#555;padding:0 4px;white-space:nowrap;'
 FLOW_HTML = (
     '<div style="margin:18px 0 12px;font-family:\'Noto Sans KR\',\'Malgun Gothic\',sans-serif;">'
 
@@ -217,6 +217,7 @@ $mergePyCode = @'
 import sys, os, re, fitz, shutil
 from pathlib import Path
 from datetime import datetime
+sys.stdout.reconfigure(encoding='utf-8')
 
 *parts, tmp_out = sys.argv[1:]
 
@@ -316,14 +317,57 @@ for i in range(total):
     ph = page.rect.height
     txt = f'{page_num}/{guide_count}'
     tw = fitz.get_text_length(txt, fontname="helv", fontsize=7.5)
-    # Erase Edge's footer (URL + page number) with white rectangle
-    page.draw_rect(fitz.Rect(0, ph - 22, pw, ph), color=(1,1,1), fill=(1,1,1))
+    # Erase bottom strip (6mm CSS margin + page number zone)
+    page.draw_rect(fitz.Rect(0, ph - 15, pw, ph), color=(1,1,1), fill=(1,1,1))
     page.insert_text(
-        fitz.Point((pw - tw) / 2, ph - 10), txt,
+        fitz.Point((pw - tw) / 2, ph - 7), txt,
         fontname="helv", fontsize=7.5,
         color=(0.45, 0.45, 0.45)
     )
 print(f'page numbers added: 1-{guide_count}')
+
+# ── 6.5 PDF metadata TOC (bookmarks) ─────────────────────────────────
+# Search body pages for chapter heading markers; skip first body page (TOC table)
+TOC_DEFS = [
+    (1, "이 가이드를 읽기 전에",                                    "이 가이드를 읽기 전에"),
+    (2, "전체 구성도",                                                               "전체 구성도 —"),
+    (2, "사전 준비물",                                                               "사전 준비물"),
+    (1, "1장. 가비아 — 도메인 구입 및 네임서버 변경",  "1장."),
+    (1, "2장. Cloudflare — 계정 설정 및 도메인 등록",  "2장."),
+    (1, "3장. Synology NAS — DSM 7.x 웹 서비스 설정",                  "3장."),
+    (1, "4장. Cloudflare Tunnel — 공유기 설정 없이 NAS 연결","4장."),
+    (1, "5장. 서브도메인 DNS 설정",                                      "5장."),
+    (1, "6장. Cloudflare Worker — 외부 API 호출",                               "6장."),
+    (1, "7장. Supabase — 회원 로그인 시스템 구축",     "7장."),
+    (1, "8장. Supabase 데이터베이스 — 회원 정보·결제·크레딧 저장", "8장."),
+    (1, "9장. 온라인 결제 연동 — 토스페이먼츠 (국내)",  "9장."),
+    (1, "10장. 웹사이트 코드와 Supabase 연결",                   "10장."),
+    (1, "11장. 배포 자동화 스크립트 (Windows PowerShell)",       "11장."),
+    (1, "12장. 역할 기반 접근 제어 (RBAC)",                          "12장."),
+    (1, "13장. 테스트 환경 구축 — Playwright + Supabase 분리", "13장."),
+    (1, "부록 A. 전체 설정 순서 요약",                           "부록 A."),
+    (1, "부록 B. 트러블슈팅",                                               "부록 B."),
+    (1, "부록 C. 포트 구성 참고표",                                  "부록 C."),
+    (1, "부록 D. 파일 위치 참고 (WorksFree Hub 기준)",            "부록 D."),
+]
+found_toc = {}
+for i in range(SKIP_START + 1, total - SKIP_END):
+    try:
+        pg_text = doc[i].get_text("text")
+    except Exception:
+        continue
+    for lvl, title, marker in TOC_DEFS:
+        if title not in found_toc and marker in pg_text:
+            found_toc[title] = i + 1  # 1-based PDF page
+pdf_toc = [[lvl, title, found_toc[title]] for lvl, title, _ in TOC_DEFS if title in found_toc]
+for entry in pdf_toc:
+    print(f'  TOC[{entry[0]}] p{entry[2]}: {entry[1]}')
+not_found = [title for _, title, _ in TOC_DEFS if title not in found_toc]
+if not_found:
+    print(f'  TOC NOT FOUND: {not_found}')
+if pdf_toc:
+    doc.set_toc(pdf_toc)
+    print(f'PDF TOC: {len(pdf_toc)} entries set')
 
 # ── 7. Save ──────────────────────────────────────────────────────────
 doc.save(tmp_out)

@@ -113,7 +113,7 @@ tr.dragging .drag-handle{cursor:grabbing;}
         <th style="width:280px">페이지</th>
         <th>비로그인·일반</th>
         <th>컨설턴트</th>
-        <th style="color:var(--hint)">파트너(GFC)</th>
+        <th style="color:var(--hint)">파트너</th>
         <th style="color:var(--hint)">관리자</th>
       </tr>
     </thead>
@@ -148,8 +148,9 @@ const CONFIGURABLE_PAGES = [
   { label:'마케팅 자료',               path:'consulting/marketing/index.html' },
   { label:'상속·증여 진단',            path:'consulting/inheritance/index.html' },
   { label:'비상장주식 가치평가',        path:'consulting/stockval/index.html' },
-  { label:'경영종합진단 (GFC)',        path:'consulting/gfc/index.html' },
+  { label:'경영종합진단',               path:'consulting/gfc/index.html' },
   { label:'CEO 플랜',                 path:'consulting/ceo/index.html' },
+  { label:'연금 절세 시뮬레이터',       path:'consulting/pension/index.html' },
   { label:'타코매니저 AI (v1)',        path:'consulting/tacomanager/v1/index.html' },
   { label:'타코매니저 AI (v2)',        path:'consulting/tacomanager/v2/index.html' },
   { label:'타코매니저 AI (v3)',        path:'consulting/tacomanager/v3/index.html' },
@@ -169,7 +170,7 @@ const LEVEL_LABELS = { full:'전체 공개', blur:'블러', readonly:'읽기 전
 const ROLES = [
   { key:'general',    label:'비로그인·일반' },
   { key:'consultant', label:'컨설턴트' },
-  { key:'gfc',        label:'파트너(GFC)',  fixed:'full' },
+  { key:'gfc',        label:'파트너',       fixed:'full' },
   { key:'admin',      label:'관리자',       fixed:'full' },
 ];
 

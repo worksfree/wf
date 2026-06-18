@@ -26,11 +26,19 @@ const CORS_HEADERS = {
 };
 
 const MONTHLY_LIMIT = 3000;
+const DAILY_CAMPAIGN_LIMIT = 100;
 
 function monthKey() {
   // KST(UTC+9) 기준 월 키
   const d = new Date(Date.now() + 9 * 3600 * 1000);
   return 'sent_' + d.getUTCFullYear() + '_' + String(d.getUTCMonth() + 1).padStart(2, '0');
+}
+
+function dailyCampaignKey() {
+  const d = new Date(Date.now() + 9 * 3600 * 1000);
+  return 'camp_' + d.getUTCFullYear() + '_'
+    + String(d.getUTCMonth() + 1).padStart(2, '0') + '_'
+    + String(d.getUTCDate()).padStart(2, '0');
 }
 
 // ── Supabase REST 헬퍼 ──────────────────────────────────────────────
@@ -74,6 +82,26 @@ async function sbPost(env, table, rows) {
 }
 
 /**
+ * Supabase RPC 호출 (SECURITY DEFINER 함수용 — service_role 키 사용)
+ */
+async function sbRpc(env, fn, body = {}) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) return null;
+  try {
+    const res = await fetch(env.SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: {
+        'apikey':        env.SUPABASE_SERVICE_KEY,
+        'Authorization': 'Bearer ' + env.SUPABASE_SERVICE_KEY,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch { return null; }
+}
+
+/**
  * 수신거부 이메일 목록을 Set<string>으로 반환
  * Supabase 미설정 또는 실패 시 빈 Set 반환 (발송은 계속 진행)
  */
@@ -92,6 +120,45 @@ export default {
     }
 
     const url = new URL(request.url);
+
+    // ── GET /db-stats : DB 캠페인 통계 ──────────────────────────
+    if (request.method === 'GET' && url.pathname === '/db-stats') {
+      const stats = await sbRpc(env, 'get_campaign_stats');
+      const todayKey = dailyCampaignKey();
+      const todaySent = parseInt((await env.MAIL_USAGE.get(todayKey)) || '0');
+      return json({
+        ...(stats || { total: 0, active: 0, sent: 0, unsubscribed: 0, pending: 0 }),
+        today_sent:      todaySent,
+        today_limit:     DAILY_CAMPAIGN_LIMIT,
+        today_remaining: Math.max(0, DAILY_CAMPAIGN_LIMIT - todaySent),
+      });
+    }
+
+    // ── GET /db-pending : 오늘 발송 가능한 다음 배치 ────────────
+    if (request.method === 'GET' && url.pathname === '/db-pending') {
+      const todayKey = dailyCampaignKey();
+      const todaySent = parseInt((await env.MAIL_USAGE.get(todayKey)) || '0');
+      const todayRemaining = Math.max(0, DAILY_CAMPAIGN_LIMIT - todaySent);
+      if (todayRemaining === 0) {
+        return json({ emails: [], today_sent: todaySent, today_remaining: 0, today_limit: DAILY_CAMPAIGN_LIMIT });
+      }
+      const reqLimit = parseInt(url.searchParams.get('limit') || '100');
+      const effectiveLimit = Math.min(reqLimit, todayRemaining);
+      const emails = await sbRpc(env, 'get_campaign_pending', { p_limit: effectiveLimit });
+      return json({
+        emails:          emails || [],
+        today_sent:      todaySent,
+        today_remaining: todayRemaining,
+        today_limit:     DAILY_CAMPAIGN_LIMIT,
+      });
+    }
+
+    // ── GET /db-list : 전체 발송 현황 목록 ─────────────────────────
+    if (request.method === 'GET' && url.pathname === '/db-list') {
+      const list = await sbRpc(env, 'get_campaign_list');
+      if (!list) return json({ error: 'DB 조회 실패 — Supabase RPC 오류' }, 500);
+      return json(list);
+    }
 
     // ── GET / : 발송 현황 조회 ───────────────────────────────────
     if (request.method === 'GET') {
@@ -126,6 +193,106 @@ export default {
         note:   body.note   || null,
       }]);
       return json({ success: true, email });
+    }
+
+    // ── POST /db-send : DB 캠페인 발송 (일일 한도 100건 강제) ────
+    if (url.pathname === '/db-send') {
+      if (!env.RESEND_API_KEY) return json({ error: 'RESEND_API_KEY not configured' }, 500);
+
+      const todayKey       = dailyCampaignKey();
+      const todaySent      = parseInt((await env.MAIL_USAGE.get(todayKey)) || '0');
+      const todayRemaining = Math.max(0, DAILY_CAMPAIGN_LIMIT - todaySent);
+      if (todayRemaining === 0) {
+        return json({ error: `오늘 발송 한도 소진 (${todaySent}/${DAILY_CAMPAIGN_LIMIT}건) — 자정(KST) 이후 재시도` }, 429);
+      }
+
+      const dbEmails = Array.isArray(body.emails) ? body.emails : [];
+      const meta     = body.meta || {};
+      if (!dbEmails.length) return json({ error: 'No emails specified' }, 400);
+
+      // 일일 한도 내로 제한
+      const allowedEmails = dbEmails.slice(0, todayRemaining);
+
+      // 수신거부 필터
+      const unsubSet = await getUnsubscribes(env);
+      const toSend   = allowedEmails.filter(e => !unsubSet.has((e.to || '').toLowerCase()));
+      const filtered = allowedEmails
+        .filter(e => unsubSet.has((e.to || '').toLowerCase()))
+        .map(e => ({ email: e.to, reason: '수신거부' }));
+
+      // 월 한도 확인
+      const mKey       = monthKey();
+      const monthSent  = parseInt((await env.MAIL_USAGE.get(mKey)) || '0');
+      if (monthSent + toSend.length > MONTHLY_LIMIT) {
+        return json({ error: `월 발송 한도 초과 (${monthSent}/${MONTHLY_LIMIT})` }, 429);
+      }
+
+      const from       = env.MAIL_FROM || 'WorksFree 컨설팅 <onboarding@resend.dev>';
+      const authHeader = 'Bearer ' + env.RESEND_API_KEY;
+      const sentEmails = [], failed = [];
+
+      // Resend batch API: 단일 요청으로 최대 100건 → 초당 2건 레이트 제한 회피
+      const batchBody = toSend.map(e => ({
+        from, to: [e.to], subject: e.subject, html: e.html,
+      }));
+      try {
+        const batchRes  = await fetch('https://api.resend.com/emails/batch', {
+          method:  'POST',
+          headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+          body:    JSON.stringify(batchBody),
+        });
+        const batchData = await batchRes.json();
+        if (!batchRes.ok) {
+          const errMsg = batchData.message || 'Resend batch error';
+          toSend.forEach(e => failed.push({ email: e.to, reason: errMsg }));
+        } else {
+          // batchData.data: [{id: "..."}, ...] 순서 대응
+          const results = Array.isArray(batchData.data) ? batchData.data : [];
+          toSend.forEach((e, idx) => {
+            if (results[idx] && results[idx].id) {
+              sentEmails.push(e);
+            } else {
+              failed.push({ email: e.to, reason: '발송 ID 없음 (Resend 응답 불일치)' });
+            }
+          });
+        }
+      } catch (err) {
+        toSend.forEach(e => failed.push({ email: e.to, reason: err.message }));
+      }
+
+      const sentCount    = sentEmails.length;
+      const newDailySent = todaySent + sentCount;
+
+      if (sentCount > 0) {
+        await env.MAIL_USAGE.put(mKey,      String(monthSent + sentCount));
+        await env.MAIL_USAGE.put(todayKey,  String(newDailySent));
+      }
+
+      // email_log 기록
+      const now     = new Date().toISOString();
+      const logRows = sentEmails.map(e => ({
+        sent_at:         now,
+        recipient_email: e.to.toLowerCase(),
+        sender_email:    (meta.senderEmail || '').toLowerCase() || null,
+        sender_name:     meta.senderName   || null,
+        sender_user_id:  meta.senderUserId || null,
+        flyer_src:       meta.flyerSrc     || null,
+        flyer_name:      meta.flyerName    || null,
+        subject:         e.subject         || null,
+        env:             meta.env          || 'portal',
+        status:          'sent',
+      }));
+      if (logRows.length > 0) ctx.waitUntil(sbPost(env, 'email_log', logRows));
+
+      return json({
+        success:         true,
+        sent:            sentCount,
+        filtered,
+        failed,
+        today_sent:      newDailySent,
+        today_remaining: Math.max(0, DAILY_CAMPAIGN_LIMIT - newDailySent),
+        today_limit:     DAILY_CAMPAIGN_LIMIT,
+      });
     }
 
     // ── POST / : 메일 발송 ───────────────────────────────────────

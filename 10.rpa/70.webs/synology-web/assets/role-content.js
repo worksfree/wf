@@ -5,7 +5,7 @@
  *   <script src="../../assets/role-content.js"></script>
  *
  * HTML 마킹:
- *   data-ins   → 보험 전용 콘텐츠 (gfc/보험설계사만 표시)
+ *   data-ins   → 전문 컨설턴트 전용 콘텐츠 (gfc/전문 컨설턴트만 표시)
  *   data-mgmt  → 경영지도사 전용 콘텐츠 (consultant만 표시)
  *
  * CSS 규칙 (이 파일이 자동 삽입):

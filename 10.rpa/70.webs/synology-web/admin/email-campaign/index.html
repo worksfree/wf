@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이메일 캠페인 — WorksFree 어드민</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --bg:#0f1117;--surface:#1c2333;--surface2:#222536;--border:#2a3347;--border2:#3a4a5c;
+  --text:#e2e8f0;--muted:#64748b;--hint:#475569;
+  --blue:#3b82f6;--blue-bg:#0c1a30;
+  --green:#10b981;--yellow:#f59e0b;--red:#ef4444;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65;font-size:14px}
+
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14px;padding:14px 24px;background:var(--surface);border-bottom:1px solid var(--border);min-height:72px}
+.hdr-icon{font-size:26px;flex-shrink:0}
+.hdr-info{flex:1}
+.hdr-title{font-size:17px;font-weight:600;letter-spacing:-.2px}
+.hdr-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.hdr-r{font-size:12px;color:var(--hint);font-weight:500;margin-left:auto;flex-shrink:0}
+
+.page{max-width:860px;margin:0 auto;padding:28px 20px 80px}
+.section{margin-bottom:28px}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px}
+.stat-card.highlight{border-color:var(--blue)}
+.sc-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.sc-val{font-size:28px;font-weight:700;line-height:1}
+.sc-sub{font-size:11px;color:var(--hint);margin-top:4px}
+
+/* today bar */
+.today-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:28px}
+.today-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.today-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.today-fill{height:100%;border-radius:3px;transition:width .4s,background .4s;background:var(--green)}
+.today-note{font-size:12px;color:var(--hint);margin-top:8px}
+
+/* card */
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.f-label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;margin-bottom:-4px}
+.f-input,.f-select,.f-textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;padding:9px 12px;width:100%;outline:none;font-family:inherit}
+.f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--blue)}
+.f-textarea{resize:vertical;min-height:80px}
+.f-hint{font-size:12px;color:var(--hint)}
+
+/* presets */
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.preset-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
+.preset-btn:hover{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.06)}
+.preset-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.1);font-weight:700}
+
+/* send button */
+.send-btn{background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;padding:13px 28px;cursor:pointer;transition:opacity .15s;width:100%}
+.send-btn:hover{opacity:.88}
+.send-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* status */
+.status-msg{font-size:13px;padding:10px 0;min-height:24px}
+.status-msg.ok{color:#6ee7b7}
+.status-msg.err{color:#f87171}
+.status-msg.warn{color:#fbbf24}
+.status-msg.loading{color:var(--muted)}
+
+/* result card */
+.result-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;display:none}
+.result-card.show{display:block}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.result-row:last-child{border-bottom:none}
+.result-label{font-size:12px;color:var(--muted)}
+.result-val{font-size:14px;font-weight:600}
+.next-info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:14px 18px;margin-top:16px;font-size:13px;color:#93c5fd;line-height:1.65}
+
+/* legal */
+.legal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+
+/* admin gate */
+#admin-gate{display:none;position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+#admin-gate.visible{display:flex}
+#admin-gate h2{font-size:18px;color:var(--red)}
+#admin-gate p{font-size:14px;color:var(--muted)}
+#main{display:none}
+#main.visible{display:block}
+
+/* refresh btn */
+.refresh-btn{font-size:11px;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
+.refresh-btn:hover{text-decoration:underline}
+
+/* 발송 진행 */
+#send-progress{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:16px}
+.sp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.sp-label{font-size:12px;font-weight:600;color:var(--muted)}
+#prog-text{font-size:13px;font-weight:700;color:var(--text)}
+.sp-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.sp-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .3s}
+.batch-log{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;margin-top:10px;padding:2px 0}
+.batch-line{font-size:12px;padding:5px 10px;border-radius:5px;line-height:1.45;border-left:3px solid transparent}
+.batch-ok{background:rgba(16,185,129,.08);color:#6ee7b7;border-color:#10b981}
+.batch-err{background:rgba(239,68,68,.1);color:#fca5a5;border-color:#ef4444;font-weight:600}
+.batch-warn{background:rgba(245,158,11,.08);color:#fbbf24;border-color:#f59e0b}
+.batch-loading{background:rgba(100,116,139,.08);color:var(--muted);border-color:var(--border)}
+
+/* ── 발송 현황 목록 버튼 ── */
+.list-open-btn{font-size:12px;font-weight:600;color:var(--blue);background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:6px;padding:7px 14px;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:12px}
+.list-open-btn:hover{background:rgba(59,130,246,.16)}
+
+/* ── 발송 현황 목록 모달 ── */
+#db-modal{display:none;position:fixed;inset:0;z-index:500;flex-direction:column}
+#db-modal.open{display:flex}
+.db-panel{display:flex;flex-direction:column;width:100%;height:100%;background:#0f1117;overflow:hidden}
+.db-header{padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex-shrink:0}
+.db-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.db-count-badge{font-size:11px;background:rgba(59,130,246,.15);color:var(--blue);border-radius:10px;padding:2px 8px;font-weight:600}
+.db-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-left:auto}
+.db-filter-tabs{display:flex;gap:3px}
+.db-tab{font-size:12px;padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.db-tab.active{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.1);font-weight:700}
+#db-search{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px;width:170px;outline:none}
+#db-search:focus{border-color:var(--blue)}
+.db-csv-btn{font-size:12px;background:rgba(16,185,129,.1);color:#6ee7b7;border:1px solid rgba(16,185,129,.3);border-radius:6px;padding:6px 12px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;white-space:nowrap}
+.db-csv-btn:hover{background:rgba(16,185,129,.18)}
+.db-close-btn{font-size:17px;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1;flex-shrink:0}
+.db-close-btn:hover{color:var(--text);background:var(--border)}
+.db-body{flex:1;overflow-y:auto;overflow-x:auto}
+.db-table{border-collapse:collapse;font-size:13px;min-width:900px;width:100%}
+.db-table th{position:sticky;top:0;background:var(--surface2);color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.05em;padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.db-table td{padding:8px 12px;border-bottom:1px solid rgba(42,51,71,.5);vertical-align:middle;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.db-table tr:hover td{background:rgba(59,130,246,.04)}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+.badge-sent{background:rgba(16,185,129,.12);color:#6ee7b7}
+.badge-pending{background:rgba(100,116,139,.12);color:var(--muted)}
+.badge-unsub{background:rgba(239,68,68,.12);color:#fca5a5}
+.db-footer{padding:10px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface);gap:10px;flex-wrap:wrap}
+.db-page-info{font-size:12px;color:var(--muted)}
+.db-filtered-info{font-size:12px;color:var(--hint)}
+.db-page-btns{display:flex;gap:5px}
+.db-page-btn{font-size:12px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-family:inherit;transition:all .15s}
+.db-page-btn:disabled{opacity:.35;cursor:not-allowed}
+.db-page-btn:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.db-empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:14px}
+/* 정렬 */
+.db-table th.sortable{cursor:pointer;user-select:none}
+.db-table th.sortable:hover{color:var(--text)}
+.sort-icon{margin-left:5px;font-size:11px;opacity:.25;transition:opacity .1s}
+.sort-icon.active{opacity:1;color:var(--blue)}
+.sort-rank{font-size:9px;vertical-align:super;margin-left:1px;color:var(--blue);font-weight:900}
+.db-summary{display:flex;align-items:center;gap:6px;padding:9px 18px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+.db-sum-item{font-size:12px;color:var(--muted)}
+.db-sum-val{font-size:13px;font-weight:700}
+.db-sum-sep{color:var(--border2);font-size:13px}
+.sum-pending{color:#fbbf24}
+.sum-sent{color:#6ee7b7}
+.sum-unsub{color:#fca5a5}
+/* 행 구분선 — 미발송↔발송완료 경계 */
+.db-table tr.status-divider td{padding:0;border:none}
+.db-table tr.status-divider td div{height:2px;background:var(--border);margin:4px 0}
+</style>
+</head>
+<body>
+
+<!-- 레이어 2: 어드민 게이트 -->
+<div id="admin-gate">
+  <h2>🔒 관리자 전용</h2>
+  <p>이 페이지는 관리자(admin) 계정만 접근할 수 있습니다.</p>
+</div>
+
+<!-- 메인 콘텐츠 (auth 통과 후 표시) -->
+<div id="main">
+<header>
+  <div class="hdr-icon">📧</div>
+  <div class="hdr-info">
+    <div class="hdr-title">이메일 캠페인 관리 · Email Campaign</div>
+    <div class="hdr-sub">DART B2B 이메일 DB → 일일 100건 순차 발송 · 발송 이력 자동 제외</div>
+  </div>
+  <div class="hdr-r">어드민 전용</div>
+</header>
+
+<div class="page">
+
+  <!-- DB 통계 -->
+  <div class="section">
+    <div class="section-label">
+      DB 현황 <button class="refresh-btn" onclick="loadStats()">↻ 새로고침</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="sc-label">발송 대기</div>
+        <div class="sc-val" id="stat-pending">—</div>
+        <div class="sc-sub">미발송 활성 이메일</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">오늘 남은 한도</div>
+        <div class="sc-val" id="stat-today-rem">—</div>
+        <div class="sc-sub">일일 한도 100건</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">전체 활성 DB</div>
+        <div class="sc-val" id="stat-active">—</div>
+        <div class="sc-sub">email_status = active</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">발송 완료</div>
+        <div class="sc-val" id="stat-sent">—</div>
+        <div class="sc-sub">email_log 누적</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">수신거부</div>
+        <div class="sc-val" id="stat-unsub">—</div>
+        <div class="sc-sub">자동 제외됨</div>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <button class="list-open-btn" onclick="openListModal()">📋 전체 발송 현황 목록 →</button>
+    </div>
+  </div>
+
+  <!-- 오늘 발송 현황 -->
+  <div class="today-card">
+    <div class="today-row">
+      <span style="font-size:13px;font-weight:600;color:var(--muted)">오늘 발송 현황 (KST 자정 초기화)</span>
+      <span style="font-size:13px;font-weight:700" id="today-text">—</span>
+    </div>
+    <div class="today-bar"><div class="today-fill" id="today-fill" style="width:0%"></div></div>
+    <div class="today-note" id="today-note">통계를 불러오는 중...</div>
+  </div>
+
+  <!-- 캠페인 설정 -->
+  <div class="section">
+    <div class="section-label">캠페인 설정</div>
+
+    <div class="card">
+      <span class="f-label">전단지 선택</span>
+      <select id="flyer-sel" class="f-select" onchange="onFlyerChange()"></select>
+
+      <span class="f-label">이메일 제목</span>
+      <input id="subject" class="f-input" type="text" placeholder="예) 중대재해처벌법 대비 — 아는 대표는 이미 다했습니다">
+
+      <span class="f-label" style="display:flex;align-items:center;justify-content:space-between">
+        본문 메시지
+        <span style="font-size:11px;color:var(--hint);font-weight:400">프리셋 선택 후 수정하세요</span>
+      </span>
+      <div class="presets" id="presets"></div>
+      <textarea id="body" class="f-textarea" rows="5" placeholder="이메일에 포함될 메시지를 입력하세요..."></textarea>
+      <p class="f-hint">✦ 본문에 <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:11px">{{기업명}}</code> <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:11px">{{대표이름}}</code> 입력 시 수신자별 자동 치환됩니다</p>
+    </div>
+
+    <!-- 발신자 정보 (법적 필수) -->
+    <div class="card" style="background:rgba(124,16,16,0.1);border-color:#7c1010">
+      <span style="font-size:12px;font-weight:700;color:#fca5a5">⚠ 광고 이메일 법적 필수 사항 (정보통신망법)</span>
+      <div class="legal-grid">
+        <div>
+          <span class="f-label">발신자 명칭</span>
+          <input id="sender-name" class="f-input" type="text" value="WorksFree 경영 컨설팅" oninput="saveLegal()">
+        </div>
+        <div>
+          <span class="f-label">발신자 연락처</span>
+          <input id="sender-phone" class="f-input" type="text" value="010-4935-7573" oninput="saveLegal()">
+        </div>
+        <div style="grid-column:1/-1">
+          <span class="f-label">발신자 이메일</span>
+          <input id="sender-email" class="f-input" type="email" value="insung.lee@worksfree.co.kr" oninput="saveLegal()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 발송 버튼 -->
+  <div class="section">
+    <button class="send-btn" id="send-btn" onclick="runCampaign()" disabled>
+      📤 <span id="send-btn-label">통계 로딩 중...</span>
+    </button>
+    <div id="status-msg" class="status-msg"></div>
+  </div>
+
+  <!-- 발송 진행 상황 (10건씩 배치 결과 실시간 표시) -->
+  <div id="send-progress" style="display:none">
+    <div class="sp-header">
+      <span class="sp-label">📤 발송 진행</span>
+      <span id="prog-text">0 / 0건</span>
+    </div>
+    <div class="sp-track"><div class="sp-fill" id="prog-fill" style="width:0%"></div></div>
+    <div id="batch-log" class="batch-log"></div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="result-card" class="result-card">
+    <div class="section-label" style="margin-bottom:12px">발송 결과</div>
+    <div class="result-row"><span class="result-label">✅ 발송 성공</span><span class="result-val" id="res-sent">—</span></div>
+    <div class="result-row"><span class="result-label">⊘ 수신거부 제외</span><span class="result-val" id="res-filtered">—</span></div>
+    <div class="result-row"><span class="result-label">✗ 발송 실패</span><span class="result-val" id="res-failed">—</span></div>
+    <div class="result-row"><span class="result-label">오늘 누적 발송</span><span class="result-val" id="res-today">—</span></div>
+    <div class="result-row"><span class="result-label">오늘 남은 한도</span><span class="result-val" id="res-remaining">—</span></div>
+    <div class="next-info" id="next-info" style="display:none"></div>
+  </div>
+
+</div><!-- /page -->
+</div><!-- /main -->
+
+<!-- ── 발송 현황 목록 전체화면 모달 ────────────────────────────────── -->
+<div id="db-modal">
+  <div class="db-panel">
+    <div class="db-header">
+      <div class="db-title">
+        📋 이메일 발송 현황
+        <span class="db-count-badge" id="db-total-badge">로딩 중...</span>
+      </div>
+      <div class="db-controls">
+        <div class="db-filter-tabs">
+          <button class="db-tab active" data-filter="all"          onclick="setListFilter('all')">전체</button>
+          <button class="db-tab"        data-filter="pending"      onclick="setListFilter('pending')">미발송</button>
+          <button class="db-tab"        data-filter="sent"         onclick="setListFilter('sent')">발송완료</button>
+          <button class="db-tab"        data-filter="unsubscribed" onclick="setListFilter('unsubscribed')">수신거부</button>
+        </div>
+        <input id="db-search" type="search" placeholder="회사명 / 이메일 검색..."
+               oninput="onListSearch(this.value)">
+        <button class="db-csv-btn" onclick="downloadListCsv()">⬇ CSV 다운로드</button>
+        <button class="db-close-btn" onclick="closeListModal()">✕</button>
+      </div>
+    </div>
+
+    <!-- 상태별 요약 바 -->
+    <div class="db-summary">
+      <span class="db-sum-item">⬜ 미발송</span>
+      <b class="db-sum-val sum-pending" id="sum-pending">—</b>
+      <span class="db-sum-sep">·</span>
+      <span class="db-sum-item">✅ 발송완료</span>
+      <b class="db-sum-val sum-sent" id="sum-sent">—</b>
+      <span class="db-sum-sep">·</span>
+      <span class="db-sum-item">⊘ 수신거부</span>
+      <b class="db-sum-val sum-unsub" id="sum-unsub">—</b>
+      <span class="db-sum-sep" style="margin:0 4px">|</span>
+      <span class="db-sum-item" id="db-filtered-info" style="color:var(--hint)"></span>
+    </div>
+
+    <div class="db-body">
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th style="width:40px;min-width:40px">#</th>
+            <th class="sortable" style="min-width:150px" onclick="onColumnSort('corp_name')">회사명<span class="sort-icon" id="si-corp_name">↕</span><span class="sort-rank" id="sr-corp_name"></span></th>
+            <th class="sortable" style="min-width:70px"  onclick="onColumnSort('ceo_nm')">대표자<span class="sort-icon" id="si-ceo_nm">↕</span><span class="sort-rank" id="sr-ceo_nm"></span></th>
+            <th class="sortable" style="min-width:180px" onclick="onColumnSort('email')">이메일<span class="sort-icon" id="si-email">↕</span><span class="sort-rank" id="sr-email"></span></th>
+            <th class="sortable" style="min-width:84px"  onclick="onColumnSort('send_status')">발송 상태<span class="sort-icon" id="si-send_status">↕</span><span class="sort-rank" id="sr-send_status"></span></th>
+            <th class="sortable" style="min-width:130px" onclick="onColumnSort('sent_at_kst')">발송 일시 (KST)<span class="sort-icon" id="si-sent_at_kst">↕</span><span class="sort-rank" id="sr-sent_at_kst"></span></th>
+            <th class="sortable" style="min-width:180px" onclick="onColumnSort('subject')">제목<span class="sort-icon" id="si-subject">↕</span><span class="sort-rank" id="sr-subject"></span></th>
+            <th class="sortable" style="min-width:100px" onclick="onColumnSort('flyer_name')">전단지<span class="sort-icon" id="si-flyer_name">↕</span><span class="sort-rank" id="sr-flyer_name"></span></th>
+          </tr>
+        </thead>
+        <tbody id="db-tbody">
+          <tr><td colspan="8" class="db-empty">⏳ 불러오는 중...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="db-footer">
+      <span style="font-size:12px;color:var(--hint)">미발송이 상단에 표시됩니다 · ESC 또는 ✕ 닫기</span>
+      <span class="db-filtered-info" id="db-footer-info" style="font-size:12px;color:var(--muted)"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const sb            = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const MAIL_WORKER_URL = 'https://send-mail.worksfree.workers.dev';
+const UNSUBSCRIBE_BASE = location.origin;
+
+// ── 전단지 데이터 ────────────────────────────────────────────────────
+const FLYERS = [
+  {
+    key: 'flyer-ceo',
+    src: 'consulting/ceo/flyers/flyer-ceo.html',
+    label: '아는 대표는 이미 다했다',
+    emailHero: '<div style="background:#0d1b2a;padding:28px 32px 20px"><p style="color:rgba(255,255,255,0.45);font-size:10px;font-weight:700;letter-spacing:3px;margin:0 0 16px">▶ 2025 TREND REPORT — CEO RISK DATA</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">아는 대표는<br>이미 <span style="color:#ff3333">다 했습니다.</span></h1><p style="color:rgba(255,255,255,0.6);font-size:12px;line-height:1.65;margin:0 0 14px">중대재해 기소 건수 매년 2배 증가 · 상장사 70% 이미 임원보험 가입<br>지금 이 순간도, 경쟁사 대표는 리스크를 관리하고 있습니다.</p><table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px"><tr><td style="background:rgba(255,255,255,0.05);border-radius:6px;padding:10px 6px;text-align:center;width:33%"><div style="color:#fff;font-size:20px;font-weight:900">887<span style="font-size:11px">건</span></div><div style="color:rgba(255,255,255,0.4);font-size:10px;line-height:1.4;margin-top:3px">법 시행 3년간<br>중대산업재해</div></td><td style="width:4px"></td><td style="background:rgba(255,255,255,0.05);border-radius:6px;padding:10px 6px;text-align:center;width:33%"><div style="color:#ff3333;font-size:20px;font-weight:900">121<span style="font-size:11px">건</span></div><div style="color:rgba(255,255,255,0.4);font-size:10px;line-height:1.4;margin-top:3px">CEO·경영책임자<br>기소 누적</div></td><td style="width:4px"></td><td style="background:rgba(255,255,255,0.05);border-radius:6px;padding:10px 6px;text-align:center;width:33%"><div style="color:#f0c27f;font-size:20px;font-weight:900">70<span style="font-size:11px">%</span></div><div style="color:rgba(255,255,255,0.4);font-size:10px;line-height:1.4;margin-top:3px">상장 기업<br>임원보험 가입률</div></td></tr></table></div>',
+  },
+  {
+    key: 'flyer-safety-all',
+    src: 'consulting/ceo/flyers/flyer-safety-all.html',
+    label: '안전조치, 그게 전부?',
+    emailHero: '<div style="background:#cc0000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">중대재해처벌법 — 경영자 필독</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2024 · 시행 2년차</span></div><div style="background:#0a0a0a;padding:32px 32px 24px"><p style="color:#cc0000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 18px">— SERIOUS ACCIDENTS PUNISHMENT ACT</p><h1 style="color:#fff;font-size:30px;font-weight:900;line-height:1.2;margin:0 0 14px;font-family:Georgia,serif">안전조치,<br>그게 <span style="color:#ff3333">전부</span>라고<br>생각하십니까?</h1><p style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:700;margin:0 0 8px">대표님이 모르는 리스크가 아직 남아 있습니다.</p><p style="color:#f0c27f;font-size:12px;line-height:1.65;margin:0 0 28px">완벽한 안전조치 후에도 사고는 날 수 있습니다.<br>중요한 건 사고 이후를 대비했느냐입니다.</p></div>',
+  },
+  {
+    key: 'flyer-hard-work',
+    src: 'consulting/ceo/flyers/flyer-hard-work.html',
+    label: '열심히했는데 남는 게 없다',
+    emailHero: '<div style="background:#1a1a2e;padding:20px 32px 0"><div style="display:table;width:100%;padding-bottom:14px;border-bottom:1px solid rgba(200,146,42,0.3);margin-bottom:18px"><span style="display:table-cell;vertical-align:middle"><span style="display:inline-block;width:28px;height:28px;background:#c8922a;border-radius:4px;text-align:center;line-height:28px;color:#fff;font-size:10px;font-weight:900;margin-right:8px;vertical-align:middle">WF</span><span style="color:#fff;font-size:12px;font-weight:700;letter-spacing:1px;vertical-align:middle">기업 재무 컨설팅</span></span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.35);font-size:10px;letter-spacing:2px;vertical-align:middle">CORPORATE FINANCIAL CONSULTING</span></div><p style="color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:2px;font-weight:700;margin:0 0 12px">— 제조기업 대표님께 드리는 질문</p><h1 style="color:#fff;font-size:26px;font-weight:900;line-height:1.3;margin:0 0 12px;font-family:Georgia,serif">열심히 달려왔는데,<br><span style="color:#c8922a;text-decoration:underline">남는 게 없다</span>는 느낌,<br>혹시 드신 적 있으십니까?</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 28px">매출은 늘었는데 세금도 늘고, 직원 관리는 더 어려워지고,<br>회사 돈이 내 돈 같지 않은 이 구조 — 사실 설계의 문제입니다.</p></div>',
+  },
+  {
+    key: 'flyer-case-study',
+    src: 'consulting/ceo/flyers/flyer-case-study.html',
+    label: '이건 실제 이야기입니다',
+    emailHero: '<div style="background:#b50000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">중대재해처벌법 — 실제 판결 사례 보고서</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2022–2025 · 확인된 판결 기준</span></div><div style="background:#0c0c0c;padding:32px 32px 24px"><p style="color:#b50000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 14px">— REAL CASE STUDY</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">이건 <span style="color:#ff3333">실제 이야기</span>입니다.<br>그리고 다음 차례는<br>누구일까요.</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 28px">중대재해처벌법 시행 이후 실제 판결이 확정된 사건들입니다.<br>흔한 끼임·추락 사고 1건이 대표이사의 인생을 바꿨습니다.</p></div>',
+  },
+  {
+    key: 'flyer-ceo-fear',
+    src: 'consulting/ceo/flyers/flyer-ceo-fear.html',
+    label: '10곳 중 7곳이 "못 지킨다"',
+    emailHero: '<div style="background:#b50000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">중대재해처벌법 — 중소기업 대표 현실 진단</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2025 · 실제 설문·판결 기반</span></div><div style="background:#0c0c0c;padding:32px 32px 24px"><p style="color:#b50000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 14px">— REALITY CHECK</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">10곳 중 <span style="color:#ff3333">7곳</span>이<br>"우리는 못 지킨다"고<br>했습니다.</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 28px">중기중앙회 실제 설문 결과입니다. 준비가 안 된 채로 사고가 나면<br>대표님이 직접 법정에 서야 합니다. 그리고 합의금을 마련해야 합니다.</p></div>',
+  },
+  {
+    key: 'flyer-group-insurance',
+    src: 'consulting/ceo/flyers/flyer-group-insurance.html',
+    label: '합의금 재원을 지금 준비하라',
+    emailHero: '<div style="background:#b50000;padding:10px 32px;display:table;width:100%;box-sizing:border-box"><span style="display:table-cell;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px">삼성생명 단체보험 — 합의금 재원 솔루션</span><span style="display:table-cell;text-align:right;color:rgba(255,255,255,0.7);font-size:10px;white-space:nowrap">2025 · 제안서</span></div><div style="background:#0c0c0c;padding:32px 32px 24px"><p style="color:#b50000;font-size:10px;letter-spacing:3px;font-weight:700;margin:0 0 14px">— GROUP INSURANCE PROPOSAL</p><h1 style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin:0 0 12px;font-family:Georgia,serif">합의금 재원을<br><span style="color:#ff3333">지금</span> 준비하십시오.</h1><p style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.65;margin:0 0 28px">중대재해 1건 합의금 최대 10억 — 사고 후 마련할 수 없습니다.<br>단체보험으로 월 소액 납입, 사망위로금·합의금 재원 즉시 확보.</p></div>',
+  },
+];
+
+// ── 본문 프리셋 ──────────────────────────────────────────────────────
+const MSG_PRESETS = [
+  {
+    id: 'default', icon: '📋', label: '기본',
+    body: `{{기업명}} 대표님께 도움이 될 만한 자료를 보내드립니다.\n\n첨부 자료를 가볍게 훑어보신 후, 관심이 생기시면\n자료 하단의 연락처로 편하게 문의해 주세요.`,
+  },
+  {
+    id: 'urgent', icon: '⚠️', label: '중처법 긴급경고',
+    body: `중대재해처벌법 시행 이후 중소기업 대표 기소 건수가 매년 증가하고 있습니다.\n\n{{기업명}} 대표님,\n"우리 회사는 괜찮겠지"라고 생각하는 순간이 가장 위험합니다.\n\n실제 판결 사례를 보면 대부분 "설마"라고 했던 곳에서 사고가 났습니다.\n지금 당장 준비할 수 있는 방법을 첨부 자료에 담았습니다.\n\n검토 후 궁금한 점은 자료 하단의 연락처로 편하게 문의해 주세요.`,
+  },
+  {
+    id: 'insurance', icon: '🛡', label: '합의금 재원',
+    body: `중대재해 1건 합의금, 최대 10억 원 — 사고가 난 뒤에는 마련할 수 없습니다.\n\n{{기업명}} 대표님,\n단체보험 하나로 월 소액 납입만으로 합의금 재원을 즉시 확보할 수 있습니다.\n준비한 기업과 그렇지 않은 기업의 차이는 사고 이후에 극명하게 드러납니다.\n\n자세한 내용을 첨부 자료에 담았습니다.\n관심이 있으시면 자료 하단의 연락처로 편하게 연락 주세요.`,
+  },
+  {
+    id: 'hanwha', icon: '🚨', label: '한화 사례',
+    body: `최근 한화에어로스페이스 대전 공장 폭발 사고로\n중대재해처벌법이 다시 주목받고 있습니다.\n\n매출 26조, 직원 8천 명의 대기업조차 피하지 못했습니다.\n{{기업명}}은 지금 어떻게 준비하고 계십니까?\n\n안정적인 기업 경영을 위해서는 사고 이후에 대한 대비도 중요합니다.\n첨부 자료를 확인하시고 자료 하단의 연락처로 문의해 주시기 바랍니다.`,
+  },
+];
+
+// ── 유틸 ─────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getEnv() {
+  var h = location.hostname;
+  if (h.startsWith('test.'))    return 'test';
+  if (h.startsWith('staging.')) return 'staging';
+  return 'portal';
+}
+
+function getHubUserId() {
+  try {
+    var raw = localStorage.getItem('sb-rkycwfpkzorfpcxfvaqt-auth-token');
+    if (!raw) return null;
+    return JSON.parse(raw)?.user?.id || null;
+  } catch { return null; }
+}
+
+function getLegal() {
+  return {
+    senderName:  (document.getElementById('sender-name').value  || '').trim(),
+    senderPhone: (document.getElementById('sender-phone').value || '').trim(),
+    senderEmail: (document.getElementById('sender-email').value || '').trim(),
+  };
+}
+
+function saveLegal() {
+  try { localStorage.setItem('wf_legal_camp', JSON.stringify(getLegal())); } catch(e) {}
+}
+
+function loadLegal() {
+  try {
+    var s = JSON.parse(localStorage.getItem('wf_legal_camp') || 'null');
+    if (!s) return;
+    if (s.senderName)  document.getElementById('sender-name').value  = s.senderName;
+    if (s.senderPhone) document.getElementById('sender-phone').value = s.senderPhone;
+    if (s.senderEmail) document.getElementById('sender-email').value = s.senderEmail;
+  } catch(e) {}
+}
+
+// ── 이메일 HTML 빌드 ──────────────────────────────────────────────────
+function buildEmailHtml(company, ceo, message, flyerLabel, flyerUrl, emailHero, legalOpts, recipientEmail) {
+  var greetParts = [];
+  if (company) greetParts.push('<strong>' + escHtml(company) + '<\/strong>');
+  if (ceo)     greetParts.push('<strong>' + escHtml(ceo) + '<\/strong>');
+  var greetWho = greetParts.length ? greetParts.join(' ') + ' ' : '';
+  var greeting = '<p style="margin:0 0 12px">안녕하세요? ' + greetWho + '대표님,<\/p>';
+
+  var msgPersonalized = (message || '')
+    .replace(/\{\{기업명\}\}/g,   company        || '')
+    .replace(/\{\{대표이름\}\}/g, ceo            || '')
+    .replace(/\{\{이메일\}\}/g,   recipientEmail || '');
+  var msgHtml = escHtml(msgPersonalized).replace(/\n/g, '<br>');
+
+  var heroBlock = emailHero
+    ? '<tr><td style="padding:0">' + emailHero + '<\/td><\/tr>'
+    : '<tr><td style="background:#0f172a;padding:28px 32px;text-align:center"><h1 style="color:#fff;font-size:26px;font-weight:800;margin:0">' + escHtml(flyerLabel) + '<\/h1><\/td><\/tr>';
+
+  var parts = [];
+  if (legalOpts && legalOpts.senderName)  parts.push(escHtml(legalOpts.senderName));
+  if (legalOpts && legalOpts.senderPhone) parts.push(escHtml(legalOpts.senderPhone));
+  if (legalOpts && legalOpts.senderEmail) parts.push('<a href="mailto:' + escHtml(legalOpts.senderEmail) + '" style="color:#94a3b8">' + escHtml(legalOpts.senderEmail) + '<\/a>');
+  var infoLine = parts.length ? parts.join(' &nbsp;·&nbsp; ') : 'WorksFree · support@worksfree.co.kr';
+  var unsubLine = '';
+  if (recipientEmail) {
+    var unsubUrl = UNSUBSCRIBE_BASE + '/consulting/unsubscribe/?e=' + encodeURIComponent(recipientEmail.toLowerCase());
+    unsubLine = '<br><br><a href="' + unsubUrl + '" style="display:inline-block;background:#ef4444;color:#fff;font-weight:700;font-size:11px;padding:5px 16px;border-radius:4px;text-decoration:none;margin-top:2px">무료 수신거부<\/a>'
+      + '<br><span style="color:#b0b8c4;font-size:10px;margin-top:4px;display:inline-block">위 버튼 클릭 시 발송 목록에서 즉시 제외됩니다<\/span>';
+  }
+
+  return [
+    '<!DOCTYPE html><html><head><meta charset="UTF-8"><\/head>',
+    '<body style="margin:0;padding:0;font-family:\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;background:#f1f5f9">',
+    '<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">',
+    '<table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">',
+    heroBlock,
+    '<tr><td style="padding:28px 32px;color:#1e293b;font-size:15px;line-height:1.75">',
+    greeting,
+    '<p style="margin:0">' + msgHtml + '<\/p>',
+    '<p style="font-size:13px;color:#94a3b8;margin:24px 0 0;border-top:1px solid #e2e8f0;padding-top:20px">이 메일은 ' + (legalOpts && legalOpts.senderName ? escHtml(legalOpts.senderName) : 'WorksFree 경영 컨설팅') + '에서 발송했습니다.<\/p>',
+    '<\/td><\/tr>',
+    '<tr><td style="background:#f8fafc;padding:16px 32px;text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0">' + infoLine + unsubLine + '<\/td><\/tr>',
+    '<\/table><\/td><\/tr><\/table><\/body><\/html>',
+  ].join('');
+}
+
+// ── 전단지 선택 UI ────────────────────────────────────────────────────
+function buildFlyerSelect() {
+  var sel = document.getElementById('flyer-sel');
+  sel.innerHTML = FLYERS.map(function(f, i) {
+    return '<option value="' + i + '">' + f.label + '<\/option>';
+  }).join('');
+  onFlyerChange();
+}
+
+function onFlyerChange() {
+  var idx = +document.getElementById('flyer-sel').value;
+  var subjectEl = document.getElementById('subject');
+  if (!subjectEl.value || FLYERS.some(function(f){ return f.label === subjectEl.value; })) {
+    subjectEl.value = FLYERS[idx].label;
+  }
+}
+
+// ── 프리셋 UI ─────────────────────────────────────────────────────────
+function buildPresets() {
+  var el = document.getElementById('presets');
+  el.innerHTML = MSG_PRESETS.map(function(p) {
+    return '<button class="preset-btn" id="preset-' + p.id + '" onclick="applyPreset(\'' + p.id + '\')">' + p.icon + ' ' + p.label + '<\/button>';
+  }).join('');
+}
+
+function applyPreset(id) {
+  var preset = MSG_PRESETS.find(function(p){ return p.id === id; });
+  if (!preset) return;
+  document.getElementById('body').value = preset.body;
+  document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.getElementById('preset-' + id);
+  if (btn) btn.classList.add('active');
+}
+
+// ── 통계 로딩 ─────────────────────────────────────────────────────────
+var _stats = null;
+
+async function loadStats() {
+  document.getElementById('stat-pending').textContent    = '...';
+  document.getElementById('stat-today-rem').textContent  = '...';
+  document.getElementById('stat-active').textContent     = '...';
+  document.getElementById('stat-sent').textContent       = '...';
+  document.getElementById('stat-unsub').textContent      = '...';
+  document.getElementById('today-text').textContent      = '...';
+  document.getElementById('today-note').textContent      = '통계를 불러오는 중...';
+
+  try {
+    var res = await fetch(MAIL_WORKER_URL + '/db-stats');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    _stats = await res.json();
+    renderStats(_stats);
+  } catch(e) {
+    document.getElementById('today-note').textContent = '통계 로딩 실패 — Worker 미배포 또는 연결 오류';
+    document.getElementById('send-btn-label').textContent = '통계 로딩 실패';
+  }
+}
+
+function renderStats(s) {
+  document.getElementById('stat-pending').textContent   = (s.pending   || 0).toLocaleString() + '건';
+  document.getElementById('stat-today-rem').textContent = (s.today_remaining || 0) + '건';
+  document.getElementById('stat-active').textContent    = (s.active    || 0).toLocaleString() + '건';
+  document.getElementById('stat-sent').textContent      = (s.sent      || 0).toLocaleString() + '건';
+  document.getElementById('stat-unsub').textContent     = (s.unsubscribed || 0).toLocaleString() + '건';
+
+  var todaySent = s.today_sent || 0;
+  var todayRem  = s.today_remaining || 0;
+  var todayLim  = s.today_limit || 100;
+  var pct       = Math.round(todaySent / todayLim * 100);
+  var fillEl    = document.getElementById('today-fill');
+  fillEl.style.width      = pct + '%';
+  fillEl.style.background = pct < 80 ? 'var(--green)' : pct < 100 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('today-text').textContent = todaySent + ' / ' + todayLim + '건';
+
+  if (todayRem === 0) {
+    document.getElementById('today-note').textContent = '오늘 한도 소진 — 자정(KST) 이후 초기화됩니다';
+    document.getElementById('today-note').style.color  = '#f87171';
+    document.getElementById('send-btn').disabled = true;
+    document.getElementById('send-btn-label').textContent = '오늘 한도 소진 — 내일 계속';
+  } else if (s.pending === 0) {
+    document.getElementById('today-note').textContent = '발송 대기 이메일 없음 — DART에서 이메일을 수집하면 대기열이 채워집니다';
+    document.getElementById('today-note').style.color  = 'var(--hint)';
+    document.getElementById('send-btn').disabled = true;
+    document.getElementById('send-btn-label').textContent = '발송 대기 없음';
+  } else {
+    var sendCount = Math.min(todayRem, s.pending);
+    document.getElementById('today-note').textContent = '오늘 ' + sendCount + '건 발송 가능 · 내일 이후 계속 가능 (남은 대기: ' + (s.pending || 0).toLocaleString() + '건)';
+    document.getElementById('today-note').style.color  = 'var(--hint)';
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('send-btn-label').textContent = sendCount + '건 캠페인 발송 시작 →';
+  }
+}
+
+// ── 유틸: 타임아웃 fetch ─────────────────────────────────────────────
+function fetchTimeout(url, opts, ms) {
+  return new Promise(function(resolve, reject) {
+    var done = false;
+    var timer = setTimeout(function(){
+      if (done) return;
+      done = true;
+      reject(new Error('요청 시간 초과 (' + Math.round(ms/1000) + '초) — Worker 응답 없음'));
+    }, ms);
+    fetch(url, opts).then(function(res){
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve(res);
+    }, function(err){
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
+// ── 유틸: 진행 표시 ──────────────────────────────────────────────────
+function updateProgress(done, total) {
+  var pct = total > 0 ? Math.min(100, Math.round(done / total * 100)) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-text').textContent = done + ' / ' + total + '건 (' + pct + '%)';
+}
+
+function appendBatchLog(type, msg) {
+  var el = document.getElementById('batch-log');
+  var line = document.createElement('div');
+  line.className = 'batch-line batch-' + type;
+  line.textContent = (type === 'ok' ? '✓ ' : type === 'err' ? '✗ ' : type === 'warn' ? '⚠ ' : '… ') + msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+// ── 캠페인 실행 (10건씩 청크, 배치별 결과 즉시 표시) ─────────────────
+var _running = false;
+
+async function runCampaign() {
+  if (_running) return;
+
+  var flyerIdx = +document.getElementById('flyer-sel').value;
+  var flyer    = FLYERS[flyerIdx];
+  var subject  = document.getElementById('subject').value.trim();
+  var message  = document.getElementById('body').value.trim();
+  var legal    = getLegal();
+
+  if (!subject) { setStatus('err', '이메일 제목을 입력하세요.'); return; }
+  if (!legal.senderName) { setStatus('err', '발신자 명칭을 입력하세요.'); return; }
+
+  _running = true;
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('result-card').classList.remove('show');
+
+  // 진행 패널 초기화
+  document.getElementById('batch-log').innerHTML = '';
+  document.getElementById('send-progress').style.display = '';
+  updateProgress(0, 0);
+  setStatus('loading', '① 발송 대상 DB 조회 중...');
+
+  try {
+    // ── Step 1: 미발송 연락처 목록 조회 (최대 100건) ──────────────
+    var pendingRes = await fetchTimeout(MAIL_WORKER_URL + '/db-pending?limit=100', {}, 15000);
+    if (!pendingRes.ok) throw new Error('DB 조회 실패 — HTTP ' + pendingRes.status);
+    var pendingData = await pendingRes.json();
+
+    if (!pendingData.emails || !pendingData.emails.length) {
+      document.getElementById('send-progress').style.display = 'none';
+      if (pendingData.today_remaining === 0) {
+        setStatus('warn', '오늘 발송 한도 소진 — 자정(KST) 이후 재시도하세요');
+      } else {
+        setStatus('warn', '발송 대기 이메일이 없습니다 (DART에서 이메일을 먼저 수집하세요)');
+      }
+      _running = false;
+      document.getElementById('send-btn').disabled = false;
+      return;
+    }
+
+    var contacts = pendingData.emails;
+    var total    = contacts.length;
+    setStatus('loading', '② ' + total + '건 이메일 HTML 생성 중...');
+    updateProgress(0, total);
+
+    // ── Step 2: 이메일 HTML 빌드 ──────────────────────────────────
+    var finalSubj = '(광고) ' + subject;
+    var flyerUrl  = location.origin + '/' + flyer.src;
+    var msgText   = message || '대표님께 필요한 최신 자료를 보내드립니다.';
+    var allEmails = contacts.map(function(c) {
+      var toEmail = (c.email || '').toLowerCase();
+      return {
+        to:      toEmail,
+        subject: finalSubj,
+        html:    buildEmailHtml(c.corp_name || '', c.ceo_nm || '', msgText, flyer.label, flyerUrl, flyer.emailHero, legal, toEmail),
+      };
+    });
+
+    var meta = {
+      senderEmail:  legal.senderEmail,
+      senderName:   legal.senderName,
+      flyerSrc:     flyer.src,
+      flyerName:    flyer.label,
+      env:          getEnv(),
+      senderUserId: getHubUserId(),
+    };
+
+    // ── Step 3: 10건씩 청크 발송 ─────────────────────────────────
+    var CHUNK       = 10;
+    var totalSent   = 0, totalFiltered = 0, totalFailed = 0;
+    var lastDailySent = pendingData.today_sent || 0;
+    var lastDailyRem  = pendingData.today_remaining || 0;
+    var aborted = false;
+
+    setStatus('loading', '③ 발송 시작 — ' + total + '건을 ' + CHUNK + '건씩 순차 처리');
+
+    for (var i = 0; i < allEmails.length; i += CHUNK) {
+      if (aborted) break;
+
+      var chunk      = allEmails.slice(i, i + CHUNK);
+      var chunkStart = i + 1;
+      var chunkEnd   = Math.min(i + CHUNK, total);
+      var chunkLabel = chunkStart + '–' + chunkEnd + '번';
+
+      appendBatchLog('loading', chunkLabel + ' 발송 중... (' + chunk.length + '건)');
+
+      try {
+        var sendRes = await fetchTimeout(MAIL_WORKER_URL + '/db-send', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ emails: chunk, meta: meta }),
+        }, 45000);
+
+        var sendData = await sendRes.json();
+
+        // 마지막 로그 항목 업데이트 (loading → 결과)
+        var lastLine = document.getElementById('batch-log').lastChild;
+        if (lastLine) lastLine.remove();
+
+        if (!sendRes.ok) {
+          // HTTP 에러 (429 한도 초과 포함)
+          appendBatchLog('err', chunkLabel + ' 실패 [HTTP ' + sendRes.status + '] — ' + (sendData.error || '알 수 없는 오류'));
+          if (sendRes.status === 429) {
+            appendBatchLog('warn', '일일 한도 소진 — 자정(KST) 이후 나머지 ' + (total - chunkEnd) + '건 계속 가능');
+            aborted = true;
+          }
+          // 429 외 오류는 다음 청크 계속 시도
+          continue;
+        }
+
+        if (!sendData.success) {
+          appendBatchLog('err', chunkLabel + ' 실패 — ' + (sendData.error || '서버 오류'));
+          continue;
+        }
+
+        var bSent     = sendData.sent || 0;
+        var bFiltered = (sendData.filtered || []).length;
+        var bFailed   = (sendData.failed   || []).length;
+        totalSent     += bSent;
+        totalFiltered += bFiltered;
+        totalFailed   += bFailed;
+        lastDailySent  = sendData.today_sent      || lastDailySent;
+        lastDailyRem   = sendData.today_remaining || 0;
+
+        // 배치 결과 로그
+        var logParts = [bSent + '건 발송'];
+        if (bFiltered > 0) logParts.push(bFiltered + '건 수신거부');
+        if (bFailed   > 0) logParts.push(bFailed + '건 실패');
+        var logType = bFailed > 0 ? 'warn' : 'ok';
+        appendBatchLog(logType, chunkLabel + ' — ' + logParts.join(' · '));
+
+        // 실패 이메일 상세 (최대 3건)
+        if (sendData.failed && sendData.failed.length > 0) {
+          sendData.failed.slice(0, 3).forEach(function(f) {
+            appendBatchLog('err', '  └ ' + f.email + ' → ' + (f.reason || '알 수 없음'));
+          });
+          if (sendData.failed.length > 3) {
+            appendBatchLog('err', '  └ ... 외 ' + (sendData.failed.length - 3) + '건 더');
+          }
+        }
+
+        updateProgress(chunkEnd, total);
+
+        if (lastDailyRem === 0 && chunkEnd < total) {
+          appendBatchLog('warn', '일일 한도 소진 (오늘 ' + lastDailySent + '건) — 자정 이후 나머지 ' + (total - chunkEnd) + '건 계속 발송');
+          aborted = true;
+        }
+
+      } catch(chunkErr) {
+        // 타임아웃 또는 네트워크 오류
+        var lastLine2 = document.getElementById('batch-log').lastChild;
+        if (lastLine2 && lastLine2.classList.contains('batch-loading')) lastLine2.remove();
+        appendBatchLog('err', chunkLabel + ' 오류 — ' + chunkErr.message);
+        // 네트워크 오류는 다음 청크 계속 시도
+      }
+    }
+
+    // ── Step 4: 최종 결과 ─────────────────────────────────────────
+    var pendLeft = (_stats ? Math.max(0, _stats.pending - totalSent) : 0);
+
+    if (totalSent > 0) {
+      setStatus('ok', '✓ 완료 — ' + totalSent + '건 발송'
+        + (totalFiltered > 0 ? ' · ' + totalFiltered + '건 수신거부 제외' : '')
+        + (totalFailed   > 0 ? ' · ' + totalFailed + '건 실패' : ''));
+    } else if (totalFailed > 0) {
+      setStatus('err', '발송 실패 — 0건 성공, ' + totalFailed + '건 오류 (위 로그 확인)');
+    } else {
+      setStatus('warn', '발송 대상 없음 (전원 수신거부 또는 한도 초과)');
+    }
+
+    document.getElementById('res-sent').textContent      = totalSent.toLocaleString() + '건';
+    document.getElementById('res-filtered').textContent  = totalFiltered + '건';
+    document.getElementById('res-failed').textContent    = totalFailed + '건';
+    document.getElementById('res-today').textContent     = lastDailySent + ' / 100건';
+    document.getElementById('res-remaining').textContent = lastDailyRem + '건';
+
+    var nextInfo = document.getElementById('next-info');
+    if (lastDailyRem === 0) {
+      nextInfo.style.display = '';
+      nextInfo.textContent   = '오늘 한도 소진. 자정(KST) 이후 초기화 → 내일 계속 발송 가능. 남은 대기: 약 ' + pendLeft.toLocaleString() + '건';
+      document.getElementById('send-btn-label').textContent = '오늘 한도 소진 — 내일 계속';
+      document.getElementById('send-btn').disabled = true;
+    } else if (pendLeft <= 0) {
+      nextInfo.style.display = '';
+      nextInfo.textContent   = '모든 대기 이메일 발송 완료. DART에서 새 이메일을 수집하면 대기열이 보충됩니다.';
+      document.getElementById('send-btn-label').textContent = '발송 대기 없음';
+      document.getElementById('send-btn').disabled = true;
+    } else {
+      nextInfo.style.display = '';
+      var nextCount = Math.min(lastDailyRem, pendLeft);
+      nextInfo.textContent   = '오늘 남은 한도: ' + lastDailyRem + '건 · 남은 대기: 약 ' + pendLeft.toLocaleString() + '건';
+      document.getElementById('send-btn-label').textContent = nextCount + '건 추가 발송 →';
+      document.getElementById('send-btn').disabled = false;
+    }
+
+    document.getElementById('result-card').classList.add('show');
+
+    // 통계 갱신
+    if (_stats) {
+      _stats.sent           = (_stats.sent || 0) + totalSent;
+      _stats.pending        = Math.max(0, (_stats.pending || 0) - totalSent);
+      _stats.today_sent     = lastDailySent;
+      _stats.today_remaining = lastDailyRem;
+      renderStats(_stats);
+    }
+
+  } catch(e) {
+    document.getElementById('send-progress').style.display = 'none';
+    setStatus('err', '오류: ' + e.message);
+    document.getElementById('send-btn').disabled = false;
+  } finally {
+    _running = false;
+  }
+}
+
+function setStatus(type, msg) {
+  var el = document.getElementById('status-msg');
+  el.className = 'status-msg ' + type;
+  el.textContent = msg;
+}
+
+// ── 어드민 인증 (레이어 2) ────────────────────────────────────────────
+(async () => {
+  try {
+    var { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      var { data: p } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+      if (p?.role === 'admin') {
+        document.getElementById('admin-gate').style.display = 'none';
+        document.getElementById('main').classList.add('visible');
+        return;
+      }
+    }
+  } catch(e) {}
+  document.getElementById('admin-gate').classList.add('visible');
+})();
+
+// ── 발송 현황 목록 모달 ──────────────────────────────────────────────
+var _listData   = null;  // 로드된 전체 rows (active 이메일 ~900건)
+var _listFilter = 'all';
+var _listSearch = '';
+var _sortCols   = [];    // [{key:'corp_name', dir:1}, ...] — 1=오름, -1=내림
+
+// 정렬 가능한 컬럼 키 목록
+var SORT_COL_KEYS = ['corp_name','ceo_nm','email','send_status','sent_at_kst','subject','flyer_name'];
+
+function onColumnSort(key) {
+  var idx = _sortCols.findIndex(function(s) { return s.key === key; });
+  if (idx >= 0) {
+    if (_sortCols[idx].dir === 1) {
+      _sortCols[idx].dir = -1;        // 오름 → 내림
+    } else {
+      _sortCols.splice(idx, 1);       // 내림 → 해제 (3단계 토글)
+    }
+  } else {
+    _sortCols.push({ key: key, dir: 1 }); // 새 컬럼 추가 (AND 조건)
+  }
+  updateSortIndicators();
+  renderListFiltered();
+}
+
+function updateSortIndicators() {
+  SORT_COL_KEYS.forEach(function(k) {
+    var icon = document.getElementById('si-' + k);
+    var rank = document.getElementById('sr-' + k);
+    if (icon) { icon.textContent = '↕'; icon.className = 'sort-icon'; }
+    if (rank) rank.textContent = '';
+  });
+  _sortCols.forEach(function(s, i) {
+    var icon = document.getElementById('si-' + s.key);
+    var rank = document.getElementById('sr-' + s.key);
+    if (icon) { icon.textContent = s.dir === 1 ? '↑' : '↓'; icon.className = 'sort-icon active'; }
+    if (rank && _sortCols.length > 1) rank.textContent = (i + 1);
+  });
+}
+
+function applySortToRows(rows) {
+  if (!_sortCols.length) return rows; // 정렬 없으면 DB 순서 유지
+  return rows.slice().sort(function(a, b) {
+    for (var i = 0; i < _sortCols.length; i++) {
+      var s  = _sortCols[i];
+      var va = String(a[s.key] || '').toLowerCase();
+      var vb = String(b[s.key] || '').toLowerCase();
+      if (va < vb) return -s.dir;
+      if (va > vb) return  s.dir;
+    }
+    return 0;
+  });
+}
+
+var STATUS_LABEL = { sent:'발송완료', pending:'미발송', unsubscribed:'수신거부' };
+var STATUS_CLS   = { sent:'badge-sent', pending:'badge-pending', unsubscribed:'badge-unsub' };
+
+function openListModal() {
+  document.getElementById('db-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (!_listData) loadListData();
+  else renderListFiltered();
+}
+
+function closeListModal() {
+  document.getElementById('db-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function loadListData() {
+  document.getElementById('db-tbody').innerHTML =
+    '<tr><td colspan="8" class="db-empty">⏳ 이메일 발송 대상 목록 로딩 중...</td></tr>';
+  try {
+    var res = await fetch(MAIL_WORKER_URL + '/db-list');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    if (data.error) throw new Error(data.error);
+    _listData = data.rows || [];
+    document.getElementById('db-total-badge').textContent = _listData.length.toLocaleString() + '건';
+    updateSummaryCounts();
+    renderListFiltered();
+  } catch(e) {
+    document.getElementById('db-tbody').innerHTML =
+      '<tr><td colspan="8" class="db-empty" style="color:#fca5a5">⚠ 로드 실패: ' + escHtml(e.message) + '</td></tr>';
+  }
+}
+
+function updateSummaryCounts() {
+  if (!_listData) return;
+  var c = { sent:0, pending:0, unsubscribed:0 };
+  _listData.forEach(function(r) { c[r.send_status] = (c[r.send_status]||0) + 1; });
+  document.getElementById('sum-pending').textContent = c.pending.toLocaleString() + '건';
+  document.getElementById('sum-sent').textContent    = c.sent.toLocaleString() + '건';
+  document.getElementById('sum-unsub').textContent   = (c.unsubscribed||0) + '건';
+}
+
+function setListFilter(filter) {
+  _listFilter = filter;
+  document.querySelectorAll('.db-tab').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  renderListFiltered();
+}
+
+function onListSearch(val) {
+  _listSearch = val.trim().toLowerCase();
+  renderListFiltered();
+}
+
+function getFilteredRows() {
+  if (!_listData) return [];
+  return _listData.filter(function(r) {
+    if (_listFilter !== 'all' && r.send_status !== _listFilter) return false;
+    if (_listSearch) {
+      var hay = ((r.corp_name||'') + ' ' + (r.email||'') + ' ' + (r.ceo_nm||'')).toLowerCase();
+      if (hay.indexOf(_listSearch) < 0) return false;
+    }
+    return true;
+  });
+}
+
+function renderListFiltered() {
+  var rows   = getFilteredRows();
+  var sorted = applySortToRows(rows);
+  renderListTable(sorted);
+
+  var filterLabel = { all:'전체', pending:'미발송', sent:'발송완료', unsubscribed:'수신거부' };
+  var label = filterLabel[_listFilter] || '';
+  var sortNote = _sortCols.length
+    ? ' · 정렬 ' + _sortCols.map(function(s) {
+        var names = {corp_name:'회사명',ceo_nm:'대표자',email:'이메일',send_status:'발송상태',sent_at_kst:'발송일시',subject:'제목',flyer_name:'전단지'};
+        return (names[s.key]||s.key) + (s.dir===1?'↑':'↓');
+      }).join(' & ')
+    : '';
+  document.getElementById('db-filtered-info').textContent =
+    (_listSearch ? '검색: "' + _listSearch + '" — ' : '') + label + ' ' + rows.length.toLocaleString() + '건' + sortNote;
+  document.getElementById('db-footer-info').textContent =
+    rows.length.toLocaleString() + '건 표시 중' + (_listData ? ' (전체 ' + _listData.length.toLocaleString() + '건)' : '');
+}
+
+function renderListTable(rows) {
+  if (!rows.length) {
+    document.getElementById('db-tbody').innerHTML =
+      '<tr><td colspan="8" class="db-empty">검색 결과가 없습니다.</td></tr>';
+    return;
+  }
+
+  // 전체 보기일 때 미발송↔발송완료 경계선 삽입
+  var showDivider = (_listFilter === 'all' && !_listSearch);
+  var dividerInserted = false;
+
+  var html = rows.map(function(r, i) {
+    var s   = r.send_status || 'pending';
+    var sub = r.subject ? (r.subject.length > 38 ? r.subject.slice(0,38)+'…' : r.subject) : '—';
+    var rowBg = s === 'sent' ? '' : s === 'unsubscribed' ? 'background:rgba(239,68,68,.04)' : '';
+
+    var divider = '';
+    if (showDivider && !dividerInserted && s !== 'pending') {
+      dividerInserted = true;
+      divider = '<tr class="status-divider"><td colspan="8"><div></div></td></tr>';
+    }
+
+    return divider + '<tr style="' + rowBg + '">' +
+      '<td style="color:var(--hint);font-size:11px;text-align:right;padding-right:8px;width:44px">' + (i+1) + '</td>' +
+      '<td style="font-weight:600">' + escHtml(r.corp_name||'—') + '</td>' +
+      '<td style="color:var(--muted)">' + escHtml(r.ceo_nm||'—') + '</td>' +
+      '<td style="font-family:monospace;font-size:12px">' + escHtml(r.email||'—') + '</td>' +
+      '<td><span class="badge '+(STATUS_CLS[s]||'badge-pending')+'">'+(STATUS_LABEL[s]||s)+'</span></td>' +
+      '<td style="color:var(--muted);font-size:12px;white-space:nowrap">' + escHtml(r.sent_at_kst||'—') + '</td>' +
+      '<td style="color:var(--muted);font-size:12px" title="'+escHtml(r.subject||'')+'">' + escHtml(sub) + '</td>' +
+      '<td style="color:var(--hint);font-size:12px">' + escHtml(r.flyer_name||'—') + '</td>' +
+      '</tr>';
+  }).join('');
+  document.getElementById('db-tbody').innerHTML = html;
+}
+
+function downloadListCsv() {
+  var rows = getFilteredRows();
+  if (!rows.length) { alert('다운로드할 데이터가 없습니다.'); return; }
+  var STATUS_KO = { sent:'발송완료', pending:'미발송', unsubscribed:'수신거부' };
+  var cols = ['순번','회사명','대표자','이메일','이메일상태','발송상태','발송일시(KST)','제목','전단지'];
+  var lines = [cols.join(',')];
+  rows.forEach(function(r, i) {
+    lines.push([
+      i+1, cc(r.corp_name), cc(r.ceo_nm), cc(r.email), cc(r.email_status),
+      STATUS_KO[r.send_status]||r.send_status||'',
+      cc(r.sent_at_kst), cc(r.subject), cc(r.flyer_name),
+    ].join(','));
+  });
+  var tag  = _listFilter !== 'all' ? '-'+_listFilter : '';
+  var bom  = '﻿';
+  var blob = new Blob([bom + lines.join('\r\n')], { type:'text/csv;charset=utf-8' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'campaign'+tag+'-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function cc(v) {
+  if (v==null||v==='') return '';
+  var s = String(v);
+  return (s.includes(',')||s.includes('"')||s.includes('\n')) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key==='Escape') closeListModal();
+});
+
+// ── 초기화 ───────────────────────────────────────────────────────────
+buildFlyerSelect();
+buildPresets();
+loadStats();
+loadLegal();
+applyPreset('hanwha');
+</script>
+</body>
+</html>

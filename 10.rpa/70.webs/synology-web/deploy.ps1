@@ -24,7 +24,7 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.8.4.0"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.8.4.11"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -384,21 +384,39 @@ if ($allOk) {
     if (Test-Path $secretsFile) { . $secretsFile }
     $CF_API_TOKEN = $env:CF_CACHE_PURGE_TOKEN
     Write-Host ""
-    Write-Host "  ▶ Cloudflare 캐시 퍼지 중..." -ForegroundColor Gray
-    try {
-        $cfResult = Invoke-RestMethod `
-            -Uri     "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" `
-            -Method  POST `
-            -Headers @{ "Authorization" = "Bearer $CF_API_TOKEN"; "Content-Type" = "application/json" } `
-            -Body    '{"purge_everything":true}' `
-            -ErrorAction Stop
-        if ($cfResult.success) {
-            Write-Host "    ✅ Cloudflare 캐시 퍼지 완료 — 브라우저 새로고침 시 최신 파일 적용됨" -ForegroundColor Green
-        } else {
-            Write-Host "    ⚠️  Cloudflare 퍼지 실패: $($cfResult.errors | ConvertTo-Json -Compress)" -ForegroundColor Yellow
+    if (-not $CF_API_TOKEN) {
+        Write-Host "    ⚠️  CF_CACHE_PURGE_TOKEN이 비어 있습니다 — secrets.ps1 확인 필요" -ForegroundColor Yellow
+    } else {
+        Write-Host "  ▶ Cloudflare 캐시 퍼지 중..." -ForegroundColor Gray
+        try {
+            $cfResult = Invoke-RestMethod `
+                -Uri     "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" `
+                -Method  POST `
+                -Headers @{ "Authorization" = "Bearer $CF_API_TOKEN"; "Content-Type" = "application/json" } `
+                -Body    '{"purge_everything":true}' `
+                -ErrorAction Stop
+            if ($cfResult.success) {
+                Write-Host "    ✅ Cloudflare 캐시 퍼지 완료 — 브라우저 새로고침 시 최신 파일 적용됨" -ForegroundColor Green
+            } else {
+                $errCode = ($cfResult.errors | Select-Object -First 1).code
+                if ($errCode -eq 10000) {
+                    Write-Host "    ⚠️  Cloudflare 인증 오류 — API 토큰이 만료되었거나 권한이 없습니다" -ForegroundColor Yellow
+                    Write-Host "    → cloudflare.com > My Profile > API Tokens > 기존 토큰 삭제 후 재발급" -ForegroundColor Yellow
+                    Write-Host "    → 재발급 후 secrets.ps1 의 CF_CACHE_PURGE_TOKEN 값 교체" -ForegroundColor Yellow
+                } else {
+                    Write-Host "    ⚠️  Cloudflare 퍼지 실패: $($cfResult.errors | ConvertTo-Json -Compress)" -ForegroundColor Yellow
+                }
+            }
+        } catch {
+            $errBody = $_.ErrorDetails.Message
+            if ($errBody -match '"code":10000') {
+                Write-Host "    ⚠️  Cloudflare 인증 오류 — API 토큰이 만료되었거나 권한이 없습니다" -ForegroundColor Yellow
+                Write-Host "    → cloudflare.com > My Profile > API Tokens > 기존 토큰 삭제 후 재발급" -ForegroundColor Yellow
+                Write-Host "    → 재발급 후 secrets.ps1 의 CF_CACHE_PURGE_TOKEN 값 교체" -ForegroundColor Yellow
+            } else {
+                Write-Host "    ⚠️  Cloudflare 퍼지 오류: $_" -ForegroundColor Yellow
+            }
         }
-    } catch {
-        Write-Host "    ⚠️  Cloudflare 퍼지 오류: $_" -ForegroundColor Yellow
     }
 }
 # ────────────────────────────────────────────────────────────────

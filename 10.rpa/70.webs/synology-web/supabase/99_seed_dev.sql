@@ -9,7 +9,7 @@
 -- 생성 계정 (이메일 로그인):
 --   test@worksfree.co.kr        일반회원    TestPassword123!
 --   consultant@worksfree.co.kr  컨설턴트    TestPassword123!
---   gfc@worksfree.co.kr         GFC파트너   TestPassword123!
+--   gfc@worksfree.co.kr         파트너      TestPassword123!
 --   admin@worksfree.co.kr       관리자      AdminPassword123!
 --
 -- 멱등성: ON CONFLICT DO NOTHING → 반복 실행 안전
@@ -78,7 +78,7 @@ UPDATE public.profiles SET role = 'consultant', agreed_at = NOW()
 WHERE id = 'd0000002-0000-4000-8000-000000000000'::UUID;
 
 
--- (3) GFC 파트너
+-- (3) 파트너
 INSERT INTO auth.users (
   id, aud, role, email, encrypted_password,
   email_confirmed_at, created_at, updated_at,
@@ -90,7 +90,7 @@ INSERT INTO auth.users (
   'authenticated', 'authenticated', 'gfc@worksfree.co.kr',
   crypt('TestPassword123!', gen_salt('bf')),
   now(), now(), now(),
-  '{"full_name":"GFC 파트너 테스터"}'::JSONB,
+  '{"full_name":"파트너 테스터"}'::JSONB,
   '{"provider":"email","providers":["email"]}'::JSONB,
   false, false, '', '', '', ''
 ) ON CONFLICT (id) DO NOTHING;

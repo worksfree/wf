@@ -536,3 +536,75 @@ for (let i = 1; i <= pdf.numPages; i++) {
 ```
 
 스캔 PDF 감지: 텍스트 추출 후 200자 미만이면 스캔 문서로 판단 → Claude Vision 권장.
+
+---
+
+## 컨설팅 페이지 UX 패턴 (2026-06 분석)
+
+### 패턴 A: 진단형 (다단계 선택 → 자동 결과)
+**적용 페이지**: CEO 플랜, GFC 보험진단, 상속세, 주식평가
+
+- 단계별 카드(Step 1, Step 2...)를 순서대로 선택하면 자동으로 다음 단계가 펼쳐짐
+- 별도 "계산하기" 버튼 없음 — 선택 완료 시 즉시 결과 렌더링
+- 인쇄/공유용 보고서 버튼 없음 (플라이어 등 별도 출력물 존재)
+
+### 패턴 B: 시뮬레이터형 (입력값 변경 → 자동 계산 → 보고서 생성)
+**적용 페이지**: 연금 절세 시뮬레이터 (`consulting/pension/index.html`)
+
+```
+[헤더] 📋 보고서 생성 버튼 (첫 계산 후 표시)
+[auto-bar] 자동업데이트 표시 (autoDot pulse 애니메이션)
+[입력 패널] oninput="onIC()" → debounce 200ms → calculate()
+[결과 섹션] #resultsSection (초기 display:none → 계산 후 display:block)
+```
+
+**핵심 구현 규칙:**
+1. `oninput="onIC()"` 모든 입력 필드에 → `clearTimeout` + `setTimeout(calculate, 200)` 패턴
+2. 결과 표시: `document.getElementById('resultsSection').style.display = 'block'` (CSS 룰 오버라이드이므로 `''` 아닌 `'block'` 필수)
+3. 자동 업데이트 피드백: autoDot 애니메이션 — `classList.remove('pulse'); void el.offsetWidth; classList.add('pulse')`
+4. 별도 계산 버튼 없음
+
+**📋 보고서 생성 패턴 (ESG/연금 공통):**
+```html
+<!-- 헤더 우측 -->
+<button id="rptBtn" style="display:none" onclick="showReport()">📋 보고서 생성</button>
+
+<!-- body 끝 (오버레이) -->
+<div class="pension-report" id="pensionReport">
+  <div class="rpt-topbar">  <!-- sticky, 인쇄/닫기 버튼 포함 -->
+  <div class="rpt-body" id="rptContent"></div>  <!-- 동적 생성 -->
+</div>
+```
+```css
+/* 오버레이 패턴 */
+.pension-report { display:none; position:fixed; inset:0; background:#fff; z-index:200; overflow-y:auto; }
+.pension-report.open { display:block; }
+@media print {
+  body > *:not(.pension-report) { display:none !important; }
+  .pension-report { display:block !important; position:static !important; }
+  .rpt-topbar { display:none !important; }
+}
+```
+```js
+function showReport() {
+  // lastResult / lastInput으로 innerHTML 동적 빌드
+  document.getElementById('pensionReport').classList.add('open');
+}
+function closeReport() { document.getElementById('pensionReport').classList.remove('open'); }
+function printReport() { window.print(); }
+```
+- 계산 성공 시 `rptBtn.style.display = ''` 로 버튼 노출
+- 보고서 내용: 입력 조건 요약 → 핵심 지표 → 연도별 명세 → 면책고지
+
+**금액 단위 표시 규칙:**
+- 요약 카드 월수령: 값 옆에 `<span class="unit-badge">/월</span>` 표기
+- 요약 카드 합산: sub-line에 "(총 N년 합산)" 명시
+- 시나리오 카드: 연간 금액은 `원/년`, 월 금액은 `원/월` 접미사
+- 테이블 헤더: 섹션 소제목에 "(연 합산 기준 · 월 열만 원/월)" 명시
+
+### 패턴 선택 기준
+| 상황 | 권장 패턴 |
+|------|-----------|
+| 선택지가 이산적 (유형 선택) | 패턴 A (진단형) |
+| 수치 입력 + 연속적 시뮬레이션 | 패턴 B (시뮬레이터형) |
+| 결과가 프린트용 보고서로 필요 | 📋 보고서 생성 버튼 추가 |

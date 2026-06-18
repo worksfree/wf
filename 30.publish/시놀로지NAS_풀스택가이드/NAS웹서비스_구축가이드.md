@@ -13,25 +13,25 @@
 <h2>목차</h2>
 <table class="toc-table">
 <tr><td class="toc-num">도입</td><td class="toc-title">이 가이드를 읽기 전에</td><td class="toc-page">2</td></tr>
-<tr><td class="toc-num"></td><td class="toc-title">전체 구성도</td><td class="toc-page">4</td></tr>
-<tr><td class="toc-num"></td><td class="toc-title">사전 준비물</td><td class="toc-page">6</td></tr>
-<tr class="toc-part"><td class="toc-num">1장</td><td class="toc-title">가비아 — 도메인 구입 및 네임서버 변경</td><td class="toc-page">7</td></tr>
-<tr><td class="toc-num">2장</td><td class="toc-title">Cloudflare — 계정 설정 및 도메인 등록</td><td class="toc-page">8</td></tr>
-<tr><td class="toc-num">3장</td><td class="toc-title">Synology NAS — DSM 7.x 웹 서비스 설정</td><td class="toc-page">10</td></tr>
-<tr><td class="toc-num">4장</td><td class="toc-title">Cloudflare Tunnel — 공유기 설정 없이 NAS 연결</td><td class="toc-page">13</td></tr>
-<tr><td class="toc-num">5장</td><td class="toc-title">서브도메인 DNS 설정</td><td class="toc-page">17</td></tr>
-<tr><td class="toc-num">6장</td><td class="toc-title">Cloudflare Worker — 외부 API 호출</td><td class="toc-page">18</td></tr>
-<tr><td class="toc-num">7장</td><td class="toc-title">Supabase — 회원 로그인 시스템 구축</td><td class="toc-page">24</td></tr>
-<tr><td class="toc-num">8장</td><td class="toc-title">Supabase 데이터베이스 — 회원 정보·결제·크레딧 저장</td><td class="toc-page">33</td></tr>
-<tr><td class="toc-num">9장</td><td class="toc-title">온라인 결제 연동 — 토스페이먼츠 + Stripe</td><td class="toc-page">53</td></tr>
-<tr><td class="toc-num">10장</td><td class="toc-title">웹사이트 코드와 Supabase 연결</td><td class="toc-page">70</td></tr>
-<tr><td class="toc-num">11장</td><td class="toc-title">배포 자동화 스크립트 (Windows PowerShell)</td><td class="toc-page">71</td></tr>
-<tr><td class="toc-num">12장</td><td class="toc-title">역할 기반 접근 제어 (RBAC)</td><td class="toc-page">76</td></tr>
-<tr><td class="toc-num">13장</td><td class="toc-title">테스트 환경 구축 — Playwright + Supabase 분리</td><td class="toc-page">79</td></tr>
-<tr class="toc-appendix"><td class="toc-num">부록 A</td><td class="toc-title">전체 설정 순서 요약</td><td class="toc-page">83</td></tr>
-<tr class="toc-appendix"><td class="toc-num">부록 B</td><td class="toc-title">트러블슈팅</td><td class="toc-page">84</td></tr>
-<tr class="toc-appendix"><td class="toc-num">부록 C</td><td class="toc-title">포트 구성 참고표</td><td class="toc-page">89</td></tr>
-<tr class="toc-appendix"><td class="toc-num">부록 D</td><td class="toc-title">파일 위치 참고 (WorksFree Hub 기준)</td><td class="toc-page">90</td></tr>
+<tr><td class="toc-num"></td><td class="toc-title">전체 구성도</td><td class="toc-page">5</td></tr>
+<tr><td class="toc-num"></td><td class="toc-title">사전 준비물</td><td class="toc-page">5</td></tr>
+<tr class="toc-part"><td class="toc-num">1장</td><td class="toc-title">가비아 — 도메인 구입 및 네임서버 변경</td><td class="toc-page">6</td></tr>
+<tr><td class="toc-num">2장</td><td class="toc-title">Cloudflare — 계정 설정 및 도메인 등록</td><td class="toc-page">7</td></tr>
+<tr><td class="toc-num">3장</td><td class="toc-title">Synology NAS — DSM 7.x 웹 서비스 설정</td><td class="toc-page">8</td></tr>
+<tr><td class="toc-num">4장</td><td class="toc-title">Cloudflare Tunnel — 공유기 설정 없이 NAS 연결</td><td class="toc-page">11</td></tr>
+<tr><td class="toc-num">5장</td><td class="toc-title">서브도메인 DNS 설정</td><td class="toc-page">16</td></tr>
+<tr><td class="toc-num">6장</td><td class="toc-title">Cloudflare Worker — 외부 API 호출</td><td class="toc-page">17</td></tr>
+<tr><td class="toc-num">7장</td><td class="toc-title">Supabase — 회원 로그인 시스템 구축</td><td class="toc-page">21</td></tr>
+<tr><td class="toc-num">8장</td><td class="toc-title">Supabase 데이터베이스 — 회원 정보·결제·크레딧 저장</td><td class="toc-page">30</td></tr>
+<tr><td class="toc-num">9장</td><td class="toc-title">온라인 결제 연동 — 토스페이먼츠 (국내)</td><td class="toc-page">46</td></tr>
+<tr><td class="toc-num">10장</td><td class="toc-title">웹사이트 코드와 Supabase 연결</td><td class="toc-page">55</td></tr>
+<tr><td class="toc-num">11장</td><td class="toc-title">배포 자동화 스크립트 (Windows PowerShell)</td><td class="toc-page">56</td></tr>
+<tr><td class="toc-num">12장</td><td class="toc-title">역할 기반 접근 제어 (RBAC)</td><td class="toc-page">59</td></tr>
+<tr><td class="toc-num">13장</td><td class="toc-title">테스트 환경 구축 — Playwright + Supabase 분리</td><td class="toc-page">61</td></tr>
+<tr class="toc-appendix"><td class="toc-num">부록 A</td><td class="toc-title">전체 설정 순서 요약</td><td class="toc-page">64</td></tr>
+<tr class="toc-appendix"><td class="toc-num">부록 B</td><td class="toc-title">트러블슈팅</td><td class="toc-page">66</td></tr>
+<tr class="toc-appendix"><td class="toc-num">부록 C</td><td class="toc-title">포트 구성 참고표</td><td class="toc-page">70</td></tr>
+<tr class="toc-appendix"><td class="toc-num">부록 D</td><td class="toc-title">파일 위치 참고 (WorksFree Hub 기준)</td><td class="toc-page">70</td></tr>
 </table>
 </div>
 
@@ -51,15 +51,55 @@
 기본 웹사이트(정적 페이지)를 넘어서, 아래와 같은 기능이 필요해지면  
 각각의 서비스가 추가됩니다.
 
-| 필요한 기능 | 사용하는 서비스 | 이 가이드의 챕터 |
-|------------|----------------|----------------|
-| 보안·성능 강화, 도메인 관리 | Cloudflare | 2장 |
-| 공유기 설정 없이 NAS 외부 공개 | Cloudflare Tunnel | 4장 |
-| 외부 API 데이터 가져오기 (예: DART 기업정보) | Cloudflare Worker | 6장 |
-| 회원 가입·로그인 (Google, 카카오 등) | Supabase 인증 | 7장 |
-| 회원 정보·결제 이력·크레딧 저장 | Supabase 데이터베이스 | 8장 |
-| 온라인 결제 (카드·계좌이체) | PG사 연동 (토스페이먼츠 등) | 9장 |
-| 이메일 발송 (단건·대량, 발송 현황 추적) | Resend + Cloudflare Worker KV | 14장 |
+<table>
+<colgroup>
+<col style="width:33%">
+<col style="width:33%">
+<col style="width:34%">
+</colgroup>
+<thead><tr>
+<th>필요한 기능</th>
+<th>사용하는 서비스</th>
+<th>이 가이드의 챕터</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>보안·성능 강화, 도메인 관리</td>
+<td>Cloudflare</td>
+<td>2장</td>
+</tr>
+<tr>
+<td>공유기 설정 없이 NAS 외부 공개</td>
+<td>Cloudflare Tunnel</td>
+<td>4장</td>
+</tr>
+<tr>
+<td>외부 API 데이터 가져오기 (예: DART 기업정보)</td>
+<td>Cloudflare Worker</td>
+<td>6장</td>
+</tr>
+<tr>
+<td>회원 가입·로그인 (Google, 카카오 등)</td>
+<td>Supabase 인증</td>
+<td>7장</td>
+</tr>
+<tr>
+<td>회원 정보·결제 이력·크레딧 저장</td>
+<td>Supabase 데이터베이스</td>
+<td>8장</td>
+</tr>
+<tr>
+<td>온라인 결제 (카드·계좌이체)</td>
+<td>PG사 연동 (토스페이먼츠 등)</td>
+<td>9장</td>
+</tr>
+<tr>
+<td>이메일 발송 (단건·대량, 발송 현황 추적)</td>
+<td>Resend + Cloudflare Worker KV</td>
+<td>14장</td>
+</tr>
+</tbody>
+</table>
 
 ### 이 가이드를 따라가면 만들 수 있는 것
 
@@ -68,6 +108,48 @@
 - 사용자별 크레딧·결제 이력을 관리하는 데이터베이스
 - 온라인 결제 후 크레딧이 자동으로 충전되는 결제 시스템
 - 개발용·테스트용·실 서비스용 환경을 분리한 배포 구조
+
+### DS925+ 성능 안내 — 동시 접속자 수 기준
+
+이 가이드의 구현 사례는 **시놀로지 DS923+/DS925+** (기본 RAM **4GB**)를 기준으로 합니다.
+서비스를 구축하기 전에 이 하드웨어의 실제 수용 능력을 먼저 파악해두면, 적합한 서비스 규모를 설계하는 데 도움이 됩니다.
+
+#### 동시 접속자(Concurrent User)란?
+
+처음 서버를 다루는 분들은 "동시 접속자"를 *"지금 내 사이트를 열어놓은 사람 수"*로 생각하기 쉽습니다. 하지만 서버 입장에서 실제로 중요한 것은 다릅니다.
+
+> **동시 접속자 = 1초 안에 서버에 데이터 요청을 보내는 사람 수**
+>
+> 페이지를 열어두고 글을 읽고 있는 동안에는, 서버는 그 사용자를 전혀 인식하지 않습니다.  
+> 버튼 클릭, 로그인, 데이터 조회처럼 **무언가를 요청하는 순간**에만 서버 부하가 발생합니다.
+
+예를 들어 100명이 사이트에 접속해 있어도, 동시에 요청을 보내는 사람은 보통 1~5명입니다. 이것이 서버가 실제로 상대하는 동시 접속자입니다.
+
+#### DS925+ RAM 4GB 기준 수용 능력
+
+<table>
+<colgroup><col style="width:30%"><col style="width:40%"><col style="width:30%"></colgroup>
+<thead><tr><th>서비스 유형</th><th>예시</th><th>권장 동시 접속자</th></tr></thead>
+<tbody>
+<tr><td>경량형 (텍스트·API 위주)</td><td>메모장 앱, 텍스트 API</td><td>약 70명</td></tr>
+<tr><td>표준형 (DB 연동 포함)</td><td>로그인·회원가입, 게시판</td><td>약 30명</td></tr>
+<tr><td>중량형 (복잡한 로직·이미지)</td><td>대용량 파일 처리, 복잡한 비즈니스 로직</td><td>10명 이하</td></tr>
+</tbody>
+</table>
+
+위 수치는 다음 세 가지 전제를 기반으로 합니다.
+
+**① 시스템 기본 소모:** DSM OS 약 1.5~1.75GB + cloudflared 등 데몬 약 150MB = **총 약 1.9GB 고정 소모.**  
+RAM 4GB 중 서비스가 실제로 쓸 수 있는 여유 메모리는 **약 2.1GB**입니다.
+
+**② 요청당 메모리:** 경량형은 요청 1건당 약 30MB, 표준형(DB 연동)은 약 70MB 기준.  
+2,100MB ÷ 30MB ≒ 70명, 2,100MB ÷ 70MB ≒ 30명으로 계산됩니다.
+
+**③ Cloudflare 캐싱:** 이미지·CSS·JS 같은 정적 파일은 Cloudflare가 전부 캐싱합니다.  
+NAS는 JSON API 등 순수 데이터만 응답하므로 실제 부하가 크게 줄어듭니다.  
+Cloudflare 없이 NAS 단독으로 정적 파일까지 제공한다면 **20명도 버거울 수 있습니다.**
+
+RAM 4GB를 초과하는 트래픽이 예상된다면, DS925+는 최대 32GB까지 RAM을 추가 장착할 수 있으며, 용량에 비례해 수용 가능 사용자 수도 늘어납니다.
 
 ---
 
@@ -99,14 +181,42 @@ flowchart LR
 
 ## 사전 준비물
 
-| 항목 | 설명 |
-|------|------|
-| 가비아 계정 | 도메인 등록용 |
-| Cloudflare 계정 | cloudflare.com 무료 가입 |
-| Synology NAS | DSM 7.x 이상, 유선 LAN 연결, 공유기 내 고정 IP 설정 권장 |
-| Supabase 계정 | supabase.com GitHub 로그인 |
-| Google Cloud Console 계정 | OAuth 자격증명 발급용 |
-| 카카오 개발자 계정 | Kakao OAuth 사용 시 |
+<table>
+<colgroup>
+<col style="width:28%">
+<col style="width:72%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>설명</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>가비아 계정</td>
+<td>도메인 등록용</td>
+</tr>
+<tr>
+<td>Cloudflare 계정</td>
+<td>cloudflare.com 무료 가입</td>
+</tr>
+<tr>
+<td>Synology NAS</td>
+<td>DSM 7.x 이상, 유선 LAN 연결, 공유기 내 고정 IP 설정 권장</td>
+</tr>
+<tr>
+<td>Supabase 계정</td>
+<td>supabase.com GitHub 로그인</td>
+</tr>
+<tr>
+<td>Google Cloud Console 계정</td>
+<td>OAuth 자격증명 발급용</td>
+</tr>
+<tr>
+<td>카카오 개발자 계정</td>
+<td>Kakao OAuth 사용 시</td>
+</tr>
+</tbody>
+</table>
 
 ---
 
@@ -234,15 +344,46 @@ flowchart LR
 1. 포털 유형: **가상 호스트 기반의 웹 서비스** → **[다음]**
 2. 설정 입력:
 
-| 항목 | 입력값 |
-|------|--------|
-| 포털 이름 | `www` |
-| 호스트 이름 | `www.example.co.kr` |
-| HTTP 포트 | `8080` |
-| HTTPS 포트 | `비워두기` (Cloudflare Tunnel이 처리) |
-| 백엔드 서버 | Nginx |
-| PHP | 필요 없으면 없음 |
-| 문서 루트 | `/volume1/web/www` |
+<table>
+<colgroup>
+<col style="width:28%">
+<col style="width:72%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>입력값</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>포털 이름</td>
+<td>`www`</td>
+</tr>
+<tr>
+<td>호스트 이름</td>
+<td>`www.example.co.kr`</td>
+</tr>
+<tr>
+<td>HTTP 포트</td>
+<td>`8080`</td>
+</tr>
+<tr>
+<td>HTTPS 포트</td>
+<td>`비워두기` (Cloudflare Tunnel이 처리)</td>
+</tr>
+<tr>
+<td>백엔드 서버</td>
+<td>Nginx</td>
+</tr>
+<tr>
+<td>PHP</td>
+<td>필요 없으면 없음</td>
+</tr>
+<tr>
+<td>문서 루트</td>
+<td>`/volume1/web/www`</td>
+</tr>
+</tbody>
+</table>
 
 3. **[완료]**
 
@@ -287,7 +428,7 @@ ssh admin@192.168.x.x "echo SSH key OK"
 # → SSH key OK (비밀번호 없이 출력되면 성공)
 ```
 
-> ⚠️ DSM 업데이트 후 sshd_config가 초기화될 수 있습니다.  
+> ▲ DSM 업데이트 후 sshd_config가 초기화될 수 있습니다.  
 > 그럴 경우 위 `sed` 명령어를 다시 실행하세요.
 
 ---
@@ -399,20 +540,72 @@ sudo cloudflared service install eyJhIjoiXXX...토큰값...
 
 서브도메인마다 아래 항목을 입력하고 **[Save]**:
 
-| 항목 | 설명 | 입력 예시 (www) |
-|------|------|-------------------|
-| Subdomain | 서브도메인 이름 | `www` |
-| Domain | 보유한 도메인 | `example.co.kr` |
-| Type | 연결 방식 | `HTTP` 선택 |
-| URL | NAS 내부 주소:포트 | `localhost:8080` |
+<table>
+<colgroup>
+<col style="width:22%">
+<col style="width:33%">
+<col style="width:45%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>설명</th>
+<th>입력 예시 (www)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Subdomain</td>
+<td>서브도메인 이름</td>
+<td>`www`</td>
+</tr>
+<tr>
+<td>Domain</td>
+<td>보유한 도메인</td>
+<td>`example.co.kr`</td>
+</tr>
+<tr>
+<td>Type</td>
+<td>연결 방식</td>
+<td>`HTTP` 선택</td>
+</tr>
+<tr>
+<td>URL</td>
+<td>NAS 내부 주소:포트</td>
+<td>`localhost:8080`</td>
+</tr>
+</tbody>
+</table>
 
 운영할 서브도메인 수만큼 반복:
 
-| 용도 | Subdomain | URL |
-|------|-----------|-----|
-| 실 서비스 | `www` | `localhost:8080` |
-| 최종 점검용 | `staging` | `localhost:8082` |
-| 개발 테스트용 | `test` | `localhost:8081` |
+<table>
+<colgroup>
+<col style="width:22%">
+<col style="width:28%">
+<col style="width:50%">
+</colgroup>
+<thead><tr>
+<th>용도</th>
+<th>Subdomain</th>
+<th>URL</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>실 서비스</td>
+<td>`www`</td>
+<td>`localhost:8080`</td>
+</tr>
+<tr>
+<td>최종 점검용</td>
+<td>`staging`</td>
+<td>`localhost:8082`</td>
+</tr>
+<tr>
+<td>개발 테스트용</td>
+<td>`test`</td>
+<td>`localhost:8081`</td>
+</tr>
+</tbody>
+</table>
 
 **[Save tunnel]** 클릭
 
@@ -457,13 +650,39 @@ Cloudflare 터널을 사용하면 내 서버의 실제 IP는 숨겨지고 Cloudf
 
 Tunnel 설정 후 자동 생성된 CNAME 레코드 확인:
 
-| 이름 | 유형 | 내용 |
-|------|------|------|
-| `www` | CNAME | `tunnel-id.cfargotunnel.com` |
-| `staging` | CNAME | `tunnel-id.cfargotunnel.com` |
-| `test` | CNAME | `tunnel-id.cfargotunnel.com` |
+<table>
+<colgroup>
+<col style="width:25%">
+<col style="width:18%">
+<col style="width:57%">
+</colgroup>
+<thead><tr>
+<th>이름</th>
+<th>유형</th>
+<th>내용</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>`www`</td>
+<td>CNAME</td>
+<td>`tunnel-id.cfargotunnel.com`</td>
+</tr>
+<tr>
+<td>`staging`</td>
+<td>CNAME</td>
+<td>`tunnel-id.cfargotunnel.com`</td>
+</tr>
+<tr>
+<td>`test`</td>
+<td>CNAME</td>
+<td>`tunnel-id.cfargotunnel.com`</td>
+</tr>
+</tbody>
+</table>
 
 > 프록시 상태(주황색 구름 아이콘): **프록시됨** 상태여야 합니다.
+
+<div style="page-break-inside:avoid;break-inside:avoid;">
 
 **수동으로 추가하는 경우**:
 
@@ -473,6 +692,8 @@ Tunnel 설정 후 자동 생성된 CNAME 레코드 확인:
 4. Target: Tunnel URL (`tunnel-id.cfargotunnel.com`)
 5. Proxy status: **Proxied** (주황색)
 6. **[Save]**
+
+</div>
 
 ---
 
@@ -602,18 +823,47 @@ function corsHeaders() {
 **메뉴 경로**:  
 `Workers & Pages → dart-proxy → [Settings] 탭 → [Triggers] → [Add Custom Domain]`
 
-| 항목 | 입력 예시 |
-|------|----------|
-| Custom Domain | `api.example.co.kr` |
+<table>
+<colgroup>
+<col style="width:35%">
+<col style="width:65%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>입력 예시</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Custom Domain</td>
+<td>`api.example.co.kr`</td>
+</tr>
+</tbody>
+</table>
 
 **[Add Custom Domain]** 클릭
 
 또는 특정 경로에만 Worker를 연결하고 싶을 때 **[Add Route]**:
 
-| 항목 | 입력 예시 |
-|------|----------|
-| Route | `www.example.co.kr/dart/*` |
-| Zone | `example.co.kr` |
+<table>
+<colgroup>
+<col style="width:35%">
+<col style="width:65%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>입력 예시</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Route</td>
+<td>`www.example.co.kr/dart/*`</td>
+</tr>
+<tr>
+<td>Zone</td>
+<td>`example.co.kr`</td>
+</tr>
+</tbody>
+</table>
 
 **[Add route]** 클릭
 
@@ -657,13 +907,52 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 
 처음에는 더 많은 SNS를 지원하는 방향을 검토했습니다.
 
-| 검토한 플랫폼 | 국내·해외 커버리지 | Supabase 기본 지원 | 최종 결정 |
-|------------|----------------|------------------|---------|
-| **카카오** | 국내 (스마트폰 사용자의 97%+) | ✅ 기본 지원 | ✅ **채택** |
-| **Google** | 해외 + 국내 (기업·대학 이메일) | ✅ 기본 지원 | ✅ **채택** |
-| 네이버 | 국내 한정 | ❌ 기본 지원 없음 | ✗ 포기 |
-| 페이스북 | 해외 (Meta 계열) | ⚠️ 지원하지만 Meta 앱 심사 필요 | ✗ 포기 |
-| 인스타그램 | 해외 (Meta 계열) | ❌ Instagram 직접 지원 없음 (페이스북 경유) | ✗ 포기 |
+<table>
+<colgroup>
+<col style="width:22%">
+<col style="width:28%">
+<col style="width:32%">
+<col style="width:18%">
+</colgroup>
+<thead><tr>
+<th>검토한 플랫폼</th>
+<th>국내·해외 커버리지</th>
+<th>Supabase 기본 지원</th>
+<th>최종 결정</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>**카카오**</td>
+<td>국내 (스마트폰 사용자의 97%+)</td>
+<td>☑ 기본 지원</td>
+<td>☑ **채택**</td>
+</tr>
+<tr>
+<td>**Google**</td>
+<td>해외 + 국내 (기업·대학 이메일)</td>
+<td>☑ 기본 지원</td>
+<td>☑ **채택**</td>
+</tr>
+<tr>
+<td>네이버</td>
+<td>국내 한정</td>
+<td>✗ 기본 지원 없음</td>
+<td>✗ 포기</td>
+</tr>
+<tr>
+<td>페이스북</td>
+<td>해외 (Meta 계열)</td>
+<td>▲ 지원하지만 Meta 앱 심사 필요</td>
+<td>✗ 포기</td>
+</tr>
+<tr>
+<td>인스타그램</td>
+<td>해외 (Meta 계열)</td>
+<td>✗ Instagram 직접 지원 없음 (페이스북 경유)</td>
+<td>✗ 포기</td>
+</tr>
+</tbody>
+</table>
 
 #### 네이버를 포기한 이유
 
@@ -691,13 +980,38 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 
 ### Supabase Free 플랜이 제공하는 것
 
-| 기능 | 설명 |
-|------|------|
-| 소셜 로그인 | Google, 카카오 등 OAuth Provider를 대시보드에서 설정만으로 연동 |
-| 이메일 로그인 | 이메일 인증 링크 발송, 비밀번호 설정 |
-| 사용자 관리 | 회원 목록, 가입일, 마지막 로그인 등 자동 기록 |
-| 데이터베이스 | 회원별 데이터를 안전하게 저장하는 PostgreSQL DB (8장에서 다룸) |
-| 보안 | 토큰 기반 인증, 자동 만료, 세션 관리 |
+<table>
+<colgroup>
+<col style="width:30%">
+<col style="width:70%">
+</colgroup>
+<thead><tr>
+<th>기능</th>
+<th>설명</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>소셜 로그인</td>
+<td>Google, 카카오 등 OAuth Provider를 대시보드에서 설정만으로 연동</td>
+</tr>
+<tr>
+<td>이메일 로그인</td>
+<td>이메일 인증 링크 발송, 비밀번호 설정</td>
+</tr>
+<tr>
+<td>사용자 관리</td>
+<td>회원 목록, 가입일, 마지막 로그인 등 자동 기록</td>
+</tr>
+<tr>
+<td>데이터베이스</td>
+<td>회원별 데이터를 안전하게 저장하는 PostgreSQL DB (8장에서 다룸)</td>
+</tr>
+<tr>
+<td>보안</td>
+<td>토큰 기반 인증, 자동 만료, 세션 관리</td>
+</tr>
+</tbody>
+</table>
 
 > **무료 한도**: 월 활성 사용자 **50,000명**까지 무료.  
 > 소규모 서비스를 시작할 때는 비용 없이 운영할 수 있습니다.
@@ -711,12 +1025,34 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 3. 대시보드 → **[New project]** 버튼
 4. 입력:
 
-| 항목 | 입력 |
-|------|------|
-| 조직(Organization) | 기본값 또는 새 조직 생성 |
-| Project name | `myproject` |
-| Database password | 강력한 비밀번호 입력 (저장 필수) |
-| Region | **Northeast Asia (Tokyo)** 권장 |
+<table>
+<colgroup>
+<col style="width:30%">
+<col style="width:70%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>입력</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>조직(Organization)</td>
+<td>기본값 또는 새 조직 생성</td>
+</tr>
+<tr>
+<td>Project name</td>
+<td>`myproject`</td>
+</tr>
+<tr>
+<td>Database password</td>
+<td>강력한 비밀번호 입력 (저장 필수)</td>
+</tr>
+<tr>
+<td>Region</td>
+<td>**Northeast Asia (Tokyo)** 권장</td>
+</tr>
+</tbody>
+</table>
 
 5. **[Create new project]** → 2~3분 대기 (프로비저닝)
 
@@ -728,16 +1064,38 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 > Supabase UI 업데이트로 메뉴 명칭이 변경됨.  
 > 탭이 두 개(Publishable and secret / **Legacy anon, service_role**)이므로 반드시 **Legacy** 탭을 선택.
 
-| 키 이름 | 용도 | 노출 범위 |
-|---------|------|-----------|
-| `anon public` | 프런트엔드 코드 (`SUPABASE_ANON` 상수) | 브라우저 공개 가능 |
-| `service_role` **secret** | Admin API, Playwright 실DB 테스트 (`.env.test`) | 서버·환경변수 전용 — **절대 프런트엔드·커밋 금지** |
+<table>
+<colgroup>
+<col style="width:25%">
+<col style="width:45%">
+<col style="width:30%">
+</colgroup>
+<thead><tr>
+<th>키 이름</th>
+<th>용도</th>
+<th>노출 범위</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>`anon public`</td>
+<td>프런트엔드 코드 (`SUPABASE_ANON` 상수)</td>
+<td>브라우저 공개 가능</td>
+</tr>
+<tr>
+<td>`service_role` **secret**</td>
+<td>Admin API, Playwright 실DB 테스트 (`.env.test`)</td>
+<td>서버·환경변수 전용 — **절대 프런트엔드·커밋 금지**</td>
+</tr>
+</tbody>
+</table>
 
 > `service_role` 키는 RLS(Row Level Security)를 **완전히 우회**합니다.  
 > 유출 시 즉시 Supabase 대시보드에서 **Revoke** 후 재발급하세요.
 
 **Project URL**과 **anon public** 키를 복사해 `index.html` 상단의 `SUPABASE_URL` / `SUPABASE_ANON` 상수에 입력합니다.  
 **service_role** 키는 `.env.test`(Playwright 실DB 테스트용)에만 사용합니다.
+
+<div style="page-break-before:always;break-before:page;"></div>
 
 ### 7.3 Google OAuth 설정
 
@@ -805,11 +1163,30 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 
 Supabase가 요청하는 scope에 해당하는 항목을 **필수 동의** 또는 **선택 동의**로 활성화합니다:
 
-| 동의항목 | 설정 |
-|---------|------|
-| 닉네임 (profile_nickname) | 필수 동의 |
-| 프로필 사진 (profile_image) | 선택 동의 |
-| 카카오계정(이메일) (account_email) | 필수 동의 |
+<table>
+<colgroup>
+<col style="width:58%">
+<col style="width:42%">
+</colgroup>
+<thead><tr>
+<th>동의항목</th>
+<th>설정</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>닉네임 (profile_nickname)</td>
+<td>필수 동의</td>
+</tr>
+<tr>
+<td>프로필 사진 (profile_image)</td>
+<td>선택 동의</td>
+</tr>
+<tr>
+<td>카카오계정(이메일) (account_email)</td>
+<td>필수 동의</td>
+</tr>
+</tbody>
+</table>
 
 > **주의**: 이 항목을 설정하지 않으면 로그인 시 **KOE205 오류**("요청하신 기능을 사용할 수 없습니다")가 발생합니다.  
 > 신규 앱은 기본적으로 모든 동의항목이 비활성 상태입니다.
@@ -836,9 +1213,25 @@ Supabase가 요청하는 scope에 해당하는 항목을 **필수 동의** 또�
 **Site URL은 이메일 확인·비밀번호 재설정 링크의 실제 리디렉션 목적지**입니다.  
 Redirect URLs 허용 목록과는 별개로, 이메일 본문의 링크가 이 URL을 기준으로 생성됩니다.
 
-| 항목 | 올바른 값 | ❌ 잘못된 예 |
-|------|-----------|------------|
-| Site URL | `https://www.worksfree.co.kr` | `http://localhost:3000` |
+<table>
+<colgroup>
+<col style="width:25%">
+<col style="width:38%">
+<col style="width:37%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>올바른 값</th>
+<th>✗ 잘못된 예</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Site URL</td>
+<td>`https://www.worksfree.co.kr`</td>
+<td>`http://localhost:3000`</td>
+</tr>
+</tbody>
+</table>
 
 > **주의**: Site URL을 `localhost`로 두면 사용자가 이메일 링크를 클릭했을 때  
 > `localhost:3000/#access_token=...` 으로 리디렉션되어 인증이 완료되지 않습니다.  
@@ -886,6 +1279,11 @@ http://127.0.0.1:5500/**
 > 이제 그 사람의 **데이터를 저장**해야 합니다.  
 > Supabase는 인증 기능 외에 **PostgreSQL 데이터베이스**도 함께 제공합니다.
 
+> **▲ SQL 스크립트 활용 안내**  
+> 이 장의 SQL 스크립트는 WorksFree Hub 실제 구현을 기반으로 한 **참조용 예시**입니다.  
+> 데이터베이스 스키마는 서비스 요구사항·규모·팀 컨벤션에 따라 설계가 달라지므로,  
+> 스크립트를 그대로 복사하기보다는 **본인의 DB 설계에 맞게 수정**하여 활용하시기 바랍니다.
+
 ### 8.1 DB 설계 원칙
 
 실제로 운영하다 보면 DB 스크립트를 **여러 번 실행**해야 하는 상황이 생깁니다.  
@@ -899,9 +1297,9 @@ http://127.0.0.1:5500/**
 
 ```text
 supabase/
-├── complete_db_setup.sql         # ✅ Step 1 — 허브 코어 DB 전체 (v3.0, 필수)
-├── bizdb_setup.sql               # ✅ Step 2 — B2B 이메일 수집/발송 DB (필수)
-├── jobkorea_setup.sql            # ✅ Step 3 — 잡코리아 자동화 DB (선택)
+├── complete_db_setup.sql         # ☑ Step 1 — 허브 코어 DB 전체 (v3.0, 필수)
+├── bizdb_setup.sql               # ☑ Step 2 — B2B 이메일 수집/발송 DB (필수)
+├── jobkorea_setup.sql            # ☑ Step 3 — 잡코리아 자동화 DB (선택)
 ├── phase1_check_before_run.sql   # 사전 진단용 (선택 사항)
 │
 └── tmp_*.sql                     # 구버전·일회용 파일 — 참고용만, 재실행 불필요
@@ -950,7 +1348,7 @@ supabase/
 1. 실행할 블록의 시작 줄부터 끝 줄까지 마우스로 드래그
 2. `Ctrl+Enter` → **선택 영역만** 실행됨
 
-> ⚠️ **주의**: 방법 B는 선택 범위를 잘못 잡으면 절반만 실행되어 오류가 납니다.  
+> ▲ **주의**: 방법 B는 선택 범위를 잘못 잡으면 절반만 실행되어 오류가 납니다.  
 > 불확실하면 방법 A를 사용하세요.
 
 #### 예시: admin_set_user_name 함수 하나만 추가
@@ -1019,10 +1417,34 @@ SELECT category, item, detail FROM (
 
 크레딧을 저장하는 방법에는 두 가지가 있습니다:
 
-| 방식 | 설명 | 장점 | 단점 |
-|------|------|------|------|
-| **잔액 방식** | `balance` 컬럼에 현재 잔액을 덮어씀 | 조회 간단 | 이력 없음, 조작 가능 |
-| **원장(Ledger) 방식** | 모든 변동을 `delta` 행으로 기록, 잔액은 SUM | 완전한 이력, 감사 가능 | 조회 시 집계 필요 |
+<table>
+<colgroup>
+<col style="width:15%">
+<col style="width:40%">
+<col style="width:25%">
+<col style="width:20%">
+</colgroup>
+<thead><tr>
+<th>방식</th>
+<th>설명</th>
+<th>장점</th>
+<th>단점</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>**잔액 방식**</td>
+<td>`balance` 컬럼에 현재 잔액을 덮어씀</td>
+<td>조회 간단</td>
+<td>이력 없음, 조작 가능</td>
+</tr>
+<tr>
+<td>**원장(Ledger) 방식**</td>
+<td>모든 변동을 `delta` 행으로 기록, 잔액은 SUM</td>
+<td>완전한 이력, 감사 가능</td>
+<td>조회 시 집계 필요</td>
+</tr>
+</tbody>
+</table>
 
 **권장: 원장 방식** (`delta` 기반). 충전·사용·환불의 모든 내역이 남아 분쟁 대응이 가능합니다.
 
@@ -1038,26 +1460,69 @@ user-001 | +100  | admin_grant   | 이벤트 지급
 
 ---
 
-### 8.4 DB 구축 스크립트 — complete_db_setup.sql ✅ 현재 권장 (v3.0)
+### 8.4 DB 구축 스크립트 — complete_db_setup.sql ☑ 현재 권장 (v3.0)
 
 > **신규 구축 또는 기존 DB 보완 모두 이 파일 하나로 처리합니다.**  
 > 멱등성 보장: 이미 구축된 DB에 실행해도 안전합니다.
 
 #### 포함 내용
 
-| 섹션 | 내용 |
-|------|------|
-| 1 | 확장: `pgcrypto` |
-| 2 | 테이블 6개: `profiles` · `credits` · `payments` · `email_log` · `email_unsubscribes` · `page_views` |
-| 3 | `is_admin()` 헬퍼 함수 (RLS 정책에서 참조) |
-| 4 | RLS 정책 전체 (기존 정책 정리 후 통일된 이름으로 재생성) |
-| 5 | 트리거: `on_auth_user_created` · `on_auth_user_updated` |
-| 6 | 관리자 함수 6개: `admin_set_user_role` · `admin_grant_credits` · `admin_set_user_name` · `admin_get_all_profiles` · `admin_get_user_logins` · `admin_page_view_stats` |
-| 7 | 일반 함수 3개: `get_user_credit_balance` · `deduct_credits` · `get_email_history` |
-| 8 | 뷰 2개: `credit_balance` · `page_view_stats` |
-| 9 | 기존 사용자 소급 동기화 (name/email 백필) |
-| 10 | 개발 테스트 사용자 4명 (auth.identities + instance_id 포함) |
-| 11 | 최종 검증 SELECT 쿼리 7개 |
+<table>
+<colgroup>
+<col style="width:12%">
+<col style="width:88%">
+</colgroup>
+<thead><tr>
+<th>섹션</th>
+<th>내용</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>확장: `pgcrypto`</td>
+</tr>
+<tr>
+<td>2</td>
+<td>테이블 6개: `profiles` · `credits` · `payments` · `email_log` · `email_unsubscribes` · `page_views`</td>
+</tr>
+<tr>
+<td>3</td>
+<td>`is_admin()` 헬퍼 함수 (RLS 정책에서 참조)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>RLS 정책 전체 (기존 정책 정리 후 통일된 이름으로 재생성)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>트리거: `on_auth_user_created` · `on_auth_user_updated`</td>
+</tr>
+<tr>
+<td>6</td>
+<td>관리자 함수 6개: `admin_set_user_role` · `admin_grant_credits` · `admin_set_user_name` · `admin_get_all_profiles` · `admin_get_user_logins` · `admin_page_view_stats`</td>
+</tr>
+<tr>
+<td>7</td>
+<td>일반 함수 3개: `get_user_credit_balance` · `deduct_credits` · `get_email_history`</td>
+</tr>
+<tr>
+<td>8</td>
+<td>뷰 2개: `credit_balance` · `page_view_stats`</td>
+</tr>
+<tr>
+<td>9</td>
+<td>기존 사용자 소급 동기화 (name/email 백필)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>개발 테스트 사용자 4명 (auth.identities + instance_id 포함)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>최종 검증 SELECT 쿼리 7개</td>
+</tr>
+</tbody>
+</table>
 
 #### 실행 방법
 
@@ -1093,17 +1558,65 @@ page_views     → id, user_id, page, duration_s, env, viewed_at
 
 #### RLS 정책 요약
 
-| 테이블 | 정책 | 대상 |
-|--------|------|------|
-| profiles | profiles_self (ALL) | 본인 행 |
-| profiles | profiles_admin_select_all (SELECT) | 관리자 전체 조회 |
-| credits | credits_select_own (SELECT) | 본인 행 |
-| credits | credits_insert_purchase (INSERT) | 본인 충전만 허용 |
-| payments | payments_select_own, payments_insert_own | 본인 행 |
-| email_log | email_log_admin_select (SELECT) | 관리자만, INSERT는 Worker service_role |
-| email_unsubscribes | email_unsubscribes_admin (ALL) | 관리자만, Worker service_role |
-| page_views | pv_insert_own · pv_select_own · pv_update_own | 본인 행 |
-| page_views | pv_admin_select (SELECT) | 관리자 전체 조회 |
+<table>
+<colgroup>
+<col style="width:20%">
+<col style="width:50%">
+<col style="width:30%">
+</colgroup>
+<thead><tr>
+<th>테이블</th>
+<th>정책</th>
+<th>대상</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>profiles</td>
+<td>profiles_self (ALL)</td>
+<td>본인 행</td>
+</tr>
+<tr>
+<td>profiles</td>
+<td>profiles_admin_select_all (SELECT)</td>
+<td>관리자 전체 조회</td>
+</tr>
+<tr>
+<td>credits</td>
+<td>credits_select_own (SELECT)</td>
+<td>본인 행</td>
+</tr>
+<tr>
+<td>credits</td>
+<td>credits_insert_purchase (INSERT)</td>
+<td>본인 충전만 허용</td>
+</tr>
+<tr>
+<td>payments</td>
+<td>payments_select_own, payments_insert_own</td>
+<td>본인 행</td>
+</tr>
+<tr>
+<td>email_log</td>
+<td>email_log_admin_select (SELECT)</td>
+<td>관리자만, INSERT는 Worker service_role</td>
+</tr>
+<tr>
+<td>email_unsubscribes</td>
+<td>email_unsubscribes_admin (ALL)</td>
+<td>관리자만, Worker service_role</td>
+</tr>
+<tr>
+<td>page_views</td>
+<td>pv_insert_own · pv_select_own · pv_update_own</td>
+<td>본인 행</td>
+</tr>
+<tr>
+<td>page_views</td>
+<td>pv_admin_select (SELECT)</td>
+<td>관리자 전체 조회</td>
+</tr>
+</tbody>
+</table>
 
 > **credits·payments env 컬럼**: test/staging/www 환경이 동일 DB를 공유할 때  
 > 결제·크레딧 데이터를 환경별로 분리하는 컬럼. 상세는 8.7절 참고.
@@ -1112,37 +1625,125 @@ page_views     → id, user_id, page, duration_s, env, viewed_at
 
 ### 8.4-A (Deprecated) 구 스크립트 목록
 
-> ⚠️ 아래 파일들은 `tmp_` 접두사로 이름이 변경됐습니다. **재실행 불필요.**  
+> ▲ 아래 파일들은 `tmp_` 접두사로 이름이 변경됐습니다. **재실행 불필요.**  
 > 모두 `complete_db_setup.sql`에 통합됐거나 일회성으로 이미 적용된 파일입니다.  
 > 자세한 분류는 `supabase/README.md` 참고.
 
-| 파일 (현재 이름) | 분류 | 내용 |
-|------|------|------|
-| `tmp_master_db_setup.sql` | 구버전 | v2.0 통합본 → complete v3.0으로 대체 |
-| `tmp_phase1_db_setup.sql` | 구버전 | profiles·credits·payments 초기 생성 |
-| `tmp_phase2_email_management.sql` | 구버전 | email_log (status 컬럼 없음 — 버그 버전) |
-| `tmp_phase3_dev_users_and_email_mgmt.sql` | 구버전 | dev 사용자 + email status 추가 |
-| `tmp_phase2_and_3_combined.sql` | 구버전 | phase2+3 중간 합본 |
-| `tmp_email_log.sql` | 중복 | email_log 단독 생성 |
-| `tmp_tracking_tables.sql` | 중복 | page_views 테이블 단독 생성 |
-| `tmp_fix_profiles_name_sync.sql` | 중복 | profiles name 동기화 트리거 |
-| `tmp_admin_functions.sql` | 중복 | 관리자 함수 3개 단독 |
-| `tmp_setup_page_views_complete.sql` | 중복 | page_views RLS 재설정 중간본 |
-| `tmp_quick_fix_stats.sql` | 일회용 | admin_get_* 함수 긴급 추가 패치 |
-| `tmp_update_env_filter.sql` | 일회용 | admin_page_view_stats 파라미터 변경 |
-| `tmp_fix_pageviews_rls.sql` | 일회용 | pv_select_own 정책 누락 패치 |
-| `tmp_add_sender_user_id.sql` | 일회용 | email_log에 sender_user_id 추가 |
-| `tmp_fix_pageview_stats_env.sql` | 일회용 | env_filter 기본값 변경 |
-| `tmp_phase3_fix_identities.sql` | 일회용 | dev 사용자 identities 보정 |
-| `tmp_phase3_fix_instance_id.sql` | 일회용 | dev 사용자 instance_id 보정 |
-| `tmp_fix_dev_account_names.sql` | 일회용 | dev 계정 이름 보정 |
-| `tmp_fix_dev_profiles_roles.sql` | 일회용 | dev 계정 역할·동의 UPSERT 보정 |
+<table>
+<colgroup>
+<col style="width:42%">
+<col style="width:15%">
+<col style="width:43%">
+</colgroup>
+<thead><tr>
+<th>파일 (현재 이름)</th>
+<th>분류</th>
+<th>내용</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>`tmp_master_db_setup.sql`</td>
+<td>구버전</td>
+<td>v2.0 통합본 → complete v3.0으로 대체</td>
+</tr>
+<tr>
+<td>`tmp_phase1_db_setup.sql`</td>
+<td>구버전</td>
+<td>profiles·credits·payments 초기 생성</td>
+</tr>
+<tr>
+<td>`tmp_phase2_email_management.sql`</td>
+<td>구버전</td>
+<td>email_log (status 컬럼 없음 — 버그 버전)</td>
+</tr>
+<tr>
+<td>`tmp_phase3_dev_users_and_email_mgmt.sql`</td>
+<td>구버전</td>
+<td>dev 사용자 + email status 추가</td>
+</tr>
+<tr>
+<td>`tmp_phase2_and_3_combined.sql`</td>
+<td>구버전</td>
+<td>phase2+3 중간 합본</td>
+</tr>
+<tr>
+<td>`tmp_email_log.sql`</td>
+<td>중복</td>
+<td>email_log 단독 생성</td>
+</tr>
+<tr>
+<td>`tmp_tracking_tables.sql`</td>
+<td>중복</td>
+<td>page_views 테이블 단독 생성</td>
+</tr>
+<tr>
+<td>`tmp_fix_profiles_name_sync.sql`</td>
+<td>중복</td>
+<td>profiles name 동기화 트리거</td>
+</tr>
+<tr>
+<td>`tmp_admin_functions.sql`</td>
+<td>중복</td>
+<td>관리자 함수 3개 단독</td>
+</tr>
+<tr>
+<td>`tmp_setup_page_views_complete.sql`</td>
+<td>중복</td>
+<td>page_views RLS 재설정 중간본</td>
+</tr>
+<tr>
+<td>`tmp_quick_fix_stats.sql`</td>
+<td>일회용</td>
+<td>admin_get_* 함수 긴급 추가 패치</td>
+</tr>
+<tr>
+<td>`tmp_update_env_filter.sql`</td>
+<td>일회용</td>
+<td>admin_page_view_stats 파라미터 변경</td>
+</tr>
+<tr>
+<td>`tmp_fix_pageviews_rls.sql`</td>
+<td>일회용</td>
+<td>pv_select_own 정책 누락 패치</td>
+</tr>
+<tr>
+<td>`tmp_add_sender_user_id.sql`</td>
+<td>일회용</td>
+<td>email_log에 sender_user_id 추가</td>
+</tr>
+<tr>
+<td>`tmp_fix_pageview_stats_env.sql`</td>
+<td>일회용</td>
+<td>env_filter 기본값 변경</td>
+</tr>
+<tr>
+<td>`tmp_phase3_fix_identities.sql`</td>
+<td>일회용</td>
+<td>dev 사용자 identities 보정</td>
+</tr>
+<tr>
+<td>`tmp_phase3_fix_instance_id.sql`</td>
+<td>일회용</td>
+<td>dev 사용자 instance_id 보정</td>
+</tr>
+<tr>
+<td>`tmp_fix_dev_account_names.sql`</td>
+<td>일회용</td>
+<td>dev 계정 이름 보정</td>
+</tr>
+<tr>
+<td>`tmp_fix_dev_profiles_roles.sql`</td>
+<td>일회용</td>
+<td>dev 계정 역할·동의 UPSERT 보정</td>
+</tr>
+</tbody>
+</table>
 
 ---
 
 ### 8.4-B (Deprecated) 테이블·뷰·함수 생성 인라인 스크립트
 
-> ⚠️ 이 섹션의 SQL은 현재 `master_db_setup.sql`로 대체되었습니다.  
+> ▲ 이 섹션의 SQL은 현재 `master_db_setup.sql`로 대체되었습니다.  
 > 참고용으로만 보관하며, 직접 실행하지 마세요.
 
 **메뉴 경로 (구버전)**:  
@@ -1328,7 +1929,7 @@ async function loadCreditBalance() {
     .select('balance')
     .eq('user_id', authUser.id)
     .maybeSingle();
-  return data?.balance ?? 0;
+  return data?.balance ? 0;
 }
 ```
 
@@ -1421,15 +2022,17 @@ DELETE FROM payments WHERE env = 'www';
 
 ---
 
-## 9장. 온라인 결제 연동 — 국내(토스페이먼츠) + 해외(Stripe)
+## 9장. 온라인 결제 연동 — 토스페이먼츠 (국내)
 
 > **이 장에서 하는 이유**  
 > 크레딧을 충전하거나 서비스를 구매할 때 실제 돈을 받아야 합니다.  
 > 카드 결제·계좌이체 처리는 금융 보안 규정이 엄격해서 직접 구현하면 불법이 될 수 있습니다.  
 > **결제대행사(PG사)**에 등록하면 이 모든 것을 합법적으로 처리할 수 있습니다.  
 >  
-> 국내는 **토스페이먼츠** (카드·계좌이체·카카오페이·네이버페이 등 포함),  
-> 해외는 **Stripe** (신용카드·Apple Pay·Google Pay 등 포함)를 사용합니다.
+> 국내 결제는 **토스페이먼츠** (카드·계좌이체·카카오페이·네이버페이 등 포함)를 사용합니다.  
+>  
+> **해외 결제(Stripe) 연동은 별도 가이드로 제공 예정입니다.**  
+> 현재 시점에서 Stripe 구현이 완료되지 않아 이 가이드에서는 다루지 않습니다.
 
 ### 결제 흐름 이해하기
 
@@ -1453,7 +2056,7 @@ Supabase DB: payments 테이블에 이력 저장
              credits 테이블에 크레딧 추가
 ```
 
-### 배포 전 사전 준비 — 토스페이먼츠·Stripe에서 받아야 하는 것
+### 배포 전 사전 준비 — 토스페이먼츠에서 받아야 하는 것
 
 결제 기능은 PG사(결제대행사) 계정이 있어야 합니다.  
 코드 개발과 동시에 계정 신청을 시작하면 됩니다.  
@@ -1463,12 +2066,40 @@ Supabase DB: payments 테이블에 이력 저장
 
 #### 토스페이먼츠에서 받아야 하는 것
 
-| 단계 | 받는 것 | 시점 |
-|------|---------|------|
-| 회원가입 직후 | 테스트 클라이언트 키 (`test_ck_...`) | 즉시 |
-| 회원가입 직후 | 테스트 시크릿 키 (`test_sk_...`) | 즉시 |
-| 사업자 인증 완료 후 | 실서비스 클라이언트 키 (`live_ck_...`) | 심사 후 1~3 영업일 |
-| 사업자 인증 완료 후 | 실서비스 시크릿 키 (`live_sk_...`) | 심사 후 1~3 영업일 |
+<table>
+<colgroup>
+<col style="width:32%">
+<col style="width:42%">
+<col style="width:26%">
+</colgroup>
+<thead><tr>
+<th>단계</th>
+<th>받는 것</th>
+<th>시점</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>회원가입 직후</td>
+<td>테스트 클라이언트 키 (`test_ck_...`)</td>
+<td>즉시</td>
+</tr>
+<tr>
+<td>회원가입 직후</td>
+<td>테스트 시크릿 키 (`test_sk_...`)</td>
+<td>즉시</td>
+</tr>
+<tr>
+<td>사업자 인증 완료 후</td>
+<td>실서비스 클라이언트 키 (`live_ck_...`)</td>
+<td>심사 후 1~3 영업일</td>
+</tr>
+<tr>
+<td>사업자 인증 완료 후</td>
+<td>실서비스 시크릿 키 (`live_sk_...`)</td>
+<td>심사 후 1~3 영업일</td>
+</tr>
+</tbody>
+</table>
 
 **가입 절차:**
 
@@ -1483,27 +2114,6 @@ Supabase DB: payments 테이블에 이력 저장
 
 ---
 
-#### Stripe에서 받아야 하는 것
-
-| 단계 | 받는 것 | 시점 |
-|------|---------|------|
-| 회원가입 직후 | 테스트 퍼블리셔블 키 (`pk_test_...`) | 즉시 |
-| 회원가입 직후 | 테스트 시크릿 키 (`sk_test_...`) | 즉시 |
-| 계정 인증 완료 후 | 실서비스 퍼블리셔블 키 (`pk_live_...`) | 즉시 (자동 심사) |
-| 계정 인증 완료 후 | 실서비스 시크릿 키 (`sk_live_...`) | 즉시 (자동 심사) |
-
-**가입 절차:**
-
-1. [stripe.com](https://stripe.com) → **[Start now]**
-2. 이메일·비밀번호 가입 → 대시보드 진입
-3. `대시보드 → [Developers] → [API keys]` → **Test keys** 탭에서 복사
-4. 실서비스 전환: 대시보드 안내에 따라 사업자 정보 입력 (자동 심사, 보통 즉시)
-
-> Stripe는 개인(프리랜서 포함)도 실서비스 계정 전환이 가능합니다.  
-> 한국 원화(KRW) 정산도 지원하지만, 해외 결제(USD 등)와 정산 통화를 별도 확인하세요.
-
----
-
 ### 9.1 토스페이먼츠 가입 및 설정 (국내 결제)
 
 #### ① API 키 확인
@@ -1511,10 +2121,26 @@ Supabase DB: payments 테이블에 이력 저장
 **메뉴 경로**:  
 `토스페이먼츠 대시보드 → 왼쪽 메뉴 [개발] → [API 키]`
 
-| 키 이름 | 용도 |
-|--------|------|
-| 클라이언트 키 | 결제창 호출 (웹페이지에 삽입) |
-| 시크릿 키 | 결제 검증 (서버/Worker에서만 사용, 절대 노출 금지) |
+<table>
+<colgroup>
+<col style="width:28%">
+<col style="width:72%">
+</colgroup>
+<thead><tr>
+<th>키 이름</th>
+<th>용도</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>클라이언트 키</td>
+<td>결제창 호출 (웹페이지에 삽입)</td>
+</tr>
+<tr>
+<td>시크릿 키</td>
+<td>결제 검증 (서버/Worker에서만 사용, 절대 노출 금지)</td>
+</tr>
+</tbody>
+</table>
 
 > 테스트용 키와 실서비스용 키가 별도로 존재합니다. 개발 중에는 반드시 **테스트 키** 사용.
 
@@ -1601,92 +2227,7 @@ async function handlePayment(request) {
 }
 ```
 
----
-
-### 9.2 Stripe 가입 및 설정 (해외 결제)
-
-#### ① 가입
-
-1. [stripe.com](https://stripe.com) → **[Start now]**
-2. 이메일 · 비밀번호 입력 후 가입
-3. 대시보드 진입 → 사업자 정보 입력 (선택, 나중에 해도 됨)
-4. 테스트 모드에서는 즉시 사용 가능
-
-#### ② API 키 확인
-
-**메뉴 경로**:  
-`Stripe 대시보드 → 왼쪽 메뉴 [Developers] → [API keys]`
-
-| 키 이름 | 용도 |
-|--------|------|
-| Publishable key | 결제창 호출 (웹페이지에 삽입) |
-| Secret key | 결제 검증 (Worker에서만 사용) |
-
-> 대시보드 오른쪽 상단 **[Test mode]** 토글이 켜져 있는지 확인 후 테스트 키 사용.
-
-#### ③ 프런트엔드 결제창 호출
-
-```html
-<!-- Stripe.js 로드 -->
-<script src="https://js.stripe.com/v3/"></script>
-```
-
-```javascript
-const STRIPE_KEY = 'pk_test_여기에_퍼블리셔블키_입력';
-const stripe = Stripe(STRIPE_KEY);
-
-async function openStripePayment(amountUSD, credits) {
-  // 1. 서버(Worker)에서 결제 세션 생성
-  const res = await fetch('https://api.example.co.kr/stripe/create-session', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount: amountUSD, credits })
-  });
-  const { sessionId } = await res.json();
-
-  // 2. Stripe 결제 페이지로 이동
-  const { error } = await stripe.redirectToCheckout({ sessionId });
-  if (error) console.error(error);
-}
-```
-
-#### ④ Worker에서 Stripe 세션 생성
-
-```javascript
-// Cloudflare Worker: stripe-session
-const STRIPE_SECRET = 'sk_test_시크릿키_입력';
-
-async function createStripeSession(request) {
-  const { amount, credits } = await request.json();
-
-  const body = new URLSearchParams({
-    'payment_method_types[]': 'card',
-    'line_items[0][price_data][currency]': 'usd',
-    'line_items[0][price_data][unit_amount]': amount,  // 센트 단위 (100 = $1)
-    'line_items[0][price_data][product_data][name]': `크레딧 ${credits}개`,
-    'line_items[0][quantity]': '1',
-    'mode': 'payment',
-    'success_url': 'https://www.example.co.kr/payment/success?session_id={CHECKOUT_SESSION_ID}',
-    'cancel_url':  'https://www.example.co.kr/payment/cancel',
-  });
-
-  const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Basic ' + btoa(STRIPE_SECRET + ':'),
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: body.toString()
-  });
-
-  const session = await response.json();
-  return new Response(JSON.stringify({ sessionId: session.id }), {
-    headers: { 'Content-Type': 'application/json' }
-  });
-}
-```
-
-### 9.3 결제 후 크레딧 자동 충전
+### 9.2 결제 후 크레딧 자동 충전
 
 > 결제가 성공하면 Supabase DB에 결제 이력을 기록하고 크레딧을 추가해야 합니다.  
 > 이 작업은 Worker에서 Supabase API를 호출하여 처리합니다.
@@ -1721,7 +2262,7 @@ async function updateCreditsAfterPayment(userId, amount, credits, orderId, provi
     { headers }
   );
   const [lastRow] = await balRes.json();
-  const newBalance = (lastRow?.balance ?? 0) + credits;
+  const newBalance = (lastRow?.balance ? 0) + credits;
 
   await fetch(`${SUPABASE_URL}/rest/v1/credits`, {
     method: 'POST',
@@ -1736,7 +2277,7 @@ async function updateCreditsAfterPayment(userId, amount, credits, orderId, provi
 
 ---
 
-### 9.4 개발 중 반복 테스트 — 가결제로 기능 검증하기
+### 9.3 개발 중 반복 테스트 — 가결제로 기능 검증하기
 
 PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**  
 아래 테스트 카드 번호를 입력하면 결제 성공·실패를 원하는 만큼 시뮬레이션할 수 있습니다.
@@ -1747,45 +2288,63 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 
 `test_ck_...` 키를 사용하는 상태에서 아래 정보를 입력합니다.
 
-| 항목 | 입력값 |
-|------|--------|
-| 카드 번호 | `4242 4242 4242 4242` |
-| 유효기간 | 아무 미래 날짜 (예: `12/26`) |
-| CVC | 아무 3자리 (예: `123`) |
-| 카드 비밀번호 | 아무 2자리 (예: `00`) |
-| 생년월일 | 아무 6자리 (예: `900101`) |
+<table>
+<colgroup>
+<col style="width:28%">
+<col style="width:72%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>입력값</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>카드 번호</td>
+<td>`4242 4242 4242 4242`</td>
+</tr>
+<tr>
+<td>유효기간</td>
+<td>아무 미래 날짜 (예: `12/26`)</td>
+</tr>
+<tr>
+<td>CVC</td>
+<td>아무 3자리 (예: `123`)</td>
+</tr>
+<tr>
+<td>카드 비밀번호</td>
+<td>아무 2자리 (예: `00`)</td>
+</tr>
+<tr>
+<td>생년월일</td>
+<td>아무 6자리 (예: `900101`)</td>
+</tr>
+</tbody>
+</table>
 
 **의도적 실패 테스트** (실패 케이스도 반드시 확인해야 합니다):
 
-| 카드 번호 | 결과 |
-|----------|------|
-| `4000 0000 0000 0002` | 카드 거절 |
-| `4100 0000 0000 0019` | 한도 초과 |
+<table>
+<colgroup>
+<col style="width:48%">
+<col style="width:52%">
+</colgroup>
+<thead><tr>
+<th>카드 번호</th>
+<th>결과</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>`4000 0000 0000 0002`</td>
+<td>카드 거절</td>
+</tr>
+<tr>
+<td>`4100 0000 0000 0019`</td>
+<td>한도 초과</td>
+</tr>
+</tbody>
+</table>
 
 > 토스 테스트 카드 전체 목록: [docs.tosspayments.com → 테스트 카드 번호](https://docs.tosspayments.com/reference/testing)
-
----
-
-#### Stripe 테스트 카드
-
-`pk_test_...` / `sk_test_...` 키를 사용하는 상태에서 입력합니다.
-
-| 항목 | 입력값 |
-|------|--------|
-| 카드 번호 | `4242 4242 4242 4242` |
-| 유효기간 | 아무 미래 날짜 (예: `12/28`) |
-| CVC | `424` |
-| 우편번호 | `12345` (아무 숫자) |
-
-**의도적 실패 테스트:**
-
-| 카드 번호 | 결과 |
-|----------|------|
-| `4000 0000 0000 0002` | 카드 거절 |
-| `4000 0000 0000 9995` | 잔액 부족 |
-| `4000 0025 0000 3155` | 3D Secure 인증 필요 (추가 인증 화면 테스트 가능) |
-
-> Stripe 테스트 카드 전체 목록: [stripe.com/docs/testing](https://stripe.com/docs/testing)
 
 ---
 
@@ -1804,7 +2363,6 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 - [ ] Supabase `payments` 테이블에 결제 기록이 삽입됐다
 - [ ] Supabase `credits` 테이블에 크레딧 delta가 삽입됐다
 - [ ] 화면에 "크레딧이 충전됐습니다" 토스트 메시지가 나타난다
-- [ ] Stripe 흐름도 동일하게 통과한다
 
 **오류 흐름 (Error Path):**
 
@@ -1817,23 +2375,18 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 
 `대시보드 → [거래] → [결제 내역]` → 테스트 결제 내역이 표시되는지 확인
 
-**Stripe 대시보드에서 확인:**
-
-`대시보드 → [Payments]` (Test mode ON) → 결제 세션이 `Succeeded` 상태인지 확인
-
 ---
 
 #### 반복 테스트 팁
 
 - 토스 테스트 모드에서는 같은 `orderId`로 2번 이상 결제하면 오류가 납니다.  
   매번 새 주문번호가 생성되는지 코드에서 확인하세요. (`Date.now()` 기반이면 자동으로 달라집니다.)
-- Stripe Checkout 세션은 30분 뒤 만료됩니다. 테스트 중 너무 오래 기다리면 새로 시작하세요.
 - Supabase `payments`·`credits` 테이블에 테스트 데이터가 쌓입니다.  
   실서비스 전환 전에 `DELETE FROM payments WHERE pg = 'toss';` 등으로 테스트 데이터를 정리하세요.
 
 ---
 
-### 9.5 실서비스 전환 전 최종 점검 — 실제 결제로 검증하기
+### 9.4 실서비스 전환 전 최종 점검 — 실제 결제로 검증하기
 
 > 개발 완료 후, 서비스 오픈 직전에 실키(live key)로 전환하고  
 > **자기 카드로 실제 소액 결제**를 해봐야 합니다.  
@@ -1851,17 +2404,7 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 4. Cloudflare Worker → `toss-verify` → `Settings → Variables`  
    → `TOSS_SECRET_KEY` 값을 실서비스 시크릿 키 (`live_sk_...`)로 교체
 
-**Step 2. Stripe 실서비스 키로 교체**
-
-1. Stripe 대시보드 오른쪽 상단 **[Test mode]** 토글 OFF (= Live mode)
-2. `[Developers] → [API keys]` → `Publishable key` / `Secret key` 복사
-3. Cloudflare Worker → `stripe-session` → `Settings → Variables`  
-   → `STRIPE_SECRET_KEY` 값을 실서비스 시크릿 키 (`sk_live_...`)로 교체
-
-> `index.html`에는 Stripe의 퍼블리셔블 키가 현재 이 구현에서는 사용되지 않습니다 (Checkout Session 방식).  
-> Worker만 교체하면 됩니다.
-
-**Step 3. 배포**
+**Step 2. 배포**
 
 키 교체 후 `deploy.ps1`을 실행해서 index.html과 Worker를 반영합니다.
 
@@ -1871,20 +2414,53 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 
 아래 항목을 순서대로 실행합니다. **자신의 카드로 실제 결제**합니다.
 
-| # | 점검 항목 | 확인 방법 |
-|---|----------|---------|
-| 1 | 가장 저렴한 패키지(베이직 ₩5,500)로 토스 결제 | 실제 결제문자 수신 확인 |
-| 2 | 토스 대시보드 → 거래 내역에 ₩5,500 결제 기록 | 상태: 완료 |
-| 3 | Supabase `payments` 테이블 → 레코드 삽입 확인 | `status = 'paid'` |
-| 4 | Supabase `credits` 테이블 → delta = 50 삽입 확인 | 크레딧 충전 |
-| 5 | 서비스 내 크레딧 잔액 UI 갱신 확인 (있는 경우) | 50 크레딧 표시 |
-| 6 | 토스 대시보드에서 해당 결제 **환불** 처리 | 테스트 비용 회수 |
-| 7 | Stripe로 $4.99 결제 반복 (위 1~5 동일) | 달러 결제문자 수신 |
-| 8 | Stripe 대시보드에서 환불 처리 | Refund 완료 |
+<table>
+<colgroup>
+<col style="width:7%">
+<col style="width:58%">
+<col style="width:35%">
+</colgroup>
+<thead><tr>
+<th>#</th>
+<th>점검 항목</th>
+<th>확인 방법</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>가장 저렴한 패키지(베이직 ₩5,500)로 토스 결제</td>
+<td>실제 결제문자 수신 확인</td>
+</tr>
+<tr>
+<td>2</td>
+<td>토스 대시보드 → 거래 내역에 ₩5,500 결제 기록</td>
+<td>상태: 완료</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Supabase `payments` 테이블 → 레코드 삽입 확인</td>
+<td>`status = 'paid'`</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Supabase `credits` 테이블 → delta = 50 삽입 확인</td>
+<td>크레딧 충전</td>
+</tr>
+<tr>
+<td>5</td>
+<td>서비스 내 크레딧 잔액 UI 갱신 확인 (있는 경우)</td>
+<td>50 크레딧 표시</td>
+</tr>
+<tr>
+<td>6</td>
+<td>토스 대시보드에서 해당 결제 **환불** 처리</td>
+<td>테스트 비용 회수</td>
+</tr>
+</tbody>
+</table>
 
-> 환불은 각 PG 대시보드에서 수동으로 처리할 수 있습니다.  
-> 토스: `거래 → 결제 상세 → [취소/환불]`  
-> Stripe: `Payments → 결제 상세 → [Refund]`
+> 환불은 토스 대시보드에서 수동으로 처리할 수 있습니다.  
+> `거래 → 결제 상세 → [취소/환불]`
 
 ---
 
@@ -1894,10 +2470,10 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
   실제 카드만 사용 가능합니다.
 - Worker 환경 변수에 실서비스 시크릿 키를 저장할 때 반드시 **Encrypt** 옵션을 켜세요.  
   키가 외부에 노출되면 타인이 내 계정으로 결제 조작을 할 수 있습니다.
-- 실서비스 중 결제 오류가 발생하면, 토스/Stripe 대시보드의 **로그(Logs)** 탭에서  
+- 실서비스 중 결제 오류가 발생하면, 토스 대시보드의 **로그(Logs)** 탭에서  
   어떤 에러가 반환됐는지 먼저 확인하세요.
-- 정산일·정산 주기를 각 PG 대시보드에서 미리 확인해두세요.  
-  (토스는 기본 D+1, Stripe는 기본 주 1회 또는 월 1회)
+- 정산일·정산 주기를 토스 대시보드에서 미리 확인해두세요.  
+  (토스는 기본 D+1 정산)
 
 ---
 
@@ -1996,10 +2572,26 @@ NAS에서 index.html 존재 확인 (배포 검증)
 
 **해결책 (현재 적용 방식)**:
 
-| 레이어 | 해결 방법 |
-|--------|----------|
-| Cloudflare Edge | 배포 직후 `purge_everything` API 호출 |
-| 브라우저 (iframe) | `?v=HUB_VERSION` — 배포마다 URL이 달라져 브라우저가 새 리소스로 인식 |
+<table>
+<colgroup>
+<col style="width:28%">
+<col style="width:72%">
+</colgroup>
+<thead><tr>
+<th>레이어</th>
+<th>해결 방법</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Cloudflare Edge</td>
+<td>배포 직후 `purge_everything` API 호출</td>
+</tr>
+<tr>
+<td>브라우저 (iframe)</td>
+<td>`?v=HUB_VERSION` — 배포마다 URL이 달라져 브라우저가 새 리소스로 인식</td>
+</tr>
+</tbody>
+</table>
 
 ```javascript
 // index.html 내부 — 컨설팅 페이지 iframe 로드 시
@@ -2011,12 +2603,52 @@ iframe.src = src + '?v=' + HUB_VERSION;
 
 버전 형식: `MAJOR.MINOR.PATCH.BUILD` (예: `0.7.4.12`)
 
-| 환경 | 메뉴 번호 | 증가 자리 | 동작 | 예시 |
-|------|----------|----------|------|------|
-| test | 1 | BUILD (4번째) | 자연 증가, 상한 없음 | `0.7.4.9` → `0.7.4.10` |
-| staging | 2 | PATCH (3번째) | BUILD를 0으로 리셋 | `0.7.4.15` → `0.7.5.0` |
-| www | 3 | MINOR (2번째) | PATCH·BUILD를 0으로 리셋 | `0.7.5.3` → `0.8.0.0` |
-| g1consulting | 4 | BUILD (4번째) | test와 동일 | `0.7.4.9` → `0.7.4.10` |
+<table>
+<colgroup>
+<col style="width:12%">
+<col style="width:12%">
+<col style="width:16%">
+<col style="width:38%">
+<col style="width:22%">
+</colgroup>
+<thead><tr>
+<th>환경</th>
+<th>메뉴 번호</th>
+<th>증가 자리</th>
+<th>동작</th>
+<th>예시</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>test</td>
+<td>1</td>
+<td>BUILD (4번째)</td>
+<td>자연 증가, 상한 없음</td>
+<td>`0.7.4.9` → `0.7.4.10`</td>
+</tr>
+<tr>
+<td>staging</td>
+<td>2</td>
+<td>PATCH (3번째)</td>
+<td>BUILD를 0으로 리셋</td>
+<td>`0.7.4.15` → `0.7.5.0`</td>
+</tr>
+<tr>
+<td>www</td>
+<td>3</td>
+<td>MINOR (2번째)</td>
+<td>PATCH·BUILD를 0으로 리셋</td>
+<td>`0.7.5.3` → `0.8.0.0`</td>
+</tr>
+<tr>
+<td>g1consulting</td>
+<td>4</td>
+<td>BUILD (4번째)</td>
+<td>test와 동일</td>
+<td>`0.7.4.9` → `0.7.4.10`</td>
+</tr>
+</tbody>
+</table>
 
 - BUILD 자리는 test 반복 횟수 — 10을 넘어도 캐스케이드 없이 그대로 증가 (`0.7.4.10`, `0.7.4.11` …)
 - PATCH·MINOR는 9를 넘으면 상위 자리 올림 (`0.7.9.x` staging → `0.8.0.0`)
@@ -2066,7 +2698,7 @@ Invoke-RestMethod -Uri "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/p
     -Body '{"purge_everything":true}'
 ```
 
-> ⚠️ `--no-same-permissions --no-same-owner 2>/dev/null; exit 0` 없으면  
+> ▲ `--no-same-permissions --no-same-owner 2>/dev/null; exit 0` 없으면  
 > NAS의 BusyBox tar가 디렉토리 권한 변경 실패 오류를 내며 배포 실패로 잘못 판정됩니다.
 
 ---
@@ -2157,10 +2789,30 @@ function renderMenu(node) {
 
 ### 13.1 DB 환경 분리 전략
 
-| 환경 | Supabase 프로젝트 | 용도 |
-|------|-----------------|------|
-| **Project A** | 운영 | 실 사용자 데이터, 실 결제 |
-| **Project B** | 테스트/스테이징 | Playwright 자동 테스트, 테스트 계정 |
+<table>
+<colgroup>
+<col style="width:20%">
+<col style="width:48%">
+<col style="width:32%">
+</colgroup>
+<thead><tr>
+<th>환경</th>
+<th>Supabase 프로젝트</th>
+<th>용도</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>**Project A**</td>
+<td>운영</td>
+<td>실 사용자 데이터, 실 결제</td>
+</tr>
+<tr>
+<td>**Project B**</td>
+<td>테스트/스테이징</td>
+<td>Playwright 자동 테스트, 테스트 계정</td>
+</tr>
+</tbody>
+</table>
 
 > Supabase Free 플랜은 프로젝트 2개까지 무료.  
 > 테스트에서 `service_role` 키를 사용해도 운영 DB에 영향 없음.
@@ -2182,10 +2834,30 @@ tests/
 
 **두 가지 테스트 모드**:
 
-| 모드 | 특징 | 언제 사용 |
-|------|------|----------|
-| `mock` | 외부 API 전부 인터셉트, 인터넷 불필요 | 매 커밋, CI |
-| `realdb` | 실제 Supabase Project B 사용 | DB 스키마/RLS 검증 |
+<table>
+<colgroup>
+<col style="width:15%">
+<col style="width:50%">
+<col style="width:35%">
+</colgroup>
+<thead><tr>
+<th>모드</th>
+<th>특징</th>
+<th>언제 사용</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>`mock`</td>
+<td>외부 API 전부 인터셉트, 인터넷 불필요</td>
+<td>매 커밋, CI</td>
+</tr>
+<tr>
+<td>`realdb`</td>
+<td>실제 Supabase Project B 사용</td>
+<td>DB 스키마/RLS 검증</td>
+</tr>
+</tbody>
+</table>
 
 ### 13.3 환경 변수 설정
 
@@ -2276,14 +2948,58 @@ npm run test:all
 
 웹 서비스에서 이메일을 발송하는 방법은 여러 가지이나, **Cloudflare Worker 환경**에서는 아래 이유로 **Resend**가 가장 적합합니다.
 
-| | Resend | Gmail SMTP | Gmail API |
-|---|---|---|---|
-| 월 무료 한도 | **3,000건** | ~15,000건 (500/일) | ~3,000건 환산 |
-| 커스텀 도메인 발신 | ✓ (`consulting@yourdomain.kr`) | ✗ | ✗ |
-| Worker API 키 연동 | **쉬움** (Bearer 토큰 1개) | 어려움 (SMTP) | 매우 어려움 (OAuth2) |
-| DKIM/SPF 자동 설정 | ✓ | ✗ | ✗ |
-| 스팸 분류 위험 | 낮음 | 높음 | 중간 |
-| 발송 현황 API | ✓ (KV 직접 추적) | ✗ | ✗ |
+<table>
+<colgroup>
+<col style="width:22%">
+<col style="width:26%">
+<col style="width:26%">
+<col style="width:26%">
+</colgroup>
+<thead><tr>
+<th></th>
+<th>Resend</th>
+<th>Gmail SMTP</th>
+<th>Gmail API</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>월 무료 한도</td>
+<td>**3,000건**</td>
+<td>~15,000건 (500/일)</td>
+<td>~3,000건 환산</td>
+</tr>
+<tr>
+<td>커스텀 도메인 발신</td>
+<td>✓ (`consulting@yourdomain.kr`)</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Worker API 키 연동</td>
+<td>**쉬움** (Bearer 토큰 1개)</td>
+<td>어려움 (SMTP)</td>
+<td>매우 어려움 (OAuth2)</td>
+</tr>
+<tr>
+<td>DKIM/SPF 자동 설정</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>스팸 분류 위험</td>
+<td>낮음</td>
+<td>높음</td>
+<td>중간</td>
+</tr>
+<tr>
+<td>발송 현황 API</td>
+<td>✓ (KV 직접 추적)</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+</tbody>
+</table>
 
 > **Gmail 주의사항**: Gmail은 한도가 더 많아 보이지만 커스텀 도메인 발신이 불가능하고 Worker 연동이 복잡합니다. 수신자에게 `@gmail.com` 주소로 표시되어 전문성이 떨어지며 스팸 분류 확률도 높습니다.
 
@@ -2352,11 +3068,35 @@ id      = "실제_KV_네임스페이스_ID"   # STEP 3에서 생성
 
 #### `send-mail.js` Worker API
 
-| 메서드 | 경로 | 역할 |
-|--------|------|------|
-| `GET`  | `/`  | 이번 달 발송 현황 반환 `{ sent, limit, remaining, period }` |
-| `POST` | `/`  | 단건 발송 `{ to, subject, html }` |
-| `POST` | `/`  | 대량 발송 `{ emails: [{to, subject, html}, ...] }` (최대 100건) |
+<table>
+<colgroup>
+<col style="width:13%">
+<col style="width:18%">
+<col style="width:69%">
+</colgroup>
+<thead><tr>
+<th>메서드</th>
+<th>경로</th>
+<th>역할</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>`GET`</td>
+<td>`/`</td>
+<td>이번 달 발송 현황 반환 `{ sent, limit, remaining, period }`</td>
+</tr>
+<tr>
+<td>`POST`</td>
+<td>`/`</td>
+<td>단건 발송 `{ to, subject, html }`</td>
+</tr>
+<tr>
+<td>`POST`</td>
+<td>`/`</td>
+<td>대량 발송 `{ emails: [{to, subject, html}, ...] }` (최대 100건)</td>
+</tr>
+</tbody>
+</table>
 
 Worker 내부 동작:
 - 발송 전 월 한도(3,000건) 초과 여부 확인 → 초과 시 `429` 반환
@@ -2419,25 +3159,81 @@ Invoke-RestMethod -Uri "https://send-mail.yourname.workers.dev" -Method GET
 
 **Domain Verification (필수)**
 
-| 타입 | 호스트 | 값 |
-|------|--------|----|
-| TXT | `resend._domainkey` | `p=MIGfMA0...` (Resend 화면에 표시된 DKIM 전체 값) |
+<table>
+<colgroup>
+<col style="width:13%">
+<col style="width:28%">
+<col style="width:59%">
+</colgroup>
+<thead><tr>
+<th>타입</th>
+<th>호스트</th>
+<th>값</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>TXT</td>
+<td>`resend._domainkey`</td>
+<td>`p=MIGfMA0...` (Resend 화면에 표시된 DKIM 전체 값)</td>
+</tr>
+</tbody>
+</table>
 
 **Enable Sending — SPF (필수)**
 
-| 타입 | 호스트 | 값 | 우선순위 |
-|------|--------|-----|---------|
-| MX | `send` | `feedback-smtp.us-east-1.amazonses.com` | 10 |
-| TXT | `send` | `v=spf1 include:amazonses.com ~all` | — |
+<table>
+<colgroup>
+<col style="width:12%">
+<col style="width:22%">
+<col style="width:48%">
+<col style="width:18%">
+</colgroup>
+<thead><tr>
+<th>타입</th>
+<th>호스트</th>
+<th>값</th>
+<th>우선순위</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>MX</td>
+<td>`send`</td>
+<td>`feedback-smtp.us-east-1.amazonses.com`</td>
+<td>10</td>
+</tr>
+<tr>
+<td>TXT</td>
+<td>`send`</td>
+<td>`v=spf1 include:amazonses.com ~all`</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
 
 > **참고**: SPF 레코드 호스트가 `@`(루트)가 아니라 `send` 서브도메인입니다.  
 > 기존 Google SPF(`@`)와 충돌하지 않으므로 별도로 추가하면 됩니다.
 
 **DMARC (선택)**
 
-| 타입 | 호스트 | 값 |
-|------|--------|----|
-| TXT | `_dmarc` | `v=DMARC1; p=none;` |
+<table>
+<colgroup>
+<col style="width:13%">
+<col style="width:28%">
+<col style="width:59%">
+</colgroup>
+<thead><tr>
+<th>타입</th>
+<th>호스트</th>
+<th>값</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>TXT</td>
+<td>`_dmarc`</td>
+<td>`v=DMARC1; p=none;`</td>
+</tr>
+</tbody>
+</table>
 
 4. DNS 레코드 추가 후 Resend 화면의 **확인 버튼** 클릭  
    (버튼 라벨 예: "I've added these records" 또는 유사한 문구)
@@ -2509,11 +3305,40 @@ CSV 형식: 헤더 없음, `이름,이메일` 또는 `이메일` 1열 (UTF-8, �
 
 ### 14.7 요금 및 업그레이드
 
-| 플랜 | 월 비용 | 월 발송 한도 | 도메인 수 |
-|------|---------|-------------|-----------|
-| Free | 무료 | 3,000건 | 1개 |
-| Pro | $20 | 50,000건 | 무제한 |
-| Business | 문의 | 무제한 | 무제한 |
+<table>
+<colgroup>
+<col style="width:18%">
+<col style="width:20%">
+<col style="width:35%">
+<col style="width:27%">
+</colgroup>
+<thead><tr>
+<th>플랜</th>
+<th>월 비용</th>
+<th>월 발송 한도</th>
+<th>도메인 수</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Free</td>
+<td>무료</td>
+<td>3,000건</td>
+<td>1개</td>
+</tr>
+<tr>
+<td>Pro</td>
+<td>$20</td>
+<td>50,000건</td>
+<td>무제한</td>
+</tr>
+<tr>
+<td>Business</td>
+<td>문의</td>
+<td>무제한</td>
+<td>무제한</td>
+</tr>
+</tbody>
+</table>
 
 > **업그레이드 시점 기준**: 마케팅 메일을 월 3,000건 이상 발송해야 하는 시점.  
 > Worker 코드 변경 없이 Resend 플랜만 업그레이드하면 자동으로 한도가 증가합니다.
@@ -2547,21 +3372,59 @@ CSV 형식: 헤더 없음, `이름,이메일` 또는 `이메일` 1열 (UTF-8, �
 
 ### 15.1 언제 필요한가
 
-| 상황 | 권장 방법 |
-|------|-----------|
-| 크레탑·DART 등 **디지털 생성 PDF** | PDF.js 텍스트 추출 (무료, 브라우저 처리) |
-| **스캔 PDF·사진 파일** | Claude Vision API (유료) |
-| 오픈소스 OCR (Tesseract 등) | 테이블 구조 인식률 ~82% → 재무 데이터에 부적합 |
+<table>
+<colgroup>
+<col style="width:38%">
+<col style="width:62%">
+</colgroup>
+<thead><tr>
+<th>상황</th>
+<th>권장 방법</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>크레탑·DART 등 **디지털 생성 PDF**</td>
+<td>PDF.js 텍스트 추출 (무료, 브라우저 처리)</td>
+</tr>
+<tr>
+<td>**스캔 PDF·사진 파일**</td>
+<td>Claude Vision API (유료)</td>
+</tr>
+<tr>
+<td>오픈소스 OCR (Tesseract 등)</td>
+<td>테이블 구조 인식률 ~82% → 재무 데이터에 부적합</td>
+</tr>
+</tbody>
+</table>
 
 > **재무 데이터 한 자리 오류는 치명적**입니다. 스캔 문서에는 99%+ 정확도의 Claude Vision을 권장합니다.
 
 ### 15.2 비용 구조
 
-| 단위 | 비용 |
-|------|------|
-| 페이지당 | **$0.003** (claude-sonnet-4-6 기준) |
-| 재무제표 3년치 (약 6페이지) | 약 $0.018 |
-| 월 100건 처리 시 | 약 $1.8 |
+<table>
+<colgroup>
+<col style="width:30%">
+<col style="width:70%">
+</colgroup>
+<thead><tr>
+<th>단위</th>
+<th>비용</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>페이지당</td>
+<td>**$0.003** (claude-sonnet-4-6 기준)</td>
+</tr>
+<tr>
+<td>재무제표 3년치 (약 6페이지)</td>
+<td>약 $0.018</td>
+</tr>
+<tr>
+<td>월 100건 처리 시</td>
+<td>약 $1.8</td>
+</tr>
+</tbody>
+</table>
 
 > 비용은 Anthropic API 요금 정책에 따라 변동될 수 있습니다.  
 > 이 서비스는 WorksFree 크레딧을 소모합니다 (회원 전용).
@@ -2669,12 +3532,11 @@ export default {
 
 [ 결제 연동 ]
 24. 토스페이먼츠 가입 → 테스트 API 키 확인 (즉시 가능)
-25. Stripe 가입 → 테스트 API 키 확인 (즉시 가능)
-26. 결제 검증 Cloudflare Worker 생성 및 배포 (toss-verify, stripe-session)
-27. Worker 환경 변수에 시크릿 키 등록 (Encrypt 체크)
-28. 결제 후 크레딧 DB 업데이트 로직 연결
-29. 테스트 카드로 전체 흐름 반복 검증 (9.4 체크리스트)
-30. 사업자 인증 완료 → 실서비스 키로 교체 → 실결제 점검 (9.5 체크리스트)
+25. 결제 검증 Cloudflare Worker 생성 및 배포 (toss-verify)
+26. Worker 환경 변수에 시크릿 키 등록 (Encrypt 체크)
+27. 결제 후 크레딧 DB 업데이트 로직 연결
+28. 테스트 카드로 전체 흐름 반복 검증 (9.3 체크리스트)
+29. 사업자 인증 완료 → 실서비스 키로 교체 → 실결제 점검 (9.4 체크리스트)
 
 [ 역할 기반 접근 제어 ]
 31. profiles.role 컬럼에 역할 값 정의 (general / consultant / gfc 등)
@@ -2758,11 +3620,30 @@ cat ~/.ssh/id_ed25519.pub | ssh admin@192.168.x.x 'cat > ~/.ssh/authorized_keys'
 
 필요한 항목을 **필수 동의** 또는 **선택 동의**로 설정:
 
-| 항목 | 권장 설정 |
-|------|-----------|
-| 닉네임 (profile_nickname) | 필수 동의 |
-| 프로필 사진 (profile_image) | 선택 동의 |
-| 카카오계정(이메일) (account_email) | 필수 동의 |
+<table>
+<colgroup>
+<col style="width:55%">
+<col style="width:45%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>권장 설정</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>닉네임 (profile_nickname)</td>
+<td>필수 동의</td>
+</tr>
+<tr>
+<td>프로필 사진 (profile_image)</td>
+<td>선택 동의</td>
+</tr>
+<tr>
+<td>카카오계정(이메일) (account_email)</td>
+<td>필수 동의</td>
+</tr>
+</tbody>
+</table>
 
 > **검토 상태 주의**: 항목을 처음 추가하면 "검토 중" 상태일 수 있습니다.  
 > 테스트 환경에서는 앱 팀원으로 등록된 계정만 로그인 가능합니다.  
@@ -2856,11 +3737,40 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 
 ## 부록 C. 포트 구성 참고표
 
-| 환경 | 서브도메인 | NAS 포트 | 문서 루트 |
-|------|-----------|---------|----------|
-| 운영(prod) | `www.example.co.kr` | 8080 | `/volume1/web/www` |
-| 스테이징 | `staging.example.co.kr` | 8082 | `/volume1/web/staging` |
-| 테스트 | `test.example.co.kr` | 8081 | `/volume1/web/test` |
+<table>
+<colgroup>
+<col style="width:15%">
+<col style="width:32%">
+<col style="width:14%">
+<col style="width:39%">
+</colgroup>
+<thead><tr>
+<th>환경</th>
+<th>서브도메인</th>
+<th>NAS 포트</th>
+<th>문서 루트</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>운영(prod)</td>
+<td>`www.example.co.kr`</td>
+<td>8080</td>
+<td>`/volume1/web/www`</td>
+</tr>
+<tr>
+<td>스테이징</td>
+<td>`staging.example.co.kr`</td>
+<td>8082</td>
+<td>`/volume1/web/staging`</td>
+</tr>
+<tr>
+<td>테스트</td>
+<td>`test.example.co.kr`</td>
+<td>8081</td>
+<td>`/volume1/web/test`</td>
+</tr>
+</tbody>
+</table>
 
 ---
 
@@ -2870,26 +3780,122 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 
 ## 부록 D. 파일 위치 참고 (WorksFree Hub 기준)
 
-| 항목 | 경로 | 비고 |
-|------|------|------|
-| 메인 SPA | `synology-web/index.html` | |
-| **DB 구축 스크립트 (현재 권장)** | `synology-web/supabase/master_db_setup.sql` | ✅ 신규 구축 시 이것만 실행 |
-| DB 상태 진단 | `synology-web/supabase/phase1_check_before_run.sql` | 선택 사항 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/phase1_db_setup.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/phase2_email_management.sql` | ⚠️ status 컬럼 없는 구버전 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/phase2_and_3_combined.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/email_log.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/tracking_tables.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/admin_functions.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/fix_profiles_name_sync.sql` | ⚠️ master에 통합됨 |
-| 테스트 픽스처 | `synology-web/tests/fixtures/` | |
-| 테스트 환경변수 템플릿 | `synology-web/.env.test.example` | |
-| Playwright 설정 | `synology-web/playwright.config.js` | |
-| 배포 스크립트 | `synology-web/deploy.ps1` | |
-| DART Worker | `synology-web/consulting/dart/worker.js` | |
-| 메일 발송 Worker | `synology-web/service/payment/send-mail.js` | |
-| 메일 Worker 배포 설정 | `synology-web/service/payment/wrangler-mail.toml` | |
-| 결제 검증 Worker | `synology-web/service/payment/toss-verify.js` | |
-| 결제 Worker 배포 설정 | `synology-web/service/payment/wrangler-toss.toml` | |
-| 마케팅 자료 페이지 | `synology-web/consulting/marketing/index.html` | |
-| 이 가이드 | `synology-web/NAS웹서비스_구축가이드.md` | |
+<table>
+<colgroup>
+<col style="width:25%">
+<col style="width:52%">
+<col style="width:23%">
+</colgroup>
+<thead><tr>
+<th>항목</th>
+<th>경로</th>
+<th>비고</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>메인 SPA</td>
+<td>`synology-web/index.html`</td>
+<td></td>
+</tr>
+<tr>
+<td>**DB 구축 스크립트 (현재 권장)**</td>
+<td>`synology-web/supabase/master_db_setup.sql`</td>
+<td>☑ 신규 구축 시 이것만 실행</td>
+</tr>
+<tr>
+<td>DB 상태 진단</td>
+<td>`synology-web/supabase/phase1_check_before_run.sql`</td>
+<td>선택 사항</td>
+</tr>
+<tr>
+<td>DB 스크립트 이력 (Deprecated)</td>
+<td>`synology-web/supabase/phase1_db_setup.sql`</td>
+<td>▲ master에 통합됨</td>
+</tr>
+<tr>
+<td>DB 스크립트 이력 (Deprecated)</td>
+<td>`synology-web/supabase/phase2_email_management.sql`</td>
+<td>▲ status 컬럼 없는 구버전</td>
+</tr>
+<tr>
+<td>DB 스크립트 이력 (Deprecated)</td>
+<td>`synology-web/supabase/phase2_and_3_combined.sql`</td>
+<td>▲ master에 통합됨</td>
+</tr>
+<tr>
+<td>DB 스크립트 이력 (Deprecated)</td>
+<td>`synology-web/supabase/email_log.sql`</td>
+<td>▲ master에 통합됨</td>
+</tr>
+<tr>
+<td>DB 스크립트 이력 (Deprecated)</td>
+<td>`synology-web/supabase/tracking_tables.sql`</td>
+<td>▲ master에 통합됨</td>
+</tr>
+<tr>
+<td>DB 스크립트 이력 (Deprecated)</td>
+<td>`synology-web/supabase/admin_functions.sql`</td>
+<td>▲ master에 통합됨</td>
+</tr>
+<tr>
+<td>DB 스크립트 이력 (Deprecated)</td>
+<td>`synology-web/supabase/fix_profiles_name_sync.sql`</td>
+<td>▲ master에 통합됨</td>
+</tr>
+<tr>
+<td>테스트 픽스처</td>
+<td>`synology-web/tests/fixtures/`</td>
+<td></td>
+</tr>
+<tr>
+<td>테스트 환경변수 템플릿</td>
+<td>`synology-web/.env.test.example`</td>
+<td></td>
+</tr>
+<tr>
+<td>Playwright 설정</td>
+<td>`synology-web/playwright.config.js`</td>
+<td></td>
+</tr>
+<tr>
+<td>배포 스크립트</td>
+<td>`synology-web/deploy.ps1`</td>
+<td></td>
+</tr>
+<tr>
+<td>DART Worker</td>
+<td>`synology-web/consulting/dart/worker.js`</td>
+<td></td>
+</tr>
+<tr>
+<td>메일 발송 Worker</td>
+<td>`synology-web/service/payment/send-mail.js`</td>
+<td></td>
+</tr>
+<tr>
+<td>메일 Worker 배포 설정</td>
+<td>`synology-web/service/payment/wrangler-mail.toml`</td>
+<td></td>
+</tr>
+<tr>
+<td>결제 검증 Worker</td>
+<td>`synology-web/service/payment/toss-verify.js`</td>
+<td></td>
+</tr>
+<tr>
+<td>결제 Worker 배포 설정</td>
+<td>`synology-web/service/payment/wrangler-toss.toml`</td>
+<td></td>
+</tr>
+<tr>
+<td>마케팅 자료 페이지</td>
+<td>`synology-web/consulting/marketing/index.html`</td>
+<td></td>
+</tr>
+<tr>
+<td>이 가이드</td>
+<td>`synology-web/NAS웹서비스_구축가이드.md`</td>
+<td></td>
+</tr>
+</tbody>
+</table>

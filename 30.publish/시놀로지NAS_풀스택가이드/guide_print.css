@@ -36,8 +36,8 @@ h1 {
   border-bottom: 2px solid #1A9FD4;
   page-break-before: always;
   break-before: page;
-  page-break-after: avoid !important;
-  break-after: avoid !important;
+  page-break-after: auto;
+  break-after: auto;
 }
 h1:first-child, h1.title {
   page-break-before: avoid; break-before: avoid;
@@ -108,7 +108,8 @@ div.sourceCode, pre {
   line-height: 1.55;
   overflow-x: hidden;
   white-space: pre-wrap !important;
-  word-break: break-all !important;
+  word-break: break-word;
+  overflow-wrap: break-word;
   page-break-inside: auto;
   break-inside: auto;
 }

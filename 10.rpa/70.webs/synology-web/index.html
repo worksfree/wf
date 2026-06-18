@@ -1368,7 +1368,7 @@
     <div id="dev-track-status" style="font-size:10px;color:#475569;margin-bottom:6px;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.04)">📊 페이지뷰 추적: —</div>
     <button class="dev-btn" id="dev-btn-general"    onclick="devLogin('general')">▶ 일반회원</button>
     <button class="dev-btn" id="dev-btn-consultant" onclick="devLogin('consultant')" style="border-color:#0ea5e9;color:#7dd3fc" title="경영지도사 — 비보험 콘텐츠">▶ 컨설턴트</button>
-    <button class="dev-btn" id="dev-btn-gfc"        onclick="devLogin('gfc')"        style="border-color:#7c3aed;color:#c4b5fd" title="보험설계사 — 보험 콘텐츠 포함">▶ 파트너 (🔒)</button>
+    <button class="dev-btn" id="dev-btn-gfc"        onclick="devLogin('gfc')"        style="border-color:#7c3aed;color:#c4b5fd" title="전문 컨설턴트 — 전문 콘텐츠 포함">▶ 파트너 (🔒)</button>
     <button class="dev-btn" id="dev-btn-admin"      onclick="devLogin('admin')"      style="border-color:#dc2626;color:#fca5a5">▶ 관리자 (🔒)</button>
     <button class="dev-btn" onclick="devShowConsent()">📋 동의 모달 보기</button>
     <button class="dev-btn danger" onclick="devResetConsent()">↺ 동의 초기화</button>
@@ -1466,7 +1466,7 @@
       <div class="ao-card">
         <div class="ao-icon">🔐</div>
         <div class="ao-title" id="ao-title">파트너 전용 기능</div>
-        <div class="ao-desc" id="ao-desc">이 기능은 파트너(GFC) 계정에서만 사용할 수 있습니다.<br>파트너 가입 또는 권한 승인이 필요합니다.</div>
+        <div class="ao-desc" id="ao-desc">이 기능은 파트너 계정에서만 사용할 수 있습니다.<br>파트너 가입 또는 권한 승인이 필요합니다.</div>
         <button class="ao-btn" onclick="showHome()">홈으로 돌아가기</button>
       </div>
     </div>
@@ -1958,7 +1958,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.4.0';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.4.11';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2013,6 +2013,7 @@ const TREE = [
       { label:{ko:'비상장주식 가치평가',    en:'Stock Valuation'},     icon:'📊', iframe:'consulting/stockval/index.html',  consultantOnly:true },
       { label:{ko:'경영종합진단',          en:'Financial Plan'},      icon:'📈', iframe:'consulting/gfc/index.html',   consultantOnly:true },
       { label:{ko:'CEO 플랜',             en:'CEO Plan'},            icon:'👔', iframe:'consulting/ceo/index.html',   consultantOnly:true },
+      { label:{ko:'연금 절세 시뮬레이터',  en:'Pension Tax Simulator'}, icon:'💰', iframe:'consulting/pension/index.html', consultantOnly:true },
       { label:{ko:'타코매니저 AI',         en:'Taco Manager AI'},     icon:'🌮', iframe:'consulting/tacomanager/v1/index.html', consultantOnly:true },
       { label:{ko:'타코매니저 AI v2',      en:'Taco Manager AI v2'},  icon:'🌮', iframe:'consulting/tacomanager/v2/index.html', consultantOnly:true },
       { label:{ko:'타코매니저 AI v3',      en:'Taco Manager AI v3'},  icon:'🌮', iframe:'consulting/tacomanager/v3/index.html', consultantOnly:true },
@@ -2041,6 +2042,7 @@ const TREE = [
   {
     label:{ko:'O&M 관리', en:'O&M Admin'}, icon:'⚙', adminOnly:true, children:[
       { label:{ko:'사용자 관리',    en:'User Mgmt'},       icon:'👥', iframe:'admin/users/index.html' },
+      { label:{ko:'이메일 캠페인', en:'Email Campaign'}, icon:'📧', iframe:'admin/email-campaign/index.html' },
       { label:{ko:'시스템 모니터', en:'System Monitor'}, icon:'📊', iframe:'admin/monitor/index.html' },
       { label:{ko:'콘텐츠 관리',  en:'Content Mgmt'},   icon:'📝', iframe:'admin/content/index.html' },
       { label:{ko:'페이지 권한',   en:'Page Access'},    icon:'🔐', iframe:'admin/permissions/index.html' },
@@ -2121,6 +2123,10 @@ const DASH_CARDS = [
     title:{ko:'CEO 플랜',            en:'CEO Plan'},
     desc: {ko:'법인 컨설팅 종합 플랜',               en:'Corporate consulting comprehensive plan'},
     iframe:'consulting/ceo/index.html', consultantOnly:true },
+  { icon:'💰',
+    title:{ko:'연금 절세 시뮬레이터',  en:'Pension Tax Simulator'},
+    desc: {ko:'개인·퇴직연금 절세 설계 · 2026 세법 · GFC 상담용', en:'Pension payout tax planning · 2026 KR Tax Law · GFC Advisory'},
+    iframe:'consulting/pension/index.html', consultantOnly:true },
   { icon:'🌮',
     title:{ko:'타코매니저 AI',      en:'Taco Manager AI'},
     desc: {ko:'AI 기반 매장 재고·프로모션 관제', en:'AI-powered store inventory & promo control'},
@@ -3412,7 +3418,7 @@ function devToggleCollapse() {
 
 let _devPwResolve = null;
 function devPromptPw(role) {
-  const titles = { gfc: '🔐 파트너(GFC) 비밀번호', admin: '🔐 관리자 비밀번호' };
+  const titles = { gfc: '🔐 파트너 비밀번호', admin: '🔐 관리자 비밀번호' };
   const titleEl = document.getElementById('dev-pw-title');
   if (titleEl) titleEl.textContent = titles[role] || '🔐 비밀번호 확인';
   // 원래 함수 로직은 아래에서 이어짐 (이름 변경 후 즉시 return)
