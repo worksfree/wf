@@ -33,3 +33,11 @@ dist/
 
 # 앱 설정 (인증키·이메일 비밀번호 포함)
 wf_rpa_config.json
+
+# NAS 가이드 PDF 빌드 아웃풋 (타임스탬프 버전, YYMMDDHHII 10자리)
+*_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].pdf
+
+# k6 부하 테스트 결과물 (자동 생성)
+load-test/report-*.txt
+load-test/report-*.json
+load-test/run-load-test.ps1
