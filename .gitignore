@@ -38,6 +38,7 @@ wf_rpa_config.json
 *_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].pdf
 
 # k6 부하 테스트 결과물 (자동 생성)
-load-test/report-*.txt
-load-test/report-*.json
-load-test/run-load-test.ps1
+10.rpa/70.webs/synology-web/load-test/report-*.txt
+10.rpa/70.webs/synology-web/load-test/report-*.json
+10.rpa/70.webs/synology-web/load-test/nas-load-test-report.json
+10.rpa/70.webs/synology-web/load-test/nas-mixed-test-report.json
