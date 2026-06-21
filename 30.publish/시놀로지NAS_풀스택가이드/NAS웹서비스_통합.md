@@ -1165,7 +1165,7 @@ Redirect URLs 허용 목록과는 별개로, 이메일 본문의 링크가 이 U
 
 | 항목 | 올바른 값 | ❌ 잘못된 예 |
 |------|-----------|------------|
-| Site URL | `https://portal.worksfree.co.kr` | `http://localhost:3000` |
+| Site URL | `https://portal.worksfree.kr` | `http://localhost:3000` |
 
 > **주의**: Site URL을 `localhost`로 두면 사용자가 이메일 링크를 클릭했을 때  
 > `localhost:3000/#access_token=...` 으로 리디렉션되어 인증이 완료되지 않습니다.  
@@ -1176,9 +1176,9 @@ Redirect URLs 허용 목록과는 별개로, 이메일 본문의 링크가 이 U
 이메일 링크에서 허용할 목적지 URL 허용 목록입니다. **Add URL** 버튼으로 하나씩 추가:
 
 ```
-https://portal.worksfree.co.kr/**
-https://staging.worksfree.co.kr/**
-https://test.worksfree.co.kr/**
+https://portal.worksfree.kr/**
+https://staging.worksfree.kr/**
+https://test.worksfree.kr/**
 http://127.0.0.1:5500/**
 ```
 
@@ -1469,7 +1469,7 @@ page_views     → id, user_id, page, duration_s, env, viewed_at
 
 ### 8.4-B (Deprecated) 테이블·뷰·함수 생성 인라인 스크립트
 
-> ⚠️ 이 섹션의 SQL은 현재 `master_db_setup.sql`로 대체되었습니다.  
+> ⚠️ 이 섹션의 SQL은 현재 `complete_db_setup.sql`로 대체되었습니다.  
 > 참고용으로만 보관하며, 직접 실행하지 마세요.
 
 **메뉴 경로 (구버전)**:  
@@ -2987,9 +2987,9 @@ export default {
 
 [ 데이터베이스 ]
 19. (선택) supabase/phase1_check_before_run.sql 실행 → 현재 DB 상태 사전 진단
-20. supabase/master_db_setup.sql 실행 → 전체 DB 한 번에 구축
+20. supabase/complete_db_setup.sql 실행 → 전체 DB 한 번에 구축
     (profiles/credits/payments/email_log/page_views + 함수/트리거/RLS + 개발 테스트 사용자)
-21. 결과 패널에서 6개 테이블·10개 함수·2개 트리거 모두 표시되는지 확인
+21. 결과 패널에서 6개 테이블·12개 함수·2개 트리거 모두 표시되는지 확인
 22. Authentication → Users에서 실제 관리자 UUID 확인 → role='admin' 지정
     → SQL Editor: UPDATE public.profiles SET role='admin' WHERE id='<UUID>';
 23. 프런트엔드에서 credit_balance 뷰 조회 → 잔액 표시 확인
@@ -3200,7 +3200,7 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 | 항목 | 경로 | 비고 |
 |------|------|------|
 | 메인 SPA | `synology-web/index.html` | |
-| **DB 구축 스크립트 (현재 권장)** | `synology-web/supabase/master_db_setup.sql` | ✅ 신규 구축 시 이것만 실행 |
+| **DB 구축 스크립트 (현재 권장)** | `synology-web/supabase/complete_db_setup.sql` | ✅ 신규 구축 시 이것만 실행 |
 | DB 상태 진단 | `synology-web/supabase/phase1_check_before_run.sql` | 선택 사항 |
 | 테스트 픽스처 | `synology-web/tests/fixtures/` | |
 | 테스트 환경변수 템플릿 | `synology-web/.env.test.example` | |
