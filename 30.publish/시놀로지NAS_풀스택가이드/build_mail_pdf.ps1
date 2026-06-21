@@ -175,6 +175,9 @@ html = html.replace(
     1
 )
 
+# MD의 \pagebreak 마커 → CSS 페이지 구분 div
+html = re.sub(r'<p>\\pagebreak</p>', '<div class="pagebreak"></div>', html)
+
 html_path.write_text(html, encoding="utf-8")
 print("post-process complete")
 '@

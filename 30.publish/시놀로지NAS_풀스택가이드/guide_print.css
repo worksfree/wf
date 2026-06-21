@@ -194,6 +194,13 @@ figcaption {
   text-align: center;
 }
 
+/* ── 수동 페이지 구분 마커 (\pagebreak 로 MD에서 삽입) ── */
+.pagebreak {
+  break-before: page;
+  page-break-before: always;
+  height: 0;
+}
+
 /* ── 구분선 ── */
 hr {
   border: none;

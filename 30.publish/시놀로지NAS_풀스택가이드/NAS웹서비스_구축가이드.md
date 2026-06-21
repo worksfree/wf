@@ -754,16 +754,15 @@ sudo cloudflared service install eyJhIjoiXXX...토큰값...
 |------|------|-------------------|
 | Subdomain | 서브도메인 이름 | `portal` |
 | Domain | 보유한 도메인 | `example.co.kr` |
-| Type | 연결 방식 | `HTTP` 선택 |
-| URL | NAS 내부 주소:포트 | `localhost:8080` |
+| Service URL | NAS 내부 주소:포트 (프로토콜 포함) | `http://localhost:8080` |
 
 운영할 서브도메인 수만큼 반복:
 
-| 용도 | Subdomain | URL |
-|------|-----------|-----|
-| 실 서비스 | `portal` | `localhost:8080` |
-| 최종 점검용 | `staging` | `localhost:8082` |
-| 개발 테스트용 | `test` | `localhost:8081` |
+| 용도 | Subdomain | Service URL |
+|------|-----------|-------------|
+| 실 서비스 | `portal` | `http://localhost:8080` |
+| 최종 점검용 | `staging` | `http://localhost:8082` |
+| 개발 테스트용 | `test` | `http://localhost:8081` |
 
 **[Save tunnel]** 클릭
 

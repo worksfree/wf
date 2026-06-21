@@ -368,8 +368,7 @@ Cloudflare Email Worker가 브릿지를 호출할 수 있도록 공개 URL을 �
 |------|-----|
 | Subdomain | `bridge` |
 | Domain | `worksfree.kr` |
-| Service Type | `HTTP` |
-| URL | `192.168.x.x:3001` (NAS 내부 IP) |
+| Service URL | `http://192.168.x.x:3001` (NAS 내부 IP) |
 
 저장 후 `https://bridge.worksfree.kr` 엔드포인트가 생성됩니다.
 
@@ -453,6 +452,8 @@ name               = "email-receiver"
 main               = "worker.js"
 compatibility_date = "2025-01-01"
 ```
+
+\pagebreak
 
 ### 6.2 시크릿 등록 및 배포
 
