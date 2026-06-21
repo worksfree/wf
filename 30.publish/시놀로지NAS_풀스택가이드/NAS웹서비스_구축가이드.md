@@ -1343,6 +1343,8 @@ SELECT category, item, detail FROM (
 > 미지의 컬럼은 건드리지 않고, 우리가 필요한 컬럼만 `ADD COLUMN IF NOT EXISTS`로 추가.  
 > 기존 RLS 정책 이름이 달라 (`본인만 조회`, `본인만 수정` 등) 동적 루프로 전부 삭제 후 통일.
 
+<div class="pagebreak"></div>
+
 ### 8.3 크레딧 설계 — 잔액 vs 원장
 
 크레딧을 저장하는 방법에는 두 가지가 있습니다:
@@ -1448,7 +1450,7 @@ page_views     → id, user_id, page, duration_s, env, viewed_at
 > | (비로그인) | 미가입·미로그인 | 공개 콘텐츠 + 미리보기 모드 |
 > | `member` | 기본 회원 | 공개 + 회원 전용 도구 (앱 스토어) |
 > | `consultant` | 경영지도사 | member + 컨설팅 메뉴 실사용 |
-> | `partner` | GFC 파트너 | consultant + 전문 파트너 전용 메뉴 |
+> | `partner` | 파트너 | consultant + 파트너 전용 메뉴 |
 > | `admin` | 관리자 | 전체 접근 + 관리자 대시보드 |
 
 **관리자 계정 role 지정** (Supabase SQL Editor):
@@ -2002,6 +2004,8 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 4. Cloudflare Worker → `toss-verify` → `Settings → Variables`  
    → `TOSS_SECRET_KEY` 값을 실서비스 시크릿 키 (`live_sk_...`)로 교체
 
+<div class="pagebreak"></div>
+
 **Step 2. Stripe 실서비스 키로 교체**
 
 1. Stripe 대시보드 오른쪽 상단 **[Test mode]** 토글 OFF (= Live mode)
@@ -2017,6 +2021,8 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 키 교체 후 `deploy.ps1`을 실행해서 index.html과 Worker를 반영합니다.
 
 ---
+
+<div class="pagebreak"></div>
 
 #### 실결제 점검 시나리오
 
@@ -2038,6 +2044,8 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 > Stripe: `Payments → 결제 상세 → [Refund]`
 
 ---
+
+<div class="pagebreak"></div>
 
 #### 실서비스 전환 후 주의사항
 
@@ -2158,6 +2166,8 @@ iframe.src = src + '?v=' + HUB_VERSION;
 // HUB_VERSION은 배포마다 자동 갱신되므로 강제 새로고침 없이도 최신 파일 수신
 ```
 
+<div class="pagebreak"></div>
+
 ### 11.3 배포 환경별 버전 증가 규칙
 
 버전 형식: `MAJOR.MINOR.PATCH.BUILD` (예: `0.7.4.12`)
@@ -2239,7 +2249,7 @@ Invoke-RestMethod -Uri "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/p
 비로그인       non-member    공개 + 미리보기(preview) 모드
 기본 회원      member        공개 + 회원 전용 도구 + 컨설팅 잠금 안내
 경영지도사     consultant    member + 컨설팅 메뉴 실사용
-GFC 파트너     partner       consultant + 파트너 전용 메뉴
+파트너         partner       consultant + 파트너 전용 메뉴
 관리자         admin         전체 + 관리자 대시보드
 ```
 
@@ -2318,6 +2328,8 @@ function renderMenu(node) {
 
 > Supabase Free 플랜은 프로젝트 2개까지 무료.  
 > 테스트에서 `service_role` 키를 사용해도 운영 DB에 영향 없음.
+
+<div class="pagebreak"></div>
 
 ### 13.2 테스트 계층 구조
 
