@@ -3204,13 +3204,6 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 | 메인 SPA | `synology-web/index.html` | |
 | **DB 구축 스크립트 (현재 권장)** | `synology-web/supabase/master_db_setup.sql` | ✅ 신규 구축 시 이것만 실행 |
 | DB 상태 진단 | `synology-web/supabase/phase1_check_before_run.sql` | 선택 사항 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/phase1_db_setup.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/phase2_email_management.sql` | ⚠️ status 컬럼 없는 구버전 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/phase2_and_3_combined.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/email_log.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/tracking_tables.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/admin_functions.sql` | ⚠️ master에 통합됨 |
-| DB 스크립트 이력 (Deprecated) | `synology-web/supabase/fix_profiles_name_sync.sql` | ⚠️ master에 통합됨 |
 | 테스트 픽스처 | `synology-web/tests/fixtures/` | |
 | 테스트 환경변수 템플릿 | `synology-web/.env.test.example` | |
 | Playwright 설정 | `synology-web/playwright.config.js` | |
@@ -3224,7 +3217,7 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 | 이 가이드 | `synology-web/NAS웹서비스_구축가이드.md` | |
 
 
-<!-- 판권 -->
+<!--
 <div class="html-page page-cr">
 <div class="page">
   <!-- 헤더 -->
@@ -3314,3 +3307,4 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
   </div>
 </div>
 </div>
+-->
