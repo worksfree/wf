@@ -420,7 +420,7 @@ CREATE TABLE email_log (
 ```
 supabase/
 ├── schema.sql          ← ✅ 완전 마스터 (신규 DB 단독 생성용)
-├── 70_seed_dev.sql     ← 개발 시드 (프로덕션 금지)
+├── seed_dev.sql        ← 개발 시드 (프로덕션 금지)
 ├── migration_*.sql     ← 증분 이력 (schema.sql에 통합됨)
 └── archive/            ← 레거시 temp_ 파일 (참고용)
 ```

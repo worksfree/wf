@@ -23,7 +23,7 @@
 -- 실행 방법: Supabase → SQL Editor → New query → 전체 붙여넣기 → Run
 -- 멱등성: 반복 실행 안전 (CREATE ... IF NOT EXISTS, OR REPLACE)
 --
--- ⚠ 개발 테스트 계정이 필요한 경우 별도로 99_seed_dev.sql 실행
+-- ⚠ 개발 테스트 계정이 필요한 경우 별도로 seed_dev.sql 실행
 -- ═══════════════════════════════════════════════════════════════════
 
 

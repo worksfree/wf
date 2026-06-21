@@ -1227,12 +1227,12 @@ http://127.0.0.1:5500/**
 ```text
 supabase/
 ├── complete_db_setup.sql      # ✅ 코어 DB 전체 (테이블·함수·RLS·트리거·뷰, 필수)
-├── 99_seed_dev.sql            # 🛠 개발용 테스트 계정 4명 (운영에서는 실행 금지)
+├── seed_dev.sql               # 🛠 개발용 테스트 계정 4명 (운영에서는 실행 금지)
 ├── email_campaign_setup.sql   # ✅ 이메일 캠페인 함수 (선택 — 캠페인 기능 사용 시)
 └── add_campaign_indexes.sql   # ✅ 캠페인 인덱스 (email_campaign_setup.sql 이후 실행)
 ```
 
-> **실행 순서**: `complete_db_setup.sql` → (개발환경만) `99_seed_dev.sql` → (캠페인 기능 시) `email_campaign_setup.sql` → `add_campaign_indexes.sql`  
+> **실행 순서**: `complete_db_setup.sql` → (개발환경만) `seed_dev.sql` → (캠페인 기능 시) `email_campaign_setup.sql` → `add_campaign_indexes.sql`  
 > `email_campaign_setup.sql`은 `biz_contacts` 테이블을 별도로 관리하는 캠페인 전용 DB이며, 코어 DB(`complete_db_setup.sql`)와 독립적으로 분리된 상태를 유지합니다.
 
 ---
@@ -1375,7 +1375,7 @@ user-001 | +100  | admin_grant   | 이벤트 지급
 | 9 | 기존 사용자 소급 동기화 (name/email 백필) |
 | 10 | 최종 검증 SELECT 쿼리 7개 (테이블·함수·트리거·뷰 모두 확인) |
 
-> **참고**: 개발용 테스트 계정(member/consultant/partner/admin 4명)은 `99_seed_dev.sql`에 별도 분리되어 있습니다. 운영 환경에서는 실행하지 않습니다.
+> **참고**: 개발용 테스트 계정(member/consultant/partner/admin 4명)은 `seed_dev.sql`에 별도 분리되어 있습니다. 운영 환경에서는 실행하지 않습니다.
 
 #### 실행 방법
 
@@ -2983,7 +2983,7 @@ export default {
 [ 데이터베이스 ]
 19. supabase/complete_db_setup.sql 실행 → 전체 DB 한 번에 구축
     (profiles/credits/payments/email_log/page_views + 함수/트리거/RLS)
-20-1. (개발환경만) supabase/99_seed_dev.sql 실행 → 테스트 계정 4명 생성
+20-1. (개발환경만) supabase/seed_dev.sql 실행 → 테스트 계정 4명 생성
 21. 결과 패널에서 6개 테이블·12개 함수·2개 트리거 모두 표시되는지 확인
 22. Authentication → Users에서 실제 관리자 UUID 확인 → role='admin' 지정
     → SQL Editor: UPDATE public.profiles SET role='admin' WHERE id='<UUID>';
@@ -3196,7 +3196,7 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 |------|------|------|
 | 메인 SPA | `synology-web/index.html` | |
 | **DB 구축 스크립트 (코어)** | `synology-web/supabase/complete_db_setup.sql` | ✅ 신규 구축 시 이것만 실행 |
-| 개발용 시드 데이터 | `synology-web/supabase/99_seed_dev.sql` | 🛠 개발환경 전용 (운영 실행 금지) |
+| 개발용 시드 데이터 | `synology-web/supabase/seed_dev.sql` | 🛠 개발환경 전용 (운영 실행 금지) |
 | 이메일 캠페인 DB | `synology-web/supabase/email_campaign_setup.sql` | 캠페인 기능 사용 시 |
 | 캠페인 인덱스 | `synology-web/supabase/add_campaign_indexes.sql` | 위 파일 이후 실행 |
 | 테스트 픽스처 | `synology-web/tests/fixtures/` | |

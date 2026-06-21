@@ -1,16 +1,16 @@
 -- ═══════════════════════════════════════════════════════════════════
--- 99_seed_dev.sql
+-- seed_dev.sql
 -- WorksFree Hub — [개발/테스트 전용] 테스트 계정 생성
 --
 -- ⚠ 프로덕션(portal) 환경에서는 절대 실행하지 마세요.
 --
--- 사전 조건: 01_auth_profiles.sql 실행 완료
+-- 사전 조건: complete_db_setup.sql 실행 완료
 --
 -- 생성 계정 (이메일 로그인):
---   test@worksfree.co.kr        일반회원    TestPassword123!
---   consultant@worksfree.co.kr  컨설턴트    TestPassword123!
---   partner@worksfree.co.kr     파트너      TestPassword123!
---   admin@worksfree.co.kr       관리자      AdminPassword123!
+--   test@worksfree.co.kr        홍길동    일반회원    TestPassword123!
+--   consultant@worksfree.co.kr  이경영    컨설턴트    TestPassword123!
+--   partner@worksfree.co.kr     박동훈    파트너      TestPassword123!
+--   admin@worksfree.co.kr       관리자    관리자      AdminPassword123!
 --
 -- 멱등성: ON CONFLICT DO NOTHING → 반복 실행 안전
 -- ═══════════════════════════════════════════════════════════════════
@@ -32,7 +32,7 @@ INSERT INTO auth.users (
   'authenticated', 'authenticated', 'test@worksfree.co.kr',
   crypt('TestPassword123!', gen_salt('bf')),
   now(), now(), now(),
-  '{"full_name":"테스트 회원"}'::JSONB,
+  '{"full_name":"홍길동"}'::JSONB,
   '{"provider":"email","providers":["email"]}'::JSONB,
   false, false, '', '', '', ''
 ) ON CONFLICT (id) DO NOTHING;
@@ -61,7 +61,7 @@ INSERT INTO auth.users (
   'authenticated', 'authenticated', 'consultant@worksfree.co.kr',
   crypt('TestPassword123!', gen_salt('bf')),
   now(), now(), now(),
-  '{"full_name":"컨설턴트 테스터"}'::JSONB,
+  '{"full_name":"이경영"}'::JSONB,
   '{"provider":"email","providers":["email"]}'::JSONB,
   false, false, '', '', '', ''
 ) ON CONFLICT (id) DO NOTHING;
@@ -90,7 +90,7 @@ INSERT INTO auth.users (
   'authenticated', 'authenticated', 'partner@worksfree.co.kr',
   crypt('TestPassword123!', gen_salt('bf')),
   now(), now(), now(),
-  '{"full_name":"파트너 테스터"}'::JSONB,
+  '{"full_name":"박동훈"}'::JSONB,
   '{"provider":"email","providers":["email"]}'::JSONB,
   false, false, '', '', '', ''
 ) ON CONFLICT (id) DO NOTHING;
@@ -119,7 +119,7 @@ INSERT INTO auth.users (
   'authenticated', 'authenticated', 'admin@worksfree.co.kr',
   crypt('AdminPassword123!', gen_salt('bf')),
   now(), now(), now(),
-  '{"full_name":"관리자 테스터"}'::JSONB,
+  '{"full_name":"관리자"}'::JSONB,
   '{"provider":"email","providers":["email"]}'::JSONB,
   false, false, '', '', '', ''
 ) ON CONFLICT (id) DO NOTHING;

@@ -11,7 +11,7 @@
 ```
 supabase/
 ├── complete_db_setup.sql     ← [8장 필수] 코어 DB 전체 (v3.0) — 1회 실행
-├── 99_seed_dev.sql           ← [개발 전용] 테스트 계정 4개 (프로덕션 실행 금지)
+├── seed_dev.sql              ← [개발 전용] 테스트 계정 4개 (프로덕션 실행 금지)
 │
 ├── README.md                 ← 이 파일
 │
@@ -60,7 +60,7 @@ supabase/
 complete_db_setup.sql
 
 # Step 2 — 개발 테스트 계정 생성 (dev 환경만, 프로덕션 실행 금지)
-99_seed_dev.sql
+seed_dev.sql
 ```
 
 **메뉴 경로**: Supabase → SQL Editor → New query → `.sql` 전체 내용 붙여넣기 → Run
@@ -82,22 +82,22 @@ complete_db_setup.sql
 | `=== 5. 트리거 ===` | `on_auth_user_created`, `on_auth_user_updated` 2개 |
 | `=== 7. 뷰 목록 ===` | `credit_balance`, `page_view_stats` 2개 |
 
-`99_seed_dev.sql` 실행 후:
+`seed_dev.sql` 실행 후:
 
 | 항목 | 기대 결과 |
 |------|-----------|
-| `=== 6. 개발 테스트 사용자 ===` | 4명 (general/consultant/gfc/admin) roles 확인 |
+| `=== 6. 개발 테스트 사용자 ===` | 4명 (member/consultant/partner/admin) roles 확인 |
 
 ---
 
-## Dev 테스트 계정 (`99_seed_dev.sql` 실행 후)
+## Dev 테스트 계정 (`seed_dev.sql` 실행 후)
 
-| 이메일 | 역할 | UUID |
-|--------|------|------|
-| `test@worksfree.co.kr` | general | `d0000001-0000-4000-8000-000000000000` |
-| `consultant@worksfree.co.kr` | consultant | `d0000002-0000-4000-8000-000000000000` |
-| `gfc@worksfree.co.kr` | gfc | `d0000003-0000-4000-8000-000000000000` |
-| `admin@worksfree.co.kr` | admin | `d0000004-0000-4000-8000-000000000000` |
+| 이메일 | 이름 | 역할 | UUID |
+|--------|------|------|------|
+| `test@worksfree.co.kr` | 홍길동 | member | `d0000001-0000-4000-8000-000000000000` |
+| `consultant@worksfree.co.kr` | 이경영 | consultant | `d0000002-0000-4000-8000-000000000000` |
+| `partner@worksfree.co.kr` | 박동훈 | partner | `d0000003-0000-4000-8000-000000000000` |
+| `admin@worksfree.co.kr` | 관리자 | admin | `d0000004-0000-4000-8000-000000000000` |
 
 비밀번호: `TestPassword123!` (관리자: `AdminPassword123!`)
 
