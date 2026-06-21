@@ -488,14 +488,14 @@ const STEPS = [
 let currentStep = 0;
 let answers = {}; // {id: value}
 let multiSel = []; // for multi-select step
-let userRole = 'general'; // ceo | staff | consultant | gfc | general
+let userRole = 'member'; // ceo | staff | consultant | gfc | general
 const IS_PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
 
 window.addEventListener('message', e => {
-  if (e.data?.type === 'wf_role') userRole = e.data.role || 'general';
+  if (e.data?.type === 'wf_role') userRole = e.data.role || 'member';
 });
 
-const isInsRole = () => ['ceo', 'gfc'].includes(userRole);
+const isInsRole = () => ['partner', 'partner'].includes(userRole);
 
 function visibleSteps(){
   return STEPS.filter(s => !s.skip || !s.skip(answers));

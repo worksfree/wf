@@ -199,9 +199,9 @@ td{padding:10px 14px;vertical-align:middle}
       <div class="section-title">회원 목록</div>
       <div class="toolbar">
         <button class="filter-btn active" data-mf="all"        onclick="filterMembers('all')">전체</button>
-        <button class="filter-btn"        data-mf="general"    onclick="filterMembers('general')">일반회원</button>
+        <button class="filter-btn"        data-mf="general"    onclick="filterMembers('member')">일반회원</button>
         <button class="filter-btn"        data-mf="consultant" onclick="filterMembers('consultant')">컨설턴트</button>
-        <button class="filter-btn"        data-mf="gfc"        onclick="filterMembers('gfc')">파트너</button>
+        <button class="filter-btn"        data-mf="gfc"        onclick="filterMembers('partner')">파트너</button>
         <button class="filter-btn"        data-mf="admin"      onclick="filterMembers('admin')">관리자</button>
         <input class="search-input" id="member-search" placeholder="이름 또는 이메일 검색…"
                oninput="renderMembersTable()" style="max-width:240px;margin-left:auto">
@@ -234,9 +234,9 @@ td{padding:10px 14px;vertical-align:middle}
       <div class="section-title">회원 역할 관리</div>
       <div class="toolbar">
         <button class="filter-btn active" data-rf="all"        onclick="filterRole('all')">전체</button>
-        <button class="filter-btn"        data-rf="general"    onclick="filterRole('general')">일반회원</button>
+        <button class="filter-btn"        data-rf="general"    onclick="filterRole('member')">일반회원</button>
         <button class="filter-btn"        data-rf="consultant" onclick="filterRole('consultant')">컨설턴트</button>
-        <button class="filter-btn"        data-rf="gfc"        onclick="filterRole('gfc')">파트너</button>
+        <button class="filter-btn"        data-rf="gfc"        onclick="filterRole('partner')">파트너</button>
         <input class="search-input" id="role-search" placeholder="이름 또는 이메일 검색…"
                oninput="renderRoleTable()" style="max-width:240px;margin-left:auto">
       </div>
@@ -398,7 +398,7 @@ function escHtml(s)     { return String(s||'').replace(/&/g,'&amp;').replace(/</
 
 function roleBadge(role) {
   const lbl = { general:'일반', consultant:'컨설턴트', gfc:'파트너', admin:'관리자', ceo:'CEO', staff:'스태프' };
-  return `<span class="badge badge-${role||'general'}">${lbl[role]||role||'—'}</span>`;
+  return `<span class="badge badge-${role||'member'}">${lbl[role]||role||'—'}</span>`;
 }
 
 /* 로그인 상태 표시
@@ -488,7 +488,7 @@ function renderMembersTable() {
       </td>
       <td>
         <button class="edit-btn"
-          onclick="openEdit('${p.id}','${sn}','${p.role||'general'}','${se}')">✏ 편집</button>
+          onclick="openEdit('${p.id}','${sn}','${p.role||'member'}','${se}')">✏ 편집</button>
       </td>
     </tr>`;
   }).join('');
@@ -570,7 +570,7 @@ function renderRoleTable() {
     const cr  = credMap[p.id] || {};
     const bal = cr.balance || 0;
     const LABELS = { general:'일반', consultant:'컨설턴트', gfc:'파트너' };
-    const opts = ['general','consultant','gfc'].filter(r => r !== p.role)
+    const opts = ['member','consultant','partner'].filter(r => r !== p.role)
       .map(r => `<option value="${r}">${LABELS[r]}</option>`).join('');
     return `<tr>
       <td style="color:var(--hint)">${i+1}</td>
@@ -694,7 +694,7 @@ function openEdit(userId, name, role, email) {
   _editOrigRole = role;
   document.getElementById('edit-email').textContent = email || '—';
   document.getElementById('edit-name').value        = name  || '';
-  document.getElementById('edit-role-sel').value    = role  || 'general';
+  document.getElementById('edit-role-sel').value    = role  || 'member';
   const msg = document.getElementById('edit-msg');
   msg.textContent = ''; msg.className = 'editbox-msg';
   document.getElementById('editbg').style.display = 'flex';

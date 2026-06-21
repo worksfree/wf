@@ -313,7 +313,7 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
 });
 
 let lang  = 'ko';
-let role  = 'general';
+let role  = 'member';
 let user  = null;
 let posts = [];
 let total = 0;
@@ -333,7 +333,7 @@ sb.auth.onAuthStateChange((_event, session) => {
 
 window.addEventListener('message', e => {
   if (e.data?.type === 'wf_lang') { lang = e.data.lang || 'ko'; }
-  if (e.data?.type === 'wf_role') { role = e.data.role || 'general'; }
+  if (e.data?.type === 'wf_role') { role = e.data.role || 'member'; }
 });
 
 /* ── 탭 ── */

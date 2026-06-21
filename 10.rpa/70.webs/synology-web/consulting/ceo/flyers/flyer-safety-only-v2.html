@@ -500,11 +500,11 @@ function toggleL2(btn){var body=btn.nextElementSibling;var open=body.classList.t
 <script>
 /* ── 역할별 보험 용어 자동 치환 (gfc/admin: 원문, 그 외: 중립 표현) ── */
 (function(){
-  var role = new URLSearchParams(location.search).get('role') || 'gfc';
+  var role = new URLSearchParams(location.search).get('role') || 'partner';
   window.addEventListener('message', function(e){
     if(e.data && e.data.type === 'wf_role'){
-      role = e.data.role || 'gfc';
-      if(role !== 'gfc' && role !== 'admin') sanitize(document.body);
+      role = e.data.role || 'partner';
+      if(role !== 'partner' && role !== 'admin') sanitize(document.body);
     }
   });
   function replace(t){
@@ -532,7 +532,7 @@ function toggleL2(btn){var body=btn.nextElementSibling;var open=body.classList.t
     }
   }
   document.addEventListener('DOMContentLoaded', function(){
-    if(role !== 'gfc' && role !== 'admin') sanitize(document.body);
+    if(role !== 'partner' && role !== 'admin') sanitize(document.body);
   });
 })();
 </script>

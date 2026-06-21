@@ -308,7 +308,7 @@ function openFlyer(idx) {
 }
 
 function cardHtml(f, i) {
-  const thumbSrc = f.src + '?v=' + _FV + '&role=' + (_currentRole || 'gfc');
+  const thumbSrc = f.src + '?v=' + _FV + '&role=' + (_currentRole || 'partner');
   const nameLines = f.nameKo.split('\n').join('<br>');
   const badgeBg = f.badge==='v2'?'#1e4a70':f.badge==='new'?'#7c1010':'#2a3347';
   const badgeFg = f.badge==='v2'?'#60a5fa':f.badge==='new'?'#fca5a5':'#94a3b8';
@@ -347,7 +347,7 @@ function applyMarketingRole(role) {
   document.getElementById('section-loading').style.display = 'none';
 
   // consultant도 전체 플라이어 노출 (역할에 따라 보험 용어 자동 치환)
-  const showFlyers = (role === 'gfc' || role === 'admin' || role === 'consultant');
+  const showFlyers = (role === 'partner' || role === 'admin' || role === 'consultant');
 
   document.getElementById('section-ins').style.display  = showFlyers ? '' : 'none';
   document.getElementById('section-mgmt').style.display = 'none'; // section-ins로 통합
@@ -489,7 +489,7 @@ const MSG_PRESETS = [
 관심이 있으시면 자료 하단의 연락처로 편하게 연락 주세요.`,
   },
   {
-    id: 'gfc',
+    id: 'partner',
     icon: '💼',
     label: '파트너 재무컨설팅',
     body:
@@ -862,7 +862,7 @@ function loadCsv(e) {
             ((hl.includes('이메일') || hl.includes('email')) &&
              !hl.includes('상태') && !hl.includes('status')))                    emailIdx    = i;
         if (hl.includes('기업명') || hl === 'name' || hl === '이름')             companyIdx  = i;
-        if (hl.includes('대표') || hl.includes('ceo') || hl.includes('대표자'))  ceoIdx      = i;
+        if (hl.includes('대표') || hl.includes('partner') || hl.includes('대표자'))  ceoIdx      = i;
       });
     } else {
       // 헤더 없음: "@" 포함한 첫 번째 컬럼을 이메일로 자동 탐지

@@ -9,7 +9,7 @@
 -- 생성 계정 (이메일 로그인):
 --   test@worksfree.co.kr        일반회원    TestPassword123!
 --   consultant@worksfree.co.kr  컨설턴트    TestPassword123!
---   gfc@worksfree.co.kr         파트너      TestPassword123!
+--   partner@worksfree.co.kr     파트너      TestPassword123!
 --   admin@worksfree.co.kr       관리자      AdminPassword123!
 --
 -- 멱등성: ON CONFLICT DO NOTHING → 반복 실행 안전
@@ -45,7 +45,7 @@ VALUES (
   'email', now(), now(), now()
 ) ON CONFLICT (provider_id, provider) DO NOTHING;
 
-UPDATE public.profiles SET role = 'general', agreed_at = NOW()
+UPDATE public.profiles SET role = 'member', agreed_at = NOW()
 WHERE id = 'd0000001-0000-4000-8000-000000000000'::UUID;
 
 
@@ -87,7 +87,7 @@ INSERT INTO auth.users (
   confirmation_token, recovery_token, email_change, email_change_token_new
 ) VALUES (
   'd0000003-0000-4000-8000-000000000000'::UUID,
-  'authenticated', 'authenticated', 'gfc@worksfree.co.kr',
+  'authenticated', 'authenticated', 'partner@worksfree.co.kr',
   crypt('TestPassword123!', gen_salt('bf')),
   now(), now(), now(),
   '{"full_name":"파트너 테스터"}'::JSONB,
@@ -97,13 +97,13 @@ INSERT INTO auth.users (
 
 INSERT INTO auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
 VALUES (
-  'gfc@worksfree.co.kr', 'd0000003-0000-4000-8000-000000000000'::UUID,
+  'partner@worksfree.co.kr', 'd0000003-0000-4000-8000-000000000000'::UUID,
   jsonb_build_object('sub','d0000003-0000-4000-8000-000000000000',
-    'email','gfc@worksfree.co.kr','email_verified',true,'phone_verified',false),
+    'email','partner@worksfree.co.kr','email_verified',true,'phone_verified',false),
   'email', now(), now(), now()
 ) ON CONFLICT (provider_id, provider) DO NOTHING;
 
-UPDATE public.profiles SET role = 'gfc', agreed_at = NOW()
+UPDATE public.profiles SET role = 'partner', agreed_at = NOW()
 WHERE id = 'd0000003-0000-4000-8000-000000000000'::UUID;
 
 

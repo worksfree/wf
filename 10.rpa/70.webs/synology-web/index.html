@@ -195,15 +195,15 @@
   .d2 > .tree-label.active { color:#93c5fd; }
 
   /* 파트너 전용 메뉴 강조 */
-  .d2.gfc-item > .tree-label {
+  .d2.partner-item > .tree-label {
     color:#60a5fa;
   }
-  .d2.gfc-item > .tree-label::before {
+  .d2.partner-item > .tree-label::before {
     content:'🔒';
     font-size:12px;
     margin-right:2px;
   }
-  .d2.gfc-item > .tree-label.active { color:#93c5fd; }
+  .d2.partner-item > .tree-label.active { color:#93c5fd; }
 
   .tree-icon  { font-size:14px; flex-shrink:0; width:16px; text-align:center; }
   .tree-caret { font-size:12px; color:var(--muted); margin-left:auto; flex-shrink:0; transition:transform .2s; }
@@ -1366,9 +1366,9 @@
   <div class="dev-body">
     <div class="dev-status" id="dev-status">비로그인</div>
     <div id="dev-track-status" style="font-size:10px;color:#475569;margin-bottom:6px;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.04)">📊 페이지뷰 추적: —</div>
-    <button class="dev-btn" id="dev-btn-general"    onclick="devLogin('general')">▶ 일반회원</button>
+    <button class="dev-btn" id="dev-btn-member"    onclick="devLogin('member')">▶ 일반회원</button>
     <button class="dev-btn" id="dev-btn-consultant" onclick="devLogin('consultant')" style="border-color:#0ea5e9;color:#7dd3fc" title="경영지도사 — 비보험 콘텐츠">▶ 컨설턴트</button>
-    <button class="dev-btn" id="dev-btn-gfc"        onclick="devLogin('gfc')"        style="border-color:#7c3aed;color:#c4b5fd" title="전문 컨설턴트 — 전문 콘텐츠 포함">▶ 파트너 (🔒)</button>
+    <button class="dev-btn" id="dev-btn-partner"        onclick="devLogin('partner')"        style="border-color:#7c3aed;color:#c4b5fd" title="전문 컨설턴트 — 전문 콘텐츠 포함">▶ 파트너 (🔒)</button>
     <button class="dev-btn" id="dev-btn-admin"      onclick="devLogin('admin')"      style="border-color:#dc2626;color:#fca5a5">▶ 관리자 (🔒)</button>
     <button class="dev-btn" onclick="devShowConsent()">📋 동의 모달 보기</button>
     <button class="dev-btn danger" onclick="devResetConsent()">↺ 동의 초기화</button>
@@ -1907,7 +1907,7 @@ function applyHubLang() {
   if (elChTitle) elChTitle.textContent = t('ch_title');
   // 홈 화면
   document.getElementById('home-screen').querySelector('.home-title').textContent = t('dashboard');
-  document.getElementById('home-desc').textContent = IS_GFC ? t('home_desc_gfc') : t('home_desc_open');
+  document.getElementById('home-desc').textContent = IS_PARTNER ? t('home_desc_gfc') : t('home_desc_open');
   // 트리 재빌드
   const treeRoot = document.getElementById('treeRoot');
   treeRoot.innerHTML = '';
@@ -1920,9 +1920,9 @@ function applyHubLang() {
   // 브레드크럼 재렌더
   if (currentLabel) setBreadcrumb(currentPath, currentLabel);
   // dev 툴바 버튼
-  const elDevGeneral    = document.getElementById('dev-btn-general');
+  const elDevGeneral    = document.getElementById('dev-btn-member');
   const elDevConsultant = document.getElementById('dev-btn-consultant');
-  const elDevGfc        = document.getElementById('dev-btn-gfc');
+  const elDevGfc        = document.getElementById('dev-btn-partner');
   const elDevAdmin      = document.getElementById('dev-btn-admin');
   if (elDevGeneral)    elDevGeneral.textContent    = t('dev_login_general');
   if (elDevConsultant) elDevConsultant.textContent = t('dev_login_consultant');
@@ -1963,7 +1963,7 @@ const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
 const roleToken = params.get('role') || '';
-let IS_GFC   = false; // onAuthComplete()에서 userRole 기반으로 설정
+let IS_PARTNER   = false; // onAuthComplete()에서 userRole 기반으로 설정
 
 /* ─ 역할 배지 — applyHubLang에서 렌더됨 ─ */
 const badgeWrap = document.getElementById('role-badge-wrap');
@@ -1973,14 +1973,14 @@ document.getElementById('footer-ver').textContent =
   `v${HUB_VERSION} · WorksFree ${new Date().getFullYear()}`;
 
 /* footer에 현재 토큰 힌트 표시 (디버그용, 운영 시 제거 가능) */
-if (IS_GFC) {
+if (IS_PARTNER) {
   document.getElementById('footer-token').textContent = `token: ${roleToken}`;
 }
 
 /* ════════════════════════════════════════════
    2. 메뉴 트리 데이터
    ────────────────────────────────────────────
-   gfcOnly: true  → 파트너(IS_GFC) 일 때만 표시
+   partnerOnly: true  → 파트너(IS_PARTNER) 일 때만 표시
    iframe  : 경로 → 클릭 시 iframe에 로드
 ════════════════════════════════════════════ */
 
@@ -2156,7 +2156,7 @@ const DASH_CARDS = [
 let activeLabel = null;
 
 // consultant, gfc, admin 역할이면 true
-const canConsult = () => userRole === 'consultant' || userRole === 'gfc' || userRole === 'admin';
+const canConsult = () => userRole === 'consultant' || userRole === 'partner' || userRole === 'admin';
 
 function buildTree(nodes, depth=0, path=[]) {
   const wrap = document.createElement('div');
@@ -2169,10 +2169,10 @@ function buildTree(nodes, depth=0, path=[]) {
     // 페이지 접근 규칙: hidden → 트리에서 완전 숨김
     if (node.iframe && getAccessLevel(node.iframe) === 'hidden') return;
 
-    const isGfcItem = !!node.gfcOnly;
+    const isPartnerItem = !!node.partnerOnly;
 
     const nodeEl = document.createElement('div');
-    nodeEl.className = `tree-node d${depth}${isGfcItem ? ' gfc-item' : ''}`;
+    nodeEl.className = `tree-node d${depth}${isPartnerItem ? ' partner-item' : ''}`;
 
     const labelEl = document.createElement('div');
     labelEl.className = 'tree-label';
@@ -2234,7 +2234,7 @@ function buildTree(nodes, depth=0, path=[]) {
         labelEl.appendChild(tag);
       }
 
-      if (node.gfcOnly && !IS_GFC) {
+      if (node.partnerOnly && !IS_PARTNER) {
         labelEl.dataset.tooltip = t('tooltip_gfc');
         labelEl.style.cursor = 'not-allowed';
       }
@@ -2251,7 +2251,7 @@ function buildTree(nodes, depth=0, path=[]) {
       labelEl.addEventListener('click', () => {
         if (node.coming) return;
         if (node.action) { node.action(); setActive(labelEl); return; }
-        if (node.gfcOnly && !IS_GFC) { showDenied(); return; }
+        if (node.partnerOnly && !IS_PARTNER) { showDenied(); return; }
         if (node.consultantOnly) {
           if (!authUser) { loadIframePreview(node.iframe, path, node.label); setActive(labelEl); return; }
           if (!canConsult()) { showDenied('denied_consultant_title', 'denied_consultant_desc'); return; }
@@ -2295,7 +2295,7 @@ function renderDashCards() {
     if (card.iframe && getAccessLevel(card.iframe) === 'hidden') return;
 
     const isLocked =
-      (card.gfcOnly        && !IS_GFC) ||
+      (card.partnerOnly        && !IS_PARTNER) ||
       (card.roleOnly       && userRole !== 'admin' && userRole !== card.roleOnly) ||
       (card.consultantOnly && !canConsult()) ||
       (card.memberOnly     && !authUser);  // 비로그인 시 앱스토어 잠금
@@ -2575,7 +2575,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 let _sb       = null;
 let authUser  = null;  // 현재 로그인 사용자 (null = 비로그인)
 let _sbReady  = false; // Supabase 초기화 성공 여부
-let userRole  = 'general'; // 사용자 역할: ceo | staff | consultant | gfc | general
+let userRole  = 'member'; // 사용자 역할: non-member | member | consultant | partner | admin
 let _isIntentionalSignOut = false; // signOut() 호출 시 true → SIGNED_OUT 즉시 처리 (재로그인 방지)
 
 /* ── 페이지 접근 규칙 ──────────────────────────────────────────────
@@ -2628,9 +2628,9 @@ function getAccessLevel(src) {
   const clean = src.split('?')[0];
   const rule  = pageAccessRules[clean];
   if (!rule) return 'full';
-  const role = authUser ? userRole : 'general';
+  const role = authUser ? userRole : 'member';
   // 알 수 없는 역할(member 등)은 general 규칙으로 폴백
-  return rule[role] ?? rule['general'] ?? 'full';
+  return rule[role] ?? rule['member'] ?? 'full';
 }
 
 function applyAccessOverlay(level) {
@@ -2658,7 +2658,7 @@ function _chainAuth(fn) {
 // ── dev mock 사용자 반환 헬퍼 ────────────────────────────────────────
 function _getDevUser(role) {
   if (role === 'admin')      return DEV_USER_ADMIN;
-  if (role === 'gfc')        return DEV_USER_GFC;
+  if (role === 'partner')        return DEV_USER_PARTNER;
   if (role === 'consultant') return DEV_USER_CONSULTANT;
   return DEV_USER;
 }
@@ -2751,7 +2751,7 @@ async function handleAuthStateChange(user) {
   closeAuthModal();
 
   if (!user) {
-    userRole = 'general';
+    userRole = 'member';
     localStorage.removeItem('wf_role'); // 역할 캐시 즉시 제거
     onAuthComplete();
     return;
@@ -2785,7 +2785,7 @@ async function handleAuthStateChange(user) {
   const { role, agreed } = await _loadUserProfile(user.id);
   userRole = role;
 
-  const isInternal = ['gfc', 'ceo', 'staff', 'consultant', 'admin'].includes(userRole);
+  const isInternal = ['partner', 'consultant', 'admin'].includes(userRole);
   if (!agreed && !isInternal) {
     showConsentModal();
   } else {
@@ -2798,7 +2798,7 @@ async function handleAuthStateChange(user) {
    반환: { role: string, agreed: boolean }
    1차: localStorage.wf_role 즉시 적용 (UI 깜빡임 방지)
    2차: Supabase profiles 쿼리 (정확한 값, 캐시 갱신)
-   폴백: 캐시 역할 || 'general'  +  wf_agreed_* localStorage */
+   폴백: 캐시 역할 || 'member'  +  wf_agreed_* localStorage */
 async function _loadUserProfile(userId) {
   const cachedRole = localStorage.getItem('wf_role');
   if (cachedRole) userRole = cachedRole; // 캐시 즉시 반영 — DB 응답 전 메뉴 깜빡임 방지
@@ -2815,18 +2815,18 @@ async function _loadUserProfile(userId) {
       }
       // 행은 있으나 role 미설정: agreed_at만 있을 때도 agreed 처리
       if (data && !data.role && data.agreed_at) {
-        const r = cachedRole || 'general';
+        const r = cachedRole || 'member';
         return { role: r, agreed: true };
       }
     } catch (_e) {
       console.warn('[_loadUserProfile] 예외, 폴백 사용:', _e?.message);
     }
   }
-  // Supabase 미설정·오류·RLS 차단 → 캐시 → dev세션 → 'general' 순서로 폴백
+  // Supabase 미설정·오류·RLS 차단 → 캐시 → dev세션 → 'member' 순서로 폴백
   // IS_DEV mock 모드: devLogin이 설정한 wf_dev_session 역할을 보존
   const devSessionRole = IS_DEV ? (localStorage.getItem('wf_dev_session') || '') : '';
   return {
-    role:   cachedRole || devSessionRole || 'general',
+    role:   cachedRole || devSessionRole || 'member',
     agreed: !!localStorage.getItem('wf_agreed_' + userId)
   };
 }
@@ -2837,7 +2837,7 @@ let _devLoginReload = false;
 let _devLoginReal   = false;
 
 function onAuthComplete() {
-  IS_GFC = userRole === 'gfc' || userRole === 'admin';
+  IS_PARTNER = userRole === 'partner' || userRole === 'admin';
   hidePreviewOverlay();
   localStorage.setItem('wf_last_login', '1');
   updateAuthUI();
@@ -3385,7 +3385,7 @@ const DEV_USER_CONSULTANT = {
   email: 'consultant@worksfree.co.kr',
   user_metadata: { full_name: '컨설턴트 테스터', avatar_url: '' }
 };
-const DEV_USER_GFC = {
+const DEV_USER_PARTNER = {
   id: 'd0000003-0000-4000-8000-000000000000',
   email: 'gfc@worksfree.co.kr',
   user_metadata: { full_name: '파트너 테스터', avatar_url: '' }
@@ -3484,9 +3484,9 @@ const DEV_CREDS = {
   admin:      { email: 'support@worksfree.kr',      pw: 'AdminPassword123!' },
 };
 
-async function devLogin(role = 'general') {
+async function devLogin(role = 'member') {
   // 파트너 / 관리자: 비밀번호 확인 + 잠금 처리 (기존 유지)
-  if (role === 'gfc' || role === 'admin') {
+  if (role === 'partner' || role === 'admin') {
     const LOCK_KEY     = 'wf_dev_admin_lock';
     const ATTEMPT_KEY  = 'wf_dev_admin_attempts';
     const MAX_ATTEMPTS = 3;
@@ -3522,7 +3522,7 @@ async function devLogin(role = 'general') {
 
   // 모의 사용자 (폴백용 — 실제 로그인 실패 시 사용)
   const user = role === 'admin'      ? DEV_USER_ADMIN
-             : role === 'gfc'        ? DEV_USER_GFC
+             : role === 'partner'        ? DEV_USER_PARTNER
              : role === 'consultant' ? DEV_USER_CONSULTANT
              : DEV_USER;
 
@@ -3562,7 +3562,7 @@ async function devLogin(role = 'general') {
 }
 
 function devShowConsent() {
-  if (!authUser) { authUser = DEV_USER; userRole = 'general'; }
+  if (!authUser) { authUser = DEV_USER; userRole = 'member'; }
   showConsentModal();
   updateDevStatus();
 }

@@ -1226,24 +1226,14 @@ http://127.0.0.1:5500/**
 
 ```text
 supabase/
-├── complete_db_setup.sql         # ✅ Step 1 — 허브 코어 DB 전체 (v3.0, 필수)
-├── bizdb_setup.sql               # ✅ Step 2 — B2B 이메일 수집/발송 DB (필수)
-├── jobkorea_setup.sql            # ✅ Step 3 — 잡코리아 자동화 DB (선택)
-├── phase1_check_before_run.sql   # 사전 진단용 (선택 사항)
-│
-└── tmp_*.sql                     # 구버전·일회용 파일 — 참고용만, 재실행 불필요
-    ├── tmp_master_db_setup.sql           (v2.0 구버전)
-    ├── tmp_phase1_db_setup.sql           (구버전)
-    ├── tmp_phase2_email_management.sql   (구버전)
-    ├── tmp_phase3_*.sql                  (구버전 + 일회용 핫픽스)
-    ├── tmp_email_log.sql                 (complete_db_setup에 포함)
-    ├── tmp_tracking_tables.sql           (complete_db_setup에 포함)
-    ├── tmp_admin_functions.sql           (complete_db_setup에 포함)
-    └── tmp_fix_*.sql                     (일회용 핫픽스, 이미 적용됨)
+├── complete_db_setup.sql      # ✅ 코어 DB 전체 (테이블·함수·RLS·트리거·뷰, 필수)
+├── 99_seed_dev.sql            # 🛠 개발용 테스트 계정 4명 (운영에서는 실행 금지)
+├── email_campaign_setup.sql   # ✅ 이메일 캠페인 함수 (선택 — 캠페인 기능 사용 시)
+└── add_campaign_indexes.sql   # ✅ 캠페인 인덱스 (email_campaign_setup.sql 이후 실행)
 ```
 
-> `tmp_` 접두사 파일은 이미 `complete_db_setup.sql`에 통합됐거나 일회성으로 적용된 파일입니다.  
-> 신규 구축 시 `tmp_` 파일은 실행하지 않습니다. 자세한 내용은 `supabase/README.md` 참고.
+> **실행 순서**: `complete_db_setup.sql` → (개발환경만) `99_seed_dev.sql` → (캠페인 기능 시) `email_campaign_setup.sql` → `add_campaign_indexes.sql`  
+> `email_campaign_setup.sql`은 `biz_contacts` 테이블을 별도로 관리하는 캠페인 전용 DB이며, 코어 DB(`complete_db_setup.sql`)와 독립적으로 분리된 상태를 유지합니다.
 
 ---
 
@@ -1383,8 +1373,9 @@ user-001 | +100  | admin_grant   | 이벤트 지급
 | 7 | 일반 함수 3개: `get_user_credit_balance` · `deduct_credits` · `get_email_history` |
 | 8 | 뷰 2개: `credit_balance` · `page_view_stats` |
 | 9 | 기존 사용자 소급 동기화 (name/email 백필) |
-| 10 | 개발 테스트 사용자 4명 (auth.identities + instance_id 포함) |
-| 11 | 최종 검증 SELECT 쿼리 7개 |
+| 10 | 최종 검증 SELECT 쿼리 7개 (테이블·함수·트리거·뷰 모두 확인) |
+
+> **참고**: 개발용 테스트 계정(member/consultant/partner/admin 4명)은 `99_seed_dev.sql`에 별도 분리되어 있습니다. 운영 환경에서는 실행하지 않습니다.
 
 #### 실행 방법
 
@@ -1401,7 +1392,7 @@ user-001 | +100  | admin_grant   | 이벤트 지급
 === 3. RLS 정책 ===           → 각 테이블의 정책 목록 확인
 === 4. 함수 목록 ===          → 12개 함수 모두 표시
 === 5. 트리거 ===             → on_auth_user_created, on_auth_user_updated 2개
-=== 6. 개발 테스트 사용자 === → 4명 (general/consultant/gfc/admin) roles 확인
+=== 6. 개발 테스트 사용자 === → 4명 (member/consultant/partner/admin) roles 확인
 === 7. 뷰 목록 ===            → credit_balance, page_view_stats 2개
 ```
 
@@ -1483,11 +1474,11 @@ CREATE TABLE IF NOT EXISTS profiles (
   id               uuid REFERENCES auth.users PRIMARY KEY,
   agreed_at        timestamptz,
   marketing_agreed boolean     DEFAULT false,
-  role             text        DEFAULT 'general',
+  role             text        DEFAULT 'member',
   created_at       timestamptz DEFAULT now()
 );
 ALTER TABLE profiles
-  ADD COLUMN IF NOT EXISTS role             text        DEFAULT 'general',
+  ADD COLUMN IF NOT EXISTS role             text        DEFAULT 'member',
   ADD COLUMN IF NOT EXISTS marketing_agreed boolean     DEFAULT false,
   ADD COLUMN IF NOT EXISTS agreed_at        timestamptz,
   ADD COLUMN IF NOT EXISTS created_at       timestamptz DEFAULT now();
@@ -1618,14 +1609,15 @@ END; $$;
 
 서비스에 따라 사용자 등급이 다릅니다. `profiles.role` 컬럼으로 관리합니다.
 
-> **WorksFree Hub 역할 체계**:
+> **WorksFree Hub 역할 체계 (5단계)**:
 >
 > | role 값 | 의미 | 접근 범위 |
 > |---------|------|-----------|
-> | `general` | 기본 회원 (RPA 앱 사용자) | 공개 + 회원 전용 도구 |
-> | `consultant` | 경영지도사 | general + 컨설팅 메뉴 |
-> | `gfc` | GFC 파트너 | consultant + 보험 관련 전용 메뉴 |
-> | `ceo`, `staff` | 향후 확장용 | — |
+> | (비로그인) | 미가입·미로그인 | 공개 콘텐츠 + 미리보기 모드 |
+> | `member` | 기본 회원 | 공개 + 회원 전용 도구 (앱 스토어) |
+> | `consultant` | 경영지도사 | member + 컨설팅 메뉴 실사용 |
+> | `partner` | GFC 파트너 | consultant + 전문 파트너 전용 메뉴 |
+> | `admin` | 관리자 | 전체 접근 + 관리자 대시보드 |
 
 **관리자 계정 role 지정** (Supabase SQL Editor):
 
@@ -1635,14 +1627,14 @@ END; $$;
 
 -- 2. role 업데이트 (profiles 행이 없는 경우도 안전하게 처리)
 INSERT INTO profiles (id, agreed_at, role)
-SELECT id, now(), 'gfc' FROM auth.users WHERE email = '관리자이메일@example.co.kr'
-ON CONFLICT (id) DO UPDATE SET role = 'gfc', agreed_at = COALESCE(profiles.agreed_at, now());
+SELECT id, now(), 'partner' FROM auth.users WHERE email = '관리자이메일@example.co.kr'
+ON CONFLICT (id) DO UPDATE SET role = 'partner', agreed_at = COALESCE(profiles.agreed_at, now());
 
 -- 3. 초기 크레딧 지급도 함께
 SELECT admin_grant_credits('<UUID>', 9999, '파트너 계정 초기 지급');
 ```
 
-> **주의**: `UPDATE profiles SET role = 'gfc' WHERE id = '<UUID>'` 방식은 해당 사용자의 profiles 행이 이미 존재하는 경우에만 동작합니다.  
+> **주의**: `UPDATE profiles SET role = 'partner' WHERE id = '<UUID>'` 방식은 해당 사용자의 profiles 행이 이미 존재하는 경우에만 동작합니다.  
 > 소셜 로그인(Google/Kakao)으로 첫 로그인한 직후 바로 역할을 지정할 때는 트리거가 행을 아직 생성하지 않았을 수 있으므로 위의 `INSERT ... ON CONFLICT DO UPDATE` 방식을 사용합니다.
 
 ### 8.6 프런트엔드에서 잔액 조회
@@ -2405,23 +2397,26 @@ Invoke-RestMethod -Uri "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/p
 
 ### 12.1 설계 원칙
 
-- **DB**: `profiles.role` 컬럼에 역할 문자열 저장 (`general`, `consultant`, `gfc` 등)
+- **DB**: `profiles.role` 컬럼에 역할 문자열 저장 (`member`, `consultant`, `partner` 등)
 - **프런트엔드**: 로그인 후 profiles를 조회해 `userRole` 변수에 저장, UI 렌더링 시 참조
 - **숨기기 vs 잠그기**: 완전히 숨기는 항목(`roleOnly`)과 보이지만 클릭 차단(`consultantOnly`)을 구분
 
 ```text
-사용자 유형    role 값       볼 수 있는 것
-─────────────────────────────────────────────────────
-비로그인        —            공개 + 미리보기(preview) 모드
-일반 회원      general       공개 + 회원 전용 + 컨설팅 테이저(잠김)
-경영지도사     consultant    general + 컨설팅 메뉴 실사용
-GFC 파트너     gfc           consultant + 보험/전문 메뉴
+사용자 유형    role 값        볼 수 있는 것
+─────────────────────────────────────────────────────────
+비로그인       non-member    공개 + 미리보기(preview) 모드
+기본 회원      member        공개 + 회원 전용 도구 + 컨설팅 잠금 안내
+경영지도사     consultant    member + 컨설팅 메뉴 실사용
+GFC 파트너     partner       consultant + 파트너 전용 메뉴
+관리자         admin         전체 + 관리자 대시보드
 ```
+
+> `non-member`는 DB에 저장하지 않고, 프런트엔드에서 비로그인 상태의 기본값으로만 사용합니다.
 
 ### 12.2 로그인 후 역할 로드
 
 ```javascript
-let userRole = 'general';  // 기본값
+let userRole = 'member';  // 기본값
 
 async function loadUserRole(userId) {
   const { data } = await _sb
@@ -2445,18 +2440,18 @@ const MENU = [
   { label:'앱 스토어', memberOnly: true, iframe:'...' },
 
   // ③ 컨설팅 전용: 모든 로그인 사용자에게 보이되,
-  //    consultant/gfc만 실 사용 — general은 "전용 서비스" 안내
+  //    consultant/partner만 실 사용 — member은 "전용 서비스" 안내
   { label:'컨설팅', consultantOnly: true, iframe:'...' },
 
-  // ④ GFC 전용: consultant/general에게 완전히 숨김
-  { label:'경영종합진단', roleOnly: 'gfc', iframe:'...' },
+  // ④ 파트너 전용: consultant/member에게 완전히 숨김
+  { label:'경영종합진단', roleOnly: 'partner', iframe:'...' },
 ];
 ```
 
 ### 12.4 렌더링 로직
 
 ```javascript
-const canConsult = () => userRole === 'consultant' || userRole === 'gfc';
+const canConsult = () => userRole === 'consultant' || userRole === 'partner' || userRole === 'admin';
 
 function renderMenu(node) {
   // GFC 전용 → 해당 role 아니면 아예 렌더 안 함
@@ -2476,7 +2471,7 @@ function renderMenu(node) {
 
 > **WorksFree Hub 사례**:  
 > 컨설팅 노드 6개 항목 → `consultantOnly:true` (모든 로그인 사용자에게 초록 "컨설팅 전용" 칩으로 표시)  
-> 경영종합진단·CEO 플랜 → `roleOnly:'gfc'` (GFC 아니면 메뉴 자체가 없음)
+> 경영종합진단·CEO 플랜 → `roleOnly:'partner'` (GFC 아니면 메뉴 자체가 없음)
 
 ---
 
@@ -2542,9 +2537,9 @@ module.exports = async function globalSetup() {
 
   // 테스트 계정 3종 생성
   const [userId, adminId, freeId] = await Promise.all([
-    createTestUser(admin, 'test-paid@worksfree-test.local',  'general', 500),
-    createTestUser(admin, 'test-admin@worksfree-test.local', 'gfc',     9999),
-    createTestUser(admin, 'test-free@worksfree-test.local',  'general', 0),
+    createTestUser(admin, 'test-paid@worksfree-test.local',  'member', 500),
+    createTestUser(admin, 'test-admin@worksfree-test.local', 'partner',     9999),
+    createTestUser(admin, 'test-free@worksfree-test.local',  'member', 0),
   ]);
 
   // 다음 테스트 파일에서 참조 가능
@@ -2986,9 +2981,9 @@ export default {
 18. index.html에 Supabase 클라이언트 코드 추가 → 로그인 테스트
 
 [ 데이터베이스 ]
-19. (선택) supabase/phase1_check_before_run.sql 실행 → 현재 DB 상태 사전 진단
-20. supabase/complete_db_setup.sql 실행 → 전체 DB 한 번에 구축
-    (profiles/credits/payments/email_log/page_views + 함수/트리거/RLS + 개발 테스트 사용자)
+19. supabase/complete_db_setup.sql 실행 → 전체 DB 한 번에 구축
+    (profiles/credits/payments/email_log/page_views + 함수/트리거/RLS)
+20-1. (개발환경만) supabase/99_seed_dev.sql 실행 → 테스트 계정 4명 생성
 21. 결과 패널에서 6개 테이블·12개 함수·2개 트리거 모두 표시되는지 확인
 22. Authentication → Users에서 실제 관리자 UUID 확인 → role='admin' 지정
     → SQL Editor: UPDATE public.profiles SET role='admin' WHERE id='<UUID>';
@@ -3004,7 +2999,7 @@ export default {
 30. 사업자 인증 완료 → 실서비스 키로 교체 → 실결제 점검 (9.5 체크리스트)
 
 [ 역할 기반 접근 제어 ]
-31. profiles.role 컬럼에 역할 값 정의 (general / consultant / gfc 등)
+31. profiles.role 컬럼에 역할 값 정의 (member / consultant / partner 등)
 32. 프런트엔드 메뉴에 roleOnly / consultantOnly / memberOnly 플래그 설정
 33. 로그인 후 profiles 조회 → userRole 변수에 저장 → 렌더링 시 참조
 
@@ -3140,11 +3135,11 @@ async function initPaymentResult() {
 **원인 A**: `saveConsent()`에서 Supabase profiles 테이블 upsert가 실패(RLS INSERT 정책 없음)하여 동의 사실이 저장되지 않음  
 **해결**: 8.7절의 RLS INSERT 정책 추가 후 재시도; `saveConsent()`는 localStorage에 먼저 저장 후 Supabase에 시도하는 방식으로 구현
 
-**원인 B**: 내부 관리자 역할(gfc/ceo/staff/consultant)임에도 동의 팝업이 표시됨  
+**원인 B**: 내부 역할(partner/consultant/admin)임에도 동의 팝업이 표시됨  
 **해결**: 인증 완료 콜백에서 사용자 역할 확인 후 내부 역할은 팝업 건너뜀:
 
 ```javascript
-const isInternal = ['gfc', 'ceo', 'staff', 'consultant'].includes(userRole);
+const isInternal = ['partner', 'consultant', 'admin'].includes(userRole);
 if (!agreed && !isInternal) {
   showConsentModal();
 } else {
@@ -3200,8 +3195,10 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 | 항목 | 경로 | 비고 |
 |------|------|------|
 | 메인 SPA | `synology-web/index.html` | |
-| **DB 구축 스크립트 (현재 권장)** | `synology-web/supabase/complete_db_setup.sql` | ✅ 신규 구축 시 이것만 실행 |
-| DB 상태 진단 | `synology-web/supabase/phase1_check_before_run.sql` | 선택 사항 |
+| **DB 구축 스크립트 (코어)** | `synology-web/supabase/complete_db_setup.sql` | ✅ 신규 구축 시 이것만 실행 |
+| 개발용 시드 데이터 | `synology-web/supabase/99_seed_dev.sql` | 🛠 개발환경 전용 (운영 실행 금지) |
+| 이메일 캠페인 DB | `synology-web/supabase/email_campaign_setup.sql` | 캠페인 기능 사용 시 |
+| 캠페인 인덱스 | `synology-web/supabase/add_campaign_indexes.sql` | 위 파일 이후 실행 |
 | 테스트 픽스처 | `synology-web/tests/fixtures/` | |
 | 테스트 환경변수 템플릿 | `synology-web/.env.test.example` | |
 | Playwright 설정 | `synology-web/playwright.config.js` | |

@@ -1288,7 +1288,7 @@ function downloadResultCsv() {
   const bom = '﻿';
   const headers = lang==='ko'
     ? ['입력','메모','고유번호','조회회사명','상장구분','대표자','사업자번호','업종코드','설립일','결산월','주소','대표전화','홈페이지','종목코드','상태']
-    : ['input','memo','corp_code','found_name','corp_cls','ceo','bizr_no','induty_code','est_dt','acc_mt','adres','phone','website','stock_code','status'];
+    : ['input','memo','corp_code','found_name','corp_cls','partner','bizr_no','induty_code','est_dt','acc_mt','adres','phone','website','stock_code','status'];
   const esc = v => `"${String(v||'').replace(/"/g,'""')}"`;
   const rows = bulkState.rows.map(r => {
     const d = r.result || {};

@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   email            TEXT,
   agreed_at        TIMESTAMPTZ,
   marketing_agreed BOOLEAN     DEFAULT false,
-  role             TEXT        DEFAULT 'general',
+  role             TEXT        DEFAULT 'member',
   created_at       TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -53,13 +53,13 @@ ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS email            TEXT,
   ADD COLUMN IF NOT EXISTS agreed_at        TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS marketing_agreed BOOLEAN     DEFAULT false,
-  ADD COLUMN IF NOT EXISTS role             TEXT        DEFAULT 'general',
+  ADD COLUMN IF NOT EXISTS role             TEXT        DEFAULT 'member',
   ADD COLUMN IF NOT EXISTS created_at       TIMESTAMPTZ DEFAULT NOW();
 
 ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_role_check;
 ALTER TABLE public.profiles
   ADD CONSTRAINT profiles_role_check
-  CHECK (role IN ('general', 'consultant', 'gfc', 'ceo', 'staff', 'admin'));
+  CHECK (role IN ('member', 'consultant', 'partner', 'admin'));
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
@@ -345,7 +345,7 @@ DECLARE _caller_role TEXT;
 BEGIN
   SELECT role INTO _caller_role FROM public.profiles WHERE id = auth.uid();
   IF _caller_role IS DISTINCT FROM 'admin' THEN RETURN 'error: not_admin'; END IF;
-  IF new_role NOT IN ('general', 'consultant', 'gfc', 'ceo', 'staff') THEN
+  IF new_role NOT IN ('member', 'consultant', 'partner') THEN
     RETURN 'error: invalid_role';
   END IF;
   UPDATE public.profiles SET role = new_role WHERE id = target_id;
