@@ -2001,7 +2001,7 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 1. 토스 대시보드 → `[개발] → [API 키]` → **실서비스** 탭
 2. 실서비스 클라이언트 키 (`live_ck_...`) 복사
 3. `index.html`의 `TOSS_CLIENT_KEY` 값 교체
-4. Cloudflare Worker → `toss-verify` → `Settings → Variables`  
+4. Cloudflare Worker → `toss-verify` → `[Settings] → [Variables and Secrets]`  
    → `TOSS_SECRET_KEY` 값을 실서비스 시크릿 키 (`live_sk_...`)로 교체
 
 <div class="pagebreak"></div>
@@ -2010,7 +2010,7 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 
 1. Stripe 대시보드 오른쪽 상단 **[Test mode]** 토글 OFF (= Live mode)
 2. `[Developers] → [API keys]` → `Publishable key` / `Secret key` 복사
-3. Cloudflare Worker → `stripe-session` → `Settings → Variables`  
+3. Cloudflare Worker → `stripe-session` → `[Settings] → [Variables and Secrets]`  
    → `STRIPE_SECRET_KEY` 값을 실서비스 시크릿 키 (`sk_live_...`)로 교체
 
 > `index.html`에는 Stripe의 퍼블리셔블 키가 현재 이 구현에서는 사용되지 않습니다 (Checkout Session 방식).  
@@ -2561,13 +2561,13 @@ wrangler kv namespace create MAIL_USAGE --config service/payment/wrangler-mail.t
 
 ```powershell
 wrangler deploy --config service/payment/wrangler-mail.toml
-# 성공 시: https://send-mail.yourname.workers.dev
+# 성공 시: https://send-mail.계정명.workers.dev
 ```
 
 #### STEP 5. 동작 확인 (GET 요청으로 현황 조회)
 
 ```powershell
-Invoke-RestMethod -Uri "https://send-mail.yourname.workers.dev" -Method GET
+Invoke-RestMethod -Uri "https://send-mail.계정명.workers.dev" -Method GET
 # 정상 응답 예시:
 # { "sent": 0, "limit": 3000, "remaining": 3000, "period": "2026-05" }
 ```

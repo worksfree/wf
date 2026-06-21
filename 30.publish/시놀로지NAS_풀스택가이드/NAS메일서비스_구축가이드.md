@@ -478,7 +478,7 @@ wrangler deploy --config workers/email-receiver/wrangler.toml
 
 ### 7.1 Catch-all 규칙 변경
 
-**Cloudflare → Email Routing → worksfree.kr → Routing rules 탭**
+**Cloudflare 대시보드 → 좌측 메뉴 → Email → Email Routing → worksfree.kr → Routing rules 탭**
 
 1. **Catch-all** 행의 `···` 클릭 → **Edit**
 2. Action: `Drop` → **Send to a Worker** 변경
