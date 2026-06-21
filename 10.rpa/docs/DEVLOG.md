@@ -1,4 +1,4 @@
-# WorksFree RPA 개발 일지
+﻿# WorksFree RPA 개발 일지
 
 **프로젝트**: WorksFree RPA 통합 시스템
 **개발 기간**: 2025-06-09 ~ 현재
@@ -1896,7 +1896,7 @@ consistency score: 100%
 **성공 메일 발송** (8월 8일):
 - 작업 완료 시 성공 메일 자동 발송
 - 메일 송신자/수신자 엑셀 표기
-- insung.lee1973@gmail.com → insung.lee@worksfree.co.kr
+- insung.lee1973@gmail.com → insung.lee@worksfree.kr
 - 보낸 편지함 쌓이는 문제 식별
 
 ---

@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 
 # 모듈 레벨 로거 (부모에서 주입 가능). 기본은 NullHandler로 안전하게 무시
 logger: logging.Logger = logging.getLogger("wf_googlesheets_manager")
@@ -1824,7 +1824,7 @@ def _create_default_wf_rpa_config(config_file: Path):
             "version": 2,
             "use_local_email_config": True,
             "email_from": "insung.lee1973@gmail.com",
-            "email_to": "insung.lee@worksfree.co.kr",
+            "email_to": "insung.lee@worksfree.kr",
             "smtp_server": "smtp.gmail.com",
             "smtp_port": 587,
             "smtp_security": "starttls",

@@ -131,7 +131,8 @@ SET search_path = public AS $$
           FROM public.email_log
           WHERE recipient_email = lower(bc.email)
             AND status = 'sent'
-          ORDER BY sent_at DESC
+          ORDER BY sent_at DESCㅣㅑㄴ@3412
+          
           LIMIT 1
         ) el ON true
         LEFT JOIN public.email_unsubscribes eu

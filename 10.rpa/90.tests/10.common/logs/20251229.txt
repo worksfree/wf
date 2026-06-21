@@ -1,4 +1,4 @@
-2025-12-29 05:17:25,266 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
+﻿2025-12-29 05:17:25,266 - INFO - [wf_rpa.test_email_config] wf_log:108 - ===== WorksFree Logger Initialized =====
 2025-12-29 05:17:25,266 - INFO - [wf_rpa.test_email_config] wf_log:109 - App: test_email_config
 2025-12-29 05:17:25,736 - INFO - [wf_rpa.test_email_config] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
 2025-12-29 05:17:25,744 - INFO - [wf_rpa.test_email_success] wf_log:108 - ===== WorksFree Logger Initialized =====
@@ -68,7 +68,7 @@
 2025-12-29 05:22:59,980 - INFO - [wf_rpa.test_email_success] test_wf_email_success:50 - 
 Step 2: 메일 전송 파라미터 확인
 2025-12-29 05:22:59,980 - INFO - [wf_rpa.test_email_success] test_wf_email_success:51 -   제목: [B2E] [TEST] Success First Try - 테스트 메일
-2025-12-29 05:22:59,980 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.co.kr
+2025-12-29 05:22:59,980 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.kr
 2025-12-29 05:22:59,980 - INFO - [wf_rpa.test_email_success] test_wf_email_success:53 -   첨부파일: None
 2025-12-29 05:22:59,980 - INFO - [wf_rpa.test_email_success] test_wf_email_success:55 - 
 Step 3: wfm.mail_send_attach() 호출
@@ -200,7 +200,7 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:38:06,716 - INFO - [wf_rpa.test_email_success] test_wf_email_success:50 - 
 Step 2: 메일 전송 파라미터 확인
 2025-12-29 08:38:06,716 - INFO - [wf_rpa.test_email_success] test_wf_email_success:51 -   제목: [B2E] [TEST] Success First Try - 테스트 메일
-2025-12-29 08:38:06,716 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.co.kr
+2025-12-29 08:38:06,716 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.kr
 2025-12-29 08:38:06,716 - INFO - [wf_rpa.test_email_success] test_wf_email_success:53 -   첨부파일: None
 2025-12-29 08:38:06,716 - INFO - [wf_rpa.test_email_success] test_wf_email_success:55 - 
 Step 3: wfm.mail_send_attach() 호출
@@ -386,7 +386,7 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:06,713 - INFO - [wf_rpa.test_email_success] test_wf_email_success:50 - 
 Step 2: 메일 전송 파라미터 확인
 2025-12-29 08:48:06,713 - INFO - [wf_rpa.test_email_success] test_wf_email_success:51 -   제목: [B2E] [TEST] Success First Try - 테스트 메일
-2025-12-29 08:48:06,713 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.co.kr
+2025-12-29 08:48:06,713 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.kr
 2025-12-29 08:48:06,713 - INFO - [wf_rpa.test_email_success] test_wf_email_success:53 -   첨부파일: None
 2025-12-29 08:48:06,713 - INFO - [wf_rpa.test_email_success] test_wf_email_success:55 - 
 Step 3: wfm.mail_send_attach() 호출
@@ -429,8 +429,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:07,228 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:48:07,228 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:48:07,228 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:48:07,228 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:48:07,228 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:48:07,228 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:48:07,228 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:48:07,228 - WARNING - [wf_rpa.bom_exporter] automation:606 - 연속 타임아웃 증가: 1/2 (원인: test_timeout_1)
 2025-12-29 08:48:07,228 - WARNING - [wf_rpa.bom_exporter] automation:606 - 연속 타임아웃 증가: 2/2 (원인: test_timeout_2)
 2025-12-29 08:48:07,228 - WARNING - [wf_rpa.bom_exporter] automation:610 - 연속 타임아웃 임계치 도달 - 안전한 솔리드웍스 재시작 시도
@@ -452,8 +452,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:07,234 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:48:07,234 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:48:07,235 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:48:07,235 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:48:07,235 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:48:07,235 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:48:07,235 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:48:07,235 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=10.00, wait_time=120
 2025-12-29 08:48:07,235 - DEBUG - [wf_rpa.bom_exporter] automation:650 - Computed waits: ui=120s, save=240s (multiplier=2)
 2025-12-29 08:48:07,235 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=50.00, wait_time=360
@@ -471,8 +471,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:07,735 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:48:07,735 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:48:07,735 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:48:07,735 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:48:07,735 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:48:07,735 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:48:07,735 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:48:07,735 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=20.00, wait_time=180
 2025-12-29 08:48:07,735 - DEBUG - [wf_rpa.bom_exporter] automation:650 - Computed waits: ui=180s, save=360s (multiplier=2)
 2025-12-29 08:48:07,736 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=75.00, wait_time=480
@@ -491,8 +491,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:09,183 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:48:09,183 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:48:09,183 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:48:09,183 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:48:09,183 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:48:09,183 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:48:09,183 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:48:11,232 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
 2025-12-29 08:48:11,233 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
 2025-12-29 08:48:11,233 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
@@ -575,7 +575,7 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:55,124 - INFO - [wf_rpa.test_email_success] test_wf_email_success:50 - 
 Step 2: 메일 전송 파라미터 확인
 2025-12-29 08:48:55,124 - INFO - [wf_rpa.test_email_success] test_wf_email_success:51 -   제목: [B2E] [TEST] Success First Try - 테스트 메일
-2025-12-29 08:48:55,124 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.co.kr
+2025-12-29 08:48:55,124 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.kr
 2025-12-29 08:48:55,124 - INFO - [wf_rpa.test_email_success] test_wf_email_success:53 -   첨부파일: None
 2025-12-29 08:48:55,124 - INFO - [wf_rpa.test_email_success] test_wf_email_success:55 - 
 Step 3: wfm.mail_send_attach() 호출
@@ -618,8 +618,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:55,612 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:48:55,612 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:48:55,613 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:48:55,613 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:48:55,613 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:48:55,613 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:48:55,613 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:48:55,613 - WARNING - [wf_rpa.bom_exporter] automation:606 - 연속 타임아웃 증가: 1/2 (원인: test_timeout_1)
 2025-12-29 08:48:55,613 - WARNING - [wf_rpa.bom_exporter] automation:606 - 연속 타임아웃 증가: 2/2 (원인: test_timeout_2)
 2025-12-29 08:48:55,613 - WARNING - [wf_rpa.bom_exporter] automation:610 - 연속 타임아웃 임계치 도달 - 안전한 솔리드웍스 재시작 시도
@@ -641,8 +641,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:55,618 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:48:55,618 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:48:55,618 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:48:55,619 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:48:55,619 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:48:55,619 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:48:55,619 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:48:55,619 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=10.00, wait_time=120
 2025-12-29 08:48:55,619 - DEBUG - [wf_rpa.bom_exporter] automation:650 - Computed waits: ui=120s, save=240s (multiplier=2)
 2025-12-29 08:48:55,619 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=50.00, wait_time=360
@@ -660,8 +660,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=20.00, wait_time=180
 2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:650 - Computed waits: ui=180s, save=360s (multiplier=2)
 2025-12-29 08:48:56,124 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=75.00, wait_time=480
@@ -680,8 +680,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:48:57,644 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:48:57,644 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:48:57,645 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:48:57,645 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:48:57,645 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:48:57,645 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:48:57,645 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:48:59,740 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
 2025-12-29 08:48:59,741 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
 2025-12-29 08:48:59,741 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W
@@ -752,7 +752,7 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:49:09,595 - INFO - [wf_rpa.test_email_success] test_wf_email_success:50 - 
 Step 2: 메일 전송 파라미터 확인
 2025-12-29 08:49:09,596 - INFO - [wf_rpa.test_email_success] test_wf_email_success:51 -   제목: [B2E] [TEST] Success First Try - 테스트 메일
-2025-12-29 08:49:09,596 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.co.kr
+2025-12-29 08:49:09,596 - INFO - [wf_rpa.test_email_success] test_wf_email_success:52 -   수신자: insung.lee@worksfree.kr
 2025-12-29 08:49:09,596 - INFO - [wf_rpa.test_email_success] test_wf_email_success:53 -   첨부파일: None
 2025-12-29 08:49:09,596 - INFO - [wf_rpa.test_email_success] test_wf_email_success:55 - 
 Step 3: wfm.mail_send_attach() 호출
@@ -795,8 +795,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:49:10,106 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:49:10,106 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:49:10,106 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:49:10,107 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:49:10,107 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:49:10,107 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:49:10,107 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:49:10,107 - WARNING - [wf_rpa.bom_exporter] automation:606 - 연속 타임아웃 증가: 1/2 (원인: test_timeout_1)
 2025-12-29 08:49:10,107 - WARNING - [wf_rpa.bom_exporter] automation:606 - 연속 타임아웃 증가: 2/2 (원인: test_timeout_2)
 2025-12-29 08:49:10,107 - WARNING - [wf_rpa.bom_exporter] automation:610 - 연속 타임아웃 임계치 도달 - 안전한 솔리드웍스 재시작 시도
@@ -818,8 +818,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=10.00, wait_time=120
 2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:650 - Computed waits: ui=120s, save=240s (multiplier=2)
 2025-12-29 08:49:10,114 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=50.00, wait_time=360
@@ -837,8 +837,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:49:10,602 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:49:10,602 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:49:10,603 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:49:10,603 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:49:10,603 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:49:10,603 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:49:10,603 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:49:10,603 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=20.00, wait_time=180
 2025-12-29 08:49:10,603 - DEBUG - [wf_rpa.bom_exporter] automation:650 - Computed waits: ui=180s, save=360s (multiplier=2)
 2025-12-29 08:49:10,603 - DEBUG - [wf_rpa.bom_exporter] automation:632 - Computed wait: file_size_mb=75.00, wait_time=480
@@ -857,8 +857,8 @@ ValueError: 잘못된 보내는 사람 이메일 주소:
 2025-12-29 08:49:12,193 - DEBUG - [wf_rpa.bom_exporter] automation:220 - BomAutomation initialized with folder_path: None
 2025-12-29 08:49:12,193 - DEBUG - [wf_rpa.bom_exporter] automation:228 - SolidWorks 설정: {'program_path': 'C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\SLDWORKS.exe', 'application_title': 'SOLIDWORKS.*'}
 2025-12-29 08:49:12,194 - DEBUG - [wf_rpa.bom_exporter] automation:519 - 최종 이메일 설정:
-2025-12-29 08:49:12,194 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.co.kr
-2025-12-29 08:49:12,194 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.co.kr
+2025-12-29 08:49:12,194 - DEBUG - [wf_rpa.bom_exporter] automation:520 -   user_email: insung.lee@worksfree.kr
+2025-12-29 08:49:12,194 - DEBUG - [wf_rpa.bom_exporter] automation:521 -   report_email: insung.lee@worksfree.kr
 2025-12-29 08:49:14,350 - INFO - [wf_rpa.Dwg_Classifier] wf_log:108 - ===== WorksFree Logger Initialized =====
 2025-12-29 08:49:14,350 - INFO - [wf_rpa.Dwg_Classifier] wf_log:109 - App: Dwg_Classifier
 2025-12-29 08:49:14,350 - INFO - [wf_rpa.Dwg_Classifier] wf_log:115 - HW Fingerprint: 7f2e103edcb03e15d4d79bcdd0b0987e804e49ac699b993d910209bfaa2814b0 | CPU: Intel(R) Core(TM) i9-14900HX [Intel64 Family 6 Model 183 Stepping 1] | MainBoard: PTLPB00WBKR00W

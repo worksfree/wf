@@ -1,4 +1,4 @@
-"""
+﻿"""
 성공 메일 전송 테스트 스크립트
 automation.py의 성공 메일 전송 로직을 독립적으로 테스트
 
@@ -31,7 +31,7 @@ def test_success_email():
     logger.info("=" * 60)
 
     # 테스트 데이터
-    test_email = "insung.lee@worksfree.co.kr"
+    test_email = "insung.lee@worksfree.kr"
     title = "[B2E] [TEST] Success First Try - 테스트 메일"
     content = """사용자: test@example.com\r\n
 총 처리 대상 파일: 5개\r\n\r\n

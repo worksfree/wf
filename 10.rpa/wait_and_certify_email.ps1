@@ -1,7 +1,7 @@
-# wait_and_certify_email.ps1
+﻿# wait_and_certify_email.ps1
 # 빌드 완료 대기 -> EXE 인증 -> 이메일
 
-param([string]$EmailTo = "insung.lee@worksfree.co.kr")
+param([string]$EmailTo = "insung.lee@worksfree.kr")
 
 $StartTime = Get-Date
 Write-Host "`n==== 빌드 완료 대기 및 인증 ====" -ForegroundColor Cyan

@@ -1,4 +1,4 @@
-import gspread
+﻿import gspread
 from google.oauth2.service_account import Credentials
 
 import smtplib
@@ -441,7 +441,7 @@ if __name__ == "__main__":
     parser.add_argument("--to", dest="to_addr", help="수신자 이메일(선택)")
 
     # 기본 테스트 모드로 설정
-    set_argv("--test --to insung.lee@worksfree.co.kr")
+    set_argv("--test --to insung.lee@worksfree.kr")
 
     args = parser.parse_args()
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 WorksFree Simple Credit Management Module
 단순화된 크레딧 관리 모듈 - 앱별 독립 관리
@@ -339,7 +339,7 @@ class WorksFreeManager:
                 email_config = {
                     "use_local_email_config": False,
                     "email_from": email_config_raw.get("email_from", "insung.lee1973@gmail.com"),
-                    "email_to": email_config_raw.get("email_to", "insung.lee@worksfree.co.kr"),
+                    "email_to": email_config_raw.get("email_to", "insung.lee@worksfree.kr"),
                     "smtp_server": email_config_raw.get("smtp_server", "smtp.gmail.com"),
                     "smtp_port": int(email_config_raw.get("smtp_port", 587)),
                     "smtp_security": "starttls",
@@ -368,7 +368,7 @@ class WorksFreeManager:
         email_config = {
             "use_local_email_config": False,
             "email_from": "insung.lee1973@gmail.com",
-            "email_to": "insung.lee@worksfree.co.kr",
+            "email_to": "insung.lee@worksfree.kr",
             "smtp_server": "smtp.gmail.com",
             "smtp_port": 587,
             "smtp_security": "starttls",

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -961,7 +961,7 @@ async function sendBulk() {
   });
 
   // ── 관리자 확인 사본 (대량 발송 시 항상 1건 추가) ──────────────────
-  var OWNER_EMAIL = 'insung.lee@worksfree.co.kr';
+  var OWNER_EMAIL = 'support@worksfree.kr';
   var ownerSubj   = '[발송 확인 ' + rowsToSend.length + '건] ' + subject;
   var ownerHtml   = buildEmailHtml('발송 확인 사본', '', msgText, flyerName, flyerUrl, flyerBadge, flyerEmailHero, legal, OWNER_EMAIL);
   emails = [{to: OWNER_EMAIL, subject: ownerSubj, html: ownerHtml}].concat(emails);

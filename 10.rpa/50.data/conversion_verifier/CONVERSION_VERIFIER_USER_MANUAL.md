@@ -1,4 +1,4 @@
-<style>
+﻿<style>
 .warning-icon {
   display: inline-block;
   width: 1.2em;
@@ -345,7 +345,7 @@ Conversion Verifier는 3D CAD 파일과 변환된 2D 도면(DWG/PDF) 간의 변�
 
 추가 지원이 필요한 경우 다음 채널로 문의해주세요:
 
-- **이메일**: insung.lee@worksfree.co.kr
+- **이메일**: insung.lee@worksfree.kr
 - **웹사이트**: https://worksfree.com/support
 - **운영 시간**: 평일 09:00 - 18:00 (주말/공휴일 제외)
 

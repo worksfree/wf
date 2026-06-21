@@ -1,4 +1,4 @@
----
+﻿---
 title: "시놀로지 NAS 풀스택 인프라 구축 완전 가이드"
 author: "이인성"
 lang: ko
@@ -362,7 +362,7 @@ img { max-width: 100%; }
       </p>
     </div>
     <div class="contact-block">
-      <div class="contact-item"><strong>E-MAIL</strong>insung.lee@worksfree.co.kr</div>
+      <div class="contact-item"><strong>E-MAIL</strong>support@worksfree.kr</div>
       <div class="contact-item"><strong>WEB</strong>portal.worksfree.kr</div>
     </div>
   </div>
@@ -2783,7 +2783,7 @@ Invoke-RestMethod -Uri "https://send-mail.yourname.workers.dev" -Method GET
 1. [admin.google.com](https://admin.google.com) → **사용자** → `insung.lee` 선택
 2. **사용자 정보** → **별칭** → `consulting@worksfree.co.kr` 추가
 
-이후 `consulting@`로 온 메일이 `insung.lee@worksfree.co.kr` 받은편지함에 도착합니다.
+이후 `consulting@`로 온 메일이 `support@worksfree.kr` 받은편지함에 도착합니다.
 
 #### 14.5.3 발신자 주소를 Worker에 등록
 
@@ -3269,7 +3269,7 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
       </tr>
       <tr>
         <td class="info-label">이메일</td>
-        <td class="info-value">insung.lee@worksfree.co.kr</td>
+        <td class="info-value">support@worksfree.kr</td>
       </tr>
       <tr>
         <td class="info-label">웹사이트</td>

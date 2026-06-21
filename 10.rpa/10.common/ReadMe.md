@@ -1,4 +1,4 @@
-# 프로젝트 개요
+﻿# 프로젝트 개요
 기구설계자 및 제조업 엔지니어를 위한 Python 업무자동화 앱 및 앱 스토어의 공통 라이선스 관리 모듈
 
 ## 앱 목록 및 약어
@@ -643,7 +643,7 @@ Drawing_Attribute_Reset   |  DAR        |  파트 파일의 속성을 정리해�
 컬럼명          |  데이터 타입        |  설명                      |  예시                        
 -------------|----------------|--------------------------|----------------------------
 amin_pw      |  VARCHAR(100)  |  관리자 비밀번호 또는 인증용 키       |  admin3838                 
-email_to     |  VARCHAR(255)  |  수신 이메일 주소               |  insung.lee@worksfree.co.kr
+email_to     |  VARCHAR(255)  |  수신 이메일 주소               |  insung.lee@worksfree.kr
 email_from   |  VARCHAR(255)  |  발신 이메일 주소               |  insung.lee1973@gmail.com  
 email_login  |  VARCHAR(255)  |  SMTP 로그인용 앱 비밀번호 또는 토큰  |  yxvn ebai aori lytb       
 smtp_server  |  VARCHAR(100)  |  SMTP 서버 주소              |  smtp.gmail.com            

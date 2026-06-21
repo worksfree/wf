@@ -1,4 +1,4 @@
-<style>
+﻿<style>
 .warning-icon {
   display: inline-block;
   width: 1.2em;
@@ -384,7 +384,7 @@ DWG Batch Print는 다수의 AutoCAD DWG 파일을 일괄 출력하는 프로그
 
 추가 지원이 필요한 경우 다음 채널로 문의해주세요:
 
-- **이메일**: insung.lee@worksfree.co.kr
+- **이메일**: insung.lee@worksfree.kr
 - **웹사이트**: https://worksfree.com/support
 - **운영 시간**: 평일 09:00 - 18:00 (주말/공휴일 제외)
 

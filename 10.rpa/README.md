@@ -1,4 +1,4 @@
-# WorksFree RPA 프로젝트
+﻿# WorksFree RPA 프로젝트
 
 WorksFree 자동화 솔루션 모음
 
@@ -1359,7 +1359,7 @@ flowchart TD
 ---
 
 ## 📧 연락처
-- **Email**: insung.lee@worksfree.co.kr
+- **Email**: insung.lee@worksfree.kr
 - **Organization**: WorksFree Co., Ltd.
 - **Website**: https://worksfree.co.kr
 

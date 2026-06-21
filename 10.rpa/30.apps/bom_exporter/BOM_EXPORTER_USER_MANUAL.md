@@ -1101,7 +1101,7 @@ BOM Exporter는 SOLIDWORKS 어셈블리 파일(.sldasm)의 BOM(Bill of Materials
 
 추가 지원이 필요한 경우 다음 채널로 문의해주세요:
 
-- **이메일**: insung.lee@worksfree.co.kr
+- **이메일**: insung.lee@worksfree.kr
 - **웹사이트**: https://worksfree.com/support
 <!-- - **전화**: 010-4935-7573 -->
 - **운영 시간**: 평일 09:00 - 18:00 (주말/공휴일 제외)

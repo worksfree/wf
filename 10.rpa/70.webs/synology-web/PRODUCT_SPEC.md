@@ -1,8 +1,8 @@
-# WorksFree Hub — 제품 명세서 (GS인증 대응)
+﻿# WorksFree Hub — 제품 명세서 (GS인증 대응)
 
 **버전**: 0.8.3.0 · **작성일**: 2026-06-05  
 **제품명**: WorksFree Hub — B2B 마케팅 자동화 플랫폼  
-**개발사**: WorksFree · **문의**: insung.lee@worksfree.co.kr
+**개발사**: WorksFree · **문의**: support@worksfree.kr
 
 ---
 
@@ -122,7 +122,7 @@ DART(금융감독원 전자공시) 공개 데이터 기반 기업 이메일 DB �
 | MKT-02 | 단건 발송 | 즉시 단일 수신처 발송 | gfc+ |
 | MKT-03 | 대량 발송 | CSV 업로드, 월 한도 내 제한 없음 | gfc+ |
 | MKT-04 | 청크 자동 분할 | 100건 초과 시 100건씩 순차 발송 | — |
-| MKT-05 | 관리자 확인 사본 | 대량 발송 시 `insung.lee@worksfree.co.kr` 자동 추가 | — |
+| MKT-05 | 관리자 확인 사본 | 대량 발송 시 `support@worksfree.kr` 자동 추가 | — |
 | MKT-06 | 수신거부 자동 필터 | `email_unsubscribes` DB 조회 → 자동 제외 | — |
 | MKT-07 | 발송 이력 표시 | CSV 미리보기에서 과거 발송 배지 표시 | gfc+ |
 | MKT-08 | 발송 현황 | 월별 발송건·잔여 한도 게이지 표시 | gfc+ |
@@ -533,7 +533,7 @@ wrangler secret put MAIL_FROM            --config service/payment/wrangler-mail.
 ```
 
 > **월 한도**: 3,000건 (Resend 무료 플랜)  
-> **관리자 확인 사본**: 모든 대량 발송 시 `insung.lee@worksfree.co.kr`로 자동 발송
+> **관리자 확인 사본**: 모든 대량 발송 시 `support@worksfree.kr`로 자동 발송
 
 ### 9.3 CSV 파일 형식
 

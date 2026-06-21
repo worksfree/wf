@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -185,7 +185,7 @@ def build_author_section() -> str:
 - 목차는 3 페이지에 제공되며 본문 내의 파랑색으로 보이는 모든 문구는 문서 내부 링크로서 클릭하면 문제, 예시답안, 목차로 이동합니다.
 - 예시답안은 설명을 위해 단계별로 내용이 작성되어 불필요하게 긴 예시답안이 있는데 실제 답안 작성시에는 꼭 필요한 경우만 풀이 과정을 단계별로 작성해도 됩니다.
 - 예시답안의 내용에 대한 개정 의견이나 시험 관련된 문의 사항은 아래 이메일로 보내주시기 바라며 수험생들의 고득점을 기원합니다.
-- 이메일 : insung.lee@worksfree.co.kr
+- 이메일 : insung.lee@worksfree.kr
 
 """
 
@@ -201,7 +201,7 @@ def build_copyright_section(session: int) -> str:
 | 펴낸이 | 웍스프리 |
 | 펴낸곳 | 웍스프리 |
 | 발행일 | {publish_date} |
-| 이메일 | insung.lee@worksfree.co.kr |
+| 이메일 | insung.lee@worksfree.kr |
 | 가격 | 6,600원 |
 
 본 책은 저작자의 지적 재산으로서 무단 전제와 복제를 금합니다.
