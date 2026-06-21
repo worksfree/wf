@@ -291,16 +291,15 @@ img { max-width: 100%; }
       <div class="toc-item"><span class="toc-ch">2장</span>Cloudflare 계정·도메인</div>
       <div class="toc-item"><span class="toc-ch">3장</span>NAS DSM 설정</div>
       <div class="toc-item"><span class="toc-ch">4장</span>Cloudflare Tunnel</div>
-      <div class="toc-item"><span class="toc-ch">5장</span>정적 웹사이트 배포</div>
+      <div class="toc-item"><span class="toc-ch">5장</span>서브도메인 DNS 설정</div>
       <div class="toc-item"><span class="toc-ch">6장</span>Cloudflare Worker</div>
       <div class="toc-item"><span class="toc-ch">7장</span>Supabase 인증</div>
       <div class="toc-item"><span class="toc-ch">8장</span>Supabase 데이터베이스</div>
       <div class="toc-item"><span class="toc-ch">9장</span>온라인 결제 연동</div>
-      <div class="toc-item"><span class="toc-ch">10장</span>역할 기반 접근 제어</div>
-      <div class="toc-item"><span class="toc-ch">11장</span>3단계 배포 구조</div>
-      <div class="toc-item"><span class="toc-ch">12장</span>캐시·성능 최적화</div>
-      <div class="toc-item"><span class="toc-ch">13장</span>어드민 페이지</div>
-      <div class="toc-item"><span class="toc-ch">14장</span>이메일 발송 시스템</div>
+      <div class="toc-item"><span class="toc-ch">10장</span>웹사이트 코드·Supabase 연결</div>
+      <div class="toc-item"><span class="toc-ch">11장</span>배포 자동화 스크립트</div>
+      <div class="toc-item"><span class="toc-ch">12장</span>역할 기반 접근 제어</div>
+      <div class="toc-item"><span class="toc-ch">13장</span>테스트 환경 구축</div>
     </div>
   </div>
   <!-- 하단 -->
@@ -409,7 +408,6 @@ img { max-width: 100%; }
 | 회원 가입·로그인 (Google, 카카오 등) | Supabase 인증 | 7장 |
 | 회원 정보·결제 이력·크레딧 저장 | Supabase 데이터베이스 | 8장 |
 | 온라인 결제 (카드·계좌이체) | PG사 연동 (토스페이먼츠 등) | 9장 |
-| 이메일 발송 (단건·대량, 발송 현황 추적) | Resend + Cloudflare Worker KV | 14장 |
 
 ### 이 가이드를 따라가면 만들 수 있는 것
 
