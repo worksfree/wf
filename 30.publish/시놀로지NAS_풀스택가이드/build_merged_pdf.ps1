@@ -141,6 +141,10 @@ html = re.sub(
     html, count=1
 )
 
+# HTML 주석(<!-- -->)으로 제외된 장(14장·15장 등)이 pandoc TOC에 포함되는 문제 수정
+# TOC <li> 항목 중 주석 처리된 장 번호가 포함된 항목 제거
+html = re.sub(r'<li[^>]*>\s*<a[^>]*>[^<]*(?:14장|15장)[^<]*</a>\s*(?:<ul>.*?</ul>\s*)?</li>', '', html, flags=re.DOTALL)
+
 # Replace mermaid code blocks with 3-step setup workflow (no CDN, guaranteed rendering)
 BOX_P = 'border:1.5px solid #8E5CE0;border-radius:5px;background:#F0EAFF;padding:8px 8px;text-align:center;font-size:12.5px;font-weight:700;min-width:88px;line-height:1.55;color:#222;'
 BOX_B = 'border:1.5px solid #1A9FD4;border-radius:5px;background:#E8F6FB;padding:8px 8px;text-align:center;font-size:12.5px;font-weight:700;min-width:88px;line-height:1.55;color:#222;'
