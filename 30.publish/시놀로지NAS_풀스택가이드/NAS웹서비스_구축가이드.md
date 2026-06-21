@@ -3030,4 +3030,4 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 | 결제 검증 Worker | `synology-web/service/payment/toss-verify.js` | |
 | 결제 Worker 배포 설정 | `synology-web/service/payment/wrangler-toss.toml` | |
 | 마케팅 자료 페이지 | `synology-web/consulting/marketing/index.html` | |
-| 이 가이드 | `synology-web/NAS웹서비스_통합.md` | |
+| 이 가이드 | `synology-web/NAS웹서비스_구축가이드.md` | |

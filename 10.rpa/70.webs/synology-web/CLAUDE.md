@@ -615,7 +615,7 @@ function printReport() { window.print(); }
 
 | 파일 | 역할 | 출판용 경로 | 개발용 경로 |
 |------|------|------------|------------|
-| NAS웹서비스_통합.md | 웹 서비스 가이드 **최종본** (front matter 포함 통합본) | `30.publish/시놀로지NAS_풀스택가이드/` | `10.rpa/70.webs/synology-web/` |
+| NAS웹서비스_구축가이드.md | 웹 서비스 가이드 **최종본** | `30.publish/시놀로지NAS_풀스택가이드/` | `10.rpa/70.webs/synology-web/` |
 | NAS메일서버_구축가이드.md | 메일 서버 가이드 최종본 | `30.publish/시놀로지NAS_풀스택가이드/` | `10.rpa/70.webs/synology-web/` |
 
 **하드링크 방향**: 출판용이 기준(canonical). 출판용 파일이 원본, 개발용 파일이 하드링크.

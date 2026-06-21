@@ -66,13 +66,13 @@ $guideHtml = "$TMP\guide_body.html"
 $guidePdf  = "$TMP\05_guide.pdf"
 $cssSrc    = "$SCRIPT_DIR\guide_print.css"
 
-# 통합본 MD 파일 우선 선택 (NAS웹서비스_통합.md), 없으면 NAS웹서비스*.md 순서로 탐색
-$mdSrcPS = (Get-ChildItem -Path $SCRIPT_DIR -Filter "*통합.md" | Where-Object { $_.Name -match 'NAS' } | Select-Object -First 1).FullName
+# 구축가이드 MD 파일 우선 선택 (NAS웹서비스_구축가이드.md), 없으면 NAS웹서비스*.md 순서로 탐색
+$mdSrcPS = (Get-ChildItem -Path $SCRIPT_DIR -Filter "*구축가이드.md" | Where-Object { $_.Name -match 'NAS' } | Select-Object -First 1).FullName
 if (-not $mdSrcPS) {
     $mdSrcPS = (Get-ChildItem -Path $SCRIPT_DIR -Filter "NAS웹서비스*.md" | Select-Object -First 1).FullName
 }
 if (-not $mdSrcPS) {
-    Write-Host "ERROR: NAS웹서비스 통합.md not found in $SCRIPT_DIR" -ForegroundColor Red; exit 1
+    Write-Host "ERROR: NAS웹서비스_구축가이드.md not found in $SCRIPT_DIR" -ForegroundColor Red; exit 1
 }
 Write-Host "  MD source: $(Split-Path -Leaf $mdSrcPS)" -ForegroundColor DarkGray
 
@@ -428,9 +428,9 @@ print(f'merged: {total} pages -> {tmp_out}')
 
 script_dir = os.environ.get('NAS_SCRIPT_DIR', '')
 if script_dir:
-    latest = Path(script_dir) / 'NAS웹서비스_통합.pdf'
+    latest = Path(script_dir) / 'NAS웹서비스_구축가이드.pdf'
     shutil.copy2(tmp_out, str(latest))
-    print(f'saved: NAS웹서비스_통합.pdf  ({total} pages)')
+    print(f'saved: NAS웹서비스_구축가이드.pdf  ({total} pages)')
 '@
 [System.IO.File]::WriteAllText($mergePyFile, $mergePyCode, [System.Text.Encoding]::UTF8)
 
