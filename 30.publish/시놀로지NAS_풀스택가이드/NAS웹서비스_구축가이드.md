@@ -515,9 +515,9 @@ flowchart TD
 ### 2.2 도메인 추가 (Add a Site)
 
 **메뉴 경로**:  
-`대시보드 홈 → 상단 또는 우측의 [Add a site] 버튼`
+`대시보드 홈 → 우측 상단의 [Add] 버튼 → Connect a domain`
 
-1. 도메인 입력 (예: `example.co.kr`) → **[Add site]**
+1. 도메인 입력 (예: `example.co.kr`) → **[Continue]**
 2. 플랜 선택 → **Free** → **[Continue]**
 3. 기존 DNS 레코드 검색 결과 화면 → 내용 확인 후 **[Continue]**
 4. **Cloudflare 네임서버 2개 주소** 화면 표시 → 복사해둠
