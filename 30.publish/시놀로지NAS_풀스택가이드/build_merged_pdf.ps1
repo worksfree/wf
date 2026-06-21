@@ -66,10 +66,13 @@ $guideHtml = "$TMP\guide_body.html"
 $guidePdf  = "$TMP\05_guide.pdf"
 $cssSrc    = "$SCRIPT_DIR\guide_print.css"
 
-# Find MD file with ASCII-only wildcard (avoids Korean literal in PS script)
-$mdSrcPS = (Get-ChildItem -Path $SCRIPT_DIR -Filter "NAS*.md" | Select-Object -First 1).FullName
+# 통합본 MD 파일 우선 선택 (NAS웹서비스_통합.md), 없으면 NAS웹서비스*.md 순서로 탐색
+$mdSrcPS = (Get-ChildItem -Path $SCRIPT_DIR -Filter "*통합.md" | Where-Object { $_.Name -match 'NAS' } | Select-Object -First 1).FullName
 if (-not $mdSrcPS) {
-    Write-Host "ERROR: NAS*.md not found in $SCRIPT_DIR" -ForegroundColor Red; exit 1
+    $mdSrcPS = (Get-ChildItem -Path $SCRIPT_DIR -Filter "NAS웹서비스*.md" | Select-Object -First 1).FullName
+}
+if (-not $mdSrcPS) {
+    Write-Host "ERROR: NAS웹서비스 통합.md not found in $SCRIPT_DIR" -ForegroundColor Red; exit 1
 }
 Write-Host "  MD source: $(Split-Path -Leaf $mdSrcPS)" -ForegroundColor DarkGray
 
@@ -80,13 +83,18 @@ Copy-Item -Path $mdSrcPS -Destination $mdCopy -Force
 # Strip YAML frontmatter via Python (all paths ASCII)
 $pyExtract = "$TMP\extract_md.py"
 $pyCode = @'
-import sys
+import sys, re
 from pathlib import Path
 src, dst = Path(sys.argv[1]), Path(sys.argv[2])
 text = src.read_text(encoding="utf-8")
+# 1) YAML frontmatter 제거
 sep = "\n---\n\n"
 idx = text.find(sep)
 body = text[idx + len(sep):] if idx >= 0 else text
+# 2) CSS/HTML 디자인 페이지 섹션 건너뜀 — 첫 번째 "## " 헤딩부터 본문 시작
+m = re.search(r'^##\s+', body, re.MULTILINE)
+if m:
+    body = body[m.start():]
 dst.write_text(body, encoding="utf-8")
 print(f"extracted: {len(body)} chars")
 '@
@@ -351,7 +359,7 @@ TOC_DEFS = [
     (1, "부록 D. 파일 위치 참고 (WorksFree Hub 기준)",            "부록 D."),
 ]
 found_toc = {}
-for i in range(SKIP_START + 1, total - SKIP_END):
+for i in range(SKIP_START, total - SKIP_END):
     try:
         pg_text = doc[i].get_text("text")
     except Exception:
@@ -360,6 +368,9 @@ for i in range(SKIP_START + 1, total - SKIP_END):
         if title not in found_toc and marker in pg_text:
             found_toc[title] = i + 1  # 1-based PDF page
 pdf_toc = [[lvl, title, found_toc[title]] for lvl, title, _ in TOC_DEFS if title in found_toc]
+# pymupdf 요구: 첫 항목은 반드시 level 1 — level 2로 시작하면 앞 항목 제거
+while pdf_toc and pdf_toc[0][0] != 1:
+    pdf_toc.pop(0)
 for entry in pdf_toc:
     print(f'  TOC[{entry[0]}] p{entry[2]}: {entry[1]}')
 not_found = [title for _, title, _ in TOC_DEFS if title not in found_toc]
@@ -376,12 +387,9 @@ print(f'merged: {total} pages -> {tmp_out}')
 
 script_dir = os.environ.get('NAS_SCRIPT_DIR', '')
 if script_dir:
-    ts = datetime.now().strftime('%y%m%d%H%M')
-    final = Path(script_dir) / f'NAS웹서비스_통합_{ts}.pdf'
-    shutil.copy2(tmp_out, str(final))
     latest = Path(script_dir) / 'NAS웹서비스_통합.pdf'
     shutil.copy2(tmp_out, str(latest))
-    print(f'saved: NAS웹서비스_통합_{ts}.pdf  ({total} pages)')
+    print(f'saved: NAS웹서비스_통합.pdf  ({total} pages)')
 '@
 [System.IO.File]::WriteAllText($mergePyFile, $mergePyCode, [System.Text.Encoding]::UTF8)
 
