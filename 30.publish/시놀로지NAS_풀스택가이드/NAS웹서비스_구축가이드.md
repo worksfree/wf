@@ -744,7 +744,7 @@ sudo cloudflared service install eyJhIjoiXXX...토큰값...
 > `portal.example.co.kr` → NAS 포트 8080 → `/volume1/web/portal` 폴더 순서로 연결됩니다.
 
 **메뉴 경로**:  
-`Cloudflare 대시보드 (one.dash.cloudflare.com) → Protect & Connect → Networking → Tunnels → [tunnel 이름] 클릭 → Configure → Public Hostnames 탭 → [Add a public hostname] 버튼`
+`Cloudflare 대시보드 → Networking → Tunnels → [tunnel 이름] 클릭 → Configure → Routes 탭 → [Add route] 버튼 → Published application`
 
 > **기존 서브도메인 수정**: 목록에서 해당 행의 **Edit route** 클릭
 
@@ -2786,7 +2786,7 @@ export default {
  6. Web Station → 가상 호스트 생성 (서브도메인별)
  7. Cloudflare Zero Trust → Tunnel 생성
  8. NAS SSH 접속 → cloudflared 설치 및 실행
- 9. Tunnel → Public Hostname 설정 (서브도메인 ↔ NAS 포트)
+ 9. Tunnel → Routes 설정 (서브도메인 ↔ NAS 포트)
 10. 브라우저에서 https://portal.example.co.kr 접속 확인
 
 [ 외부 API 연동 — 필요한 경우 ]

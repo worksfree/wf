@@ -360,9 +360,9 @@ sudo docker compose logs -f
 
 Cloudflare Email Worker가 브릿지를 호출할 수 있도록 공개 URL을 만듭니다.
 
-### 5.1 Public Hostname 추가
+### 5.1 Routes 추가 (Published application)
 
-**Cloudflare Zero Trust (one.dash.cloudflare.com) → Networks → Tunnels → synology-tunnel → Configure → Public Hostnames → Add a public hostname**
+**Cloudflare 대시보드 → Networking → Tunnels → [tunnel 이름] 클릭 → Configure → Routes 탭 → [Add route] 버튼 → Published application**
 
 | 항목 | 값 |
 |------|-----|

@@ -66,8 +66,8 @@ $guideHtml = "$TMP\guide_body.html"
 $guidePdf  = "$TMP\05_guide.pdf"
 $cssSrc    = "$SCRIPT_DIR\guide_print.css"
 
-# 구축가이드 MD 파일 우선 선택 (NAS웹서비스_구축가이드.md), 없으면 NAS웹서비스*.md 순서로 탐색
-$mdSrcPS = (Get-ChildItem -Path $SCRIPT_DIR -Filter "*구축가이드.md" | Where-Object { $_.Name -match 'NAS' } | Select-Object -First 1).FullName
+# 웹서비스 구축가이드 MD 선택 (메일서비스 가이드와 구분하기 위해 '웹서비스' 포함 파일만 선택)
+$mdSrcPS = (Get-ChildItem -Path $SCRIPT_DIR -Filter "*구축가이드.md" | Where-Object { $_.Name -match '웹서비스' } | Select-Object -First 1).FullName
 if (-not $mdSrcPS) {
     $mdSrcPS = (Get-ChildItem -Path $SCRIPT_DIR -Filter "NAS웹서비스*.md" | Select-Object -First 1).FullName
 }
