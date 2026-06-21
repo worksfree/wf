@@ -271,7 +271,7 @@ img { max-width: 100%; }
       <p>
         <strong>대상 독자</strong> — 자체 도메인과 Synology NAS를 보유한 개인·소기업 운영자<br>
         <strong>전제 조건</strong> — DSM 7.x 이상, Cloudflare Free 플랜, Supabase Free 플랜<br>
-        <strong>실제 구현 사례</strong> — WorksFree Hub (portal.worksfree.kr) 기반
+        <strong>실제 구현 사례</strong> — WorksFree Hub (www.worksfree.kr) 기반
       </p>
     </div>
     <div class="section-label">이 책으로 만들 수 있는 것</div>
@@ -357,12 +357,12 @@ img { max-width: 100%; }
       <p>
         <em>"비싼 클라우드 서버 대신 집에 있는 NAS로 실제 서비스를 운영할 수 있다"</em>는 것을
         직접 증명하고, 그 과정을 이 책에 담았습니다.<br>
-        WorksFree Hub(portal.worksfree.kr)가 바로 이 가이드의 실제 구현 사례입니다.
+        WorksFree Hub(www.worksfree.kr)가 바로 이 가이드의 실제 구현 사례입니다.
       </p>
     </div>
     <div class="contact-block">
       <div class="contact-item"><strong>E-MAIL</strong>support@worksfree.kr</div>
-      <div class="contact-item"><strong>WEB</strong>portal.worksfree.kr</div>
+      <div class="contact-item"><strong>WEB</strong>www.worksfree.kr</div>
     </div>
   </div>
   <!-- 하단 -->
@@ -380,7 +380,7 @@ img { max-width: 100%; }
 > **대상 독자**: 자체 도메인과 Synology NAS를 보유한 개인·소기업 운영자  
 > **전제 조건**: DSM 7.x, Cloudflare Free 플랜, Supabase Free 플랜  
 > **예시 도메인**: `example.co.kr` (실제 작업 시 자신의 도메인으로 교체)  
-> **실제 구현 사례**: WorksFree Hub (`portal.worksfree.kr`) — 이 가이드의 실례는 이 프로젝트를 기준으로 합니다.
+> **실제 구현 사례**: WorksFree Hub (`www.worksfree.kr`) — 이 가이드의 실례는 이 프로젝트를 기준으로 합니다.
 
 ---
 
@@ -411,7 +411,7 @@ img { max-width: 100%; }
 
 ### 이 가이드를 따라가면 만들 수 있는 것
 
-- 내 도메인 주소(`portal.example.co.kr`)로 접속하는 웹사이트
+- 내 도메인 주소(`www.example.co.kr`)로 접속하는 웹사이트
 - Google 계정 또는 카카오 계정으로 로그인하는 회원 시스템
 - 사용자별 크레딧·결제 이력을 관리하는 데이터베이스
 - 온라인 결제 후 크레딧이 자동으로 충전되는 결제 시스템
@@ -423,11 +423,11 @@ img { max-width: 100%; }
 
 ```mermaid
 flowchart TD
-    Browser["방문자 브라우저\nportal.example.co.kr 접속 · 로그인 · 결제"]
+    Browser["방문자 브라우저\nwww.example.co.kr 접속 · 로그인 · 결제"]
     CF["Cloudflare\n① 도메인 주소 → 실제 서버 연결 안내원\n② 악성 트래픽 차단 보안 검문소\n③ 터널 · 워커 등 부가 기능"]
     Tunnel["Cloudflare Tunnel\nNAS와 인터넷을 연결하는 비밀 통로"]
     Worker["Cloudflare Worker\nDART 등 외부 API를 대신 호출하는 심부름꾼"]
-    NAS["Synology NAS\n실제 웹 파일(HTML · CSS · JS) 저장 서버\n/volume1/web/portal  /volume1/web/test 등"]
+    NAS["Synology NAS\n실제 웹 파일(HTML · CSS · JS) 저장 서버\n/volume1/web/www  /volume1/web/test 등"]
     Auth["Supabase 인증\nGoogle · 카카오 로그인\n회원 가입 · 탈퇴 처리"]
     PG["PG사 결제대행사\n토스페이먼츠(국내) · Stripe(해외)"]
     DB[("Supabase 데이터베이스\nPostgreSQL\n· 회원 프로필 · 결제 이력 · 크레딧 잔액")]
@@ -466,7 +466,7 @@ flowchart TD
 > **이 장에서 하는 이유**  
 > 도메인은 웹사이트의 "주소"입니다.  
 > 아무리 좋은 웹사이트를 만들어도 주소가 없으면 아무도 찾아올 수 없습니다.  
-> `192.168.1.5` 같은 숫자 주소 대신 `portal.example.co.kr` 같은 기억하기 쉬운 주소를 갖기 위해 도메인을 구입합니다.  
+> `192.168.1.5` 같은 숫자 주소 대신 `www.example.co.kr` 같은 기억하기 쉬운 주소를 갖기 위해 도메인을 구입합니다.  
 >  
 > 구입 후 **네임서버를 Cloudflare로 변경**하는 이유는, 가비아보다 Cloudflare의 DNS가 더 많은 기능(터널, 워커, 보안 등)을 제공하기 때문입니다. 도메인 자체는 가비아에 그대로 있고, 주소 안내 역할만 Cloudflare로 넘기는 것입니다.
 
@@ -593,13 +593,13 @@ flowchart TD
 
 | 항목 | 입력값 |
 |------|--------|
-| 포털 이름 | `portal` |
-| 호스트 이름 | `portal.example.co.kr` |
+| 포털 이름 | `www` |
+| 호스트 이름 | `www.example.co.kr` |
 | HTTP 포트 | `8080` |
 | HTTPS 포트 | `비워두기` (Cloudflare Tunnel이 처리) |
 | 백엔드 서버 | Nginx |
 | PHP | 필요 없으면 없음 |
-| 문서 루트 | `/volume1/web/portal` |
+| 문서 루트 | `/volume1/web/www` |
 
 3. **[완료]**
 
@@ -608,7 +608,7 @@ flowchart TD
 
 **문서 루트 폴더 생성** (SSH 또는 File Station에서):
 ```bash
-mkdir -p /volume1/web/portal
+mkdir -p /volume1/web/www
 mkdir -p /volume1/web/staging
 mkdir -p /volume1/web/test
 ```
@@ -678,7 +678,7 @@ ssh admin@192.168.x.x "echo SSH key OK"
 
 ```
 방문자 브라우저
-      │  "portal.example.co.kr 보여줘"
+      │  "www.example.co.kr 보여줘"
       ▼
 Cloudflare 서버 (전 세계 중계 서버)
       │
@@ -753,7 +753,7 @@ sudo cloudflared service install eyJhIjoiXXX...토큰값...
 ### 4.4 서브도메인과 NAS 연결하기
 
 > 이 단계에서 "어떤 주소로 접속하면 NAS의 어느 폴더로 연결할지"를 지정합니다.  
-> `portal.example.co.kr` → NAS 포트 8080 → `/volume1/web/portal` 폴더 순서로 연결됩니다.
+> `www.example.co.kr` → NAS 포트 8080 → `/volume1/web/www` 폴더 순서로 연결됩니다.
 
 **메뉴 경로**:  
 `Cloudflare 대시보드 → Networking → Tunnels → [tunnel 이름] 클릭 → Configure → Routes 탭 → [Add route] 버튼 → Published application`
@@ -762,9 +762,9 @@ sudo cloudflared service install eyJhIjoiXXX...토큰값...
 
 서브도메인마다 아래 항목을 입력하고 **[Save]**:
 
-| 항목 | 설명 | 입력 예시 (portal) |
+| 항목 | 설명 | 입력 예시 (www) |
 |------|------|-------------------|
-| Subdomain | 서브도메인 이름 | `portal` |
+| Subdomain | 서브도메인 이름 | `www` |
 | Domain | 보유한 도메인 | `example.co.kr` |
 | Service URL | NAS 내부 주소:포트 (프로토콜 포함) | `http://localhost:8080` |
 
@@ -772,7 +772,7 @@ sudo cloudflared service install eyJhIjoiXXX...토큰값...
 
 | 용도 | Subdomain | Service URL |
 |------|-----------|-------------|
-| 실 서비스 | `portal` | `http://localhost:8080` |
+| 실 서비스 | `www` | `http://localhost:8080` |
 | 최종 점검용 | `staging` | `http://localhost:8082` |
 | 개발 테스트용 | `test` | `http://localhost:8081` |
 
@@ -780,7 +780,7 @@ sudo cloudflared service install eyJhIjoiXXX...토큰값...
 
 ### 4.5 연결 확인
 
-브라우저 주소창에 `https://portal.example.co.kr` 입력 →  
+브라우저 주소창에 `https://www.example.co.kr` 입력 →  
 NAS에 업로드해 둔 `index.html` 내용이 화면에 보이면 터널 연결 완료
 
 ---
@@ -797,7 +797,7 @@ Tunnel 설정 후 자동 생성된 CNAME 레코드 확인:
 
 | 이름 | 유형 | 내용 |
 |------|------|------|
-| `portal` | CNAME | `tunnel-id.cfargotunnel.com` |
+| `www` | CNAME | `tunnel-id.cfargotunnel.com` |
 | `staging` | CNAME | `tunnel-id.cfargotunnel.com` |
 | `test` | CNAME | `tunnel-id.cfargotunnel.com` |
 
@@ -805,7 +805,7 @@ Tunnel 설정 후 자동 생성된 CNAME 레코드 확인:
 
 1. **[Add record]** 클릭
 2. Type: **CNAME**
-3. Name: `portal` (서브도메인명)
+3. Name: `www` (서브도메인명)
 4. Target: Tunnel URL (`tunnel-id.cfargotunnel.com`)
 5. Proxy status: **Proxied** (주황색)
 6. **[Save]**
@@ -948,7 +948,7 @@ function corsHeaders() {
 
 | 항목 | 입력 예시 |
 |------|----------|
-| Route | `portal.example.co.kr/dart/*` |
+| Route | `www.example.co.kr/dart/*` |
 | Zone | `example.co.kr` |
 
 **[Add route]** 클릭
@@ -1132,7 +1132,7 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 **메뉴 경로**:  
 `[플랫폼] → [Web 플랫폼 등록]`
 
-- 사이트 도메인: `https://portal.example.co.kr` → **[저장]**
+- 사이트 도메인: `https://www.example.co.kr` → **[저장]**
 
 #### ③ 동의항목 설정 (KOE205 오류 방지)
 
@@ -1174,7 +1174,7 @@ Redirect URLs 허용 목록과는 별개로, 이메일 본문의 링크가 이 U
 
 | 항목 | 올바른 값 | ❌ 잘못된 예 |
 |------|-----------|------------|
-| Site URL | `https://portal.worksfree.kr` | `http://localhost:3000` |
+| Site URL | `https://www.worksfree.kr` | `http://localhost:3000` |
 
 > **주의**: Site URL을 `localhost`로 두면 사용자가 이메일 링크를 클릭했을 때  
 > `localhost:3000/#access_token=...` 으로 리디렉션되어 인증이 완료되지 않습니다.  
@@ -1185,7 +1185,7 @@ Redirect URLs 허용 목록과는 별개로, 이메일 본문의 링크가 이 U
 이메일 링크에서 허용할 목적지 URL 허용 목록입니다. **Add URL** 버튼으로 하나씩 추가:
 
 ```
-https://portal.worksfree.kr/**
+https://www.worksfree.kr/**
 https://staging.worksfree.kr/**
 https://test.worksfree.kr/**
 http://127.0.0.1:5500/**
@@ -1211,7 +1211,7 @@ http://127.0.0.1:5500/**
 4. 사용자의 이메일로 비밀번호 재설정 링크가 발송됨
 
 > **주의**: 비밀번호 재설정 링크는 Supabase Site URL 설정에 따라 생성됩니다.  
-> Site URL이 실서비스 도메인(`portal.example.co.kr`)으로 설정되어 있어야 링크가 올바르게 동작합니다.
+> Site URL이 실서비스 도메인(`www.example.co.kr`)으로 설정되어 있어야 링크가 올바르게 동작합니다.
 
 ---
 
@@ -1436,7 +1436,7 @@ page_views     → id, user_id, page, duration_s, env, viewed_at
 | page_views | pv_insert_own · pv_select_own · pv_update_own | 본인 행 |
 | page_views | pv_admin_select (SELECT) | 관리자 전체 조회 |
 
-> **credits·payments env 컬럼**: test/staging/portal 환경이 동일 DB를 공유할 때  
+> **credits·payments env 컬럼**: test/staging/www 환경이 동일 DB를 공유할 때  
 > 결제·크레딧 데이터를 환경별로 분리하는 컬럼. 상세는 8.7절 참고.
 
 ### 8.5 사용자 역할(role) 지정
@@ -1487,15 +1487,15 @@ async function loadCreditBalance() {
 
 ### 8.7 결제 데이터 환경 격리 — env 컬럼
 
-test / staging / portal 세 환경이 **동일한 Supabase 프로젝트를 공유**할 때,  
+test / staging / www 세 환경이 **동일한 Supabase 프로젝트를 공유**할 때,  
 결제 관련 테이블에 `env` 텍스트 컬럼을 추가하여 환경별 데이터를 분리합니다.
 
 #### ① env 컬럼 추가 (최초 1회, SQL Editor에서 실행)
 
 ```sql
-ALTER TABLE payments      ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'portal';
-ALTER TABLE credits       ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'portal';
-ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'portal';
+ALTER TABLE payments      ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'www';
+ALTER TABLE credits       ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'www';
+ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS env text NOT NULL DEFAULT 'www';
 ```
 
 > `subscriptions` 테이블이 없다면 해당 줄은 건너뜁니다.
@@ -1533,7 +1533,7 @@ function getPaymentEnv() {
   const h = location.hostname;
   if (h.startsWith('test.'))    return 'test';
   if (h.startsWith('staging.')) return 'staging';
-  return 'portal';
+  return 'www';
 }
 ```
 
@@ -1564,13 +1564,13 @@ DELETE FROM payments WHERE env = 'test';
 DELETE FROM credits  WHERE env = 'staging';
 DELETE FROM payments WHERE env = 'staging';
 
--- portal 시험 구매 데이터 삭제 (출시 직전)
-DELETE FROM credits  WHERE env = 'portal';
-DELETE FROM payments WHERE env = 'portal';
+-- www 시험 구매 데이터 삭제 (출시 직전)
+DELETE FROM credits  WHERE env = 'www';
+DELETE FROM payments WHERE env = 'www';
 ```
 
-> **출시 체크리스트**: 정식 서비스 오픈 직전에 portal 데이터를 삭제하고 시작합니다.  
-> 그 이후의 portal 데이터는 실제 고객 데이터이므로 절대 삭제하지 않습니다.
+> **출시 체크리스트**: 정식 서비스 오픈 직전에 www 데이터를 삭제하고 시작합니다.  
+> 그 이후의 www 데이터는 실제 고객 데이터이므로 절대 삭제하지 않습니다.
 
 ---
 
@@ -1682,7 +1682,7 @@ Supabase DB: payments 테이블에 이력 저장
 ```
 https://test.example.co.kr
 https://staging.example.co.kr
-https://portal.example.co.kr
+https://www.example.co.kr
 ```
 
 > **핵심**: 결제 기능 테스트는 반드시 등록된 도메인(예: `test.example.co.kr`)에서 진행합니다.  
@@ -1707,8 +1707,8 @@ async function openTossPayment(amount, credits) {
       amount: amount,                          // 결제 금액 (원)
       orderId: orderId,
       orderName: `크레딧 ${credits}개 충전`,
-      successUrl: 'https://portal.example.co.kr/payment/success',
-      failUrl:    'https://portal.example.co.kr/payment/fail',
+      successUrl: 'https://www.example.co.kr/payment/success',
+      failUrl:    'https://www.example.co.kr/payment/fail',
     });
   } catch (error) {
     console.error('결제 오류:', error);
@@ -1819,8 +1819,8 @@ async function createStripeSession(request) {
     'line_items[0][price_data][product_data][name]': `크레딧 ${credits}개`,
     'line_items[0][quantity]': '1',
     'mode': 'payment',
-    'success_url': 'https://portal.example.co.kr/payment/success?session_id={CHECKOUT_SESSION_ID}',
-    'cancel_url':  'https://portal.example.co.kr/payment/cancel',
+    'success_url': 'https://www.example.co.kr/payment/success?session_id={CHECKOUT_SESSION_ID}',
+    'cancel_url':  'https://www.example.co.kr/payment/cancel',
   });
 
   const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
@@ -2081,7 +2081,7 @@ async function signInWithGoogle() {
   const { error } = await _sb.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: 'https://portal.example.co.kr'
+      redirectTo: 'https://www.example.co.kr'
     }
   });
   if (error) console.error(error);
@@ -2095,7 +2095,7 @@ async function signInWithKakao() {
   const { error } = await _sb.auth.signInWithOAuth({
     provider: 'kakao',
     options: {
-      redirectTo: 'https://portal.example.co.kr'
+      redirectTo: 'https://www.example.co.kr'
     }
   });
   if (error) console.error(error);
@@ -2176,14 +2176,14 @@ iframe.src = src + '?v=' + HUB_VERSION;
 |------|----------|----------|------|------|
 | test | 1 | BUILD (4번째) | 자연 증가, 상한 없음 | `0.7.4.9` → `0.7.4.10` |
 | staging | 2 | PATCH (3번째) | BUILD를 0으로 리셋 | `0.7.4.15` → `0.7.5.0` |
-| portal | 3 | MINOR (2번째) | PATCH·BUILD를 0으로 리셋 | `0.7.5.3` → `0.8.0.0` |
-| g1consulting | 4 | BUILD (4번째) | test와 동일 | `0.7.4.9` → `0.7.4.10` |
+| www | 3 | MINOR (2번째) | PATCH·BUILD를 0으로 리셋 | `0.7.5.3` → `0.8.0.0` |
+
 
 - BUILD 자리는 test 반복 횟수 — 10을 넘어도 캐스케이드 없이 그대로 증가 (`0.7.4.10`, `0.7.4.11` …)
 - PATCH·MINOR는 9를 넘으면 상위 자리 올림 (`0.7.9.x` staging → `0.8.0.0`)
 - Q(취소)·R(롤백) 선택 시 버전 변경 없음
 
-**권장 배포 순서**: test → staging → portal (각 환경에서 검증 후 다음 단계)
+**권장 배포 순서**: test → staging → www (각 환경에서 검증 후 다음 단계)
 
 ### 11.4 deploy.bat (더블클릭 실행기)
 
@@ -2205,13 +2205,13 @@ $CF_ZONE_ID = "<Cloudflare Zone ID>"
 $CF_API_TOKEN = "<Cloudflare API Token>"
 
 # ── 배포 환경 메뉴 ──
-# [1] test  [2] staging  [3] portal  [4] g1consulting  [Q] 취소  [R] 롤백
+# [1] test  [2] staging  [3] www  [Q] 취소  [R] 롤백
 
 # ── 버전 증가 (환경 선택 직후 실행) ──
 switch ($choice) {
     "2" { $p[2]++; $p[3] = 0 }           # staging: PATCH↑, BUILD 리셋
-    "3" { $p[1]++; $p[2] = 0; $p[3] = 0 } # portal: MINOR↑, PATCH·BUILD 리셋
-    default { $p[3]++ }                    # test·g1: BUILD 자연 증가
+    "3" { $p[1]++; $p[2] = 0; $p[3] = 0 } # www: MINOR↑, PATCH·BUILD 리셋
+    default { $p[3]++ }                    # test: BUILD 자연 증가
 }
 # deploy.ps1 자신의 $VERSION 라인과 index.html의 HUB_VERSION 동기화
 
@@ -2754,7 +2754,7 @@ main = "vision-worker.js"
 compatibility_date = "2024-01-01"
 
 [vars]
-ALLOWED_ORIGIN = "https://portal.worksfree.kr"
+ALLOWED_ORIGIN = "https://www.worksfree.kr"
 ```
 
 ```bash
@@ -2810,7 +2810,7 @@ export default {
  7. Cloudflare Zero Trust → Tunnel 생성
  8. NAS SSH 접속 → cloudflared 설치 및 실행
  9. Tunnel → Routes 설정 (서브도메인 ↔ NAS 포트)
-10. 브라우저에서 https://portal.example.co.kr 접속 확인
+10. 브라우저에서 https://www.example.co.kr 접속 확인
 
 [ 외부 API 연동 — 필요한 경우 ]
 11. Cloudflare Worker 생성 (예: DART API 프록시)
@@ -2855,7 +2855,7 @@ export default {
 [ 배포 ]
 37. 배포 스크립트(deploy.ps1) 작성
 38. NAS에 SSH 무비번 로그인 설정
-39. 배포 실행 → https://portal.example.co.kr 최종 확인
+39. 배포 실행 → https://www.example.co.kr 최종 확인
 ```
 
 ---
@@ -3024,7 +3024,7 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 
 | 환경 | 서브도메인 | NAS 포트 | 문서 루트 |
 |------|-----------|---------|----------|
-| 운영(prod) | `portal.example.co.kr` | 8080 | `/volume1/web/portal` |
+| 운영(prod) | `www.example.co.kr` | 8080 | `/volume1/web/www` |
 | 스테이징 | `staging.example.co.kr` | 8082 | `/volume1/web/staging` |
 | 테스트 | `test.example.co.kr` | 8081 | `/volume1/web/test` |
 
