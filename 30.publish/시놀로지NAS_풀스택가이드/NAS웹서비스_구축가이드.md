@@ -520,7 +520,7 @@ flowchart TD
 `대시보드 홈 → 우측 상단의 [Add] 버튼 → Connect a domain`
 
 1. 도메인 입력 (예: `example.co.kr`) → **[Continue]**
-2. 플랜 선택 → **Free** → **[Continue]**
+2. 플랜 선택 → **Free** → **[Select plan]**
 3. 기존 DNS 레코드 검색 결과 화면 → 내용 확인 후 **[Continue]**
 4. **Cloudflare 네임서버 2개 주소** 화면 표시 → 복사해둠
 5. **[Done, check nameservers]** 클릭
@@ -536,6 +536,8 @@ flowchart TD
 
 > NAS에 자체 서명 인증서가 있거나 Let's Encrypt를 사용한다면 **Full (strict)**을 권장합니다.  
 > NAS에 별도 인증서가 없으면 임시로 **Full**을 사용합니다.
+
+<div class="pagebreak"></div>
 
 ### 2.4 HTTPS 자동 리디렉션 설정
 
