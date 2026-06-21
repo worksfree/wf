@@ -569,6 +569,8 @@ flowchart TD
 
 - **사용자 홈 서비스 활성화** 체크박스 ON → **[적용]**
 
+<div class="pagebreak"></div>
+
 ### 3.3 Web Station 설치
 
 **메뉴 경로**:  
@@ -670,6 +672,8 @@ ssh admin@192.168.x.x "echo SSH key OK"
 
 ---
 
+<div class="pagebreak"></div>
+
 ### 터널 연결 흐름
 
 ```
@@ -701,6 +705,8 @@ Synology NAS — 웹 파일 전달
 - 처음 접속 시 팀 이름 입력 팝업 → 아무 이름이나 입력 → **[Next]**
 - 요금제 선택 → **Free** → **[Proceed]**
 
+<div class="pagebreak"></div>
+
 ### 4.2 터널 만들기
 
 **메뉴 경로**:  
@@ -726,6 +732,8 @@ Synology NAS — 웹 파일 전달
    > NAS 모델명을 Synology 공식 사이트에서 검색하면 CPU 종류를 확인할 수 있습니다.
 
 4. 화면에 표시된 명령어 블록 오른쪽 **복사 아이콘** 클릭
+
+<div class="pagebreak"></div>
 
 **PC에서 NAS에 SSH 접속 후**, 복사한 명령어를 붙여넣고 Enter:
 
@@ -780,7 +788,7 @@ NAS에 업로드해 둔 `index.html` 내용이 화면에 보이면 터널 연결
 ## 5장. 서브도메인 DNS 설정
 
 > Cloudflare Tunnel을 사용하면 DNS 레코드는 자동으로 생성됩니다.  
-> 아래는 수동으로 확인하거나 추가하는 방법입니다.
+> 아래는 수동으로 확인하거나 추가하는 방법입니다. 자동 생성에 실패하거나 필요한 경우만 참조하고 그렇지 않은 경우는 건너뜁니다.
 
 **메뉴 경로**:  
 `Cloudflare 대시보드 → 해당 도메인 선택 → 왼쪽 메뉴 [DNS] → [Records]`
@@ -792,8 +800,6 @@ Tunnel 설정 후 자동 생성된 CNAME 레코드 확인:
 | `portal` | CNAME | `tunnel-id.cfargotunnel.com` |
 | `staging` | CNAME | `tunnel-id.cfargotunnel.com` |
 | `test` | CNAME | `tunnel-id.cfargotunnel.com` |
-
-> 프록시 상태(주황색 구름 아이콘): **프록시됨** 상태여야 합니다.
 
 **수동으로 추가하는 경우**:
 
