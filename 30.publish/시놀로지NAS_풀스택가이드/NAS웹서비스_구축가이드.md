@@ -864,7 +864,7 @@ Cloudflare Worker
 ### 6.1 Worker 만들기
 
 **메뉴 경로**:  
-`Cloudflare 대시보드 → 왼쪽 메뉴 [Workers & Pages] → [Create application] → [Create Worker]`
+`Cloudflare 대시보드 → 왼쪽 메뉴 [Build] → [Compute] → [Workers & Pages] → [Create application] → [Start with Hello World!] → [Create Worker]`
 
 1. Worker 이름 입력 (예: `dart-proxy`)  
    이름은 나중에 Worker 주소가 됩니다: `dart-proxy.계정명.workers.dev`
