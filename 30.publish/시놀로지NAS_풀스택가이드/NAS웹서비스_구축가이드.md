@@ -2955,6 +2955,8 @@ cat ~/.ssh/id_ed25519.pub | ssh admin@192.168.x.x 'cat > ~/.ssh/authorized_keys'
 
 ---
 
+<div class="pagebreak"></div>
+
 ### 결제 성공 후 "Not authenticated" 토스트 메시지
 
 **증상**: 토스 결제 완료 후 서비스 페이지로 돌아왔을 때 "인증되지 않은 사용자" 오류 토스트가 표시되고 크레딧이 충전되지 않음
@@ -2975,6 +2977,8 @@ async function initPaymentResult() {
 그리고 `onAuthStateChange` 콜백 내에서 인증 완료 후 `initPaymentResult()`를 다시 호출하도록 합니다.
 
 ---
+
+<div class="pagebreak"></div>
 
 ### 서비스 이용 동의 팝업이 매번 반복됨
 
@@ -2997,6 +3001,8 @@ if (!agreed && !isInternal) {
 ```
 
 ---
+
+<div class="pagebreak"></div>
 
 ### 새로고침 후 로그인 상태가 사라짐 (Dev 모드)
 
