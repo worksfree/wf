@@ -128,14 +128,14 @@ pre code, div.sourceCode code {
   font-size: inherit;
 }
 
-/* ── 표 (큰 표는 페이지 분리 허용, thead 반복, 행 단위만 차단) ── */
+/* ── 표 (행 단위 분리 차단; 표 전체는 가능하면 한 페이지에, 큰 표는 자동 분리) ── */
 table {
   border-collapse: collapse;
   width: 100%;
   margin: 3mm 0 4mm 0;
   font-size: 9.5pt;
-  page-break-inside: auto;
-  break-inside: auto;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 thead {
   display: table-header-group !important;
@@ -166,8 +166,8 @@ blockquote {
   padding: 3mm 4mm;
   border-radius: 0 4px 4px 0;
   color: #2a3a4a;
-  page-break-inside: auto;
-  break-inside: auto;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 blockquote p { margin-bottom: 1.5mm; text-align: left; }
 blockquote p:last-child { margin-bottom: 0; }

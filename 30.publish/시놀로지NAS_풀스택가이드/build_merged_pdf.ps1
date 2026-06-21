@@ -198,6 +198,40 @@ html = re.sub(
     html, flags=re.DOTALL
 )
 
+# ── 장·부록 h2 heading에만 페이지 구분 삽입 (인트로 섹션 제외) ────────────────
+_CH_STYLE = (
+    'page-break-before:always;break-before:page;'
+    'padding-top:14mm;margin-top:0;'
+)
+def _chapter_break(m):
+    tag, content, close = m.group(1), m.group(2), m.group(3)
+    text = re.sub(r'<[^>]+>', '', content)
+    if re.search(r'\d+장\.|부록\s*[A-Z]\.', text):
+        tag = tag[:-1] + ' style="' + _CH_STYLE + '">'
+    return tag + content + close
+html = re.sub(r'(<h2[^>]*>)(.*?)(</h2>)', _chapter_break, html, flags=re.DOTALL)
+
+# ── 첫 컬럼이 좁은 표(섹션·#)에 colgroup 주입 ──────────────────────────────
+def _colgroup(m):
+    tbl = m.group(0)
+    th_m = re.search(r'<th[^>]*>(.*?)</th>', tbl, re.DOTALL)
+    if not th_m:
+        return tbl
+    first_th = re.sub(r'<[^>]+>', '', th_m.group(1)).strip()
+    thead_m = re.search(r'<thead[^>]*>.*?</thead>', tbl, re.DOTALL)
+    if not thead_m:
+        return tbl
+    ncols = len(re.findall(r'<th', thead_m.group(0)))
+    if first_th == '섹션' and ncols == 2:
+        cg = '<colgroup><col style="width:12%"><col style="width:88%"></colgroup>\n'
+        return tbl.replace('<thead>', cg + '<thead>', 1)
+    if first_th == '#' and ncols >= 2:
+        cg = ('<colgroup><col style="width:8%">'
+              + '<col>' * (ncols - 1) + '</colgroup>\n')
+        return tbl.replace('<thead>', cg + '<thead>', 1)
+    return tbl
+html = re.sub(r'<table[^>]*>.*?</table>', _colgroup, html, flags=re.DOTALL)
+
 # Override @page margins: 5mm top/bottom eliminates space for Edge browser headers
 html = re.sub(
     r'@page\s*\{\s*size:[^}]+\}',
