@@ -94,7 +94,7 @@ DSM → **패키지 센터** → 검색: `MailPlus Server` → **설치**
 > MailPlus → 도메인 → 기존 도메인 선택 → **편집** → 추가 도메인 필드에서 해당 도메인 제거 후 저장.
 > 그 다음 다시 독립 도메인으로 추가합니다.
 
-\pagebreak
+<div class="pagebreak"></div>
 
 ### 1.3 메일 계정 생성
 
@@ -374,7 +374,7 @@ Cloudflare Email Worker가 브릿지를 호출할 수 있도록 공개 URL을 �
 
 저장 후 `https://bridge.worksfree.kr` 엔드포인트가 생성됩니다.
 
-\pagebreak
+<div class="pagebreak"></div>
 
 ### 5.2 브릿지 동작 확인
 
@@ -457,7 +457,7 @@ main               = "worker.js"
 compatibility_date = "2025-01-01"
 ```
 
-\pagebreak
+<div class="pagebreak"></div>
 
 ### 6.2 시크릿 등록 및 배포
 
