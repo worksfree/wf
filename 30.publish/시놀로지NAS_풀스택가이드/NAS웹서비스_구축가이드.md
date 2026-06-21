@@ -1059,7 +1059,7 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 ### 7.2 API 키 확인
 
 **메뉴 경로**:  
-`프로젝트 대시보드 → 왼쪽 메뉴 [Settings] → [API Keys] → **Legacy anon, service_role API keys** 탭`
+`프로젝트 대시보드 → 왼쪽 메뉴 [Project Settings] → [API Keys] → **Legacy anon, service_role API keys** 탭`
 
 > Supabase UI 업데이트로 메뉴 명칭이 변경됨.  
 > 탭이 두 개(Publishable and secret / **Legacy anon, service_role**)이므로 반드시 **Legacy** 탭을 선택.
@@ -1153,7 +1153,7 @@ Supabase가 요청하는 scope에 해당하는 항목을 **필수 동의** 또�
 #### ④ Supabase에 Kakao 정보 입력
 
 **메뉴 경로**:  
-`Supabase 프로젝트 → [Authentication] → [Providers] → [Kakao]`
+`Supabase 프로젝트 → [Authentication] → [Configuration] → [Sign In / Providers]`
 
 1. **Enable Sign in with Kakao** 토글 **ON**
 2. Kakao App Key: REST API 키 붙여넣기
@@ -1230,6 +1230,8 @@ http://127.0.0.1:5500/**
 > **멱등성**: 같은 스크립트를 몇 번 실행해도 항상 동일한 결과가 나오는 성질.  
 > `CREATE TABLE IF NOT EXISTS`, `ALTER TABLE ADD COLUMN IF NOT EXISTS`,  
 > `CREATE OR REPLACE FUNCTION`, `DROP POLICY IF EXISTS` 패턴으로 구현합니다.
+
+<div class="pagebreak"></div>
 
 **권장 파일 구조** (2026-06-03 기준):
 
