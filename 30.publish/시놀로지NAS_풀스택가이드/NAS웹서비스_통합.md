@@ -1295,13 +1295,13 @@ GRANT EXECUTE ON FUNCTION public.admin_set_user_name(UUID, TEXT) TO anon, authen
 
 ---
 
-### 8.2-A 실행 전 현재 상태 진단 (선택 사항)
+### 8.2.1 실행 전 현재 상태 진단 (선택 사항)
 
 처음 설정하는 경우나 기존 DB 상태가 불확실한 경우, 먼저 진단 쿼리를 실행합니다.  
 Supabase SQL Editor는 마지막 SELECT만 표시하므로 UNION ALL로 하나의 결과로 통합합니다.
 
 ```sql
--- phase1_check_before_run.sql
+-- DB 현재 상태 진단 쿼리
 SELECT category, item, detail FROM (
   SELECT '1_tables'  AS category, table_name AS item, table_type AS detail
   FROM information_schema.tables
@@ -2804,7 +2804,7 @@ export default {
 [ 데이터베이스 ]
 19. supabase/complete_db_setup.sql 실행 → 전체 DB 한 번에 구축
     (profiles/credits/payments/email_log/page_views + 함수/트리거/RLS)
-20-1. (개발환경만) supabase/seed_dev.sql 실행 → 테스트 계정 4명 생성
+20. (개발환경만) supabase/seed_dev.sql 실행 → 테스트 계정 4명 생성
 21. 결과 패널에서 6개 테이블·12개 함수·2개 트리거 모두 표시되는지 확인
 22. Authentication → Users에서 실제 관리자 UUID 확인 → role='admin' 지정
     → SQL Editor: UPDATE public.profiles SET role='admin' WHERE id='<UUID>';
@@ -3030,4 +3030,4 @@ _sb.auth.onAuthStateChange(async (_event, session) => {
 | 결제 검증 Worker | `synology-web/service/payment/toss-verify.js` | |
 | 결제 Worker 배포 설정 | `synology-web/service/payment/wrangler-toss.toml` | |
 | 마케팅 자료 페이지 | `synology-web/consulting/marketing/index.html` | |
-| 이 가이드 | `synology-web/NAS웹서비스_구축가이드.md` | |
+| 이 가이드 | `synology-web/NAS웹서비스_통합.md` | |
