@@ -2938,6 +2938,8 @@ cat ~/.ssh/id_ed25519.pub | ssh admin@192.168.x.x 'cat > ~/.ssh/authorized_keys'
 
 ---
 
+<div class="pagebreak"></div>
+
 ### 토스페이먼츠 — "인증되지 않은 클라이언트 키" 오류
 
 **증상**: 결제창 버튼 클릭 시 Toss 결제창이 열리지 않고 "인증되지 않은 클라이언트 키" 또는 "인증되지 않은 시크릿 키" 오류
