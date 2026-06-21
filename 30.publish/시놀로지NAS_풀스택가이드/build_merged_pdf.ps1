@@ -221,15 +221,18 @@ def _colgroup(m):
     thead_m = re.search(r'<thead[^>]*>.*?</thead>', tbl, re.DOTALL)
     if not thead_m:
         return tbl
-    ncols = len(re.findall(r'<th', thead_m.group(0)))
+    # <th(?!e) 로 <thead> 를 제외하고 실제 <th> 셀만 카운트
+    ncols = len(re.findall(r'<th(?!e)', thead_m.group(0)))
     if first_th == '섹션' and ncols == 2:
         cg = '<colgroup><col style="width:12%"><col style="width:88%"></colgroup>\n'
-        return tbl.replace('<thead>', cg + '<thead>', 1)
-    if first_th == '#' and ncols >= 2:
+    elif first_th == '#' and ncols >= 2:
         cg = ('<colgroup><col style="width:8%">'
               + '<col>' * (ncols - 1) + '</colgroup>\n')
-        return tbl.replace('<thead>', cg + '<thead>', 1)
-    return tbl
+    else:
+        return tbl
+    # pandoc 이 이미 생성한 colgroup 을 제거하고 새 colgroup 으로 교체
+    tbl = re.sub(r'<colgroup>.*?</colgroup>\s*', '', tbl, count=1, flags=re.DOTALL)
+    return tbl.replace('<thead>', cg + '<thead>', 1)
 html = re.sub(r'<table[^>]*>.*?</table>', _colgroup, html, flags=re.DOTALL)
 
 # Override @page margins: 5mm top/bottom eliminates space for Edge browser headers
