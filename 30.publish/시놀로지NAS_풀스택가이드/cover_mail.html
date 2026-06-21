@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>표지 — 시놀로지 NAS 메일 서버 구축 완전 가이드</title>
+  <style>
+    @font-face { font-family: 'Noto Sans KR'; src: local('Noto Sans KR'), local('NotoSansKR'), local('Noto_Sans_KR'); }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    }
+
+    .cover {
+      width: 560px;
+      height: 840px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.7);
+    }
+    .bg-main {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+    .network-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 410px;
+      object-fit: cover;
+      object-position: center bottom;
+    }
+    .text-layer {
+      position: absolute;
+      inset: 0;
+    }
+    .subtitle-top {
+      position: absolute;
+      top: 52px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 2.5px;
+      line-height: 2.1;
+    }
+    .title-block {
+      position: absolute;
+      top: 20%;
+      left: 0; right: 0;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .main-title {
+      font-size: 60px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 6px;
+      line-height: 1.05;
+      margin-bottom: 16px;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.5);
+    }
+    .nas-en {
+      font-family: 'Arial Black', Impact, Arial, sans-serif;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+    .sub1 {
+      font-size: 34px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 8px;
+      line-height: 1.45;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+    .sub2 {
+      font-size: 34px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 8px;
+      line-height: 1.45;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+    .bottom-gradient {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 240px;
+    }
+    .bottom-block {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      text-align: center;
+      padding: 18px 0 52px;
+    }
+    .tagline {
+      font-size: 12px;
+      font-weight: 400;
+      color: #ffffff;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+    }
+    .author-pub {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 3px;
+    }
+
+    @page { size: 148mm 210mm; margin: 0; }
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      html, body { margin: 0 !important; padding: 0 !important; width: 100% !important; background: #040c1c !important; display: block !important; }
+      .cover { width: 148.5mm !important; height: 210mm !important; box-shadow: none !important; overflow: hidden !important; }
+    }
+  </style>
+</head>
+<body>
+<div class="cover">
+
+  <img class="bg-main" src="bg_0_X4.png" alt="">
+  <img class="network-layer" src="bg_1_X6.png" alt="">
+
+  <svg class="bottom-gradient" viewBox="0 0 560 240" preserveAspectRatio="none"
+       xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="darkFade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#040c1c" stop-opacity="0"/>
+        <stop offset="35%"  stop-color="#040c1c" stop-opacity="0.45"/>
+        <stop offset="70%"  stop-color="#040c1c" stop-opacity="0.78"/>
+        <stop offset="100%" stop-color="#040c1c" stop-opacity="0.92"/>
+      </linearGradient>
+    </defs>
+    <rect width="560" height="240" fill="url(#darkFade)"/>
+  </svg>
+
+  <div class="text-layer">
+
+    <div class="subtitle-top">
+      MailPlus · Resend · Cloudflare
+    </div>
+
+    <div class="title-block">
+      <div class="main-title">시놀로지&ensp;<span class="nas-en">NAS</span></div>
+      <div class="sub1">메일 서버 구축</div>
+      <div class="sub2">완전 가이드</div>
+    </div>
+
+    <div class="bottom-block">
+      <div class="tagline">발신 · 수신 완전 구축</div>
+      <div class="author-pub">이인성 저 &nbsp;·&nbsp; 웍스프리</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

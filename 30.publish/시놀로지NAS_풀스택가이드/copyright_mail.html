@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>판권 — 시놀로지 NAS 메일 서버 구축 완전 가이드</title>
+  <style>
+    @font-face { font-family: 'Noto Sans KR'; src: local('Noto Sans KR'), local('NotoSansKR'), local('Noto_Sans_KR'); }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    }
+    .page {
+      width: 560px;
+      height: 840px;
+      position: relative;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-header {
+      position: relative;
+      height: 80px;
+      background: #0B1628;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .page-header svg {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+    }
+    .header-label {
+      position: absolute;
+      bottom: 16px;
+      left: 36px;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+    .header-accent {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #1A9FD4 0%, #29B6F6 50%, transparent 100%);
+    }
+
+    .page-body {
+      flex: 1;
+      padding: 32px 48px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .title-block { margin-bottom: 20px; }
+    .title-kr {
+      font-size: 19px;
+      font-weight: 900;
+      color: #0B1628;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .title-kr span { color: #1A9FD4; }
+    .title-en {
+      font-size: 11px;
+      color: #aaa;
+      line-height: 1.7;
+    }
+
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 0;
+    }
+    .info-table tr { border-bottom: 1px solid #f0f0f0; }
+    .info-table tr:first-child { border-top: 1px solid #ddd; }
+    .info-table td {
+      padding: 10px 0;
+      font-size: 12.5px;
+      vertical-align: top;
+    }
+    .info-label {
+      color: #1A9FD4;
+      font-weight: 700;
+      width: 88px;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    .info-value { color: #333; line-height: 1.6; }
+
+    .copyright-block {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e8e8e8;
+    }
+    .copyright-text {
+      font-size: 11px;
+      color: #888;
+      line-height: 1.85;
+      margin-bottom: 16px;
+    }
+
+    .publisher-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pub-logo-block { display: flex; flex-direction: column; }
+    .pub-logo-name {
+      font-size: 20px;
+      font-weight: 900;
+      color: #0B1628;
+      letter-spacing: 1px;
+    }
+    .pub-logo-tagline {
+      font-size: 9.5px;
+      color: #aaa;
+      letter-spacing: 0.5px;
+      margin-top: 3px;
+    }
+
+    .page-footer {
+      height: 34px;
+      background: #0B1628;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 36px;
+      flex-shrink: 0;
+    }
+    .footer-pub { font-size: 10px; color: #1A9FD4; font-weight: 700; letter-spacing: 2px; }
+    .footer-page { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
+
+    @page { size: 148mm 210mm; margin: 0; }
+    @media print {
+      body { background: none; padding: 0; }
+      .page { width: 148mm; height: 210mm; box-shadow: none; overflow: hidden; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <svg viewBox="0 0 560 80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+          <circle cx="14" cy="14" r="1" fill="rgba(26,159,212,0.25)"/>
+        </pattern>
+      </defs>
+      <rect width="560" height="80" fill="url(#dots)"/>
+      <line x1="0" y1="40" x2="200" y2="40" stroke="rgba(26,159,212,0.2)" stroke-width="0.5"/>
+      <polygon points="460,0 560,0 560,80" fill="rgba(26,159,212,0.06)"/>
+      <polygon points="500,0 560,0 560,50" fill="rgba(26,159,212,0.08)"/>
+    </svg>
+    <div class="header-label">판권</div>
+    <div class="header-accent"></div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="title-block">
+      <div class="title-kr">
+        시놀로지 <span>NAS</span> 메일 서버 구축 완전 가이드
+      </div>
+      <div class="title-en">
+        Synology NAS Mail Server Setup Complete Guide<br>
+        MailPlus · Resend SMTP Relay · Cloudflare Email Routing · Email Worker
+      </div>
+    </div>
+
+    <table class="info-table">
+      <tr>
+        <td class="info-label">저&emsp;자</td>
+        <td class="info-value">이인성</td>
+      </tr>
+      <tr>
+        <td class="info-label">발&emsp;행</td>
+        <td class="info-value">2026년 06월 22일</td>
+      </tr>
+      <tr>
+        <td class="info-label">출판사</td>
+        <td class="info-value">웍스프리 (WorksFree)</td>
+      </tr>
+      <tr>
+        <td class="info-label">이메일</td>
+        <td class="info-value">support@worksfree.kr</td>
+      </tr>
+      <tr>
+        <td class="info-label">웹사이트</td>
+        <td class="info-value">www.worksfree.kr</td>
+      </tr>
+      <tr>
+        <td class="info-label">ISBN</td>
+        <td class="info-value">979-11-992314-8-1 (06000)</td>
+      </tr>
+      <tr>
+        <td class="info-label">정&emsp;가</td>
+        <td class="info-value">14,900원</td>
+      </tr>
+    </table>
+
+    <div class="copyright-block">
+      <p class="copyright-text">
+        Copyright © 2026 이인성, 웍스프리. All rights reserved.<br><br>
+        이 전자책의 저작권은 저자와 웍스프리에 있습니다. 저작권법에 의해 보호를 받는
+        저작물이므로 무단 전재와 무단 복제를 금합니다. 이 책의 일부 또는 전부를 이용하려면
+        반드시 저작권자의 서면 동의를 받아야 합니다.<br><br>
+        이 가이드의 실제 구현 사례는 WorksFree Hub(www.worksfree.kr)를 기반으로 하며,
+        예시 코드 및 설정값은 학습 목적으로만 활용하시기 바랍니다.
+      </p>
+
+      <div class="publisher-footer">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img src="logo_wf.png" style="width: 40px; height: 40px; object-fit: contain; display: block; flex-shrink: 0;" alt="WorksFree">
+          <div class="pub-logo-block">
+            <div class="pub-logo-name">웍스프리</div>
+            <div class="pub-logo-tagline">Our Works Make You Free</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <span class="footer-pub">WORKSFREE</span>
+    <span class="footer-page">iv</span>
+  </div>
+
+</div>
+</body>
+</html>
