@@ -2884,6 +2884,8 @@ sudo sed -i 's/#StrictModes yes/StrictModes no/' /etc/ssh/sshd_config
 sudo /usr/syno/bin/synosystemctl restart sshd
 ```
 
+<div class="pagebreak"></div>
+
 ### Supabase 로그인 후 URL이 이상한 경우
 
 - Supabase → Authentication → URL Configuration
