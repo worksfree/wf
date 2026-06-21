@@ -146,10 +146,10 @@ html = re.sub(
 html = re.sub(r'<li[^>]*>\s*<a[^>]*>[^<]*(?:14장|15장)[^<]*</a>\s*(?:<ul>.*?</ul>\s*)?</li>', '', html, flags=re.DOTALL)
 
 # Replace mermaid code blocks with 3-step setup workflow (no CDN, guaranteed rendering)
-BOX_P = 'border:1.5px solid #8E5CE0;border-radius:5px;background:#F0EAFF;padding:8px 8px;text-align:center;font-size:12.5px;font-weight:700;min-width:88px;line-height:1.55;color:#222;'
-BOX_B = 'border:1.5px solid #1A9FD4;border-radius:5px;background:#E8F6FB;padding:8px 8px;text-align:center;font-size:12.5px;font-weight:700;min-width:88px;line-height:1.55;color:#222;'
-SUB_P = 'font-size:10px;font-weight:400;color:#666;'
-ARR   = 'font-size:10px;color:#555;padding:0 4px;white-space:nowrap;'
+BOX_P = 'border:1.5px solid #8E5CE0;border-radius:5px;background:#F0EAFF;padding:6px 6px;text-align:center;font-size:11px;font-weight:700;min-width:76px;flex-shrink:1;line-height:1.55;color:#222;'
+BOX_B = 'border:1.5px solid #1A9FD4;border-radius:5px;background:#E8F6FB;padding:6px 6px;text-align:center;font-size:11px;font-weight:700;min-width:76px;flex-shrink:1;line-height:1.55;color:#222;'
+SUB_P = 'font-size:9px;font-weight:400;color:#666;'
+ARR   = 'font-size:9.5px;color:#555;padding:0 3px;white-space:nowrap;flex-shrink:0;'
 FLOW_HTML = (
     '<div style="margin:18px 0 12px;font-family:\'Noto Sans KR\',\'Malgun Gothic\',sans-serif;">'
 
@@ -185,7 +185,7 @@ FLOW_HTML = (
     '↓ ① + ② 준비 완료 시 ↓</div>'
     '<div style="display:flex;justify-content:center;">'
     '<div style="border:2px solid #2E7D32;border-radius:7px;background:#E8F5E9;'
-    'padding:10px 22px;text-align:center;font-size:13.5px;font-weight:700;color:#1B5E20;line-height:1.5;">'
+    'padding:8px 18px;text-align:center;font-size:12px;font-weight:700;color:#1B5E20;line-height:1.5;">'
     '자가 도메인으로 웹 서비스(홈페이지) 구동 가능'
     '</div>'
     '</div>'
