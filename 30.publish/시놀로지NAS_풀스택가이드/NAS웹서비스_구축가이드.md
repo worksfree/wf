@@ -710,7 +710,7 @@ Synology NAS — 웹 파일 전달
 ### 4.2 터널 만들기
 
 **메뉴 경로**:  
-`왼쪽 메뉴 [Networks] → [Tunnels] → 오른쪽 상단 [Create a tunnel] 버튼`
+`왼쪽 메뉴 [Networking] → [Tunnels] → 오른쪽 상단 [Create a tunnel] 버튼`
 
 1. 연결 방식 선택: **Cloudflared** 선택 → **[Next]**
 2. 터널 이름 입력 (예: `my-nas-tunnel`, 아무 이름이나 가능) → **[Save Tunnel]**
@@ -1101,7 +1101,7 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 #### ② Supabase에 Google 정보 입력
 
 **메뉴 경로**:  
-`Supabase 프로젝트 → 왼쪽 메뉴 [Authentication] → [Providers] → [Google]`
+`Supabase 프로젝트 → [Authentication] → [Configuration] → [Sign In / Providers]`
 
 1. **Enable Sign in with Google** 토글 **ON**
 2. Client ID 붙여넣기
@@ -1881,7 +1881,7 @@ async function updateCreditsAfterPayment(userId, amount, credits, orderId, provi
     headers,
     body: JSON.stringify({
       user_id: userId, delta: credits,
-      reason: 'purchase', balance: newBalance
+      reason: 'purchase'
     })
   });
 }
@@ -1982,7 +1982,7 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
   매번 새 주문번호가 생성되는지 코드에서 확인하세요. (`Date.now()` 기반이면 자동으로 달라집니다.)
 - Stripe Checkout 세션은 30분 뒤 만료됩니다. 테스트 중 너무 오래 기다리면 새로 시작하세요.
 - Supabase `payments`·`credits` 테이블에 테스트 데이터가 쌓입니다.  
-  실서비스 전환 전에 `DELETE FROM payments WHERE pg = 'toss';` 등으로 테스트 데이터를 정리하세요.
+  실서비스 전환 전에 8.7절의 정리 SQL(`DELETE FROM payments WHERE env IN ('test', 'dev');` 등)로 테스트 데이터를 정리하세요.
 
 ---
 
@@ -2296,7 +2296,7 @@ const MENU = [
 const canConsult = () => userRole === 'consultant' || userRole === 'partner' || userRole === 'admin';
 
 function renderMenu(node) {
-  // GFC 전용 → 해당 role 아니면 아예 렌더 안 함
+  // partner 전용 → 해당 role 아니면 아예 렌더 안 함
   if (node.roleOnly && userRole !== node.roleOnly) return;
 
   // 클릭 핸들러
@@ -2313,7 +2313,7 @@ function renderMenu(node) {
 
 > **WorksFree Hub 사례**:  
 > 컨설팅 노드 6개 항목 → `consultantOnly:true` (모든 로그인 사용자에게 초록 "컨설팅 전용" 칩으로 표시)  
-> 경영종합진단·CEO 플랜 → `roleOnly:'partner'` (GFC 아니면 메뉴 자체가 없음)
+> 경영종합진단·CEO 플랜 → `roleOnly:'partner'` (partner 역할 아니면 메뉴 자체가 없음)
 
 ---
 
@@ -2389,6 +2389,7 @@ module.exports = async function globalSetup() {
   // 다음 테스트 파일에서 참조 가능
   process.env.TEST_USER_ID  = userId;
   process.env.TEST_ADMIN_ID = adminId;
+  process.env.TEST_FREE_ID  = freeId;
 };
 
 // tests/global-teardown.js — CASCADE로 credits/payments도 자동 삭제
@@ -2830,7 +2831,8 @@ export default {
 20. (개발환경만) supabase/seed_dev.sql 실행 → 테스트 계정 4명 생성
 21. 결과 패널에서 6개 테이블·12개 함수·2개 트리거 모두 표시되는지 확인
 22. Authentication → Users에서 실제 관리자 UUID 확인 → role='admin' 지정
-    → SQL Editor: UPDATE public.profiles SET role='admin' WHERE id='<UUID>';
+    → SQL Editor: `UPDATE public.profiles SET role='admin' WHERE id='실제-UUID';`
+    (profiles 행이 이미 존재하는 경우에만 동작 — 회원가입 후 실행)
 23. 프런트엔드에서 credit_balance 뷰 조회 → 잔액 표시 확인
 
 [ 결제 연동 ]
@@ -2945,7 +2947,7 @@ cat ~/.ssh/id_ed25519.pub | ssh admin@192.168.x.x 'cat > ~/.ssh/authorized_keys'
 **증상**: 결제창 버튼 클릭 시 Toss 결제창이 열리지 않고 "인증되지 않은 클라이언트 키" 또는 "인증되지 않은 시크릿 키" 오류
 
 **원인 1**: `localhost`에서 결제창 호출 시도  
-**해결**: 8.7절 참고 — 등록된 도메인(예: `test.example.co.kr`)에서 테스트
+**해결**: 9.1절 ② 참고 — 등록된 도메인(예: `test.example.co.kr`)에서 테스트
 
 **원인 2**: 도메인이 토스 대시보드에 미등록  
 **해결**: `토스 대시보드 → [개발] → 허용 도메인`에 서비스 도메인 등록
