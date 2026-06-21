@@ -512,6 +512,8 @@ flowchart TD
 2. 이메일 · 비밀번호 입력 → **[Create Account]**
 3. 이메일 인증 완료
 
+<div class="pagebreak"></div>
+
 ### 2.2 도메인 추가 (Add a Site)
 
 **메뉴 경로**:  
@@ -523,7 +525,7 @@ flowchart TD
 4. **Cloudflare 네임서버 2개 주소** 화면 표시 → 복사해둠
 5. **[Done, check nameservers]** 클릭
 
-> 이 네임서버 주소를 가비아 1.2 단계에서 입력합니다.
+> 이 네임서버 주소를 1.2 네임서버를 Cloudflare로 변경 단계에서 입력합니다.
 
 ### 2.3 SSL/TLS 모드 설정
 
