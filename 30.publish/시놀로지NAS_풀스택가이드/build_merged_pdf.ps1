@@ -273,22 +273,16 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 *parts, tmp_out = sys.argv[1:]
 
-# ── 0. Cover post-process: draw dark gradient + solid bottom strip
+# ── 0. Cover post-process: solid bottom strip only
+# SVG gradient in HTML already provides dark text background.
+# pymupdf gradient loop was removed — it drew semi-transparent rects OVER white text,
+# making the text appear dimmed. Only the opaque bottom strip remains (below text area).
 cover_pdf_path = parts[0]
 cover_doc = fitz.open(cover_pdf_path)
 cover_page = cover_doc[0]
 pw, ph = cover_page.rect.width, cover_page.rect.height
-# 그라디언트 구역 (상단부 페이드)
-gradient_h = 130
-steps = 14
 DARK = (4/255, 12/255, 28/255)
-for s in range(steps):
-    y0 = ph - gradient_h + s * (gradient_h / steps)
-    y1 = ph - gradient_h + (s + 1) * (gradient_h / steps)
-    t = (s + 1) / steps
-    alpha = min(0.96, 0.08 + 0.88 * (t ** 1.1))
-    cover_page.draw_rect(fitz.Rect(0, y0, pw, y1), color=None, fill=DARK, fill_opacity=alpha)
-# 최하단 42pt: 완전 불투명 — 핑크/보라 완전 차단 (텍스트 배경 보장)
+# 최하단 42pt: 완전 불투명 — 핑크/보라 완전 차단 (텍스트 하단 여백 아래)
 cover_page.draw_rect(fitz.Rect(0, ph - 42, pw, ph), color=None, fill=DARK, fill_opacity=1.0)
 cover_doc.save(cover_pdf_path, incremental=True, encryption=fitz.PDF_ENCRYPT_KEEP)
 cover_doc.close()
