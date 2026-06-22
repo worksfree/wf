@@ -215,7 +215,7 @@ Gmail 등 외부 메일함에 정상 수신되면 성공입니다.
 
 ### 3.1 Email Routing 활성화
 
-**Cloudflare 대시보드 → 좌측 메뉴 → Email → Email Routing → worksfree.kr 선택**
+**Cloudflare 대시보드 → 좌측 메뉴 [Build] → [Compute] → [Email Service] → [Email Routing] → worksfree.kr 선택**
 
 **Enable Email Routing** 클릭 → MX 레코드 자동 추가 확인
 
@@ -478,7 +478,7 @@ wrangler deploy --config workers/email-receiver/wrangler.toml
 
 ### 7.1 Catch-all 규칙 변경
 
-**Cloudflare 대시보드 → 좌측 메뉴 → Email → Email Routing → worksfree.kr → Routing rules 탭**
+**Cloudflare 대시보드 → 좌측 메뉴 [Build] → [Compute] → [Email Service] → [Email Routing] → worksfree.kr → Routing rules 탭**
 
 1. **Catch-all** 행의 `···` 클릭 → **Edit**
 2. Action: `Drop` → **Send to a Worker** 변경
