@@ -936,7 +936,7 @@ function corsHeaders() {
 > `https://api.example.co.kr` 같은 내 도메인 주소로 Worker를 사용할 수 있습니다.
 
 **메뉴 경로**:  
-`Workers & Pages → dart-proxy → [Settings] 탭 → [Triggers] → [Add Custom Domain]`
+`Workers & Pages → dart-proxy → [Settings] 탭 → [Domains & Routes] → [Add] → [Custom Domain]`
 
 | 항목 | 입력 예시 |
 |------|----------|
@@ -1059,7 +1059,7 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 ### 7.2 API 키 확인
 
 **메뉴 경로**:  
-`프로젝트 대시보드 → 왼쪽 메뉴 [Project Settings] → [API Keys] → **Legacy anon, service_role API keys** 탭`
+`프로젝트 대시보드 → 왼쪽 메뉴 [Settings] → [API Keys] → **Legacy anon, service_role API keys** 탭`
 
 > Supabase UI 업데이트로 메뉴 명칭이 변경됨.  
 > 탭이 두 개(Publishable and secret / **Legacy anon, service_role**)이므로 반드시 **Legacy** 탭을 선택.
@@ -1101,7 +1101,7 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 #### ② Supabase에 Google 정보 입력
 
 **메뉴 경로**:  
-`Supabase 프로젝트 → [Authentication] → [Configuration] → [Sign In / Providers]`
+`Supabase 프로젝트 → [Authentication] → [Sign In / Providers]`
 
 1. **Enable Sign in with Google** 토글 **ON**
 2. Client ID 붙여넣기
@@ -1153,7 +1153,7 @@ Supabase가 요청하는 scope에 해당하는 항목을 **필수 동의** 또�
 #### ④ Supabase에 Kakao 정보 입력
 
 **메뉴 경로**:  
-`Supabase 프로젝트 → [Authentication] → [Configuration] → [Sign In / Providers]`
+`Supabase 프로젝트 → [Authentication] → [Sign In / Providers]`
 
 1. **Enable Sign in with Kakao** 토글 **ON**
 2. Kakao App Key: REST API 키 붙여넣기
