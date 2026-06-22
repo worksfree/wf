@@ -534,8 +534,20 @@ flowchart TD
 
 - 암호화 모드: **Full (strict)** 선택
 
-> NAS에 자체 서명 인증서가 있거나 Let's Encrypt를 사용한다면 **Full (strict)**을 권장합니다.  
-> NAS에 별도 인증서가 없으면 임시로 **Full**을 사용합니다.
+> - **Full (Strict)** (권장): NAS에 Let's Encrypt 등 신뢰된 CA 인증서가 있을 때 사용합니다. Cloudflare Tunnel 사용 시에도 이 설정이 기본입니다.  
+> - **Full**: NAS에 자체 서명 인증서가 있거나 별도 인증서가 없을 때 사용합니다. 인증서 유효성을 검증하지 않으므로 자체 서명 인증서도 허용됩니다.
+>
+> **💡 NAS에 별도 인증서가 없어도 Full (Strict)가 작동하는 이유**  
+> Cloudflare는 도메인을 등록하는 순간 방문자용 HTTPS 인증서를 **자동으로 발급·관리**합니다 (별도 작업 불필요).  
+> 트래픽 흐름은 다음과 같습니다.
+>
+> ```
+> 방문자 ──[HTTPS: Cloudflare 자동 인증서]──▶ Cloudflare ──[Tunnel]──▶ NAS
+> ```
+>
+> 방문자와 Cloudflare 사이는 Cloudflare가 발급한 신뢰된 인증서가 처리하고,  
+> Cloudflare와 NAS 사이는 `cloudflared` Tunnel이 담당합니다.  
+> NAS 자체에는 인증서가 없어도 되므로, **별도 인증서를 직접 만들거나 설치할 필요가 없습니다.**
 
 <div class="pagebreak"></div>
 
