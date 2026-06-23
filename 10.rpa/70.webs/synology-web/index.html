@@ -1958,7 +1958,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.4.11';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.4.24';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -1995,6 +1995,7 @@ const TREE = [
       { label:{ko:'파일명 자소복원',        en:'Korean Normalizer'},   icon:'✦', iframe:'service/normalizer/index.html' },
       { label:{ko:'변환 결과 검증',        en:'Conversion Verifier'}, icon:'✦', iframe:'service/conversion-verifier/index.html' },
       { label:{ko:'앱 요청 게시판',        en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
+      { label:{ko:'전자책 미리보기',        en:'eBook Preview'},        icon:'📖', iframe:'service/ebook/index.html' },
     ]
   },
   {
@@ -2070,6 +2071,10 @@ const DASH_CARDS = [
     title:{ko:'앱 요청 게시판',       en:'App Request Board'},
     desc: {ko:'원하는 자동화 앱을 요청하세요',        en:'Request an automation app you need'},
     iframe:'board/index.html' },
+  { icon:'📖',
+    title:{ko:'전자책 미리보기',       en:'eBook Preview'},
+    desc: {ko:'NAS 풀스택 가이드 20% 무료 미리보기',  en:'20% free preview of NAS Full-Stack Guide'},
+    iframe:'service/ebook/index.html' },
   /* ── 컨설팅 ─────────────────────────────────── */
   { icon:MINDMAP_ICON,
     title:{ko:'컨설팅 마인드맵',      en:'Consulting Mindmap'},

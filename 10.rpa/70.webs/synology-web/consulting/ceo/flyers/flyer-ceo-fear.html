@@ -381,8 +381,8 @@ body {
 
   <!-- 푸터 -->
   <div class="footer-f">
-    <span class="fc">CORPORATE RISK CONSULTING · 전문 컨설팅</span>
-    <span class="fd">본 자료는 중소기업중앙회 설문조사·법원 판결문·언론 보도를 기반으로 작성되었습니다. 정보 제공 목적이며 법률·보험 전문가 상담을 권장합니다.</span>
+    <span class="fc">파트너 · 기업 재무 컨설팅</span>
+    <span class="fd">본 자료는 정보 제공 목적으로 제작되었습니다</span>
   </div>
 
 </div><!-- /a4 -->
@@ -398,6 +398,10 @@ body {
   });
   function replace(t){
     return t
+      .replace(/삼성생명 협력 파트너 · /g, '')
+      .replace(/ · 삼성생명 협력 파트너/g, '')
+      .replace(/삼성생명 협력 파트너/g, '독립 컨설턴트')
+      .replace(/삼성생명/g,              '')
       .replace(/경영인정기보험 비용처리/g, '파트너 상담 절세 설계')
       .replace(/경영인정기보험/g,           '파트너 상담 플랜')
       .replace(/법인 종신보험/g,            '파트너 솔루션')

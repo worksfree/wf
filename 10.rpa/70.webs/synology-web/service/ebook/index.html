@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>전자책 미리보기 — WorksFree</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg:#0f1117; --panel:#1c2333; --border:#2a3347;
+  --accent:#3b82f6; --accent2:#06b6d4; --success:#10b981;
+  --text:#e2e8f0; --muted:#64748b; --hover:#243049;
+  --gold:#f59e0b; --radius:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'IBM Plex Sans KR',sans-serif;
+  background:var(--bg); color:var(--text); font-size:14px;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+
+/* ── 책 선택 탭 ── */
+.book-tabs {
+  background:#111827; border-bottom:1px solid var(--border);
+  padding:0 24px; display:flex; gap:2px; flex-shrink:0; overflow-x:auto;
+}
+.book-tab {
+  padding:10px 16px; cursor:pointer; font-size:13px; color:var(--muted);
+  border-bottom:2px solid transparent; white-space:nowrap; transition:color .15s;
+  display:flex; align-items:center; gap:6px; background:none; border-top:none;
+  border-left:none; border-right:none; font-family:inherit;
+}
+.book-tab:hover { color:var(--text); }
+.book-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+.book-tab-badge {
+  font-size:10px; padding:1px 6px; border-radius:8px;
+  background:rgba(245,158,11,0.15); color:var(--gold);
+  border:1px solid rgba(245,158,11,0.25);
+}
+.book-tab-badge.online {
+  background:rgba(16,185,129,0.12); color:var(--success);
+  border-color:rgba(16,185,129,0.25);
+}
+
+/* ── 책 정보 헤더 ── */
+.book-header {
+  background:var(--panel); border-bottom:1px solid var(--border);
+  padding:14px 24px; display:flex; align-items:center; gap:14px; flex-shrink:0;
+}
+.book-cover-thumb {
+  width:40px; height:54px; border-radius:4px; display:flex; align-items:center;
+  justify-content:center; font-size:18px; flex-shrink:0; border:1px solid var(--border);
+}
+.cover-web  { background:linear-gradient(135deg,#1e3a5f,#0f1a2e); }
+.cover-mail { background:linear-gradient(135deg,#3b1f5f,#1a0f2e); }
+.book-meta { flex:1; min-width:0; }
+.book-title { font-size:14px; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:3px; }
+.book-author { font-size:12px; color:var(--muted); margin-bottom:5px; }
+.book-badges { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.badge { border-radius:4px; font-size:11px; font-weight:600; padding:2px 7px; border:1px solid; }
+.badge-preview { background:rgba(245,158,11,.12); color:var(--gold); border-color:rgba(245,158,11,.3); }
+.badge-free    { background:rgba(16,185,129,.1); color:var(--success); border-color:rgba(16,185,129,.25); }
+.badge-online  { background:rgba(59,130,246,.1); color:var(--accent); border-color:rgba(59,130,246,.25); }
+.book-price-row { display:flex; align-items:center; gap:12px; flex-shrink:0; flex-wrap:wrap; }
+.book-price { font-size:12px; color:var(--muted); }
+.book-price strong { color:var(--text); font-size:15px; }
+.buy-btns { display:flex; gap:6px; flex-wrap:wrap; }
+.buy-btn {
+  padding:7px 12px; border-radius:6px; font-size:12px; font-weight:600;
+  cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+  transition:filter .15s;
+}
+.buy-btn:hover { filter:brightness(1.12); }
+.buy-btn-primary  { background:var(--accent); color:#fff; border:none; }
+.buy-btn-secondary{ background:transparent; color:var(--text); border:1px solid var(--border); }
+.buy-btn-secondary:hover { background:var(--hover); }
+.buy-btn-none { font-size:12px; color:var(--muted); font-style:italic; }
+
+/* ── 툴바 ── */
+.toolbar {
+  background:var(--panel); border-bottom:1px solid var(--border);
+  padding:7px 24px; display:flex; align-items:center; gap:10px; flex-shrink:0;
+}
+.nav-group { display:flex; align-items:center; gap:5px; }
+.tb-btn {
+  width:30px; height:30px; border-radius:6px; border:1px solid var(--border);
+  background:transparent; color:var(--text); cursor:pointer; font-size:14px;
+  display:flex; align-items:center; justify-content:center; transition:background .15s;
+}
+.tb-btn:hover:not(:disabled) { background:var(--hover); }
+.tb-btn:disabled { opacity:.35; cursor:not-allowed; }
+.page-info { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:3px; white-space:nowrap; }
+.page-input {
+  width:38px; text-align:center; padding:3px 2px; background:var(--bg);
+  border:1px solid var(--border); border-radius:4px; color:var(--text);
+  font-size:12px; font-family:inherit;
+}
+.page-input:focus { outline:none; border-color:var(--accent); }
+.zoom-info { font-size:11px; color:var(--muted); min-width:36px; text-align:center; }
+.tb-sep { width:1px; height:20px; background:var(--border); flex-shrink:0; }
+.tb-spacer { flex:1; }
+.preview-notice {
+  font-size:11px; color:var(--gold); white-space:nowrap;
+  background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2);
+  border-radius:4px; padding:3px 8px;
+}
+
+/* ── 뷰어 ── */
+.viewer-wrap {
+  flex:1; overflow:auto; display:flex; flex-direction:column; align-items:center;
+  padding:24px 16px; gap:0; position:relative;
+  scrollbar-width:none;
+}
+.viewer-wrap::-webkit-scrollbar { display:none; }
+.page-container {
+  position:relative; box-shadow:0 8px 32px rgba(0,0,0,.6);
+  overflow:hidden; line-height:0;
+}
+.page-canvas { display:block; }
+
+/* ── 잠금 오버레이 ── */
+.lock-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to bottom, transparent 0%, rgba(15,17,23,.92) 35%, rgba(15,17,23,.99) 100%);
+  display:flex; align-items:center; justify-content:center;
+}
+.lock-overlay.full { background:rgba(15,17,23,.97); }
+.lock-card {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:12px; padding:28px 32px; text-align:center; max-width:360px; width:90%;
+  margin-top:30%;
+}
+.lock-overlay.full .lock-card { margin-top:0; }
+.lock-icon { font-size:26px; margin-bottom:12px; }
+.lock-title { font-size:15px; font-weight:700; margin-bottom:8px; line-height:1.4; }
+.lock-desc { font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:18px; }
+.lock-price { font-size:20px; font-weight:700; margin-bottom:16px; }
+.lock-price span { font-size:13px; color:var(--muted); font-weight:400; }
+.lock-btns { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.lock-btn {
+  padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600;
+  cursor:pointer; text-decoration:none; display:inline-block; transition:filter .15s;
+}
+.lock-btn:hover { filter:brightness(1.12); }
+.lock-btn-primary   { background:var(--accent); color:#fff; }
+.lock-btn-secondary { background:transparent; color:var(--text); border:1px solid var(--border); }
+.lock-btn-secondary:hover { background:var(--hover); }
+.lock-soon { font-size:13px; color:var(--muted); margin-top:8px; }
+
+/* ── 로딩 / 에러 ── */
+.loading-wrap {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+}
+.spinner {
+  width:36px; height:36px; border:3px solid var(--border);
+  border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-text { color:var(--muted); font-size:13px; }
+.error-wrap {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; text-align:center; padding:32px;
+}
+.error-icon { font-size:36px; }
+.error-title { font-size:15px; font-weight:600; }
+.error-desc { font-size:13px; color:var(--muted); line-height:1.6; }
+
+@media(max-width:600px){
+  .book-header { flex-wrap:wrap; }
+  .book-price-row { width:100%; justify-content:flex-end; }
+  .toolbar { flex-wrap:wrap; gap:6px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── 책 선택 탭 ── -->
+<div class="book-tabs" id="bookTabs"></div>
+
+<!-- ── 책 정보 헤더 ── -->
+<div class="book-header" id="bookHeader"></div>
+
+<!-- ── 툴바 ── -->
+<div class="toolbar">
+  <div class="nav-group">
+    <button class="tb-btn" id="btnFirst" title="첫 페이지">⟨⟨</button>
+    <button class="tb-btn" id="btnPrev"  title="이전 페이지">‹</button>
+    <div class="page-info">
+      <input class="page-input" id="pageInput" type="number" min="1" value="1">
+      <span>/</span>
+      <span id="totalPages">—</span>
+    </div>
+    <button class="tb-btn" id="btnNext"  title="다음 페이지">›</button>
+    <button class="tb-btn" id="btnLast"  title="마지막 미리보기 페이지">⟩⟩</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="nav-group">
+    <button class="tb-btn" id="btnZoomOut" title="축소">−</button>
+    <span class="zoom-info" id="zoomInfo">100%</span>
+    <button class="tb-btn" id="btnZoomIn"  title="확대">+</button>
+    <button class="tb-btn" id="btnFit" title="너비 맞춤" style="font-size:11px;width:auto;padding:0 7px;">너비</button>
+  </div>
+  <div class="tb-spacer"></div>
+  <div class="preview-notice" id="previewNotice">미리보기</div>
+</div>
+
+<!-- ── 뷰어 ── -->
+<div class="viewer-wrap" id="viewerWrap">
+  <div class="loading-wrap" id="loadingWrap">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">PDF 로딩 중…</div>
+  </div>
+</div>
+
+<script>
+/* ───────────────────────── BOOKS CONFIG ───────────────────────── */
+const BOOKS = [
+  {
+    id:       'web',
+    coverClass:'cover-web',
+    pdfUrl:   '/assets/books/nas-guide-web.pdf?v=20260623',
+    title:    { ko:'시놀로지 NAS 풀스택 인프라 구축 완전 가이드',
+                en:'Synology NAS Full-Stack Infrastructure Complete Guide' },
+    tabLabel: { ko:'웹서비스 구축', en:'Web Infrastructure' },
+    author:   { ko:'이인성 · 웍스프리', en:'Insung Lee · WorksFree' },
+    price:    '39,900원',
+    previewRatio: 0.20,
+    minFreePages: 10,
+    lockDesc: { ko:'완전판에서 만들 수 있는 것:\n· 자체 도메인으로 웹사이트 직접 운영\n· Google·카카오 소셜 로그인 회원 시스템\n· 사용자별 크레딧·결제 이력 관리 DB\n· 온라인 결제 후 크레딧 자동 충전 시스템\n· 개발·테스트·실서비스 분리 배포 구조',
+                en:'What you can build with the full guide:\n· Run a website on your own domain\n· Social login (Google, Kakao) member system\n· User credit & payment history database\n· Online payment with auto credit top-up\n· Separated dev / test / production environments' },
+    buyLinks: [
+      { label:'교보문고', url:'https://www.kyobobook.co.kr/product/detailViewKor.laf?isbn=9791199231474' },
+      { label:'예스24',  url:'https://www.yes24.com/Product/Goods/140000000' },
+    ],
+    online: true,
+  },
+  {
+    id:       'mail',
+    coverClass:'cover-mail',
+    pdfUrl:   '/assets/books/nas-guide-mail.pdf',
+    title:    { ko:'시놀로지 NAS 메일서비스 구축 완전 가이드',
+                en:'Synology NAS Mail Service Complete Guide' },
+    tabLabel: { ko:'메일서비스 구축', en:'Mail Service' },
+    author:   { ko:'이인성 · 웍스프리', en:'Insung Lee · WorksFree' },
+    price:    '미정',
+    previewRatio: 0.20,
+    minFreePages: 10,
+    lockDesc: { ko:'스팸 차단, 바이러스 필터, 웹메일까지\n자체 메일서버를 직접 구축하는 실전 가이드 완전판.',
+                en:'Spam filtering, virus protection, and webmail — a complete guide to building your own mail server.' },
+    buyLinks: [],
+    online: false,
+  },
+];
+/* ────────────────────────────────────────────────────────────────── */
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let lang       = 'ko';
+let currBookIdx = 0;
+let pdfDoc     = null;
+let currPage   = 1;
+let freePages  = 0;
+let scale      = 1.0;
+let fitWidth   = true;
+let rendering  = false;
+
+const I18N = {
+  ko: { loading:'PDF 로딩 중…', preview:'미리보기', of:'/', free:'무료', preview_pct:'20% 무료 미리보기',
+        online:'서점 판매 중', lock_title:'전체 내용은 구매 후 이용하실 수 있습니다',
+        lock_price_label:'완전판 구매', btn_buy:'구매하기',
+        err_title:'PDF를 불러올 수 없습니다', err_desc:'파일이 준비 중이거나 네트워크 오류입니다.\n잠시 후 다시 시도해 주세요.',
+        coming_soon:'출시 예정 — 온라인 서점 등록 준비 중입니다', price_label:'정가' },
+  en: { loading:'Loading PDF…', preview:'Preview', of:'/', free:'Free', preview_pct:'20% Free Preview',
+        online:'Available Online', lock_title:'Full content available after purchase',
+        lock_price_label:'Buy Full Version', btn_buy:'Purchase',
+        err_title:'Unable to load PDF', err_desc:'The file may be unavailable or a network error occurred.\nPlease try again later.',
+        coming_soon:'Coming Soon — Registration in progress', price_label:'Price' },
+};
+const t = k => (I18N[lang] || I18N.ko)[k] || k;
+const book = () => BOOKS[currBookIdx];
+
+function formatLockDesc(text) {
+  const lines = text.split('\n');
+  if (lines.length <= 1) return text;
+  const header  = lines[0];
+  const bullets = lines.slice(1);
+  const listHtml = bullets.map(l =>
+    `<div style="padding:2px 0 2px 4px;">${l}</div>`
+  ).join('');
+  return `<div style="font-weight:600;color:var(--text);margin-bottom:8px;">${header}</div>`
+       + `<div style="text-align:left;font-size:11.5px;">${listHtml}</div>`;
+}
+
+/* ── 탭 렌더링 ── */
+function renderTabs() {
+  const wrap = document.getElementById('bookTabs');
+  wrap.innerHTML = BOOKS.map((b, i) => `
+    <button class="book-tab ${i===currBookIdx?'active':''}" onclick="switchBook(${i})">
+      ${b.tabLabel[lang]}
+      ${b.online
+        ? `<span class="book-tab-badge online">${t('online')}</span>`
+        : `<span class="book-tab-badge">${t('coming_soon').split('—')[0].trim()}</span>`}
+    </button>`).join('');
+}
+
+/* ── 헤더 렌더링 ── */
+function renderHeader() {
+  const b = book();
+  const buyHtml = b.buyLinks.length
+    ? b.buyLinks.map((lk, i) =>
+        `<a href="${lk.url}" target="_blank" rel="noopener"
+           class="buy-btn ${i===0?'buy-btn-primary':'buy-btn-secondary'}">${lk.label}</a>`
+      ).join('')
+    : `<span class="buy-btn-none">${t('coming_soon')}</span>`;
+
+  const priceStr = b.price === '미정'
+    ? `<span style="font-size:13px;color:var(--muted);">${t('coming_soon').split('—')[0].trim()}</span>`
+    : `${t('price_label')} <strong>${b.price}</strong>`;
+
+  document.getElementById('bookHeader').innerHTML = `
+    <div class="book-cover-thumb ${b.coverClass}">📖</div>
+    <div class="book-meta">
+      <div class="book-title">${b.title[lang]}</div>
+      <div class="book-author">${b.author[lang]}</div>
+      <div class="book-badges">
+        <span class="badge badge-preview">${t('preview_pct')}</span>
+        ${b.online ? `<span class="badge badge-online">${t('online')}</span>` : ''}
+      </div>
+    </div>
+    <div class="book-price-row">
+      <div class="book-price">${priceStr}</div>
+      <div class="buy-btns">${buyHtml}</div>
+    </div>`;
+}
+
+/* ── 페이지 렌더링 ── */
+async function renderPage(num) {
+  if (!pdfDoc || rendering) return;
+  rendering = true;
+
+  const wrap = document.getElementById('viewerWrap');
+  const page = await pdfDoc.getPage(num);
+  const vp0  = page.getViewport({scale:1});
+  const viewport = fitWidth
+    ? page.getViewport({scale: (wrap.clientWidth - 48) / vp0.width})
+    : page.getViewport({scale});
+
+  scale = viewport.scale;
+  document.getElementById('zoomInfo').textContent = Math.round(scale * 100) + '%';
+
+  wrap.querySelectorAll('.page-container').forEach(el => el.remove());
+
+  const container = document.createElement('div');
+  container.className = 'page-container';
+  const canvas = document.createElement('canvas');
+  canvas.className = 'page-canvas';
+  container.appendChild(canvas);
+  wrap.appendChild(container);
+
+  const CLIP_R  = 2; // clip 2px from right to hide PDF right-margin rendering artifact
+  const dispW   = Math.round(viewport.width);
+  const dispH   = Math.round(viewport.height);
+  const vp2     = page.getViewport({scale: viewport.scale * (dispW + CLIP_R) / dispW});
+
+  canvas.width  = dispW + CLIP_R;
+  canvas.height = Math.round(vp2.height);
+  container.style.width  = dispW + 'px';
+  container.style.height = dispH + 'px';
+
+  await page.render({canvasContext: canvas.getContext('2d'), viewport: vp2}).promise;
+
+  if (num === freePages) showLockOverlay(container, 'half');
+  else if (num > freePages) showLockOverlay(container, 'full');
+
+  updateNav();
+  rendering = false;
+}
+
+function showLockOverlay(container, mode) {
+  const b = book();
+  const overlay = document.createElement('div');
+  overlay.className = 'lock-overlay' + (mode === 'full' ? ' full' : '');
+
+  const buyHtml = b.buyLinks.length
+    ? b.buyLinks.map((lk, i) =>
+        `<a href="${lk.url}" target="_blank" rel="noopener"
+           class="lock-btn ${i===0?'lock-btn-primary':'lock-btn-secondary'}">${t('btn_buy')} — ${lk.label}</a>`
+      ).join('')
+    : `<div class="lock-soon">${t('coming_soon')}</div>`;
+
+  const priceHtml = b.price === '미정'
+    ? ''
+    : `<div class="lock-price">${b.price}<span> · ${t('lock_price_label')}</span></div>`;
+
+  overlay.innerHTML = `
+    <div class="lock-card">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title">${t('lock_title')}</div>
+      <div class="lock-desc">${formatLockDesc(b.lockDesc[lang])}</div>
+      ${priceHtml}
+      <div class="lock-btns">${buyHtml}</div>
+    </div>`;
+  container.appendChild(overlay);
+}
+
+/* ── 네비게이션 상태 ── */
+function updateNav() {
+  document.getElementById('pageInput').value = currPage;
+  document.getElementById('pageInput').max   = freePages;
+  document.getElementById('btnFirst').disabled = currPage <= 1;
+  document.getElementById('btnPrev').disabled  = currPage <= 1;
+  document.getElementById('btnNext').disabled  = currPage >= freePages;
+  document.getElementById('btnLast').disabled  = currPage >= freePages;
+  document.getElementById('previewNotice').textContent =
+    `${t('preview')} ${currPage} ${t('of')} ${freePages}p`;
+}
+
+function gotoPage(n) {
+  const p = Math.min(freePages, Math.max(1, n));
+  currPage = p;
+  renderPage(currPage);
+}
+
+/* ── PDF 로드 ── */
+async function loadPdf() {
+  const wrap = document.getElementById('viewerWrap');
+  wrap.querySelectorAll('.page-container').forEach(el => el.remove());
+  document.getElementById('totalPages').textContent = '—';
+  pdfDoc = null; currPage = 1; freePages = 0;
+
+  // 로딩 표시
+  if (!document.getElementById('loadingWrap')) {
+    const lw = document.createElement('div');
+    lw.className = 'loading-wrap'; lw.id = 'loadingWrap';
+    lw.innerHTML = `<div class="spinner"></div><div class="loading-text">${t('loading')}</div>`;
+    wrap.appendChild(lw);
+  } else {
+    document.getElementById('loadingText').textContent = t('loading');
+  }
+
+  try {
+    const task = pdfjsLib.getDocument({
+      url: book().pdfUrl,
+      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+      cMapPacked: true
+    });
+    pdfDoc    = await task.promise;
+    freePages = Math.max(book().minFreePages, Math.floor(pdfDoc.numPages * book().previewRatio));
+    document.getElementById('totalPages').textContent = `${pdfDoc.numPages}p`;
+    document.getElementById('loadingWrap')?.remove();
+    gotoPage(1);
+  } catch(e) {
+    document.getElementById('loadingWrap')?.remove();
+    wrap.innerHTML = `
+      <div class="error-wrap">
+        <div class="error-icon">📄</div>
+        <div class="error-title">${t('err_title')}</div>
+        <div class="error-desc">${t('err_desc').replace(/\n/g,'<br>')}</div>
+      </div>`;
+    console.error('PDF load error:', e);
+  }
+}
+
+/* ── 책 전환 ── */
+function switchBook(idx) {
+  currBookIdx = idx;
+  fitWidth = true;
+  renderTabs();
+  renderHeader();
+  loadPdf();
+}
+
+/* ── 이벤트 ── */
+document.getElementById('btnFirst').addEventListener('click',  () => gotoPage(1));
+document.getElementById('btnPrev').addEventListener('click',   () => gotoPage(currPage - 1));
+document.getElementById('btnNext').addEventListener('click',   () => gotoPage(currPage + 1));
+document.getElementById('btnLast').addEventListener('click',   () => gotoPage(freePages));
+document.getElementById('pageInput').addEventListener('change',  e => gotoPage(parseInt(e.target.value,10)||1));
+document.getElementById('pageInput').addEventListener('keydown', e => { if(e.key==='Enter') gotoPage(parseInt(e.target.value,10)||1); });
+document.getElementById('btnZoomOut').addEventListener('click', () => { fitWidth=false; scale=Math.max(.4,scale-.15); renderPage(currPage); });
+document.getElementById('btnZoomIn').addEventListener('click',  () => { fitWidth=false; scale=Math.min(3,scale+.15); renderPage(currPage); });
+document.getElementById('btnFit').addEventListener('click',     () => { fitWidth=true; renderPage(currPage); });
+window.addEventListener('resize', () => { if(fitWidth && pdfDoc) renderPage(currPage); });
+
+/* ── Hub 언어 수신 ── */
+window.addEventListener('message', e => {
+  if(!e.data) return;
+  if(e.data.type === 'wf_lang') {
+    lang = e.data.lang || 'ko';
+    renderTabs();
+    renderHeader();
+  }
+});
+
+/* ── 초기화 ── */
+renderTabs();
+renderHeader();
+loadPdf();
+</script>
+</body>
+</html>

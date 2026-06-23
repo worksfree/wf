@@ -960,11 +960,16 @@ async function sendBulk() {
     return {to: toEmail, subject: finalSubj, html: buildEmailHtml(r.company, r.ceo, msgText, flyerName, flyerUrl, flyerBadge, flyerEmailHero, legal, toEmail)};
   });
 
-  // ── 관리자 확인 사본 (대량 발송 시 항상 1건 추가) ──────────────────
+  // ── 관리자 확인 사본 — bulk 배열과 분리해서 별도 발송 (rate limit 방지) ──
   var OWNER_EMAIL = 'support@worksfree.kr';
   var ownerSubj   = '[발송 확인 ' + rowsToSend.length + '건] ' + subject;
   var ownerHtml   = buildEmailHtml('발송 확인 사본', '', msgText, flyerName, flyerUrl, flyerBadge, flyerEmailHero, legal, OWNER_EMAIL);
-  emails = [{to: OWNER_EMAIL, subject: ownerSubj, html: ownerHtml}].concat(emails);
+  // 사본은 고객 bulk와 별도로 단건 발송 (bulk가 100건일 때 101건이 되어 2-청크가 생기는 것 방지)
+  fetch(MAIL_WORKER_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({to: OWNER_EMAIL, subject: ownerSubj, html: ownerHtml, meta: meta}),
+  }).catch(function(){});
 
   try {
     var res  = await fetch(MAIL_WORKER_URL, {
@@ -974,8 +979,7 @@ async function sendBulk() {
     });
     var data = await res.json();
     if (data.success) {
-      // data.sent에는 owner 사본 1건 포함 — 실제 수신자 수는 -1
-      var actualSent = Math.max(0, data.sent - 1);
+      var actualSent    = data.sent || 0;
       var filteredCount = data.filtered ? data.filtered.length : 0;
       var failedCount   = data.failed ? data.failed.length : 0;
       var resultItems   = (data.filtered || []).concat(data.failed || []);

@@ -24,7 +24,7 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.8.4.11"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.8.4.24"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -376,6 +376,24 @@ if ($ok) {
 }
 
 } # end foreach deployList
+
+# ── PDF 에셋 동기화 (staging/portal 배포 시 NAS 내 test → 해당 환경 복사) ──
+# PDF는 대용량이라 deploy.ps1 배포 대상에 포함되지 않음.
+# test에 업로드된 PDF를 NAS 내부에서 복사하여 staging/portal에 반영.
+if ($allOk -and ($choice -eq "2" -or $choice -eq "3")) {
+    $targetEnvPath = $T.Path
+    Write-Host ""
+    Write-Host "  ▶ PDF 에셋 동기화 (test → $($T.Name))..." -ForegroundColor Gray
+    $syncCmd = "mkdir -p '${targetEnvPath}/assets/books' && " +
+               "cp -r '/volume1/web/test/assets/books/.' '${targetEnvPath}/assets/books/' 2>&1 && echo 'SYNC_OK'"
+    $syncResult = & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} ""$syncCmd""" 2>&1
+    if ($syncResult -match 'SYNC_OK') {
+        Write-Host "    ✅ PDF 에셋 동기화 완료" -ForegroundColor Green
+    } else {
+        Write-Host "    ⚠️  PDF 동기화 실패 (test에 assets/books 가 없을 수 있음)" -ForegroundColor Yellow
+        Write-Host ($syncResult -join "`n") -ForegroundColor DarkYellow
+    }
+}
 
 # ── Cloudflare 캐시 퍼지 (전체 배포 완료 후 1회) ────────────────
 if ($allOk) {

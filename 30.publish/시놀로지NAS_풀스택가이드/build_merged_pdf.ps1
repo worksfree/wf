@@ -159,7 +159,7 @@ FLOW_HTML = (
 
     # 준비① 행 (보라)
     '<div style="display:flex;align-items:center;justify-content:center;gap:0;">'
-    f'<div style="{BOX_P}">자가 보유 도메인<br><span style="{SUB_P}">가비아</span></div>'
+    f'<div style="{BOX_P}">자체 도메인<br><span style="{SUB_P}">가비아</span></div>'
     f'<div style="{ARR}">→ NS위임 →</div>'
     f'<div style="{BOX_P}">네임서버 설정<br><span style="{SUB_P}">Cloudflare DNS</span></div>'
     f'<div style="{ARR}">→ 터널 생성 →</div>'
@@ -186,7 +186,7 @@ FLOW_HTML = (
     '<div style="display:flex;justify-content:center;">'
     '<div style="border:2px solid #2E7D32;border-radius:7px;background:#E8F5E9;'
     'padding:8px 18px;text-align:center;font-size:12px;font-weight:700;color:#1B5E20;line-height:1.5;">'
-    '자가 도메인으로 웹 서비스(홈페이지) 구동 가능'
+    '자체 도메인으로 웹서비스 운영 가능'
     '</div>'
     '</div>'
 
@@ -283,10 +283,10 @@ cover_page = cover_doc[0]
 pw, ph = cover_page.rect.width, cover_page.rect.height
 DARK = (4/255, 12/255, 28/255)
 # 최하단 42pt: 완전 불투명 — 핑크/보라 완전 차단 (텍스트 하단 여백 아래)
-cover_page.draw_rect(fitz.Rect(0, ph - 42, pw, ph), color=None, fill=DARK, fill_opacity=1.0)
+cover_page.draw_rect(fitz.Rect(0, ph - 20, pw, ph), color=None, fill=DARK, fill_opacity=1.0)
 cover_doc.save(cover_pdf_path, incremental=True, encryption=fitz.PDF_ENCRYPT_KEEP)
 cover_doc.close()
-print('  cover: dark gradient + solid bottom applied')
+print('  cover: solid bottom strip applied (20pt)')
 
 # ── 1. Merge PDFs ────────────────────────────────────────────────────
 doc = fitz.open()

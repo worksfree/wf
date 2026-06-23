@@ -556,7 +556,7 @@ function buildResult() {
   // Phase 2: 보험 연계 (2~6개월)
   if (!isIndiv && !isMedical && taxHigh) phase2Items.push('경영인정기보험 계약 — 비용처리 후 실질 납입 부담 = (보험료 × 78%) 구조 확정');
   if (isHighRisk || giNone) phase2Items.push(`단체 재해보장보험 신규 설계 (${C.empLabel||''}규모 맞춤, 인당 5~10만원 설계)`);
-  if (giPartial) phase2Items.push('기가입 단체보험 비교분석 — 삼성생명 등 경쟁사 대비 합리성 점검 후 업그레이드 설계');
+  if (giPartial) phase2Items.push('기가입 단체보험 비교분석 — 경쟁사 대비 합리성 점검 후 업그레이드 설계');
   if (reHigh || (stake100 && isMature)) phase2Items.push('이익잉여금 출구전략: 임원 퇴직금 사전 설계 + 법인 종신보험 상속세 재원 마련');
   if (ageSenior) phase2Items.push(`대표이사(${C.ageLabel||''}) 긴급 Key Person 보험 가입 — 연령 상승 전 빠른 실행`);
   if (!phase2Items.find(i=>i.includes('단체'))) phase2Items.push('임직원 복지 단체보험 패키지 설계 (재해+건강 분리 설계, 월별 분산 계약으로 할인 적용)');

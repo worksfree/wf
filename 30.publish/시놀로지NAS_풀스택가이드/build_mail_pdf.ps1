@@ -206,10 +206,10 @@ cover_doc = fitz.open(cover_pdf_path)
 cover_page = cover_doc[0]
 pw, ph = cover_page.rect.width, cover_page.rect.height
 DARK = (4/255, 12/255, 28/255)
-cover_page.draw_rect(fitz.Rect(0, ph - 42, pw, ph), color=None, fill=DARK, fill_opacity=1.0)
+cover_page.draw_rect(fitz.Rect(0, ph - 20, pw, ph), color=None, fill=DARK, fill_opacity=1.0)
 cover_doc.save(cover_pdf_path, incremental=True, encryption=fitz.PDF_ENCRYPT_KEEP)
 cover_doc.close()
-print('  cover: dark strip applied')
+print('  cover: solid bottom strip applied (20pt)')
 
 # Merge
 doc = fitz.open()

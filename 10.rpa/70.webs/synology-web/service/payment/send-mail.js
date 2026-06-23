@@ -344,12 +344,15 @@ export default {
       }, 429);
     }
 
-    // ── Resend API 호출 (100건씩 청크 — Resend batch 단건 제한) ──────
+    // ── Resend API 호출 (100건씩 청크, 초당 2건 레이트 제한 준수) ──────
     const auth      = 'Bearer ' + env.RESEND_API_KEY;
     const CHUNK     = 100;
+    const RATE_MS   = 550; // Resend: 2 req/sec 제한 → 청크 간 550ms 대기
     const sentEmails = [];
     const failed = [];
     const sendErrors = [];
+
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
 
     async function sendOne(e) {
       const res = await fetch('https://api.resend.com/emails', {
@@ -363,6 +366,7 @@ export default {
     }
 
     for (let i = 0; i < toSend.length; i += CHUNK) {
+      if (i > 0) await sleep(RATE_MS); // 청크 간 간격 — Resend 초당 2건 제한 준수
       const chunk = toSend.slice(i, i + CHUNK);
       let resendRes;
 
