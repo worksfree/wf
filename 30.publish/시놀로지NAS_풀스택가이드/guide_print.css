@@ -7,7 +7,7 @@
 /* ── 페이지 설정 (A5, 제본 내측 여백 좌측 우선) ── */
 @page {
   size: 148mm 210mm;
-  margin: 20mm 17mm 22mm 20mm; /* top right bottom left */
+  margin: 20mm 19mm 22mm 20mm; /* top right bottom left */
 }
 
 /* ── 리셋 ── */
@@ -100,7 +100,7 @@ li > ul, li > ol { margin-top: 1mm; }
 div.sourceCode, pre {
   background: #f5f6f8;
   border: 1px solid #d8dde6;
-  border-left: 3px solid #1A9FD4;
+  border-left: 3px solid #059669;
   border-radius: 0 4px 4px 0;
   padding: 3mm 4mm;
   margin: 3mm 0 4mm 0;
@@ -126,6 +126,15 @@ pre code, div.sourceCode code {
   padding: 0;
   color: inherit;
   font-size: inherit;
+}
+/* div.sourceCode > pre: 외부 div가 이미 테두리/배경을 가지므로 내부 pre 중복 제거 */
+div.sourceCode pre {
+  border: none;
+  border-left: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
 }
 
 /* ── 표 (행 단위 분리 차단; 표 전체는 가능하면 한 페이지에, 큰 표는 자동 분리) ── */

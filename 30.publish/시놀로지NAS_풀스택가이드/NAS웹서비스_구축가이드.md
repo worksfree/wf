@@ -527,6 +527,8 @@ flowchart TD
 
 > 이 네임서버 주소를 1.2 네임서버를 Cloudflare로 변경 단계에서 입력합니다.
 
+<div class="pagebreak"></div>
+
 ### 2.3 SSL/TLS 모드 설정
 
 **메뉴 경로**:  
@@ -539,17 +541,9 @@ flowchart TD
 >
 > **💡 NAS에 별도 인증서가 없어도 Full (Strict)가 작동하는 이유**  
 > Cloudflare는 도메인을 등록하는 순간 방문자용 HTTPS 인증서를 **자동으로 발급·관리**합니다 (별도 작업 불필요).  
-> 트래픽 흐름은 다음과 같습니다.
 >
-> ```
-> 방문자 ──[HTTPS: Cloudflare 자동 인증서]──▶ Cloudflare ──[Tunnel]──▶ NAS
-> ```
->
-> 방문자와 Cloudflare 사이는 Cloudflare가 발급한 신뢰된 인증서가 처리하고,  
-> Cloudflare와 NAS 사이는 `cloudflared` Tunnel이 담당합니다.  
+> 방문자와 Cloudflare 사이는 Cloudflare가 발급한 신뢰된 인증서가 처리하고, Cloudflare와 NAS 사이는 `cloudflared` Tunnel이 담당합니다.
 > NAS 자체에는 인증서가 없어도 되므로, **별도 인증서를 직접 만들거나 설치할 필요가 없습니다.**
-
-<div class="pagebreak"></div>
 
 ### 2.4 HTTPS 자동 리디렉션 설정
 
@@ -629,6 +623,8 @@ mkdir -p /volume1/web/test
 
 > 배포 스크립트가 비밀번호 없이 NAS에 접속할 수 있도록 설정합니다.
 
+<div class="pagebreak"></div>
+
 **로컬 PC(Windows)에서**:
 
 ```bash
@@ -665,18 +661,17 @@ ssh admin@192.168.x.x "echo SSH key OK"
 
 ### 터널이 왜 필요한가?
 
-집이나 사무실에 있는 NAS는 기본적으로 외부 인터넷에서 접근할 수 없습니다.  
-일반적인 해결책은 공유기에서 **포트포워딩**이라는 설정을 해야 하는데,  
-이 방법은 복잡한 데다 보안에도 취약합니다.
+집이나 사무실에 있는 NAS는 기본적으로 외부 인터넷에서 접근할 수 없습니다. 일반적인 해결책은 공유기에서 **포트포워딩**이라는 설정을 해야 하는데, 이 방법은 복잡한 데다 보안에도 취약합니다.
 
 **Cloudflare Tunnel은 이 문제를 완전히 다른 방식으로 해결합니다.**
 
-> 비유: 일반 포트포워딩은 "우리 집 주소와 현관 번호를 인터넷에 공개"하는 것과 같습니다.  
+> 비유: 일반 포트포워딩은 "우리 집 주소와 현관 번호를 인터넷에 공개"하는 것과 같습니다. 
 > 반면 Cloudflare Tunnel은 **NAS가 먼저 Cloudflare에 전화를 걸어 항상 연결 대기 상태를 유지**하는 방식입니다.  
 > 외부에서 접속 요청이 오면, 이미 열려있는 이 통화 채널을 통해 안전하게 전달됩니다.  
 > 우리 집 주소는 전혀 공개되지 않습니다.
 
 **결과적으로**:
+
 - 공유기 설정 불필요
 - NAS IP 주소 외부 노출 없음
 - Cloudflare의 보안 필터링 자동 적용
@@ -828,9 +823,7 @@ Tunnel 설정 후 자동 생성된 CNAME 레코드 확인:
 
 ### Worker가 왜 필요한가?
 
-웹 서비스를 만들다 보면 외부 데이터를 가져와야 할 때가 있습니다.  
-예를 들어 **DART(금융감독원 전자공시시스템)** 에서 기업 공시 정보를 조회하는 기능을 만든다고 할 때,  
-브라우저에서 DART API에 직접 요청을 보내면 **거절**당합니다.
+웹 서비스를 만들다 보면 외부 데이터를 가져와야 할 때가 있습니다. 예를 들어 **DART(금융감독원 전자공시시스템)** 에서 기업 공시 정보를 조회하는 기능을 만든다고 할 때, 브라우저에서 DART API에 직접 요청을 보내면 **거절**당합니다.
 
 > **왜 거절당할까?**  
 > 보안 정책 때문입니다. DART API를 운영하는 쪽에서 "우리 API는 허가된 서버에서만 호출할 수 있고,  
@@ -1024,10 +1017,8 @@ Google, 카카오 각각이 요구하는 **OAuth 2.0 프로토콜**을 구현해
 
 페이스북 OAuth는 Supabase가 지원하지만, Meta 개발자 플랫폼에서  
 **비즈니스 인증과 앱 심사**를 별도로 받아야 합니다. (심사 기간 최대 수 주)  
-인스타그램은 독립적인 OAuth를 제공하지 않고 Facebook Login을 경유하는 구조여서  
-결국 Facebook과 동일한 심사 절차가 필요합니다.  
-심사를 통과해도 제공하는 추가 커버리지가 Google로 이미 충당되는 해외 사용자층과 크게 겹쳐  
-투자 대비 효과가 낮다고 판단했습니다.
+인스타그램은 독립적인 OAuth를 제공하지 않고 Facebook Login을 경유하는 구조여서 결국 Facebook과 동일한 심사 절차가 필요합니다.
+심사를 통과해도 제공하는 추가 커버리지가 Google로 이미 충당되는 해외 사용자층과 크게 겹쳐 투자 대비 효과가 낮다고 판단했습니다.
 
 #### 결론 — 카카오 + Google 두 가지로 충분한 이유
 
@@ -1236,8 +1227,8 @@ http://127.0.0.1:5500/**
 
 ### 8.1 DB 설계 원칙
 
-실제로 운영하다 보면 DB 스크립트를 **여러 번 실행**해야 하는 상황이 생깁니다.  
-(설정 변경, 컬럼 추가, 정책 수정 등) 이때 **멱등성(Idempotency)** 을 보장해야 합니다.
+실제로 운영하다 보면 DB 스크립트를 **여러 번 실행**해야 하는 상황이 생깁니다. (설정 변경, 컬럼 추가, 정책 수정 등)
+이때 **멱등성(Idempotency)** 을 보장해야 합니다.
 
 > **멱등성**: 같은 스크립트를 몇 번 실행해도 항상 동일한 결과가 나오는 성질.  
 > `CREATE TABLE IF NOT EXISTS`, `ALTER TABLE ADD COLUMN IF NOT EXISTS`,  
@@ -1273,7 +1264,7 @@ supabase/
 5. **실행**: **"Run"** 버튼 클릭 또는 `Ctrl+Enter`
 6. **결과 확인**: 하단 Results 패널에서 섹션별 결과 확인
 
-> 오류가 발생하면 빨간 에러 메시지가 표시됩니다. 오류 내용을 복사해서 공유하면 해결책을 찾을 수 있습니다.
+> 오류가 발생하면 빨간 에러 메시지가 표시되니 참고하기 바랍니다.
 
 #### 일부 블록만 선택해서 실행
 
@@ -1290,8 +1281,7 @@ supabase/
 1. 실행할 블록의 시작 줄부터 끝 줄까지 마우스로 드래그
 2. `Ctrl+Enter` → **선택 영역만** 실행됨
 
-> ⚠️ **주의**: 방법 B는 선택 범위를 잘못 잡으면 절반만 실행되어 오류가 납니다.  
-> 불확실하면 방법 A를 사용하세요.
+> ⚠️ **주의**: 방법 B는 선택 범위를 잘못 잡으면 절반만 실행되어 오류가 납니다. 불확실하면 방법 A를 사용하세요.
 
 #### 예시: admin_set_user_name 함수 하나만 추가
 
@@ -1448,8 +1438,7 @@ page_views     → id, user_id, page, duration_s, env, viewed_at
 | page_views | pv_insert_own · pv_select_own · pv_update_own | 본인 행 |
 | page_views | pv_admin_select (SELECT) | 관리자 전체 조회 |
 
-> **credits·payments env 컬럼**: test/staging/www 환경이 동일 DB를 공유할 때  
-> 결제·크레딧 데이터를 환경별로 분리하는 컬럼. 상세는 8.7절 참고.
+> **credits·payments env 컬럼**: test/staging/www 환경이 동일 DB를 공유할 때 결제·크레딧 데이터를 환경별로 분리하는 컬럼. 상세는 8.7절 참고.
 
 ### 8.5 사용자 역할(role) 지정
 
@@ -2061,12 +2050,10 @@ PG사 테스트 모드에서는 **실제 돈이 전혀 오가지 않습니다.**
 
 #### 실서비스 전환 후 주의사항
 
-- 테스트 카드 번호(`4242 4242 ...`)는 **실서비스 키에서는 작동하지 않습니다.**  
-  실제 카드만 사용 가능합니다.
+- 테스트 카드 번호(`4242 4242 ...`)는 **실서비스 키에서는 작동하지 않습니다.** 실제 카드만 사용 가능합니다.
 - Worker 환경 변수에 실서비스 시크릿 키를 저장할 때 반드시 **Encrypt** 옵션을 켜세요.  
   키가 외부에 노출되면 타인이 내 계정으로 결제 조작을 할 수 있습니다.
-- 실서비스 중 결제 오류가 발생하면, 토스/Stripe 대시보드의 **로그(Logs)** 탭에서  
-  어떤 에러가 반환됐는지 먼저 확인하세요.
+- 실서비스 중 결제 오류가 발생하면, 토스/Stripe 대시보드의 **로그(Logs)** 탭에서 어떤 에러가 반환됐는지 먼저 확인하세요.
 - 정산일·정산 주기를 각 PG 대시보드에서 미리 확인해두세요.  
   (토스는 기본 D+1, Stripe는 기본 주 1회 또는 월 1회)
 
@@ -2132,8 +2119,7 @@ _sb.auth.onAuthStateChange((event, session) => {
 ## 11장. 배포 자동화 스크립트 (Windows PowerShell)
 
 > 로컬에서 작업한 파일을 NAS에 자동으로 업로드하는 스크립트입니다.  
-> Git Bash의 `tar`를 사용하여 Google Drive 클라우드 파일도 포함 전송하며,  
-> 배포 후 Cloudflare Edge 캐시까지 자동으로 초기화합니다.
+> Git Bash의 `tar`를 사용하여 Google Drive 클라우드 파일도 포함 전송하며, 배포 후 Cloudflare Edge 캐시까지 자동으로 초기화합니다.
 
 ### 11.1 3단계 배포 흐름
 
@@ -2210,8 +2196,8 @@ pause
 ```powershell
 # ── 변수 ──
 $VERSION    = "0.7.4.12"   # 배포 시 자동 갱신
-$NAS_USER   = "wfadmin"
-$NAS_IP     = "192.168.100.38"
+$NAS_USER   = "계정명"
+$NAS_IP     = "192.168.x.x"
 $GIT_BASH   = "C:\Program Files\Git\bin\bash.exe"
 $CF_ZONE_ID = "<Cloudflare Zone ID>"
 $CF_API_TOKEN = "<Cloudflare API Token>"
@@ -2239,8 +2225,8 @@ Invoke-RestMethod -Uri "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/p
     -Body '{"purge_everything":true}'
 ```
 
-> ⚠️ `--no-same-permissions --no-same-owner 2>/dev/null; exit 0` 없으면  
-> NAS의 BusyBox tar가 디렉토리 권한 변경 실패 오류를 내며 배포 실패로 잘못 판정됩니다.
+> ⚠️ `--no-same-permissions --no-same-owner 2>/dev/null; exit 0`
+> 없으면 NAS의 BusyBox tar가 디렉토리 권한 변경 실패 오류를 내며 배포 실패로 잘못 판정됩니다.
 
 ---
 
@@ -2627,19 +2613,19 @@ Invoke-RestMethod -Uri "https://send-mail.계정명.workers.dev" -Method GET
 
 #### 14.5.2 Google Workspace 별칭 추가 (답장 수신용)
 
-발신 주소를 `consulting@worksfree.co.kr`로 설정하면, 수신자가 답장 시 해당 주소로 옵니다.  
+발신 주소를 `consulting@yourdomain.co.kr`로 설정하면, 수신자가 답장 시 해당 주소로 옵니다.  
 `consulting@`로 온 메일을 받으려면 Google Workspace에 별칭을 추가합니다.
 
-1. [admin.google.com](https://admin.google.com) → **사용자** → `insung.lee` 선택
-2. **사용자 정보** → **별칭** → `consulting@worksfree.co.kr` 추가
+1. [admin.google.com](https://admin.google.com) → **사용자** → `your.account` 선택
+2. **사용자 정보** → **별칭** → `consulting@yourdomain.co.kr` 추가
 
-이후 `consulting@`로 온 메일이 `support@worksfree.kr` 받은편지함에 도착합니다.
+이후 `consulting@`로 온 메일이 `support@yourdomain.kr` 받은편지함에 도착합니다.
 
 #### 14.5.3 발신자 주소를 Worker에 등록
 
 ```powershell
 wrangler secret put MAIL_FROM --config service/payment/wrangler-mail.toml
-# 값: WorksFree 컨설팅 <consulting@worksfree.co.kr>
+# 값: 회사명 <consulting@yourdomain.co.kr>
 ```
 
 > Worker는 `MAIL_FROM` 시크릿이 없으면 자동으로 `onboarding@resend.dev`를 사용합니다.  

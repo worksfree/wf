@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -35,25 +35,17 @@
       flex-shrink: 0;
       overflow: hidden;
     }
-    .page-header svg {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-    }
+    .page-header svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     .header-label {
       position: absolute;
-      bottom: 16px;
-      left: 36px;
+      bottom: 16px; left: 36px;
       color: #ffffff;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      text-transform: uppercase;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 4px; text-transform: uppercase;
     }
     .header-accent {
       position: absolute;
-      bottom: 0;
-      left: 0; right: 0;
+      bottom: 0; left: 0; right: 0;
       height: 2px;
       background: linear-gradient(90deg, #1A9FD4 0%, #29B6F6 50%, transparent 100%);
     }
@@ -61,92 +53,95 @@
     /* ── 본문 ── */
     .page-body {
       flex: 1;
-      padding: 32px 48px 20px;
+      padding: 24px 44px 16px;
       display: flex;
       flex-direction: column;
     }
 
-    .title-block { margin-bottom: 20px; }
+    .title-block { margin-bottom: 16px; }
     .title-kr {
-      font-size: 20px;
-      font-weight: 900;
-      color: #0B1628;
-      line-height: 1.4;
-      margin-bottom: 8px;
-      letter-spacing: -0.3px;
+      font-size: 18px; font-weight: 900;
+      color: #0B1628; line-height: 1.4;
+      margin-bottom: 6px; letter-spacing: -0.3px;
     }
     .title-kr span { color: #1A9FD4; }
-    .title-en {
-      font-size: 11px;
-      color: #aaa;
-      line-height: 1.7;
-    }
+    .title-en { font-size: 10.5px; color: #aaa; line-height: 1.7; }
 
-    /* 정보 테이블 */
+    /* ── 정보 테이블 공통 ── */
     .info-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 0;
     }
     .info-table tr { border-bottom: 1px solid #f0f0f0; }
     .info-table tr:first-child { border-top: 1px solid #ddd; }
-    .info-table td {
-      padding: 10px 0;
-      font-size: 12.5px;
-      vertical-align: top;
-    }
+    .info-table td { padding: 8px 0; font-size: 11.5px; vertical-align: middle; }
     .info-label {
-      color: #1A9FD4;
-      font-weight: 700;
-      width: 88px;
-      font-size: 11px;
-      letter-spacing: 0.5px;
+      color: #1A9FD4; font-weight: 700;
+      width: 58px; font-size: 10px;
+      letter-spacing: 0.5px; white-space: nowrap;
     }
-    .info-value { color: #333; line-height: 1.6; }
+    .info-value { color: #333; line-height: 1.5; padding-right: 10px; }
 
-    /* 저작권 */
+    /* ── ISBN 행 (라벨 | 값 | 바코드) ── */
+    .isbn-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0;
+    }
+    .isbn-table tr { border-bottom: 1px solid #ddd; }
+    .isbn-table td { padding: 10px 0; font-size: 11.5px; vertical-align: middle; }
+    .isbn-table .info-label { color: #1A9FD4; font-weight: 700; width: 58px; font-size: 10px; letter-spacing: 0.5px; white-space: nowrap; }
+    .isbn-table .info-value { color: #333; line-height: 1.5; padding-right: 10px; }
+    .barcode-cell {
+      width: 140px;
+      text-align: right;
+      vertical-align: middle;
+      padding-left: 8px;
+    }
+    .barcode-cell img { width: 132px; height: auto; display: block; margin-left: auto; }
+
+    /* ── 저작권 ── */
     .copyright-block {
-      margin-top: 20px;
-      padding-top: 20px;
+      margin-top: 16px;
+      padding-top: 14px;
       border-top: 1px solid #e8e8e8;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     .copyright-text {
-      font-size: 11px;
-      color: #888;
-      line-height: 1.85;
-      margin-bottom: 16px;
+      font-size: 10px; color: #888;
+      line-height: 1.8; margin-bottom: 12px;
     }
 
-    /* 출판사 하단 */
-    .publisher-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    /* ── 면책조항 ── */
+    .disclaimer-block {
+      background: #f8f9fb;
+      border-left: 2px solid #1A9FD4;
+      border-radius: 0 4px 4px 0;
+      padding: 10px 12px;
+      margin-bottom: 14px;
     }
+    .disclaimer-title {
+      font-size: 9px; font-weight: 700;
+      color: #1A9FD4; letter-spacing: 0.8px;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .disclaimer-text { font-size: 9.5px; color: #777; line-height: 1.78; }
+
+    /* ── 출판사 하단 ── */
+    .publisher-footer { display: flex; align-items: center; }
     .pub-logo-block { display: flex; flex-direction: column; }
-    .pub-logo-name {
-      font-size: 20px;
-      font-weight: 900;
-      color: #0B1628;
-      letter-spacing: 1px;
-    }
-    .pub-logo-name span { color: #0B1628; }
-    .pub-logo-tagline {
-      font-size: 9.5px;
-      color: #aaa;
-      letter-spacing: 0.5px;
-      margin-top: 3px;
-    }
+    .pub-logo-name { font-size: 18px; font-weight: 900; color: #0B1628; letter-spacing: 1px; }
+    .pub-logo-tagline { font-size: 9px; color: #aaa; letter-spacing: 0.5px; margin-top: 2px; }
 
-    /* ── 하단 ── */
+    /* ── 하단 바 ── */
     .page-footer {
-      height: 34px;
-      background: #0B1628;
-      display: flex;
-      align-items: center;
+      height: 34px; background: #0B1628;
+      display: flex; align-items: center;
       justify-content: space-between;
-      padding: 0 36px;
-      flex-shrink: 0;
+      padding: 0 36px; flex-shrink: 0;
     }
     .footer-pub { font-size: 10px; color: #1A9FD4; font-weight: 700; letter-spacing: 2px; }
     .footer-page { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
@@ -182,68 +177,84 @@
   <div class="page-body">
 
     <div class="title-block">
-      <div class="title-kr">
-        시놀로지 <span>NAS</span> 풀스택 인프라 구축 완전 가이드
-      </div>
+      <div class="title-kr">시놀로지 <span>NAS</span> 풀스택 인프라 구축 완전 가이드</div>
       <div class="title-en">
         Synology NAS Full-Stack Infrastructure Complete Guide<br>
         Gabia · Cloudflare Tunnel/Worker · Supabase Auth·DB · RBAC · Online Payment
       </div>
     </div>
 
+    <!-- 기본 정보 테이블 (4컬럼, 3행) -->
     <table class="info-table">
+      <colgroup>
+        <col style="width:58px"><col><col style="width:58px"><col>
+      </colgroup>
       <tr>
         <td class="info-label">저&emsp;자</td>
         <td class="info-value">이인성</td>
-      </tr>
-      <tr>
         <td class="info-label">발&emsp;행</td>
         <td class="info-value">2026년 06월 22일</td>
       </tr>
       <tr>
         <td class="info-label">출판사</td>
         <td class="info-value">웍스프리 (WorksFree)</td>
-      </tr>
-      <tr>
         <td class="info-label">이메일</td>
         <td class="info-value">support@worksfree.kr</td>
       </tr>
       <tr>
         <td class="info-label">웹사이트</td>
         <td class="info-value">www.worksfree.kr</td>
-      </tr>
-      <tr>
-        <td class="info-label">ISBN</td>
-        <td class="info-value">979-11-992314-7-4 (15000)</td>
-        <td rowspan="2" style="vertical-align: middle; text-align: right; padding-left: 10px; width: 158px;">
-          <img src="isbn-barcode.svg" style="width: 148px; height: auto; display: block;" alt="ISBN 979-11-992314-7-4">
-        </td>
-      </tr>
-      <tr>
         <td class="info-label">정&emsp;가</td>
         <td class="info-value">39,900원</td>
       </tr>
     </table>
 
+    <!-- ISBN 행 (라벨 | 값 | 바코드 이미지) -->
+    <table class="isbn-table">
+      <tr>
+        <td class="info-label">ISBN</td>
+        <td class="info-value">979-11-992314-7-4 (15000)</td>
+        <td class="barcode-cell">
+          <img src="isbn-barcode.svg" alt="ISBN 979-11-992314-7-4">
+        </td>
+      </tr>
+    </table>
+
     <div class="copyright-block">
-      <p class="copyright-text">
-        Copyright © 2026 이인성, 웍스프리. All rights reserved.<br><br>
-        이 전자책의 저작권은 저자와 웍스프리에 있습니다. 저작권법에 의해 보호를 받는
-        저작물이므로 무단 전재와 무단 복제를 금합니다. 이 책의 일부 또는 전부를 이용하려면
-        반드시 저작권자의 서면 동의를 받아야 합니다.<br><br>
-        이 가이드의 실제 구현 사례는 WorksFree Hub(www.worksfree.kr)를 기반으로 하며,
-        예시 코드 및 설정값은 학습 목적으로만 활용하시기 바랍니다.
-      </p>
+
+      <div>
+        <p class="copyright-text">
+          Copyright © 2026 이인성, 웍스프리. All rights reserved.<br><br>
+          이 전자책의 저작권은 저자와 웍스프리에 있습니다. 저작권법에 의해 보호를 받는 저작물이므로
+          무단 전재와 무단 복제를 금합니다. 이 책의 일부 또는 전부를 이용하려면 반드시 저작권자의
+          서면 동의를 받아야 합니다.<br><br>
+          이 가이드의 실제 구현 사례는 WorksFree Hub(www.worksfree.kr)를 기반으로 하며,
+          예시 코드 및 설정값은 학습 목적으로만 활용하시기 바랍니다.<br><br>
+        </p>
+
+        <div class="disclaimer-block">
+          <div class="disclaimer-title">상표권 고지 및 면책 조항 · Trademark Notice &amp; Disclaimer</div>
+          <p class="disclaimer-text">
+            이 책에 등장하는 Synology, Cloudflare, Supabase, Resend, 토스페이먼츠(Toss Payments),
+            Gabia, Google 등의 명칭은 각 해당 기업의 등록상표 또는 서비스표입니다.
+            저자 및 출판사는 언급된 어떠한 기업과도 제휴·보증·공식 파트너 관계에 있지 않습니다.<br>
+            이 책의 내용은 집필 시점의 서비스 정책·UI·가격을 기준으로 하며, 이후 서비스 변경으로
+            내용이 달라질 수 있습니다. 저자와 출판사는 이 책의 활용 결과에 대해 어떠한
+            법적 책임도 지지 않습니다.
+          </p>
+        </div>
+      </div>
 
       <div class="publisher-footer">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <img src="logo_wf.png" style="width: 40px; height: 40px; object-fit: contain; display: block; flex-shrink: 0;" alt="WorksFree">
+          <img src="logo_wf.png" style="width: 36px; height: 36px; object-fit: contain; display: block; flex-shrink: 0;" alt="WorksFree">
           <div class="pub-logo-block">
-            <div class="pub-logo-name">웍스<span>프리</span></div>
+            <div class="pub-logo-name">웍스<span style="color:#0B1628">프리</span></div>
             <div class="pub-logo-tagline">Our Works Make You Free</div>
           </div>
         </div>
       </div>
+
     </div>
 
   </div>

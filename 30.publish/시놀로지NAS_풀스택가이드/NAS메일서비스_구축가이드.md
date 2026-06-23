@@ -67,7 +67,7 @@ Synology MailPlus Server
 | Cloudflare 계정 | 도메인 DNS 관리 중, Tunnel 운영 중 |
 | Resend 계정 | resend.com 가입 완료, API 키 보유 |
 | 도메인 | 예: `worksfree.kr` (Cloudflare DNS 관리 중) |
-| NAS SSH 접속 | wfadmin 또는 admin 계정 |
+| NAS SSH 접속 | support 또는 admin 계정 |
 
 ---
 
@@ -101,7 +101,7 @@ DSM → **패키지 센터** → 검색: `MailPlus Server` → **설치**
 **MailPlus Server → 계정 → 생성**
 
 - 도메인: `worksfree.kr` 선택
-- 계정 이름: 예) `wfadmin` → 이메일 주소: `wfadmin@worksfree.kr`
+- 계정 이름: 예) `support` → 이메일 주소: `support@worksfree.kr`
 
 ### 1.4 FQDN 설정 확인
 
@@ -118,7 +118,7 @@ DSM → **패키지 센터** → 검색: `MailPlus Server` → **설치**
 
 MailPlus Server 무료 라이선스는 계정 5개까지만 허용합니다. 별칭(Alias)을 사용하면 추가 라이선스 없이 여러 이메일 주소를 한 계정에서 수신할 수 있습니다.
 
-**예시**: `info@worksfree.kr`, `support@worksfree.kr`, `hello@worksfree.kr` → 모두 `wfadmin` 계정 받은편지함으로 수신. 라이선스는 1개만 사용.
+**예시**: `info@worksfree.kr`, `support@worksfree.kr`, `hello@worksfree.kr` → 모두 `support` 계정 받은편지함으로 수신. 라이선스는 1개만 사용.
 
 > **별칭 vs 메일 그룹**
 >
@@ -134,23 +134,23 @@ MailPlus Server 무료 라이선스는 계정 5개까지만 허용합니다. 별
 | 입력 항목 | 예시 값 |
 |----------|---------|
 | 별칭 주소 | `info` (→ `info@worksfree.kr`) |
-| 수신 계정 | `wfadmin` (또는 다른 활성 계정 선택) |
+| 수신 계정 | `support` (또는 다른 활성 계정 선택) |
 
 **추가 가능한 별칭 예시:**
 
 | 별칭 주소 | 용도 | 수신 계정 |
 |----------|------|----------|
-| `info` | 일반 문의 | `wfadmin` |
-| `support` | 기술 지원 | `wfadmin` |
-| `noreply` | 자동 발신 전용 | `wfadmin` |
-| `admin` | 관리자 | `wfadmin` |
-| `hello` | 마케팅 문의 | `wfadmin` |
+| `info` | 일반 문의 | `support` |
+| `support` | 기술 지원 | `support` |
+| `noreply` | 자동 발신 전용 | `support` |
+| `admin` | 관리자 | `support` |
+| `hello` | 마케팅 문의 | `support` |
 
 > 별칭은 수신 전용입니다. 발신 시 `From` 주소를 별칭으로 표시하려면 MailPlus 클라이언트에서 **설정 → 계정 → 보낸 사람 주소 추가** 후 원하는 별칭 주소를 등록하세요.
 
 #### 별칭 동작 확인
 
-외부에서 `info@worksfree.kr`로 테스트 메일 발송 → `wfadmin` 계정 받은편지함에 수신되면 성공입니다.
+외부에서 `info@worksfree.kr`로 테스트 메일 발송 → `support` 계정 받은편지함에 수신되면 성공입니다.
 
 ---
 
@@ -247,7 +247,7 @@ Cloudflare Email Worker에서 보내는 HTTP 요청을 받아 NAS 내부의 Mail
 NAS SSH 접속:
 
 ```bash
-ssh wfadmin@192.168.x.x
+ssh 계정명@192.168.x.x
 ```
 
 폴더 및 파일 생성:
@@ -387,7 +387,7 @@ Invoke-RestMethod -Uri "https://bridge.worksfree.kr/email-inject-json" `
     "x-secret"      = "여기에_BRIDGE_SECRET_값"
     "Content-Type"  = "application/json"
   } `
-  -Body '{"from":"test@worksfree.kr","to":"wfadmin@worksfree.kr","subject":"브릿지 테스트","text":"정상 동작 확인"}'
+  -Body '{"from":"test@yourdomain.kr","to":"계정명@yourdomain.kr","subject":"브릿지 테스트","text":"정상 동작 확인"}'
 ```
 
 `{ ok: true }` 응답과 함께 MailPlus 받은편지함에 메일이 도착하면 성공입니다.
@@ -514,7 +514,7 @@ MailPlus 작성 → 외부 이메일(Gmail 등)로 발송
 
 ### 8.2 수신 테스트 — 텍스트
 
-외부에서 `wfadmin@worksfree.kr`로 텍스트 메일 발송 → MailPlus 받은편지함 확인
+외부에서 `계정명@yourdomain.kr`로 텍스트 메일 발송 → MailPlus 받은편지함 확인
 
 ### 8.3 수신 테스트 — HTML + 인라인 이미지
 
