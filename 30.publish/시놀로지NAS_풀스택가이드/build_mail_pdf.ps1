@@ -200,9 +200,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 *parts, tmp_out = sys.argv[1:]
 
-# ── Cover: solid bottom strip only
-# SVG gradient in HTML already provides dark text background.
-# pymupdf gradient loop removed — drew semi-transparent rects over white text.
+# Cover: solid bottom strip
 cover_pdf_path = parts[0]
 cover_doc = fitz.open(cover_pdf_path)
 cover_page = cover_doc[0]
@@ -211,9 +209,9 @@ DARK = (4/255, 12/255, 28/255)
 cover_page.draw_rect(fitz.Rect(0, ph - 42, pw, ph), color=None, fill=DARK, fill_opacity=1.0)
 cover_doc.save(cover_pdf_path, incremental=True, encryption=fitz.PDF_ENCRYPT_KEEP)
 cover_doc.close()
-print('  cover: dark gradient + solid bottom applied')
+print('  cover: dark strip applied')
 
-# ── Merge
+# Merge
 doc = fitz.open()
 total = 0
 for p in parts:
@@ -228,90 +226,85 @@ SKIP_START = 3  # cover, author, book
 SKIP_END   = 1  # copyright
 guide_count = total - SKIP_START - SKIP_END
 
-# ── TOC 페이지 검출 (섹션번호가 많은 페이지)
-page_sn_data = {}
-for page_idx in range(SKIP_START, total - SKIP_END):
-    page = doc[page_idx]
-    sns = []
-    for w in page.get_text("words"):
-        word = w[4].strip()
-        if re.match(r'^\d{1,2}(?:\.\d{1,2}){0,2}$', word):
-            parts_n = [int(x) for x in word.split('.')]
-            if all(1 <= x <= 25 for x in parts_n):
-                sns.append((word, w[3]))
-    page_sn_data[page_idx] = sns
+# Predefined chapter markers for mail guide (pandoc h2 headings)
+MAIL_TOC_DEFS = [
+    (1, "이 가이드를 읽기 전에"),
+    (1, "전체 구성도"),
+    (1, "사전 준비물"),
+    (1, "1장."),
+    (1, "2장."),
+    (1, "3장."),
+    (1, "4장."),
+    (1, "5장."),
+    (1, "6장."),
+    (1, "7장."),
+    (1, "8장."),
+    (1, "부록 A."),
+    (1, "부록 B."),
+    (1, "부록 C."),
+    (1, "부록 D."),
+]
+
+# TOC page detection: pandoc generates "목차" heading + chapter names on same page
+def is_toc_page(page):
+    text = page.get_text("text")
+    if "목차" in text and sum(1 for k in ["1장", "2장", "3장", "4장", "5장"] if k in text) >= 3:
+        return True
+    return False
 
 toc_pages = []
 for page_idx in range(SKIP_START, total - SKIP_END):
-    if len(page_sn_data.get(page_idx, [])) > 12:
+    if is_toc_page(doc[page_idx]):
         toc_pages.append(page_idx)
-    elif toc_pages:
-        break
 print(f'TOC pages: {toc_pages}')
 
-# ── 섹션 위치 수집
-section_pages = {}
-for page_idx in range(SKIP_START, total - SKIP_END):
-    if page_idx in toc_pages:
-        continue
-    for sn, _ in page_sn_data.get(page_idx, []):
-        if sn not in section_pages:
-            section_pages[sn] = page_idx - SKIP_START + 1
-print(f'sections found: {len(section_pages)}')
-
-# ── TOC 페이지에 페이지번호 오버레이
-for toc_idx in toc_pages:
-    page = doc[toc_idx]
-    pw = page.rect.width
-    drawn = set()
-    for w in page.get_text("words"):
-        word = w[4].strip()
-        if re.match(r'^\d{1,2}(?:\.\d{1,2}){0,2}$', word) and word in section_pages:
-            x1, y0, x2, y1 = w[0], w[1], w[2], w[3]
-            if word not in drawn:
-                pg_num = str(section_pages[word])
-                page.draw_rect(fitz.Rect(x1 - 1, y0 - 1, x2 + 50, y1 + 1),
-                               color=None, fill=(1, 1, 1), fill_opacity=1.0)
-                page.insert_text(
-                    fitz.Point(pw - 52, y1),
-                    pg_num,
-                    fontsize=9, color=(0.4, 0.4, 0.4)
-                )
-                drawn.add(word)
-print(f'TOC page numbers overlaid on {len(toc_pages)} page(s)')
-
-# ── 본문 페이지 번호 추가
-font_color = (0.45, 0.45, 0.45)
-for i, page_idx in enumerate(range(SKIP_START, total - SKIP_END)):
-    page = doc[page_idx]
-    pw, ph = page.rect.width, page.rect.height
-    pg_num = str(i + 1)
-    page.insert_text(
-        fitz.Point(pw / 2 - 5, ph - 8),
-        pg_num,
-        fontsize=8, color=font_color
-    )
-print(f'page numbers added: 1-{guide_count}')
-
-# ── TOC 항목 설정
+# Search each page (top 40%) for predefined chapter markers
+# Korean text is rendered as per-character spans — concatenate spans per line
 toc_entries = []
+found_markers = set()
+
 for page_idx in range(SKIP_START, total - SKIP_END):
     if page_idx in toc_pages:
         continue
     page = doc[page_idx]
+    page_h = page.rect.height
+    top_limit = page_h * 0.40
     blocks = page.get_text("dict")["blocks"]
     for blk in blocks:
+        if blk.get("type") != 0:
+            continue
+        # only look in top 40% of page
+        if blk["bbox"][1] > top_limit:
+            continue
         for line in blk.get("lines", []):
-            for span in line.get("spans", []):
-                txt = span["text"].strip()
-                sz  = span["size"]
-                if sz >= 11 and re.match(r'^(\d+장\.|부록\s*[A-Z]\.|이 가이드|전체 구성도|사전 준비물)', txt):
-                    level = 1 if sz >= 13 else 2
-                    toc_entries.append([level, txt[:60], page_idx + 1])
+            spans = line.get("spans", [])
+            if not spans:
+                continue
+            # Concatenate all spans in this line (handles per-char Korean rendering)
+            line_text = "".join(s["text"] for s in spans).strip()
+            sz = spans[0]["size"]
+            if sz < 9 or not line_text:
+                continue
+            for level, marker in MAIL_TOC_DEFS:
+                if marker not in found_markers and line_text.startswith(marker):
+                    toc_entries.append([level, line_text[:80], page_idx + 1])
+                    found_markers.add(marker)
                     break
 
 doc.set_toc(toc_entries)
 print(f'PDF TOC: {len(toc_entries)} entries set')
+
+# Page numbers on body pages
+font_color = (0.45, 0.45, 0.45)
+for i, page_idx in enumerate(range(SKIP_START, total - SKIP_END)):
+    page = doc[page_idx]
+    pw2, ph2 = page.rect.width, page.rect.height
+    page.insert_text(
+        fitz.Point(pw2 / 2 - 5, ph2 - 8),
+        str(i + 1),
+        fontsize=8, color=font_color
+    )
+print(f'page numbers added: 1-{guide_count}')
 
 doc.save(tmp_out)
 doc.close()
@@ -321,7 +314,8 @@ script_dir = os.environ.get('NAS_SCRIPT_DIR', '')
 if script_dir:
     latest = Path(script_dir) / 'NAS메일서비스_구축가이드.pdf'
     shutil.copy2(tmp_out, str(latest))
-    print(f'saved: NAS메일서비스_구축가이드.pdf  ({total} pages)')
+    sz_kb = int(latest.stat().st_size / 1024)
+    print(f'saved: NAS메일서비스_구축가이드.pdf  ({total} pages, {sz_kb} KB)')
 '@
 [System.IO.File]::WriteAllText($mergePyFile, $mergePyCode, [System.Text.Encoding]::UTF8)
 

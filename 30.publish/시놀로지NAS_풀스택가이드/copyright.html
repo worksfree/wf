@@ -71,6 +71,7 @@
     .info-table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
     }
     .info-table tr { border-bottom: 1px solid #f0f0f0; }
     .info-table tr:first-child { border-top: 1px solid #ddd; }
@@ -87,24 +88,24 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 0;
+      table-layout: fixed;
     }
     .isbn-table tr { border-bottom: 1px solid #ddd; }
     .isbn-table td { padding: 10px 0; font-size: 11.5px; vertical-align: middle; }
     .isbn-table .info-label { color: #1A9FD4; font-weight: 700; width: 58px; font-size: 10px; letter-spacing: 0.5px; white-space: nowrap; }
     .isbn-table .info-value { color: #333; line-height: 1.5; padding-right: 10px; }
     .barcode-cell {
-      width: 140px;
-      text-align: right;
+      text-align: left;
       vertical-align: middle;
-      padding-left: 8px;
+      padding-left: 0;
+      padding-right: 20px;
     }
-    .barcode-cell img { width: 132px; height: auto; display: block; margin-left: auto; }
+    .barcode-cell img { width: 128px; height: auto; display: block; margin: 0; }
 
     /* ── 저작권 ── */
     .copyright-block {
       margin-top: 16px;
       padding-top: 14px;
-      border-top: 1px solid #e8e8e8;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -187,7 +188,7 @@
     <!-- 기본 정보 테이블 (4컬럼, 3행) -->
     <table class="info-table">
       <colgroup>
-        <col style="width:58px"><col><col style="width:58px"><col>
+        <col style="width:58px"><col style="width:140px"><col style="width:58px"><col>
       </colgroup>
       <tr>
         <td class="info-label">저&emsp;자</td>
@@ -211,6 +212,9 @@
 
     <!-- ISBN 행 (라벨 | 값 | 바코드 이미지) -->
     <table class="isbn-table">
+      <colgroup>
+        <col style="width:58px"><col style="width:198px"><col>
+      </colgroup>
       <tr>
         <td class="info-label">ISBN</td>
         <td class="info-value">979-11-992314-7-4 (15000)</td>
