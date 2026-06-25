@@ -229,6 +229,7 @@ guide_count = total - SKIP_START - SKIP_END
 # Predefined chapter markers for mail guide (pandoc h2 headings)
 MAIL_TOC_DEFS = [
     (1, "이 가이드를 읽기 전에"),
+    (1, "배경 —"),
     (1, "전체 구성도"),
     (1, "사전 준비물"),
     (1, "1장."),
@@ -268,7 +269,7 @@ for page_idx in range(SKIP_START, total - SKIP_END):
         continue
     page = doc[page_idx]
     page_h = page.rect.height
-    top_limit = page_h * 0.40
+    top_limit = page_h * 0.60
     blocks = page.get_text("dict")["blocks"]
     for blk in blocks:
         if blk.get("type") != 0:
