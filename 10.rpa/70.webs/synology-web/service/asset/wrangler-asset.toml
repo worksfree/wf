@@ -1,0 +1,33 @@
+name               = "asset-api"
+main               = "asset-api.js"
+compatibility_date = "2025-01-01"
+account_id         = "cfa572c2bcb9f142db8430b310cf5a32"
+
+# ════════════════════════════════════════════════════════════════════
+#  배포 가이드 (최초 1회)
+# ════════════════════════════════════════════════════════════════════
+#
+# ── STEP 1. Wrangler 로그인 확인 ──────────────────────────────────────
+#   wrangler whoami
+#   (미로그인 시: wrangler login)
+#
+# ── STEP 2. 배포 ─────────────────────────────────────────────────────
+#   (이 폴더에서 실행)
+#   wrangler deploy --config wrangler-asset.toml
+#
+#   배포 완료 후 Worker URL 확인:
+#   → https://asset-api.<YOUR_CF_SUBDOMAIN>.workers.dev
+#   또는 커스텀 도메인 연결:
+#   → https://asset-api.worksfree.kr  (CF Dashboard → Workers → Routes)
+#
+# ── STEP 3. 프론트엔드 연동 ───────────────────────────────────────────
+#   consulting/asset/index.html 상단에서:
+#
+#     const DEMO_MODE  = false;                          ← false로 변경
+#     const WORKER_BASE = 'https://asset-api.worksfree.workers.dev'; ← Worker URL
+#
+# ── 참고 ─────────────────────────────────────────────────────────────
+#   - 이 Worker는 네이버 금융 API를 프록시합니다 (CORS 우회)
+#   - 별도 시크릿/KV 없음 — 즉시 배포 가능
+#   - 네이버 API 변경 시 asset-api.js의 handleSearch / fetchSingleQuote 수정 필요
+# ════════════════════════════════════════════════════════════════════
