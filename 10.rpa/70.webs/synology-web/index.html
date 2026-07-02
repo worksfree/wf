@@ -208,9 +208,10 @@
   .tree-icon  { font-size:14px; flex-shrink:0; width:16px; text-align:center; }
   .tree-caret { font-size:12px; color:var(--muted); margin-left:auto; flex-shrink:0; transition:transform .2s; }
   .tree-caret.open { transform:rotate(90deg); }
+  .tree-section-hdr { display:flex; align-items:center; gap:7px; padding:12px 16px 8px; font-size:11px; font-weight:600; letter-spacing:.4px; color:var(--muted); border-bottom:1px solid var(--border); margin-bottom:4px; text-transform:uppercase; }
 
-  .tree-children { overflow:hidden; max-height:0; transition:max-height .25s ease; }
-  .tree-children.open { max-height:600px; }
+  .tree-children { overflow:hidden; max-height:0; transition:max-height .35s ease; }
+  .tree-children.open { max-height:2000px; }
 
   .sidebar-footer {
     padding:12px 14px;
@@ -1372,6 +1373,7 @@
     <button class="dev-btn" id="dev-btn-admin"      onclick="devLogin('admin')"      style="border-color:#dc2626;color:#fca5a5">▶ 관리자 (🔒)</button>
     <button class="dev-btn" onclick="devShowConsent()">📋 동의 모달 보기</button>
     <button class="dev-btn danger" onclick="devResetConsent()">↺ 동의 초기화</button>
+    <button class="dev-btn danger" onclick="devClearAssetDB()">🗑 자산 DB 초기화</button>
     <button class="dev-btn danger" onclick="devLogout()">✕ 테스트 로그아웃</button>
   </div>
 </div>
@@ -1426,7 +1428,7 @@
 <!-- 사이드바 -->
 <div id="sidebar">
   <div class="sidebar-header">
-    <div class="logo"><img src="assets/logo-481KB.png" alt="WorksFree">WorksFree Hub</div>
+    <div class="logo" onclick="showHome()" style="cursor:pointer" title="홈으로"><img src="assets/logo-481KB.png" alt="WorksFree">WorksFree Hub</div>
     <div class="badge-lang-row">
       <div id="user-widget-wrap" class="user-widget"></div>
       <div class="lang-toggle">
@@ -1547,7 +1549,8 @@ const HUB_I18N = {
     denied_desc:   '이 메뉴는 파트너 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.',
     dashboard:     '대시보드',
     home_desc_gfc: '파트너 전용 도구 포함 전체 메뉴에 접근 가능합니다.',
-    home_desc_open:'공용 도구에 접근 가능합니다. 파트너 전용 콘텐츠는 제공되지 않습니다.',
+    home_desc_consultant: '컨설팅 도구 전체 메뉴에 접근 가능합니다.',
+    home_desc_open:'공용 도구에 접근 가능합니다. 컨설팅 콘텐츠는 제공되지 않습니다.',
     tooltip_gfc:   '파트너 전용 메뉴입니다',
     tooltip_coming:'준비 중인 메뉴입니다',
     coming_tag:    '준비중',
@@ -1672,7 +1675,8 @@ const HUB_I18N = {
     denied_desc:   'This menu is for partners only.<br>Please use the correct link or<br>contact your account manager.',
     dashboard:     'Dashboard',
     home_desc_gfc: 'You have access to all menus including partner-exclusive tools.',
-    home_desc_open:'You have access to public tools. Partner-exclusive content is not available.',
+    home_desc_consultant: 'You have access to all consulting tools.',
+    home_desc_open:'You have access to public tools. Consulting content is not available.',
     tooltip_gfc:   'Partner exclusive menu',
     tooltip_coming:'This menu is coming soon',
     coming_tag:    'Coming Soon',
@@ -1907,7 +1911,7 @@ function applyHubLang() {
   if (elChTitle) elChTitle.textContent = t('ch_title');
   // 홈 화면
   document.getElementById('home-screen').querySelector('.home-title').textContent = t('dashboard');
-  document.getElementById('home-desc').textContent = IS_PARTNER ? t('home_desc_gfc') : t('home_desc_open');
+  document.getElementById('home-desc').textContent = IS_PARTNER ? t('home_desc_gfc') : canConsult() ? t('home_desc_consultant') : t('home_desc_open');
   // 트리 재빌드
   const treeRoot = document.getElementById('treeRoot');
   treeRoot.innerHTML = '';
@@ -1958,7 +1962,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.4.24';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.5.57';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -1990,42 +1994,66 @@ const MINDMAP_ICON = `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="no
 const TREE = [
   { label:{ko:'홈', en:'Home'}, icon:'⌂', action: showHome },
   {
+    slug:'service',
     label:{ko:'서비스', en:'Services'}, icon:'🛠', children:[
-      { label:{ko:'QR 생성기',           en:'QR Generator'},       icon:'✦', iframe:'service/qr/index.html' },
-      { label:{ko:'파일명 자소복원',        en:'Korean Normalizer'},   icon:'✦', iframe:'service/normalizer/index.html' },
-      { label:{ko:'변환 결과 검증',        en:'Conversion Verifier'}, icon:'✦', iframe:'service/conversion-verifier/index.html' },
-      { label:{ko:'앱 요청 게시판',        en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
-      { label:{ko:'전자책 미리보기',        en:'eBook Preview'},        icon:'📖', iframe:'service/ebook/index.html' },
+      { label:{ko:'QR 생성기',        en:'QR Generator'},       icon:'✦', iframe:'service/qr/index.html' },
+      { label:{ko:'파일명 자소복원',   en:'Korean Normalizer'},   icon:'✦', iframe:'service/normalizer/index.html' },
+      { label:{ko:'변환 결과 검증',   en:'Conversion Verifier'}, icon:'✦', iframe:'service/conversion-verifier/index.html' },
+      { label:{ko:'앱 요청 게시판',   en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
+      { label:{ko:'전자책 미리보기',   en:'eBook Preview'},       icon:'📖', iframe:'service/ebook/index.html' },
     ]
   },
   {
+    slug:'consulting',
     label:{ko:'컨설팅', en:'Consulting (KR)'}, icon:'◈', consultantTag:true, children:[
-      { label:{ko:'컨설팅 마인드맵',       en:'Consulting Mindmap'}, icon:MINDMAP_ICON, iframe:'consulting/mindmap/index.html', consultantOnly:true },
-      { label:{ko:'예비창업패키지',        en:'Pre-Startup Package'}, icon:'🚀', iframe:'consulting/prebiz/index.html', consultantOnly:true },
-      { label:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'}, icon:'🏪', iframe:'consulting/soho/index.html',  consultantOnly:true },
-      { label:{ko:'현장클리닉 관리',       en:'Field Clinic'},        icon:'🏥', iframe:'consulting/g1/index.html',    consultantOnly:true },
-      { label:{ko:'중대재해처벌법',        en:'Serious Accident Act'}, icon:'⚖', iframe:'consulting/jdh/index.html',  consultantOnly:true },
-      { label:{ko:'ESG 자가진단',         en:'ESG Assessment'},      icon:'🏢', iframe:'consulting/esg/index.html',   consultantOnly:true },
-      // { label:{ko:'ISO 자가진단',         en:'ISO Self-Check'},      icon:'📋', iframe:'consulting/iso/index.html',   consultantOnly:true },
-      { label:{ko:'기업공시 조회',         en:'DART Disclosure'},     icon:'🏙', iframe:'consulting/dart/index.html',  consultantOnly:true },
-      { label:{ko:'B2B 이메일 DB',       en:'B2B Email DB'},        icon:'🏢', iframe:'consulting/bizdb/index.html', consultantOnly:true },
-      { label:{ko:'마케팅 자료', en:'Marketing Materials'}, icon:'📄', iframe:'consulting/marketing/index.html', consultantOnly:true },
-      { label:{ko:'상속·증여 진단',        en:'Inheritance Plan'},    icon:'🏛', iframe:'consulting/inheritance/index.html', consultantOnly:true },
-      { label:{ko:'비상장주식 가치평가',    en:'Stock Valuation'},     icon:'📊', iframe:'consulting/stockval/index.html',  consultantOnly:true },
-      { label:{ko:'경영종합진단',          en:'Financial Plan'},      icon:'📈', iframe:'consulting/gfc/index.html',   consultantOnly:true },
-      { label:{ko:'CEO 플랜',             en:'CEO Plan'},            icon:'👔', iframe:'consulting/ceo/index.html',   consultantOnly:true },
-      { label:{ko:'연금 절세 시뮬레이터',  en:'Pension Tax Simulator'}, icon:'💰', iframe:'consulting/pension/index.html', consultantOnly:true },
-      { label:{ko:'타코매니저 AI',         en:'Taco Manager AI'},     icon:'🌮', iframe:'consulting/tacomanager/v1/index.html', consultantOnly:true },
-      { label:{ko:'타코매니저 AI v2',      en:'Taco Manager AI v2'},  icon:'🌮', iframe:'consulting/tacomanager/v2/index.html', consultantOnly:true },
-      { label:{ko:'타코매니저 AI v3',      en:'Taco Manager AI v3'},  icon:'🌮', iframe:'consulting/tacomanager/v3/index.html', consultantOnly:true },
+      { label:{ko:'컨설팅 마인드맵',      en:'Consulting Mindmap'},   icon:MINDMAP_ICON, iframe:'consulting/mindmap/index.html',     consultantOnly:true },
+      { label:{ko:'예비창업패키지',       en:'Pre-Startup Package'},  icon:'🚀', iframe:'consulting/prebiz/index.html',      consultantOnly:true },
+      { label:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'}, icon:'🏪', iframe:'consulting/soho/index.html',        consultantOnly:true },
+      { label:{ko:'현장클리닉 관리',      en:'Field Clinic'},         icon:'🏥', iframe:'consulting/g1/index.html',          consultantOnly:true },
+      { label:{ko:'중대재해처벌법',       en:'Serious Accident Act'}, icon:'⚖', iframe:'consulting/jdh/index.html',         consultantOnly:true },
+      { label:{ko:'ESG 자가진단',        en:'ESG Assessment'},       icon:'🏢', iframe:'consulting/esg/index.html',         consultantOnly:true },
+      // { label:{ko:'ISO 자가진단',      en:'ISO Self-Check'},       icon:'📋', iframe:'consulting/iso/index.html',         consultantOnly:true },
+      { label:{ko:'기업공시 조회',        en:'DART Disclosure'},      icon:'🏙', iframe:'consulting/dart/index.html',        consultantOnly:true },
+      { label:{ko:'B2B 이메일 DB',      en:'B2B Email DB'},         icon:'🏢', iframe:'consulting/bizdb/index.html',       consultantOnly:true },
+      { label:{ko:'마케팅 자료',         en:'Marketing Materials'},  icon:'📄', iframe:'consulting/marketing/index.html',   consultantOnly:true },
+      { label:{ko:'상속·증여 진단',      en:'Inheritance Plan'},     icon:'🏛', iframe:'consulting/inheritance/index.html', consultantOnly:true },
+      { label:{ko:'비상장주식 가치평가',  en:'Stock Valuation'},      icon:'📊', iframe:'consulting/stockval/index.html',    consultantOnly:true },
+      { label:{ko:'경영종합진단',        en:'Financial Plan'},       icon:'📈', iframe:'consulting/gfc/index.html',         consultantOnly:true },
+      { label:{ko:'CEO 플랜',           en:'CEO Plan'},             icon:'👔', iframe:'consulting/ceo/index.html',         consultantOnly:true },
     ]
   },
   {
+    slug:'finance',
+    label:{ko:'재무관리', en:'Finance'}, icon:'💰', consultantTag:true, children:[
+      {
+        label:{ko:'연금 시뮬레이터', en:'Pension Simulator'}, icon:'💰', consultantOnly:true, children:[
+          { label:{ko:'v1 절세 시뮬레이터', en:'v1 Tax Simulator'},     icon:'✦', iframe:'consulting/pension/index.html',    consultantOnly:true },
+          { label:{ko:'v2 최적 인출 전략', en:'v2 Optimal Withdrawal'}, icon:'✦', iframe:'consulting/pension/v2/index.html', consultantOnly:true },
+        ]
+      },
+      { label:{ko:'자산 통합 관리', en:'Asset Portfolio'}, icon:'📊', iframe:'consulting/asset/index.html', consultantOnly:true },
+    ]
+  },
+  {
+    slug:'pilot',
+    label:{ko:'파일럿', en:'Pilot'}, icon:'🧪', children:[
+      {
+        label:{ko:'타코 매니저', en:'Taco Manager'}, icon:'🌮', consultantOnly:true, children:[
+          { label:{ko:'v1', en:'v1'}, icon:'✦', iframe:'consulting/tacomanager/v1/index.html', consultantOnly:true },
+          { label:{ko:'v2', en:'v2'}, icon:'✦', iframe:'consulting/tacomanager/v2/index.html', consultantOnly:true },
+          { label:{ko:'v3', en:'v3'}, icon:'✦', iframe:'consulting/tacomanager/v3/index.html', consultantOnly:true },
+        ]
+      },
+      { label:{ko:'Naver Blog Commenter', en:'Naver Blog Commenter'}, icon:'💬', iframe:'app-store/web/naver-blog-commenter/index.html' },
+    ]
+  },
+  {
+    slug:'app-store',
     label:{ko:'앱스토어', en:'App Store'}, icon:'📦', memberTag:true, children:[
       {
         label:{ko:'솔리드웍스', en:'SolidWorks'}, icon:'⚙', children:[
-          { label:{ko:'BOM 추출',          en:'BOM Exporter'},    icon:'✦', iframe:'app-store/solidworks/bom-exporter/index.html' },
-          { label:{ko:'속성 초기화',      en:'Attribute Reset'}, icon:'✦', iframe:'app-store/solidworks/attribute-reset/index.html' },
+          { label:{ko:'BOM 추출',    en:'BOM Exporter'},    icon:'✦', iframe:'app-store/solidworks/bom-exporter/index.html' },
+          { label:{ko:'속성 초기화', en:'Attribute Reset'}, icon:'✦', iframe:'app-store/solidworks/attribute-reset/index.html' },
         ]
       },
       {
@@ -2033,132 +2061,221 @@ const TREE = [
           { label:{ko:'도면 출력 자동화', en:'DWG Batch Print'}, icon:'✦', iframe:'app-store/etc/dwg-batch-print/index.html' },
         ]
       },
-      {
-        label:{ko:'웹 자동화', en:'Web Automation'}, icon:'🌐', children:[
-          { label:{ko:'Naver Blog Commenter', en:'Naver Blog Commenter'}, icon:'✦', iframe:'app-store/web/naver-blog-commenter/index.html' },
-        ]
-      },
     ]
   },
   {
+    slug:'admin',
     label:{ko:'O&M 관리', en:'O&M Admin'}, icon:'⚙', adminOnly:true, children:[
-      { label:{ko:'사용자 관리',    en:'User Mgmt'},       icon:'👥', iframe:'admin/users/index.html' },
-      { label:{ko:'이메일 캠페인', en:'Email Campaign'}, icon:'📧', iframe:'admin/email-campaign/index.html' },
-      { label:{ko:'시스템 모니터', en:'System Monitor'}, icon:'📊', iframe:'admin/monitor/index.html' },
-      { label:{ko:'콘텐츠 관리',  en:'Content Mgmt'},   icon:'📝', iframe:'admin/content/index.html' },
-      { label:{ko:'페이지 권한',   en:'Page Access'},    icon:'🔐', iframe:'admin/permissions/index.html' },
-      { label:{ko:'채용 관리',     en:'Recruit Mgmt'},   icon:'👔', iframe:'admin/recruit/index.html' },
+      { label:{ko:'사용자 관리',   en:'User Mgmt'},       icon:'👥', iframe:'admin/users/index.html' },
+      { label:{ko:'이메일 캠페인', en:'Email Campaign'},   icon:'📧', iframe:'admin/email-campaign/index.html' },
+      { label:{ko:'시스템 모니터', en:'System Monitor'},   icon:'📊', iframe:'admin/monitor/index.html' },
+      { label:{ko:'콘텐츠 관리',  en:'Content Mgmt'},    icon:'📝', iframe:'admin/content/index.html' },
+      { label:{ko:'페이지 권한',  en:'Page Access'},      icon:'🔐', iframe:'admin/permissions/index.html' },
+      { label:{ko:'채용 관리',    en:'Recruit Mgmt'},    icon:'👔', iframe:'admin/recruit/index.html' },
     ]
   },
 ];
 
-/* 대시보드 카드 — 메뉴 트리와 동일한 순서 */
+/* 대시보드 카드 — section 필드로 섹션 서브 대시보드 필터링 */
 const DASH_CARDS = [
   /* ── 서비스 ─────────────────────────────────── */
-  { icon:'▣',
+  { section:'service', icon:'▣',
     title:{ko:'QR 생성기',          en:'QR Generator'},
     desc: {ko:'URL→QR 즉시 생성·다운로드',          en:'Generate & download QR from URL'},
     iframe:'service/qr/index.html', proTag:true },
-  { icon:'ㅇㅝㄱㅅㅡ -> 웍스',
+  { section:'service', icon:'ㅇㅝㄱㅅㅡ -> 웍스',
     title:{ko:'파일명 자소복원',      en:'Korean Normalizer'},
     desc: {ko:'한글 파일명 자소분리 일괄 복원',      en:'Batch restore decomposed Korean filenames'},
     iframe:'service/normalizer/index.html' },
-  { icon:'✔',
+  { section:'service', icon:'✔',
     title:{ko:'변환 결과 검증',       en:'Conversion Verifier'},
     desc: {ko:'변환 전·후 파일 쌍 검증',             en:'Verify source/target conversion pairs'},
     iframe:'service/conversion-verifier/index.html' },
-  { icon:'📋',
+  { section:'service', icon:'📋',
     title:{ko:'앱 요청 게시판',       en:'App Request Board'},
     desc: {ko:'원하는 자동화 앱을 요청하세요',        en:'Request an automation app you need'},
     iframe:'board/index.html' },
-  { icon:'📖',
+  { section:'service', icon:'📖',
     title:{ko:'전자책 미리보기',       en:'eBook Preview'},
     desc: {ko:'NAS 풀스택 가이드 20% 무료 미리보기',  en:'20% free preview of NAS Full-Stack Guide'},
     iframe:'service/ebook/index.html' },
   /* ── 컨설팅 ─────────────────────────────────── */
-  { icon:MINDMAP_ICON,
+  { section:'consulting', icon:MINDMAP_ICON,
     title:{ko:'컨설팅 마인드맵',      en:'Consulting Mindmap'},
     desc: {ko:'전체 체크리스트 노드 한눈에 보기',     en:'All checklist nodes at a glance'},
     iframe:'consulting/mindmap/index.html', consultantOnly:true },
-  { icon:'🚀',
+  { section:'consulting', icon:'🚀',
     title:{ko:'예비창업패키지',       en:'Pre-Startup Package'},
     desc: {ko:'정부 지원 최대 1억원 · 창업 교육·멘토링 패키지', en:'Up to ₩100M gov\'t fund · education & mentoring'},
     iframe:'consulting/prebiz/index.html', consultantOnly:true },
-  { icon:'🏪',
+  { section:'consulting', icon:'🏪',
     title:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'},
     desc: {ko:'정부 지원 사업 한눈에 보기',           en:'Government support programs at a glance'},
     iframe:'consulting/soho/index.html', consultantOnly:true },
-  { icon:'🏥',
+  { section:'consulting', icon:'🏥',
     title:{ko:'현장클리닉 관리',      en:'Field Clinic'},
     desc: {ko:'수진기업 현장클리닉 진행현황 관리',    en:'Manage field clinic client progress'},
     iframe:'consulting/g1/index.html', consultantOnly:true },
-  { icon:'⚖',
+  { section:'consulting', icon:'⚖',
     title:{ko:'중대재해처벌법',       en:'Serious Accident Act'},
     desc: {ko:'기업 의무·리스크 자가진단',           en:'Corporate obligations & risk self-check'},
     iframe:'consulting/jdh/index.html', consultantOnly:true },
-  { icon:'🏢',
+  { section:'consulting', icon:'🏢',
     title:{ko:'ESG 자가진단',        en:'ESG Assessment'},
     desc: {ko:'환경·사회·지배구조 수준 점검',        en:'Assess ESG readiness level'},
     iframe:'consulting/esg/index.html', consultantOnly:true },
-  { icon:'🏙',
+  { section:'consulting', icon:'🏙',
     title:{ko:'기업공시 조회',        en:'DART Disclosure'},
     desc: {ko:'DART 기업 공시 정보 조회·분석',        en:'Search & analyze DART corporate disclosures'},
     iframe:'consulting/dart/index.html', consultantOnly:true },
-  { icon:'🏢',
+  { section:'consulting', icon:'🏢',
     title:{ko:'B2B 이메일 DB',        en:'B2B Email DB'},
     desc: {ko:'중소기업 이메일 수집 · 마케팅 자료 자동 발송',  en:'SME email collection & marketing automation'},
     iframe:'consulting/bizdb/index.html', consultantOnly:true },
-  { icon:'📄',
+  { section:'consulting', icon:'📄',
     title:{ko:'마케팅 자료',          en:'Marketing Materials'},
     desc: {ko:'파트너 전용 마케팅·홍보 자료',         en:'Partner-exclusive marketing materials'},
     iframe:'consulting/marketing/index.html', consultantOnly:true },
-  { icon:'🏛',
+  { section:'consulting', icon:'🏛',
     title:{ko:'상속·증여 진단',       en:'Inheritance Plan'},
     desc: {ko:'상속세 20년 동결·부동산 급등 — 파트너 등급 진단', en:'Inheritance tax 20yr freeze · partner grade diagnosis'},
     iframe:'consulting/inheritance/index.html', consultantOnly:true },
-  { icon:'📊',
+  { section:'consulting', icon:'📊',
     title:{ko:'비상장주식 가치평가',   en:'Stock Valuation'},
     desc: {ko:'목적별 주식가치 평가법 — 세법·투자·M&A·ESOP', en:'Purpose-based stock valuation — Tax, Investment, M&A, ESOP'},
     iframe:'consulting/stockval/index.html', consultantOnly:true },
-  { icon:'📈',
+  { section:'consulting', icon:'📈',
     title:{ko:'경영종합진단',         en:'Financial Plan'},
     desc: {ko:'기업 경영 종합 컨설팅 진단',           en:'Comprehensive business consulting diagnosis'},
     iframe:'consulting/gfc/index.html', consultantOnly:true },
-  { icon:'👔',
+  { section:'consulting', icon:'👔',
     title:{ko:'CEO 플랜',            en:'CEO Plan'},
     desc: {ko:'법인 컨설팅 종합 플랜',               en:'Corporate consulting comprehensive plan'},
     iframe:'consulting/ceo/index.html', consultantOnly:true },
-  { icon:'💰',
-    title:{ko:'연금 절세 시뮬레이터',  en:'Pension Tax Simulator'},
+  /* ── 재무관리 ───────────────────────────────── */
+  { section:'finance', icon:'💰',
+    title:{ko:'연금 시뮬레이터 v1',  en:'Pension Simulator v1'},
     desc: {ko:'개인·퇴직연금 절세 설계 · 2026 세법 · GFC 상담용', en:'Pension payout tax planning · 2026 KR Tax Law · GFC Advisory'},
     iframe:'consulting/pension/index.html', consultantOnly:true },
-  { icon:'🌮',
-    title:{ko:'타코매니저 AI',      en:'Taco Manager AI'},
-    desc: {ko:'AI 기반 매장 재고·프로모션 관제', en:'AI-powered store inventory & promo control'},
+  { section:'finance', icon:'💰',
+    title:{ko:'연금 시뮬레이터 v2',  en:'Pension Simulator v2'},
+    desc: {ko:'물가연동 최적 인출 전략 · 세금·건보료 최소화 엔진', en:'Inflation-adjusted optimal withdrawal · tax & premium minimizer'},
+    iframe:'consulting/pension/v2/index.html', consultantOnly:true },
+  { section:'finance', icon:'📊',
+    title:{ko:'자산 통합 관리',     en:'Asset Portfolio'},
+    desc: {ko:'주식·ETF 수익률 · 월배당 현황 · 순자산 추이', en:'Stocks & ETF P&L · Monthly dividends · Net worth'},
+    iframe:'consulting/asset/index.html', consultantOnly:true },
+  /* ── 파일럿 ─────────────────────────────────── */
+  { section:'pilot', icon:'🌮',
+    title:{ko:'타코매니저 AI v1',    en:'Taco Manager AI v1'},
+    desc: {ko:'AI 기반 매장 재고·프로모션 관제',      en:'AI-powered store inventory & promo control'},
     iframe:'consulting/tacomanager/v1/index.html', consultantOnly:true },
-  /* ── 앱스토어 ───────────────────────────────── */
-  { icon:'⚙',
-    title:{ko:'BOM 추출',            en:'BOM Exporter'},
-    desc: {ko:'SolidWorks BOM 자동 추출·변환',       en:'Auto extract & convert SolidWorks BOM'},
-    iframe:'app-store/solidworks/bom-exporter/index.html', memberOnly:true },
-  { icon:'🔄',
-    title:{ko:'속성 초기화',          en:'Attribute Reset'},
-    desc: {ko:'SolidWorks 속성 일괄 초기화',         en:'Batch reset SolidWorks attributes'},
-    iframe:'app-store/solidworks/attribute-reset/index.html', memberOnly:true },
-  { icon:'🖨',
-    title:{ko:'도면 출력 자동화',     en:'DWG Batch Print'},
-    desc: {ko:'DWG 파일 일괄 자동 출력',             en:'Batch print DWG files automatically'},
-    iframe:'app-store/etc/dwg-batch-print/index.html', memberOnly:true },
-  { icon:'💬',
+  { section:'pilot', icon:'🌮',
+    title:{ko:'타코매니저 AI v2',    en:'Taco Manager AI v2'},
+    desc: {ko:'타코매니저 v2 — 개선된 재고·프로모션 엔진', en:'Taco Manager v2 — improved inventory & promo engine'},
+    iframe:'consulting/tacomanager/v2/index.html', consultantOnly:true },
+  { section:'pilot', icon:'🌮',
+    title:{ko:'타코매니저 AI v3',    en:'Taco Manager AI v3'},
+    desc: {ko:'타코매니저 v3 — 최신 AI 관제 엔진',    en:'Taco Manager v3 — latest AI control engine'},
+    iframe:'consulting/tacomanager/v3/index.html', consultantOnly:true },
+  { section:'pilot', icon:'💬',
     title:{ko:'Naver Blog Commenter', en:'Naver Blog Commenter'},
     desc: {ko:'네이버 블로그 자동 공감·댓글 RPA',   en:'Naver blog auto like & comment RPA'},
-    iframe:'app-store/web/naver-blog-commenter/index.html', memberOnly:true },
+    iframe:'app-store/web/naver-blog-commenter/index.html' },
+  /* ── 앱스토어 ───────────────────────────────── */
+  { section:'app-store', icon:'⚙',
+    title:{ko:'BOM 추출',            en:'BOM Exporter'},
+    desc: {ko:'SolidWorks BOM 자동 추출·변환',       en:'Auto extract & convert SolidWorks BOM'},
+    iframe:'app-store/solidworks/bom-exporter/index.html' },
+  { section:'app-store', icon:'🔄',
+    title:{ko:'속성 초기화',          en:'Attribute Reset'},
+    desc: {ko:'SolidWorks 속성 일괄 초기화',         en:'Batch reset SolidWorks attributes'},
+    iframe:'app-store/solidworks/attribute-reset/index.html' },
+  { section:'app-store', icon:'🖨',
+    title:{ko:'도면 출력 자동화',     en:'DWG Batch Print'},
+    desc: {ko:'DWG 파일 일괄 자동 출력',             en:'Batch print DWG files automatically'},
+    iframe:'app-store/etc/dwg-batch-print/index.html' },
+  /* ── O&M 관리 (어드민 전용) ─────────────────── */
+  { section:'admin', icon:'👥',
+    title:{ko:'사용자 관리',   en:'User Mgmt'},
+    desc: {ko:'사용자·역할·크레딧 관리',             en:'Manage users, roles & credits'},
+    iframe:'admin/users/index.html', adminOnly:true },
+  { section:'admin', icon:'📧',
+    title:{ko:'이메일 캠페인', en:'Email Campaign'},
+    desc: {ko:'마케팅 이메일 발송 관리',             en:'Manage marketing email campaigns'},
+    iframe:'admin/email-campaign/index.html', adminOnly:true },
+  { section:'admin', icon:'📊',
+    title:{ko:'시스템 모니터', en:'System Monitor'},
+    desc: {ko:'시스템 상태 모니터링',               en:'System status monitoring'},
+    iframe:'admin/monitor/index.html', adminOnly:true },
+  { section:'admin', icon:'📝',
+    title:{ko:'콘텐츠 관리',  en:'Content Mgmt'},
+    desc: {ko:'콘텐츠 관리',                       en:'Manage content'},
+    iframe:'admin/content/index.html', adminOnly:true },
+  { section:'admin', icon:'🔐',
+    title:{ko:'페이지 권한',  en:'Page Access'},
+    desc: {ko:'페이지별 접근 권한 관리',             en:'Manage page access permissions'},
+    iframe:'admin/permissions/index.html', adminOnly:true },
+  { section:'admin', icon:'👔',
+    title:{ko:'채용 관리',    en:'Recruit Mgmt'},
+    desc: {ko:'채용 포지션 관리',                   en:'Manage recruitment positions'},
+    iframe:'admin/recruit/index.html', adminOnly:true },
 ];
 
 /* ════════════════════════════════════════════
    3. 트리 렌더
 ════════════════════════════════════════════ */
-let activeLabel = null;
+let activeLabel    = null;
+let currentSection = null; // null=홈, 섹션 node=섹션 진입 상태
+
+const SECTION_DESCS = {
+  service:    { ko:'업무 자동화 및 유틸리티 도구',       en:'Work automation & utility tools' },
+  consulting: { ko:'진단 기반 컨설팅 도구 모음',         en:'Diagnosis-based consulting tools' },
+  finance:    { ko:'연금·자산 재무 시뮬레이터',           en:'Pension & asset financial simulators' },
+  pilot:      { ko:'실험적 AI 및 자동화 도구',            en:'Experimental AI & automation tools' },
+  'app-store':{ ko:'설치형 자동화 앱 모음',               en:'Installable automation apps' },
+  admin:      { ko:'시스템 운영·관리 도구',               en:'System O&M tools' },
+};
+
+/* 섹션 사이드바 — 해당 섹션 자식만 표시 */
+function _buildSectionSidebar(node) {
+  const treeRoot = document.getElementById('treeRoot');
+  treeRoot.innerHTML = '';
+  activeLabel = null;
+  const hdr = document.createElement('div');
+  hdr.className = 'tree-section-hdr';
+  hdr.innerHTML = `<span>${node.icon || ''}</span><span>${getLabel(node.label)}</span>`;
+  treeRoot.appendChild(hdr);
+  treeRoot.appendChild(buildTree(node.children, 0, []));
+}
+
+/* 전체 사이드바 복원 */
+function _buildFullSidebar() {
+  const treeRoot = document.getElementById('treeRoot');
+  treeRoot.innerHTML = '';
+  activeLabel = null;
+  treeRoot.appendChild(buildTree(TREE));
+}
+
+/* 주어진 iframe이 어느 섹션에 속하는지 찾아 사이드바 전환 */
+function _treeContainsIframe(nodes, src) {
+  return nodes.some(n =>
+    (n.iframe && normalizeIframeSrc(n.iframe) === src) ||
+    (n.children && _treeContainsIframe(n.children, src))
+  );
+}
+function _activateSectionForIframe(src) {
+  for (const node of TREE) {
+    if (!node.slug || !node.children) continue;
+    if (_treeContainsIframe(node.children, src)) {
+      if (currentSection !== node) {
+        currentSection = node;
+        _buildSectionSidebar(node);
+      }
+      return;
+    }
+  }
+}
 
 // consultant, gfc, admin 역할이면 true
 const canConsult = () => userRole === 'consultant' || userRole === 'partner' || userRole === 'admin';
@@ -2215,10 +2332,26 @@ function buildTree(nodes, depth=0, path=[]) {
       children.classList.add('tree-children');
       if (depth === 0) { caret.classList.add('open'); children.classList.add('open'); }
 
-      labelEl.addEventListener('click', () => {
-        const open = children.classList.toggle('open');
-        caret.classList.toggle('open', open);
-      });
+      if (depth === 0 && node.slug) {
+        // 섹션 헤더: 캐럿은 하위 토글 전용, 레이블 클릭은 서브 대시보드
+        caret.addEventListener('click', e => {
+          e.stopPropagation();
+          const open = children.classList.toggle('open');
+          caret.classList.toggle('open', open);
+        });
+        labelEl.addEventListener('click', () => {
+          showSectionDash(node);
+          if (!children.classList.contains('open')) {
+            children.classList.add('open');
+            caret.classList.add('open');
+          }
+        });
+      } else {
+        labelEl.addEventListener('click', () => {
+          const open = children.classList.toggle('open');
+          caret.classList.toggle('open', open);
+        });
+      }
 
       nodeEl.appendChild(labelEl);
       nodeEl.appendChild(children);
@@ -2246,7 +2379,9 @@ function buildTree(nodes, depth=0, path=[]) {
       if (node.consultantOnly && authUser && !canConsult()) {
         labelEl.dataset.tooltip = t('tooltip_consultant');
       }
-      if ((node.memberOnly || node.consultantOnly) && !authUser) {
+      if (node.consultantOnly && !authUser) {
+        labelEl.dataset.tooltip = t('tooltip_consultant');
+      } else if (node.memberOnly && !authUser) {
         labelEl.dataset.tooltip = t('tooltip_member');
       }
       if (node.coming) {
@@ -2291,19 +2426,53 @@ function setActive(el) {
 ════════════════════════════════════════════ */
 const dashGrid = document.getElementById('dashGrid');
 
-function renderDashCards() {
+/* 홈 화면 — 섹션 타일 렌더 */
+function renderHomeSections() {
+  dashGrid.innerHTML = '';
+  const titleEl = document.querySelector('#home-screen .home-title');
+  if (titleEl) titleEl.textContent = t('dashboard');
+  TREE.forEach(node => {
+    if (!node.slug) return;
+    if (node.adminOnly && userRole !== 'admin') return;
+    const count = DASH_CARDS.filter(c =>
+      c.section === node.slug &&
+      !(c.adminOnly && userRole !== 'admin') &&
+      !(c.iframe && getAccessLevel(c.iframe) === 'hidden') &&
+      !(c.consultantOnly && !canConsult())
+    ).length;
+    if (count === 0) return;
+    const descObj = SECTION_DESCS[node.slug] || {};
+    const desc = getLabel(descObj) || '';
+    const el = document.createElement('div');
+    el.className = 'dash-card';
+    el.innerHTML = `
+      <div class="card-icon">${node.icon}</div>
+      <div class="card-title">${getLabel(node.label)}</div>
+      <div class="card-desc">${desc}</div>
+      <div style="margin-top:auto;padding-top:8px;font-size:11px;color:var(--muted)">${count}개 도구</div>
+    `;
+    el.style.cursor = 'pointer';
+    el.onclick = () => showSectionDash(node);
+    dashGrid.appendChild(el);
+  });
+}
+
+function renderDashCards(sectionFilter=null) {
   dashGrid.innerHTML = '';
   DASH_CARDS.forEach(card => {
+    // 섹션 필터 (서브 대시보드)
+    if (sectionFilter && card.section !== sectionFilter) return;
     // adminOnly 카드는 비관리자에게 완전히 숨김
     if (card.adminOnly && userRole !== 'admin') return;
     // 페이지 접근 규칙: hidden → 대시보드에서 완전 숨김
     if (card.iframe && getAccessLevel(card.iframe) === 'hidden') return;
+    // 비컨설턴트: consultantOnly 카드 완전 숨김 (잠금 표시 없이)
+    if (card.consultantOnly && !canConsult()) return;
 
     const isLocked =
-      (card.partnerOnly        && !IS_PARTNER) ||
-      (card.roleOnly       && userRole !== 'admin' && userRole !== card.roleOnly) ||
-      (card.consultantOnly && !canConsult()) ||
-      (card.memberOnly     && !authUser);  // 비로그인 시 앱스토어 잠금
+      (card.partnerOnly && !IS_PARTNER) ||
+      (card.roleOnly && userRole !== 'admin' && userRole !== card.roleOnly) ||
+      (card.memberOnly  && !authUser);
 
     const titleStr = getLabel(card.title);
     const descStr  = getLabel(card.desc);
@@ -2328,10 +2497,7 @@ function renderDashCards() {
           </div>
         </div>
       `;
-      el.onclick = () => {
-        if (card.consultantOnly) showDenied('denied_consultant_title', 'denied_consultant_desc');
-        else showDenied('denied_title', 'denied_desc');
-      };
+      el.onclick = () => showDenied('denied_title', 'denied_desc');
     } else {
       /* ── 접근 가능 카드 ── */
       el.className = `dash-card${card.gfcTag ? ' gfc-card' : ''}`;
@@ -2474,6 +2640,7 @@ function normalizeIframeSrc(src) {
 
 function loadIframe(src, path=[], label='') {
   src = normalizeIframeSrc(src);
+  _activateSectionForIframe(src);
   trackPageView(src);
   closeSidebar();
   currentPath  = path;
@@ -2505,8 +2672,8 @@ function loadIframe(src, path=[], label='') {
       iframe.contentWindow.postMessage({ type:'wf_access', level: accessLevel }, '*');
     }
   };
-  // 브라우저 히스토리에 상태 기록 → 뒤로가기 시 showHome()으로 처리
-  history.pushState({ wfhub: true }, '', location.href);
+  // URL hash 업데이트 (딥링크 공유 가능)
+  history.pushState({ wfhub: true }, '', '#' + iframeToSlug(src));
 }
 
 /* ── 자식 iframe → 부모 네비게이션 요청 처리 ── */
@@ -2521,6 +2688,9 @@ function showHome() {
   previewBaseSrc = null;
   hidePreviewOverlay();
   sessionStorage.removeItem('wf_last_page');
+  history.pushState(null, '', location.pathname + location.search);
+  currentSection = null;
+  _buildFullSidebar();
   document.getElementById('home-screen').style.display = 'block';
   const fc = document.getElementById('frame-container');
   fc.style.display = 'none';
@@ -2528,11 +2698,74 @@ function showHome() {
   document.getElementById('access-overlay')?.classList.remove('active');
   document.getElementById('contentFrame').src = '';
   document.getElementById('bc-trail').innerHTML = '';
-  if (activeLabel) { activeLabel.classList.remove('active'); activeLabel = null; }
+  if (typeof renderHomeSections === 'function') renderHomeSections();
 }
 
-// 브라우저 뒤로가기 → iframe 공백 방지: 항상 홈으로 복귀
-window.addEventListener('popstate', () => showHome());
+function showSectionDash(node) {
+  previewBaseSrc = null;
+  hidePreviewOverlay();
+  sessionStorage.removeItem('wf_last_page');
+  currentSection = node;
+  _buildSectionSidebar(node);
+  document.getElementById('home-screen').style.display = 'block';
+  const fc = document.getElementById('frame-container');
+  fc.style.display = 'none';
+  fc.classList.remove('access-blur', 'access-readonly');
+  document.getElementById('access-overlay')?.classList.remove('active');
+  document.getElementById('contentFrame').src = '';
+  const titleEl = document.querySelector('#home-screen .home-title');
+  if (titleEl) titleEl.textContent = getLabel(node.label);
+  setBreadcrumb([], node.label);
+  renderDashCards(node.slug);
+  history.pushState({ wfhub: true }, '', '#' + node.slug);
+}
+
+// ── Hash 라우팅 ──────────────────────────────────────────────────
+function iframeToSlug(src) {
+  return src.replace(/\/index\.html$/, '').replace(/\.html$/, '');
+}
+
+function navigateToHash(hash) {
+  if (!hash || hash === '#' || hash === '#home') { showHome(); return; }
+  const slug = hash.replace(/^#/, '');
+
+  // 섹션 슬러그 확인
+  for (const node of TREE) {
+    if (node.slug === slug) { showSectionDash(node); return; }
+  }
+
+  // 리프 노드 슬러그 탐색
+  let found = null;
+  (function search(nodes, parents) {
+    for (const n of nodes) {
+      if (n.iframe && iframeToSlug(normalizeIframeSrc(n.iframe)) === slug) {
+        found = { node: n, parents }; return;
+      }
+      if (n.children) search(n.children, [...parents, n]);
+    }
+  })(TREE, []);
+
+  if (found) {
+    const { node, parents } = found;
+    const pathLabels = parents.map(p => p.label);
+    if (node.consultantOnly && authUser && !canConsult()) {
+      showDenied('denied_consultant_title', 'denied_consultant_desc'); return;
+    }
+    if ((node.consultantOnly || node.memberOnly) && !authUser) {
+      loadIframePreview(node.iframe, pathLabels, node.label); return;
+    }
+    loadIframe(node.iframe, pathLabels, node.label);
+  } else {
+    showHome();
+  }
+}
+
+// 브라우저 뒤로/앞으로: hash로 라우팅
+window.addEventListener('popstate', () => {
+  const h = location.hash;
+  if (h && h !== '#') navigateToHash(h);
+  else showHome();
+});
 
 function showDenied(titleKey='denied_title', descKey='denied_desc') {
   const overlay = document.getElementById('access-denied');
@@ -2592,7 +2825,7 @@ const DEFAULT_ACCESS_RULES = {
   'consulting/gfc/index.html': {
     general: 'hidden', member: 'hidden',
     consultant: 'blur',  // 컨설턴트: 블러로 표시
-    gfc: 'full', admin: 'full'
+    partner: 'full', gfc: 'full', admin: 'full'
   }
 };
 let pageAccessRules = { ...DEFAULT_ACCESS_RULES };
@@ -2732,7 +2965,22 @@ try {
 
       // ── SIGNED_IN / INITIAL_SESSION ────────────────────────────────
       if (_signOutTimer) { clearTimeout(_signOutTimer); _signOutTimer = null; }
-      _chainAuth(() => handleAuthStateChange(user));
+      const _capturedUser = user;
+      _chainAuth(async () => {
+        // devLogin으로 설정한 역할이 실제 Supabase 프로필(e.g. consultant)로 덮어써지는 버그 방지:
+        // INITIAL_SESSION이 실제 사용자(예: insung.lee/consultant)로 발화돼도
+        // wf_dev_session이 있으면 해당 mock 사용자를 그대로 사용한다.
+        // 단, devLogin 실제 로그인 직후(_devLoginReal=true)에는 실제 사용자 처리(admin iframe 세션 연동 목적).
+        if (IS_DEV && !_devLoginReal) {
+          const _devRole = localStorage.getItem('wf_dev_session');
+          if (_devRole) {
+            userRole = _devRole;
+            await handleAuthStateChange(_getDevUser(_devRole));
+            return;
+          }
+        }
+        await handleAuthStateChange(_capturedUser);
+      });
     });
   }
 } catch(e) {
@@ -2865,26 +3113,26 @@ function onAuthComplete() {
       loadIframe(baseSrc, currentPath, currentLabel);
     }
   } else {
-    // 새로고침 후 마지막 페이지 복원 (홈 화면일 때만)
-    const fc = document.getElementById('frame-container');
-    if (fc?.style.display === 'none') {
-      const saved = sessionStorage.getItem('wf_last_page');
-      if (saved) {
-        try {
-          const { src, path, label } = JSON.parse(saved);
-          if (src) loadIframe(src, path || [], label || '');
-        } catch (_) {}
-      }
+    // hash → 홈 순서로 처리 (sessionStorage 복원은 hash 라우팅이 대체)
+    const initHash = location.hash;
+    if (initHash && initHash !== '#') {
+      navigateToHash(initHash);
+    } else {
+      showHome();
     }
   }
 }
 
 function refreshTreeAndCards() {
-  const treeRoot = document.getElementById('treeRoot');
-  treeRoot.innerHTML = '';
-  activeLabel = null;
-  treeRoot.appendChild(buildTree(TREE));
-  if (document.getElementById('home-screen').style.display !== 'none') renderDashCards();
+  if (currentSection) {
+    _buildSectionSidebar(currentSection);
+  } else {
+    _buildFullSidebar();
+  }
+  if (document.getElementById('home-screen').style.display !== 'none') {
+    if (currentSection) renderDashCards(currentSection.slug);
+    else renderHomeSections();
+  }
 }
 
 /* ════════════════════════════════════════════
@@ -3382,23 +3630,23 @@ function getPaymentEnv() {
 
 const DEV_USER = {
   id: 'd0000001-0000-4000-8000-000000000000',
-  email: 'test@worksfree.co.kr',
+  email: 'test@worksfree.kr',
   user_metadata: { full_name: '테스트 회원', avatar_url: '' }
 };
 const DEV_USER_CONSULTANT = {
   id: 'd0000002-0000-4000-8000-000000000000',
-  email: 'consultant@worksfree.co.kr',
+  email: 'consultant@worksfree.kr',
   user_metadata: { full_name: '컨설턴트 테스터', avatar_url: '' }
 };
 const DEV_USER_PARTNER = {
   id: 'd0000003-0000-4000-8000-000000000000',
-  email: 'gfc@worksfree.co.kr',
+  email: 'partner@worksfree.kr',
   user_metadata: { full_name: '파트너 테스터', avatar_url: '' }
 };
 const DEV_USER_ADMIN = {
   id: 'd0000004-0000-4000-8000-000000000000',
-  email: 'support@worksfree.kr',
-  user_metadata: { full_name: '관리자 테스터', avatar_url: '' }
+  email: 'insung.lee@worksfree.co.kr',
+  user_metadata: { full_name: '이인성(회사)', avatar_url: '' }
 };
 
 if (IS_DEV) {
@@ -3483,10 +3731,10 @@ function togglePw(inputId, btn) {
 
 // dev 테스트 계정 자격증명 (test.worksfree.kr DB 전용)
 const DEV_CREDS = {
-  general:    { email: 'test@worksfree.co.kr',       pw: 'TestPassword123!'  },
-  consultant: { email: 'consultant@worksfree.co.kr', pw: 'TestPassword123!'  },
-  gfc:        { email: 'gfc@worksfree.co.kr',        pw: 'TestPassword123!'  },
-  admin:      { email: 'support@worksfree.kr',      pw: 'AdminPassword123!' },
+  member:     { email: 'test@worksfree.kr',          pw: 'TestPassword123!'  },
+  consultant: { email: 'consultant@worksfree.kr',    pw: 'TestPassword123!'  },
+  partner:    { email: 'partner@worksfree.kr',       pw: 'TestPassword123!'  },
+  admin:      { email: 'insung.lee@worksfree.co.kr', pw: 'AdminPassword123!' },
 };
 
 async function devLogin(role = 'member') {
@@ -3577,6 +3825,25 @@ function devResetConsent() {
   localStorage.removeItem('wf_agreed_' + id);
   updateDevStatus();
   alert('동의 기록이 초기화됐습니다. 다시 로그인하면 동의 모달이 표시됩니다.');
+}
+
+async function devClearAssetDB() {
+  if (!authUser) { alert('먼저 테스트 계정으로 로그인하세요.'); return; }
+  if (!confirm(`[${authUser.email}]\n자산 포트폴리오 DB 데이터를 삭제합니까?\n(localStorage 캐시도 함께 삭제됩니다)`)) return;
+  try {
+    const session = (await _sb.auth.getSession()).data.session;
+    const token = session?.access_token;
+    if (!token) { alert('세션 토큰 없음 — 재로그인 후 시도하세요.'); return; }
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/portfolios?user_id=eq.${authUser.id}`,
+      { method: 'DELETE', headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` } }
+    );
+    localStorage.removeItem('asset_mgr_v1');
+    localStorage.removeItem('asset_dividends_v1');
+    alert(`✅ 삭제 완료 (HTTP ${res.status})\n자산 페이지를 새로고침하면 예시 데이터가 표시됩니다.`);
+  } catch(e) {
+    alert('오류: ' + e.message);
+  }
 }
 
 async function devLogout() {

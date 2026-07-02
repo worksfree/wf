@@ -24,19 +24,19 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.8.5.7"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.8.5.57"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
     "1" = @{ Name="test";             Path="/volume1/web/test";         URL="https://test.worksfree.kr";          Color="Yellow"; SubDir=$null }
     "2" = @{ Name="staging";          Path="/volume1/web/staging";      URL="https://staging.worksfree.kr";       Color="Cyan";   SubDir=$null }
-    "3" = @{ Name="portal (prod)";    Path="/volume1/web/portal";       URL="https://portal.worksfree.kr";        Color="Green";  SubDir=$null }
+    "3" = @{ Name="www (prod)";        Path="/volume1/web/portal";       URL="https://www.worksfree.kr";           Color="Green";  SubDir=$null }
     "4" = @{ Name="g1consulting";     Path="/volume1/web/g1consulting"; URL="https://g1consulting.worksfree.kr";  Color="Magenta"; SubDir="consulting/g1" }
     "5" = @{ Name="el";              Path="/volume1/web/el";           URL="https://el.worksfree.kr";           Color="Cyan";   SubDir="consulting/tacomanager" }
 }
 
 # 배포 제외 목록
-$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log",".git","node_modules","*.sh",".claude","test-results","playwright-report")
+$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log","*.bak",".git","node_modules","*.sh",".claude","test-results","playwright-report")
 # ────────────────────────────────────────────────────────────────
 
 # 배포 환경 선택 후 증가하므로, 여기서는 현재값 저장만
@@ -70,7 +70,7 @@ Write-Host "  배포 대상을 선택하세요:" -ForegroundColor White
 Write-Host ""
 Write-Host "    [1]  test          — 기능 검증용     (test.worksfree.kr)"          -ForegroundColor Yellow
 Write-Host "    [2]  staging       — 최종 점검용    (staging.worksfree.kr)"       -ForegroundColor Cyan
-Write-Host "    [3]  portal        — 실 서비스 배포  (portal.worksfree.kr)"       -ForegroundColor Green
+Write-Host "    [3]  www (prod)   — 실 서비스 배포  (www.worksfree.kr)"       -ForegroundColor Green
 Write-Host "    [4]  g1consulting  — 현장클리닉 전용 (g1consulting.worksfree.kr)"    -ForegroundColor Magenta
 Write-Host "    [5]  el           — 타코매니저 AI 전용 (el.worksfree.kr)"           -ForegroundColor Cyan
 Write-Host "    [6]  test + el   — 같은 버전으로 동시 배포 (test + el)"              -ForegroundColor Yellow
@@ -95,7 +95,7 @@ if ($choice -match "^[Rr]$") {
     Write-Host ""
     Write-Host "    [1]  test" -ForegroundColor Yellow
     Write-Host "    [2]  staging" -ForegroundColor Cyan
-    Write-Host "    [3]  portal (prod)" -ForegroundColor Green
+    Write-Host "    [3]  www (prod) " -ForegroundColor Green
     Write-Host "    [4]  g1consulting" -ForegroundColor Magenta
     Write-Host "    [5]  el" -ForegroundColor Cyan
     Write-Host ""
@@ -154,7 +154,7 @@ $T = if ($choice -eq "6") { $TARGETS["1"] } else { $TARGETS[$choice] }
 # 버전은 확인 이후에만 증가해야 취소/실패 시 중복 bump 방지
 if ($choice -eq "3") {
     Write-Host ""
-    Write-Host "  ⚠️  portal(production) 배포 — 실 서비스에 즉시 반영됩니다." -ForegroundColor Red
+    Write-Host "  ⚠️  www(production) 배포 — 실 서비스에 즉시 반영됩니다." -ForegroundColor Red
     if ($Target) {
         Write-Host "  (비대화형 모드 — -Target 3 지정 시 자동 승인)" -ForegroundColor DarkGray
     } else {
