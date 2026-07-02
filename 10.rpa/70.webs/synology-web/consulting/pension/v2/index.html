@@ -1073,6 +1073,8 @@ function renderBarChart(res, p, baseRes = null) {
       plugins:{
         legend:{ labels:{ color:'#94a3b8', font:{size:11} } },
         tooltip:{
+          mode:'index', intersect:false,
+          filter: item => item.dataset.type === 'line' || (item.raw || 0) > 0,
           callbacks:{
             label: c => `${c.dataset.label}: ${c.raw}만원`,
             footer: items => {
@@ -1086,6 +1088,7 @@ function renderBarChart(res, p, baseRes = null) {
           footerColor:'#e2e8f0',
         },
       },
+      interaction:{ mode:'index', intersect:false },
       scales:{
         x:{ stacked:true, ticks:{color:'#64748b',font:{size:10},maxRotation:0}, grid:{color:'rgba(42,51,71,.5)'} },
         y:{ stacked:true, ticks:{color:'#64748b',font:{size:10},callback:v=>v+'만'}, grid:{color:'rgba(42,51,71,.5)'} },
