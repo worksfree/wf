@@ -1066,25 +1066,25 @@ function renderBarChart(res, p, baseRes = null) {
         { label:'목표', data:rows.map(r=>toMon(r.targetMonthly)), type:'line',
           backgroundColor:'transparent', borderColor:'rgba(239,68,68,.7)',
           borderWidth:1.5, borderDash:[4,3], pointRadius:0, fill:false, stack:undefined },
-        ...(baseRes ? [{
-          label:'수령액 (갭 보충 전)',
-          type:'line',
-          data: rows.map(r => {
-            const br = baseRes.rows.find(b => b.age === r.age);
-            return br ? toMon(br.totalNet) : 0;
-          }),
-          backgroundColor:'transparent',
-          borderColor:'rgba(148,163,184,.55)',
-          borderDash:[3,3], pointRadius:0, borderWidth:1.5,
-          fill:false, stack:undefined,
-        }] : []),
       ]
     },
     options:{
       responsive:true, maintainAspectRatio:true,
       plugins:{
         legend:{ labels:{ color:'#94a3b8', font:{size:11} } },
-        tooltip:{ callbacks:{ label: c => `${c.dataset.label}: ${c.raw}만원` } },
+        tooltip:{
+          callbacks:{
+            label: c => `${c.dataset.label}: ${c.raw}만원`,
+            footer: items => {
+              const total = items
+                .filter(i => i.dataset.stack === 'a')
+                .reduce((s, i) => s + (i.raw || 0), 0);
+              return total > 0 ? `월 합계: ${Math.round(total)}만원` : null;
+            }
+          },
+          footerFont:{ weight:'bold' },
+          footerColor:'#e2e8f0',
+        },
       },
       scales:{
         x:{ stacked:true, ticks:{color:'#64748b',font:{size:10},maxRotation:0}, grid:{color:'rgba(42,51,71,.5)'} },
