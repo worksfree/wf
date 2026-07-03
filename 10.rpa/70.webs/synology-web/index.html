@@ -50,8 +50,8 @@
 
   /* ── SIDEBAR ─────────────────────── */
   #sidebar {
-    width: 260px;
-    min-width: 260px;
+    width: 280px;
+    min-width: 280px;
     background: var(--sidebar);
     border-right: 1px solid var(--border);
     display: flex;
@@ -107,7 +107,7 @@
   }
   .logo {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 500;
     color: var(--accent2);
     letter-spacing: .05em;
@@ -168,8 +168,8 @@
   #wf-tooltip.show { opacity: 1; }
 
   .tree-label {
-    display:flex; align-items:center; gap:7px;
-    padding:7px 14px; cursor:pointer;
+    display:flex; align-items:center; gap:8px;
+    padding:9px 14px; cursor:pointer;
     transition:background .15s; white-space:nowrap; overflow:hidden;
   }
   .tree-label:hover { background:var(--hover); }
@@ -180,18 +180,18 @@
 
   /* 뎁스별 indent */
   .d0 > .tree-label {
-    padding-left:14px; font-weight:700; font-size:15px;
-    color:#94a3b8;
+    padding:11px 16px 8px 16px; font-weight:700; font-size:18px;
+    color:#cbd5e1;
     background:#0c1018;
     border-top:1px solid #1e2a3a;
     margin-top:4px;
-    letter-spacing:.04em;
+    letter-spacing:.03em;
     cursor:default;
   }
   .d0:first-child > .tree-label { border-top:none; margin-top:0; }
   .d0 > .tree-label:hover { background:#0c1018; }
-  .d1 > .tree-label { padding-left:26px; font-weight:500; font-size:15px; }
-  .d2 > .tree-label { padding-left:44px; font-size:15px; color:#94a3b8; }
+  .d1 > .tree-label { padding-left:28px; font-weight:500; font-size:15px; }
+  .d2 > .tree-label { padding-left:46px; font-size:14px; color:#94a3b8; }
   .d2 > .tree-label.active { color:#93c5fd; }
 
   /* 파트너 전용 메뉴 강조 */
@@ -205,7 +205,7 @@
   }
   .d2.partner-item > .tree-label.active { color:#93c5fd; }
 
-  .tree-icon  { font-size:14px; flex-shrink:0; width:16px; text-align:center; }
+  .tree-icon  { font-size:16px; flex-shrink:0; width:18px; text-align:center; }
   .tree-caret { font-size:12px; color:var(--muted); margin-left:auto; flex-shrink:0; transition:transform .2s; }
   .tree-caret.open { transform:rotate(90deg); }
   .tree-section-hdr { display:flex; align-items:center; gap:7px; padding:12px 16px 8px; font-size:11px; font-weight:600; letter-spacing:.4px; color:var(--muted); border-bottom:1px solid var(--border); margin-bottom:4px; text-transform:uppercase; }
@@ -1962,7 +1962,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.5.62';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.5.63';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
