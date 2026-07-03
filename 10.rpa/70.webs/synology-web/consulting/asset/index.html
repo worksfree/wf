@@ -574,6 +574,9 @@ const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
 // Supabase 세션 키 (허브가 저장하는 위치와 동일)
 const SB_SESSION_KEY = `sb-rkycwfpkzorfpcxfvaqt-auth-token`;
+// 멀티테넌트 — 루트 도메인에서 tenants 테이블로 조회
+let tenantId     = null;  // public.tenants.id
+let tenantDomain = '';    // 'worksfree.kr'
 // 관리자 판단은 이메일 하드코딩 대신 profiles.role = 'admin' (DB 기준) 사용
 let sbUserId      = null;
 let sbAccessToken = null;
@@ -1021,9 +1024,9 @@ const SNAP_KEY = 'asset_snapshots_v1';
 const HIST_CUTOFF = '2026-07-03'; // 이 날짜 이전 이력은 모두 제외 — 구성 변경 전 데이터 왜곡 방지
 function saveQuoteSnapshot() {
   if (!Object.keys(quotes).length) return;
+  const today = new Date().toISOString().slice(0, 10);
   try {
     const raw        = JSON.parse(localStorage.getItem(SNAP_KEY) || '{}');
-    const today      = new Date().toISOString().slice(0,10);
     raw[today]       = raw[today] || {};
     const recentDate = Object.keys(raw).filter(k => k < today).sort().pop();
     const prevPrices = recentDate ? (raw[recentDate] || {}) : {};
@@ -1041,6 +1044,19 @@ function saveQuoteSnapshot() {
     while (keys.length > 400) delete raw[keys.shift()];
     localStorage.setItem(SNAP_KEY, JSON.stringify(raw));
   } catch(e) {}
+  // Supabase 저장 (관리자 + 테넌트 확인 시)
+  if (sbIsAdmin && tenantId) {
+    const rows = Object.keys(quotes)
+      .filter(c => quotes[c].price > 0)
+      .map(c => ({ tenant_id: tenantId, date: today, code: c, price: quotes[c].price }));
+    if (rows.length) {
+      fetch(`${SUPABASE_URL}/rest/v1/stock_snapshots`, {
+        method: 'POST',
+        headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(rows),
+      }).catch(e => console.warn('[asset] stock_snapshots 저장 실패:', e));
+    }
+  }
 }
 function resetSnapshots() {
   if (!sbIsAdmin) return;
@@ -1051,6 +1067,16 @@ function resetSnapshots() {
   if (_histChart) { _histChart.destroy(); _histChart = null; }
   const tbl = eid('histTbl');
   if (tbl) tbl.innerHTML = '<div style="color:var(--muted);text-align:center;padding:24px;font-size:12px">이력 초기화 완료 — 시세갱신 후 오늘부터 누적됩니다</div>';
+  // Supabase DB도 삭제
+  if (tenantId && sbUserId) {
+    const h = sbHeaders();
+    fetch(`${SUPABASE_URL}/rest/v1/stock_snapshots?tenant_id=eq.${tenantId}`, { method: 'DELETE', headers: h })
+      .catch(e => console.warn('[asset] stock_snapshots 초기화 실패:', e));
+    fetch(`${SUPABASE_URL}/rest/v1/portfolio_daily?tenant_id=eq.${tenantId}&user_id=eq.${sbUserId}`, { method: 'DELETE', headers: h })
+      .catch(e => console.warn('[asset] portfolio_daily 초기화 실패:', e));
+    fetch(`${SUPABASE_URL}/rest/v1/dividends?tenant_id=eq.${tenantId}&user_id=eq.${sbUserId}`, { method: 'DELETE', headers: h })
+      .catch(e => console.warn('[asset] dividends 초기화 실패:', e));
+  }
 }
 function getHistoricalPrice(code, daysAgo) {
   try {
@@ -1186,6 +1212,74 @@ function sbHeaders() {
     'Content-Type':  'application/json',
   };
 }
+
+// ── 멀티테넌트 초기화 ─────────────────────────────────────
+function getRootDomain() {
+  const h = location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1') return 'worksfree.kr';
+  const parts = h.split('.');
+  return parts.length >= 2 ? parts.slice(-2).join('.') : h;
+}
+async function initTenant() {
+  tenantDomain = getRootDomain();
+  try {
+    const res  = await fetch(
+      `${SUPABASE_URL}/rest/v1/tenants?domain=eq.${encodeURIComponent(tenantDomain)}&select=id`,
+      { headers: { 'apikey': SUPABASE_ANON } }
+    );
+    const rows = await res.json();
+    tenantId   = rows?.[0]?.id ?? null;
+    if (tenantId) console.log('[asset] 테넌트:', tenantDomain, '→', tenantId);
+    else          console.warn('[asset] 미등록 도메인:', tenantDomain);
+  } catch(e) { console.warn('[asset] 테넌트 조회 실패:', e); }
+}
+
+// ── DB → localStorage 히스토리 복원 (관리자 전용) ────────
+async function hydrateFromDB() {
+  if (!sbIsAdmin || !tenantId) return;
+  try {
+    // 종목 시세 스냅샷 → SNAP_KEY
+    const snapRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/stock_snapshots?tenant_id=eq.${tenantId}&date=gte.${HIST_CUTOFF}&select=date,code,price`,
+      { headers: sbHeaders() }
+    );
+    if (snapRes.ok) {
+      const rows = await snapRes.json();
+      if (rows.length) {
+        const raw = JSON.parse(localStorage.getItem(SNAP_KEY) || '{}');
+        rows.forEach(r => { raw[r.date] = raw[r.date] || {}; raw[r.date][r.code] = r.price; });
+        localStorage.setItem(SNAP_KEY, JSON.stringify(raw));
+      }
+    }
+    // 포트폴리오 일별 총평가액 → PORTFOLIO_DAILY_KEY
+    const dailyRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/portfolio_daily?tenant_id=eq.${tenantId}&user_id=eq.${sbUserId}&date=gte.${HIST_CUTOFF}&select=date,total&order=date.asc`,
+      { headers: sbHeaders() }
+    );
+    if (dailyRes.ok) {
+      const rows = await dailyRes.json();
+      if (rows.length) {
+        const raw = {};
+        rows.forEach(r => { raw[r.date] = r.total; });
+        localStorage.setItem(PORTFOLIO_DAILY_KEY, JSON.stringify(raw));
+      }
+    }
+    // 분배금 이력 → DIVIDEND_KEY
+    const divRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/dividends?tenant_id=eq.${tenantId}&user_id=eq.${sbUserId}&select=code,payments,last_synced`,
+      { headers: sbHeaders() }
+    );
+    if (divRes.ok) {
+      const rows = await divRes.json();
+      if (rows.length) {
+        const data = {};
+        rows.forEach(r => { data[r.code] = { payments: r.payments || [], lastSynced: r.last_synced }; });
+        localStorage.setItem(DIVIDEND_KEY, JSON.stringify(data));
+      }
+    }
+    console.log('[asset] DB 히스토리 복원 완료');
+  } catch(e) { console.warn('[asset] DB 히스토리 복원 실패:', e); }
+}
 function updateModeBadge() {
   const badge         = eid('modeBadge');
   const overlay       = eid('demo-overlay');
@@ -1238,6 +1332,7 @@ async function saveData() {
       method:  'POST',
       headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify({
+        tenant_id:  tenantId,
         user_id:    sbUserId,
         holdings,
         nw_assets:  nwAssets,
@@ -1269,10 +1364,10 @@ async function loadData() {
   if (!sbIsAdmin) return;  // 관리자만 로드 (비관리자는 예시 데이터로 시작)
   loadLocal();             // 로컬 캐시 먼저 적재 (빠른 초기 렌더)
   try {
-    const res  = await fetch(
-      `${SUPABASE_URL}/rest/v1/portfolios?user_id=eq.${sbUserId}&select=*`,
-      { headers: sbHeaders() }
-    );
+    const portfolioQuery = tenantId
+      ? `${SUPABASE_URL}/rest/v1/portfolios?tenant_id=eq.${tenantId}&user_id=eq.${sbUserId}&select=*`
+      : `${SUPABASE_URL}/rest/v1/portfolios?user_id=eq.${sbUserId}&select=*`;
+    const res  = await fetch(portfolioQuery, { headers: sbHeaders() });
     const rows = await res.json();
     const data = Array.isArray(rows) ? rows[0] : null;
     if (data) {
@@ -1487,6 +1582,15 @@ function savePortfolioDailySnapshot() {
     while (keys.length > 400) delete raw[keys.shift()];
     localStorage.setItem(PORTFOLIO_DAILY_KEY, JSON.stringify(raw));
   } catch(e) {}
+  // Supabase 저장
+  if (tenantId && sbUserId) {
+    const today = new Date().toISOString().slice(0, 10);
+    fetch(`${SUPABASE_URL}/rest/v1/portfolio_daily`, {
+      method: 'POST',
+      headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ tenant_id: tenantId, user_id: sbUserId, date: today, total }),
+    }).catch(e => console.warn('[asset] portfolio_daily 저장 실패:', e));
+  }
 }
 
 // 관리자 로그인 시 시세 갱신 후 현재 달 총평가액 저장
@@ -1801,6 +1905,25 @@ function loadDivData() {
 }
 function saveDivData(d) {
   try { localStorage.setItem(DIVIDEND_KEY, JSON.stringify(d)); } catch {}
+  // Supabase 저장 (관리자 + 테넌트 확인 시) — saveDivEntry/syncDividends/deleteDivEntry 공통 경로
+  if (tenantId && sbUserId && sbIsAdmin) {
+    const today = new Date().toISOString().slice(0, 10);
+    const rows  = Object.keys(d).map(code => ({
+      tenant_id:   tenantId,
+      user_id:     sbUserId,
+      code,
+      payments:    d[code].payments || [],
+      last_synced: d[code].lastSynced || null,
+      updated_at:  new Date().toISOString(),
+    }));
+    if (rows.length) {
+      fetch(`${SUPABASE_URL}/rest/v1/dividends`, {
+        method: 'POST',
+        headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(rows),
+      }).catch(e => console.warn('[asset] dividends 저장 실패:', e));
+    }
+  }
 }
 
 // CF Worker에서 전 종목 분배금 자동 조회
@@ -2099,10 +2222,12 @@ function renderHistChart() {
 
 // ── 초기화 ────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
+  await initTenant();   // hostname → tenantId (인증 전 선행 실행)
   await initSupabase(); // Supabase 세션 확인
 
   // 관리자만 Supabase 로드, 비관리자는 즉시 리턴
   await loadData();
+  if (sbIsAdmin) await hydrateFromDB(); // DB → localStorage 히스토리 복원
 
   // 관리자 아닌 경우 항상 예시 데이터 표시
   if (!sbIsAdmin) {
