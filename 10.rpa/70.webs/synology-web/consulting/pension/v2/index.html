@@ -204,9 +204,15 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .tl-lane{flex:1;height:22px;position:relative;background:rgba(255,255,255,.03);border-radius:3px}
 .tl-bar{position:absolute;top:0;bottom:0;border-radius:3px;display:flex;align-items:center;padding:0 7px;overflow:hidden}
 .tl-bar-txt{font-size:9px;white-space:nowrap;font-weight:500}
-.pv-toggle{display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--muted);margin-left:auto}
+.pv-toggle{display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--muted)}
 .pv-toggle input{accent-color:var(--blue);width:12px;height:12px;cursor:pointer;flex-shrink:0;margin:0}
 body.pv .ys-val,body.pv .ph-amt,body.pv .result-num{filter:blur(5px);user-select:none;transition:filter .2s}
+body.pv .pv-amt{filter:blur(4px);user-select:none;transition:filter .2s}
+body.pv .chart-canvas{filter:blur(8px);transition:filter .2s}
+.demo-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);white-space:nowrap}
+#demo-overlay{display:none;position:fixed;inset:0;z-index:40;pointer-events:none}
+#demo-overlay.show{display:block}
+#demo-overlay .wm-main{position:absolute;top:33%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);font-size:86px;font-weight:900;color:rgba(245,158,11,.38);letter-spacing:8px;user-select:none;white-space:nowrap}
 </style>
 </head>
 <body class="pv">
@@ -219,8 +225,11 @@ body.pv .ys-val,body.pv .ph-amt,body.pv .result-num{filter:blur(5px);user-select
   </div>
   <span class="badge">v2</span>
   <span class="badge badge-green">건보료 프리패스</span>
+  <span class="demo-badge" id="modeBadge" style="display:none"></span>
   <label class="pv-toggle" title="금액 숨김 처리"><input type="checkbox" id="pvChk" checked onchange="document.body.classList.toggle('pv',this.checked)">숨김처리</label>
 </header>
+
+<div id="demo-overlay"><div class="wm-main">예시 데이터</div></div>
 
 <main class="layout">
 
@@ -243,7 +252,7 @@ body.pv .ys-val,body.pv .ph-amt,body.pv .result-num{filter:blur(5px);user-select
       <div class="frow">
         <span class="fl">목표 생활비</span>
         <div class="g2-ctrl">
-          <input class="inp inp-md" type="number" id="targetMonthly" value="250" oninput="autoRun()">
+          <input class="inp inp-md pv-amt" type="number" id="targetMonthly" value="250" oninput="autoRun()">
           <span class="unit">만/월 (세후)</span>
         </div>
       </div>
@@ -264,7 +273,7 @@ body.pv .ys-val,body.pv .ph-amt,body.pv .result-num{filter:blur(5px);user-select
         <div class="g2-item">
           <span class="g2-label">현재 잔고</span>
           <div class="g2-ctrl">
-            <input class="inp inp-md" type="number" id="paBal" value="15000" oninput="autoRun()">
+            <input class="inp inp-md pv-amt" type="number" id="paBal" value="15000" oninput="autoRun()">
             <span class="unit">만</span>
           </div>
         </div>
@@ -300,7 +309,7 @@ body.pv .ys-val,body.pv .ph-amt,body.pv .result-num{filter:blur(5px);user-select
         <div class="g2-item">
           <span class="g2-label">현재 잔고</span>
           <div class="g2-ctrl">
-            <input class="inp inp-md" type="number" id="isBal" value="10000" oninput="autoRun()">
+            <input class="inp inp-md pv-amt" type="number" id="isBal" value="10000" oninput="autoRun()">
             <span class="unit">만</span>
           </div>
         </div>
@@ -336,7 +345,7 @@ body.pv .ys-val,body.pv .ph-amt,body.pv .result-num{filter:blur(5px);user-select
         <div class="g2-item">
           <span class="g2-label">현재 잔고</span>
           <div class="g2-ctrl">
-            <input class="inp inp-md" type="number" id="icBal" value="5000" oninput="autoRun()">
+            <input class="inp inp-md pv-amt" type="number" id="icBal" value="5000" oninput="autoRun()">
             <span class="unit">만</span>
           </div>
         </div>
@@ -379,7 +388,7 @@ body.pv .ys-val,body.pv .ph-amt,body.pv .result-num{filter:blur(5px);user-select
         <span class="fl">본인 월 수령</span>
         <div class="sl-row">
           <input type="range" class="slider" id="slNpSelf" min="0" max="300" step="5" value="130" oninput="onSlider('NpSelf')">
-          <span class="sl-val" id="slNpSelfv" style="min-width:40px">130만</span>
+          <span class="sl-val pv-amt" id="slNpSelfv" style="min-width:40px">130만</span>
         </div>
         <input class="inp inp-sm" type="number" id="npStartAge" value="65" min="60" max="70" oninput="autoRun()">
         <span class="unit">세</span>
@@ -388,7 +397,7 @@ body.pv .ys-val,body.pv .ph-amt,body.pv .result-num{filter:blur(5px);user-select
         <span class="fl">배우자 월 수령</span>
         <div class="sl-row">
           <input type="range" class="slider" id="slNpSpouse" min="0" max="300" step="5" value="80" oninput="onSlider('NpSpouse')">
-          <span class="sl-val" id="slNpSpousev" style="min-width:40px">80만</span>
+          <span class="sl-val pv-amt" id="slNpSpousev" style="min-width:40px">80만</span>
         </div>
         <input class="inp inp-sm" type="number" id="spouseNpStartAge" value="65" min="60" max="70" oninput="autoRun()">
         <span class="unit">세</span>
@@ -1612,8 +1621,53 @@ function renderYearSnapshot(res, p, age) {
   wrap.innerHTML = html;
 }
 
+// ── Auth (Supabase localStorage 직접 읽기 — createClient 호출 금지) ──
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const SB_SESSION_KEY = 'sb-rkycwfpkzorfpcxfvaqt-auth-token';
+let sbIsAdmin = false, isDemoMode = true;
+
+async function initAuth() {
+  try {
+    const raw = localStorage.getItem(SB_SESSION_KEY);
+    if (!raw) return;
+    const stored = JSON.parse(raw);
+    const uid = stored?.user?.id, token = stored?.access_token;
+    if (!uid || !token) return;
+    if ((stored?.expires_at ?? 0) && (Date.now() / 1000) > stored.expires_at) return;
+    const vRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` }
+    });
+    if (!vRes.ok || (await vRes.json())?.id !== uid) return;
+    const pRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${uid}&select=role`, {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` }
+    });
+    const profiles = pRes.ok ? await pRes.json() : [];
+    sbIsAdmin = profiles?.[0]?.role === 'admin';
+    isDemoMode = !sbIsAdmin;
+  } catch(e) { console.warn('[pension] auth check:', e); }
+}
+
+function applyMode() {
+  const overlay  = document.getElementById('demo-overlay');
+  const pvToggle = document.querySelector('.pv-toggle');
+  const badge    = document.getElementById('modeBadge');
+  if (isDemoMode) {
+    overlay?.classList.add('show');
+    if (pvToggle) pvToggle.style.display = 'none';
+    if (badge)    badge.style.display    = 'none';
+    document.body.classList.remove('pv');
+  } else {
+    overlay?.classList.remove('show');
+    if (pvToggle) pvToggle.style.display = '';
+    if (badge) { badge.style.display = ''; badge.textContent = '🔐 관리자'; }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   eid('stratDesc').textContent = stratDesc(1);
+  run();
+  initAuth().then(applyMode);
 });
 </script>
 </body>

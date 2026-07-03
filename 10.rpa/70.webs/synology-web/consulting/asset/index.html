@@ -38,6 +38,11 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .refresh-btn{background:none;border:1.5px solid var(--border);border-radius:7px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:11px;color:var(--muted);transition:.12s;white-space:nowrap}
 .refresh-btn:hover{border-color:var(--blue);color:var(--blue)}
 .demo-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3);white-space:nowrap}
+#demo-overlay{display:none;position:fixed;inset:0;z-index:40;pointer-events:none}
+#demo-overlay.show{display:block}
+#demo-overlay .wm-main{position:absolute;top:33%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);font-size:86px;font-weight:900;color:rgba(245,158,11,.38);letter-spacing:8px;user-select:none;white-space:nowrap}
+.pie-toggle{background:none;border:1.5px solid var(--border);border-radius:5px;padding:2px 7px;cursor:pointer;font-family:inherit;font-size:10px;color:var(--muted);transition:.12s}
+.pie-toggle.active{border-color:var(--blue);background:rgba(59,130,246,.09);color:var(--text)}
 
 /* ─ Layout ── */
 .page{max-width:1020px;margin:0 auto;padding:14px 14px 70px}
@@ -99,6 +104,10 @@ canvas{max-height:210px}
 .cal-m{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px}
 .cal-amount{font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:700;color:var(--teal)}
 .cal-tickers{font-size:9px;color:var(--hint);margin-top:3px;line-height:1.5}
+.cal-est{font-size:9.5px;color:var(--hint);margin-top:2px;font-family:'IBM Plex Mono',monospace}
+.cal-month.has-actual{border-color:rgba(16,185,129,.45)}
+.cal-month.has-actual .cal-amount{color:var(--green)}
+.cal-month.is-current{border-color:rgba(59,130,246,.4)}
 
 /* ─ 종목 등록 폼 ── */
 .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;margin-bottom:12px}
@@ -171,15 +180,54 @@ canvas{max-height:210px}
 .disc ul{list-style:none;display:flex;flex-direction:column;gap:3px}
 .disc li{font-size:10px;color:var(--muted);line-height:1.6;padding-left:9px;position:relative}
 .disc li::before{content:'·';position:absolute;left:0}
+
+/* ─ 숨김처리 토글 ── */
+.pv-toggle{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;font-size:11px;color:var(--muted);padding:4px 9px;border:1.5px solid var(--border);border-radius:7px;transition:.12s;white-space:nowrap;flex-shrink:0}
+.pv-toggle:hover{border-color:var(--blue);color:var(--text)}
+.pv-toggle input{accent-color:var(--blue);width:12px;height:12px;cursor:pointer;flex-shrink:0;margin:0}
+body.pv #totalValDisp,
+body.pv #totalPnlInline,
+body.pv #pnlDisp,
+body.pv #monthDivDisp,
+body.pv #annDivDisp,
+body.pv .perf-val,
+body.pv .cal-amount,
+body.pv .nw-v,
+body.pv .nw-total span:last-child,
+body.pv .amt-price,
+body.pv td:nth-child(3),
+body.pv td:nth-child(5),
+body.pv td:nth-child(6){filter:blur(6px);user-select:none;transition:filter .2s}
+
+/* ─ 헤더 타이틀 행 ── */
+.hdr-title-row{display:flex;align-items:center;gap:8px}
+
+/* ─ 변동 이력 모달 ── */
+.hist-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:center;justify-content:center;padding:16px}
+.hist-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);width:100%;max-width:680px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.hist-hdr{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.hist-ttl{font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-scale-btns{display:flex;gap:3px}
+.hist-scale{background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;cursor:pointer;font-family:inherit;font-size:11px;color:var(--muted);transition:.12s}
+.hist-scale.active{border-color:var(--blue);background:rgba(59,130,246,.09);color:var(--text)}
+.hist-close{background:none;border:none;color:var(--hint);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:.12s;flex-shrink:0}
+.hist-close:hover{color:var(--red);background:var(--red-bg)}
+.hist-body{padding:12px 16px 8px;flex-shrink:0;height:210px;position:relative}
+.hist-tbl-wrap{overflow-y:auto;max-height:220px;padding:0 16px 12px;flex:1}
+.hist-btn{background:none;border:none;color:var(--hint);cursor:pointer;font-size:13px;padding:1px 5px;border-radius:4px;transition:.12s}
+.hist-btn:hover{color:var(--blue);background:rgba(59,130,246,.08)}
 </style>
 </head>
-<body>
+<body class="pv">
 
 <!-- ══ HEADER ══════════════════════════════════════ -->
 <header>
   <div class="hdr-icon">📊</div>
   <div class="hdr-info">
-    <div class="hdr-title">자산 통합 관리</div>
+    <div class="hdr-title-row">
+      <div class="hdr-title">자산 통합 관리</div>
+      <label class="pv-toggle" title="금액 숨김 처리"><input type="checkbox" id="pvChk" checked onchange="document.body.classList.toggle('pv',this.checked);if(trendCh)trendCh.update()">숨김처리</label>
+    </div>
     <div class="hdr-sub">주식·ETF 수익률 · 월배당 현황 · 순자산 추이</div>
   </div>
   <div class="hdr-r">
@@ -189,6 +237,9 @@ canvas{max-height:210px}
       <button class="tab-btn" id="tabBtnNetworth"  onclick="switchTab('networth')">🏦 순자산</button>
     </div>
     <button class="refresh-btn" onclick="refreshQuotes()">↻ 시세갱신</button>
+    <button class="refresh-btn" id="divSyncBtn" onclick="syncDividends(true)" title="보유 종목의 실제 분배금 이력을 네이버/KRX에서 자동 조회합니다">📥 분배금 조회</button>
+    <button class="refresh-btn" id="snapResetBtn" onclick="resetSnapshots()" title="이상 시세가 저장된 경우 이력 데이터를 초기화합니다 (관리자 전용)" style="display:none;color:var(--amber)">🗑 이력 초기화</button>
+    <span id="divSyncMsg" style="font-size:11px;color:var(--teal);white-space:nowrap"></span>
     <button class="refresh-btn" onclick="exportData()" title="포트폴리오 데이터를 JSON 파일로 내보냅니다">📤 내보내기</button>
     <label class="refresh-btn" title="다른 기기에서 내보낸 JSON 파일을 가져옵니다" style="cursor:pointer">
       📥 가져오기<input type="file" accept=".json" style="display:none" onchange="importData(event)">
@@ -196,6 +247,10 @@ canvas{max-height:210px}
     <span class="demo-badge" id="modeBadge">데모 모드</span>
   </div>
 </header>
+
+<div id="demo-overlay">
+  <div class="wm-main">예시 데이터</div>
+</div>
 
 <div class="page">
 
@@ -208,7 +263,7 @@ canvas{max-height:210px}
   <div class="sec">포트폴리오 현황</div>
   <div class="sum-cards">
     <div class="sum-card c-total">
-      <div class="sc-lbl">총 평가액</div>
+      <div class="sc-lbl" style="display:flex;justify-content:space-between;align-items:center">총 평가액<button class="hist-btn" title="합계 변동 이력" onclick="showHistory(null)">📈</button></div>
       <div class="sc-val tc-blue" id="totalValDisp">—</div>
       <div class="sc-delta" id="totalPnlInline"></div>
       <div class="sc-sub" id="totalCostSub"></div>
@@ -283,7 +338,13 @@ canvas{max-height:210px}
       <canvas id="trendChart"></canvas>
     </div>
     <div class="chart-card">
-      <div class="ch-hd">종목별 비중</div>
+      <div class="ch-hd" style="display:flex;justify-content:space-between;align-items:center">
+        <span>비중</span>
+        <div style="display:flex;gap:3px">
+          <button id="pieModeInst" class="pie-toggle active" onclick="setPieMode('instrument')">종목별</button>
+          <button id="pieModeAcct" class="pie-toggle" onclick="setPieMode('account')">계좌별</button>
+        </div>
+      </div>
       <canvas id="weightChart"></canvas>
     </div>
   </div>
@@ -508,39 +569,51 @@ canvas{max-height:210px}
 const DEMO_MODE   = false;
 const WORKER_BASE = 'https://asset-api.worksfree.workers.dev';
 const SAVE_KEY    = 'asset_mgr_v1';
+const DIVIDEND_KEY = 'asset_dividends_v1';
 const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
 // Supabase 세션 키 (허브가 저장하는 위치와 동일)
 const SB_SESSION_KEY = `sb-rkycwfpkzorfpcxfvaqt-auth-token`;
+// 관리자 판단은 이메일 하드코딩 대신 profiles.role = 'admin' (DB 기준) 사용
 let sbUserId      = null;
 let sbAccessToken = null;
+let sbEmail       = null;
+let sbIsAdmin     = false;
+let isDemoMode    = false; // 등록 종목 없을 때 예시 데이터 표시 여부
 const MONTHS      = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 const CHART_COLORS= ['rgba(59,130,246,.8)','rgba(16,185,129,.8)','rgba(20,184,166,.8)',
                      'rgba(168,85,247,.8)','rgba(245,158,11,.8)','rgba(239,68,68,.8)'];
 
 // ── 데모 데이터 ─────────────────────────────────────────
 const DEMO_ACCOUNTS = [
-  { id:'신한은행_CMA',        name:'신한은행 CMA',        broker:'신한은행',       type:'CMA'  },
-  { id:'신한투자증권_일반',   name:'신한투자증권 일반',   broker:'신한투자증권',   type:'일반' },
-  { id:'카카오페이증권_일반', name:'카카오페이증권 일반', broker:'카카오페이증권', type:'일반' },
+  { id:'신한은행_CMA',          name:'신한은행 CMA',          broker:'신한은행',         type:'CMA'  },
+  { id:'신한투자증권_일반',     name:'신한투자증권 일반',     broker:'신한투자증권',     type:'일반' },
+  { id:'카카오페이증권_일반',   name:'카카오페이증권 일반',   broker:'카카오페이증권',   type:'일반' },
+  { id:'미래에셋증권_일반',     name:'미래에셋증권 일반',     broker:'미래에셋증권',     type:'일반' },
 ];
 const DEMO_INSTRUMENTS = {
-  '005930':{ code:'005930', name:'삼성전자',            kind:'STOCK', market:'KOSPI',  isMonthly:false, cycle:4,  divPerShare:90.25  },
-  '069500':{ code:'069500', name:'KODEX 200',           kind:'ETF',   market:'KOSPI',  isMonthly:false, cycle:4,  divPerShare:87.5   },
-  '453810':{ code:'453810', name:'TIGER 미국배당다우존스', kind:'ETF', market:'KOSPI',  isMonthly:true,  cycle:12, divPerShare:55     },
-  '432430':{ code:'432430', name:'KODEX 미국배당다우존스', kind:'ETF', market:'KOSPI',  isMonthly:true,  cycle:12, divPerShare:52     },
+  '005930':{ code:'005930', name:'삼성전자',                    kind:'STOCK', market:'KOSPI',  isMonthly:false, cycle:4,  divPerShare:90.25 },
+  '069500':{ code:'069500', name:'KODEX 200',                   kind:'ETF',   market:'KOSPI',  isMonthly:false, cycle:4,  divPerShare:87.5  },
+  '498400':{ code:'498400', name:'KODEX 200타겟위클리커버드콜', kind:'ETF',   market:'KOSPI',  isMonthly:true,  cycle:12, divPerShare:200 },
+  '432430':{ code:'432430', name:'KODEX 미국배당다우존스',      kind:'ETF',   market:'KOSPI',  isMonthly:true,  cycle:12, divPerShare:52 },
+  '133690':{ code:'133690', name:'TIGER 미국S&P500',            kind:'ETF',   market:'KOSPI',  isMonthly:false, cycle:4,  divPerShare:34 },
+  '411060':{ code:'411060', name:'TIGER 미국나스닥100',         kind:'ETF',   market:'KOSPI',  isMonthly:false, cycle:4,  divPerShare:0  },
 };
 const DEMO_QUOTES = {
   '005930':{ price:81500,  change:+1.2, source:'NAVER', delayed:15 },
   '069500':{ price:32850,  change:+0.8, source:'NAVER', delayed:15 },
-  '453810':{ price:15240,  change:-0.3, source:'NAVER', delayed:15 },
+  '498400':{ price:10050,  change:+0.2, source:'NAVER', delayed:15 },
   '432430':{ price:13870,  change:+0.5, source:'NAVER', delayed:15 },
+  '133690':{ price:18720,  change:+1.1, source:'NAVER', delayed:15 },
+  '411060':{ price:24350,  change:+0.7, source:'NAVER', delayed:15 },
 };
 const DEMO_HOLDINGS_INIT = [
   { id:'h1', accountId:'신한투자증권_일반',   code:'005930', qty:50,  avgPrice:72000, divPerShare:90.25 },
   { id:'h2', accountId:'신한투자증권_일반',   code:'069500', qty:100, avgPrice:29500, divPerShare:87.5  },
-  { id:'h3', accountId:'카카오페이증권_일반', code:'453810', qty:200, avgPrice:13800, divPerShare:55    },
-  { id:'h4', accountId:'카카오페이증권_일반', code:'432430', qty:150, avgPrice:12500, divPerShare:52    },
+  { id:'h3', accountId:'카카오페이증권_일반', code:'498400', qty:200, avgPrice:9800,  divPerShare:200 },
+  { id:'h4', accountId:'카카오페이증권_일반', code:'432430', qty:150, avgPrice:12500, divPerShare:52 },
+  { id:'h5', accountId:'미래에셋증권_일반',   code:'133690', qty:80,  avgPrice:16200, divPerShare:34 },
+  { id:'h6', accountId:'미래에셋증권_일반',   code:'411060', qty:60,  avgPrice:21500, divPerShare:0  },
 ];
 const DEMO_SEARCH = [
   // ── 국내 대형주 ──────────────────────────────────────────
@@ -634,7 +707,14 @@ let selectedInst= null;
 let editingId   = null;   // 편집 중인 holding id (null이면 신규 추가 모드)
 let trendCh     = null;
 let weightCh    = null;
+let pieMode     = 'instrument'; // 'instrument' | 'account'
 let searchTimer = null;
+let _histChart   = null;
+let _histCode    = null;   // null = 포트폴리오 합계
+let _histScale   = 'day';
+let _divSyncing  = false;
+let _divEntryCode= null;
+let _lastDivRows = [];
 
 // ── 유틸 ────────────────────────────────────────────────
 function eid(x) { return document.getElementById(x); }
@@ -670,6 +750,13 @@ function renderFilterBar() {
   ].join('');
 }
 function setFilter(id) { accFilter = id; renderFilterBar(); renderDashboard(); }
+function setPieMode(mode) {
+  pieMode = mode;
+  const bi = eid('pieModeInst'); const ba = eid('pieModeAcct');
+  if (bi) bi.classList.toggle('active', mode === 'instrument');
+  if (ba) ba.classList.toggle('active', mode === 'account');
+  renderDashboard();
+}
 
 // ── 시세 ────────────────────────────────────────────────
 async function fetchQuotes(codes) {
@@ -693,6 +780,7 @@ async function refreshQuotes() {
   if (!codes.length) return;
   await fetchQuotes(codes);
   saveQuoteSnapshot();
+  savePortfolioDailySnapshot();  // 오늘 총평가액 기록 (구성 기준 정확)
   renderDashboard();
 }
 
@@ -752,7 +840,7 @@ function onSearch(q) {
     if (!results.length) {
       const qSafe = q.trim().replace(/"/g,'&quot;');
       eid('searchDrop').innerHTML =
-        `<div class="search-no-result">검색 결과가 없습니다${DEMO_MODE?' (데모 종목 외 → 직접 입력)':''}</div>
+        `<div class="search-no-result">검색 결과가 없습니다${isDemoMode?' (예시 종목 외 → 직접 입력)':''}</div>
          <div class="search-manual-entry">
            <div class="sme-label">직접 코드·종목명 입력</div>
            <div class="sme-row">
@@ -933,14 +1021,34 @@ const SNAP_KEY = 'asset_snapshots_v1';
 function saveQuoteSnapshot() {
   if (!Object.keys(quotes).length) return;
   try {
-    const raw   = JSON.parse(localStorage.getItem(SNAP_KEY) || '{}');
-    const today = new Date().toISOString().slice(0,10);
-    raw[today]  = raw[today] || {};
-    Object.keys(quotes).forEach(code => { raw[today][code] = quotes[code].price; });
-    const keys  = Object.keys(raw).sort();
+    const raw        = JSON.parse(localStorage.getItem(SNAP_KEY) || '{}');
+    const today      = new Date().toISOString().slice(0,10);
+    raw[today]       = raw[today] || {};
+    const recentDate = Object.keys(raw).filter(k => k < today).sort().pop();
+    const prevPrices = recentDate ? (raw[recentDate] || {}) : {};
+    Object.keys(quotes).forEach(code => {
+      const price = quotes[code].price;
+      if (!price || price <= 0) return;
+      const prev = prevPrices[code];
+      if (prev && (price > prev * 3 || price < prev / 3)) {
+        console.warn(`[snapshot] ${code} 이상 시세 스킵: ${prev} → ${price}`);
+        return;
+      }
+      raw[today][code] = price;
+    });
+    const keys = Object.keys(raw).sort();
     while (keys.length > 400) delete raw[keys.shift()];
     localStorage.setItem(SNAP_KEY, JSON.stringify(raw));
   } catch(e) {}
+}
+function resetSnapshots() {
+  if (!sbIsAdmin) return;
+  if (!confirm('시세 이력 데이터를 초기화합니까?\n이상한 급등·급락 이력이 사라지고, 오늘부터 다시 누적됩니다.')) return;
+  localStorage.removeItem(SNAP_KEY);
+  localStorage.removeItem(PORTFOLIO_DAILY_KEY);
+  if (_histChart) { _histChart.destroy(); _histChart = null; }
+  const tbl = eid('histTbl');
+  if (tbl) tbl.innerHTML = '<div style="color:var(--muted);text-align:center;padding:24px;font-size:12px">이력 초기화 완료 — 시세갱신 후 오늘부터 누적됩니다</div>';
 }
 function getHistoricalPrice(code, daysAgo) {
   try {
@@ -951,12 +1059,12 @@ function getHistoricalPrice(code, daysAgo) {
   } catch(e) { return null; }
 }
 function initDemoSnapshots() {
-  if (!DEMO_MODE) return;
+  if (!isDemoMode) return;
   try {
     if (Object.keys(JSON.parse(localStorage.getItem(SNAP_KEY)||'{}')).length > 30) return;
     const baseQ = {
       '005930':72000,'000660':175000,'005380':220000,'035420':180000,
-      '069500':28500,'453810':13800,'432430':12500,'411060':12800,
+      '069500':28500,'498400':9800, '432430':12500,'411060':12800,
       '152100':32000,'292150':33500,'379800':18500,'133690':26000,
       '476150':10200,'476920':10300,'448290':10100,'122630':22000,
     };
@@ -1020,6 +1128,9 @@ function rebuildAccounts() {
 // iframe에서 createClient()를 호출하면 허브의 onAuthStateChange가
 // SIGNED_IN 이벤트를 반복 발화해 페이지 전체가 깜빡이므로
 // 허브가 저장한 세션 토큰을 직접 읽어 fetch로 PostgREST를 호출한다.
+//
+// ⚠️ SB_SESSION_KEY는 절대 쓰기·삭제 금지 — 허브 Supabase SDK가 storage 이벤트로
+//    감지해 onAuthStateChange 발화 → iframe 리로드 → 깜빡임 발생
 async function initSupabase() {
   try {
     const raw = localStorage.getItem(SB_SESSION_KEY);
@@ -1027,7 +1138,43 @@ async function initSupabase() {
     const stored = JSON.parse(raw);
     const uid    = stored?.user?.id;
     const token  = stored?.access_token;
-    if (uid && token) { sbUserId = uid; sbAccessToken = token; }
+    if (!uid || !token) return;
+
+    // ① JWT 만료 시간 사전 체크
+    const expiresAt = stored?.expires_at ?? 0;
+    if (expiresAt && (Date.now() / 1000) > expiresAt) {
+      console.warn('[asset] Supabase 세션 만료 — 데모 모드로 전환');
+      return;
+    }
+
+    // ② Supabase 서버에 실제 토큰 유효성 검증 (구 세션 재사용 방지)
+    const verifyRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` }
+    });
+    if (!verifyRes.ok) {
+      console.warn('[asset] 세션 검증 실패 (HTTP', verifyRes.status, ') — 데모 모드로 전환');
+      return;
+    }
+    const verifiedUser = await verifyRes.json();
+    if (verifiedUser?.id !== uid) {
+      console.warn('[asset] 세션 UID 불일치 — 데모 모드로 전환');
+      return;
+    }
+
+    // ③ profiles.role 조회 — 허브와 동일한 DB 기반 권한 시스템 사용
+    //    이메일 하드코딩 없이 role = 'admin' 인 계정만 관리자로 처리
+    const profileRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${uid}&select=role`,
+      { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` } }
+    );
+    const profiles = profileRes.ok ? await profileRes.json() : [];
+    const role = profiles?.[0]?.role ?? 'member';
+
+    sbUserId      = uid;
+    sbAccessToken = token;
+    sbEmail       = verifiedUser?.email ?? stored?.user?.email ?? null;
+    sbIsAdmin     = (role === 'admin');
+    console.log('[asset] 세션 확인:', sbEmail, '역할:', role, '→', sbIsAdmin ? '🔐 관리자' : '데모 모드');
   } catch(e) { console.warn('[asset] 세션 읽기 실패:', e); }
 }
 function sbHeaders() {
@@ -1038,25 +1185,52 @@ function sbHeaders() {
   };
 }
 function updateModeBadge() {
-  const badge = eid('modeBadge');
-  if (!badge) return;
-  if (sbUserId) {
-    badge.textContent = '🔐 내 포트폴리오';
-    badge.style.cssText = 'background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600';
+  const badge         = eid('modeBadge');
+  const overlay       = eid('demo-overlay');
+  const pvToggle      = document.querySelector('.pv-toggle');
+  const divSyncBtn    = eid('divSyncBtn');
+  const snapResetBtn  = eid('snapResetBtn');
+
+  // 오버레이 워터마크 — 예시 데이터 모드에서만 표시
+  if (overlay) overlay.classList[isDemoMode ? 'add' : 'remove']('show');
+  // 블러 — 예시 데이터 모드에서는 해제 (관리자만 필요)
+  if (isDemoMode) document.body.classList.remove('pv');
+
+  if (sbIsAdmin) {
+    // 관리자: 실 데이터, 숨김처리 + 분배금 조회 + 이력 초기화 표시
+    if (badge) {
+      const user = sbEmail ? sbEmail.split('@')[0] : '';
+      badge.textContent = `🔐 관리자 (${user})`;
+      badge.title = sbEmail || '';
+      badge.style.cssText = 'background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;cursor:default';
+    }
+    if (pvToggle)     pvToggle.style.display    = '';
+    if (divSyncBtn)   divSyncBtn.style.display  = '';
+    if (snapResetBtn) snapResetBtn.style.display = '';
+  } else if (isDemoMode) {
+    // 예시 데이터 모드: 배지 숨김 (워터마크로만 표시), 관리자 전용 버튼 불필요
+    if (badge) badge.style.display = 'none';
+    if (pvToggle)     pvToggle.style.display    = 'none';
+    if (divSyncBtn)   divSyncBtn.style.display  = 'none';
+    if (snapResetBtn) snapResetBtn.style.display = 'none';
+  } else {
+    // 로그인 사용자 + 실 데이터 (관리자 외)
+    if (badge) badge.style.display = 'none';
+    if (pvToggle)     pvToggle.style.display    = 'none';
+    if (divSyncBtn)   divSyncBtn.style.display  = '';
+    if (snapResetBtn) snapResetBtn.style.display = 'none';
   }
 }
 
-// ── 저장 (PostgREST upsert + localStorage 캐시) ─────────
+// ── 저장/로드 — 관리자 전용 (비관리자는 항상 예시 데이터) ──────
 function saveLocal() {
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify({ holdings, nwAssets, nwLiabs, instruments }));
-  } catch(e) {
-    console.error('[asset] 로컬 저장 실패:', e);
-  }
+  } catch(e) {}
 }
 async function saveData() {
+  if (!sbIsAdmin) return;  // 관리자만 저장 가능
   saveLocal();
-  if (!sbUserId || !sbAccessToken) return;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/portfolios`, {
       method:  'POST',
@@ -1078,7 +1252,6 @@ async function saveData() {
   }
 }
 
-// ── 로드 (PostgREST select + localStorage 폴백) ─────────
 function loadLocal() {
   try {
     const d = JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');
@@ -1091,8 +1264,8 @@ function loadLocal() {
   } catch(e) {}
 }
 async function loadData() {
-  loadLocal();
-  if (!sbUserId || !sbAccessToken) return;
+  if (!sbIsAdmin) return;  // 관리자만 로드 (비관리자는 예시 데이터로 시작)
+  loadLocal();             // 로컬 캐시 먼저 적재 (빠른 초기 렌더)
   try {
     const res  = await fetch(
       `${SUPABASE_URL}/rest/v1/portfolios?user_id=eq.${sbUserId}&select=*`,
@@ -1110,7 +1283,7 @@ async function loadData() {
       }
       migrateOldCodes();
       repairInstruments();
-      accounts = [...DEMO_ACCOUNTS];
+      accounts = [];
       rebuildAccounts();
       saveLocal();
     } else {
@@ -1250,6 +1423,7 @@ function renderDashboard() {
   }
 
   renderHoldingsTable(c.rows);
+  savePortfolioSnapshot();   // 관리자: 이달 총평가액 저장 (차트 히스토리 누적)
   renderCharts(c.rows, c.totalVal);
   renderDivCalendar(c.rows);
 
@@ -1271,7 +1445,7 @@ function renderHoldingsTable(rows) {
         <div class="t-name">${instrName(r.h.code)}<span class="acct-tag">${acctName(r.h.accountId)}</span></div>
         <div class="t-code">${r.h.code} · ${r.inst.market||''} ${r.inst.kind||''}</div>
       </td>
-      <td class="mono ${chgCls}">${r.price.toLocaleString()}<br><span style="font-size:9.5px">${sign(r.q.change)}${(r.q.change||0).toFixed(2)}%</span></td>
+      <td class="mono ${chgCls}"><span class="amt-price">${r.price.toLocaleString()}</span><br><span style="font-size:9.5px">${sign(r.q.change)}${(r.q.change||0).toFixed(2)}%</span></td>
       <td class="mono">${Math.round(r.h.avgPrice).toLocaleString()}</td>
       <td class="mono">${r.h.qty.toLocaleString()}</td>
       <td class="mono">${fmt(r.val)}</td>
@@ -1281,6 +1455,8 @@ function renderHoldingsTable(rows) {
       <td class="mono tc-purple">${r.yoc>0?pct(r.yoc/12)+'/월':'—'}</td>
       <td class="mono ${r.pct3m===null?'tc-muted':r.pct3m>=0?'tc-green':'tc-red'}" style="font-size:11px">${r.pct3m===null?'누적중':sign(r.pct3m)+pct(r.pct3m)}</td>
       <td style="white-space:nowrap">
+        <button class="hist-btn" title="분배금 입력·이력" onclick="showDivHistory('${r.h.code}')">💰</button>
+        <button class="hist-btn" title="변동 이력" onclick="showHistory('${r.h.code}')">📈</button>
         <button class="del-btn" title="수정" onclick="editHolding('${r.h.id}')" style="color:var(--blue);font-size:12px">✏️</button>
         <button class="del-btn" title="삭제" onclick="deleteHolding('${r.h.id}')">✕</button>
       </td>
@@ -1288,23 +1464,125 @@ function renderHoldingsTable(rows) {
   }).join('');
 }
 
+// ── 포트폴리오 총평가액 월별 스냅샷 ──────────────────────
+const PORTFOLIO_SNAP_KEY  = 'asset_portfolio_snap_v1';
+const PORTFOLIO_DAILY_KEY = 'asset_portfolio_daily_v1'; // 일별 총평가액 (구성 변경 시 왜곡 방지)
+
+// 일별 총평가액 저장 — 그 시점 실제 구성 기준 (현재 수량 × 과거 시세 방식은 구성 변경 시 이력 왜곡)
+function savePortfolioDailySnapshot() {
+  if (!sbIsAdmin || !holdings.length) return;
+  let total = 0;
+  holdings.forEach(h => {
+    const q = quotes[h.code];
+    if (q && q.price > 0) total += h.qty * q.price;
+  });
+  if (total <= 0) return;
+  try {
+    const raw = JSON.parse(localStorage.getItem(PORTFOLIO_DAILY_KEY) || '{}');
+    const today = new Date().toISOString().slice(0, 10);
+    raw[today] = total;
+    const keys = Object.keys(raw).sort();
+    while (keys.length > 400) delete raw[keys.shift()];
+    localStorage.setItem(PORTFOLIO_DAILY_KEY, JSON.stringify(raw));
+  } catch(e) {}
+}
+
+// 관리자 로그인 시 시세 갱신 후 현재 달 총평가액 저장
+function savePortfolioSnapshot() {
+  if (!sbIsAdmin || !holdings.length) return;
+  let total = 0;
+  holdings.forEach(h => {
+    const q = quotes[h.code];
+    if (q && q.price > 0) total += h.qty * q.price;
+  });
+  if (total <= 0) return;
+  try {
+    const raw = JSON.parse(localStorage.getItem(PORTFOLIO_SNAP_KEY) || '{}');
+    const monthKey = new Date().toISOString().slice(0, 7);
+    raw[monthKey] = total;
+    const keys = Object.keys(raw).sort();
+    while (keys.length > 36) delete raw[keys.shift()];
+    localStorage.setItem(PORTFOLIO_SNAP_KEY, JSON.stringify(raw));
+  } catch(e) {}
+}
+
+// 월별 추이 배열 구성 — PORTFOLIO_SNAP_KEY (savePortfolioSnapshot이 월별로 저장한 정확한 총평가액만 사용)
+// SNAP_KEY × 현재 수량 근사 방식은 포트폴리오 구성 변경 시 과거가 왜곡되므로 제거
+function buildMonthlySnapshots() {
+  try {
+    const portSnap = JSON.parse(localStorage.getItem(PORTFOLIO_SNAP_KEY) || '{}');
+    const out = [];
+    const today = new Date();
+    let validCount = 0;
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const monthStr = d.toISOString().slice(0, 7);
+      if (portSnap[monthStr] != null) {
+        out.push({ asOf: monthStr, totalValue: portSnap[monthStr] });
+        validCount++;
+      } else {
+        out.push({ asOf: monthStr, totalValue: null });
+      }
+    }
+    return validCount >= 1 ? out : null;
+  } catch(e) { return null; }
+}
+
+// X축 레이블: "05월" 형식, 연도 변경 시 ["'26년", "01월"] 배열(멀티라인)
+function buildSnapLabels(snapshots) {
+  const labels = [];
+  let prevYear = null;
+  snapshots.forEach(s => {
+    const year  = parseInt(s.asOf.slice(0, 4));
+    const month = parseInt(s.asOf.slice(5, 7));
+    const mm    = String(month).padStart(2, '0') + '월';
+    if (prevYear !== null && year !== prevYear) {
+      labels.push([`'${String(year).slice(2)}년`, mm]);
+    } else {
+      labels.push(mm);
+    }
+    prevYear = year;
+  });
+  return labels;
+}
+
 function renderCharts(rows, totalVal) {
-  // 추세
+  // 추세 — 관리자: 실제 스냅샷 우선 / 비관리자: 데모
   const ctx1 = eid('trendChart').getContext('2d');
   if (trendCh) trendCh.destroy();
+
+  let snapshots, isRealSnap;
+  if (sbIsAdmin) {
+    const real = buildMonthlySnapshots();
+    snapshots  = real || DEMO_SNAPSHOTS;
+    isRealSnap = !!real;
+  } else {
+    snapshots  = DEMO_SNAPSHOTS;
+    isRealSnap = false;
+  }
+
+  const snapLabels = buildSnapLabels(snapshots);
+  const snapVals   = snapshots.map(s => s.totalValue != null ? +(s.totalValue/100_000_000).toFixed(3) : null);
+
   trendCh = new Chart(ctx1, {
     type:'line',
-    data:{ labels: DEMO_SNAPSHOTS.map(s=>s.asOf.slice(5)), datasets:[{
-      label:'총 평가액', data: DEMO_SNAPSHOTS.map(s=>+(s.totalValue/100_000_000).toFixed(3)),
+    data:{ labels: snapLabels, datasets:[{
+      label:'총 평가액', data: snapVals,
       borderColor:'rgba(59,130,246,.9)', backgroundColor:'rgba(59,130,246,.07)',
-      fill:true, tension:.35, pointRadius:3, borderWidth:2,
+      fill:true, tension:.35, pointRadius:3, borderWidth:2, spanGaps:true,
     }]},
     options:{ animation:false, responsive:true, maintainAspectRatio:true,
-      plugins:{ legend:{ labels:{ color:'#94a3b8',font:{size:9.5} }}},
+      plugins:{
+        legend:{ labels:{ color:'#94a3b8', font:{size:9.5} }},
+        subtitle: isRealSnap
+          ? { display:false }
+          : { display:true, text:'참고: 시세 누적 중 — 예시 데이터', color:'#64748b', font:{size:9}, padding:{bottom:4} },
+        tooltip:{ callbacks:{ label: ctx => document.body.classList.contains('pv') ? '—' : ` ${ctx.parsed.y != null ? ctx.parsed.y.toFixed(3)+'억' : '—'}` }},
+      },
       scales:{
-        x:{ ticks:{ color:'#64748b',font:{size:9} }},
-        y:{ ticks:{ color:'#64748b',font:{size:9},callback:v=>v.toFixed(1)+'억' },
-            title:{ display:true,text:'억원',color:'#64748b',font:{size:9} }}
+        x:{ ticks:{ color:'#64748b', font:{size:9}, maxRotation:0 }},
+        y:{ ticks:{ color:'#64748b', font:{size:9}, callback: v => v != null ? (document.body.classList.contains('pv') ? '—' : v.toFixed(1)+'억') : '' },
+            title:{ display:true, text:'억원', color:'#64748b', font:{size:9} }}
       }
     }
   });
@@ -1313,49 +1591,124 @@ function renderCharts(rows, totalVal) {
   const ctx2 = eid('weightChart').getContext('2d');
   if (weightCh) weightCh.destroy();
   if (!rows.length || totalVal <= 0) return;
+
+  let labels, data;
+  if (pieMode === 'account') {
+    // 계좌별 = 각 holding 개별 (계좌+종목 조합) — 기존 '종목별' 동작
+    labels = rows.map(r => `${instrName(r.h.code)} (${acctName(r.h.accountId)})`);
+    data   = rows.map(r => Math.round(r.val));
+  } else {
+    // 종목별 = 같은 종목 코드를 계좌 무관하게 합산
+    const instMap = {};
+    rows.forEach(r => {
+      const name = instrName(r.h.code);
+      instMap[name] = (instMap[name] || 0) + Math.round(r.val);
+    });
+    labels = Object.keys(instMap);
+    data   = labels.map(k => instMap[k]);
+  }
+
   weightCh = new Chart(ctx2, {
     type:'doughnut',
     data:{
-      labels:  rows.map(r=>instrName(r.h.code)),
-      datasets:[{ data: rows.map(r=>Math.round(r.val)),
-        backgroundColor: rows.map((_,i)=>CHART_COLORS[i%CHART_COLORS.length]),
+      labels,
+      datasets:[{ data,
+        backgroundColor: labels.map((_,i)=>CHART_COLORS[i%CHART_COLORS.length]),
         borderColor:'#1c2333', borderWidth:2,
       }]
     },
     options:{ animation:false, responsive:true, maintainAspectRatio:true,
       plugins:{
-        legend:{ position:'right', labels:{ color:'#94a3b8',font:{size:9},padding:8,boxWidth:10 }},
-        tooltip:{ callbacks:{ label: ctx => ` ${fmt(ctx.raw)}  (${pct(ctx.raw/totalVal)})` }}
+        legend:{ position:'right', labels:{ color:'#94a3b8', font:{size:9}, padding:8, boxWidth:10 }},
+        tooltip:{ callbacks:{ label: ctx => document.body.classList.contains('pv') ? ` ${pct(ctx.raw/totalVal)}` : ` ${fmt(ctx.raw)}  (${pct(ctx.raw/totalVal)})` }}
       }
     }
   });
 }
 
 function renderDivCalendar(rows) {
-  const monthly = Array.from({length:12}, ()=>({ amt:0, names:[] }));
+  _lastDivRows = rows;
+  const curYear  = new Date().getFullYear();
+  const curMonth = new Date().getMonth(); // 0-based
+
+  const monthly = Array.from({length:12}, ()=>({ est:0, names:[] }));
   rows.forEach(r => {
     const inst = r.inst || {};
     const name = instrName(r.h.code);
     if (inst.isMonthly) {
       for (let m=0; m<12; m++) {
-        monthly[m].amt += r.divM;
+        monthly[m].est += r.divM;
         if (!monthly[m].names.includes(name)) monthly[m].names.push(name);
       }
     } else {
       const payMonths = (inst.cycle||4) === 4 ? [2,5,8,11] : (inst.cycle===2?[5,11]:[11]);
       payMonths.forEach(m => {
-        monthly[m].amt += r.divAnn / payMonths.length;
+        monthly[m].est += r.divAnn / payMonths.length;
         if (!monthly[m].names.includes(name)) monthly[m].names.push(name);
       });
     }
   });
-  eid('divCalendar').innerHTML = monthly.map((m,i) =>
-    `<div class="cal-month ${m.amt>0?'has-div':''}">
-      <div class="cal-m">${MONTHS[i]}</div>
-      <div class="cal-amount">${m.amt>0?fmtFull(Math.round(m.amt)):'—'}</div>
+
+  const divData = loadDivData();
+  const isPv    = () => document.body.classList.contains('pv');
+
+  eid('divCalendar').innerHTML = monthly.map((m, i) => {
+    const ym        = `${curYear}-${String(i+1).padStart(2,'0')}`;
+    const isPast    = i < curMonth;
+    const isCur     = i === curMonth;
+    const estRound  = Math.round(m.est);
+
+    // 실제 수령액 집계 — 지급 예정 종목 수 vs 실적 보유 종목 수 추적
+    let actTotal = 0, actPayCount = 0, expPayCount = 0;
+    rows.forEach(r => {
+      const ri = r.inst || {};
+      let expectedToPay = false;
+      if (ri.isMonthly) {
+        expectedToPay = (r.divM > 0);
+      } else if (r.divAnn > 0) {
+        const pm = (ri.cycle||4) === 4 ? [2,5,8,11] : (ri.cycle===2?[5,11]:[11]);
+        expectedToPay = pm.includes(i);
+      }
+      if (expectedToPay) expPayCount++;
+      const entry = (divData[r.h.code]?.payments || []).find(p => p.date === ym);
+      if (entry) {
+        actTotal += entry.perShare * r.h.qty;
+        if (expectedToPay) actPayCount++;
+      }
+    });
+    const hasAct    = actTotal > 0;
+    const isFullAct = expPayCount > 0 && actPayCount >= expPayCount;
+    const actRound  = Math.round(actTotal);
+
+    let amtHtml = '', subHtml = '';
+    if (hasAct && isFullAct) {
+      amtHtml = `<div class="cal-amount">${isPv() ? '—' : fmtFull(actRound)}</div>`;
+      if (estRound > 0 && isPast) {
+        const diff = actRound - estRound;
+        const sign = diff >= 0 ? '+' : '';
+        const cls  = diff >= 0 ? 'tc-green' : 'tc-red';
+        subHtml = `<div class="cal-est">${isPv() ? '예상 —' : `예상 ${fmtFull(estRound)}`} <span class="${cls}">(${sign}${fmtFull(Math.abs(diff))})</span></div>`;
+      } else if (estRound > 0) {
+        subHtml = `<div class="cal-est">${isPv() ? '예상 —' : `예상 ${fmtFull(estRound)}`}</div>`;
+      }
+    } else if (hasAct) {
+      // 일부 종목만 실적 → 비교 없이 부분 금액 표시
+      amtHtml = `<div class="cal-amount">${isPv() ? '—' : fmtFull(actRound)}<span style="font-size:9px;color:var(--muted);margin-left:2px">(일부)</span></div>`;
+      if (estRound > 0) subHtml = `<div class="cal-est tc-muted">예상 ${isPv() ? '—' : fmtFull(estRound)}</div>`;
+    } else if (estRound > 0) {
+      amtHtml = `<div class="cal-amount">${isPv() ? '—' : fmtFull(estRound)}</div>`;
+      if (isPast) subHtml = `<div class="cal-est tc-muted">실지급 미기록</div>`;
+    } else {
+      amtHtml = `<div class="cal-amount">—</div>`;
+    }
+
+    const hasBg = hasAct || estRound > 0;
+    return `<div class="cal-month ${hasBg?'has-div':''} ${isFullAct?'has-actual':''} ${isCur?'is-current':''}">
+      <div class="cal-m">${MONTHS[i]}${isCur?' ●':''}</div>
+      ${amtHtml}${subHtml}
       ${m.names.length?`<div class="cal-tickers">${m.names.join(', ')}</div>`:''}
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
 }
 
 // ── 등록 탭 ──────────────────────────────────────────────
@@ -1440,28 +1793,388 @@ function renderNetworth() {
   nwEl.style.color  = netWorth>=0?'var(--blue)':'var(--red)';
 }
 
+// ── 분배금 이력 누적 ────────────────────────────────────────
+function loadDivData() {
+  try { return JSON.parse(localStorage.getItem(DIVIDEND_KEY) || '{}'); } catch { return {}; }
+}
+function saveDivData(d) {
+  try { localStorage.setItem(DIVIDEND_KEY, JSON.stringify(d)); } catch {}
+}
+
+// CF Worker에서 전 종목 분배금 자동 조회
+async function syncDividends(showMsg = false) {
+  if (isDemoMode || _divSyncing) return;
+  _divSyncing = true;
+  const btn = eid('divSyncBtn');
+  if (btn) { btn.textContent = '⏳ 조회 중...'; btn.disabled = true; }
+
+  const data     = loadDivData();
+  const today    = new Date().toISOString().slice(0, 10);
+  let newCount   = 0;
+
+  const codes = [...new Set(
+    holdings.filter(h => !instruments[h.code]?.noDividend).map(h => h.code)
+  )];
+
+  await Promise.all(codes.map(async code => {
+    try {
+      const res  = await fetch(`${WORKER_BASE}/dividends?code=${code}`);
+      const json = await res.json();
+      if (!json.payments?.length) return;
+      const existing    = data[code] || { payments: [] };
+      const existingSet = new Set(existing.payments.map(p => p.date));
+      const fresh       = json.payments.filter(p => !existingSet.has(p.date));
+      const merged      = [...fresh, ...existing.payments]
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, 36);
+      data[code] = { payments: merged, lastSynced: today };
+      newCount  += fresh.length;
+    } catch {}
+  }));
+
+  saveDivData(data);
+  _divSyncing = false;
+  if (btn) { btn.textContent = '📥 분배금 조회'; btn.disabled = false; }
+
+  const msgEl = eid('divSyncMsg');
+  if (showMsg && msgEl) {
+    msgEl.textContent = newCount > 0
+      ? `✅ ${newCount}건 새로 추가됨`
+      : '✓ 신규 없음';
+    setTimeout(() => { msgEl.textContent = ''; }, 4000);
+  }
+  renderDivCalendar(_lastDivRows);
+}
+
+// 분배금 입력 모달
+function showDivHistory(code) {
+  _divEntryCode = code;
+  eid('divEntryModal').style.display = 'flex';
+  eid('divEntryTitle').textContent   = instrName(code) + ' — 분배금 이력';
+  const h = holdings.find(h => h.code === code);
+  eid('divEntrySub').textContent = h ? `보유 ${h.qty.toLocaleString()}주` : '';
+  eid('divEntryMonth').value     = new Date().toISOString().slice(0, 7);
+  eid('divEntryPerShare').value  = '';
+  eid('divEntryTotal').textContent = '';
+  renderDivEntryHistory(code);
+}
+function closeDivEntry() {
+  eid('divEntryModal').style.display = 'none';
+  _divEntryCode = null;
+}
+function updateDivEntryTotal() {
+  const ps = parseFloat(eid('divEntryPerShare')?.value || 0);
+  const h  = _divEntryCode ? holdings.find(h => h.code === _divEntryCode) : null;
+  const t  = h && ps > 0 ? ps * h.qty : 0;
+  const el = eid('divEntryTotal');
+  if (el) el.textContent = t > 0 ? `합계 ${fmtFull(t)}` : '';
+}
+function saveDivEntry() {
+  if (!_divEntryCode) return;
+  const ym       = eid('divEntryMonth')?.value;
+  const perShare = parseFloat(eid('divEntryPerShare')?.value || 0);
+  if (!ym || perShare <= 0) { alert('연월과 분배금을 입력하세요.'); return; }
+  const h        = holdings.find(h => h.code === _divEntryCode);
+  const totalAmt = h ? perShare * h.qty : 0;
+  const data     = loadDivData();
+  if (!data[_divEntryCode]) data[_divEntryCode] = { payments: [] };
+  const arr = data[_divEntryCode].payments;
+  const idx = arr.findIndex(p => p.date === ym);
+  const entry = { date: ym, perShare, totalAmt, source: 'MANUAL' };
+  if (idx >= 0) arr[idx] = entry; else arr.push(entry);
+  arr.sort((a, b) => b.date.localeCompare(a.date));
+  saveDivData(data);
+  eid('divEntryPerShare').value = '';
+  eid('divEntryTotal').textContent = '';
+  renderDivEntryHistory(_divEntryCode);
+  renderDivCalendar(_lastDivRows);
+  const msgEl = eid('divSyncMsg');
+  if (msgEl) { msgEl.textContent = `💰 ${ym} 저장 (${fmtFull(totalAmt)})`; setTimeout(() => { msgEl.textContent = ''; }, 3000); }
+}
+function renderDivEntryHistory(code) {
+  const data     = loadDivData();
+  const payments = (data[code]?.payments || []).slice(0, 36);
+  const h        = holdings.find(h => h.code === code);
+  const isPv     = document.body.classList.contains('pv');
+  if (!payments.length) {
+    eid('divEntryHistory').innerHTML = '<div style="color:var(--muted);font-size:11px;padding:6px 0">저장된 이력 없음</div>';
+    return;
+  }
+  eid('divEntryHistory').innerHTML =
+    `<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">기록된 분배금</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+      <tbody>${payments.map(p => {
+        const total = h ? p.perShare * h.qty : 0;
+        const badge = p.source === 'MANUAL'
+          ? '<span style="font-size:9px;color:var(--amber);margin-left:4px">수동</span>'
+          : '<span style="font-size:9px;color:var(--teal);margin-left:4px">자동</span>';
+        return `<tr style="border-bottom:1px solid rgba(42,51,71,.4)">
+          <td style="padding:4px 0;color:var(--muted)">${p.date}${badge}</td>
+          <td class="mono" style="text-align:right;padding:4px 0">${p.perShare.toLocaleString()}원/주</td>
+          <td class="mono tc-teal" style="text-align:right;padding:4px 6px">${isPv ? '—' : fmtFull(total)}</td>
+          <td style="padding:4px 0"><button class="del-btn" onclick="deleteDivEntry('${code}','${p.date}')" style="font-size:10px">✕</button></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+}
+function deleteDivEntry(code, ym) {
+  if (!confirm(`${ym} 분배금을 삭제합니다.`)) return;
+  const data = loadDivData();
+  if (data[code]) {
+    data[code].payments = data[code].payments.filter(p => p.date !== ym);
+    saveDivData(data);
+    renderDivEntryHistory(code);
+    renderDivCalendar(_lastDivRows);
+  }
+}
+
+// ── 변동 이력 ──────────────────────────────────────────────
+function showHistory(code) {
+  _histCode = code || null;
+  eid('histModal').style.display = 'flex';
+  eid('histTitle').textContent = _histCode
+    ? instrName(_histCode) + ' — 변동 이력'
+    : '포트폴리오 합계 — 변동 이력';
+  renderHistChart();
+}
+function closeHistory() {
+  eid('histModal').style.display = 'none';
+  if (_histChart) { _histChart.destroy(); _histChart = null; }
+}
+function setHistScale(scale) {
+  _histScale = scale;
+  document.querySelectorAll('.hist-scale').forEach(b =>
+    b.classList.toggle('active', b.dataset.scale === scale));
+  renderHistChart();
+}
+
+function _getHistSeries() {
+  try {
+    const snap = JSON.parse(localStorage.getItem(SNAP_KEY) || '{}');
+    const series = [];
+
+    if (!_histCode) {
+      // 포트폴리오 합계: 일별 저장 총액 사용 (구성 변경 시 왜곡 방지)
+      const daily = JSON.parse(localStorage.getItem(PORTFOLIO_DAILY_KEY) || '{}');
+      if (Object.keys(daily).length > 0) {
+        Object.keys(daily).sort().forEach(date => {
+          if (daily[date] > 0) series.push({ date, value: daily[date] });
+        });
+        return series;
+      }
+      // 폴백: daily 데이터 없을 때 기존 방식 (구성 변경 전 데이터라 왜곡 가능)
+      Object.keys(snap).sort().forEach(date => {
+        const prices = snap[date];
+        let total = 0, hasAny = false;
+        holdings.forEach(h => {
+          if (prices[h.code] != null) { total += h.qty * prices[h.code]; hasAny = true; }
+        });
+        if (hasAny) series.push({ date, value: total });
+      });
+      return series;
+    }
+
+    // 개별 종목
+    Object.keys(snap).sort().forEach(date => {
+      const prices = snap[date];
+      if (prices[_histCode] != null) series.push({ date, value: prices[_histCode] });
+    });
+    return series;
+  } catch(e) { return []; }
+}
+
+function _aggregateSeries(series) {
+  if (_histScale === 'day') return series.slice(-180);
+  const map = new Map();
+  series.forEach(({ date, value }) => {
+    let key;
+    if (_histScale === 'week') {
+      const d = new Date(date);
+      const day = d.getDay();
+      const mon = new Date(d);
+      mon.setDate(d.getDate() - day + (day === 0 ? -6 : 1));
+      key = mon.toISOString().slice(0, 10);
+    } else {
+      key = date.slice(0, 7);
+    }
+    map.set(key, value);
+  });
+  const limit = _histScale === 'week' ? 26 : 12;
+  return Array.from(map.entries()).map(([date, value]) => ({ date, value })).slice(-limit);
+}
+
+function renderHistChart() {
+  const raw  = _getHistSeries();
+  const data = _aggregateSeries(raw);
+  const isPrice = _histCode !== null;
+  const isPv = () => document.body.classList.contains('pv');
+  const fmtVal = v => isPrice ? v.toLocaleString() + '원' : fmt(v);
+  const labelFn = d => _histScale === 'month' ? d.slice(0, 7) : d.slice(5);
+
+  const ctx = eid('histChart').getContext('2d');
+  if (_histChart) { _histChart.destroy(); _histChart = null; }
+
+  if (!data.length) {
+    eid('histTbl').innerHTML = '<div style="color:var(--muted);text-align:center;padding:24px;font-size:12px">저장된 데이터 없음 — 시세를 갱신하면 오늘부터 이력이 쌓입니다</div>';
+    return;
+  }
+
+  const values = data.map(d => d.value);
+  const changes = values.map((v, i) => i === 0 ? null : v - values[i - 1]);
+  const changePcts = values.map((v, i) =>
+    i === 0 || values[i - 1] <= 0 ? null : (v - values[i - 1]) / values[i - 1]);
+  // 30% 초과 변동 = 포트폴리오 구성 변경으로 추정 (시세 변동이 아님)
+  const isCompoChange = changePcts.map(cp => !isPrice && cp !== null && Math.abs(cp) > 0.30);
+
+  _histChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map(d => labelFn(d.date)),
+      datasets: [{
+        label: isPrice ? '가격' : '총 평가액',
+        data: values,
+        borderColor: 'rgba(59,130,246,.9)',
+        backgroundColor: 'rgba(59,130,246,.07)',
+        fill: true, tension: .35, pointRadius: 2, borderWidth: 2,
+      }]
+    },
+    options: {
+      animation: false, responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => {
+          if (isPv()) return '—';
+          const v = c.parsed.y; const i = c.dataIndex;
+          const cp = changePcts[i];
+          const chgStr = cp !== null ? ` (${cp >= 0 ? '+' : ''}${(cp * 100).toFixed(2)}%)` : '';
+          return ` ${fmtVal(v)}${chgStr}`;
+        }}}
+      },
+      scales: {
+        x: { ticks: { color: '#64748b', font: { size: 9 }, maxRotation: 45 }},
+        y: { ticks: { color: '#64748b', font: { size: 9 }, callback: v =>
+          isPv() ? '—' : isPrice ? v.toLocaleString() : (v / 100_000_000).toFixed(2) + '억'
+        }}
+      }
+    }
+  });
+
+  // 최근 20건 역순 테이블
+  const rows = data.slice(-20).reverse().map((d, i) => {
+    const origIdx = data.length - 1 - i;
+    const chg  = changes[origIdx];
+    const cp   = changePcts[origIdx];
+    const isCC = isCompoChange[origIdx];
+    const cls  = chg === null || isCC ? 'tc-muted' : chg >= 0 ? 'tc-green' : 'tc-red';
+    const dispVal = fmtVal(d.value);
+    const chgAmt  = chg === null ? '—'
+      : `${chg >= 0 ? '+' : ''}${isPrice ? Math.round(chg).toLocaleString() + '원' : fmt(Math.abs(chg))}`;
+    const dispChg = isCC
+      ? `${chgAmt} <small style="font-size:9px;color:var(--hint)">(구성변경)</small>`
+      : chgAmt;
+    const dispPct = cp === null ? '—' : `${cp >= 0 ? '+' : ''}${(cp * 100).toFixed(2)}%`;
+    return `<tr>
+      <td style="color:var(--muted);padding:4px 8px">${d.date}</td>
+      <td class="mono" style="text-align:right;padding:4px 8px">${isPv() ? '—' : dispVal}</td>
+      <td class="mono ${cls}" style="text-align:right;padding:4px 8px">${isPv() ? '—' : dispChg}</td>
+      <td class="mono ${cls}" style="text-align:right;padding:4px 8px">${dispPct}</td>
+    </tr>`;
+  }).join('');
+
+  eid('histTbl').innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:11.5px">
+    <thead><tr style="color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface)">
+      <th style="text-align:left;padding:4px 8px;font-weight:600">날짜</th>
+      <th style="text-align:right;padding:4px 8px;font-weight:600">평가</th>
+      <th style="text-align:right;padding:4px 8px;font-weight:600">변동</th>
+      <th style="text-align:right;padding:4px 8px;font-weight:600">변동률</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
 // ── 초기화 ────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   await initSupabase(); // Supabase 세션 확인
 
-  // 로그인 상태: Supabase에서 로드 (로컬 캐시 포함)
-  // 미로그인:   localStorage에서 로드
-  const hadSaved = localStorage.getItem(SAVE_KEY) !== null;
+  // 관리자만 Supabase 로드, 비관리자는 즉시 리턴
   await loadData();
 
-  // 미로그인 + 저장 데이터 없음 → 데모 데이터로 시작 (로컬에만 저장)
-  if (!sbUserId && !hadSaved) {
-    if (!holdings.length) holdings = JSON.parse(JSON.stringify(DEMO_HOLDINGS_INIT));
-    if (!nwAssets.length) nwAssets = JSON.parse(JSON.stringify(DEMO_NW.assets));
-    if (!nwLiabs.length)  nwLiabs  = JSON.parse(JSON.stringify(DEMO_NW.liabs));
-    saveLocal();
+  // 관리자 아닌 경우 항상 예시 데이터 표시
+  if (!sbIsAdmin) {
+    holdings  = JSON.parse(JSON.stringify(DEMO_HOLDINGS_INIT));
+    nwAssets  = JSON.parse(JSON.stringify(DEMO_NW.assets));
+    nwLiabs   = JSON.parse(JSON.stringify(DEMO_NW.liabs));
+    isDemoMode = true;
   }
 
   updateModeBadge();
-  initDemoSnapshots();   // DEMO_MODE: 6개월치 과거 시세 시드 데이터 생성
+  initDemoSnapshots();   // 예시 데이터 모드: 6개월치 과거 시세 시드 데이터 생성
   renderFilterBar();
   await refreshQuotes(); // 내부에서 renderDashboard() 호출 — 중복 호출 제거
+
+  // 분배금 자동 조회 (관리자 + 비데모 모드에서만, 오늘 미조회 시)
+  if (!isDemoMode) {
+    const divData = loadDivData();
+    const today   = new Date().toISOString().slice(0, 10);
+    const needSync = holdings.some(h => {
+      const rec = divData[h.code];
+      return !rec || rec.lastSynced !== today;
+    });
+    if (needSync) syncDividends(false);
+  }
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (eid('divEntryModal')?.style.display === 'flex') { closeDivEntry(); return; }
+    if (eid('histModal')?.style.display === 'flex')    { closeHistory();  return; }
+  }
 });
 </script>
+
+<!-- ══ 분배금 입력 모달 ══════════════════════════════════ -->
+<div id="divEntryModal" class="hist-modal" onclick="if(event.target===this)closeDivEntry()">
+  <div class="hist-panel" style="max-width:460px">
+    <div class="hist-hdr">
+      <span class="hist-ttl" id="divEntryTitle">분배금 이력</span>
+      <button class="hist-close" onclick="closeDivEntry()">✕</button>
+    </div>
+    <div style="padding:14px 16px 10px;flex-shrink:0">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px" id="divEntrySub"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+        <div>
+          <div class="form-lbl" style="margin-bottom:4px">지급 연월</div>
+          <input type="month" class="inp" id="divEntryMonth">
+        </div>
+        <div>
+          <div class="form-lbl" style="margin-bottom:4px">1주당 분배금 (원)</div>
+          <input type="number" class="inp" id="divEntryPerShare" placeholder="예) 68" oninput="updateDivEntryTotal()">
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:var(--teal);font-family:'IBM Plex Mono',monospace;min-height:18px;margin-bottom:10px" id="divEntryTotal"></div>
+      <div style="display:flex;gap:8px">
+        <button class="add-btn" onclick="saveDivEntry()">저장</button>
+        <button class="refresh-btn" onclick="closeDivEntry()">닫기</button>
+      </div>
+    </div>
+    <div class="hist-tbl-wrap" id="divEntryHistory" style="max-height:200px;padding:0 16px 12px"></div>
+  </div>
+</div>
+
+<!-- ══ 변동 이력 모달 ══════════════════════════════════ -->
+<div id="histModal" class="hist-modal" onclick="if(event.target===this)closeHistory()">
+  <div class="hist-panel">
+    <div class="hist-hdr">
+      <span class="hist-ttl" id="histTitle">변동 이력</span>
+      <div class="hist-scale-btns">
+        <button class="hist-scale active" data-scale="day"   onclick="setHistScale('day')">일변동</button>
+        <button class="hist-scale"        data-scale="week"  onclick="setHistScale('week')">주변동</button>
+        <button class="hist-scale"        data-scale="month" onclick="setHistScale('month')">월변동</button>
+      </div>
+      <button class="hist-close" onclick="closeHistory()">✕</button>
+    </div>
+    <div class="hist-body"><canvas id="histChart"></canvas></div>
+    <div class="hist-tbl-wrap" id="histTbl"></div>
+  </div>
+</div>
 </body>
 </html>
