@@ -1018,6 +1018,7 @@ function onPrincipalChange() {
 
 // ── 기간 시세 스냅샷 ──────────────────────────────────────
 const SNAP_KEY = 'asset_snapshots_v1';
+const HIST_CUTOFF = '2026-07-03'; // 이 날짜 이전 이력은 모두 제외 — 구성 변경 전 데이터 왜곡 방지
 function saveQuoteSnapshot() {
   if (!Object.keys(quotes).length) return;
   try {
@@ -1046,6 +1047,7 @@ function resetSnapshots() {
   if (!confirm('시세 이력 데이터를 초기화합니까?\n이상한 급등·급락 이력이 사라지고, 오늘부터 다시 누적됩니다.')) return;
   localStorage.removeItem(SNAP_KEY);
   localStorage.removeItem(PORTFOLIO_DAILY_KEY);
+  localStorage.removeItem(PORTFOLIO_SNAP_KEY);
   if (_histChart) { _histChart.destroy(); _histChart = null; }
   const tbl = eid('histTbl');
   if (tbl) tbl.innerHTML = '<div style="color:var(--muted);text-align:center;padding:24px;font-size:12px">이력 초기화 완료 — 시세갱신 후 오늘부터 누적됩니다</div>';
@@ -1517,7 +1519,7 @@ function buildMonthlySnapshots() {
     for (let i = 11; i >= 0; i--) {
       const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthStr = d.toISOString().slice(0, 7);
-      if (portSnap[monthStr] != null) {
+      if (portSnap[monthStr] != null && monthStr >= HIST_CUTOFF.slice(0, 7)) {
         out.push({ asOf: monthStr, totalValue: portSnap[monthStr] });
         validCount++;
       } else {
@@ -1958,12 +1960,14 @@ function _getHistSeries() {
       const daily = JSON.parse(localStorage.getItem(PORTFOLIO_DAILY_KEY) || '{}');
       if (Object.keys(daily).length > 0) {
         Object.keys(daily).sort().forEach(date => {
+          if (date < HIST_CUTOFF) return;
           if (daily[date] > 0) series.push({ date, value: daily[date] });
         });
         return series;
       }
       // 폴백: daily 데이터 없을 때 기존 방식 (구성 변경 전 데이터라 왜곡 가능)
       Object.keys(snap).sort().forEach(date => {
+        if (!isDemoMode && date < HIST_CUTOFF) return;
         const prices = snap[date];
         let total = 0, hasAny = false;
         holdings.forEach(h => {
@@ -1976,6 +1980,7 @@ function _getHistSeries() {
 
     // 개별 종목
     Object.keys(snap).sort().forEach(date => {
+      if (!isDemoMode && date < HIST_CUTOFF) return;
       const prices = snap[date];
       if (prices[_histCode] != null) series.push({ date, value: prices[_histCode] });
     });
