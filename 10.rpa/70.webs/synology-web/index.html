@@ -2046,7 +2046,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.23';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.7.24';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2106,13 +2106,13 @@ const TREE = [
   {
     slug:'finance',
     label:{ko:'재무관리', en:'Finance'}, icon:'💰', consultantTag:true, children:[
+      { label:{ko:'자산 통합 관리', en:'Asset Portfolio'}, icon:'📊', iframe:'consulting/asset/index.html', consultantOnly:true },
       {
         label:{ko:'연금 시뮬레이터', en:'Pension Simulator'}, icon:'💰', consultantOnly:true, children:[
           { label:{ko:'v1 절세 시뮬레이터', en:'v1 Tax Simulator'},     icon:'✦', iframe:'consulting/pension/index.html',    consultantOnly:true },
           { label:{ko:'v2 최적 인출 전략', en:'v2 Optimal Withdrawal'}, icon:'✦', iframe:'consulting/pension/v2/index.html', consultantOnly:true },
         ]
       },
-      { label:{ko:'자산 통합 관리', en:'Asset Portfolio'}, icon:'📊', iframe:'consulting/asset/index.html', consultantOnly:true },
     ]
   },
   {
