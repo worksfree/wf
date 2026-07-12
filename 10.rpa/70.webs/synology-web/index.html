@@ -2046,7 +2046,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.21';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.7.22';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2832,8 +2832,8 @@ function loadIframe(src, path=[], label='') {
       iframe.contentWindow.postMessage({ type:'wf_user',   userId: authUser?.id ?? '' }, '*');
     }
   };
-  // URL hash 업데이트 (딥링크 공유 가능)
-  history.pushState({ wfhub: true }, '', '#' + iframeToSlug(src));
+  // URL에서 hash 제거 — 세부 URL 노출 방지 (관리자 🔗 버튼으로 공유)
+  history.replaceState({}, '', location.pathname + location.search);
   // 브라우저 탭 타이틀 업데이트 (북마크·히스토리 가독성)
   const pageTitle = typeof label === 'object' ? (label[lang] || label.ko || '') : (label || '');
   document.title = pageTitle ? pageTitle + ' — WorksFree Hub' : 'WorksFree Hub';
@@ -2851,7 +2851,7 @@ function showHome() {
   previewBaseSrc = null;
   hidePreviewOverlay();
   sessionStorage.removeItem('wf_last_page');
-  history.pushState(null, '', location.pathname + location.search);
+  history.replaceState(null, '', location.pathname + location.search);
   document.title = 'WorksFree Hub — 경영지도사·파트너 통합 컨설팅 플랫폼';
   currentSection = null;
   _fullSidebarMode = true;
@@ -2888,7 +2888,8 @@ function showSectionDash(node, keepFullSidebar=false) {
   if (titleEl) titleEl.textContent = getLabel(node.label);
   setBreadcrumb([], node.label);
   renderDashCards(node.slug);
-  history.pushState({ wfhub: true }, '', '#' + node.slug);
+  // URL hash 노출 방지 — 섹션 탐색 시에도 주소창은 기본 URL 유지
+  history.replaceState({}, '', location.pathname + location.search);
 }
 
 // ── Hash 라우팅 ──────────────────────────────────────────────────
@@ -2899,6 +2900,8 @@ function iframeToSlug(src) {
 function navigateToHash(hash) {
   if (!hash || hash === '#' || hash === '#home') { showHome(); return; }
   _fullSidebarMode = false; // hash 직접 접속 → 섹션 전용 사이드바
+  // 주소창에서 hash 즉시 제거 — 직접 URL은 내부 라우팅에만 사용
+  history.replaceState({}, '', location.pathname + location.search);
   const slug = hash.replace(/^#/, '');
 
   // 섹션 슬러그 확인
