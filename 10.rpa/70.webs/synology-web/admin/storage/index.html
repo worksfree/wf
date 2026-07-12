@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파일 스토리지 — WorksFree O&M</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#222536;--border:#2d3047;
+  --text:#e2e8f0;--muted:#94a3b8;--hint:#64748b;
+  --blue:#3b82f6;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;min-height:100vh}
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.hdr-icon{font-size:22px}
+.hdr-info{flex:1}
+.hdr-title{font-size:16px;font-weight:600}
+.hdr-sub{font-size:11px;color:var(--hint);margin-top:2px}
+
+/* toolbar — single unified row */
+.toolbar{display:flex;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);min-height:52px;overflow:hidden}
+.btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:13px;font-weight:500;transition:.15s;white-space:nowrap;flex-shrink:0}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.primary:hover{background:#2563eb;border-color:#2563eb;color:#fff}
+.btn.danger{border-color:var(--red);color:var(--red)}.btn.danger:hover{background:#3b0f0f}
+.btn.sm{padding:4px 10px;font-size:12px}
+.toolbar-sep{width:1px;height:24px;background:var(--border);flex-shrink:0;margin:0 2px}
+.search-input{width:180px;padding:6px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;flex-shrink:0}
+.search-input:focus{border-color:var(--blue)}
+
+/* folder chips (scrollable, lives inside toolbar) */
+.folder-chips{display:flex;gap:6px;align-items:center;overflow-x:auto;flex:1;min-width:0;padding:2px 0}
+.folder-chips::-webkit-scrollbar{height:3px}.folder-chips::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.folder-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap;transition:.15s;flex-shrink:0}
+.folder-chip:hover{border-color:var(--blue);color:var(--blue)}
+.folder-chip.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.folder-divider{width:1px;height:18px;background:var(--border);margin:0 2px;flex-shrink:0}
+
+/* stats */
+.stats-bar{display:flex;gap:20px;padding:8px 20px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);flex-wrap:wrap}
+.stat-val{color:var(--text);font-weight:600}
+
+/* setup banner */
+.setup-banner{margin:16px 20px;padding:16px 18px;background:var(--surface);border:1px solid #3b2800;border-radius:12px}
+.setup-banner h3{font-size:14px;font-weight:600;color:var(--yellow);margin-bottom:10px}
+.setup-banner p{font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.6}
+.setup-cmd{font-family:'Consolas','Courier New',monospace;font-size:12px;background:var(--surface2);border:1px solid var(--border);padding:9px 13px;border-radius:7px;color:#86efac;display:block;margin:6px 0;user-select:all;word-break:break-all}
+
+/* drop zone */
+.drop-zone{margin:14px 20px 0;border:2px dashed var(--border);border-radius:12px;padding:22px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--blue);background:#1e3a5f18}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop-label{font-size:13px;color:var(--muted);pointer-events:none}
+.drop-label strong{color:var(--text)}
+.drop-label-sub{font-size:11px;color:var(--hint);margin-top:5px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.drop-label-sub span{display:inline-flex;align-items:center;gap:3px}
+
+/* upload progress */
+.upload-progress{margin:10px 20px 0;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:none}
+.up-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border)}
+.up-item:last-child{border-bottom:none}
+.up-name{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.up-bar-wrap{width:140px;height:5px;background:var(--border);border-radius:3px;flex-shrink:0}
+.up-bar{height:100%;background:var(--blue);border-radius:3px;transition:width .1s}
+.up-pct{font-size:11px;color:var(--muted);width:34px;text-align:right;flex-shrink:0}
+.up-status{font-size:11px;color:var(--muted);width:50px;text-align:right;flex-shrink:0}
+.up-status.ok{color:var(--green)}.up-status.err{color:var(--red)}.up-status.warn{color:var(--yellow)}
+
+/* file grid */
+.file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:14px 20px 40px}
+.file-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:.15s}
+.file-card:hover{border-color:var(--blue);background:var(--surface2)}
+.file-card.selected{border-color:var(--blue);background:#1e3a5f30}
+.file-thumb{height:88px;display:flex;align-items:center;justify-content:center;background:var(--surface2);font-size:34px;cursor:pointer}
+.file-thumb img{width:100%;height:100%;object-fit:cover}
+.file-info{padding:8px 10px}
+.file-name{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px;cursor:pointer}
+.file-meta{font-size:11px;color:var(--hint)}
+.file-actions{display:flex;gap:4px;padding:0 8px 8px}
+/* folder card */
+.folder-card{cursor:pointer;border-color:var(--border)}
+.folder-card:hover{border-color:var(--blue);background:var(--surface2)}
+.folder-card .file-thumb{font-size:40px;background:var(--surface2);cursor:default}
+.folder-card .file-name{font-weight:600}
+/* grid section label */
+.grid-section{grid-column:1/-1;font-size:11px;font-weight:600;color:var(--hint);letter-spacing:.04em;text-transform:uppercase;padding:6px 2px 2px;border-bottom:1px solid var(--border);margin-bottom:2px}
+/* breadcrumb row inside grid */
+.grid-breadcrumb{grid-column:1/-1;display:flex;align-items:center;gap:6px;padding:0 0 8px;font-size:13px}
+.crumb-sep{color:var(--hint)}
+.crumb-cur{color:var(--text);font-weight:500}
+.empty{text-align:center;padding:60px 20px;color:var(--hint);grid-column:1/-1}
+.empty-icon{font-size:44px;margin-bottom:12px}
+.empty-title{font-size:15px;font-weight:500;color:var(--muted);margin-bottom:4px}
+
+/* admin gate */
+#admin-gate{display:flex;position:fixed;inset:0;align-items:center;justify-content:center;flex-direction:column;background:var(--bg);z-index:9999}
+.gate-icon{font-size:48px;margin-bottom:16px}
+.gate-title{font-size:18px;font-weight:600;color:#fca5a5;margin-bottom:8px}
+.gate-desc{font-size:14px;color:var(--muted)}
+#main{display:none}#main.visible{display:block}
+
+/* toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;white-space:nowrap}
+#toast.ok{background:#0c2a1a;color:#34d399;border:1px solid #10b98150}
+#toast.err{background:#2a0808;color:#fca5a5;border:1px solid #ef444450}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="admin-gate">
+  <div class="gate-icon">🔒</div>
+  <div class="gate-title">관리자 전용</div>
+  <div class="gate-desc">이 페이지는 관리자 계정에서만 접근할 수 있습니다.</div>
+</div>
+
+<div id="main">
+
+<header>
+  <div class="hdr-icon">📦</div>
+  <div class="hdr-info">
+    <div class="hdr-title">파일 스토리지</div>
+    <div class="hdr-sub" id="hdr-sub">NAS 파일 저장 · Supabase 메타데이터 관리</div>
+  </div>
+  <button class="btn sm" onclick="refresh()">↻ 새로고침</button>
+</header>
+
+<div id="setup-banner" class="setup-banner" style="display:none">
+  <h3>⚙ 초기 설정 필요</h3>
+  <div id="setup-nas-err" style="display:none">
+    <p style="color:var(--red);font-weight:600;margin-bottom:6px">❌ NAS PHP API 응답 없음 <code style="font-size:11px;color:var(--muted)">/admin/api/upload.php</code></p>
+    <p>원인 후보:</p>
+    <ul style="font-size:12px;color:var(--muted);margin:6px 0 10px 16px;line-height:1.8">
+      <li>Web Station에서 PHP 패키지가 중지됐거나 버전이 바뀜</li>
+      <li>가상 호스트 설정에 PHP 프로세서가 연결 안 됨</li>
+      <li>최신 배포 시 <code>admin/api/upload.php</code>가 NAS에 전송 안 됨</li>
+      <li>NAS 재부팅 후 <code>/volume1/web/nas_uploads/</code> 디렉터리 없어짐</li>
+    </ul>
+    <p style="color:var(--muted);margin-bottom:4px">조치:</p>
+    <code class="setup-cmd">ssh admin@nas "mkdir -p /volume1/web/nas_uploads && chown http:http /volume1/web/nas_uploads"</code>
+    <p style="font-size:11px;color:var(--hint);margin-top:6px">DSM → 패키지 센터 → Web Station → PHP 버전 확인 / 가상 호스트 PHP 연결 확인</p>
+  </div>
+  <div id="setup-db-err" style="display:none">
+    <p style="color:var(--red);font-weight:600;margin-bottom:6px">❌ Supabase <code>storage_files</code> 테이블 접근 실패</p>
+    <ul style="font-size:12px;color:var(--muted);margin:6px 0 10px 16px;line-height:1.8">
+      <li>테이블에 RLS가 활성화됐지만 SELECT 정책이 없음</li>
+      <li>테이블이 삭제됐거나 <code>folder</code> / <code>backend</code> 컬럼이 없음</li>
+    </ul>
+    <p style="color:var(--muted);margin-bottom:4px">조치 — Supabase SQL Editor에서 실행:</p>
+    <code class="setup-cmd">ALTER TABLE public.storage_files ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "storage_admin" ON public.storage_files;
+CREATE POLICY "storage_admin" ON public.storage_files FOR ALL
+  USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
+ALTER TABLE public.storage_files ADD COLUMN IF NOT EXISTS backend text DEFAULT 'nas';</code>
+  </div>
+  <div id="setup-sb-bucket-err" style="display:none">
+    <p style="color:var(--red);font-weight:600;margin-bottom:6px">❌ Supabase Storage 버킷 <code>wf-assets</code> 접근 불가</p>
+    <p style="font-size:12px;color:var(--muted);line-height:1.6">버킷은 존재하지만 업로드 정책이 없습니다. Supabase SQL Editor에서 실행:</p>
+    <code class="setup-cmd">CREATE POLICY "wf_assets_auth" ON storage.objects FOR ALL TO authenticated
+  USING (bucket_id = 'wf-assets') WITH CHECK (bucket_id = 'wf-assets');</code>
+  </div>
+  <button class="btn sm primary" onclick="init()" style="margin-top:8px">↻ 재시도</button>
+</div>
+
+<div id="storage-ui" style="display:none">
+
+  <!-- Unified toolbar (upload · folder chips · search) -->
+  <div class="toolbar">
+    <button class="btn primary" onclick="triggerUpload()">⬆ 업로드</button>
+    <div class="toolbar-sep"></div>
+    <div class="folder-chips" id="folder-bar"></div>
+    <div class="toolbar-sep"></div>
+    <input type="text" class="search-input" id="search-input" placeholder="파일명 검색…" oninput="renderGrid()">
+    <span id="sel-info" style="display:none;font-size:12px;color:var(--muted);flex-shrink:0"></span>
+    <button class="btn sm danger" id="del-sel-btn" onclick="deleteSelected()" style="display:none">🗑 선택삭제</button>
+    <div class="toolbar-sep"></div>
+    <select id="backend-sel" onchange="setBackend(this.value)"
+      style="padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;cursor:pointer;flex-shrink:0">
+      <option value="nas">🖥 NAS PHP · 100MB</option>
+      <option value="supabase">☁ Supabase · 50MB / 5GB</option>
+    </select>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar" id="stats-bar" style="display:none">
+    <div class="stat-item">📄 <span class="stat-val" id="stat-files">0</span>개</div>
+    <div class="stat-item">💾 <span class="stat-val" id="stat-size">0 B</span></div>
+    <div class="stat-item" style="color:var(--green)" id="stat-label">NAS + Supabase DB</div>
+  </div>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="drop-zone">
+    <input type="file" id="file-input" multiple onchange="handleSelect(this.files)">
+    <div class="drop-label">📎 <strong>파일을 드래그</strong>하거나 클릭해서 업로드</div>
+    <div class="drop-label-sub">
+      <span id="drop-size-label">📏 최대 100MB</span>
+      <span id="drop-folder-label">📁 루트에 저장</span>
+      <span style="color:var(--hint)">초과 파일은 NAS 드라이브를 직접 이용하세요</span>
+    </div>
+  </div>
+
+  <!-- Upload progress -->
+  <div class="upload-progress" id="upload-progress"></div>
+
+  <!-- File grid -->
+  <div class="file-grid" id="file-grid"></div>
+</div>
+
+</div>
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth:{ autoRefreshToken:true, persistSession:true }
+});
+
+const NAS_BASE   = '/nas-uploads/';
+const UPLOAD_PHP = '/admin/api/upload.php';
+const BUCKET     = 'wf-assets';
+const BACKENDS   = {
+  nas:      { label:'NAS PHP',          maxBytes:100*1024*1024, maxLabel:'100MB' },
+  supabase: { label:'Supabase Storage', maxBytes:50*1024*1024,  maxLabel:'50MB (Free) · Pro 5GB' }
+};
+let storageBackend = localStorage.getItem('wf_storage_backend') || 'nas';
+
+// ── Admin gate ───────────────────────────────────────────────────
+let currentUser = null;
+(async () => {
+  _applyBackendUI();
+  if (window !== window.top) {
+    document.getElementById('admin-gate').style.display = 'none';
+    document.getElementById('main').classList.add('visible');
+    init(); return;
+  }
+  const bypass = location.hostname==='localhost'||location.hostname==='127.0.0.1';
+  if (bypass) {
+    document.getElementById('admin-gate').style.display = 'none';
+    document.getElementById('main').classList.add('visible');
+    init(); return;
+  }
+  try {
+    const { data:{ session } } = await sb.auth.getSession();
+    if (session) {
+      const { data:p } = await sb.from('profiles').select('role').eq('id',session.user.id).single();
+      if (p?.role==='admin') {
+        currentUser = session.user;
+        document.getElementById('admin-gate').style.display = 'none';
+        document.getElementById('main').classList.add('visible');
+        init(); return;
+      }
+    }
+  } catch(e){}
+})();
+
+// ── State ────────────────────────────────────────────────────────
+let allFiles   = [];
+let allFolders = [];
+let currentFolder = '';
+let selected   = new Set();
+
+// ── Backend selector ─────────────────────────────────────────────
+function setBackend(val) {
+  storageBackend = val;
+  localStorage.setItem('wf_storage_backend', val);
+  const lbl = BACKENDS[val].maxLabel;
+  const el = document.getElementById('drop-size-label');
+  if (el) el.textContent = '📏 최대 ' + lbl;
+  init();
+}
+
+function _applyBackendUI() {
+  const sel = document.getElementById('backend-sel');
+  if (sel) sel.value = storageBackend;
+  const lbl = BACKENDS[storageBackend]?.maxLabel || '100MB';
+  const el = document.getElementById('drop-size-label');
+  if (el) el.textContent = '📏 최대 ' + lbl;
+}
+
+// ── Init ─────────────────────────────────────────────────────────
+async function init() {
+  _applyBackendUI();
+  const dbReady  = await checkDB();
+  const nasReady = storageBackend === 'supabase' ? true : await checkNAS();
+  const sbReady  = storageBackend === 'nas'      ? true : await checkSBBucket();
+
+  const banner = document.getElementById('setup-banner');
+  if (!dbReady || !nasReady || !sbReady) {
+    banner.style.display = '';
+    document.getElementById('setup-nas-err').style.display      = nasReady ? 'none' : '';
+    document.getElementById('setup-db-err').style.display       = dbReady  ? 'none' : '';
+    document.getElementById('setup-sb-bucket-err').style.display = sbReady  ? 'none' : '';
+    document.getElementById('storage-ui').style.display = 'none';
+    return;
+  }
+  banner.style.display = 'none';
+  document.getElementById('storage-ui').style.display = '';
+  setupDrag();
+  await loadFiles();
+}
+
+async function checkNAS() {
+  // PHP가 정상 처리하면 204, nginx가 PHP 미처리로 파일을 그대로 서빙하면 200 → false로 구분
+  try { const r = await fetch(UPLOAD_PHP,{method:'OPTIONS'}); return r.status===204; }
+  catch { return false; }
+}
+async function checkDB() {
+  try { const {error} = await sb.from('storage_files').select('id').limit(1); return !error; }
+  catch { return false; }
+}
+async function checkSBBucket() {
+  try {
+    const {error} = await sb.storage.from(BUCKET).list('',{limit:1});
+    // "not found" 계열만 실패 처리 — 권한 에러는 버킷 존재 확인 용도이므로 통과
+    if (error && /not.found|does.not.exist/i.test(error.message)) return false;
+    return true;
+  } catch { return false; }
+}
+function refresh() { init(); }
+
+// ── Load ─────────────────────────────────────────────────────────
+async function loadFiles() {
+  const { data, error } = await sb.from('storage_files')
+    .select('*').order('created_at',{ascending:false});
+  if (error) { toast('로드 실패: '+error.message,true); return; }
+  allFiles = data || [];
+
+  const fset = new Set(allFiles.map(f=>f.folder||'').filter(f=>f));
+  allFolders = [...fset].sort();
+  selected.clear();
+  updateSelUI();
+  renderFolders();
+  renderStats();
+  renderGrid();
+}
+
+// ── File URL helper ──────────────────────────────────────────────
+// Supabase Storage는 루트 객체를 허용하지 않으므로 _root_ 폴더를 가상 prefix로 사용
+function sbStoragePath(f) {
+  return (f.folder || 'root') + '/' + f.name;
+}
+function getFileUrl(f) {
+  if ((f.backend||'nas')==='supabase') {
+    return sb.storage.from(BUCKET).getPublicUrl(sbStoragePath(f)).data.publicUrl;
+  }
+  return NAS_BASE + f.nas_path.split('/').map(encodeURIComponent).join('/');
+}
+
+// ── Folders ──────────────────────────────────────────────────────
+function renderFolders() {
+  const bar = document.getElementById('folder-bar');
+  const chips = [];
+
+  // 홈(루트) chip
+  chips.push(`<button class="folder-chip${currentFolder===''?' active':''}" onclick="setFolder('')">🏠 루트</button>`);
+
+  // current folder as breadcrumb when inside one
+  if (currentFolder) {
+    chips.push('<div class="folder-divider"></div>');
+    chips.push(`<span class="folder-chip active" style="cursor:default">📁 ${escHtml(currentFolder)}</span>`);
+    chips.push(`<button class="btn sm danger" onclick="promptDeleteFolder('${escAttr(currentFolder)}')">🗑 폴더 삭제</button>`);
+  }
+
+  chips.push('<div class="folder-divider"></div>');
+  chips.push(`<button class="btn sm" onclick="promptCreateFolder()">＋ 새 폴더</button>`);
+
+  bar.innerHTML = chips.join('');
+  updateDropLabel();
+}
+
+function setFolder(name) {
+  currentFolder = name;
+  renderFolders();
+  renderGrid();
+}
+
+function updateDropLabel() {
+  const el = document.getElementById('drop-folder-label');
+  if (el) el.textContent = currentFolder ? `📁 "${currentFolder}"에 저장` : '📁 루트에 저장';
+}
+
+function promptCreateFolder() {
+  const name = prompt('새 폴더 이름:')?.trim();
+  if (!name) return;
+  if (!/^[a-zA-Z0-9가-힣_\- ]+$/.test(name)) {
+    toast('폴더명에 특수문자는 사용할 수 없습니다.', true); return;
+  }
+  if (!allFolders.includes(name)) { allFolders.push(name); allFolders.sort(); }
+  setFolder(name);
+  toast(`폴더 "${name}" 생성됨 — 파일을 업로드하면 저장됩니다.`);
+}
+
+async function promptDeleteFolder(folderName) {
+  const files = allFiles.filter(f=>(f.folder||'')===folderName);
+  const msg = files.length
+    ? `"${folderName}" 폴더와 파일 ${files.length}개를 모두 삭제하시겠습니까?`
+    : `"${folderName}" 폴더를 삭제하시겠습니까?`;
+  if (!confirm(msg)) return;
+
+  if (files.length) {
+    const { error } = await sb.from('storage_files').delete().eq('folder', folderName);
+    if (error) { toast('삭제 실패: '+error.message,true); return; }
+    await _deleteStorageFiles(files);
+  }
+
+  currentFolder = '';
+  toast(`"${folderName}" 삭제됨`);
+  await loadFiles();
+}
+
+// ── Render ───────────────────────────────────────────────────────
+function renderStats() {
+  let files, label;
+  if (currentFolder) {
+    files = allFiles.filter(f=>(f.folder||'')===currentFolder);
+    label = `📁 ${currentFolder}`;
+  } else {
+    files = allFiles;
+    const bLabel = storageBackend === 'supabase' ? 'Supabase Storage' : 'NAS PHP';
+    label = `${allFolders.length}개 폴더 · ${bLabel}`;
+  }
+  const total = files.reduce((s,f)=>s+(f.size||0),0);
+  document.getElementById('stat-files').textContent = files.length;
+  document.getElementById('stat-size').textContent  = fmtSize(total);
+  document.getElementById('stat-label').textContent = label;
+  document.getElementById('stats-bar').style.display = allFiles.length||allFolders.length ? '' : 'none';
+}
+
+function fileCardHtml(f) {
+  const isImg  = /\.(png|jpe?g|gif|webp|svg)$/i.test(f.name);
+  const url    = getFileUrl(f);
+  const bk     = f.backend || 'nas';
+  const thumb  = isImg
+    ? `<img src="${escHtml(url)}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='${escHtml(fileIconHtml(f.name))}'">`
+    : fileIconHtml(f.name);
+  const isSel  = selected.has(f.id);
+  const bkBadge = bk==='supabase'
+    ? `<span style="font-size:9px;color:var(--hint);margin-left:4px">☁</span>`
+    : `<span style="font-size:9px;color:var(--hint);margin-left:4px">🖥</span>`;
+  return `<div class="file-card${isSel?' selected':''}" data-id="${f.id}">
+    <div class="file-thumb" onclick="toggleSel('${f.id}')">${thumb}</div>
+    <div class="file-info">
+      <div class="file-name" title="${escHtml(f.name)}" onclick="toggleSel('${f.id}')">${escHtml(f.name)}${bkBadge}</div>
+      <div class="file-meta">${fmtSize(f.size)} · ${fmtDate(f.created_at)}</div>
+    </div>
+    <div class="file-actions">
+      <button class="btn sm" title="URL 복사" onclick="copyUrl('${escAttr(url)}')">🔗</button>
+      <button class="btn sm" title="다운로드" onclick="downloadFile('${escAttr(url)}','${escHtml(f.name)}')">⬇</button>
+      <button class="btn sm danger" title="삭제" onclick="deleteFile('${f.id}','${escAttr(f.nas_path)}','${escHtml(f.name)}','${bk}')">🗑</button>
+    </div>
+  </div>`;
+}
+
+function renderGrid() {
+  const q    = (document.getElementById('search-input')?.value||'').toLowerCase();
+  const grid = document.getElementById('file-grid');
+  let html   = '';
+
+  if (currentFolder === '') {
+    // ── ROOT VIEW: folder cards + root files ─────────────────────
+    const matchFolders = allFolders.filter(f => !q || f.toLowerCase().includes(q));
+    const rootFiles    = allFiles.filter(f => !(f.folder||'') && (!q || f.name.toLowerCase().includes(q)));
+
+    if (!matchFolders.length && !rootFiles.length) {
+      grid.innerHTML = `<div class="empty"><div class="empty-icon">📂</div>
+        <div class="empty-title">${q?'검색 결과 없음':'업로드된 파일 없음'}</div>
+        <div class="empty-title" style="font-size:13px;color:var(--hint);margin-top:4px">${q?'':'업로드 버튼이나 드래그로 파일을 추가하세요'}</div>
+      </div>`;
+      return;
+    }
+
+    // Folder cards
+    if (matchFolders.length) {
+      html += `<div class="grid-section">📁 폴더</div>`;
+      matchFolders.forEach(f => {
+        const count = allFiles.filter(x=>(x.folder||'')===f).length;
+        const size  = allFiles.filter(x=>(x.folder||'')===f).reduce((s,x)=>s+(x.size||0),0);
+        html += `<div class="file-card folder-card" onclick="setFolder('${escAttr(f)}')">
+          <div class="file-thumb">📁</div>
+          <div class="file-info">
+            <div class="file-name" title="${escHtml(f)}">${escHtml(f)}</div>
+            <div class="file-meta">${count}개 파일 · ${fmtSize(size)}</div>
+          </div>
+          <div class="file-actions">
+            <button class="btn sm danger" title="폴더 삭제" onclick="event.stopPropagation();promptDeleteFolder('${escAttr(f)}')">🗑</button>
+          </div>
+        </div>`;
+      });
+    }
+
+    // Root-level files
+    if (rootFiles.length) {
+      if (matchFolders.length) html += `<div class="grid-section">📄 루트 파일</div>`;
+      rootFiles.forEach(f => { html += fileCardHtml(f); });
+    }
+
+  } else {
+    // ── FOLDER VIEW: breadcrumb + files in folder ─────────────────
+    html += `<div class="grid-breadcrumb">
+      <button class="btn sm" onclick="setFolder('')">← 루트</button>
+      <span class="crumb-sep">/</span>
+      <span class="crumb-cur">📁 ${escHtml(currentFolder)}</span>
+    </div>`;
+
+    let files = allFiles.filter(f=>(f.folder||'')===currentFolder);
+    if (q) files = files.filter(f=>f.name.toLowerCase().includes(q));
+
+    if (!files.length) {
+      html += `<div class="empty"><div class="empty-icon">📁</div>
+        <div class="empty-title">${q?'검색 결과 없음':`"${escHtml(currentFolder)}" 폴더가 비어있음`}</div>
+        <div class="empty-title" style="font-size:13px;color:var(--hint);margin-top:4px">${q?'':'이 폴더에 파일을 드래그하거나 업로드하세요'}</div>
+      </div>`;
+    } else {
+      files.forEach(f => { html += fileCardHtml(f); });
+    }
+  }
+
+  grid.innerHTML = html;
+}
+
+// ── Selection ────────────────────────────────────────────────────
+function toggleSel(id) { selected.has(id)?selected.delete(id):selected.add(id); updateSelUI(); renderGrid(); }
+function updateSelUI() {
+  const n = selected.size;
+  document.getElementById('sel-info').style.display    = n?'':'none';
+  document.getElementById('del-sel-btn').style.display = n?'':'none';
+  if (n) document.getElementById('sel-info').textContent = n+'개 선택됨';
+}
+
+// ── Upload ───────────────────────────────────────────────────────
+function triggerUpload() { document.getElementById('file-input').click(); }
+function handleSelect(files) {
+  if (!files?.length) return;
+  uploadFiles(Array.from(files));
+  document.getElementById('file-input').value = '';
+}
+
+function setupDrag() {
+  const dz = document.getElementById('drop-zone');
+  dz.addEventListener('dragover',  e=>{ e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', ()=>dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e=>{
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length) uploadFiles(files);
+  });
+}
+
+async function uploadFiles(fileList) {
+  const prog = document.getElementById('upload-progress');
+  prog.style.display = 'block'; prog.innerHTML = '';
+
+  const session = (await sb.auth.getSession()).data?.session;
+  const uploaderName = session?.user?.user_metadata?.full_name
+    || session?.user?.user_metadata?.name
+    || session?.user?.email || 'admin';
+
+  const maxBytes = BACKENDS[storageBackend].maxBytes;
+  const maxLabel = BACKENDS[storageBackend].maxLabel;
+
+  for (const file of fileList) {
+    const safeKey = file.name.replace(/[^a-zA-Z0-9]/g,'_');
+    const folderLabel = currentFolder ? ` → 📁${currentFolder}` : '';
+    const row = document.createElement('div');
+    row.className = 'up-item';
+    row.innerHTML = `<span class="up-name" title="${escHtml(file.name)}">${escHtml(file.name)}${folderLabel}</span>
+      <div class="up-bar-wrap"><div class="up-bar" id="bar-${safeKey}" style="width:0%"></div></div>
+      <span class="up-pct" id="pct-${safeKey}">0%</span>
+      <span class="up-status" id="st-${safeKey}">대기</span>`;
+    prog.appendChild(row);
+
+    const bar    = document.getElementById('bar-'+safeKey);
+    const pct    = document.getElementById('pct-'+safeKey);
+    const status = document.getElementById('st-'+safeKey);
+    if (!bar) continue;
+
+    if (file.size > maxBytes) {
+      bar.style.width='100%'; bar.style.background='var(--yellow)';
+      pct.textContent=''; status.textContent='초과'; status.className='up-status warn';
+      toast(`"${file.name}" ${maxLabel} 초과 (${fmtSize(file.size)})`, true);
+      continue;
+    }
+
+    const nasPath = currentFolder ? currentFolder+'/'+file.name : file.name;
+
+    try {
+      status.textContent = '전송 중';
+
+      if (storageBackend === 'supabase') {
+        // ── Supabase Storage 업로드 (SDK 우회 — fetch 직접 호출) ──
+        // SDK v2 최신이 FormData 방식으로 바뀌어 서버가 Invalid key 반환하는 버그 회피
+        const sbPath = (currentFolder || 'root') + '/' + file.name;
+        const jwt = session?.access_token;
+        if (!jwt) throw new Error('Supabase 세션 없음 — 다시 로그인하세요');
+        bar.style.width='30%'; pct.textContent='30%';
+        const upRes = await fetch(
+          `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${sbPath}`,
+          { method:'POST',
+            headers:{ 'Authorization':'Bearer '+jwt,
+                      'Content-Type': file.type||'application/octet-stream',
+                      'x-upsert':'true' },
+            body: file }
+        );
+        const upJson = await upRes.json().catch(()=>({}));
+        if (!upRes.ok) throw new Error(`[${upJson.statusCode||upRes.status}] ${upJson.message||'업로드 실패'}`);
+
+        bar.style.width='80%'; pct.textContent='80%';
+        status.textContent = 'DB 저장';
+        const { error: dbErr } = await sb.from('storage_files').upsert({
+          name:          file.name,
+          size:          file.size,
+          mime_type:     file.type || 'application/octet-stream',
+          nas_path:      nasPath,
+          folder:        currentFolder,
+          backend:       'supabase',
+          uploaded_by:   session?.user?.id ?? null,
+          uploader_name: uploaderName,
+          created_at:    new Date().toISOString()
+        },{ onConflict:'nas_path' });
+        if (dbErr) throw new Error('DB 저장 실패: '+dbErr.message);
+
+      } else {
+        // ── NAS PHP 업로드 (XHR 실시간 진행률) ─────────────────
+        await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', UPLOAD_PHP);
+          xhr.upload.onprogress = e => {
+            if (!e.lengthComputable) return;
+            const p = Math.round(e.loaded / e.total * 90);
+            bar.style.width=p+'%'; pct.textContent=p+'%';
+          };
+          xhr.onload = () => {
+            let json = {};
+            try { json = JSON.parse(xhr.responseText); } catch {}
+            if ((xhr.status===200||xhr.status===201) && json.ok) resolve(json);
+            else reject(new Error(json.error || 'HTTP '+xhr.status));
+          };
+          xhr.onerror = () => reject(new Error('네트워크 오류'));
+          const fd = new FormData();
+          fd.append('file', file, file.name);
+          if (currentFolder) fd.append('folder', currentFolder);
+          xhr.send(fd);
+        });
+
+        bar.style.width='95%'; pct.textContent='95%';
+        status.textContent = 'DB 저장';
+        const { error: dbErr } = await sb.from('storage_files').upsert({
+          name:          file.name,
+          size:          file.size,
+          mime_type:     file.type || 'application/octet-stream',
+          nas_path:      nasPath,
+          folder:        currentFolder,
+          backend:       'nas',
+          uploaded_by:   session?.user?.id ?? null,
+          uploader_name: uploaderName,
+          created_at:    new Date().toISOString()
+        },{ onConflict:'nas_path' });
+        if (dbErr) throw new Error('DB 저장 실패: '+dbErr.message);
+      }
+
+      bar.style.width='100%'; bar.style.background='var(--green)';
+      pct.textContent=''; status.textContent='완료'; status.className='up-status ok';
+
+    } catch(e) {
+      bar.style.width='100%'; bar.style.background='var(--red)';
+      pct.textContent=''; status.textContent='실패'; status.className='up-status err';
+      row.title = e.message;
+      console.error('[upload]', e.message);
+      toast('❌ ' + (e.message||'업로드 실패'), true);
+    }
+  }
+
+  await loadFiles();
+  setTimeout(()=>{ prog.style.display='none'; prog.innerHTML=''; }, 1500);
+}
+
+// ── Delete ───────────────────────────────────────────────────────
+async function _deleteStorageFiles(files) {
+  const nasFiles = files.filter(f=>(f.backend||'nas')==='nas');
+  const sbFiles  = files.filter(f=>(f.backend||'nas')==='supabase');
+  await Promise.allSettled([
+    ...nasFiles.map(f=>{ const fd=new FormData(); fd.append('action','delete'); fd.append('filename',f.nas_path); return fetch(UPLOAD_PHP,{method:'POST',body:fd}); }),
+    sbFiles.length ? sb.storage.from(BUCKET).remove(sbFiles.map(f=>sbStoragePath(f))) : Promise.resolve()
+  ]);
+}
+
+async function deleteFile(id, nasPath, name, backend='nas') {
+  if (!confirm(`"${name}"을 삭제하시겠습니까?`)) return;
+  const { error } = await sb.from('storage_files').delete().eq('id', id);
+  if (error) { toast('DB 삭제 실패', true); return; }
+  try { await _deleteStorageFiles([{nas_path:nasPath, backend}]); } catch {}
+  toast(`"${name}" 삭제됨`);
+  await loadFiles();
+}
+
+async function deleteSelected() {
+  if (!selected.size) return;
+  if (!confirm(selected.size+'개 파일을 삭제하시겠습니까?')) return;
+  const targets = allFiles.filter(f=>selected.has(f.id));
+  const { error } = await sb.from('storage_files').delete().in('id',[...selected]);
+  if (error) { toast('삭제 실패', true); return; }
+  await _deleteStorageFiles(targets);
+  toast(targets.length+'개 삭제됨');
+  selected.clear();
+  await loadFiles();
+}
+
+// ── Actions ──────────────────────────────────────────────────────
+async function copyUrl(url) {
+  const full = url.startsWith('http') ? url : location.origin + url;
+  try { await navigator.clipboard.writeText(full); toast('URL 복사됨'); }
+  catch { prompt('파일 URL:', full); }
+}
+function downloadFile(url, name) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name; a.click();
+}
+
+// ── Helpers ──────────────────────────────────────────────────────
+function fmtSize(b) {
+  if (!b) return '0 B';
+  if (b<1024) return b+' B';
+  if (b<1048576) return (b/1024).toFixed(1)+' KB';
+  if (b<1073741824) return (b/1048576).toFixed(1)+' MB';
+  return (b/1073741824).toFixed(2)+' GB';
+}
+function fmtDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('ko-KR',{year:'2-digit',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function fileIconHtml(name) {
+  const ext = (name.split('.').pop()||'').toLowerCase();
+  const m={pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',ppt:'📋',pptx:'📋',
+           zip:'📦',gz:'📦',tar:'📦',mp4:'🎬',mov:'🎬',avi:'🎬',
+           mp3:'🎵',wav:'🎵',html:'🌐',js:'⚙',ts:'⚙',css:'🎨',
+           json:'⚙',txt:'📃',md:'📃',csv:'📊',xml:'⚙'};
+  return `<span style="font-size:32px">${m[ext]||'📎'}</span>`;
+}
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escAttr(s){ return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+let _tt;
+function toast(msg,isErr=false){
+  const el=document.getElementById('toast');
+  el.className='show '+(isErr?'err':'ok'); el.textContent=msg;
+  clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>

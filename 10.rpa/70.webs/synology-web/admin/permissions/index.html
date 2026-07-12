@@ -76,6 +76,28 @@ tr.dragging .drag-handle{cursor:grabbing;}
 /* 어드민 게이트 */
 #admin-gate{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center}
 #admin-gate.visible{display:flex}
+
+/* 블러 강도 설정 카드 */
+.blur-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px}
+.blur-card-desc{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6}
+.blur-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.blur-label{font-size:11px;color:var(--hint);white-space:nowrap}
+#blur-slider{flex:1;min-width:160px;accent-color:var(--yellow)}
+.blur-val{font-weight:700;color:var(--yellow);font-size:15px;min-width:36px}
+#blur-msg.ok{color:var(--green)}
+#blur-msg.err{color:var(--red)}
+/* 허브 테마 선택 카드 */
+.theme-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px}
+.theme-card-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+.theme-options{display:flex;gap:12px;flex-wrap:wrap}
+.theme-btn{display:flex;align-items:center;gap:10px;padding:10px 16px;border:2px solid var(--border);border-radius:8px;background:var(--panel);cursor:pointer;transition:border-color .15s}
+.theme-btn:hover{border-color:var(--accent)}
+.theme-btn.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.theme-preview{display:flex;gap:3px}
+.theme-swatch{width:14px;height:14px;border-radius:3px}
+.theme-name{font-size:13px;font-weight:600;color:var(--text)}
+#theme-msg.ok{color:var(--green)}
+#theme-msg.err{color:var(--red)}
 </style>
 </head>
 <body>
@@ -128,13 +150,70 @@ tr.dragging .drag-handle{cursor:grabbing;}
     <span id="save-msg"></span>
   </div>
 
+  <!-- ── 허브 테마 선택 ── -->
+  <div class="section-title" style="margin-top:36px">허브 테마</div>
+  <div class="theme-card">
+    <div class="theme-card-desc">
+      Hub 전체 색상 테마를 선택합니다. 저장 후 허브 재방문 시 모든 사용자에게 즉시 적용됩니다.
+    </div>
+    <div class="theme-options" id="theme-options"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+      <button class="btn btn-primary" id="btn-theme-save" onclick="saveTheme()">💾 테마 저장</button>
+      <span id="theme-msg" style="font-size:13px;min-height:20px"></span>
+    </div>
+  </div>
+
+  <!-- ── 블러 강도 설정 ── -->
+  <div class="section-title" style="margin-top:36px">블러 강도 설정</div>
+  <div class="blur-card">
+    <div class="blur-card-desc">
+      접근 제한 시 본문을 흐릿하게 처리하는 강도입니다. 낮을수록 내용이 더 잘 보이고, 높을수록 거의 보이지 않습니다. (기본값: 5px)
+    </div>
+    <div class="blur-row">
+      <span class="blur-label">약하게 (1px)</span>
+      <input type="range" id="blur-slider" min="1" max="20" step="1" value="5" oninput="onBlurInput(this.value)">
+      <span class="blur-label">강하게 (20px)</span>
+      <span class="blur-val" id="blur-val">5px</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+      <button class="btn btn-primary" id="btn-blur-save" onclick="saveBlur()">💾 블러 강도 저장</button>
+      <span id="blur-msg" style="font-size:13px;min-height:20px"></span>
+    </div>
+  </div>
+
 </div>
 </div><!-- /main-content -->
 
 <script>
 const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const SB_SESSION_KEY = 'sb-rkycwfpkzorfpcxfvaqt-auth-token';
+const _noopStore = { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} };
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storage:_noopStore }
+});
+async function _injectSession() {
+  try {
+    let raw = localStorage.getItem(SB_SESSION_KEY);
+    if (!raw) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
+          const v = localStorage.getItem(k);
+          if (v && v.includes('"access_token"')) { raw = v; break; }
+        }
+      }
+    }
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    const token = stored?.access_token; const uid = stored?.user?.id;
+    if (!token || !uid) return null;
+    const exp = stored?.expires_at ?? 0;
+    if (exp && (Date.now()/1000) > exp) return null;
+    try { await sb.auth.setSession({ access_token: token, refresh_token: stored?.refresh_token||'' }); } catch(e) {}
+    return { user: stored.user, access_token: token };
+  } catch(e) { return null; }
+}
 
 // 설정 가능한 페이지 목록 — 왼쪽 트리 노드와 동일한 순서 유지
 const CONFIGURABLE_PAGES = [
@@ -165,6 +244,29 @@ const DEFAULT_RULES = {
   'consulting/marketing/index.html':   { general:'hidden', member:'hidden', consultant:'full',  gfc:'full', admin:'full' },
 };
 
+// 허브 테마 정의 — index.html의 HUB_THEMES와 동기화 유지
+const HUB_THEMES = {
+  claude: { name:'클로드 기본',  preview:['#0f1117','#1c2333','#3b82f6'] },
+  sunset: { name:'선셋 다크',    preview:['#1a1208','#281d0c','#f59e0b'] },
+};
+let _currentTheme = 'claude';
+
+function renderThemeOptions() {
+  const wrap = document.getElementById('theme-options');
+  wrap.innerHTML = Object.entries(HUB_THEMES).map(([key, t]) => {
+    const swatches = t.preview.map(c => `<span class="theme-swatch" style="background:${c}"></span>`).join('');
+    return `<button class="theme-btn${_currentTheme===key?' active':''}" onclick="selectTheme('${key}')">
+      <div class="theme-preview">${swatches}</div>
+      <span class="theme-name">${t.name}</span>
+    </button>`;
+  }).join('');
+}
+
+function selectTheme(key) {
+  _currentTheme = key;
+  renderThemeOptions();
+}
+
 const LEVELS = ['full', 'blur', 'readonly', 'hidden'];
 const LEVEL_LABELS = { full:'전체 공개', blur:'블러', readonly:'읽기 전용', hidden:'숨김' };
 const ROLES = [
@@ -181,27 +283,35 @@ let _dragSrcIdx = -1;
 
 // ── 어드민 게이트 ────────────────────────────────────────────────────
 (async () => {
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      const { data: p } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-      if (p?.role === 'admin') { boot(); return; }
-    }
-  } catch {}
+  if (window !== window.top) { boot(); return; }
+  const session = await _injectSession();
+  if (session) {
+    try {
+      const r = await fetch(
+        `${SUPABASE_URL}/rest/v1/profiles?id=eq.${session.user.id}&select=role&limit=1`,
+        { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` } }
+      );
+      const rows = r.ok ? await r.json() : [];
+      if (rows[0]?.role === 'admin') { boot(); return; }
+    } catch(e) {}
+  }
   document.getElementById('admin-gate').classList.add('visible');
 })();
 
 async function boot() {
   document.getElementById('main-content').style.display = 'block';
+  renderThemeOptions();
   await loadRules();
   renderTable();
 }
 
 async function loadRules() {
   try {
-    const [rulesRes, orderRes] = await Promise.all([
+    const [rulesRes, orderRes, blurRes, themeRes] = await Promise.all([
       sb.from('site_config').select('value').eq('key','page_access_rules').maybeSingle(),
       sb.from('site_config').select('value').eq('key','page_node_order').maybeSingle(),
+      sb.from('site_config').select('value').eq('key','blur_intensity').maybeSingle(),
+      sb.from('site_config').select('value').eq('key','hub_theme').maybeSingle(),
     ]);
     currentRules = rulesRes.data?.value ? { ...DEFAULT_RULES, ...rulesRes.data.value } : { ...DEFAULT_RULES };
     if (orderRes.data?.value && Array.isArray(orderRes.data.value)) {
@@ -211,6 +321,13 @@ async function loadRules() {
         ...saved.filter(p => allPaths.includes(p)),
         ...allPaths.filter(p => !saved.includes(p)),
       ];
+    }
+    const blurVal = blurRes.data?.value ?? 5;
+    document.getElementById('blur-slider').value = blurVal;
+    document.getElementById('blur-val').textContent = blurVal + 'px';
+    if (themeRes.data?.value && HUB_THEMES[themeRes.data.value]) {
+      _currentTheme = themeRes.data.value;
+      renderThemeOptions();
     }
   } catch {
     currentRules = { ...DEFAULT_RULES };
@@ -337,6 +454,55 @@ function setMsg(msg, type = '') {
   const el = document.getElementById('save-msg');
   el.textContent = msg;
   el.className   = type;
+}
+
+async function saveTheme() {
+  const btn   = document.getElementById('btn-theme-save');
+  const msgEl = document.getElementById('theme-msg');
+  btn.disabled = true;
+  msgEl.textContent = '저장 중...';
+  msgEl.className   = '';
+  try {
+    const r = await sb.from('site_config').upsert(
+      { key: 'hub_theme', value: _currentTheme, updated_at: new Date().toISOString() },
+      { onConflict: 'key' }
+    );
+    if (r.error) throw r.error;
+    msgEl.textContent = '✅ 저장 완료 — Hub 재방문 시 즉시 적용됩니다';
+    msgEl.className   = 'ok';
+  } catch(e) {
+    msgEl.textContent = '❌ 저장 실패: ' + e.message;
+    msgEl.className   = 'err';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function onBlurInput(v) {
+  document.getElementById('blur-val').textContent = v + 'px';
+}
+
+async function saveBlur() {
+  const btn   = document.getElementById('btn-blur-save');
+  const msgEl = document.getElementById('blur-msg');
+  const v     = parseInt(document.getElementById('blur-slider').value, 10);
+  btn.disabled = true;
+  msgEl.textContent = '저장 중...';
+  msgEl.className   = '';
+  try {
+    const r = await sb.from('site_config').upsert(
+      { key: 'blur_intensity', value: v, updated_at: new Date().toISOString() },
+      { onConflict: 'key' }
+    );
+    if (r.error) throw r.error;
+    msgEl.textContent = '✅ 저장 완료 — Hub 재방문 시 즉시 적용됩니다';
+    msgEl.className   = 'ok';
+  } catch(e) {
+    msgEl.textContent = '❌ 저장 실패: ' + e.message;
+    msgEl.className   = 'err';
+  } finally {
+    btn.disabled = false;
+  }
 }
 </script>
 </body>

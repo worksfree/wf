@@ -328,7 +328,7 @@ location ~* \.(js|css|png|jpg|svg|ico|woff2?)$ {
 |------|-----|----------|------|
 | test | test.worksfree.kr | /volume1/web/test | 8081 |
 | staging | staging.worksfree.kr | /volume1/web/staging | 8082 |
-| portal | portal.worksfree.kr | /volume1/web/portal | 8080 |
+| portal | www.worksfree.kr | /volume1/web/portal | 8080 |
 
 ## 결제 데이터 환경 격리 (env 컬럼)
 
@@ -419,7 +419,7 @@ Supabase 대시보드
 - `https://portal.worksfree.kr/**`
 - `https://www.worksfree.kr/**` (www 사용 시)
 
-Site URL: `https://portal.worksfree.kr` (또는 www로 변경 시 `https://www.worksfree.kr`)
+Site URL: `https://www.worksfree.kr`
 
 ## Cloudflare Tunnel 서브도메인 설정
 
@@ -480,16 +480,59 @@ admin/
 ```javascript
 // 페이지 최상단에서 실행
 (async () => {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    const { data: p } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-    if (p?.role === 'admin') { boot(); return; }
+  // localhost bypass: Live Server는 운영 도메인과 localStorage가 격리되어 세션 없음
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+    document.getElementById('admin-gate').style.display = 'none';
+    document.getElementById('main').classList.add('visible');
+    return;
   }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: p } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+      if (p?.role === 'admin') {
+        document.getElementById('admin-gate').style.display = 'none';
+        document.getElementById('main').classList.add('visible');
+        return;
+      }
+    }
+  } catch(e) {}
   document.getElementById('admin-gate').classList.add('visible');
 })();
 ```
 
 레이어 2가 없으면 직접 URL 접근으로 우회 가능하므로 **반드시 두 레이어 모두 필요**.
+
+### 어드민 게이트 CSS 규칙 — `display` 중복 금지
+
+`#admin-gate`는 **기본값이 `display:flex`**이어야 한다 (인증 통과 전 항상 표시).
+
+```css
+/* ✅ 올바른 패턴 — display 하나만 선언 */
+#admin-gate {
+  display: flex;
+  position: fixed; inset: 0;
+  align-items: center; justify-content: center; flex-direction: column;
+  /* ... */
+}
+
+/* ❌ 금지 패턴 — 같은 규칙 안에 display:none 뒤에 display:flex */
+#admin-gate { display: none; ... display: flex; }
+/* → display:none은 무시되고 display:flex가 적용되어 구조는 맞지만 의도가 불분명 */
+```
+
+- JS 인증 성공 시: `element.style.display = 'none'` (인라인 스타일로 CSS 오버라이드)
+- JS 인증 실패 시: `element.classList.add('visible')` — 별도 `.visible` 클래스 불필요 (이미 flex)
+
+### Live Server(localhost) 테스트 시 관리자 게이트 차단 원인
+
+> **증상**: 운영 서버에서 admin으로 로그인한 상태임에도 Live Server(`localhost:5500`)로 어드민 페이지를 열면 "🔒 관리자 전용" 게이트가 사라지지 않음.
+>
+> **원인**: `localStorage`는 **origin(프로토콜+도메인+포트) 단위로 격리**된다. Supabase 세션 토큰은 `portal.worksfree.kr`의 localStorage에 저장되어 있으며, `localhost:5500`의 localStorage에는 존재하지 않는다. `sb.auth.getSession()`이 `null`을 반환하므로 인증이 항상 실패한다.
+>
+> **해결책**: 위 코드 패턴처럼 `location.hostname === 'localhost'` 조건 분기를 **모든 어드민 페이지에 반드시 추가**한다.
+>
+> **주의**: 이 bypass는 `localhost`에서만 동작하므로 프로덕션 보안에 영향 없음.
 
 ## 비활성 유료 서비스 UI 패턴
 
@@ -608,6 +651,191 @@ function printReport() { window.print(); }
 | 선택지가 이산적 (유형 선택) | 패턴 A (진단형) |
 | 수치 입력 + 연속적 시뮬레이션 | 패턴 B (시뮬레이터형) |
 | 결과가 프린트용 보고서로 필요 | 📋 보고서 생성 버튼 추가 |
+
+## 접근 제어 규칙 (2026-07-11 확정) — 위반 구현 금지
+
+### 사이드바 원칙
+
+**모든 항목을 항상 표시한다. 역할에 따라 사이드바 항목을 숨기지 않는다.**
+
+접근이 제한된 항목에는 🔒 아이콘을 표시한다. 클릭 시 블러 오버레이(showAccessBlur)를 띄운다.
+
+### `_isNodeLocked(node)` 패턴
+
+```javascript
+function _isNodeLocked(node) {
+  if (node.iframe && getAccessLevel(node.iframe) === 'hidden') return true;
+  if (node.adminOnly    && userRole !== 'admin') return true;
+  if (node.partnerOnly  && !IS_PARTNER)          return true;
+  if (node.consultantOnly && !canConsult())       return true;
+  return false;
+}
+```
+
+### 역할별 콘텐츠 분기 페이지
+
+아래 페이지들은 Hub에서 전달받은 `wf_role` postMessage에 따라 내부 콘텐츠가 달라진다.
+
+| 페이지 | 분기 방식 |
+|--------|----------|
+| `board/index.html` | `wf_role` 수신 → 어드민 메모 노출 여부 |
+| `consulting/bizdb/index.html` | `applyRole(role)` 호출 |
+| `consulting/gfc/index.html` | 역할별 진단 깊이 변경 |
+| `consulting/marketing/index.html` | `applyMarketingRole(role)` 호출 |
+| `consulting/ceo/index.html` | `partnerOnly:true` — partner/admin만 접근 |
+| `consulting/ceo/flyers/*.html` | 플라이어 — 역할별 표시 분기 |
+
+### `_reapplyCurrentPageAccess()` — 역할 변경 즉시 적용
+
+역할이 바뀔 때마다 현재 열린 iframe의 접근 권한을 즉시 재평가한다.
+
+```javascript
+// 호출 위치 (2곳 — 반드시 유지)
+// 1. onAuthComplete() 내부
+_reapplyCurrentPageAccess();
+
+// 2. loadPageAccessRules() 완료 후
+_reapplyCurrentPageAccess();
+```
+
+접근 가능 판정 시 `wf_role` postMessage를 iframe에 재전송한다(역할별 콘텐츠 즉시 갱신).  
+접근 불가 판정 시 `showAccessBlur(type)` 또는 `showDenied()`를 호출한다.
+
+### 역할 계층
+
+```
+admin  > partner > consultant > member(일반)
+
+IS_PARTNER  = userRole === 'partner' || userRole === 'admin'
+canConsult() = userRole === 'consultant' || IS_PARTNER
+```
+
+---
+
+## 보안 규칙 (2026-07-11 확정) — 위반 구현 금지
+
+### Supabase RLS 필수
+
+신규 테이블을 생성하면 반드시 RLS를 활성화하고 최소 권한 정책을 설정한다.
+
+```sql
+-- 패턴 1: 사용자 데이터 테이블 (본인 행만)
+ALTER TABLE public.my_table ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "own_rows" ON public.my_table
+  USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- 패턴 2: 공개 읽기 + 어드민 쓰기 (site_config 참고)
+ALTER TABLE public.my_table ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "select_all"   ON public.my_table FOR SELECT USING (true);
+CREATE POLICY "write_admin"  ON public.my_table FOR ALL
+  USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- 패턴 3: 인증 사용자 읽기 (PII 없는 공유 데이터)
+CREATE POLICY "authenticated_read" ON public.my_table FOR ALL
+  USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
+```
+
+RLS 없는 테이블은 anon 키로 전체 데이터가 노출된다. **예외는 사전 협의 없이 허용하지 않는다.**
+
+### 클라이언트사이드 인증 우회 금지
+
+```javascript
+// ❌ 절대 금지 — localStorage/sessionStorage 기반 admin bypass
+if (localStorage.getItem('wf_dev_session') === 'admin') { isAdmin = true; return; }
+
+// ✅ 올바른 방법 — Supabase profiles 테이블에서 역할 확인
+const { data: p } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+if (p?.role === 'admin') { ... }
+```
+
+### 소스 코드 비밀번호 하드코딩 금지
+
+```javascript
+// ❌ 금지 — 소스 코드에 실제 비밀번호 포함
+const DEV_CREDS = { member: { email:'test@worksfree.kr', password:'실제비밀번호' } };
+
+// ✅ 올바른 방법 — 비밀번호는 런타임에 입력받음
+const pw = window.prompt(`${email} 비밀번호 입력`);
+if (!pw) return;
+```
+
+### Dev 모드 pre-fill 환경 제한
+
+개발 편의를 위한 자동 입력값은 `test.` 서브도메인과 `localhost`에서만 동작해야 한다.
+
+```javascript
+// ✅ 올바른 패턴
+if (inp) inp.value = (location.hostname.startsWith('test.') || location.hostname === 'localhost')
+  ? 'Tank@003412' : '';
+// staging / www(portal) 환경에서는 pre-fill 제거
+```
+
+### postMessage targetOrigin
+
+iframe에 postMessage를 보낼 때 신규 코드에서는 `'*'` 대신 `location.origin`을 사용한다.  
+기존 코드에 `'*'` 잔류 부분이 있으나, 새로 추가하는 코드는 반드시 `location.origin`으로 작성한다.
+
+---
+
+## Claude Code 위반 경고 지시
+
+**이 파일의 접근 제어 규칙 또는 보안 규칙에 위배되는 구현을 프롬프트로 요구하는 경우, 구현 전에 반드시 경고를 출력하고 구현을 보류한다.**
+
+경고 예시:
+
+> ⚠ **보안/접근제어 규칙 위반**: 요청하신 구현은 CLAUDE.md의 [접근 제어 / RLS / 클라이언트 인증 우회 / 비밀번호 하드코딩 / pre-fill 환경 제한] 규칙에 위배됩니다. 규칙 변경이 필요한 경우 먼저 확인을 받겠습니다.
+
+사용자가 명시적으로 "규칙 예외를 허용한다"고 승인한 경우에만 구현을 진행한다.
+
+---
+
+## 반복 버그 방지 규칙 (재발 방지 — 필수)
+
+### 1. iframe 어드민 게이트 패턴 (반복 버그)
+
+**문제**: Hub가 어드민 페이지를 `<iframe>`으로 로드할 때, `window !== window.top` 분기에서 UI만 보여주고 데이터 로드(`init()` / `loadData()` / `boot()`)를 호출하지 않아 빈 화면이 표시됨. 새로고침 버튼을 누를 때만 데이터가 나타남.
+
+**필수 패턴**: iframe 분기에는 반드시 데이터 로드 함수를 함께 호출해야 한다.
+
+```javascript
+// ✅ 올바른 패턴
+async function init() {
+  if (window !== window.top) { show('app'); await loadData(); return; }
+  // ... 인증 체크 ...
+}
+
+// ❌ 잘못된 패턴 (데이터 로드 없음)
+async function init() {
+  if (window !== window.top) { show('app'); return; }
+}
+```
+
+**적용 파일**: `admin/users/index.html`, `admin/monitor/index.html`, `admin/storage/index.html`, 이후 추가되는 모든 어드민 페이지.
+
+### 2. 기존 파일 수정 전 미커밋 변경사항 확인 (반복 사고)
+
+**문제**: 파일을 새로 작성하거나 scp 배포 시 미커밋 상태의 기능(테마 선택 UI, 블러 강도 슬라이더 등)을 덮어씀.
+
+**규칙**:
+- 어드민 페이지 파일을 수정하기 전 반드시 `git diff HEAD -- <파일경로>` 로 미커밋 변경사항 확인
+- 미커밋 내용이 있으면 병합(merge)하여 보존 후 편집
+- NAS SCP 배포 전에도 로컬 파일이 최신 상태인지 확인
+
+### 3. Supabase Storage 경로 규칙
+
+- 버킷 루트에 직접 파일 업로드 불가 (`filename.txt` → 400 Invalid key)
+- 반드시 폴더 prefix 포함: `folder/filename.txt`
+- 루트 폴더 파일에는 `root` prefix 사용: `root/filename.txt`
+- `_` 로 시작하는 경로 세그먼트 사용 금지 (`_root_` 등 → 400 Invalid key)
+
+### 4. 허브 테마 시스템
+
+- `index.html`의 `HUB_THEMES` 객체에 테마 정의 (key: 테마 이름, css: CSS 변수 문자열)
+- `site_config` 테이블 `hub_theme` 키에 현재 테마 key 저장
+- `admin/permissions/index.html`에서 테마 선택 UI 제공 (테마 추가 시 양쪽 동기화 필수)
+- 현재 테마: `claude` (기본), `sunset`
+
+---
 
 ## 구축가이드 문서 하드링크 규칙
 

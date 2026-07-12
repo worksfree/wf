@@ -144,7 +144,33 @@ td{padding:10px 14px;vertical-align:middle}
 <script>
 const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const SB_SESSION_KEY = 'sb-rkycwfpkzorfpcxfvaqt-auth-token';
+const _noopStore = { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} };
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storage:_noopStore }
+});
+async function _injectSession() {
+  try {
+    let raw = localStorage.getItem(SB_SESSION_KEY);
+    if (!raw) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
+          const v = localStorage.getItem(k);
+          if (v && v.includes('"access_token"')) { raw = v; break; }
+        }
+      }
+    }
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    const token = stored?.access_token; const uid = stored?.user?.id;
+    if (!token || !uid) return null;
+    const exp = stored?.expires_at ?? 0;
+    if (exp && (Date.now()/1000) > exp) return null;
+    try { await sb.auth.setSession({ access_token: token, refresh_token: stored?.refresh_token||'' }); } catch(e) {}
+    return { user: stored.user, access_token: token };
+  } catch(e) { return null; }
+}
 
 function show(id) {
   ['loading','denied','app'].forEach(i =>
@@ -269,13 +295,17 @@ async function loadData() {
 }
 
 async function init() {
-  if (localStorage.getItem('wf_dev_session') === 'admin') {
-    show('app'); await loadData(); return;
-  }
-  const { data: { session } } = await sb.auth.getSession();
+  if (window !== window.top) { show('app'); await loadData(); return; }
+  const session = await _injectSession();
   if (!session) { show('denied'); return; }
-  const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-  if (!prof || prof.role !== 'admin') { show('denied'); return; }
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${session.user.id}&select=role&limit=1`,
+      { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` } }
+    );
+    const rows = r.ok ? await r.json() : [];
+    if (rows[0]?.role !== 'admin') { show('denied'); return; }
+  } catch(e) { show('denied'); return; }
   show('app'); await loadData();
 }
 init();
