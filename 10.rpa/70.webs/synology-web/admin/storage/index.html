@@ -636,12 +636,13 @@ async function uploadFiles(fileList) {
       if (storageBackend === 'supabase') {
         // ── Supabase Storage 업로드 (SDK 우회 — fetch 직접 호출) ──
         const sbPath = (currentFolder || 'root') + '/' + file.name;
+        // 한글·공백 등 특수문자 포함 파일명은 퍼센트 인코딩 필수
+        const sbPathEncoded = sbPath.split('/').map(s => encodeURIComponent(s)).join('/');
         const jwt = _getJWT();
         if (!jwt) throw new Error('Supabase 세션 없음 — 허브에서 관리자로 로그인 후 재시도하세요');
-        console.log('[storage] uploading:', `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${sbPath}`);
         bar.style.width='30%'; pct.textContent='30%';
         const upRes = await fetch(
-          `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${sbPath}`,
+          `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${sbPathEncoded}`,
           { method:'POST',
             headers:{ 'Authorization':'Bearer '+jwt,
                       'apikey': SUPABASE_ANON,
