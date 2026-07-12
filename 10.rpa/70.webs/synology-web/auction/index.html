@@ -1,0 +1,2217 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경매지도 · AuctionMap</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root {
+  --bg:#0f1117; --sb:#161b27; --panel:#1c2333; --border:#2a3347;
+  --accent:#3b82f6; --success:#10b981; --warn:#f59e0b; --danger:#ef4444; --purple:#8b5cf6;
+  --text:#e2e8f0; --muted:#64748b; --hover:#243049; --active:#1e3a5f; --radius:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--text);
+  display:flex;height:100vh;overflow:hidden;font-size:14px;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:280px;min-width:280px;background:var(--sb);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;z-index:10;}
+/* Hub 스타일 Brand 헤더 */
+.sb-brand{padding:15px 18px 12px;border-bottom:1px solid var(--border);}
+.sb-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+.sb-logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#0ea5e9,#3b82f6);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.sb-title{font-size:18px;font-weight:700;letter-spacing:-.3px;}
+.sb-title em{color:var(--accent);font-style:normal;}
+.sb-user-row{display:flex;align-items:center;gap:7px;}
+.sb-user-chip{flex:1;display:flex;align-items:center;gap:7px;padding:5px 9px;min-width:0;
+  border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:border-color .2s;}
+.sb-user-chip:hover{border-color:var(--accent);}
+.sb-user-av{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-user-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-user-role{font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.lang-btn{background:var(--panel);border:1px solid var(--border);color:var(--muted);
+  padding:3px 10px;border-radius:20px;cursor:pointer;font-size:11px;font-family:inherit;
+  transition:all .2s;flex-shrink:0;}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* Sidebar main + footer */
+.sb-main{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#3b5278 transparent;}
+.sb-main::-webkit-scrollbar{width:6px;}
+.sb-main::-webkit-scrollbar-track{background:rgba(255,255,255,.04);border-radius:3px;}
+.sb-main::-webkit-scrollbar-thumb{background:#3b5278;border-radius:3px;}
+.sb-main::-webkit-scrollbar-thumb:hover{background:#5272a0;}
+.filter-apply-btn{display:block;width:calc(100% - 28px);margin:10px 14px 0;padding:9px;
+  background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:filter .15s;text-align:center;}
+.filter-apply-btn:hover{filter:brightness(1.1);}
+#updateBtn{display:none;width:calc(100% - 28px);margin:6px 14px 0;padding:7px 12px;
+  background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:8px;
+  color:#a5b4fc;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;}
+#updateBtn:hover{background:rgba(99,102,241,.25);}
+#updateBtn:disabled{opacity:.5;cursor:not-allowed;}
+.sb-footer{padding:9px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);}
+
+/* ── FILTERS ── */
+.filter-sec{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:9px;}
+.f-label{font-size:10px;color:var(--muted);margin-bottom:3px;display:block;}
+.f-row{display:flex;gap:5px;flex-wrap:wrap;}
+.type-btn{padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:transparent;
+  color:var(--muted);cursor:pointer;font-size:11px;font-family:inherit;transition:all .2s;}
+.type-btn[data-t="apartment"].on{color:#93c5fd;border-color:#3b82f6;background:rgba(59,130,246,.12);}
+.type-btn[data-t="house"].on{color:#6ee7b7;border-color:#10b981;background:rgba(16,185,129,.12);}
+.type-btn[data-t="commercial"].on{color:#fcd34d;border-color:#f59e0b;background:rgba(245,158,11,.12);}
+.type-btn[data-t="land"].on{color:#c4b5fd;border-color:#8b5cf6;background:rgba(139,92,246,.12);}
+.type-btn[data-t="other"].on{color:#a5b4fc;border-color:#6366f1;background:rgba(99,102,241,.12);}
+.f-sel{background:var(--panel);border:1px solid var(--border);color:var(--text);
+  padding:5px 7px;border-radius:6px;font-family:inherit;font-size:11px;cursor:pointer;flex:1;}
+.f-sel:focus{outline:none;border-color:var(--accent);}
+
+/* ── STATS ── */
+.stats-bar{display:flex;padding:10px 14px;gap:7px;border-bottom:1px solid var(--border);}
+.stat-c{flex:1;background:var(--panel);border-radius:7px;padding:9px 10px;text-align:center;}
+.stat-v{font-size:17px;font-weight:700;color:var(--accent);}
+.stat-l{font-size:9px;color:var(--muted);margin-top:1px;}
+
+/* ── LIST ── */
+.list-hdr{padding:8px 14px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;}
+.item-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#3b5278 transparent;}
+.item-list::-webkit-scrollbar{width:6px;}
+.item-list::-webkit-scrollbar-track{background:rgba(255,255,255,.04);border-radius:3px;}
+.item-list::-webkit-scrollbar-thumb{background:#3b5278;border-radius:3px;}
+.item-list::-webkit-scrollbar-thumb:hover{background:#5272a0;}
+.icard{padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.icard:hover{background:var(--hover);}
+.icard.on{background:var(--active);border-left:3px solid var(--accent);}
+.i-top{display:flex;align-items:center;gap:5px;margin-bottom:5px;}
+.tbadge{font-size:10px;padding:2px 6px;border-radius:9px;font-weight:500;white-space:nowrap;}
+.tb-apartment{background:rgba(59,130,246,.18);color:#93c5fd;}
+.tb-house{background:rgba(16,185,129,.18);color:#6ee7b7;}
+.tb-commercial{background:rgba(245,158,11,.18);color:#fcd34d;}
+.tb-land{background:rgba(139,92,246,.18);color:#c4b5fd;}
+.tb-other{background:rgba(99,102,241,.18);color:#a5b4fc;}
+.i-addr{font-size:12px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dday{font-size:11px;font-weight:600;white-space:nowrap;}
+.dday.urg{color:var(--danger);} .dday.soon{color:var(--warn);} .dday.norm{color:var(--muted);}
+.i-prices{display:flex;gap:10px;align-items:center;}
+.pi{display:flex;flex-direction:column;}
+.pl{font-size:9px;color:var(--muted);}
+.pv{font-size:12px;font-weight:600;}
+.pv.ap{color:var(--text);} .pv.mn{color:var(--accent);}
+.fail-b{margin-left:auto;background:rgba(239,68,68,.15);color:#fca5a5;font-size:9px;padding:2px 5px;border-radius:4px;}
+.empty{padding:36px 16px;text-align:center;color:var(--muted);}
+.empty .ei{font-size:28px;margin-bottom:10px;}
+
+/* ── MAP ── */
+.map-wrap{flex:1;position:relative;}
+#map{position:absolute;inset:0;}
+
+/* ── 목록 패널 ── */
+#list-panel{width:0;overflow:hidden;background:var(--sb);border-left:1px solid var(--border);
+  transition:width .28s ease;display:flex;flex-direction:column;z-index:10;}
+#list-panel.open{width:320px;min-width:320px;}
+.lp-inner{width:320px;height:100%;display:flex;flex-direction:column;}
+/* ── 상세 패널 ── */
+#detail-panel{width:0;overflow:hidden;background:var(--sb);border-left:1px solid var(--border);
+  transition:width .28s ease;display:flex;flex-direction:column;z-index:10;}
+#detail-panel.open{width:380px;min-width:380px;}
+.dp-inner{width:380px;height:100%;display:flex;flex-direction:column;overflow:hidden;}
+/* 공통 패널 헤더 */
+.rp-hdr{padding:11px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.rp-hdr-title{font-size:13px;font-weight:600;flex:1;}
+.rp-close{background:var(--panel);border:1px solid var(--border);color:var(--muted);
+  width:27px;height:27px;border-radius:6px;cursor:pointer;font-size:13px;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.rp-close:hover{border-color:var(--accent);color:var(--text);}
+.d-inner{flex:1;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:#3b5278 transparent;}
+.d-inner::-webkit-scrollbar{width:6px;}
+.d-inner::-webkit-scrollbar-track{background:rgba(255,255,255,.04);border-radius:3px;}
+.d-inner::-webkit-scrollbar-thumb{background:#3b5278;border-radius:3px;}
+.d-inner::-webkit-scrollbar-thumb:hover{background:#5272a0;}
+/* ── TacoManager 다크 지도 스타일 ── */
+.leaflet-container{background:#070d1a!important;}
+.leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) saturate(.7) contrast(.9);}
+.d-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:11px;}
+.d-close{background:var(--panel);border:1px solid var(--border);color:var(--muted);
+  width:27px;height:27px;border-radius:6px;cursor:pointer;font-size:15px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.d-close:hover{border-color:var(--accent);color:var(--text);}
+.d-addr{font-size:13px;font-weight:600;line-height:1.45;margin-top:4px;}
+.d-case{font-size:10px;color:var(--muted);margin-top:3px;}
+.demo-tag{display:inline-block;background:rgba(245,158,11,.18);color:var(--warn);
+  font-size:9px;padding:1px 5px;border-radius:3px;margin-left:5px;}
+.d-body{padding:14px 18px;display:flex;flex-direction:column;gap:16px;}
+.sec-title{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.info-i{background:var(--panel);border-radius:7px;padding:9px 11px;}
+.info-l{font-size:9px;color:var(--muted);margin-bottom:3px;}
+.info-v{font-size:13px;font-weight:600;}
+.pbar-wrap{display:flex;flex-direction:column;gap:7px;}
+.pbar-row{display:flex;flex-direction:column;gap:3px;}
+.pbar-info{display:flex;justify-content:space-between;font-size:11px;}
+.pbar-name{color:var(--muted);}
+.pbar-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+.rate-box{background:var(--panel);border-radius:8px;padding:11px 13px;display:flex;
+  align-items:center;justify-content:space-between;margin-top:8px;}
+.rate-v{font-size:22px;font-weight:700;}
+.rate-sub{font-size:9px;color:var(--muted);}
+.chart-w{position:relative;height:150px;}
+.trade-tbl{width:100%;border-collapse:collapse;font-size:10px;}
+.trade-tbl th{color:var(--muted);text-align:left;padding:3px 5px;border-bottom:1px solid var(--border);font-weight:400;}
+.trade-tbl td{padding:5px 5px;border-bottom:1px solid rgba(42,51,71,.4);}
+.trade-tbl tr:last-child td{border-bottom:none;}
+.demo-note{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:7px;
+  padding:10px;font-size:10px;color:var(--warn);line-height:1.6;}
+.court-btn{width:100%;padding:9px;background:var(--accent);border:none;border-radius:7px;
+  color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-top:7px;transition:filter .15s;}
+.court-btn:hover{filter:brightness(1.1);}
+.court-btn:disabled{opacity:.4;cursor:not-allowed;filter:none;}
+
+/* ── Auth / Bookmark ── */
+.auth-btn{margin-left:6px;background:var(--panel);border:1px solid var(--border);color:var(--muted);
+  padding:3px 10px;border-radius:20px;cursor:pointer;font-size:11px;font-family:inherit;transition:all .2s;}
+.auth-btn:hover{border-color:var(--accent);color:var(--accent);}
+.auth-btn.signed{color:var(--success);border-color:var(--success);}
+/* ── 로그인 모달 ── */
+#auth-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;
+  align-items:center;justify-content:center;}
+#auth-modal.show{display:flex;}
+.auth-box{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:32px 28px;
+  width:min(320px,90vw);position:relative;text-align:center;}
+.auth-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);
+  font-size:16px;cursor:pointer;padding:4px 6px;border-radius:4px;transition:color .15s,background .15s;line-height:1;}
+.auth-close:hover{color:var(--text);background:var(--hover);}
+.auth-title{font-size:17px;font-weight:600;margin-bottom:8px;}
+.auth-desc{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6;}
+.btn-oauth{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 16px;
+  border-radius:8px;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;
+  transition:filter .15s;margin-bottom:10px;border:none;}
+.btn-oauth:last-of-type{margin-bottom:0;}
+.btn-oauth:hover{filter:brightness(1.08);}
+.btn-google{background:#fff;color:#3c4043;border:1px solid #dadce0!important;}
+.btn-kakao{background:#fee500;color:#191919;}
+.oauth-icon{width:18px;height:18px;flex-shrink:0;}
+/* ── 탭 ── */
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin:0 -28px 20px;padding:0 28px;}
+.auth-tab{flex:1;padding:9px 4px;font-size:13px;font-weight:500;cursor:pointer;background:none;border:none;
+  color:var(--muted);border-bottom:2px solid transparent;transition:color .15s,border-color .15s;font-family:inherit;}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.auth-panel{display:none;}
+.auth-panel.show{display:block;}
+/* ── 이메일 폼 ── */
+.auth-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--sb);color:var(--text);font-size:14px;font-family:inherit;margin-bottom:10px;
+  box-sizing:border-box;transition:border-color .15s;}
+.auth-input:focus{outline:none;border-color:var(--accent);}
+.auth-input::placeholder{color:var(--muted);}
+.pw-wrap{position:relative;width:100%;margin-bottom:10px;}
+.pw-wrap .auth-input{margin-bottom:0;padding-right:40px;width:100%;}
+.pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;
+  cursor:pointer;padding:4px;color:var(--muted);font-size:16px;line-height:1;transition:color .15s;user-select:none;}
+.pw-eye:hover{color:var(--text);}
+.auth-btn-email{width:100%;padding:11px;border:none;border-radius:8px;background:var(--accent);color:#fff;
+  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:filter .15s;margin-top:2px;}
+.auth-btn-email:hover{filter:brightness(1.1);}
+.auth-btn-email:disabled{opacity:.5;cursor:not-allowed;filter:none;}
+.auth-switch{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;}
+.auth-switch span{color:var(--accent);cursor:pointer;text-decoration:underline;}
+.auth-msg{font-size:12px;margin-top:8px;padding:8px 10px;border-radius:6px;display:none;text-align:left;line-height:1.5;}
+.auth-msg.ok{background:#d1fae5;color:#065f46;display:block;}
+.auth-msg.err{background:#fee2e2;color:#991b1b;display:block;}
+.otp-info{font-size:13px;color:var(--muted);text-align:center;margin-bottom:14px;line-height:1.6;}
+.otp-info b{color:var(--text);}
+.magic-link-icon{font-size:40px;text-align:center;margin:8px 0 12px;}
+.auth-or-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--muted);font-size:12px;}
+.auth-or-divider::before,.auth-or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.bm-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 5px;
+  transition:transform .15s;flex-shrink:0;line-height:1;}
+.bm-btn:hover{transform:scale(1.2);}
+.bm-btn.on{color:#f59e0b;}
+.bm-btn.off{color:var(--border);}
+.my-tab{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;
+  color:var(--muted);cursor:pointer;font-size:11px;font-family:inherit;transition:all .2s;white-space:nowrap;}
+.my-tab.on{color:#f59e0b;border-color:#f59e0b;background:rgba(245,158,11,.12);}
+.note-area{width:100%;background:var(--sb);border:1px solid var(--border);color:var(--text);
+  padding:8px 10px;border-radius:7px;font-family:inherit;font-size:12px;resize:none;box-sizing:border-box;
+  margin-top:6px;min-height:56px;}
+.note-area:focus{outline:none;border-color:var(--accent);}
+/* ── Admin badge ── */
+.admin-badge{display:none;}
+#devBadge{display:none;}
+/* ── Demo overlay watermark ── */
+#demo-overlay{display:none;position:fixed;inset:0;z-index:40;pointer-events:none;}
+#demo-overlay.show{display:block;}
+#demo-overlay .wm-main{position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) rotate(-20deg);font-size:86px;font-weight:900;
+  color:rgba(245,158,11,.38);letter-spacing:8px;user-select:none;white-space:nowrap;}
+/* ── Dev Toolbar (허브 스타일 일치) ── */
+#devToolbar{display:none;position:fixed;bottom:12px;right:12px;z-index:8999;
+  background:#0f172a;border:1px solid #3b82f6;border-radius:10px;
+  padding:10px 12px;font-size:12px;color:#60a5fa;
+  box-shadow:0 4px 20px rgba(59,130,246,.25);width:200px;min-width:0;}
+#devToolbar.show{display:block;}
+#devToolbar.collapsed .dev-body{display:none;}
+.dev-title{font-size:11px;font-weight:700;letter-spacing:.06em;color:#93c5fd;
+  margin-bottom:8px;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;user-select:none;
+  white-space:nowrap;background:rgba(59,130,246,.15);border-radius:6px;
+  padding:5px 8px;margin:-5px -8px 8px;border:1px solid rgba(59,130,246,.3);transition:background .15s;}
+.dev-title:hover{background:rgba(59,130,246,.28);}
+#devToolbar.collapsed .dev-title{margin-bottom:0;}
+.dev-title-caret{font-size:11px;font-weight:800;background:#1d4ed8;color:#fff;
+  border-radius:4px;padding:1px 7px;border:1px solid #3b82f6;margin-left:10px;}
+.dev-btn{display:block;width:100%;background:#1e3a5f;border:1px solid #2563eb;
+  border-radius:5px;color:#93c5fd;font-family:inherit;font-size:12px;
+  padding:5px 10px;cursor:pointer;text-align:left;margin-bottom:5px;transition:background .1s;}
+.dev-btn:last-child{margin-bottom:0;}
+.dev-btn:hover{background:#1d4ed8;color:#fff;}
+.dev-btn.danger{border-color:#991b1b;background:#1a0a0a;color:#fca5a5;}
+.dev-btn.danger:hover{background:#7f1d1d;}
+.dev-status{font-size:11px;color:#475569;margin-bottom:8px;padding:4px 6px;
+  background:#0f1117;border-radius:4px;}
+.dev-pw-row{display:flex;gap:4px;margin-bottom:5px;}
+.dev-pw-inp{flex:1;font-size:11px;padding:4px 7px;background:#0f1117;border:1px solid #2563eb;
+  border-radius:5px;color:#93c5fd;font-family:monospace;outline:none;min-width:0;}
+.dev-pw-eye{padding:3px 7px;background:#1e3a5f;border:1px solid #2563eb;border-radius:5px;
+  color:#60a5fa;cursor:pointer;font-size:13px;line-height:1;flex-shrink:0;}
+#omanPanel{position:fixed;bottom:16px;right:16px;z-index:9000;display:none;
+  background:var(--panel);border:1px solid var(--border);border-radius:10px;
+  width:300px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.65);}
+#omanPanel::-webkit-scrollbar{width:3px;}
+#omanPanel::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.oman-hdr{padding:10px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;position:sticky;top:0;background:var(--panel);}
+.oman-close{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:0;}
+.oman-body{padding:12px 14px;display:flex;flex-direction:column;gap:9px;}
+.oman-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;}
+.oman-lbl{color:var(--muted);}
+.oman-val{font-weight:500;}
+.oman-val.ok{color:var(--success);}
+.oman-val.warn{color:var(--warn);}
+.oman-sep{height:1px;background:var(--border);margin:2px 0;}
+.oman-cmd{background:var(--sb);border-radius:6px;padding:7px 10px;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6ee7b7;line-height:1.75;white-space:pre;}
+.oman-links{display:flex;flex-direction:column;gap:4px;}
+.oman-link{padding:5px 8px;background:var(--sb);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);text-decoration:none;font-size:11px;transition:border-color .15s;display:block;}
+.oman-link:hover{border-color:var(--accent);color:var(--accent);}
+.oman-btn{width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--border);
+  background:var(--sb);color:var(--text);font-family:inherit;font-size:11px;cursor:pointer;
+  text-align:left;transition:all .15s;display:flex;align-items:center;gap:6px;box-sizing:border-box;}
+.oman-btn:hover{border-color:var(--accent);color:var(--accent);}
+.oman-btn.primary{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.4);color:#a5b4fc;}
+.oman-btn.primary:hover{background:rgba(99,102,241,.28);}
+.oman-btn.danger{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#fca5a5;}
+.oman-btn.danger:hover{background:rgba(239,68,68,.2);}
+.oman-btn:disabled{opacity:.5;cursor:not-allowed;}
+.oman-input{font-size:10px;padding:4px 7px;background:var(--sb);border:1px solid var(--border);
+  border-radius:5px;color:var(--text);font-family:'IBM Plex Mono',monospace;box-sizing:border-box;
+  width:100%;outline:none;}
+.oman-input:focus{border-color:var(--accent);}
+.crawl-st{font-size:10px;padding:5px 8px;background:var(--sb);border-radius:5px;
+  border-left:2px solid var(--border);color:var(--muted);line-height:1.5;}
+.crawl-st.ok{border-color:var(--success);color:var(--success);}
+.crawl-st.warn{border-color:var(--warn);color:var(--warn);}
+.crawl-st.active{border-color:var(--accent);color:#a5b4fc;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin 1s linear infinite;}
+/* ── Crawl progress bar ── */
+#crawl-progress{display:none;padding:6px 14px 7px;border-bottom:1px solid var(--border);
+  background:rgba(99,102,241,.06);}
+#crawl-progress.show{display:block;}
+#crawl-pbar-track{height:3px;background:rgba(99,102,241,.2);border-radius:2px;overflow:hidden;margin-bottom:5px;}
+#crawl-pbar-fill{height:100%;background:var(--accent);border-radius:2px;
+  animation:crawlSlide 1.8s ease-in-out infinite;}
+@keyframes crawlSlide{0%{width:15%;margin-left:0}50%{width:35%;margin-left:35%}100%{width:15%;margin-left:85%}}
+#crawl-pbar-txt{font-size:10px;color:#a5b4fc;display:flex;align-items:center;gap:5px;}
+/* ── Leaflet dark overrides ── */
+.leaflet-popup-content-wrapper{background:var(--panel);color:var(--text);
+  border:1px solid var(--border);border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.5);}
+.leaflet-popup-tip{background:var(--panel);}
+.leaflet-popup-close-button{color:var(--muted)!important;}
+.leaflet-control-zoom a{background:var(--panel)!important;border-color:var(--border)!important;color:var(--text)!important;}
+.leaflet-control-attribution{background:rgba(15,17,23,.7)!important;color:var(--muted)!important;}
+.leaflet-control-attribution a{color:var(--muted)!important;}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <!-- Hub 스타일 Brand 헤더 -->
+  <div class="sb-brand">
+    <div class="sb-logo-row">
+      <div class="sb-logo-icon">🏛</div>
+      <div class="sb-title"><em>경매</em>지도</div>
+    </div>
+    <div class="sb-user-row">
+      <div class="sb-user-chip" id="sbUserChip" onclick="sbUserClick()">
+        <div class="sb-user-av" id="sbUserAv">?</div>
+        <span class="sb-user-name" id="sbUserName">로그인</span>
+        <span class="sb-user-role" id="sbUserRole"></span>
+      </div>
+      <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
+    </div>
+  </div>
+
+  <div class="sb-main">
+  <div class="filter-sec">
+    <div>
+      <span class="f-label" id="lbl-type">물건 종류</span>
+      <div class="f-row">
+        <button class="type-btn on" data-t="apartment" onclick="toggleType('apartment')" id="bt-apt">아파트</button>
+        <button class="type-btn on" data-t="house"     onclick="toggleType('house')"     id="bt-house">단독/다가구</button>
+        <button class="type-btn on" data-t="commercial" onclick="toggleType('commercial')" id="bt-com">상가/업무</button>
+        <button class="type-btn on" data-t="land"      onclick="toggleType('land')"      id="bt-land">토지</button>
+        <button class="type-btn on" data-t="other"     onclick="toggleType('other')"     id="bt-other">기타</button>
+      </div>
+    </div>
+    <div>
+      <span class="f-label" id="lbl-region">지역</span>
+      <div class="f-row">
+        <select class="f-sel" id="sidoF" onchange="applyFilter()">
+          <option value="">전체 지역</option>
+          <option value="서울특별시">서울</option>
+          <option value="경기도">경기</option>
+          <option value="인천광역시">인천</option>
+          <option value="부산광역시">부산</option>
+          <option value="대구광역시">대구</option>
+          <option value="대전광역시">대전</option>
+          <option value="광주광역시">광주</option>
+          <option value="울산광역시">울산</option>
+          <option value="세종특별자치시">세종</option>
+          <option value="강원특별자치도">강원</option>
+          <option value="충청북도">충북</option>
+          <option value="충청남도">충남</option>
+          <option value="전북특별자치도">전북</option>
+          <option value="전라남도">전남</option>
+          <option value="경상북도">경북</option>
+          <option value="경상남도">경남</option>
+          <option value="제주특별자치도">제주</option>
+        </select>
+      </div>
+    </div>
+    <div class="f-row">
+      <div style="flex:1">
+        <span class="f-label" id="lbl-fail">유찰횟수</span>
+        <select class="f-sel" id="failF" onchange="applyFilter()">
+          <option value="">전체</option>
+          <option value="0">신건 (0회)</option>
+          <option value="1">1회 이상</option>
+          <option value="2">2회 이상</option>
+          <option value="3">3회 이상</option>
+        </select>
+      </div>
+      <div style="flex:1">
+        <span class="f-label" id="lbl-date">입찰기일</span>
+        <select class="f-sel" id="dateF" onchange="applyFilter()">
+          <option value="">전체</option>
+          <option value="week">이번 주</option>
+          <option value="month">이번 달</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-c"><div class="stat-v" id="sv-total">-</div><div class="stat-l" id="sl-total">전체 물건</div></div>
+    <div class="stat-c"><div class="stat-v" id="sv-week">-</div><div class="stat-l" id="sl-week">이번주 입찰</div></div>
+    <div class="stat-c"><div class="stat-v" id="sv-rate">-</div><div class="stat-l" id="sl-rate">예측 낙찰가율</div></div>
+  </div>
+
+  <button class="filter-apply-btn" onclick="applyFilterAndShow()">🔍 필터 적용 · 목록 보기</button>
+  <div id="demoToggleWrap" style="display:none;margin:6px 14px 0;padding:7px 10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;">
+    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;">
+      <input type="checkbox" id="demoCheck" onchange="toggleDemoMode(this)" style="accent-color:#f59e0b;width:14px;height:14px;cursor:pointer;">
+      <span style="font-size:12px;color:var(--muted)">샘플 데이터 보기</span>
+      <span style="font-size:11px;color:rgba(245,158,11,.85);font-weight:600;margin-left:auto">142건</span>
+    </label>
+  </div>
+  <button id="updateBtn" onclick="triggerCrawl()">🔄 데이터 업데이트</button>
+  <!-- 크롤링 진행 표시바 — 업데이트 버튼 바로 아래 -->
+  <div id="crawl-progress" style="margin:6px 14px 0;">
+    <div id="crawl-pbar-track"><div id="crawl-pbar-fill"></div></div>
+    <div id="crawl-pbar-txt"><span class="spin">🔄</span><span id="crawl-pbar-msg">수집 중…</span></div>
+  </div>
+  </div><!-- /sb-main -->
+
+  <div class="sb-footer" id="sbFooter">
+    v<span id="sbVer">0.7.0.1</span> · WorksFree 2026
+    <span id="sbCollectInfo" style="display:none"> · 수집 <span id="sbCollectCnt"></span></span>
+  </div>
+</aside>
+
+<div class="map-wrap"><div id="map"></div></div>
+
+<!-- 상세 패널 (목록 왼쪽) -->
+<div id="detail-panel">
+  <div class="dp-inner">
+    <div class="d-inner" id="detailInner"></div>
+  </div>
+</div>
+
+<!-- 목록 패널 (오른쪽 끝) -->
+<div id="list-panel">
+  <div class="lp-inner">
+    <div class="rp-hdr">
+      <span class="rp-hdr-title" id="lbl-list">물건 목록</span>
+      <button class="my-tab" id="myListTab" onclick="toggleMyList()" style="display:none">★ 내 목록</button>
+      <span id="list-cnt" style="color:var(--accent);font-size:12px;font-weight:600;"></span>
+      <button class="rp-close" onclick="closeListPanel()" aria-label="목록 패널 닫기" title="닫기">✕</button>
+    </div>
+    <div class="item-list" id="itemList"></div>
+  </div>
+</div>
+
+<!-- 로그인 모달 -->
+<div id="auth-modal" onclick="if(event.target===this)closeAuthModal()">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuthModal()" aria-label="로그인 모달 닫기">✕</button>
+    <div class="auth-title">경매지도 로그인</div>
+    <div class="auth-desc">회원으로 로그인하면 실제 경매 데이터를<br>확인하고 관심 물건을 저장할 수 있습니다.</div>
+
+    <!-- 탭 -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="auth-tab-login"  onclick="switchAuthTab('login')">로그인</button>
+      <button class="auth-tab"        id="auth-tab-signup" onclick="switchAuthTab('signup')">회원가입</button>
+    </div>
+
+    <!-- 로그인 패널 -->
+    <div class="auth-panel show" id="auth-panel-login">
+      <input class="auth-input" id="el-email" type="email" placeholder="이메일" autocomplete="email"
+        onkeydown="if(event.key==='Enter')doEmailLogin()">
+      <div class="pw-wrap">
+        <input class="auth-input" id="el-pw" type="password" placeholder="비밀번호" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter')doEmailLogin()">
+        <button type="button" class="pw-eye" onclick="togglePw('el-pw',this)" tabindex="-1">👁</button>
+      </div>
+      <div class="auth-msg" id="el-msg"></div>
+      <button class="auth-btn-email" id="el-login-btn" onclick="doEmailLogin()">로그인</button>
+      <div class="auth-switch">처음이신가요? <span onclick="switchAuthTab('signup')">회원가입</span></div>
+    </div>
+
+    <!-- 회원가입 패널 -->
+    <div class="auth-panel" id="auth-panel-signup">
+      <div id="email-signup-form">
+        <div id="signup-step1">
+          <input class="auth-input" id="es-name"  type="text"     placeholder="이름 (선택)" autocomplete="name">
+          <input class="auth-input" id="es-email" type="email"    placeholder="이메일" autocomplete="email">
+          <div class="pw-wrap">
+            <input class="auth-input" id="es-pw"  type="password" placeholder="비밀번호 (8자 이상)" autocomplete="new-password">
+            <button type="button" class="pw-eye" onclick="togglePw('es-pw',this)" tabindex="-1">👁</button>
+          </div>
+          <div class="pw-wrap">
+            <input class="auth-input" id="es-pw2" type="password" placeholder="비밀번호 확인" autocomplete="new-password">
+            <button type="button" class="pw-eye" onclick="togglePw('es-pw2',this)" tabindex="-1">👁</button>
+          </div>
+          <div class="auth-msg" id="es-msg"></div>
+          <button class="auth-btn-email" id="es-send-btn" onclick="sendSignupOtp()">인증 메일 받기</button>
+          <div class="auth-switch">이미 계정이 있으신가요? <span onclick="switchAuthTab('login')">로그인</span></div>
+        </div>
+        <!-- Step 2: 인증 메일 대기 -->
+        <div id="signup-step2" style="display:none">
+          <div class="otp-info" id="otp-info-text"></div>
+          <div class="magic-link-icon">📧</div>
+          <div class="auth-msg ok" style="display:block;text-align:center">
+            이메일의 <b>인증 링크를 클릭</b>하면<br>자동으로 가입이 완료됩니다.
+          </div>
+          <div class="auth-switch" style="margin-top:16px">
+            <span onclick="backToSignupStep1()">← 이메일 변경</span>
+            &nbsp;·&nbsp;
+            <span onclick="resendSignupOtp()">링크 재발송</span>
+          </div>
+        </div>
+      </div>
+      <!-- 소셜 가입 -->
+      <div id="auth-social-section">
+        <div class="auth-or-divider"><span>또는 소셜 계정으로 가입</span></div>
+        <button class="btn-oauth btn-google" onclick="signInWithGoogle()">
+          <svg class="oauth-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Google로 가입하기
+        </button>
+        <button class="btn-oauth btn-kakao" onclick="signInWithKakao()">
+          <svg class="oauth-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.7 1.696 5.08 4.255 6.47L5.2 21l4.896-2.6c.61.083 1.234.127 1.904.127 5.523 0 10-3.477 10-7.727C22 6.477 17.523 3 12 3z" fill="#191919"/>
+          </svg>
+          카카오로 가입하기
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 예시 데이터 워터마크 -->
+<div id="demo-overlay"><div class="wm-main">예시 데이터</div></div>
+
+<!-- Dev 관리자 비밀번호 게이트 모달 -->
+<div id="devAucPwModal" style="display:none;position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.65);align-items:center;justify-content:center;">
+  <div style="background:#0f172a;border:1px solid #3b82f6;border-radius:12px;padding:18px 20px;min-width:280px;box-shadow:0 8px 32px rgba(59,130,246,.3);font-family:inherit;">
+    <div style="font-size:12px;font-weight:700;color:#93c5fd;margin-bottom:12px;letter-spacing:.04em;">🔐 관리자 비밀번호</div>
+    <input id="devAucPwInput" type="password"
+      style="width:100%;padding:8px 10px;border:1px solid #2563eb;border-radius:6px;background:#0c1524;color:#e2e8f0;font-size:12px;outline:none;font-family:inherit;box-sizing:border-box;"
+      onkeydown="if(event.key==='Enter')devAucPwConfirm();else if(event.key==='Escape')devAucPwCancel();">
+    <div id="devAucPwErr" style="font-size:11px;color:#fca5a5;margin-top:6px;min-height:16px;"></div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="devAucPwCancel()" style="flex:1;padding:7px;border:1px solid #334155;border-radius:6px;background:#1e293b;color:#94a3b8;font-size:12px;cursor:pointer;font-family:inherit;">취소</button>
+      <button onclick="devAucPwConfirm()" style="flex:2;padding:7px;border:none;border-radius:6px;background:#1d4ed8;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dev Toolbar (?dev=1 시 표시) -->
+<div id="devToolbar">
+  <div class="dev-title" onclick="devTbToggle()" title="클릭하여 접기/펼치기">
+    🛠 Dev / Test Mode
+    <span class="dev-title-caret" id="devTbCaret">▲ 접기</span>
+  </div>
+  <div class="dev-body" id="devTbBody">
+    <div class="dev-status" id="devTbStatus">비로그인</div>
+    <div id="devTbTrack" style="font-size:10px;color:#475569;margin-bottom:6px;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.04)">📊 페이지뷰 추적: —</div>
+    <button class="dev-btn" id="devGuestBtn"  onclick="devTbRole('guest')">▶ 비회원</button>
+    <button class="dev-btn" id="devMemberBtn" style="border-color:#0ea5e9;color:#7dd3fc" onclick="devTbRole('member')">▶ 회원</button>
+    <button class="dev-btn" id="devAdminBtn"  style="border-color:#dc2626;color:#fca5a5" onclick="devTbRole('admin')">▶ 관리자 (🔒)</button>
+    <button class="dev-btn danger" onclick="devTbLogout()">✕ 테스트 로그아웃</button>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ════════════════════════════════
+   SUPABASE
+════════════════════════════════ */
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let currentUser = null;
+let bookmarkedIds = new Set(); // case_number set
+let showMyList = false;
+
+/* ── Auth state listener ── */
+sb.auth.onAuthStateChange(async (event, session) => {
+  currentUser = session?.user || null;
+  updateAuthUI();
+  updateAdminUI();
+  if (currentUser) {
+    await loadBookmarks();
+    document.getElementById('myListTab').style.display = '';
+    await updateDemoOverlay(); // 로그인 → 실데이터 + 워터마크 해제
+  } else {
+    bookmarkedIds.clear();
+    document.getElementById('myListTab').style.display = 'none';
+    if (showMyList) { showMyList = false; document.getElementById('myListTab').classList.remove('on'); }
+    updateDemoOverlay(); // 로그아웃 → 예시 데이터 + 워터마크
+  }
+  // TOKEN_REFRESHED: 탭 복귀 시 Supabase가 자동 발생 — 현재 필터/클러스터 상태 건드리지 않음
+  if (event === 'TOKEN_REFRESHED') {
+    if (!_clusterMode) renderList(); // 북마크 아이콘만 갱신
+  } else {
+    applyFilter(); // 로그인·로그아웃·초기 세션 시만 전체 갱신
+  }
+  if (selItem) renderDetail(selItem);
+});
+
+function updateAuthUI() {
+  const av   = document.getElementById('sbUserAv');
+  const name = document.getElementById('sbUserName');
+  const role = document.getElementById('sbUserRole');
+  if (currentUser) {
+    const short = currentUser.email.split('@')[0];
+    if (av)   { av.textContent = short[0].toUpperCase(); av.style.background = isAdmin() ? '#dc2626' : 'var(--accent)'; }
+    if (name) name.textContent = short;
+    if (role) role.textContent = isAdmin() ? '(관리자)' : '(회원)';
+  } else {
+    if (av)   { av.textContent = '?'; av.style.background = 'var(--muted)'; }
+    if (name) name.textContent = '로그인';
+    if (role) role.textContent = '';
+  }
+}
+
+function sbUserClick() {
+  if (!currentUser) { openAuthModal(); return; }
+  if (confirm(`${currentUser.email}\n\n로그아웃 하시겠습니까?`)) sb.auth.signOut();
+}
+
+/* ── Auth modal ── */
+let _signupEmail = '';
+
+function openAuthModal(forceTab) {
+  document.getElementById('auth-modal').classList.add('show');
+  const hasVisited = localStorage.getItem('auc_last_login');
+  switchAuthTab(forceTab || (hasVisited ? 'login' : 'signup'));
+  ['el-email','el-pw','es-name','es-email','es-pw','es-pw2'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const loginBtn = document.getElementById('el-login-btn');
+  if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '로그인'; }
+  setTimeout(() => document.getElementById('el-email')?.focus(), 50);
+}
+function closeAuthModal() { document.getElementById('auth-modal').classList.remove('show'); }
+
+function switchAuthTab(tab) {
+  const isLogin = tab === 'login';
+  document.querySelectorAll('.auth-tab').forEach((t, i) =>
+    t.classList.toggle('active', isLogin ? i === 0 : i === 1));
+  document.getElementById('auth-panel-login').classList.toggle('show', isLogin);
+  document.getElementById('auth-panel-signup').classList.toggle('show', !isLogin);
+  if (!isLogin) {
+    const step1 = document.getElementById('signup-step1');
+    const step2 = document.getElementById('signup-step2');
+    const social = document.getElementById('auth-social-section');
+    if (step1) step1.style.display = 'block';
+    if (step2) step2.style.display = 'none';
+    if (social) social.style.display = 'block';
+  }
+  clearAuthMsg('el-msg'); clearAuthMsg('es-msg');
+}
+
+function setAuthMsg(id, type, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'auth-msg ' + type;
+  el.innerHTML = text;
+}
+function clearAuthMsg(id) {
+  const el = document.getElementById(id); if (el) el.className = 'auth-msg';
+}
+
+function togglePw(inputId, btn) {
+  const el = document.getElementById(inputId);
+  if (!el) return;
+  const show = el.type === 'password';
+  el.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
+
+async function doEmailLogin() {
+  const email = document.getElementById('el-email').value.trim();
+  const pw    = document.getElementById('el-pw').value;
+  if (!email || !pw) { setAuthMsg('el-msg','err','이메일과 비밀번호를 입력하세요.'); return; }
+  const btn = document.getElementById('el-login-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '로그인 중...'; }
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+  if (btn) { btn.disabled = false; btn.textContent = '로그인'; }
+  if (error) {
+    if (error.message.includes('Email not confirmed')) {
+      setAuthMsg('el-msg','err','이메일 인증이 필요합니다. 받은 편지함을 확인해주세요.');
+    } else if (error.message.includes('Invalid login')) {
+      setAuthMsg('el-msg','err','이메일 또는 비밀번호가 올바르지 않습니다.');
+    } else {
+      setAuthMsg('el-msg','err', error.message);
+    }
+    return;
+  }
+  if (data?.user) {
+    localStorage.setItem('auc_last_login', '1');
+    closeAuthModal();
+  }
+}
+
+async function sendSignupOtp() {
+  const name  = document.getElementById('es-name').value.trim();
+  const email = document.getElementById('es-email').value.trim();
+  const pw    = document.getElementById('es-pw').value;
+  const pw2   = document.getElementById('es-pw2').value;
+  if (!email)        { setAuthMsg('es-msg','err','이메일을 입력하세요.'); return; }
+  if (pw.length < 8) { setAuthMsg('es-msg','err','비밀번호는 8자 이상이어야 합니다.'); return; }
+  if (pw !== pw2)    { setAuthMsg('es-msg','err','비밀번호가 일치하지 않습니다.'); return; }
+
+  const btn = document.getElementById('es-send-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '전송 중...'; }
+  const { error } = await sb.auth.signUp({
+    email, password: pw,
+    options: { data: { full_name: name || email.split('@')[0] } }
+  });
+  if (btn) { btn.disabled = false; btn.textContent = '인증 메일 받기'; }
+
+  if (error) {
+    if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+      setAuthMsg('es-msg','err','이미 등록된 이메일입니다. 로그인 탭에서 로그인해주세요.');
+    } else {
+      setAuthMsg('es-msg','err', error.message);
+    }
+    return;
+  }
+
+  _signupEmail = email;
+  document.getElementById('otp-info-text').innerHTML = `<b>${email}</b><br>으로 인증 링크를 발송했습니다.`;
+  document.getElementById('signup-step1').style.display = 'none';
+  document.getElementById('signup-step2').style.display = 'block';
+  const social = document.getElementById('auth-social-section');
+  if (social) social.style.display = 'none';
+}
+
+function backToSignupStep1() {
+  _signupEmail = '';
+  document.getElementById('signup-step1').style.display = 'block';
+  document.getElementById('signup-step2').style.display = 'none';
+  const social = document.getElementById('auth-social-section');
+  if (social) social.style.display = 'block';
+  clearAuthMsg('es-msg');
+}
+
+async function resendSignupOtp() {
+  if (!_signupEmail) return;
+  const { error } = await sb.auth.resend({ type: 'signup', email: _signupEmail });
+  if (error) alert('재발송 실패: ' + error.message);
+  else alert('인증 메일을 다시 발송했습니다.');
+}
+
+async function signInWithGoogle() {
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: location.origin + location.pathname }
+  });
+}
+
+async function signInWithKakao() {
+  await sb.auth.signInWithOAuth({
+    provider: 'kakao',
+    options: { redirectTo: location.origin + location.pathname }
+  });
+}
+
+/* ── Bookmarks ── */
+async function loadBookmarks() {
+  if (!currentUser) return;
+  const { data } = await sb.from('auction_bookmarks').select('case_number').eq('user_id', currentUser.id);
+  bookmarkedIds = new Set((data || []).map(r => r.case_number));
+}
+
+async function toggleBookmark(item, e) {
+  if (e) { e.stopPropagation(); }
+  if (!currentUser) { openAuthModal(); return; }
+
+  const caseNo = item.case_number;
+  if (bookmarkedIds.has(caseNo)) {
+    await sb.from('auction_bookmarks').delete()
+      .eq('user_id', currentUser.id).eq('case_number', caseNo);
+    bookmarkedIds.delete(caseNo);
+  } else {
+    await sb.from('auction_bookmarks').upsert({
+      user_id:    currentUser.id,
+      case_number: caseNo,
+      court_name:  item.court,
+      item_type:   item.type,
+      address:     item.address,
+      appraise:    item.app,
+      min_price:   item.minP,
+      bid_date:    item.bid_date,
+      fail_count:  item.fc || 0,
+    }, { onConflict: 'user_id,case_number' });
+    bookmarkedIds.add(caseNo);
+  }
+  renderList();
+  if (selItem?.case_number === caseNo) renderDetail(selItem);
+}
+
+function openCourtPage(caseNo) {
+  // 법원 W2X 상세 URL 직접 접근 시 세션 미초기화로 오류 발생 → 메인 검색 폼으로 이동
+  const url = 'https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml&csNo=' + encodeURIComponent(caseNo);
+  window.open(url, '_blank');
+}
+async function saveNote(item, val) {
+  if (!currentUser) return;
+  await sb.from('auction_bookmarks')
+    .update({ note: val })
+    .eq('user_id', currentUser.id)
+    .eq('case_number', item.case_number);
+}
+
+/* ── My List tab ── */
+function toggleMyList() {
+  showMyList = !showMyList;
+  document.getElementById('myListTab').classList.toggle('on', showMyList);
+  renderList();
+  rebuildMarkers(filtered);
+  updateStats();
+}
+
+/* ════════════════════════════════
+   ADMIN / DEV MODE
+════════════════════════════════ */
+const AUC_VER = '0.7.4.15';
+const ADMIN_EMAILS = ['insung.lee@worksfree.co.kr'];
+const IS_DEV = new URLSearchParams(location.search).get('dev') === '1'
+            || localStorage.getItem('auc_dev') === '1';
+const TENANT_ID = 'worksfree';
+let WORKER_URL = (localStorage.getItem('auc_worker_url') || 'https://auction-proxy.worksfree.workers.dev').replace(/\/$/, '');
+let _dataInfo   = null;   // { generated_at, count, total_available }
+let _crawlStatus = null;  // { status, count, total_available, has_more, error, started_at, finished_at }
+let _crawlPollTimer = null;
+
+function isAdmin(){ return !!(currentUser && ADMIN_EMAILS.includes(currentUser.email)); }
+
+function updateAdminUI(){
+  const uBtn = document.getElementById('updateBtn');
+  if(uBtn) uBtn.style.display = isAdmin() ? 'block' : 'none';
+  if(IS_DEV) document.getElementById('devToolbar')?.classList.add('show');
+  const myTab = document.getElementById('myListTab');
+  if(myTab) myTab.style.display = currentUser ? 'inline-block' : 'none';
+  // 샘플 데이터 토글: 로그인 시에만 표시 (비로그인은 항상 샘플이라 불필요)
+  const demoWrap = document.getElementById('demoToggleWrap');
+  if(demoWrap) demoWrap.style.display = currentUser ? 'block' : 'none';
+  // 버전 표시
+  const sbVer = document.getElementById('sbVer');
+  if(sbVer) sbVer.textContent = AUC_VER;
+  devTbUpdateStatus();
+}
+
+/* ── Demo Overlay ── */
+async function updateDemoOverlay(){
+  const overlay = document.getElementById('demo-overlay');
+  if(!currentUser){
+    overlay?.classList.add('show');
+    // 실데이터가 로드되어 있었으면 예시 데이터로 복원
+    if(_dataInfo){
+      _dataInfo = null;
+      ALL.length = 0;
+      DEMO_DATA.forEach(it => ALL.push(it));
+      applyFilter();
+    }
+  } else {
+    overlay?.classList.remove('show');
+    if(!_dataInfo && !_demoOverride) await loadDataFromWorker();
+  }
+}
+
+/* ── 업데이트 버튼 (관리자 전용) ── */
+function _showCrawlProgress(msg){
+  document.getElementById('crawl-progress')?.classList.add('show');
+  const t = document.getElementById('crawl-pbar-msg'); if(t) t.textContent = msg || '수집 중…';
+  const btn = document.getElementById('updateBtn');
+  if(btn){ btn.textContent = '🔄 수집 중…'; btn.disabled = true; }
+}
+function _hideCrawlProgress(msg, isOk){
+  document.getElementById('crawl-progress')?.classList.remove('show');
+  const btn = document.getElementById('updateBtn');
+  if(btn){
+    btn.textContent = isOk ? '✅ 완료' : (msg ? '⚠️ 오류' : '🔄 업데이트');
+    btn.disabled = false;
+    if(isOk || msg) setTimeout(() => { if(btn) btn.textContent = '🔄 업데이트'; }, 4000);
+  }
+}
+
+async function triggerCrawl(){
+  if(!WORKER_URL){ alert('Worker URL이 설정되지 않았습니다.'); return; }
+  const secret = localStorage.getItem('auc_proxy_secret') || '';
+  const headers = { 'Content-Type':'application/json' };
+  if(secret) headers['X-Proxy-Secret'] = secret;
+  _showCrawlProgress('상태 확인 중…');
+  try{
+    const meta = await checkCrawlStatus();
+    if(meta?.status === 'crawling'){
+      _showCrawlProgress(`이미 수집 중… (${meta.count||0}건)`);
+      _crawlStatus = meta;
+      _startPollCrawlStatus();
+      return;
+    }
+    const resp = await fetch(`${WORKER_URL}/crawl?tenant=${TENANT_ID}&max=200`, { method:'POST', headers });
+    if(resp.status === 401){
+      _hideCrawlProgress('인증오류');
+      alert('인증 실패 — Worker 설정을 확인하세요.');
+      return;
+    }
+    _crawlStatus = { status:'crawling', started_at: new Date().toISOString() };
+    _showCrawlProgress('수집 시작됨…');
+    _startPollCrawlStatus();
+  }catch(e){
+    _hideCrawlProgress('오류');
+    alert('오류: ' + e.message);
+  }
+}
+
+/* ── 패널 제어 ── */
+let _listPanelOpen = false;
+
+function openListPanel() {
+  _listPanelOpen = true;
+  document.getElementById('list-panel').classList.add('open');
+  setTimeout(() => map.invalidateSize(), 300);
+}
+
+function closeListPanel() {
+  _listPanelOpen = false;
+  document.getElementById('list-panel').classList.remove('open');
+  closeDetailPanel();
+  setTimeout(() => map.invalidateSize(), 300);
+}
+
+function openDetailPanel() {
+  document.getElementById('detail-panel').classList.add('open');
+  setTimeout(() => {
+    map.invalidateSize();
+    if(!selItem) return;
+    const marker = _markerLookup[String(selItem.id)];
+    if(marker) {
+      // cluster.zoomToShowLayer: 클러스터를 풀어 개별 마커 노드까지 확대
+      cluster.zoomToShowLayer(marker, () => {
+        if(goodCoord(selItem.lat, selItem.lng)) {
+          map.setView([selItem.lat, selItem.lng], 16);
+        }
+      });
+    } else {
+      // 마커가 현재 필터에 없는 경우: 좌표 기반 fallback
+      if(goodCoord(selItem.lat, selItem.lng)) {
+        map.setView([selItem.lat, selItem.lng], 15);
+      } else if(selItem._mapLat != null && selItem._mapLng != null) {
+        map.setView([selItem._mapLat, selItem._mapLng], 13);
+      } else {
+        const ac = adminCoord(selItem);
+        if(ac) map.setView(ac, 11);
+      }
+    }
+  }, 310);
+}
+
+function closeDetailPanel() {
+  selItem = null;
+  document.querySelectorAll('.icard').forEach(el => el.classList.remove('on'));
+  if(detChart){ detChart.destroy(); detChart = null; }
+  document.getElementById('detail-panel').classList.remove('open');
+  setTimeout(() => map.invalidateSize(), 300);
+}
+
+function applyFilterAndShow() {
+  applyFilter();
+  openListPanel();
+}
+
+/* ── Dev Toolbar ── */
+function devTbToggle(){
+  const tb    = document.getElementById('devToolbar');
+  const caret = document.getElementById('devTbCaret');
+  const isCollapsed = tb.classList.toggle('collapsed');
+  caret.textContent = isCollapsed ? '▼ 열기' : '▲ 접기';
+  localStorage.setItem('auc_dev_collapsed', isCollapsed ? '1' : '');
+}
+function devTbUpdateStatus(){
+  const statusEl = document.getElementById('devTbStatus');
+  const trackEl  = document.getElementById('devTbTrack');
+
+  if(statusEl){
+    if(currentUser){
+      const role = isAdmin() ? '관리자' : '회원';
+      statusEl.textContent = `로그인: ${currentUser.email} [${role}] ✅`;
+      statusEl.style.color = '#e2e8f0';
+    } else {
+      statusEl.textContent = '비로그인';
+      statusEl.style.color = '#475569';
+    }
+  }
+
+  if(trackEl){
+    if(currentUser && IS_DEV){
+      trackEl.textContent = '⚠️ 페이지뷰 추적: ⛔ 모의 세션 — DB 미기록';
+      trackEl.style.color = '#f59e0b';
+    } else if(currentUser){
+      trackEl.textContent = '📊 페이지뷰 추적: ✅ 실세션 기록 중';
+      trackEl.style.color = '#10b981';
+    } else {
+      trackEl.textContent = '📊 페이지뷰 추적: — 비로그인';
+      trackEl.style.color = '#475569';
+    }
+  }
+
+  // 접힘 상태 복원
+  const tb = document.getElementById('devToolbar');
+  const caret = document.getElementById('devTbCaret');
+  if(tb && localStorage.getItem('auc_dev_collapsed') === '1'){
+    tb.classList.add('collapsed');
+    if(caret) caret.textContent = '▼ 열기';
+  }
+}
+
+const DEV_CREDS = {
+  member: { email:'test@worksfree.kr' },
+  admin:  { email: ADMIN_EMAILS[0]   },
+};
+
+/* 관리자 게이트 비밀번호 모달 */
+let _devPwResolve = null;
+function devAucPromptPw(){
+  const errEl = document.getElementById('devAucPwErr');
+  if(errEl) errEl.textContent = '';
+  const inp = document.getElementById('devAucPwInput');
+  if(inp) inp.value = (location.hostname.startsWith('test.') || location.hostname === 'localhost') ? 'Tank@003412' : '';
+  document.getElementById('devAucPwModal').style.display = 'flex';
+  return new Promise(resolve => {
+    _devPwResolve = resolve;
+    setTimeout(() => { if(inp){ inp.focus(); inp.select(); } }, 50);
+  });
+}
+function devAucPwConfirm(){
+  const pw = document.getElementById('devAucPwInput')?.value || '';
+  document.getElementById('devAucPwModal').style.display = 'none';
+  if(_devPwResolve){ _devPwResolve(pw); _devPwResolve = null; }
+}
+function devAucPwCancel(){
+  document.getElementById('devAucPwModal').style.display = 'none';
+  if(_devPwResolve){ _devPwResolve(null); _devPwResolve = null; }
+}
+
+async function devTbRole(role){
+  if(role === 'guest'){ await sb.auth.signOut(); return; }
+
+  /* 관리자: 게이트 비밀번호 확인 (3회 오류 시 5분 잠금) */
+  if(role === 'admin'){
+    const LOCK_KEY     = 'auc_dev_lock';
+    const ATTEMPT_KEY  = 'auc_dev_attempts';
+    const MAX_ATTEMPTS = 3;
+    const LOCK_MS      = 5 * 60 * 1000;
+
+    const lockUntil = parseInt(localStorage.getItem(LOCK_KEY) || '0');
+    if(Date.now() < lockUntil){
+      const remain = Math.ceil((lockUntil - Date.now()) / 1000);
+      alert(`🔒 잠금 중 — ${Math.floor(remain/60)}분 ${remain%60}초 후 다시 시도하세요.`);
+      return;
+    }
+
+    const pw = await devAucPromptPw();
+    if(pw === null) return;
+
+    if(pw !== 'Tank@003412'){
+      const attempts = parseInt(localStorage.getItem(ATTEMPT_KEY) || '0') + 1;
+      localStorage.setItem(ATTEMPT_KEY, attempts);
+      if(attempts >= MAX_ATTEMPTS){
+        localStorage.setItem(LOCK_KEY, Date.now() + LOCK_MS);
+        localStorage.removeItem(ATTEMPT_KEY);
+        alert(`❌ 비밀번호 ${MAX_ATTEMPTS}회 오류 — 5분간 잠금됩니다.`);
+      } else {
+        alert(`❌ 비밀번호 오류 (${attempts}/${MAX_ATTEMPTS}회)`);
+      }
+      return;
+    }
+    localStorage.removeItem(ATTEMPT_KEY);
+    localStorage.removeItem(LOCK_KEY);
+  }
+
+  const btnId = role === 'admin' ? 'devAdminBtn' : 'devMemberBtn';
+  const btnEl = document.getElementById(btnId);
+  const origText = btnEl?.textContent || '';
+  const statusEl = document.getElementById('devTbStatus');
+
+  const email = role === 'admin' ? DEV_CREDS.admin.email : DEV_CREDS.member.email;
+  const pw    = window.prompt(`${email} 비밀번호 입력`);
+  if (!pw) return;
+
+  if(btnEl){ btnEl.textContent = '⏳ 로그인 중…'; btnEl.disabled = true; }
+  if(statusEl){ statusEl.textContent = '⏳ 로그인 중…'; statusEl.style.color = '#60a5fa'; }
+
+  try{
+    const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+    if(error){
+      if(statusEl){ statusEl.textContent = '❌ ' + error.message; statusEl.style.color = '#fca5a5'; }
+      setTimeout(() => devTbUpdateStatus(), 4000);
+    }
+  }catch(e){
+    if(statusEl){ statusEl.textContent = '❌ ' + e.message; statusEl.style.color = '#fca5a5'; }
+    setTimeout(() => devTbUpdateStatus(), 4000);
+  }finally{
+    if(btnEl){ btnEl.textContent = origText; btnEl.disabled = false; }
+  }
+}
+
+async function devTbLogout(){ await sb.auth.signOut(); }
+
+let _omanOpen = false;
+function toggleOman(){
+  _omanOpen = !_omanOpen;
+  const p = document.getElementById('omanPanel');
+  if(_omanOpen){ renderOman(); p.style.display = ''; }
+  else { p.style.display = 'none'; }
+}
+
+function renderOman(){
+  const HUB = 'https://worksfree.kr';
+  let dataAge = '데이터 없음', dataClass = 'warn';
+  let itemCount = `${ALL.length.toLocaleString()}건 (데모)`;
+  if(_dataInfo?.generated_at){
+    const hrs = Math.round((Date.now() - new Date(_dataInfo.generated_at)) / 36e5);
+    dataAge = hrs < 1 ? '방금' : hrs < 24 ? `${hrs}시간 전` : `${Math.floor(hrs/24)}일 전`;
+    dataClass = hrs < 48 ? 'ok' : 'warn';
+    const src = _dataInfo.total_available ? `Worker, 전체 ${_dataInfo.total_available.toLocaleString()}건 중` : '실데이터';
+    itemCount = `${_dataInfo.count.toLocaleString()}건 (${src})`;
+  }
+
+  // ── 크롤 상태 섹션 ──
+  let crawlHtml = '';
+  const cs = _crawlStatus;
+  if(cs){
+    const cls = cs.status==='done' ? 'ok' : cs.status==='crawling' ? 'active' : cs.status==='error' ? 'warn' : '';
+    const icon = cs.status==='crawling' ? '<span class="spin">🔄</span> ' : cs.status==='done' ? '✅ ' : cs.status==='error' ? '⚠️ ' : '';
+    const msg = cs.status==='crawling' ? `수집 중… (${cs.count||0}건)` :
+                cs.status==='done'     ? `완료 ${cs.count?.toLocaleString()}건 / 전체 ${cs.total_available?.toLocaleString()}건${cs.has_more?' (더 있음)':''}` :
+                cs.status==='error'    ? `오류: ${cs.error||''}` :
+                cs.status==='idle'     ? '대기 중' : cs.status;
+    const fin = cs.finished_at ? ` · ${new Date(cs.finished_at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}` : '';
+    crawlHtml = `<div class="crawl-st ${cls}">${icon}${msg}${fin}</div>`;
+  }
+
+  const isCrawling = cs?.status === 'crawling';
+  const hasMore    = cs?.status === 'done' && cs?.has_more;
+  const crawlLabel = hasMore ? '🔄 이어서 수집 (200건 추가)' : '🔄 수집 시작 (200건)';
+  const wUrl = WORKER_URL || '';
+  const wSec = localStorage.getItem('auc_proxy_secret') || '';
+
+  document.getElementById('omanBody').innerHTML = `
+    <div>
+      <div class="oman-row"><span class="oman-lbl">데이터 업데이트</span><span class="oman-val ${dataClass}">${dataAge}</span></div>
+      <div class="oman-row"><span class="oman-lbl">경매 물건 수</span><span class="oman-val">${itemCount}</span></div>
+      <div class="oman-row"><span class="oman-lbl">현재 표시</span><span class="oman-val">${filtered.length}건</span></div>
+      ${currentUser ? `<div class="oman-row"><span class="oman-lbl">로그인</span><span class="oman-val ok">${currentUser.email}</span></div>` : ''}
+    </div>
+    <div class="oman-sep"></div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:5px">🌐 Worker 데이터 수집 (테넌트: ${TENANT_ID})</div>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <input id="oWorkerUrl" class="oman-input" type="text" placeholder="https://xxx.workers.dev" value="${wUrl}">
+      <input id="oWorkerSec" class="oman-input" type="password" placeholder="X-Proxy-Secret (선택)" value="${wSec}">
+      <button class="oman-btn" style="font-size:10px;padding:4px 8px" onclick="saveWorkerConfig()">💾 저장</button>
+    </div>
+    ${crawlHtml}
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <button class="oman-btn primary" onclick="startCrawl()" ${!wUrl||isCrawling?'disabled':''}>
+        ${isCrawling?'<span class="spin">🔄</span> 수집 중…':crawlLabel}
+      </button>
+      ${_dataInfo ? `<button class="oman-btn" onclick="loadDataFromWorker()" ${!wUrl?'disabled':''}>📥 지도 새로고침</button>` : ''}
+      <button class="oman-btn danger" onclick="resetWorkerData()" ${!wUrl||isCrawling?'disabled':''}>🗑 데이터 초기화</button>
+    </div>
+    <div class="oman-sep"></div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:5px">📍 좌표 지오코딩 (50건/회, 카카오 keyword→address)</div>
+    ${_geoStatus ? `<div class="crawl-st ok" style="font-size:10px">커버 ${(_geoStatus.total_coverage||0).toLocaleString()}건 · 잔여 ${(_geoStatus.remaining||0).toLocaleString()}건</div>` : ''}
+    <button class="oman-btn" id="geoBtn" onclick="runGeocode(this,false)" ${!wUrl||_geoRunning?'disabled':''}>
+      ${_geoRunning?'<span class="spin">📍</span> 지오코딩 중…':'📍 지오코딩 50건 실행'}
+    </button>
+    <button class="oman-btn" id="geoForceBtn" onclick="runGeocode(this,true)" ${!wUrl||_geoRunning?'disabled':''} style="margin-top:5px;background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4)">
+      🔄 전체 재지오코딩 (오류 좌표 재처리)
+    </button>
+    <div class="oman-sep"></div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:4px">허브 관리 페이지</div>
+    <div class="oman-links">
+      <a class="oman-link" href="${HUB}" target="_blank">🏠 메인 허브 (worksfree.kr)</a>
+      <a class="oman-link" href="${HUB}/admin/monitor/index.html" target="_blank">📊 시스템 모니터</a>
+      <a class="oman-link" href="${HUB}/admin/users/index.html" target="_blank">👥 사용자 관리</a>
+      <a class="oman-link" href="${HUB}/admin/email-campaign/index.html" target="_blank">📧 이메일 캠페인</a>
+      <a class="oman-link" href="${HUB}/admin/recruit/index.html" target="_blank">👔 채용 관리</a>
+      <a class="oman-link" href="${HUB}/admin/permissions/index.html" target="_blank">🔐 페이지 권한</a>
+    </div>
+    ${IS_DEV ? `<div class="oman-sep"></div>
+    <div class="oman-row"><span class="oman-lbl">개발 모드</span><span class="oman-val ok">활성</span></div>` : ''}`;
+}
+
+/* ════════════════════════════════
+   i18n
+════════════════════════════════ */
+let lang = localStorage.getItem('aucLang') || 'ko';
+const T = {
+  ko:{
+    title:'경매지도',lbl_type:'물건 종류',lbl_region:'지역',lbl_fail:'유찰횟수',lbl_date:'입찰기일',
+    bt_apt:'아파트',bt_house:'단독/다가구',bt_com:'상가/업무',bt_land:'토지',bt_other:'기타',
+    sl_total:'전체 물건',sl_week:'이번주 입찰',sl_rate:'예측 낙찰가율',lbl_list:'물건 목록',
+    no_items:'조건에 맞는 물건이 없습니다',
+    d_basic:'기본 정보',d_price:'가격 비교',d_trade:'최근 실거래',d_trend:'지역 낙찰가율 추이',
+    lbl_court:'관할 법원',lbl_area:'전용면적',lbl_floor:'층수',lbl_year:'건축연도',
+    lbl_fail2:'유찰횟수',lbl_bid:'입찰기일',lbl_trade:'평균 매매가',lbl_app:'감정가',lbl_min:'최저입찰가',
+    pred_rate:'예측 낙찰가율',pred_note:'(지역 평균 기준 추정)',
+    fail_x:'회',floor_u:'층',
+    tr_date:'거래일',tr_area:'면적',tr_price:'거래금액',tr_floor:'층',
+    demo_note:'※ 데모 데이터입니다. 실제 입찰 전 반드시 법원경매정보 원문을 확인하세요.',
+    view_court:'법원경매 원문 보기',dday_today:'오늘',dday_end:'종료',dday_pre:'D-',
+    reg_all:'전체 지역',fail_all:'전체',fail_0:'신건 (0회)',fail_1:'1회 이상',fail_2:'2회 이상',fail_3:'3회 이상',
+    date_all:'전체',date_week:'이번 주',date_month:'이번 달',
+    trend_lbl:'낙찰가율 (%)',
+  },
+  en:{
+    title:'AuctionMap',lbl_type:'Property Type',lbl_region:'Region',lbl_fail:'Failed Bids',lbl_date:'Bid Date',
+    bt_apt:'Apartment',bt_house:'House',bt_com:'Commercial',bt_land:'Land',bt_other:'Other',
+    sl_total:'Total Listings',sl_week:'This Week',sl_rate:'Est. Sold Rate',lbl_list:'Listings',
+    no_items:'No listings match your filters',
+    d_basic:'Property Info',d_price:'Price Comparison',d_trade:'Recent Trades',d_trend:'Regional Sold Rate Trend',
+    lbl_court:'Court',lbl_area:'Floor Area',lbl_floor:'Floor',lbl_year:'Built Year',
+    lbl_fail2:'Failed Bids',lbl_bid:'Bid Date',lbl_trade:'Avg Trade Price',lbl_app:'Appraised',lbl_min:'Min Bid',
+    pred_rate:'Est. Sold Rate',pred_note:'(based on regional avg)',
+    fail_x:'x',floor_u:'F',
+    tr_date:'Date',tr_area:'Area',tr_price:'Price',tr_floor:'Fl.',
+    demo_note:'※ Demo data only. Always verify with the official court auction portal before bidding.',
+    view_court:'View Official Listing',dday_today:'Today',dday_end:'Ended',dday_pre:'D-',
+    reg_all:'All Regions',fail_all:'All',fail_0:'No fails',fail_1:'1+ fails',fail_2:'2+ fails',fail_3:'3+ fails',
+    date_all:'All',date_week:'This week',date_month:'This month',
+    trend_lbl:'Sold Rate (%)',
+  }
+};
+const t = k => T[lang][k] || T.ko[k] || k;
+
+function toggleLang(){
+  lang = lang==='ko'?'en':'ko';
+  localStorage.setItem('aucLang',lang);
+  document.getElementById('langBtn').textContent = lang==='ko'?'EN':'KO';
+  applyLangDOM();
+  renderList();
+  if(selItem) renderDetail(selItem);
+}
+function applyLangDOM(){
+  const ids={
+    'lbl-type':'lbl_type','lbl-region':'lbl_region','lbl-fail':'lbl_fail','lbl-date':'lbl_date',
+    'bt-apt':'bt_apt','bt-house':'bt_house','bt-com':'bt_com','bt-land':'bt_land','bt-other':'bt_other',
+    'sl-total':'sl_total','sl-week':'sl_week','sl-rate':'sl_rate','lbl-list':'lbl_list',
+  };
+  Object.entries(ids).forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.textContent=t(k);});
+  document.title = t('title')+' · 전국 경공매 정보';
+  // selects
+  const s1=document.getElementById('sidoF'); s1.options[0].text=t('reg_all');
+  const s2=document.getElementById('failF');
+  [t('fail_all'),t('fail_0'),t('fail_1'),t('fail_2'),t('fail_3')].forEach((tx,i)=>s2.options[i].text=tx);
+  const s3=document.getElementById('dateF');
+  [t('date_all'),t('date_week'),t('date_month')].forEach((tx,i)=>s3.options[i].text=tx);
+}
+
+/* ════════════════════════════════
+   SEEDED RANDOM (consistent demo data)
+════════════════════════════════ */
+let _s = 42;
+const sr  = ()=>{ _s=(_s*9301+49297)%233280; return _s/233280; };
+const srn = (a,b)=>a+sr()*(b-a);
+const sri = (a,b)=>Math.floor(srn(a,b+0.999));
+const spc = arr=>arr[sri(0,arr.length-1)];
+
+/* ════════════════════════════════
+   MOCK DATA
+════════════════════════════════ */
+const REGIONS=[
+  {id:'gangnam',  sido:'서울특별시',gu:'강남구',       lat:37.5172,lng:127.0473,pm:2.5,n:12},
+  {id:'seocho',   sido:'서울특별시',gu:'서초구',       lat:37.4837,lng:127.0324,pm:2.3,n:10},
+  {id:'mapo',     sido:'서울특별시',gu:'마포구',       lat:37.5663,lng:126.9010,pm:1.8,n:8},
+  {id:'songpa',   sido:'서울특별시',gu:'송파구',       lat:37.5145,lng:127.1059,pm:2.0,n:10},
+  {id:'nowon',    sido:'서울특별시',gu:'노원구',       lat:37.6542,lng:127.0568,pm:1.2,n:6},
+  {id:'gangseo',  sido:'서울특별시',gu:'강서구',       lat:37.5509,lng:126.8495,pm:1.4,n:7},
+  {id:'yongsan',  sido:'서울특별시',gu:'용산구',       lat:37.5320,lng:126.9903,pm:2.1,n:7},
+  {id:'dobong',   sido:'서울특별시',gu:'도봉구',       lat:37.6688,lng:127.0471,pm:1.0,n:5},
+  {id:'haeundae', sido:'부산광역시',gu:'해운대구',     lat:35.1631,lng:129.1636,pm:1.3,n:8},
+  {id:'suyeong',  sido:'부산광역시',gu:'수영구',       lat:35.1453,lng:129.1138,pm:1.1,n:5},
+  {id:'busanjin', sido:'부산광역시',gu:'부산진구',     lat:35.1634,lng:129.0533,pm:1.0,n:6},
+  {id:'namdong',  sido:'인천광역시',gu:'남동구',       lat:37.4470,lng:126.7315,pm:0.90,n:5},
+  {id:'bupyeong', sido:'인천광역시',gu:'부평구',       lat:37.5089,lng:126.7221,pm:0.85,n:4},
+  {id:'yeongtong',sido:'경기도',    gu:'수원시 영통구',lat:37.2730,lng:127.0431,pm:1.1,n:6},
+  {id:'bundang',  sido:'경기도',    gu:'성남시 분당구',lat:37.3596,lng:127.1089,pm:1.8,n:8},
+  {id:'ilsandong',sido:'경기도',    gu:'고양시 일산동구',lat:37.6761,lng:126.7805,pm:1.0,n:5},
+  {id:'giheung',  sido:'경기도',    gu:'용인시 기흥구',lat:37.2757,lng:127.1155,pm:1.3,n:6},
+  {id:'djseo',    sido:'대전광역시',gu:'서구',         lat:36.3554,lng:127.3830,pm:0.75,n:4},
+  {id:'yuseong',  sido:'대전광역시',gu:'유성구',       lat:36.3624,lng:127.3561,pm:0.80,n:4},
+  {id:'suseong',  sido:'대구광역시',gu:'수성구',       lat:35.8583,lng:128.6308,pm:0.85,n:5},
+  {id:'dalseo',   sido:'대구광역시',gu:'달서구',       lat:35.8298,lng:128.5328,pm:0.70,n:4},
+  {id:'gjseo',    sido:'광주광역시',gu:'서구',         lat:35.1519,lng:126.8902,pm:0.65,n:4},
+  {id:'jeju',     sido:'제주특별자치도',gu:'제주시',   lat:33.4996,lng:126.5312,pm:0.90,n:3},
+];
+const DONGS={
+  gangnam:['개포동','논현동','대치동','도곡동','삼성동','압구정동','역삼동','청담동'],
+  seocho: ['방배동','반포동','서초동','양재동','잠원동'],
+  mapo:   ['공덕동','망원동','상수동','서교동','합정동'],
+  songpa: ['가락동','잠실동','풍납동','문정동','방이동'],
+  nowon:  ['공릉동','상계동','월계동','중계동','하계동'],
+  gangseo:['가양동','내발산동','방화동','화곡동'],
+  yongsan:['이태원동','한남동','효창동','청파동'],
+  dobong: ['도봉동','방학동','창동','쌍문동'],
+  haeundae:['우동','중동','좌동','반여동'],
+  suyeong: ['광안동','남천동','민락동'],
+  busanjin:['부전동','연지동','전포동','초읍동'],
+  namdong: ['간석동','구월동','논현동','만수동'],
+  bupyeong:['부평동','산곡동','삼산동','십정동'],
+  yeongtong:['영통동','원천동','이의동','하동'],
+  bundang: ['구미동','금곡동','분당동','서현동','수내동','야탑동'],
+  ilsandong:['마두동','백석동','식사동','장항동'],
+  giheung: ['기흥동','보라동','신갈동','영덕동'],
+  djseo:   ['갈마동','둔산동','만년동','월평동'],
+  yuseong: ['관평동','노은동','봉명동','전민동'],
+  suseong: ['범어동','만촌동','수성동','황금동'],
+  dalseo:  ['본동','상인동','성당동','죽전동'],
+  gjseo:   ['농성동','동천동','치평동','화정동'],
+  jeju:    ['건입동','노형동','삼도동','연동'],
+};
+const COURTS={
+  '서울특별시':['서울중앙지방법원','서울남부지방법원','서울동부지방법원','서울서부지방법원','서울북부지방법원'],
+  '부산광역시':['부산지방법원'],
+  '인천광역시':['인천지방법원'],
+  '경기도':['수원지방법원','수원지방법원 성남지원','의정부지방법원'],
+  '대전광역시':['대전지방법원'],
+  '대구광역시':['대구지방법원'],
+  '광주광역시':['광주지방법원'],
+  '제주특별자치도':['제주지방법원'],
+};
+const TCFG={
+  apartment: {ko:'아파트',  en:'Apartment', color:'#3b82f6', base:9000000},
+  house:     {ko:'단독/다가구',en:'House',  color:'#10b981', base:5500000},
+  commercial:{ko:'상가/업무',en:'Commercial',color:'#f59e0b', base:7000000},
+  land:      {ko:'토지',    en:'Land',      color:'#8b5cf6', base:3000000},
+  other:     {ko:'기타',    en:'Other',     color:'#6366f1', base:5000000},
+};
+const TPOOL=['apartment','apartment','apartment','apartment','house','house','commercial','land'];
+
+/* ── 한반도 행정구역 기준 좌표 (좌표 불량 물건의 지도 표시용) ── */
+const SIDO_LL={
+  '서울특별시':[37.5665,126.9780],'부산광역시':[35.1796,129.0756],'대구광역시':[35.8714,128.6014],
+  '인천광역시':[37.4563,126.7052],'광주광역시':[35.1595,126.8526],'대전광역시':[36.3504,127.3845],
+  '울산광역시':[35.5384,129.3114],'세종특별자치시':[36.4801,127.2882],'경기도':[37.2636,127.0286],
+  '강원특별자치도':[37.8813,127.7300],'강원도':[37.8813,127.7300],'충청북도':[36.6357,127.4914],
+  '충청남도':[36.6013,126.6607],'전라북도':[35.8242,127.1479],'전북특별자치도':[35.8242,127.1479],
+  '전라남도':[34.8679,126.9910],'경상북도':[36.5760,128.5056],'경상남도':[35.2284,128.6811],
+  '제주특별자치도':[33.4996,126.5312],
+};
+const GU_LL={
+  // 서울 25구
+  '서울특별시_종로구':[37.5735,126.9790],'서울특별시_중구':[37.5641,126.9979],'서울특별시_용산구':[37.5384,126.9654],
+  '서울특별시_성동구':[37.5636,127.0369],'서울특별시_광진구':[37.5385,127.0824],'서울특별시_동대문구':[37.5744,127.0396],
+  '서울특별시_중랑구':[37.6065,127.0927],'서울특별시_성북구':[37.5894,127.0167],'서울특별시_강북구':[37.6396,127.0257],
+  '서울특별시_도봉구':[37.6688,127.0471],'서울특별시_노원구':[37.6543,127.0568],'서울특별시_은평구':[37.6027,126.9290],
+  '서울특별시_서대문구':[37.5791,126.9368],'서울특별시_마포구':[37.5638,126.9084],'서울특별시_양천구':[37.5169,126.8664],
+  '서울특별시_강서구':[37.5509,126.8496],'서울특별시_구로구':[37.4954,126.8874],'서울특별시_금천구':[37.4568,126.8953],
+  '서울특별시_영등포구':[37.5264,126.8963],'서울특별시_동작구':[37.5124,126.9393],'서울특별시_관악구':[37.4781,126.9514],
+  '서울특별시_서초구':[37.4836,127.0327],'서울특별시_강남구':[37.5172,127.0473],'서울특별시_송파구':[37.5145,127.1059],
+  '서울특별시_강동구':[37.5301,127.1238],
+  // 부산 16구군
+  '부산광역시_중구':[35.1059,129.0326],'부산광역시_서구':[35.0977,129.0249],'부산광역시_동구':[35.1359,129.0552],
+  '부산광역시_영도구':[35.0909,129.0698],'부산광역시_부산진구':[35.1629,129.0545],'부산광역시_동래구':[35.1987,129.0847],
+  '부산광역시_남구':[35.1363,129.0876],'부산광역시_북구':[35.1984,128.9903],'부산광역시_해운대구':[35.1630,129.1635],
+  '부산광역시_사하구':[35.1013,128.9748],'부산광역시_금정구':[35.2427,129.0918],'부산광역시_강서구':[35.2124,128.9834],
+  '부산광역시_연제구':[35.1763,129.0817],'부산광역시_수영구':[35.1453,129.1135],'부산광역시_사상구':[35.1479,128.9934],
+  '부산광역시_기장군':[35.2447,129.2232],
+  // 대구 8구군
+  '대구광역시_중구':[35.8699,128.6063],'대구광역시_동구':[35.8870,128.6354],'대구광역시_서구':[35.8723,128.5598],
+  '대구광역시_남구':[35.8460,128.5994],'대구광역시_북구':[35.8852,128.5834],'대구광역시_수성구':[35.8576,128.6308],
+  '대구광역시_달서구':[35.8299,128.5330],'대구광역시_달성군':[35.7749,128.4315],
+  // 인천 10구군
+  '인천광역시_중구':[37.4745,126.6217],'인천광역시_동구':[37.4748,126.6480],'인천광역시_미추홀구':[37.4487,126.6512],
+  '인천광역시_연수구':[37.4105,126.6780],'인천광역시_남동구':[37.4471,126.7311],'인천광역시_부평구':[37.4986,126.7232],
+  '인천광역시_계양구':[37.5374,126.7376],'인천광역시_서구':[37.5450,126.6762],'인천광역시_강화군':[37.7470,126.4878],
+  '인천광역시_옹진군':[37.4463,126.6300],
+  // 광주 5구
+  '광주광역시_동구':[35.1437,126.9232],'광주광역시_서구':[35.1514,126.8895],'광주광역시_남구':[35.1324,126.9027],
+  '광주광역시_북구':[35.1739,126.9122],'광주광역시_광산구':[35.1395,126.7934],
+  // 대전 5구
+  '대전광역시_동구':[36.3122,127.4541],'대전광역시_중구':[36.3254,127.4211],'대전광역시_서구':[36.3556,127.3832],
+  '대전광역시_유성구':[36.3623,127.3559],'대전광역시_대덕구':[36.3461,127.4150],
+  // 울산 5구군
+  '울산광역시_중구':[35.5695,129.3320],'울산광역시_남구':[35.5384,129.3114],'울산광역시_동구':[35.5051,129.4162],
+  '울산광역시_북구':[35.5828,129.3617],'울산광역시_울주군':[35.5222,129.1585],
+  // 경기도
+  '경기도_수원시':[37.2636,127.0286],'경기도_성남시':[37.4449,127.1388],'경기도_의정부시':[37.7381,127.0338],
+  '경기도_안양시':[37.3943,126.9568],'경기도_부천시':[37.5034,126.7660],'경기도_광명시':[37.4784,126.8646],
+  '경기도_평택시':[36.9920,127.1128],'경기도_동두천시':[37.9040,127.0609],'경기도_안산시':[37.3219,126.8309],
+  '경기도_고양시':[37.6584,126.8320],'경기도_과천시':[37.4292,126.9875],'경기도_구리시':[37.5943,127.1297],
+  '경기도_남양주시':[37.6358,127.2160],'경기도_오산시':[37.1496,127.0773],'경기도_시흥시':[37.3800,126.8033],
+  '경기도_군포시':[37.3614,126.9353],'경기도_의왕시':[37.3444,126.9681],'경기도_하남시':[37.5290,127.2150],
+  '경기도_용인시':[37.2411,127.1775],'경기도_파주시':[37.7597,126.7800],'경기도_이천시':[37.2722,127.4350],
+  '경기도_안성시':[37.0078,127.2798],'경기도_김포시':[37.6154,126.7155],'경기도_화성시':[37.1994,126.8317],
+  '경기도_광주시':[37.4295,127.2556],'경기도_양주시':[37.7852,127.0457],'경기도_포천시':[37.8946,127.2003],
+  '경기도_여주시':[37.2982,127.6375],'경기도_연천군':[38.0964,127.0750],'경기도_가평군':[37.8318,127.5100],
+  '경기도_양평군':[37.4915,127.4874],
+  // 강원
+  '강원특별자치도_춘천시':[37.8813,127.7300],'강원특별자치도_원주시':[37.3422,127.9202],'강원특별자치도_강릉시':[37.7519,128.8761],
+  '강원특별자치도_동해시':[37.5243,129.1201],'강원특별자치도_태백시':[37.1641,128.9855],'강원특별자치도_속초시':[38.2070,128.5918],
+  '강원특별자치도_삼척시':[37.4498,129.1658],'강원특별자치도_홍천군':[37.6960,127.8882],'강원특별자치도_횡성군':[37.4916,127.9842],
+  '강원특별자치도_영월군':[37.1837,128.4615],'강원특별자치도_평창군':[37.3703,128.3904],'강원특별자치도_정선군':[37.3798,128.6604],
+  '강원특별자치도_철원군':[38.1461,127.3132],'강원특별자치도_화천군':[38.1066,127.7063],'강원특별자치도_양구군':[38.1101,127.9894],
+  '강원특별자치도_인제군':[38.0699,128.1696],'강원특별자치도_고성군':[38.3773,128.4682],'강원특별자치도_양양군':[38.0761,128.6178],
+  '강원도_춘천시':[37.8813,127.7300],'강원도_원주시':[37.3422,127.9202],'강원도_강릉시':[37.7519,128.8761],
+  '강원도_동해시':[37.5243,129.1201],'강원도_속초시':[38.2070,128.5918],'강원도_삼척시':[37.4498,129.1658],
+  // 충북
+  '충청북도_청주시':[36.6357,127.4914],'충청북도_충주시':[36.9910,127.9259],'충청북도_제천시':[37.1329,128.1916],
+  '충청북도_보은군':[36.4895,127.7297],'충청북도_옥천군':[36.3063,127.5707],'충청북도_영동군':[36.1750,127.7836],
+  '충청북도_증평군':[36.7853,127.5814],'충청북도_진천군':[36.8557,127.4367],'충청북도_괴산군':[36.8155,127.7868],
+  '충청북도_음성군':[36.9400,127.6909],'충청북도_단양군':[36.9849,128.3652],
+  // 충남
+  '충청남도_천안시':[36.8151,127.1139],'충청남도_공주시':[36.4465,127.1192],'충청남도_보령시':[36.3333,126.6128],
+  '충청남도_아산시':[36.7899,127.0025],'충청남도_서산시':[36.7846,126.4503],'충청남도_논산시':[36.1873,127.0987],
+  '충청남도_계룡시':[36.2752,127.2490],'충청남도_당진시':[36.8897,126.6478],'충청남도_금산군':[36.1092,127.4882],
+  '충청남도_부여군':[36.2752,126.9099],'충청남도_서천군':[36.0806,126.6913],'충청남도_청양군':[36.4596,126.8024],
+  '충청남도_홍성군':[36.6013,126.6607],'충청남도_예산군':[36.6837,126.8460],'충청남도_태안군':[36.7453,126.2977],
+  // 전북
+  '전북특별자치도_전주시':[35.8242,127.1479],'전북특별자치도_군산시':[35.9675,126.7363],'전북특별자치도_익산시':[35.9483,126.9577],
+  '전북특별자치도_정읍시':[35.5700,126.8558],'전북특별자치도_남원시':[35.4164,127.3900],'전북특별자치도_김제시':[35.8033,126.8810],
+  '전북특별자치도_완주군':[35.9069,127.1601],'전북특별자치도_진안군':[35.7924,127.4257],'전북특별자치도_무주군':[35.9046,127.6609],
+  '전북특별자치도_장수군':[35.6474,127.5212],'전북특별자치도_임실군':[35.6177,127.2893],'전북특별자치도_순창군':[35.3744,127.1374],
+  '전북특별자치도_고창군':[35.4359,126.7019],'전북특별자치도_부안군':[35.7303,126.7334],
+  '전라북도_전주시':[35.8242,127.1479],'전라북도_군산시':[35.9675,126.7363],'전라북도_익산시':[35.9483,126.9577],
+  '전라북도_정읍시':[35.5700,126.8558],'전라북도_남원시':[35.4164,127.3900],'전라북도_김제시':[35.8033,126.8810],
+  '전라북도_완주군':[35.9069,127.1601],
+  // 전남
+  '전라남도_목포시':[34.8118,126.3922],'전라남도_여수시':[34.7604,127.6622],'전라남도_순천시':[34.9506,127.4871],
+  '전라남도_나주시':[35.0160,126.7109],'전라남도_광양시':[34.9406,127.6962],'전라남도_담양군':[35.3214,126.9878],
+  '전라남도_곡성군':[35.2822,127.2914],'전라남도_구례군':[35.2027,127.4626],'전라남도_고흥군':[34.6067,127.2771],
+  '전라남도_보성군':[34.7713,127.0800],'전라남도_화순군':[34.9642,127.0067],'전라남도_장흥군':[34.6821,126.9073],
+  '전라남도_강진군':[34.6433,126.7676],'전라남도_해남군':[34.5736,126.5994],'전라남도_영암군':[34.8008,126.6970],
+  '전라남도_무안군':[34.9906,126.4816],'전라남도_함평군':[35.0653,126.5177],'전라남도_영광군':[35.2774,126.5120],
+  '전라남도_장성군':[35.3018,126.7892],'전라남도_완도군':[34.3109,126.7549],'전라남도_진도군':[34.4875,126.2641],
+  '전라남도_신안군':[34.8298,126.1072],
+  // 경북
+  '경상북도_포항시':[36.0190,129.3435],'경상북도_경주시':[35.8562,129.2247],'경상북도_김천시':[36.1397,128.1135],
+  '경상북도_안동시':[36.5684,128.7294],'경상북도_구미시':[36.1196,128.3444],'경상북도_영주시':[36.8058,128.6239],
+  '경상북도_영천시':[35.9733,128.9385],'경상북도_상주시':[36.4109,128.1590],'경상북도_문경시':[36.5864,128.1860],
+  '경상북도_경산시':[35.8254,128.7414],'경상북도_군위군':[36.2415,128.5710],'경상북도_의성군':[36.3526,128.6973],
+  '경상북도_청송군':[36.4359,129.0571],'경상북도_영양군':[36.6672,129.1121],'경상북도_영덕군':[36.4153,129.3651],
+  '경상북도_청도군':[35.6474,128.7358],'경상북도_고령군':[35.7280,128.2631],'경상북도_성주군':[35.9192,128.2832],
+  '경상북도_칠곡군':[35.9956,128.4016],'경상북도_예천군':[36.6524,128.4933],'경상북도_봉화군':[36.8933,128.7323],
+  '경상북도_울진군':[36.9929,129.4003],'경상북도_울릉군':[37.4848,130.9057],
+  // 경남
+  '경상남도_창원시':[35.2284,128.6811],'경상남도_진주시':[35.1800,128.1076],'경상남도_통영시':[34.8544,128.4334],
+  '경상남도_사천시':[35.0032,128.0643],'경상남도_김해시':[35.2283,128.8890],'경상남도_밀양시':[35.5036,128.7460],
+  '경상남도_거제시':[34.8806,128.6212],'경상남도_양산시':[35.3350,129.0376],'경상남도_의령군':[35.3225,128.2629],
+  '경상남도_함안군':[35.2730,128.4066],'경상남도_창녕군':[35.5443,128.4924],'경상남도_고성군':[34.9731,128.3224],
+  '경상남도_남해군':[34.8378,127.8925],'경상남도_하동군':[35.0670,127.7512],'경상남도_산청군':[35.4143,127.8726],
+  '경상남도_함양군':[35.5201,127.7253],'경상남도_거창군':[35.6868,127.9096],'경상남도_합천군':[35.5664,128.1659],
+  // 제주
+  '제주특별자치도_제주시':[33.4996,126.5312],'제주특별자치도_서귀포시':[33.2530,126.5599],
+};
+
+function genItems(){
+  const items=[]; let id=1001;
+  const today=new Date(); today.setHours(0,0,0,0);
+  for(const r of REGIONS){
+    const dongs=DONGS[r.id]||['동'];
+    const courts=COURTS[r.sido]||['지방법원'];
+    for(let i=0;i<r.n;i++){
+      const type=spc(TPOOL);
+      const isLand=type==='land';
+      const area=isLand?srn(100,600):srn(40,155);
+      const ppm=TCFG[type].base*r.pm*srn(0.82,1.18);
+      const app=Math.round(ppm*area/1000000)*1000000;
+      const fc=sri(0,3);
+      const minP=Math.round(app*Math.pow(0.8,fc)/500000)*500000;
+      const avgT=Math.round(app*srn(1.05,1.30)/500000)*500000;
+      const bd=new Date(today); bd.setDate(bd.getDate()+sri(1,60));
+      const dong=spc(dongs);
+      const court=spc(courts);
+      const caseN=String(sri(1000,99999)).padStart(5,'0');
+      const floor=isLand?null:sri(1,type==='apartment'?30:5);
+      const yr=isLand?null:sri(1990,2022);
+      const baseRate=0.85-fc*0.07+(r.pm-1)*0.05;
+      const pred=Math.round(Math.max(0.55,Math.min(0.95,baseRate+srn(-0.05,0.05)))*100);
+      items.push({
+        id:id++, case_number:`2025타경${caseN}`, court, type,
+        sido:r.sido, gu:r.gu, dong,
+        address:`${r.sido} ${r.gu} ${dong} ${sri(1,999)}-${sri(1,99)}`,
+        lat:r.lat+srn(-0.017,0.017), lng:r.lng+srn(-0.017,0.017),
+        area:Math.round(area*10)/10,
+        app, minP, avgT, fc,
+        bid_date:bd.toISOString().split('T')[0],
+        floor, yr, pred, rid:r.id,
+      });
+    }
+  }
+  return items;
+}
+const ALL=genItems();
+const DEMO_DATA=[...ALL]; // 예시 데이터 스냅샷 (로그아웃 시 복원용)
+
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+let filtered=[...ALL], selItem=null, map=null, cluster=null, detChart=null;
+const activeTypes=new Set(['apartment','house','commercial','land','other']);
+
+/* ════════════════════════════════
+   HELPERS
+════════════════════════════════ */
+function fmtP(w){
+  if(w>=100000000){
+    const e=Math.floor(w/100000000), m=Math.round((w%100000000)/10000);
+    return m>0?`${e}억 ${m.toLocaleString()}만`:`${e}억`;
+  }
+  return `${Math.round(w/10000).toLocaleString()}만`;
+}
+function fmtA(m2){if(!m2||isNaN(m2))return '<span style="color:var(--muted);font-size:11px">면적 미제공</span>';return `${m2}㎡ (${(m2*0.3025).toFixed(1)}평)`;}
+function dday(ds){
+  const d=Math.round((new Date(ds)-new Date('2026-07-03'))/(864e5));
+  if(d===0)return{tx:t('dday_today'),c:'urg'};
+  if(d<0)return{tx:t('dday_end'),c:'norm'};
+  if(d<=3)return{tx:`${t('dday_pre')}${d}`,c:'urg'};
+  if(d<=7)return{tx:`${t('dday_pre')}${d}`,c:'soon'};
+  return{tx:`${t('dday_pre')}${d}`,c:'norm'};
+}
+function badge(type){
+  const lb=lang==='ko'?TCFG[type].ko:TCFG[type].en;
+  return `<span class="tbadge tb-${type}">${lb}</span>`;
+}
+
+/* ════════════════════════════════
+   MAP
+════════════════════════════════ */
+function initMap(){
+  map=L.map('map',{zoomControl:false}).setView([36.5,127.8],7);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap contributors',
+    maxZoom:19,
+  }).addTo(map);
+  L.control.zoom({position:'bottomright'}).addTo(map);
+  cluster=L.markerClusterGroup({
+    maxClusterRadius: 40,
+    spiderfyOnMaxZoom: false,   // 달팽이 spiderfy 비활성화
+    chunkedLoading: true,       // 대량 마커 청크 분할 로딩 (성능)
+    zoomToBoundsOnClick: false, // 커스텀 핸들러로 제어
+    iconCreateFunction:cl=>{
+      const n=cl.getChildCount();
+      const sz=n>200?52:n>50?44:n>20?38:32;
+      return L.divIcon({
+        html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:rgba(59,130,246,.78);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:${sz>44?14:12}px;border:2px solid rgba(255,255,255,.4);box-shadow:0 3px 12px rgba(0,0,0,.6);">${n}</div>`,
+        className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],
+      });
+    },
+  });
+  cluster.on('clusterclick', function(e){
+    const cl=e.layer;
+    const count=cl.getChildCount();
+    // 30건 이하: 해당 항목을 목록 패널에 표시 (확대 대신)
+    if(count<=30){
+      const items=cl.getAllChildMarkers().map(m=>m._auctionItem).filter(Boolean);
+      if(items.length) showClusterItems(items, count);
+      return;
+    }
+    // 대규모 클러스터: 단계적 확대
+    const cz=map.getZoom();
+    const bounds=cl.getBounds();
+    const sw=bounds.getSouthWest(), ne=bounds.getNorthEast();
+    if(Math.abs(ne.lat-sw.lat)+Math.abs(ne.lng-sw.lng)<0.0005) return;
+    const padded=bounds.pad(0.25);
+    const bz=map.getBoundsZoom(padded);
+    const tz=Math.min(Math.max(cz+2, bz-1), 15);
+    map.flyToBounds(padded,{maxZoom:tz,padding:[70,70],duration:0.4});
+  });
+  map.addLayer(cluster);
+  // 첫 마커 렌더는 onAuthStateChange → applyFilter() 에서 처리 (데모 플래시 방지)
+}
+
+function markerIcon(type, isApprox){
+  const c=(TCFG[type]||TCFG.other).color;
+  // 근사 좌표(행정구역 기준): 반투명 + 점선 테두리로 구분
+  const style=isApprox
+    ?`width:11px;height:11px;border-radius:50%;background:${c};opacity:0.55;border:2px dashed rgba(255,255,255,.8);box-shadow:0 1px 4px rgba(0,0,0,.4);`
+    :`width:13px;height:13px;border-radius:50%;background:${c};border:2.5px solid rgba(255,255,255,.9);box-shadow:0 2px 6px rgba(0,0,0,.55);`;
+  return L.divIcon({
+    html:`<div style="${style}"></div>`,
+    className:'',iconSize:[13,13],iconAnchor:[6.5,6.5],
+  });
+}
+
+// GPS 좌표 품질 검사: 소수점 ≥2자리 + 한반도 범위 (33-39°N, 124.5-131°E)
+function goodCoord(lat, lng){
+  if(lat==null||lng==null)return false;
+  if(lat<33.0||lat>38.9||lng<124.5||lng>131.0)return false;
+  const ls=lat.toString(), rs=lng.toString();
+  const ld=ls.includes('.')?ls.split('.')[1].length:0;
+  const rd=rs.includes('.')?rs.split('.')[1].length:0;
+  return ld>=2&&rd>=2;
+}
+
+// 주소 기반 행정구역 좌표 조회 (GPS 불량 시 대체)
+function adminCoord(item){
+  const sido=item.sido||'', gu=item.gu||'';
+  // 시군구 풀네임 또는 첫 토큰 시도
+  const full=`${sido}_${gu}`;
+  if(GU_LL[full])return GU_LL[full];
+  const short=`${sido}_${gu.split(' ')[0]}`;
+  if(GU_LL[short])return GU_LL[short];
+  return SIDO_LL[sido]||null;
+}
+
+// 결정론적 지터 (동일 행정구역 내 항목 분산 — 최대 radius도 단위)
+function applyJitter(lat0, lng0, seed, radius){
+  let h=0; const s=String(seed);
+  for(let i=0;i<s.length;i++) h=((h<<5)-h+s.charCodeAt(i))|0;
+  const angle=((h&0xffff)/65536)*Math.PI*2;
+  const r=radius*Math.sqrt(((h>>>16)&0xffff)/65536);
+  return[lat0+r*Math.sin(angle), lng0+r*Math.cos(angle)/Math.cos(lat0*Math.PI/180)];
+}
+
+const _markerLookup = {}; // item.id → L.marker (목록 클릭 시 cluster.zoomToShowLayer 용)
+
+function rebuildMarkers(items){
+  cluster.clearLayers();
+  // 기존 lookup 초기화
+  Object.keys(_markerLookup).forEach(k => delete _markerLookup[k]);
+  const markers=[];
+  items.forEach(item=>{
+    let lat, lng, isApprox=false;
+    if(goodCoord(item.lat,item.lng)){
+      lat=item.lat; lng=item.lng;
+    } else {
+      const ac=adminCoord(item);
+      if(!ac)return;
+      [lat,lng]=applyJitter(ac[0],ac[1],item.case_number||item.id,0.015);
+      isApprox=true;
+    }
+    item._renderedLat=lat; item._renderedLng=lng; // 목록 클릭 시 setView 전달용
+    const m=L.marker([lat,lng],{icon:markerIcon(item.type,isApprox)});
+    m._auctionItem=item;
+    m.on('click',()=>selectItem(item,lat,lng));
+    _markerLookup[String(item.id)] = m;
+    markers.push(m);
+  });
+  cluster.addLayers(markers);     // 배치 추가 — 개별 addLayer 루프보다 훨씬 빠름
+}
+
+/* ════════════════════════════════
+   FILTER
+════════════════════════════════ */
+function toggleType(type){
+  if(activeTypes.has(type)){
+    if(activeTypes.size===1)return;
+    activeTypes.delete(type);
+  }else{
+    activeTypes.add(type);
+  }
+  document.querySelector(`.type-btn[data-t="${type}"]`).classList.toggle('on',activeTypes.has(type));
+  applyFilter();
+}
+
+function applyFilter(){
+  const sido=document.getElementById('sidoF').value;
+  const failMin=document.getElementById('failF').value;
+  const dateR=document.getElementById('dateF').value;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const wkEnd=new Date(today); wkEnd.setDate(today.getDate()+7);
+  const moEnd=new Date(today.getFullYear(),today.getMonth()+1,0);
+
+  filtered=ALL.filter(it=>{
+    if(!activeTypes.has(it.type))return false;
+    if(sido){
+      const sidoMatch = it.sido === sido
+        || (sido === '강원특별자치도' && it.sido === '강원도')
+        || (sido === '전북특별자치도' && (it.sido === '전라북도' || it.sido === '전북도'));
+      if(!sidoMatch)return false;
+    }
+    if(failMin!=='' && it.fc<parseInt(failMin))return false;
+    if(dateR==='week'){const d=new Date(it.bid_date);if(d<today||d>wkEnd)return false;}
+    if(dateR==='month'){const d=new Date(it.bid_date);if(d<today||d>moEnd)return false;}
+    if(showMyList && !bookmarkedIds.has(it.case_number))return false;
+    return true;
+  });
+
+  rebuildMarkers(filtered);
+  renderList();
+  updateStats();
+  if(selItem && !filtered.find(i=>i.id===selItem.id)) closeDetail();
+}
+
+/* ════════════════════════════════
+   STATS
+════════════════════════════════ */
+function updateStats(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const wkEnd=new Date(today); wkEnd.setDate(today.getDate()+7);
+  const wk=filtered.filter(i=>{const d=new Date(i.bid_date);return d>=today&&d<=wkEnd;});
+  const avgR=filtered.length?Math.round(filtered.reduce((s,i)=>s+i.pred,0)/filtered.length):0;
+  document.getElementById('sv-total').textContent=filtered.length.toLocaleString();
+  document.getElementById('sv-week').textContent=wk.length;
+  document.getElementById('sv-rate').textContent=avgR?`${avgR}%`:'-';
+  if(!_clusterMode) document.getElementById('list-cnt').textContent=`${filtered.length}건`;
+}
+
+/* ════════════════════════════════
+   ITEM LIST
+════════════════════════════════ */
+function renderList(){
+  const el=document.getElementById('itemList');
+  if(!filtered.length){
+    el.innerHTML=`<div class="empty"><div class="ei">🔍</div>${t('no_items')}</div>`;
+    return;
+  }
+  // 클러스터 모드: 입찰일 순 / 일반 모드: 지도 중심 근접순
+  let sorted;
+  if(_clusterMode){
+    sorted=[...filtered].sort((a,b)=>new Date(a.bid_date)-new Date(b.bid_date));
+  } else {
+    const c=map.getCenter();
+    sorted=[...filtered].sort((a,b)=>{
+      const aLat=a._renderedLat??null, aLng=a._renderedLng??null;
+      const bLat=b._renderedLat??null, bLng=b._renderedLng??null;
+      if(aLat==null) return 1;
+      if(bLat==null) return -1;
+      const da=(aLat-c.lat)**2+(aLng-c.lng)**2;
+      const db=(bLat-c.lat)**2+(bLng-c.lng)**2;
+      return da-db;
+    });
+  }
+  el.innerHTML=sorted.map(it=>{
+    const dd=dday(it.bid_date);
+    const failLbl=it.fc>0?`유찰 ${it.fc}${t('fail_x')}`:'';
+    const isOn=selItem?.id===it.id;
+    const isBm = bookmarkedIds.has(it.case_number);
+    return `<div class="icard${isOn?' on':''}" data-id="${it.id}" onclick="selectById('${it.id}')">
+      <div class="i-top">
+        ${badge(it.type)}
+        <span class="i-addr">${it.gu} ${it.dong}</span>
+        <span class="dday ${dd.c}">${dd.tx}</span>
+        <button class="bm-btn ${isBm?'on':'off'}" aria-label="${isBm?'북마크 해제':'북마크 추가'}" title="${isBm?'북마크 해제':'북마크'}"
+          onclick="toggleBookmark(ALL.find(x=>x.id===${it.id}),event)">${isBm?'★':'☆'}</button>
+      </div>
+      <div class="i-prices">
+        <div class="pi"><span class="pl">${t('lbl_app')}</span><span class="pv ap">${fmtP(it.app)}</span></div>
+        <div class="pi"><span class="pl">${t('lbl_min')}</span><span class="pv mn">${fmtP(it.minP)}</span></div>
+        ${failLbl?`<span class="fail-b">${failLbl}</span>`:'<span style="flex:1"></span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectById(id){
+  const item=ALL.find(i=>String(i.id)===String(id));
+  if(item)selectItem(item, item._renderedLat, item._renderedLng);
+}
+
+/* ── 클러스터 목록 표시 모드 ── */
+let _clusterMode=false;
+
+/* ── 샘플 데이터 토글 ── */
+let _demoOverride=false, _realDataCache=null;
+function toggleDemoMode(el){
+  _demoOverride=el.checked;
+  if(_demoOverride){
+    if(ALL.length && ALL[0]?.is_real) _realDataCache=[...ALL];
+    ALL.length=0; DEMO_DATA.forEach(it=>ALL.push(it));
+  } else {
+    if(_realDataCache?.length){ ALL.length=0; _realDataCache.forEach(it=>ALL.push(it)); _realDataCache=null; }
+    else if(_dataInfo){ /* 실데이터 유지 */ }
+  }
+  applyFilter();
+}
+function showClusterItems(items, count){
+  _clusterMode=true;
+  filtered=items;
+  renderList();
+  // 헤더에 "클러스터 N건 | 전체보기" 표시
+  const cnt=document.getElementById('list-cnt');
+  if(cnt) cnt.innerHTML=`<span style="color:var(--accent)">${count}건</span>
+    <button onclick="exitClusterMode()" style="margin-left:6px;padding:1px 7px;font-size:11px;
+    border:1px solid var(--accent);border-radius:10px;background:transparent;
+    color:var(--accent);cursor:pointer">전체목록</button>`;
+  openListPanel();
+}
+function exitClusterMode(){
+  _clusterMode=false;
+  applyFilter(); // 원래 필터로 복원
+}
+
+/* ════════════════════════════════
+   DETAIL
+════════════════════════════════ */
+function selectItem(item, _mapLat, _mapLng){
+  selItem = item;
+  selItem._mapLat = _mapLat ?? null;
+  selItem._mapLng = _mapLng ?? null;
+  document.querySelectorAll('.icard').forEach(el => el.classList.toggle('on', el.dataset.id === String(item.id)));
+  try { renderDetail(item); } catch(e) { console.error('renderDetail:', e); }
+  if(!_listPanelOpen) openListPanel();
+  openDetailPanel();
+  const card = document.querySelector(`.icard[data-id="${item.id}"]`);
+  if(card) card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function closeDetail(){ closeDetailPanel(); }
+
+function renderDetail(item){
+  if(detChart){detChart.destroy();detChart=null;}
+  const dd=dday(item.bid_date);
+  const mx=Math.max(item.avgT||0,item.app||0,item.minP||0)||1;
+  const trRatio=(item.avgT/mx*100).toFixed(0);
+  const appRatio=(item.app/mx*100).toFixed(0);
+  const minRatio=(item.minP/mx*100).toFixed(0);
+  const trades=item.is_real ? [] : mockTrades(item);
+  const rateColor=item.pred<70?'var(--success)':item.pred<85?'var(--accent)':'var(--warn)';
+  const bidColor=dd.c==='urg'?'var(--danger)':dd.c==='soon'?'var(--warn)':'var(--text)';
+
+  document.getElementById('detailInner').innerHTML=`
+    <div class="d-hdr">
+      <div style="flex:1">
+        ${badge(item.type)}
+        <div class="d-addr" style="margin-top:5px">${item.address}</div>
+        <div class="d-case">${item.case_number} · ${item.court}${item.is_real?'':'<span class="demo-tag">DEMO</span>'}</div>
+      </div>
+      <button class="bm-btn ${bookmarkedIds.has(item.case_number)?'on':'off'}"
+        style="font-size:20px;align-self:flex-start;padding:4px;"
+        onclick="toggleBookmark(selItem,event)"
+        aria-label="${bookmarkedIds.has(item.case_number)?'북마크 해제':'북마크 추가'}"
+        title="${bookmarkedIds.has(item.case_number)?'북마크 해제':'북마크 추가'}"
+        >${bookmarkedIds.has(item.case_number)?'★':'☆'}</button>
+      <button class="d-close" onclick="closeDetail()" aria-label="상세 패널 닫기" title="닫기">✕</button>
+    </div>
+    <div class="d-body">
+      <div>
+        <div class="sec-title">${t('d_basic')}</div>
+        <div class="info-grid">
+          <div class="info-i"><div class="info-l">${t('lbl_area')}</div><div class="info-v" style="font-size:12px">${fmtA(item.area)}</div></div>
+          ${item.floor?`<div class="info-i"><div class="info-l">${t('lbl_floor')}</div><div class="info-v">${item.floor}${t('floor_u')}</div></div>`:''}
+          ${item.yr?`<div class="info-i"><div class="info-l">${t('lbl_year')}</div><div class="info-v">${item.yr}년</div></div>`:''}
+          <div class="info-i"><div class="info-l">${t('lbl_bid')}</div><div class="info-v" style="font-size:12px;color:${bidColor}">${item.bid_date} (${dd.tx})</div></div>
+          <div class="info-i"><div class="info-l">${t('lbl_fail2')}</div><div class="info-v">${item.fc}${t('fail_x')}</div></div>
+          <div class="info-i"><div class="info-l">${t('lbl_court')}</div><div class="info-v" style="font-size:11px">${item.court}</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title">${t('d_price')}</div>
+        <div class="pbar-wrap">
+          <div class="pbar-row">
+            <div class="pbar-info"><span class="pbar-name">${t('lbl_trade')}</span><span style="font-weight:600;color:var(--success)">${fmtP(item.avgT)}</span></div>
+            <div class="pbar-track"><div class="pbar-fill" style="width:${trRatio}%;background:var(--success)"></div></div>
+          </div>
+          <div class="pbar-row">
+            <div class="pbar-info"><span class="pbar-name">${t('lbl_app')}</span><span style="font-weight:600;color:var(--text)">${fmtP(item.app)}</span></div>
+            <div class="pbar-track"><div class="pbar-fill" style="width:${appRatio}%;background:var(--muted)"></div></div>
+          </div>
+          <div class="pbar-row">
+            <div class="pbar-info"><span class="pbar-name">${t('lbl_min')}</span><span style="font-weight:600;color:var(--accent)">${fmtP(item.minP)}</span></div>
+            <div class="pbar-track"><div class="pbar-fill" style="width:${minRatio}%;background:var(--accent)"></div></div>
+          </div>
+        </div>
+        <div class="rate-box">
+          <div><div style="font-size:11px;color:var(--muted)">${t('pred_rate')}</div><div class="rate-sub">${t('pred_note')}</div></div>
+          <div style="text-align:right"><div class="rate-v" style="color:${rateColor}">${item.pred}%</div><div class="rate-sub">감정가 기준</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title">${t('d_trend')}</div>
+        <div class="chart-w"><canvas id="detChart"></canvas></div>
+      </div>
+      <div>
+        <div class="sec-title">${t('d_trade')}</div>
+        <table class="trade-tbl">
+          <thead><tr><th>${t('tr_date')}</th><th>${t('tr_area')}</th><th>${t('tr_floor')}</th><th style="text-align:right">${t('tr_price')}</th></tr></thead>
+          <tbody>${item.is_real
+            ? '<tr><td colspan="4" style="text-align:center;color:var(--muted);font-size:12px;padding:14px 0">실거래 데이터 준비 중</td></tr>'
+            : trades.map(tr=>`<tr>
+            <td>${tr.date}</td><td>${tr.area}㎡</td>
+            <td>${tr.fl?(tr.fl+(lang==='ko'?'층':'F')):'-'}</td>
+            <td style="text-align:right;font-weight:600;color:var(--accent)">${fmtP(tr.price)}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div>
+        ${currentUser && bookmarkedIds.has(item.case_number) ? `
+        <div class="sec-title">메모</div>
+        <textarea class="note-area" id="noteArea" placeholder="개인 메모를 입력하세요..."
+          onblur="saveNote(selItem, this.value)">${''}</textarea>
+        ` : ''}
+        ${!item.is_real ? `<div class="demo-note">${t('demo_note')}</div>` : ''}
+        ${item.case_number
+          ? `<button class="court-btn" data-case="${item.case_number.replace(/"/g,'')}" onclick="openCourtPage(this.dataset.case)">🔗 ${t('view_court')}</button>`
+          : `<button class="court-btn" disabled>🔗 ${t('view_court')}</button>`}
+      </div>
+    </div>`;
+
+  // 메모 로드 (북마크된 경우)
+  if(currentUser && bookmarkedIds.has(item.case_number)){
+    sb.from('auction_bookmarks')
+      .select('note')
+      .eq('user_id',currentUser.id)
+      .eq('case_number',item.case_number)
+      .single()
+      .then(({data})=>{
+        const el=document.getElementById('noteArea');
+        if(el&&data?.note)el.value=data.note;
+      });
+  }
+  setTimeout(()=>{
+    const ctx=document.getElementById('detChart');
+    if(!ctx)return;
+    const months=lang==='ko'
+      ?['2월','3월','4월','5월','6월','7월']
+      :['Feb','Mar','Apr','May','Jun','Jul'];
+    const rates=mockRates(item.pred, item.id);
+    detChart=new Chart(ctx,{
+      type:'line',
+      data:{
+        labels:months,
+        datasets:[{
+          label:t('trend_lbl'),data:rates,
+          borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.15)',
+          borderWidth:2,pointRadius:4,pointBackgroundColor:'#3b82f6',fill:true,tension:0.35,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            backgroundColor:'#1c2333',borderColor:'#2a3347',borderWidth:1,
+            titleColor:'#e2e8f0',bodyColor:'#94a3b8',
+            callbacks:{label:c=>`${c.parsed.y}%`},
+          }
+        },
+        scales:{
+          x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(42,51,71,.5)'}},
+          y:{min:50,max:100,ticks:{color:'#64748b',font:{size:10},callback:v=>`${v}%`},grid:{color:'rgba(42,51,71,.5)'}},
+        }
+      }
+    });
+  },80);
+}
+
+function _idNum(id){ let h=0,s=String(id); for(let i=0;i<s.length;i++) h=((h<<5)-h+s.charCodeAt(i))|0; return Math.abs(h)||1; }
+
+function mockTrades(item){
+  let ls=_idNum(item.id)*7+13;
+  const lr=()=>{ls=(ls*9301+49297)%233280;return ls/233280;};
+  const lri=(a,b)=>Math.floor(a+lr()*(b-a+1));
+  const rows=[];
+  const base=new Date('2026-07-03');
+  for(let i=0;i<5;i++){
+    const d=new Date(base); d.setDate(d.getDate()-lri(5,170));
+    const baseArea = item.area || 85;
+    rows.push({
+      date:d.toISOString().split('T')[0].slice(2).replace(/-/g,'.'),
+      area:Math.round((baseArea+lr()*20-10)*10)/10,
+      fl:item.floor?lri(1,Math.max(item.floor,15)):null,
+      price:Math.round(item.avgT*(0.9+lr()*0.2)/500000)*500000,
+    });
+  }
+  return rows.sort((a,b)=>b.date.localeCompare(a.date));
+}
+
+function mockRates(current, id){
+  let ls=_idNum(id)*3+77;
+  const lr=()=>{ls=(ls*9301+49297)%233280;return ls/233280;};
+  const rates=[];
+  let r=current+(lr()*10-5);
+  for(let i=0;i<6;i++){rates.push(Math.round(Math.max(52,Math.min(97,r))));r+=lr()*8-4;}
+  rates[5]=current;
+  return rates;
+}
+
+/* ════════════════════════════════
+   REAL DATA LOADER
+════════════════════════════════ */
+function _applyRealData(json, source){
+  _dataInfo = { generated_at: json.generated_at, count: json.count, total_available: json.total_available };
+  ALL.length = 0;
+  // 사건번호(id) 기준 dedup — Worker 배치 내 중복 + KV 누적 중복 모두 제거
+  const seen = new Set();
+  json.items.forEach(it => {
+    const key = it.id || it.case_number;
+    if(!key || seen.has(key)) return;
+    seen.add(key);
+    ALL.push(it);
+  });
+  // dedup 후 실제 고유 건수로 갱신
+  _dataInfo.count = ALL.length;
+  document.querySelectorAll('.demo-tag').forEach(el => el.remove());
+  const note = document.querySelector('.demo-note');
+  if(note) note.textContent = `실데이터 ${ALL.length.toLocaleString()}건 (${source}) · ${(json.generated_at||'').slice(0,16)}`;
+  // 수집 현황 표시 (관리자 전용 footer)
+  if(isAdmin() && json.total_available){
+    const pct = Math.round(ALL.length / json.total_available * 100);
+    const el = document.getElementById('sbCollectCnt');
+    if(el) el.textContent = `${ALL.length.toLocaleString()} / ${json.total_available.toLocaleString()}건 (${pct}%)`;
+    document.getElementById('sbCollectInfo')?.removeAttribute('style');
+  }
+}
+
+/* 지오코딩 오버레이 로드 — Worker KV 우선, NAS 파일 fallback */
+let _geoStatus = null; // { coverage, remaining } 마지막 지오코딩 현황
+async function applyGeoOverlay(){
+  try{
+    let overlay = null;
+    // 1) Worker KV 조회 (최신 데이터)
+    if(WORKER_URL){
+      try{
+        const wr = await fetch(`${WORKER_URL}/geocode-data?tenant=${TENANT_ID}`, { cache:'no-store' });
+        if(wr.ok){ const d = await wr.json(); if(Object.keys(d).length) overlay = d; }
+      }catch(_){}
+    }
+    // 2) Worker 실패 시 NAS 정적 파일 fallback
+    if(!overlay){
+      try{
+        const nr = await fetch('/data/geocode.json', { cache:'force-cache' });
+        if(nr.ok) overlay = await nr.json();
+      }catch(_){}
+    }
+    if(!overlay) return 0;
+    let merged = 0;
+    ALL.forEach(item => {
+      if(item.is_real && overlay[item.case_number]){
+        const o = overlay[item.case_number];
+        item.lat = o.lat; item.lng = o.lng;
+        merged++;
+      }
+    });
+    if(merged > 0){
+      console.log(`[geo] 오버레이 ${merged}건 좌표 적용`);
+      rebuildMarkers(filtered);
+    }
+    return merged;
+  }catch(e){ return 0; }
+}
+
+/* 지오코딩 배치 실행 (관리자 패널 버튼) */
+let _geoRunning = false;
+async function runGeocode(btn, force=false){
+  if(_geoRunning || !WORKER_URL) return;
+  if(force && !confirm('기존 지오코딩 데이터를 모두 재처리합니다. 계속하시겠습니까?')) return;
+  _geoRunning = true;
+  const origText = btn?.textContent;
+  if(btn){ btn.disabled = true; btn.textContent = '📍 지오코딩 중…'; }
+  const geoForceBtn = document.getElementById('geoForceBtn');
+  if(geoForceBtn) geoForceBtn.disabled = true;
+  try{
+    const forceParam = force ? '&force=1' : '';
+    const resp = await fetch(`${WORKER_URL}/geocode?tenant=${TENANT_ID}&max=50${forceParam}`, { method:'POST' });
+    if(!resp.ok){ alert('지오코딩 실패: ' + resp.status); return; }
+    const d = await resp.json();
+    _geoStatus = d;
+    renderAdminPanel();
+    // 결과 반영: 좌표 업데이트 후 지도 재생성
+    if(d.success > 0) applyGeoOverlay();
+  }catch(e){ alert('오류: ' + e.message); }
+  finally{
+    _geoRunning = false;
+    if(btn){ btn.disabled = false; btn.textContent = origText || '📍 지오코딩 50건 실행'; }
+    if(geoForceBtn) geoForceBtn.disabled = false;
+  }
+}
+
+async function loadDataFromWorker(){
+  if(!WORKER_URL) return false;
+  try{
+    const resp = await fetch(`${WORKER_URL}/data?tenant=${TENANT_ID}`, { cache:'no-store' });
+    if(!resp.ok) return false;
+    const json = await resp.json();
+    if(!json.items || !json.items.length) return false;
+    _applyRealData(json, 'Worker');
+    applyFilter();
+    // 지오코딩 오버레이 비동기 로드 (지도 표시에 영향 없이 백그라운드 보완)
+    applyGeoOverlay();
+    return true;
+  }catch(e){ return false; }
+}
+
+async function checkCrawlStatus(){
+  if(!WORKER_URL) return null;
+  try{
+    const resp = await fetch(`${WORKER_URL}/status?tenant=${TENANT_ID}`, { cache:'no-store' });
+    if(!resp.ok) return null;
+    return await resp.json();
+  }catch(e){ return null; }
+}
+
+async function startCrawl(){
+  const wUrl = document.getElementById('oWorkerUrl')?.value.trim().replace(/\/$/, '') || WORKER_URL;
+  const wSec = document.getElementById('oWorkerSec')?.value.trim() || localStorage.getItem('auc_proxy_secret') || '';
+  if(!wUrl){ alert('Worker URL을 먼저 입력하고 저장하세요.'); return; }
+  saveWorkerConfig();
+
+  const headers = { 'Content-Type':'application/json' };
+  if(wSec) headers['X-Proxy-Secret'] = wSec;
+
+  let resp;
+  try{ resp = await fetch(`${WORKER_URL}/crawl?tenant=${TENANT_ID}&max=200`, { method:'POST', headers }); }
+  catch(e){ alert('Worker 연결 실패: ' + e.message); return; }
+
+  if(resp.status === 401){ alert('인증 실패 — X-Proxy-Secret을 확인하세요.'); return; }
+  const data = await resp.json();
+  if(data.status === 'crawling'){ alert('이미 수집 중입니다. 잠시 후 다시 확인하세요.'); return; }
+
+  _crawlStatus = { status:'crawling', started_at: new Date().toISOString() };
+  _showCrawlProgress('수집 시작됨…');
+  _startPollCrawlStatus();
+}
+
+function _startPollCrawlStatus(){
+  if(_crawlPollTimer) clearInterval(_crawlPollTimer);
+  _crawlPollTimer = setInterval(async () => {
+    const st = await checkCrawlStatus();
+    if(!st) return;
+    _crawlStatus = st;
+    if(st.status === 'crawling'){
+      _showCrawlProgress(`${(st.count||0).toLocaleString()}건 수집 중…`);
+    } else if(st.status === 'done'){
+      clearInterval(_crawlPollTimer); _crawlPollTimer = null;
+      await loadDataFromWorker();
+      _hideCrawlProgress(null, true);
+    } else if(st.status === 'error'){
+      clearInterval(_crawlPollTimer); _crawlPollTimer = null;
+      _hideCrawlProgress('오류');
+    }
+  }, 3000);
+}
+
+async function resetWorkerData(){
+  if(!WORKER_URL){ alert('Worker URL이 설정되지 않았습니다.'); return; }
+  if(!confirm('Worker에 저장된 경매 데이터를 초기화합니다.\n다음 수집 시 처음부터 시작합니다.\n계속하시겠습니까?')) return;
+  const wSec = localStorage.getItem('auc_proxy_secret') || '';
+  const headers = { 'Content-Type':'application/json' };
+  if(wSec) headers['X-Proxy-Secret'] = wSec;
+  try{
+    const resp = await fetch(`${WORKER_URL}/reset?tenant=${TENANT_ID}`, { method:'POST', headers });
+    if(resp.ok){ _crawlStatus = null; }
+    else alert('초기화 실패: ' + resp.status);
+  }catch(e){ alert('Worker 연결 실패: ' + e.message); }
+}
+
+function saveWorkerConfig(){
+  const urlEl = document.getElementById('oWorkerUrl');
+  const secEl = document.getElementById('oWorkerSec');
+  if(urlEl){ WORKER_URL = urlEl.value.trim().replace(/\/$/, ''); localStorage.setItem('auc_worker_url', WORKER_URL); }
+  if(secEl){ localStorage.setItem('auc_proxy_secret', secEl.value.trim()); }
+}
+
+async function tryLoadRealData(){
+  // Worker 우선 시도
+  if(WORKER_URL){
+    const ok = await loadDataFromWorker();
+    if(ok) return true;
+  }
+  // 로컬 파일 fallback
+  try{
+    const resp = await fetch('data/auctions.json?_='+Date.now());
+    if(!resp.ok) return false;
+    const json = await resp.json();
+    if(!json.items || !json.items.length) return false;
+    _applyRealData(json, 'NAS');
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
+window.addEventListener('DOMContentLoaded',async()=>{
+  initMap();
+  document.getElementById('demo-overlay')?.classList.add('show');
+  updateAdminUI();
+  filtered=[...ALL];
+  // 목록/통계는 onAuthStateChange → applyFilter() 에서 처음 렌더 (142 데모 플래시 방지)
+  document.getElementById('sv-total').textContent='...';
+  document.getElementById('sv-week').textContent='...';
+  document.getElementById('sv-rate').textContent='...';
+  document.getElementById('list-cnt').textContent='';
+  document.getElementById('itemList').innerHTML='<div class="empty"><div class="ei" style="font-size:28px">⏳</div>데이터 준비 중…</div>';
+  applyLangDOM();
+  document.getElementById('langBtn').textContent=lang==='ko'?'EN':'KO';
+  // Worker 크롤 상태 확인 (진행 중이면 프로그레스바 + 폴링 재시작)
+  if(WORKER_URL){
+    const st = await checkCrawlStatus();
+    if(st){
+      _crawlStatus = st;
+      if(st.status==='crawling'){
+        _showCrawlProgress(`${(st.count||0).toLocaleString()}건 수집 중…`);
+        _startPollCrawlStatus();
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
