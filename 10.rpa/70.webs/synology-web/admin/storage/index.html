@@ -272,12 +272,14 @@ let currentUser = null;
   if (window !== window.top) {
     document.getElementById('admin-gate').style.display = 'none';
     document.getElementById('main').classList.add('visible');
+    await _injectSession();
     init(); return;
   }
   const bypass = location.hostname==='localhost'||location.hostname==='127.0.0.1';
   if (bypass) {
     document.getElementById('admin-gate').style.display = 'none';
     document.getElementById('main').classList.add('visible');
+    await _injectSession();
     init(); return;
   }
   try {
