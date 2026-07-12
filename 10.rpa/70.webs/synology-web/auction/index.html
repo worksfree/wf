@@ -448,8 +448,18 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
   <div class="sb-footer" id="sbFooter">
     v<span id="sbVer">0.7.0.1</span> · WorksFree 2026
     <span id="sbCollectInfo" style="display:none"> · 수집 <span id="sbCollectCnt"></span></span>
+    <button id="omanBtn" onclick="toggleOman()" title="관리자 패널" style="display:none;margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 2px;line-height:1;">⚙️</button>
   </div>
 </aside>
+
+<!-- O&M 관리자 패널 -->
+<div id="omanPanel">
+  <div class="oman-hdr">
+    <span>⚙️ 관리자 패널</span>
+    <button class="oman-close" onclick="toggleOman()">✕</button>
+  </div>
+  <div class="oman-body" id="omanBody"></div>
+</div>
 
 <div class="map-wrap"><div id="map"></div></div>
 
@@ -846,7 +856,7 @@ function toggleMyList() {
 /* ════════════════════════════════
    ADMIN / DEV MODE
 ════════════════════════════════ */
-const AUC_VER = '0.7.4.15';
+const AUC_VER = '0.7.4.16';
 const ADMIN_EMAILS = ['insung.lee@worksfree.co.kr'];
 const IS_DEV = new URLSearchParams(location.search).get('dev') === '1'
             || localStorage.getItem('auc_dev') === '1';
@@ -861,6 +871,8 @@ function isAdmin(){ return !!(currentUser && ADMIN_EMAILS.includes(currentUser.e
 function updateAdminUI(){
   const uBtn = document.getElementById('updateBtn');
   if(uBtn) uBtn.style.display = isAdmin() ? 'block' : 'none';
+  const oBtn = document.getElementById('omanBtn');
+  if(oBtn) oBtn.style.display = isAdmin() ? 'inline-block' : 'none';
   if(IS_DEV) document.getElementById('devToolbar')?.classList.add('show');
   const myTab = document.getElementById('myListTab');
   if(myTab) myTab.style.display = currentUser ? 'inline-block' : 'none';
