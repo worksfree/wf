@@ -293,21 +293,22 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .demo-stop-btn:hover{opacity:.85;}
 
 .demo-callout{
-  position:fixed;left:50%;transform:translateX(-50%);
-  bottom:78px;z-index:899;
+  position:fixed;left:0;top:0;z-index:899;
+  cursor:grab;user-select:none;
   background:linear-gradient(135deg,rgba(10,17,30,.97),rgba(18,28,52,.97));
   border:1px solid rgba(99,102,241,.5);
   border-radius:18px;padding:20px 26px 17px;
   box-shadow:0 16px 56px rgba(0,0,0,.75),0 0 80px rgba(99,102,241,.14);
   min-width:310px;max-width:400px;text-align:center;
-  pointer-events:none;display:none;
+  display:none;
 }
+.demo-callout.dragging{cursor:grabbing;}
 .demo-callout.dc-in {animation:dcIn .42s cubic-bezier(.34,1.56,.64,1) forwards;}
 .demo-callout.dc-out{animation:dcOut .28s ease-in forwards;}
-@keyframes dcIn  {from{opacity:0;transform:translateX(-50%) translateY(14px) scale(.94)}
-                  to  {opacity:1;transform:translateX(-50%) translateY(0)    scale(1)}}
-@keyframes dcOut {from{opacity:1;transform:translateX(-50%) translateY(0)}
-                  to  {opacity:0;transform:translateX(-50%) translateY(-8px)}}
+@keyframes dcIn  {from{opacity:0;transform:translateY(14px) scale(.94)}
+                  to  {opacity:1;transform:none}}
+@keyframes dcOut {from{opacity:1;transform:none}
+                  to  {opacity:0;transform:translateY(-8px)}}
 .demo-callout-icon {font-size:34px;line-height:1;margin-bottom:10px;}
 .demo-callout-title{font-size:17px;font-weight:800;color:#e2e8f0;line-height:1.35;white-space:pre-line;letter-spacing:-.3px;margin-bottom:6px;}
 .demo-callout-sub  {font-size:12px;color:#94a3b8;line-height:1.55;}
@@ -1342,6 +1343,50 @@ const DEMO = {
     },
   ],
 
+  _posKey() { return 'taco_v2_demo_pos'; },
+  _savePos(el) {
+    localStorage.setItem(this._posKey(), JSON.stringify({ left: el.style.left, top: el.style.top }));
+  },
+  _loadPos(el) {
+    const raw = localStorage.getItem(this._posKey());
+    if (!raw) return false;
+    try {
+      const { left, top } = JSON.parse(raw);
+      if (left && top) { el.style.left = left; el.style.top = top; return true; }
+    } catch {}
+    return false;
+  },
+  _centerPos(el) {
+    const w = el.offsetWidth  || 360;
+    const h = el.offsetHeight || 200;
+    el.style.left = Math.round((window.innerWidth  - w) / 2) + 'px';
+    el.style.top  = Math.round((window.innerHeight - h) / 2) + 'px';
+  },
+  _initDrag(el) {
+    let ox = 0, oy = 0, sx = 0, sy = 0, dragging = false;
+    el.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      dragging = true;
+      sx = e.clientX; sy = e.clientY;
+      ox = parseInt(el.style.left) || 0;
+      oy = parseInt(el.style.top)  || 0;
+      el.classList.add('dragging');
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const nx = ox + (e.clientX - sx);
+      const ny = oy + (e.clientY - sy);
+      el.style.left = Math.max(0, Math.min(nx, window.innerWidth  - (el.offsetWidth  || 360))) + 'px';
+      el.style.top  = Math.max(0, Math.min(ny, window.innerHeight - (el.offsetHeight || 200))) + 'px';
+    });
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging');
+      this._savePos(el);
+    });
+  },
   start() {
     this.active = true;
     this.step   = 0;
@@ -1387,7 +1432,11 @@ const DEMO = {
       '<div class="demo-callout-title" id="demoTitle"></div>' +
       '<div class="demo-callout-sub" id="demoSub"></div>' +
       '<div class="demo-callout-bar"><div class="demo-callout-fill" id="demoFill"></div></div>';
+    calloutEl.style.visibility = 'hidden'; calloutEl.style.display = 'block';
     document.body.appendChild(calloutEl);
+    if (!this._loadPos(calloutEl)) this._centerPos(calloutEl);
+    calloutEl.style.display = 'none'; calloutEl.style.visibility = '';
+    this._initDrag(calloutEl);
 
     // Pill
     const pillEl  = document.createElement('div');
@@ -1432,6 +1481,7 @@ const DEMO = {
     if (callout) {
       callout.classList.remove('dc-in', 'dc-out');
       callout.style.display = 'block';
+      if (!callout.style.left) this._centerPos(callout);
       void callout.offsetWidth;                       // reflow
       callout.classList.add('dc-in');
       document.getElementById('demoIcon').textContent  = s.icon;
