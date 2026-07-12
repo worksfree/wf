@@ -296,6 +296,35 @@ location ~* \.(js|css|png|jpg|svg|ico|woff2?)$ {
 
 > **레이어 1·2로 대부분의 케이스는 커버된다. 레이어 3은 안전망(defense in depth).**
 
+#### 레이어 3-B — auction.worksfree.kr 전용 (포트 기반 포털, SSH 1회 설정)
+
+`auction.worksfree.kr`은 DSM 웹 스테이션에서 **포트 기반** 포털(포트 9001)로 구성돼 있어 DSM UI에 "사용자 nginx 설정" 탭이 없다. 대신 아래 경로에 직접 파일을 만들어야 한다.
+
+```bash
+# SSH 접속 후 1회 실행
+sudo mkdir -p /usr/local/etc/nginx/conf.d/832f75cf-5eb3-4e86-8754-2d03c520ec3c
+
+sudo tee /usr/local/etc/nginx/conf.d/832f75cf-5eb3-4e86-8754-2d03c520ec3c/user.conf << 'EOF'
+location ~* \.html$ {
+    add_header Cache-Control "no-cache, no-store, must-revalidate";
+    add_header Pragma "no-cache";
+    add_header Expires "0";
+}
+location ~* \.(js|css|png|jpg|svg|ico|woff2?)$ {
+    expires 7d;
+    add_header Cache-Control "public";
+}
+add_header X-Content-Type-Options "nosniff";
+EOF
+
+sudo nginx -s reload
+```
+
+- nginx 설정 파일 위치: `/usr/local/etc/nginx/conf.d/832f75cf-5eb3-4e86-8754-2d03c520ec3c/user.conf`
+- 서비스 UUID는 `832f75cf-5eb3-4e86-8754-2d03c520ec3c` (포털 UUID: `77c28213-3462-4e07-8566-1cb2ffb20318`)
+- `nginx-auction.conf` 참조 파일이 로컬에 있으며, `deploy.ps1 -Target 8` 실행 시 sudo 권한 있으면 자동 업데이트됨
+- DSM을 재설정(Web Station 포털 삭제 후 재생성)하면 UUID가 바뀔 수 있으므로 재확인 필요
+
 ## 버전 규칙 (웹 전용)
 
 버전 형식: `MAJOR.MINOR.PATCH.BUILD` (예: `0.7.4.12`)
