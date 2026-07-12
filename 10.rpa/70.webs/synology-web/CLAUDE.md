@@ -835,6 +835,22 @@ async function init() {
 - `admin/permissions/index.html`에서 테마 선택 UI 제공 (테마 추가 시 양쪽 동기화 필수)
 - 현재 테마: `claude` (기본), `sunset`
 
+### 5. 배포 시 필수 절차 (누락 시 버전 추적 불가)
+
+NAS scp 배포 전에 반드시 아래 순서를 따른다:
+
+1. **버전 증가** — `deploy.ps1`의 `$VERSION`과 `index.html`의 `HUB_VERSION`을 동일하게 올린다.
+   - test 배포 → BUILD(4번째) 증가: `0.8.7.13` → `0.8.7.14`
+   - staging 배포 → PATCH(3번째) 증가, BUILD 리셋
+   - portal 배포 → MINOR(2번째) 증가, PATCH·BUILD 리셋
+
+2. **git commit** — 변경된 파일 전체를 스테이징하고 커밋한다. scp 배포만 하고 커밋하지 않으면 미커밋 상태로 쌓여 나중에 덮어써짐.
+
+3. **scp 배포** — 커밋 후 배포.
+
+> `deploy.ps1`을 사용하면 버전 증가·index.html 동기화·scp·캐시 퍼지가 자동으로 처리된다.  
+> 개별 파일만 빠르게 배포할 때도 위 1·2번은 수동으로 반드시 처리한다.
+
 ---
 
 ## 구축가이드 문서 하드링크 규칙
