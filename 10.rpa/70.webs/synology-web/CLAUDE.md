@@ -791,22 +791,40 @@ iframe에 postMessage를 보낼 때 신규 코드에서는 `'*'` 대신 `locatio
 
 ## 반복 버그 방지 규칙 (재발 방지 — 필수)
 
+### 0. Supabase REST API 직접 fetch 필수 헤더
+
+SDK(`sb.storage`, `sb.from()`)를 우회해 `fetch()`로 Supabase API를 직접 호출할 때는 **두 헤더가 모두 필수**다.
+
+```javascript
+headers: {
+  'Authorization': 'Bearer ' + jwt,   // 사용자 JWT
+  'apikey': SUPABASE_ANON,            // ← 필수! SDK는 자동 추가하지만 직접 fetch는 수동 추가 필요
+  'Content-Type': '...',
+}
+```
+
+`apikey` 누락 시 Supabase 게이트웨이가 400을 반환한다.
+
 ### 1. iframe 어드민 게이트 패턴 (반복 버그)
 
 **문제**: Hub가 어드민 페이지를 `<iframe>`으로 로드할 때, `window !== window.top` 분기에서 UI만 보여주고 데이터 로드(`init()` / `loadData()` / `boot()`)를 호출하지 않아 빈 화면이 표시됨. 새로고침 버튼을 누를 때만 데이터가 나타남.
 
-**필수 패턴**: iframe 분기에는 반드시 데이터 로드 함수를 함께 호출해야 한다.
+**필수 패턴**: iframe 분기에는 반드시 세션 주입 후 데이터 로드를 함께 호출해야 한다.
 
 ```javascript
-// ✅ 올바른 패턴
+// ✅ 올바른 패턴 (_noopStore 사용 페이지: users, monitor, permissions 등)
 async function init() {
-  if (window !== window.top) { show('app'); await loadData(); return; }
+  if (window !== window.top) { show('app'); await _injectSession(); await loadData(); return; }
   // ... 인증 체크 ...
 }
 
-// ❌ 잘못된 패턴 (데이터 로드 없음)
+// ❌ 잘못된 패턴 1 (데이터 로드 없음)
 async function init() {
   if (window !== window.top) { show('app'); return; }
+}
+// ❌ 잘못된 패턴 2 (세션 주입 없이 로드 → 모의 세션 모드 표시)
+async function init() {
+  if (window !== window.top) { show('app'); await loadData(); return; }
 }
 ```
 
