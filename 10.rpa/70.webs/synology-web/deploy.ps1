@@ -25,7 +25,7 @@ $fromBat = try {
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
 $VERSION  = "0.8.7.27"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
-$AUC_VER  = "0.7.4.20"            # 경매지도 버전 (auction 배포 시 4번째↑)
+$AUC_VER  = "0.7.4.21"            # 경매지도 버전 (auction 배포 시 4번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -413,6 +413,28 @@ if ($ok) {
     }
     if ($verifyResult -match 'WARN:') {
         Write-Host "  ⚠️  .claude 폴더가 NAS에 남아있습니다. 수동으로 삭제하세요." -ForegroundColor Yellow
+    }
+
+    # ── nginx-auction.conf 자동 push + reload (auction 전용) ────────
+    if ($deployKey -eq "8") {
+        $nginxConfLocal = Join-Path $PSScriptRoot "nginx-auction.conf"
+        if (Test-Path $nginxConfLocal) {
+            Write-Host ""
+            Write-Host "  ▶ nginx-auction.conf NAS 적용 중..." -ForegroundColor Blue
+            $nginxPosixDir = '/' + $LOCAL_PATH.Substring(0,1).ToLower() + ($LOCAL_PATH.Substring(2) -replace '\\','/')
+            $nginxCmd = "set -o pipefail; cd '$nginxPosixDir' && tar -czf - nginx-auction.conf | " +
+                        "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} " +
+                        "'tar -xzf - -C /volume1/web/auction/ --no-same-permissions --no-same-owner 2>&1; " +
+                        "nginx -s reload 2>/dev/null || true; echo NGINX_EXIT:`$?'"
+            $nginxResult    = & $gitBash -c $nginxCmd 2>&1
+            $nginxResultStr = ($nginxResult -join "`n")
+            if ($nginxResultStr -match 'NGINX_EXIT:[012]') {
+                Write-Host "    OK nginx 캐시 설정 적용 완료" -ForegroundColor Green
+            } else {
+                Write-Host "    INFO nginx reload 불필요 — DSM 웹 스테이션에서 수동 적용 필요" -ForegroundColor DarkGray
+                Write-Host "         auction.worksfree.kr 가상호스트 → 사용자 nginx 설정 → nginx-auction.conf 내용 붙여넣기" -ForegroundColor DarkGray
+            }
+        }
     }
 
     # ── geocode.json 자동 업로드 (auction 전용) ───────────────────
