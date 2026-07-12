@@ -215,9 +215,46 @@ ALTER TABLE public.storage_files ADD COLUMN IF NOT EXISTS backend text DEFAULT '
 <script>
 const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const _noopStore = { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} };
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth:{ autoRefreshToken:true, persistSession:true }
+  auth:{ persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storage:_noopStore }
 });
+
+// Hub localStorage에서 JWT를 직접 읽음 (SDK 세션 의존 없이 안정적)
+function _getJWT() {
+  try {
+    let raw = null;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
+        const v = localStorage.getItem(k);
+        if (v && v.includes('"access_token"')) { raw = v; break; }
+      }
+    }
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    const exp = stored?.expires_at ?? 0;
+    if (exp && (Date.now() / 1000) > exp) return null;
+    return stored?.access_token || null;
+  } catch { return null; }
+}
+
+async function _injectSession() {
+  const jwt = _getJWT();
+  if (!jwt) return null;
+  try {
+    const raw = localStorage.getItem((() => {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) return k;
+      }
+      return '';
+    })());
+    const stored = JSON.parse(raw || '{}');
+    await sb.auth.setSession({ access_token: jwt, refresh_token: stored?.refresh_token || '' });
+    return { user: stored.user, access_token: jwt };
+  } catch { return null; }
+}
 
 const NAS_BASE   = '/nas-uploads/';
 const UPLOAD_PHP = '/admin/api/upload.php';
@@ -244,10 +281,14 @@ let currentUser = null;
     init(); return;
   }
   try {
-    const { data:{ session } } = await sb.auth.getSession();
+    const session = await _injectSession();
     if (session) {
-      const { data:p } = await sb.from('profiles').select('role').eq('id',session.user.id).single();
-      if (p?.role==='admin') {
+      const r = await fetch(
+        `${SUPABASE_URL}/rest/v1/profiles?id=eq.${session.user.id}&select=role&limit=1`,
+        { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` } }
+      );
+      const rows = r.ok ? await r.json() : [];
+      if (rows[0]?.role === 'admin') {
         currentUser = session.user;
         document.getElementById('admin-gate').style.display = 'none';
         document.getElementById('main').classList.add('visible');
@@ -592,10 +633,10 @@ async function uploadFiles(fileList) {
 
       if (storageBackend === 'supabase') {
         // ── Supabase Storage 업로드 (SDK 우회 — fetch 직접 호출) ──
-        // SDK v2 최신이 FormData 방식으로 바뀌어 서버가 Invalid key 반환하는 버그 회피
         const sbPath = (currentFolder || 'root') + '/' + file.name;
-        const jwt = session?.access_token;
-        if (!jwt) throw new Error('Supabase 세션 없음 — 다시 로그인하세요');
+        const jwt = _getJWT();
+        if (!jwt) throw new Error('Supabase 세션 없음 — 허브에서 관리자로 로그인 후 재시도하세요');
+        console.log('[storage] uploading:', `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${sbPath}`);
         bar.style.width='30%'; pct.textContent='30%';
         const upRes = await fetch(
           `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${sbPath}`,
@@ -607,7 +648,8 @@ async function uploadFiles(fileList) {
             body: file }
         );
         const upJson = await upRes.json().catch(()=>({}));
-        if (!upRes.ok) throw new Error(`[${upJson.statusCode||upRes.status}] ${upJson.message||'업로드 실패'}`);
+        console.log('[storage] response:', upRes.status, JSON.stringify(upJson));
+        if (!upRes.ok) throw new Error(`[${upRes.status}] ${upJson.message || upJson.error || JSON.stringify(upJson)}`);
 
         bar.style.width='80%'; pct.textContent='80%';
         status.textContent = 'DB 저장';

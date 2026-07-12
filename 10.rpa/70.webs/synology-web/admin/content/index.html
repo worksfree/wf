@@ -94,6 +94,7 @@ thead th.sort-active .sort-icon{color:var(--blue);opacity:1}
 .env-staging{background:#1e2a3b;color:#60a5fa;border:1px solid #3b82f640}
 .env-test{background:#2a2208;color:#fbbf24;border:1px solid #f59e0b40}
 .env-dev{background:#1e1e2e;color:var(--muted);border:1px solid var(--border)}
+.env-consulting{background:#1e1a3b;color:#a78bfa;border:1px solid #7c3aed40}
 
 /* ── Toast ── */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
@@ -116,6 +117,18 @@ thead th.sort-active .sort-icon{color:var(--blue);opacity:1}
 .screen{display:flex;align-items:center;justify-content:center;min-height:300px}
 .denied-box{text-align:center}.denied-icon{font-size:44px;margin-bottom:12px}
 .dev-note{font-size:12px;color:var(--yellow);padding:10px 14px;background:#2a2208;border-radius:8px;border:1px solid #78350f;margin-bottom:12px}
+
+/* ── 테마 카드 ── */
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:20px}
+.theme-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .2s,transform .1s;position:relative}
+.theme-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+.theme-card.active{border-color:var(--blue)}
+.theme-card-active-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;padding:2px 7px;border-radius:8px;opacity:0}
+.theme-card.active .theme-card-active-badge{opacity:1}
+.theme-swatches{display:flex;gap:6px;margin-bottom:10px}
+.theme-swatch{width:32px;height:32px;border-radius:6px;border:1px solid rgba(255,255,255,.1)}
+.theme-name{font-size:14px;font-weight:600;margin-bottom:4px}
+.theme-desc{font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -132,6 +145,7 @@ thead th.sort-active .sort-icon{color:var(--blue);opacity:1}
   <button class="tab-btn active" data-tab="stats"  onclick="switchTab('stats')">📊 페이지 통계</button>
   <button class="tab-btn"        data-tab="email"  onclick="switchTab('email')">📧 이메일 발송</button>
   <button class="tab-btn"        data-tab="unsub"  onclick="switchTab('unsub')">🚫 수신거부</button>
+  <button class="tab-btn"        data-tab="theme"  onclick="switchTab('theme')">🎨 테마</button>
 </nav>
 
 <div id="loading" class="screen"><span style="color:var(--muted)">데이터 로딩 중…</span></div>
@@ -356,6 +370,20 @@ thead th.sort-active .sort-icon{color:var(--blue);opacity:1}
 
   </div><!-- /tab-unsub -->
 
+  <!-- ══ TAB 4: 테마 ══ -->
+  <div id="tab-theme" class="tab-panel page">
+    <div class="section-title">허브 테마 선택</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.7">
+      선택한 테마는 허브 사이드바·헤더와 모든 관리 페이지에 공통 적용됩니다.<br>
+      변경 후 다음 방문 시 즉시 반영됩니다.
+    </p>
+    <div class="theme-grid" id="theme-grid"></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn success" id="btn-theme-save" onclick="saveTheme()">💾 테마 저장</button>
+      <span id="theme-msg" style="font-size:13px"></span>
+    </div>
+  </div><!-- /tab-theme -->
+
 </div><!-- /app -->
 
 <!-- 수신거부 등록 모달 -->
@@ -387,10 +415,35 @@ thead th.sort-active .sort-icon{color:var(--blue);opacity:1}
 <script>
 const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const SB_SESSION_KEY = 'sb-rkycwfpkzorfpcxfvaqt-auth-token';
+const _noopStore = { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} };
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storage:_noopStore }
+});
+async function _injectSession() {
+  try {
+    let raw = localStorage.getItem(SB_SESSION_KEY);
+    if (!raw) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
+          const v = localStorage.getItem(k);
+          if (v && v.includes('"access_token"')) { raw = v; break; }
+        }
+      }
+    }
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    const token = stored?.access_token; const uid = stored?.user?.id;
+    if (!token || !uid) return null;
+    const exp = stored?.expires_at ?? 0;
+    if (exp && (Date.now()/1000) > exp) return null;
+    try { await sb.auth.setSession({ access_token: token, refresh_token: stored?.refresh_token||'' }); } catch(e) {}
+    return { user: stored.user, access_token: token };
+  } catch(e) { return null; }
+}
 
-// wf_dev_session=admin 이더라도 실제 Supabase 로그인 성공 시 init()에서 false로 전환됨
-let IS_DEV_SESSION = localStorage.getItem('wf_dev_session') === 'admin';
+let IS_DEV_SESSION = false;
 
 // Resend 메일 Worker URL
 const MAIL_WORKER_URL = 'https://send-mail.worksfree.workers.dev';
@@ -415,6 +468,7 @@ function getQueryEnvs() {
   const h = location.hostname;
   if (h.startsWith('portal.') || h === 'www.worksfree.kr') return ['portal'];
   if (h.startsWith('staging.')) return ['staging'];
+  if (h.startsWith('consulting.')) return ['consulting'];
   return ['test', 'staging'];   // test 사이트: test+staging 통합 조회
 }
 function getQueryEnvLabel() {
@@ -932,27 +986,92 @@ async function loadUnsubData() {
    초기화
 ───────────────────────────────────────────── */
 async function init() {
-  if (IS_DEV_SESSION) {
-    // devLogin 실제 로그인 성공 시 IS_DEV_SESSION 해제
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      if (session?.user) {
-        const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-        if (prof?.role === 'admin') IS_DEV_SESSION = false;
-      }
-    } catch (_) {}
-    show('app');
-    await loadStatsData();
-    return;
-  }
-  const { data: { session } } = await sb.auth.getSession();
+  if (window !== window.top) { show('app'); await _injectSession(); await loadStatsData(); await loadTheme(); return; }
+  const session = await _injectSession();
   if (!session) { show('denied'); return; }
-  const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-  if (!prof || prof.role !== 'admin') { show('denied'); return; }
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${session.user.id}&select=role&limit=1`,
+      { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` } }
+    );
+    const rows = r.ok ? await r.json() : [];
+    if (rows[0]?.role !== 'admin') { show('denied'); return; }
+  } catch(e) { show('denied'); return; }
   show('app');
   await loadStatsData();
+  await loadTheme();
 }
 init();
+
+/* ─────────────────────────────────────────────
+   테마 관리
+───────────────────────────────────────────── */
+const THEMES = {
+  claude: {
+    name: '클로드 기본',
+    desc: '차가운 네이비 다크 — 기본 테마',
+    preview: ['#0f1117','#1c2333','#3b82f6']
+  },
+  sunset: {
+    name: '선셋 다크',
+    desc: '따뜻한 앰버·브라운 다크',
+    preview: ['#1a1208','#281d0c','#f59e0b']
+  }
+};
+let _currentThemeKey = 'claude';
+let _pendingThemeKey  = 'claude';
+
+async function loadTheme() {
+  try {
+    const r = await sb.from('site_config').select('value').eq('key','hub_theme').maybeSingle();
+    _currentThemeKey = r.data?.value || 'claude';
+    _pendingThemeKey = _currentThemeKey;
+  } catch(_) {}
+  renderThemes();
+}
+
+function renderThemes() {
+  const grid = document.getElementById('theme-grid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(THEMES).map(([key, t]) => {
+    const active = key === _pendingThemeKey ? ' active' : '';
+    const swatches = t.preview.map(c =>
+      `<div class="theme-swatch" style="background:${c}"></div>`
+    ).join('');
+    return `<div class="theme-card${active}" onclick="selectTheme('${key}')">
+      <span class="theme-card-active-badge">선택됨</span>
+      <div class="theme-swatches">${swatches}</div>
+      <div class="theme-name">${t.name}</div>
+      <div class="theme-desc">${t.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectTheme(key) {
+  _pendingThemeKey = key;
+  renderThemes();
+  document.getElementById('theme-msg').textContent = '';
+}
+
+async function saveTheme() {
+  const btn = document.getElementById('btn-theme-save');
+  const msg = document.getElementById('theme-msg');
+  btn.disabled = true;
+  msg.textContent = '저장 중...'; msg.style.color = 'var(--muted)';
+  try {
+    const r = await sb.from('site_config').upsert(
+      { key: 'hub_theme', value: _pendingThemeKey, updated_at: new Date().toISOString() },
+      { onConflict: 'key' }
+    );
+    if (r.error) throw r.error;
+    _currentThemeKey = _pendingThemeKey;
+    msg.textContent  = '✅ 저장 완료 — Hub 재방문 시 적용됩니다';
+    msg.style.color  = 'var(--green)';
+  } catch(e) {
+    msg.textContent = '❌ 저장 실패: ' + e.message;
+    msg.style.color = 'var(--red)';
+  } finally { btn.disabled = false; }
+}
 </script>
 </body>
 </html>
