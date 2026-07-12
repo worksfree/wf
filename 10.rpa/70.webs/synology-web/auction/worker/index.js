@@ -216,7 +216,8 @@ async function doCrawl(env, tenant, maxItems) {
     const prevMetaRaw = await env.AUCTION_DATA.get(metaKey);
     const prevMeta = prevMetaRaw ? JSON.parse(prevMetaRaw) : {};
     const startPage = prevMeta.next_page || 1;
-    const prevItems = startPage > 1 ? JSON.parse(await env.AUCTION_DATA.get(dataKey) || '{"items":[]}').items : [];
+    // startPage가 1이어도 기존 데이터를 유지 — 재시작 시 전체 데이터 유실 방지
+    const prevItems = JSON.parse(await env.AUCTION_DATA.get(dataKey) || '{"items":[]}').items;
 
     // 상태 업데이트
     await env.AUCTION_DATA.put(metaKey, JSON.stringify({
