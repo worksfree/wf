@@ -1448,7 +1448,6 @@
     <button class="dev-btn" id="dev-btn-admin"      onclick="devLogin('admin')"      style="border-color:#dc2626;color:#fca5a5">▶ 관리자 (🔒)</button>
     <button class="dev-btn" onclick="devShowConsent()">📋 동의 모달 보기</button>
     <button class="dev-btn danger" onclick="devResetConsent()">↺ 동의 초기화</button>
-    <button class="dev-btn danger" onclick="devClearAssetDB()">🗑 자산 DB 초기화</button>
     <button class="dev-btn danger" onclick="devLogout()">✕ 테스트 로그아웃</button>
   </div>
 </div>
@@ -2046,7 +2045,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.25';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.7.26';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -4134,25 +4133,6 @@ function devResetConsent() {
   localStorage.removeItem('wf_agreed_' + id);
   updateDevStatus();
   alert('동의 기록이 초기화됐습니다. 다시 로그인하면 동의 모달이 표시됩니다.');
-}
-
-async function devClearAssetDB() {
-  if (!authUser) { alert('먼저 테스트 계정으로 로그인하세요.'); return; }
-  if (!confirm(`[${authUser.email}]\n자산 포트폴리오 DB 데이터를 삭제합니까?\n(localStorage 캐시도 함께 삭제됩니다)`)) return;
-  try {
-    const session = (await _sb.auth.getSession()).data.session;
-    const token = session?.access_token;
-    if (!token) { alert('세션 토큰 없음 — 재로그인 후 시도하세요.'); return; }
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/portfolios?user_id=eq.${authUser.id}`,
-      { method: 'DELETE', headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` } }
-    );
-    localStorage.removeItem('asset_mgr_v1');
-    localStorage.removeItem('asset_dividends_v1');
-    alert(`✅ 삭제 완료 (HTTP ${res.status})\n자산 페이지를 새로고침하면 예시 데이터가 표시됩니다.`);
-  } catch(e) {
-    alert('오류: ' + e.message);
-  }
 }
 
 async function devLogout() {
