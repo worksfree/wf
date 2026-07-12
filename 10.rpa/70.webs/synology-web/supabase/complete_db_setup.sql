@@ -348,7 +348,16 @@ BEGIN
   IF new_role NOT IN ('member', 'consultant', 'partner') THEN
     RETURN 'error: invalid_role';
   END IF;
+  -- profiles.role 업데이트
   UPDATE public.profiles SET role = new_role WHERE id = target_id;
+  -- auth.users.raw_app_meta_data.wf_role 동기화 (Supabase 대시보드 App Metadata에서 확인 가능)
+  UPDATE auth.users
+  SET raw_app_meta_data = jsonb_set(
+    COALESCE(raw_app_meta_data, '{}'),
+    '{wf_role}',
+    to_jsonb(new_role)
+  )
+  WHERE id = target_id;
   RETURN 'ok';
 END;
 $$;
@@ -366,7 +375,16 @@ BEGIN
   SELECT role INTO _caller_role FROM public.profiles WHERE id = auth.uid();
   IF _caller_role IS DISTINCT FROM 'admin' THEN RETURN 'error: not_admin'; END IF;
   IF new_name IS NULL OR trim(new_name) = '' THEN RETURN 'error: empty_name'; END IF;
+  -- profiles.name 업데이트
   UPDATE public.profiles SET name = trim(new_name) WHERE id = target_id;
+  -- auth.users.raw_user_meta_data.full_name 동기화 (Supabase 대시보드와 일치)
+  UPDATE auth.users
+  SET raw_user_meta_data = jsonb_set(
+    COALESCE(raw_user_meta_data, '{}'),
+    '{full_name}',
+    to_jsonb(trim(new_name))
+  )
+  WHERE id = target_id;
   RETURN 'ok';
 END;
 $$;
@@ -375,6 +393,7 @@ GRANT EXECUTE ON FUNCTION public.admin_set_user_name(UUID, TEXT) TO anon, authen
 
 
 -- ── admin_get_all_profiles ─────────────────────────────────────────────
+-- RETURNS TABLE 컬럼명(role, id)과 내부 SELECT 컬럼명 충돌 방지 → alias p2 사용
 CREATE OR REPLACE FUNCTION public.admin_get_all_profiles()
 RETURNS TABLE (
   id        UUID,
@@ -386,7 +405,7 @@ RETURNS TABLE (
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE _r TEXT;
 BEGIN
-  SELECT role INTO _r FROM public.profiles WHERE id = auth.uid();
+  SELECT p2.role INTO _r FROM public.profiles p2 WHERE p2.id = auth.uid();
   IF _r IS DISTINCT FROM 'admin' THEN RETURN; END IF;
   RETURN QUERY
     SELECT p.id, p.email, p.name, p.role, p.agreed_at
@@ -399,6 +418,7 @@ GRANT EXECUTE ON FUNCTION public.admin_get_all_profiles() TO anon, authenticated
 
 
 -- ── admin_get_user_logins ──────────────────────────────────────────────
+-- RETURNS TABLE 컬럼명(id)과 WHERE id 충돌 방지 → alias p2 사용
 CREATE OR REPLACE FUNCTION public.admin_get_user_logins()
 RETURNS TABLE (
   id              UUID,
@@ -407,7 +427,7 @@ RETURNS TABLE (
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE _r TEXT;
 BEGIN
-  SELECT role INTO _r FROM public.profiles WHERE id = auth.uid();
+  SELECT p2.role INTO _r FROM public.profiles p2 WHERE p2.id = auth.uid();
   IF _r IS DISTINCT FROM 'admin' THEN RETURN; END IF;
   RETURN QUERY
     SELECT au.id::UUID, au.last_sign_in_at
