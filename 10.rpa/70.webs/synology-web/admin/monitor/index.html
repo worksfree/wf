@@ -295,7 +295,7 @@ async function loadData() {
 }
 
 async function init() {
-  if (window !== window.top) { show('app'); await loadData(); return; }
+  if (window !== window.top) { show('app'); await _injectSession(); await loadData(); return; }
   const session = await _injectSession();
   if (!session) { show('denied'); return; }
   try {
