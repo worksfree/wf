@@ -382,8 +382,10 @@ async function loadFiles() {
 }
 
 // ── File URL helper ──────────────────────────────────────────────
-// Supabase Storage는 루트 객체를 허용하지 않으므로 _root_ 폴더를 가상 prefix로 사용
+// Supabase Storage 키: nas_path가 '/'를 포함하면 그대로 사용(UUID 기반 신규 포맷),
+// 없으면 레거시 root 파일 → 'root/' + name 으로 복원
 function sbStoragePath(f) {
+  if (f.nas_path && f.nas_path.includes('/')) return f.nas_path;
   return (f.folder || 'root') + '/' + f.name;
 }
 function getFileUrl(f) {
@@ -635,14 +637,19 @@ async function uploadFiles(fileList) {
 
       if (storageBackend === 'supabase') {
         // ── Supabase Storage 업로드 (SDK 우회 — fetch 직접 호출) ──
-        const sbPath = (currentFolder || 'root') + '/' + file.name;
-        // 한글·공백 등 특수문자 포함 파일명은 퍼센트 인코딩 필수
-        const sbPathEncoded = sbPath.split('/').map(s => encodeURIComponent(s)).join('/');
+        // 파일명에 한글·공백·특수문자가 있어도 Supabase Storage가 거부하지 않도록
+        // UUID 기반 안전한 키 사용. 원본 파일명은 DB name 컬럼에 보존.
+        const ext = file.name.includes('.')
+          ? '.' + file.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g,'')
+          : '';
+        const uuid = crypto.randomUUID ? crypto.randomUUID()
+          : Date.now().toString(36) + Math.random().toString(36).slice(2);
+        const sbKey = (currentFolder || 'root') + '/' + uuid + ext;
         const jwt = _getJWT();
         if (!jwt) throw new Error('Supabase 세션 없음 — 허브에서 관리자로 로그인 후 재시도하세요');
         bar.style.width='30%'; pct.textContent='30%';
         const upRes = await fetch(
-          `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${sbPathEncoded}`,
+          `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${sbKey}`,
           { method:'POST',
             headers:{ 'Authorization':'Bearer '+jwt,
                       'apikey': SUPABASE_ANON,
@@ -657,10 +664,10 @@ async function uploadFiles(fileList) {
         bar.style.width='80%'; pct.textContent='80%';
         status.textContent = 'DB 저장';
         const { error: dbErr } = await sb.from('storage_files').upsert({
-          name:          file.name,
+          name:          file.name,        // 원본 파일명 (한글 가능)
           size:          file.size,
           mime_type:     file.type || 'application/octet-stream',
-          nas_path:      nasPath,
+          nas_path:      sbKey,            // 실제 Storage 키 (UUID 기반, 폴더 prefix 포함)
           folder:        currentFolder,
           backend:       'supabase',
           uploaded_by:   session?.user?.id ?? null,
