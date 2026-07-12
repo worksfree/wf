@@ -206,15 +206,11 @@ async function ping() {
 async function loadData() {
   const t0 = Date.now();
 
-  // subscriptions 테이블은 미존재 가능 → 에러 시 빈 결과로 처리
-  const safeSubQ = sb.from('subscriptions').select('*')
-    .eq('status','active').order('expires_at',{ascending:false})
-    .then(r => r.error ? {data:[],error:null} : r)
-    .catch(() => ({data:[],error:null}));
+  // subscriptions 테이블 미존재 → HTTP 요청 자체를 생략 (콘솔 400 방지)
+  const subRes = { data: [], error: null };
 
-  const [payRes, subRes, crRes, profRes, latency] = await Promise.all([
+  const [payRes, crRes, profRes, latency] = await Promise.all([
     sb.from('payments').select('*').order('created_at',{ascending:false}).limit(100),
-    safeSubQ,
     sb.from('credits').select('id,env,created_at').order('created_at',{ascending:false}).limit(200),
     sb.from('profiles').select('id',{count:'exact',head:true}),
     ping(),
