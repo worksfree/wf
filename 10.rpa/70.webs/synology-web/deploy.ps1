@@ -25,7 +25,7 @@ $fromBat = try {
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
 $VERSION  = "0.8.7.26"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
-$AUC_VER  = "0.7.4.17"            # 경매지도 버전 (auction 배포 시 4번째↑)
+$AUC_VER  = "0.7.4.18"            # 경매지도 버전 (auction 배포 시 4번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -376,13 +376,14 @@ if (Test-Path $gitBash) {
 }
 
 # ── 로그 기록 ───────────────────────────────────────────────────
-"[$TIMESTAMP] v$VERSION → $($T.Name) : $(if ($ok){'SUCCESS'}else{'FAILED'})" | Add-Content $LOG_FILE
+$deployVer = if ($choice -eq "8") { $AUC_VER } else { $VERSION }
+"[$TIMESTAMP] v$deployVer → $($T.Name) : $(if ($ok){'SUCCESS'}else{'FAILED'})" | Add-Content $LOG_FILE
 
 # ── 결과 출력 ───────────────────────────────────────────────────
 Write-Host ""
 if ($ok) {
     Write-Host "  ╔════════════════════════════════════════╗" -ForegroundColor $T.Color
-    Write-Host "  ║  ✅ 배포 완료  v$VERSION                 ║" -ForegroundColor $T.Color
+    Write-Host "  ║  ✅ 배포 완료  v$deployVer                 ║" -ForegroundColor $T.Color
     Write-Host "  ║  → $($T.Name.PadRight(36))║" -ForegroundColor $T.Color
     Write-Host "  ║  $($T.URL.PadRight(40))║" -ForegroundColor $T.Color
     Write-Host "  ╚════════════════════════════════════════╝" -ForegroundColor $T.Color
