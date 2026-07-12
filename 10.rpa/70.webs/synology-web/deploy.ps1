@@ -415,24 +415,26 @@ if ($ok) {
         Write-Host "  ⚠️  .claude 폴더가 NAS에 남아있습니다. 수동으로 삭제하세요." -ForegroundColor Yellow
     }
 
-    # ── nginx-auction.conf 자동 push + reload (auction 전용) ────────
+    # ── nginx auction Cache-Control user.conf 자동 적용 (auction 전용) ──
+    # 경로: /usr/local/etc/nginx/conf.d/832f75cf-5eb3-4e86-8754-2d03c520ec3c/user.conf
     if ($deployKey -eq "8") {
         $nginxConfLocal = Join-Path $PSScriptRoot "nginx-auction.conf"
+        $AUC_NGINX_DIR  = "/usr/local/etc/nginx/conf.d/832f75cf-5eb3-4e86-8754-2d03c520ec3c"
+        $AUC_NGINX_CONF = "$AUC_NGINX_DIR/user.conf"
         if (Test-Path $nginxConfLocal) {
             Write-Host ""
-            Write-Host "  ▶ nginx-auction.conf NAS 적용 중..." -ForegroundColor Blue
-            $nginxPosixDir = '/' + $LOCAL_PATH.Substring(0,1).ToLower() + ($LOCAL_PATH.Substring(2) -replace '\\','/')
-            $nginxCmd = "set -o pipefail; cd '$nginxPosixDir' && tar -czf - nginx-auction.conf | " +
-                        "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} " +
-                        "'tar -xzf - -C /volume1/web/auction/ --no-same-permissions --no-same-owner 2>&1; " +
-                        "nginx -s reload 2>/dev/null || true; echo NGINX_EXIT:`$?'"
-            $nginxResult    = & $gitBash -c $nginxCmd 2>&1
-            $nginxResultStr = ($nginxResult -join "`n")
-            if ($nginxResultStr -match 'NGINX_EXIT:[012]') {
-                Write-Host "    OK nginx 캐시 설정 적용 완료" -ForegroundColor Green
+            Write-Host "  ▶ auction nginx Cache-Control 적용 중..." -ForegroundColor Blue
+            $nginxContent = (Get-Content $nginxConfLocal -Raw -Encoding UTF8) -replace "'", "'\\'''"
+            $nginxRemote  = "sudo mkdir -p '$AUC_NGINX_DIR' && printf '%s' '$nginxContent' | sudo tee '$AUC_NGINX_CONF' > /dev/null && sudo nginx -s reload && echo NGINX_OK || echo NGINX_FAIL"
+            $nginxResult  = & $gitBash -c "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} `"$nginxRemote`"" 2>&1
+            $nginxStr     = ($nginxResult -join "`n")
+            if ($nginxStr -match 'NGINX_OK') {
+                Write-Host "    OK Cache-Control no-cache 적용 완료 (nginx reload 성공)" -ForegroundColor Green
             } else {
-                Write-Host "    INFO nginx reload 불필요 — DSM 웹 스테이션에서 수동 적용 필요" -ForegroundColor DarkGray
-                Write-Host "         auction.worksfree.kr 가상호스트 → 사용자 nginx 설정 → nginx-auction.conf 내용 붙여넣기" -ForegroundColor DarkGray
+                Write-Host "    INFO sudo 권한 없음 — 수동 적용 필요 (1회)" -ForegroundColor DarkYellow
+                Write-Host "    SSH: sudo mkdir -p $AUC_NGINX_DIR" -ForegroundColor DarkGray
+                Write-Host "    SSH: sudo tee $AUC_NGINX_CONF < nginx-auction.conf (참조파일: /volume1/web/auction/nginx-auction.conf)" -ForegroundColor DarkGray
+                Write-Host "    SSH: sudo nginx -s reload" -ForegroundColor DarkGray
             }
         }
     }
