@@ -24,7 +24,8 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.8.5.63"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.8.7.14"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$AUC_VER  = "0.7.4.14"            # 경매지도 버전 (auction 배포 시 4번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -33,6 +34,8 @@ $TARGETS = @{
     "3" = @{ Name="www (prod)";        Path="/volume1/web/portal";       URL="https://www.worksfree.kr";           Color="Green";  SubDir=$null }
     "4" = @{ Name="g1consulting";     Path="/volume1/web/g1consulting"; URL="https://g1consulting.worksfree.kr";  Color="Magenta"; SubDir="consulting/g1" }
     "5" = @{ Name="el";              Path="/volume1/web/el";           URL="https://el.worksfree.kr";           Color="Cyan";   SubDir="consulting/tacomanager" }
+    "7" = @{ Name="consulting";      Path="/volume1/web/consulting";   URL="https://consulting.worksfree.kr";   Color="DarkMagenta"; SubDir="consulting" }
+    "8" = @{ Name="auction";         Path="/volume1/web/auction";      URL="https://auction.worksfree.kr";       Color="Blue";        SubDir="auction";     Excludes=@("crawler","SPEC.md","*.pyc","__pycache__") }
 }
 
 # 배포 제외 목록
@@ -74,6 +77,8 @@ Write-Host "    [3]  www (prod)   — 실 서비스 배포  (www.worksfree.kr)" 
 Write-Host "    [4]  g1consulting  — 현장클리닉 전용 (g1consulting.worksfree.kr)"    -ForegroundColor Magenta
 Write-Host "    [5]  el           — 타코매니저 AI 전용 (el.worksfree.kr)"           -ForegroundColor Cyan
 Write-Host "    [6]  test + el   — 같은 버전으로 동시 배포 (test + el)"              -ForegroundColor Yellow
+Write-Host "    [7]  consulting  — 컨설팅 전용 배포    (consulting.worksfree.kr)"   -ForegroundColor DarkMagenta
+Write-Host "    [8]  auction    — 경매지도 서비스     (auction.worksfree.kr)"         -ForegroundColor Blue
 Write-Host "    [Q]  취소"                                                            -ForegroundColor Gray
 Write-Host "    [R]  롤백          — 이전 배포 버전 복원"                             -ForegroundColor DarkYellow
 Write-Host ""
@@ -98,6 +103,8 @@ if ($choice -match "^[Rr]$") {
     Write-Host "    [3]  www (prod) " -ForegroundColor Green
     Write-Host "    [4]  g1consulting" -ForegroundColor Magenta
     Write-Host "    [5]  el" -ForegroundColor Cyan
+    Write-Host "    [7]  consulting" -ForegroundColor DarkMagenta
+    Write-Host "    [8]  auction" -ForegroundColor Blue
     Write-Host ""
     $envChoice = Read-Host "  선택"
     if (-not $TARGETS.ContainsKey($envChoice)) {
@@ -197,10 +204,53 @@ if ($choice -eq "6") {
         }
     }
 }
+if ($choice -eq "7") {
+    Write-Host ""
+    Write-Host "  ℹ️  consulting 배포: consulting/ → /volume1/web/consulting/" -ForegroundColor DarkMagenta
+    Write-Host "     ESG · DART · 타코매니저 + blog 자동화(app-store → blog/) 포함" -ForegroundColor Gray
+    Write-Host "     (NAS 디렉터리가 없으면 자동 생성됩니다)" -ForegroundColor Gray
+    if (-not $Target) {
+        $confirm = Read-Host "  계속하려면 Enter, 취소는 Q"
+        if ($confirm -match "^[Qq]$") {
+            Write-Host "`n  취소됨." -ForegroundColor Gray; Start-Sleep 1; exit 0
+        }
+    }
+}
+if ($choice -eq "8") {
+    Write-Host ""
+    Write-Host "  ℹ️  auction 배포: auction/ → /volume1/web/auction/" -ForegroundColor Blue
+    Write-Host "     crawler/, SPEC.md 는 배포 제외 (웹에셋만 전송)" -ForegroundColor Gray
+    Write-Host "     사전 준비: auction.worksfree.kr DNS + NAS 가상호스트 등록 필요" -ForegroundColor Gray
+    if (-not $Target) {
+        $confirm = Read-Host "  계속하려면 Enter, 취소는 Q"
+        if ($confirm -match "^[Qq]$") {
+            Write-Host "`n  취소됨." -ForegroundColor Gray; Start-Sleep 1; exit 0
+        }
+    }
+}
 
 # ── 버전 자동 증가 (확인 통과 후 실행) ──────────────────────────
 # 규칙: test·g1=4번째 자연 증가, staging=3번째↑+4번째 리셋, portal=2번째↑+3·4번째 리셋
-if ($scriptContent -match '\$VERSION\s*=\s*"(\d+)\.(\d+)\.(\d+)\.(\d+)"') {
+# auction(8): $AUC_VER 별도 증가 (hub $VERSION은 변경 없음)
+
+if ($choice -eq "8") {
+    # 경매지도 전용 버전 증가
+    if ($scriptContent -match '\$AUC_VER\s*=\s*"(\d+)\.(\d+)\.(\d+)\.(\d+)"') {
+        $a = @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4])
+        $a[3]++
+        $newAucVer = "$($a[0]).$($a[1]).$($a[2]).$($a[3])"
+        $updated = $scriptContent -replace '(\$AUC_VER\s*=\s*")[\d.]+"', ('${1}' + $newAucVer + '"')
+        [System.IO.File]::WriteAllText($PSCommandPath, $updated, [System.Text.Encoding]::UTF8)
+        $AUC_VER = $newAucVer
+        $aucIndexPath = Join-Path $PSScriptRoot 'auction\index.html'
+        if (Test-Path $aucIndexPath) {
+            $aucHtml = [System.IO.File]::ReadAllText($aucIndexPath, [System.Text.Encoding]::UTF8)
+            $aucHtml = $aucHtml -replace "(const AUC_VER\s*=\s*')[\d.]+'", ('${1}' + $newAucVer + "'")
+            [System.IO.File]::WriteAllText($aucIndexPath, $aucHtml, [System.Text.Encoding]::UTF8)
+        }
+        Write-Host "  📦 경매지도 버전: $AUC_VER" -ForegroundColor Blue
+    }
+} elseif ($scriptContent -match '\$VERSION\s*=\s*"(\d+)\.(\d+)\.(\d+)\.(\d+)"') {
     $p = @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4])
     switch ($choice) {
         "2" {        # staging: 3번째↑, 4번째 리셋, 자릿수 올림
@@ -293,7 +343,11 @@ if (Test-Path $gitBash) {
     }
 
     # tar로 묶기(cloud-only 파일 포함) → SSH 파이프 → NAS에서 풀기
-    $excludeFlags = if ($isSubDir) { "" } else {
+    # 타겟별 Excludes 필드 처리 (trailing space 필수 — tar 소스경로 '.' 분리용)
+    $perTargetExcludeFlags = if ($T.Excludes) {
+        (($T.Excludes | ForEach-Object { "--exclude='$_'" }) -join ' ') + ' '
+    } else { "" }
+    $excludeFlags = if ($isSubDir) { $perTargetExcludeFlags } else {
         "--exclude='deploy.ps1' --exclude='deploy.bat' " +
         "--exclude='*.log' --exclude='*.sh' " +
         "--exclude='.git' --exclude='node_modules' --exclude='.vscode' " +
@@ -359,6 +413,55 @@ if ($ok) {
     if ($verifyResult -match 'WARN:') {
         Write-Host "  ⚠️  .claude 폴더가 NAS에 남아있습니다. 수동으로 삭제하세요." -ForegroundColor Yellow
     }
+
+    # ── geocode.json 자동 업로드 (auction 전용) ───────────────────
+    if ($deployKey -eq "8") {
+        $geoLocalPath = Join-Path $LOCAL_PATH "auction\data\geocode.json"
+        Write-Host ""
+        if (Test-Path $geoLocalPath) {
+            Write-Host "  ▶ geocode.json 업로드 중..." -ForegroundColor Blue
+            $geoDirPosix = '/' + $LOCAL_PATH.Substring(0,1).ToLower() + ($LOCAL_PATH.Substring(2) -replace '\\','/') + '/auction/data'
+            # tar로 파일만 추출 → SSH 파이프 → NAS에서 풀기 (SCP 대신 tar: 디렉터리 자동 생성 + 클라우드 파일 대응)
+            $geoCmd = "set -o pipefail; cd '$geoDirPosix' && tar -czf - geocode.json | " +
+                      "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} " +
+                      "'mkdir -p /volume1/web/auction/data && tar -xzf - -C /volume1/web/auction/data/ --no-same-permissions --no-same-owner 2>&1; echo GEO_EXIT:`$?'"
+            $geoResult    = & $gitBash -c $geoCmd 2>&1
+            $geoResultStr = ($geoResult -join "`n")
+            $geoOk = ($LASTEXITCODE -eq 0) -and ($geoResultStr -match 'GEO_EXIT:[012]')
+            if ($geoOk) {
+                $geoKB = [math]::Round((Get-Item $geoLocalPath).Length / 1KB)
+                Write-Host "    OK geocode.json 업로드 완료 (${geoKB} KB)" -ForegroundColor Green
+            } else {
+                Write-Host "    WARN geocode.json 업로드 실패" -ForegroundColor Yellow
+                Write-Host ($geoResult | Where-Object { $_ -notmatch 'WARNING|post-quantum' }) -ForegroundColor DarkYellow
+            }
+        } else {
+            Write-Host "  INFO geocode.json 없음 — 지오코딩 미실행 상태" -ForegroundColor DarkGray
+        }
+    }
+
+    # ── 블로그 자동화 추가 배포 (consulting 전용) ──────────────────
+    if ($deployKey -eq "7") {
+        Write-Host ""
+        Write-Host "  ▶ blog 자동화 추가 배포 중..." -ForegroundColor DarkMagenta
+        $blogSrcPath = Join-Path $LOCAL_PATH "app-store\web\naver-blog-commenter"
+        $blogDstPath = "$($T.Path)/blog"
+        $dl2 = $blogSrcPath.Substring(0,1).ToLower()
+        $posixBlog = '/' + $dl2 + ($blogSrcPath.Substring(2) -replace '\\', '/')
+        & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} 'mkdir -p ${blogDstPath}'" | Out-Null
+        $blogCmd = "set -o pipefail; cd '$posixBlog' && tar -czf - . | " +
+                   "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} " +
+                   "'tar -xzf - -C ${blogDstPath}/ --no-same-permissions --no-same-owner 2>&1; echo TAR_EXIT:`$?'"
+        $blogResult    = & $gitBash -c $blogCmd 2>&1
+        $blogResultStr = ($blogResult -join "`n")
+        $blogOk = ($LASTEXITCODE -eq 0) -and ($blogResultStr -match 'TAR_EXIT:[012]')
+        if ($blogOk) {
+            Write-Host "    ✅ blog/ 배포 완료 → $blogDstPath" -ForegroundColor Green
+        } else {
+            Write-Host "    ⚠️  blog/ 배포 실패 (app-store/web/naver-blog-commenter 경로 확인 필요)" -ForegroundColor Yellow
+            $allOk = $false
+        }
+    }
 } else {
     $allOk = $false
     Write-Host "  ╔════════════════════════════════════════╗" -ForegroundColor Red
@@ -381,17 +484,21 @@ if ($ok) {
 # PDF는 대용량이라 deploy.ps1 배포 대상에 포함되지 않음.
 # test에 업로드된 PDF를 NAS 내부에서 복사하여 staging/portal에 반영.
 if ($allOk -and ($choice -eq "2" -or $choice -eq "3")) {
-    $targetEnvPath = $T.Path
+    $syncEnv = $TARGETS[$choice]
+    $srcPath = "/volume1/web/test/assets/books"
+    $dstPath = "$($syncEnv.Path)/assets/books"
     Write-Host ""
-    Write-Host "  ▶ PDF 에셋 동기화 (test → $($T.Name))..." -ForegroundColor Gray
-    $syncCmd = "mkdir -p '${targetEnvPath}/assets/books' && " +
-               "cp -r '/volume1/web/test/assets/books/.' '${targetEnvPath}/assets/books/' 2>&1 && echo 'SYNC_OK'"
-    $syncResult = & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} ""$syncCmd""" 2>&1
-    if ($syncResult -match 'SYNC_OK') {
+    Write-Host "  ▶ PDF 에셋 동기화 (test → $($syncEnv.Name))..." -ForegroundColor Gray
+    $syncCmd = "if [ -d $srcPath ]; then mkdir -p $dstPath && cp -r $srcPath/. $dstPath/ 2>/dev/null && echo SYNC_OK; else echo SYNC_SKIP; fi"
+    $syncResult = & $gitBash -c "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} `"$syncCmd`"" 2>&1
+    $syncStr = ($syncResult -join ' ')
+    if ($syncStr -match 'SYNC_OK') {
         Write-Host "    ✅ PDF 에셋 동기화 완료" -ForegroundColor Green
+    } elseif ($syncStr -match 'SYNC_SKIP') {
+        Write-Host "    ℹ️  PDF 건너뜀 (test에 assets/books 없음)" -ForegroundColor DarkGray
     } else {
-        Write-Host "    ⚠️  PDF 동기화 실패 (test에 assets/books 가 없을 수 있음)" -ForegroundColor Yellow
-        Write-Host ($syncResult -join "`n") -ForegroundColor DarkYellow
+        Write-Host "    ⚠️  PDF 동기화 실패" -ForegroundColor Yellow
+        Write-Host $syncStr -ForegroundColor DarkYellow
     }
 }
 
