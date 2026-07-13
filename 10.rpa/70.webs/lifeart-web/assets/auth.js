@@ -79,13 +79,27 @@ async function lifeartLogout() {
   location.href = '/';
 }
 
-// 헤더 로그인 버튼 상태 갱신 (레이아웃 주입 완료 후 실행)
+// 헤더 로그인 버튼 상태 갱신 + 관리자 링크 노출 (레이아웃 주입 완료 후 실행)
 document.addEventListener('layout:ready', async () => {
   const { data: { session } } = await sb.auth.getSession();
   const btn = document.getElementById('nav-login-btn');
   if (!btn) return;
-  if (session) {
-    btn.textContent = '마이페이지';
-    btn.href = '/mypage/';
+  if (!session) return;
+
+  btn.textContent = '마이페이지';
+  btn.href = '/mypage/';
+
+  // LifeArt 관리자면 헤더에 "관리자" 링크 추가
+  const { data: profile } = await sb.from('profiles').select('role, tenant_id').eq('id', session.user.id).maybeSingle();
+  if (profile?.role === 'admin' && profile?.tenant_id === TENANT_UUID) {
+    const actions = document.getElementById('nav-actions');
+    if (actions && !document.getElementById('nav-admin-btn')) {
+      const a = document.createElement('a');
+      a.id = 'nav-admin-btn';
+      a.href = '/admin/';
+      a.className = 'btn-outline';
+      a.textContent = '⚙ 관리자';
+      actions.insertBefore(a, btn);
+    }
   }
 });

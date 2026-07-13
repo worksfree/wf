@@ -16,6 +16,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
+$VERSION  = "0.7.0.1"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
 
 $TARGETS = @{
     "1" = @{ Name="test-lifeart";     Path="/volume1/web/test-lifeart";     URL="https://test-lifeart.lifeart.ai.kr";     Color="Yellow"  }
@@ -72,10 +73,36 @@ if ($choice -eq "2") {
     }
 }
 
+# ── 버전 자동 증가 (확인 통과 후) ──────────────────────────────
+#   pre-test(9)=BUILD(4번째)↑ · test(1)=PATCH(3번째)↑+BUILD리셋 · production(2)=MINOR(2번째)↑+PATCH·BUILD리셋
+#   -Day 스테이징 배포 시에는 태그에 커밋된 버전을 그대로 사용(증가 안 함).
+if (-not $Day -and $VERSION -match '^(\d+)\.(\d+)\.(\d+)\.(\d+)$') {
+    $p = @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4])
+    switch ($choice) {
+        "2" { $p[1]++; $p[2] = 0; $p[3] = 0 }   # production: MINOR↑
+        "1" { $p[2]++; $p[3] = 0 }              # test: PATCH↑
+        default { $p[3]++ }                      # pre-test: BUILD↑
+    }
+    $newVer  = "$($p[0]).$($p[1]).$($p[2]).$($p[3])"
+    # deploy.ps1 자기 자신의 $VERSION 갱신 (UTF-8 BOM 유지 — 한글 포함)
+    $selfTxt = [System.IO.File]::ReadAllText($PSCommandPath, [System.Text.Encoding]::UTF8)
+    $selfTxt = $selfTxt -replace '(\$VERSION\s*=\s*")[\d.]+"', ('${1}' + $newVer + '"')
+    [System.IO.File]::WriteAllText($PSCommandPath, $selfTxt, (New-Object System.Text.UTF8Encoding($true)))
+    # 공통 푸터 파트셜의 버전 문자열 갱신 (전 페이지가 이 파트셜을 로드)
+    $footer = Join-Path $LOCAL_PATH 'assets\footer.html'
+    if (Test-Path $footer) {
+        $fTxt = [System.IO.File]::ReadAllText($footer, [System.Text.Encoding]::UTF8)
+        $fTxt = $fTxt -replace 'v\d+\.\d+\.\d+\.\d+', "v$newVer"
+        [System.IO.File]::WriteAllText($footer, $fTxt, [System.Text.Encoding]::UTF8)
+    }
+    $VERSION = $newVer
+}
+
 Write-Host ""
 Write-Host "  ▶ 배포 환경 : $($T.Name)" -ForegroundColor $T.Color
 Write-Host "  ▶ 대상 경로 : ${NAS_IP}:$($T.Path)" -ForegroundColor White
 Write-Host "  ▶ 공개 URL  : $($T.URL)" -ForegroundColor White
+Write-Host "  ▶ 버전      : v$VERSION" -ForegroundColor White
 Write-Host ""
 
 $gitBash = "C:\Program Files\Git\bin\bash.exe"
