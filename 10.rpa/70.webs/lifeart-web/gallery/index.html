@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>작품 갤러리 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">Gallery</div>
+  <h1>작품 갤러리</h1>
+</div>
+
+<div class="section">
+  <p style="text-align:center; color:var(--text-mid); font-size:14px;">
+    LifeArt가 25년간 제작해온 VIP 앨범 · 기업 행사 앨범 · 액자 작품들입니다.
+  </p>
+
+  <div class="gallery-filter">
+    <button class="tab-btn active" data-f="all">전체</button>
+    <button class="tab-btn" data-f="vip">VIP·기업앨범</button>
+    <button class="tab-btn" data-f="event">행사·기념</button>
+    <button class="tab-btn" data-f="product">상품컷</button>
+  </div>
+
+  <div class="gallery-grid" id="gallery-grid">
+    <div class="gallery-item" data-cat="vip"><img src="/assets/gallery/corp-01.jpg" alt="기업 VIP 앨범"><div class="cap">기업 VIP 앨범</div></div>
+    <div class="gallery-item" data-cat="vip"><img src="/assets/gallery/corp-02.jpg" alt="기업 앨범"><div class="cap">기업 기념 앨범</div></div>
+    <div class="gallery-item" data-cat="vip"><img src="/assets/gallery/corp-03.jpg" alt="VIP 앨범"><div class="cap">VIP 프리미엄 앨범</div></div>
+    <div class="gallery-item" data-cat="event"><img src="/assets/gallery/event-01.jpg" alt="명명식 앨범"><div class="cap">명명식 기념 앨범</div></div>
+    <div class="gallery-item" data-cat="event"><img src="/assets/gallery/event-02.jpg" alt="세미나 앨범"><div class="cap">세미나·워크숍</div></div>
+    <div class="gallery-item" data-cat="event"><img src="/assets/gallery/event-03.jpg" alt="골프 앨범"><div class="cap">골프·동호회 앨범</div></div>
+    <div class="gallery-item" data-cat="event"><img src="/assets/gallery/event-04.jpg" alt="여행 앨범"><div class="cap">여행 기념 앨범</div></div>
+    <div class="gallery-item" data-cat="product"><img src="/assets/gallery/prod-01.png" alt="상품컷"><div class="cap">앨범 상품컷</div></div>
+    <div class="gallery-item" data-cat="product"><img src="/assets/gallery/prod-02.png" alt="상품컷"><div class="cap">앨범 상품컷</div></div>
+    <div class="gallery-item" data-cat="product"><img src="/assets/gallery/prod-03.png" alt="상품컷"><div class="cap">앨범 상품컷</div></div>
+  </div>
+</div>
+
+<div class="lb" id="lightbox"><button class="lb-close" id="lb-close">×</button><img id="lb-img" src="" alt=""></div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/dev-toolkit.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/layout.js"></script>
+<script>
+// 필터
+document.querySelectorAll('.gallery-filter .tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.gallery-filter .tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.f;
+    document.querySelectorAll('.gallery-item').forEach(it => {
+      it.style.display = (f === 'all' || it.dataset.cat === f) ? '' : 'none';
+    });
+  });
+});
+// 라이트박스
+const lb = document.getElementById('lightbox'), lbImg = document.getElementById('lb-img');
+document.querySelectorAll('.gallery-item img').forEach(img => {
+  img.addEventListener('click', () => { lbImg.src = img.src; lb.classList.add('open'); });
+});
+document.getElementById('lb-close').addEventListener('click', () => lb.classList.remove('open'));
+lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+</script>
+</body>
+</html>

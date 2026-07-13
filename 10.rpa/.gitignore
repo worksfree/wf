@@ -94,6 +94,9 @@ screenshots/
 !70.webs/lifeart-web/assets/img/*.png
 !70.webs/lifeart-web/assets/img/*.jpg
 !70.webs/lifeart-web/assets/img/*.jpeg
+!70.webs/lifeart-web/assets/gallery/*.png
+!70.webs/lifeart-web/assets/gallery/*.jpg
+!70.webs/lifeart-web/assets/gallery/*.jpeg
 
 # 엑셀 임시 파일
 ~$*.xlsx
