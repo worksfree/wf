@@ -17,22 +17,10 @@
 
 <div class="content-section">
   <h2 id="notice">공지사항</h2>
-  <div class="notice-row"><span class="t">LifeArt 홈페이지가 새롭게 오픈했습니다</span><span class="d">2026-07-13</span></div>
-  <div class="placeholder-box" style="margin-top:12px;">추가 공지사항은 준비 중입니다.</div>
+  <div id="notice-list"><div class="placeholder-box">불러오는 중...</div></div>
 
   <h2 id="faq" style="margin-top:40px;">자주 묻는 질문</h2>
-  <div class="faq-item">
-    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">주문 후 제작 기간은 얼마나 걸리나요? <span class="arrow">▾</span></div>
-    <div class="faq-a">상품 종류와 수량에 따라 다르며, 삽입식 앨범은 현장 즉석 제작도 가능합니다. 정확한 기간은 견적 문의 시 안내드립니다.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">대량 주문 시 할인이 있나요? <span class="arrow">▾</span></div>
-    <div class="faq-a">액자 등 일부 상품은 수량에 따라 할인이 적용됩니다. 견적 문의를 통해 안내드립니다.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">기업 단체 행사도 진행하나요? <span class="arrow">▾</span></div>
-    <div class="faq-a">네, 25년간 다양한 기업 행사(진수식, 워크숍, 해외 출장 등)의 VIP 앨범과 삽입식 앨범을 제작해왔습니다.</div>
-  </div>
+  <div id="faq-list"><div class="placeholder-box">불러오는 중...</div></div>
 
   <h2 id="qna" style="margin-top:40px;">1:1 문의</h2>
   <form class="form-box" id="qna-form" onsubmit="event.preventDefault(); submitInquiry('qna', this, 'qna-msg');">
@@ -64,5 +52,47 @@
 <script src="/assets/auth.js"></script>
 <script src="/assets/forms.js"></script>
 <script src="/assets/layout.js"></script>
+<script>
+document.addEventListener('layout:ready', loadSupportContent);
+
+async function loadSupportContent() {
+  // 공지사항
+  const nEl = document.getElementById('notice-list');
+  const { data: notices, error: nErr } = await sb.from('lifeart_notices')
+    .select('title, body, created_at, pinned')
+    .order('pinned', { ascending: false }).order('created_at', { ascending: false });
+  if (nErr || !notices || !notices.length) {
+    nEl.innerHTML = '<div class="placeholder-box">등록된 공지사항이 없습니다.</div>';
+  } else {
+    nEl.innerHTML = notices.map(n => `
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          ${n.pinned ? '📌 ' : ''}${esc(n.title)}
+          <span class="d" style="margin-left:auto;font-size:11px;color:var(--text-light);">${new Date(n.created_at).toLocaleDateString('ko-KR')}</span>
+          <span class="arrow">▾</span>
+        </div>
+        <div class="faq-a" style="white-space:pre-line;">${esc(n.body)}</div>
+      </div>`).join('');
+  }
+
+  // FAQ
+  const fEl = document.getElementById('faq-list');
+  const { data: faqs, error: fErr } = await sb.from('lifeart_faqs')
+    .select('question, answer, sort_order').order('sort_order', { ascending: true });
+  if (fErr || !faqs || !faqs.length) {
+    fEl.innerHTML = '<div class="placeholder-box">등록된 FAQ가 없습니다.</div>';
+  } else {
+    fEl.innerHTML = faqs.map(f => `
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">${esc(f.question)} <span class="arrow">▾</span></div>
+        <div class="faq-a" style="white-space:pre-line;">${esc(f.answer)}</div>
+      </div>`).join('');
+  }
+}
+
+function esc(s) {
+  return (s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+}
+</script>
 </body>
 </html>

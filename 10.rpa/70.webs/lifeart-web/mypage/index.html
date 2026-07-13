@@ -96,12 +96,16 @@ async function initMypage() {
     ? estimates.map(e => `<div class="notice-row"><span class="t">${e.message.slice(0,40)}</span><span class="d">${e.status}</span></div>`).join('')
     : '<div class="placeholder-box">견적 문의 내역이 없습니다. <a href="/support/#estimate" style="color:var(--accent);">견적 문의하기 →</a></div>';
 
-  // 제휴 현황
+  // 제휴 현황 (관리자 답변이 있으면 함께 노출)
   const { data: partnerships } = await sb.from('lifeart_inquiries').select('*').eq('user_id', uid).eq('type', 'partnership').order('created_at', { ascending: false });
   const partEl = document.getElementById('partnership-list');
   partEl.className = '';
+  const inqRow = (p) => `<div style="border-bottom:1px solid var(--border);padding:12px 0;">
+      <div style="display:flex;justify-content:space-between;"><span class="t">${(p.message||'').slice(0,50)}</span><span class="d">${p.status==='answered'?'답변완료':p.status}</span></div>
+      ${p.answer ? `<div style="margin-top:8px;padding:10px 12px;background:var(--soft-gray);border-radius:6px;font-size:13px;color:var(--text-mid);white-space:pre-line;"><b style="color:var(--accent);">답변</b><br>${(p.answer)}</div>` : ''}
+    </div>`;
   partEl.innerHTML = (partnerships && partnerships.length)
-    ? partnerships.map(p => `<div class="notice-row"><span class="t">${p.message.slice(0,40)}</span><span class="d">${p.status}</span></div>`).join('')
+    ? partnerships.map(inqRow).join('')
     : '<div class="placeholder-box">제휴 문의 내역이 없습니다. <a href="/business/#inquiry" style="color:var(--accent);">제휴 문의하기 →</a></div>';
 
   // 회원정보

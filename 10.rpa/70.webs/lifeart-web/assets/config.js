@@ -20,7 +20,8 @@ function getEnv() {
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// 토스페이먼츠 — 현재는 토스 공용 테스트 키(누구나 즉시 테스트 가능한 샌드박스 키)
-// 실 운영 전환 시 LifeArt 명의로 발급받은 라이브 키로 반드시 교체할 것.
-const TOSS_CLIENT_KEY = 'test_ck_D5GePWvyJnrK0W0k6q45Qzldwmy1';
+// 토스페이먼츠 — WorksFree 허브에서 실제 가결제까지 검증된 테스트 클라이언트 키.
+// 짝이 되는 시크릿 키는 lifeart-toss-verify Worker 에 설정(현재 미일치 → 교체 필요).
+// 실 운영 전환 시 LifeArt 명의 라이브 키로 교체.
+const TOSS_CLIENT_KEY = 'test_ck_d46qopOB89Z0Z0ZQxGBE3ZmM75y0';
 const TOSS_VERIFY_URL = 'https://lifeart-toss-verify.worksfree.workers.dev';

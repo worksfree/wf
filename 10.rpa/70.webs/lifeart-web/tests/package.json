@@ -1,0 +1,14 @@
+{
+  "name": "lifeart-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LifeArt E2E 테스트 — 실제 토스 테스트 가결제까지 자동 주행 (테스트 겸 시연)",
+  "scripts": {
+    "test": "playwright test",
+    "demo": "playwright test --headed",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0"
+  }
+}
