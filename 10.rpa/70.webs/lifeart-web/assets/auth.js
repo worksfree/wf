@@ -79,27 +79,44 @@ async function lifeartLogout() {
   location.href = '/';
 }
 
-// 헤더 로그인 버튼 상태 갱신 + 관리자 링크 노출 (레이아웃 주입 완료 후 실행)
+// 헤더 인증 UI 갱신 (레이아웃 주입 완료 후 실행)
+//  비로그인 : 카탈로그 · 회원가입 · 로그인
+//  회원     : 카탈로그 · 마이페이지 · 로그아웃
+//  관리자   : 카탈로그 · ⚙관리자 · 마이페이지 · 로그아웃
 document.addEventListener('layout:ready', async () => {
+  const actions = document.getElementById('nav-actions');
+  const loginBtn  = document.getElementById('nav-login-btn');
+  const signupBtn = document.getElementById('nav-signup-btn');
+  if (!actions || !loginBtn) return;
+
   const { data: { session } } = await sb.auth.getSession();
-  const btn = document.getElementById('nav-login-btn');
-  if (!btn) return;
-  if (!session) return;
+  if (!session) return;  // 비로그인 → 회원가입/로그인 그대로
 
-  btn.textContent = '마이페이지';
-  btn.href = '/mypage/';
+  // 로그인 상태: 회원가입 숨김, 로그인 → 마이페이지, 로그아웃 추가
+  if (signupBtn) signupBtn.style.display = 'none';
+  loginBtn.textContent = '마이페이지';
+  loginBtn.href = '/mypage/';
 
-  // LifeArt 관리자면 헤더에 "관리자" 링크 추가
+  if (!document.getElementById('nav-logout-btn')) {
+    const out = document.createElement('a');
+    out.id = 'nav-logout-btn';
+    out.href = '#';
+    out.className = 'btn-outline';
+    out.textContent = '로그아웃';
+    out.addEventListener('click', (e) => { e.preventDefault(); lifeartLogout(); });
+    actions.appendChild(out);
+  }
+
+  // 관리자면 마이페이지 앞에 ⚙관리자 링크
   const { data: profile } = await sb.from('profiles').select('role, tenant_id').eq('id', session.user.id).maybeSingle();
   if (profile?.role === 'admin' && profile?.tenant_id === TENANT_UUID) {
-    const actions = document.getElementById('nav-actions');
-    if (actions && !document.getElementById('nav-admin-btn')) {
+    if (!document.getElementById('nav-admin-btn')) {
       const a = document.createElement('a');
       a.id = 'nav-admin-btn';
       a.href = '/admin/';
       a.className = 'btn-outline';
       a.textContent = '⚙ 관리자';
-      actions.insertBefore(a, btn);
+      actions.insertBefore(a, loginBtn);
     }
   }
 });

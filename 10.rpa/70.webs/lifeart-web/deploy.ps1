@@ -16,7 +16,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.7.0.1"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
+$VERSION  = "0.7.0.3"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
 
 $TARGETS = @{
     "1" = @{ Name="test-lifeart";     Path="/volume1/web/test-lifeart";     URL="https://test-lifeart.lifeart.ai.kr";     Color="Yellow"  }
@@ -24,7 +24,8 @@ $TARGETS = @{
     "9" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
 }
 
-$EXCLUDE = @("deploy.ps1","deploy.log",".git","node_modules","*.bak","worker","supabase",".wrangler")
+# 배포 제외: worker/supabase/tests/.git/node_modules/.wrangler/deploy.ps1 등
+# (스테이징 복사 단계에서 rm 처리 — 아래 전송부 참고)
 # ────────────────────────────────────────────────────────────────
 
 $LOCAL_PATH = $PSScriptRoot
@@ -149,21 +150,37 @@ if ($Day) {
     Write-Host "  ▶ 단계적 배포: $tag 시점 스냅샷 사용 (임시: $SOURCE_PATH)" -ForegroundColor Magenta
 }
 
-$dl         = $SOURCE_PATH.Substring(0,1).ToLower()
-$posixLocal = '/' + $dl + ($SOURCE_PATH.Substring(2) -replace '\\', '/')
+$srcDl      = $SOURCE_PATH.Substring(0,1).ToLower()
+$srcPosix   = '/' + $srcDl + ($SOURCE_PATH.Substring(2) -replace '\\', '/')
 $remotePath = $T.Path
+
+# ── 스테이징 복사본 생성 (작업트리 오염 없이 캐시버스팅 적용) ──────
+# Cloudflare 퍼지 권한이 없어 버전 쿼리(?v=)로 CDN·브라우저 캐시를 무력화.
+$stageWin   = Join-Path $env:TEMP "lifeart-stage-$BACKUP_TS"
+$stagePosix = '/' + $stageWin.Substring(0,1).ToLower() + ($stageWin.Substring(2) -replace '\\', '/')
+$BUST       = if ($Day) { "d$Day-$BACKUP_TS" } else { $VERSION }
+
+# 소스 → 스테이지 복사 후 불필요 폴더 제거 (배포 대상만 남김)
+& $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
+
+# 캐시버스팅: 모든 *.html 과 layout.js 의 /assets/*.js|css|html 참조에 ?v=$BUST 부착
+$bustRe = [regex]'(/assets/[A-Za-z0-9_./-]+\.(?:js|css|html))'
+Get-ChildItem -Path $stageWin -Recurse -File | Where-Object { $_.Extension -eq '.html' -or $_.Name -eq 'layout.js' } | ForEach-Object {
+    $c = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
+    $c = $bustRe.Replace($c, "`$1?v=$BUST")
+    [System.IO.File]::WriteAllText($_.FullName, $c, [System.Text.Encoding]::UTF8)
+}
 
 & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} 'mkdir -p ${remotePath}'" | Out-Null
 
-$excludeFlags = ($EXCLUDE | ForEach-Object { "--exclude='$_'" }) -join ' '
-
 # tar+SSH: D:\drive_files\ 는 Google Drive 클라우드 마운트라 scp -r 은 파일 누락 위험 (synology-web/deploy.ps1과 동일 이유)
-$bashCmd = "set -o pipefail; cd '$posixLocal' && tar -czf - $excludeFlags . | " +
+$bashCmd = "set -o pipefail; cd '$stagePosix' && tar -czf - . | " +
            "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} " +
            "'tar -xzf - -C ${remotePath}/ --no-same-permissions --no-same-owner 2>&1; echo TAR_EXIT:`$?'"
 
 $result    = & $gitBash -c $bashCmd 2>&1
 $resultStr = ($result -join "`n")
+& $gitBash -c "rm -rf '$stagePosix'" 2>&1 | Out-Null
 $meaningfulLines = $result | Where-Object { $_ -notmatch 'Cannot change mode|Exiting with failure' }
 $hasTarErrors    = ($meaningfulLines | Where-Object { $_ -match '^tar:' }).Count -gt 0
 $ok = ($LASTEXITCODE -eq 0) -and ($resultStr -match 'TAR_EXIT:[012]') -and -not $hasTarErrors

@@ -10,9 +10,13 @@
 
 <div id="site-header"></div>
 
-<div class="page-hero">
+<div class="page-hero" style="position:relative;">
   <div class="kicker">My Account</div>
   <h1>마이페이지</h1>
+  <button id="mypage-logout" onclick="lifeartLogout()"
+    style="display:none; position:absolute; top:50%; right:32px; transform:translateY(-50%);
+           background:transparent; border:1px solid var(--border); color:var(--text-mid);
+           padding:8px 16px; border-radius:4px; font-size:13px; cursor:pointer;">로그아웃</button>
 </div>
 
 <div class="content-section" id="mypage-gate" style="display:none; text-align:center;">
@@ -68,6 +72,7 @@ async function initMypage() {
     return;
   }
   document.getElementById('mypage-body').style.display = 'block';
+  document.getElementById('mypage-logout').style.display = 'block';
   const uid = session.user.id;
 
   // 탭 전환
