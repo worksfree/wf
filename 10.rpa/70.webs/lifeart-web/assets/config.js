@@ -6,7 +6,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 // LifeArt 테넌트 UUID — 공유 tenants 테이블의 lifeart.ai.kr 행 id.
 // ★ 마이그레이션 03_tenants_hardening.sql 실행 후 나오는 실제 UUID로 교체 필요.
 //   교체 전까지는 orders/inquiries insert 가 FK 위반으로 실패함(의도된 안전장치).
-const TENANT_UUID = 'REPLACE_WITH_LIFEART_TENANT_UUID';
+const TENANT_UUID = '81b84745-a87b-4a7e-8516-474d4bb5e1d5';
 const TENANT_ID = 'lifeart';  // 사람이 읽는 라벨 (컬럼 값으로는 TENANT_UUID 사용)
 
 // test-lifeart / pre-test-lifeart / production 환경 격리 (auction과 동일한 env 컬럼 패턴)
