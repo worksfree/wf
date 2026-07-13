@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>결제 완료 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">Checkout</div>
+  <h1>결제 확인 중</h1>
+</div>
+
+<div class="content-section" style="display:flex; justify-content:center;">
+  <div class="form-box" style="max-width:460px; width:100%; text-align:center;" id="result-box">
+    <div class="placeholder-box">결제를 확인하고 있습니다...</div>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/layout.js"></script>
+<script>
+document.addEventListener('layout:ready', confirmPayment);
+
+async function confirmPayment() {
+  const box = document.getElementById('result-box');
+  const params = new URLSearchParams(location.search);
+  const paymentKey = params.get('paymentKey');
+  const orderId    = params.get('orderId');
+  const amount     = parseInt(params.get('amount'), 10);
+
+  if (!paymentKey || !orderId || !amount) {
+    box.innerHTML = '<div class="placeholder-box">잘못된 결제 응답입니다.</div>';
+    return;
+  }
+
+  try {
+    const res = await fetch(TOSS_VERIFY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentKey, orderId, amount }),
+    });
+    const result = await res.json();
+    if (!result.success) {
+      box.innerHTML = `<div class="placeholder-box">결제 승인에 실패했습니다.<br>${result.error || ''}</div>`;
+      return;
+    }
+
+    // 주문 상태 갱신 + 결제 기록 저장
+    await sb.from('orders').update({ status: 'paid' }).eq('id', orderId);
+    await sb.from('payments').insert({
+      tenant_id: TENANT_ID,
+      order_id: orderId,
+      pg_provider: 'toss',
+      pg_tid: paymentKey,
+      amount,
+      status: 'approved',
+      env: getEnv(),
+      approved_at: new Date().toISOString(),
+    });
+
+    box.innerHTML = `
+      <div style="font-size:40px; margin-bottom:12px;">✅</div>
+      <div style="font-size:17px; font-weight:700; color:var(--text-dark); margin-bottom:6px;">결제가 완료되었습니다</div>
+      <div style="font-size:14px; color:var(--text-mid); margin-bottom:20px;">${amount.toLocaleString()}원 결제 완료</div>
+      <a href="/mypage/" class="btn-primary" style="display:inline-block; padding:11px 24px;">마이페이지에서 확인</a>
+    `;
+  } catch (e) {
+    box.innerHTML = '<div class="placeholder-box">결제 확인 중 오류가 발생했습니다.</div>';
+    console.error(e);
+  }
+}
+</script>
+</body>
+</html>

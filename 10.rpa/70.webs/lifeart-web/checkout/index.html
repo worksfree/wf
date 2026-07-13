@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>결제하기 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">Checkout</div>
+  <h1>결제하기</h1>
+</div>
+
+<div class="content-section" style="display:flex; justify-content:center;">
+  <div class="form-box" style="max-width:460px; width:100%;" id="checkout-box">
+    <div class="placeholder-box">주문 정보를 불러오는 중입니다...</div>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.tosspayments.com/v1/payment"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/layout.js"></script>
+<script>
+document.addEventListener('layout:ready', initCheckout);
+
+async function initCheckout() {
+  const box = document.getElementById('checkout-box');
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    box.innerHTML = '<div class="placeholder-box">로그인이 필요합니다. <a href="/auth/login/" style="color:var(--accent);">로그인하러 가기</a></div>';
+    return;
+  }
+
+  const orderId = new URLSearchParams(location.search).get('order');
+  if (!orderId) {
+    box.innerHTML = '<div class="placeholder-box">잘못된 접근입니다.</div>';
+    return;
+  }
+
+  const { data: order, error } = await sb.from('orders').select('*, products(name)').eq('id', orderId).eq('user_id', session.user.id).single();
+  if (error || !order) {
+    box.innerHTML = '<div class="placeholder-box">주문 정보를 찾을 수 없습니다.</div>';
+    return;
+  }
+  if (order.status === 'paid') {
+    box.innerHTML = '<div class="placeholder-box">이미 결제가 완료된 주문입니다. <a href="/mypage/" style="color:var(--accent);">마이페이지로 이동</a></div>';
+    return;
+  }
+
+  box.innerHTML = `
+    <div style="margin-bottom:20px;">
+      <div style="font-size:13px; color:var(--text-mid); margin-bottom:4px;">주문 상품</div>
+      <div style="font-size:16px; font-weight:700; color:var(--text-dark);">${order.products?.name || '상품'} × ${order.quantity}</div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700; padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:20px;">
+      <span>결제 금액</span><span style="color:var(--accent);">${order.amount.toLocaleString()}원</span>
+    </div>
+    <button class="form-submit" id="pay-btn">토스페이먼츠로 결제하기</button>
+    <p style="font-size:11.5px; color:var(--text-light); text-align:center; margin-top:12px;">테스트 모드 · 실제 결제가 발생하지 않습니다</p>
+  `;
+
+  document.getElementById('pay-btn').addEventListener('click', () => {
+    const tossPayments = TossPayments(TOSS_CLIENT_KEY);
+    tossPayments.requestPayment('카드', {
+      amount: order.amount,
+      orderId: order.id,
+      orderName: order.products?.name || 'LifeArt 상품',
+      customerName: session.user.user_metadata?.name || session.user.email,
+      successUrl: location.origin + '/checkout/success/',
+      failUrl: location.origin + '/checkout/fail/',
+    });
+  });
+}
+</script>
+</body>
+</html>
