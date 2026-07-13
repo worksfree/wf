@@ -5,8 +5,9 @@
 #  사용법:
 #    PowerShell: .\deploy.ps1              (대화형)
 #    비대화형:   .\deploy.ps1 -Target 1    (1=test-lifeart, 2=production, 9=pre-test-lifeart)
+#    단계적 배포: .\deploy.ps1 -Target 1 -Day 3   (git tag lifeart-day3 시점 스냅샷만 전송)
 # ================================================================
-param([string]$Target = "")
+param([string]$Target = "", [string]$Day = "")
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding          = [System.Text.Encoding]::UTF8
@@ -93,8 +94,36 @@ Write-Host ""
 
 Write-Host "  ▶ NAS 전송 중..." -ForegroundColor Yellow
 
-$dl         = $LOCAL_PATH.Substring(0,1).ToLower()
-$posixLocal = '/' + $dl + ($LOCAL_PATH.Substring(2) -replace '\\', '/')
+$SOURCE_PATH = $LOCAL_PATH
+$tempArchiveDir = $null
+
+if ($Day) {
+    $tag = "lifeart-day$Day"
+    $dl0         = $LOCAL_PATH.Substring(0,1).ToLower()
+    $posixLocal0 = '/' + $dl0 + ($LOCAL_PATH.Substring(2) -replace '\\', '/')
+
+    & $gitBash -c "cd '$posixLocal0' && git rev-parse -q --verify refs/tags/$tag" | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "  [오류] git 태그 '$tag' 를 찾을 수 없습니다." -ForegroundColor Red
+        exit 1
+    }
+
+    $tempArchiveDir = Join-Path $env:TEMP "lifeart-deploy-day$Day-$(Get-Random)"
+    New-Item -ItemType Directory -Path $tempArchiveDir -Force | Out-Null
+    $tempPosix = '/' + $tempArchiveDir.Substring(0,1).ToLower() + ($tempArchiveDir.Substring(2) -replace '\\', '/')
+
+    & $gitBash -c "cd '$posixLocal0' && git archive '$tag' -- 10.rpa/70.webs/lifeart-web | tar -x -C '$tempPosix'" 2>&1 | Out-Null
+
+    $SOURCE_PATH = Join-Path $tempArchiveDir "10.rpa\70.webs\lifeart-web"
+    if (-not (Test-Path (Join-Path $SOURCE_PATH "index.html"))) {
+        Write-Host "  [오류] '$tag' 스냅샷 추출에 실패했습니다." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "  ▶ 단계적 배포: $tag 시점 스냅샷 사용 (임시: $SOURCE_PATH)" -ForegroundColor Magenta
+}
+
+$dl         = $SOURCE_PATH.Substring(0,1).ToLower()
+$posixLocal = '/' + $dl + ($SOURCE_PATH.Substring(2) -replace '\\', '/')
 $remotePath = $T.Path
 
 & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} 'mkdir -p ${remotePath}'" | Out-Null
@@ -135,6 +164,10 @@ if ($ok) {
     Write-Host "  ║  ❌ 배포 실패                           ║" -ForegroundColor Red
     Write-Host "  ╚════════════════════════════════════════╝" -ForegroundColor Red
     Write-Host $result -ForegroundColor DarkRed
+}
+
+if ($tempArchiveDir -and (Test-Path $tempArchiveDir)) {
+    Remove-Item -Recurse -Force $tempArchiveDir
 }
 
 Write-Host ""
