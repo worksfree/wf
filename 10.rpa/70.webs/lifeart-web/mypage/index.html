@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마이페이지 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">My Account</div>
+  <h1>마이페이지</h1>
+</div>
+
+<div class="content-section" id="mypage-gate" style="display:none; text-align:center;">
+  <p>로그인이 필요한 페이지입니다.</p>
+  <a href="/auth/login/" class="btn-primary" style="display:inline-block; padding:11px 24px;">로그인하러 가기</a>
+</div>
+
+<div class="content-section" id="mypage-body" style="display:none;">
+  <div class="tab-row">
+    <button class="tab-btn active" data-tab="orders">주문 내역</button>
+    <button class="tab-btn" data-tab="estimates">견적함</button>
+    <button class="tab-btn" data-tab="partnership">제휴 현황</button>
+    <button class="tab-btn" data-tab="profile">회원정보 수정</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-orders">
+    <div id="orders-list" class="placeholder-box">불러오는 중...</div>
+  </div>
+
+  <div class="tab-panel" id="tab-estimates">
+    <div id="estimates-list" class="placeholder-box">불러오는 중...</div>
+  </div>
+
+  <div class="tab-panel" id="tab-partnership">
+    <div id="partnership-list" class="placeholder-box">불러오는 중...</div>
+  </div>
+
+  <div class="tab-panel" id="tab-profile">
+    <form class="form-box" id="profile-form" style="max-width:420px;">
+      <div class="form-row"><label>이름</label><input type="text" name="name"></div>
+      <div class="form-row"><label>연락처</label><input type="tel" name="phone"></div>
+      <div class="form-row"><label>이메일</label><input type="email" name="email" disabled></div>
+      <button type="submit" class="form-submit">저장</button>
+      <div class="form-msg" id="profile-msg"></div>
+    </form>
+    <button onclick="lifeartLogout()" class="btn-outline" style="margin-top:16px;">로그아웃</button>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/layout.js"></script>
+<script>
+document.addEventListener('layout:ready', initMypage);
+
+async function initMypage() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    document.getElementById('mypage-gate').style.display = 'block';
+    return;
+  }
+  document.getElementById('mypage-body').style.display = 'block';
+  const uid = session.user.id;
+
+  // 탭 전환
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // 주문 내역
+  const { data: orders } = await sb.from('orders').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+  const ordersEl = document.getElementById('orders-list');
+  ordersEl.className = '';
+  ordersEl.innerHTML = (orders && orders.length)
+    ? orders.map(o => `<div class="notice-row"><span class="t">주문 #${o.id.slice(0,8)} · ${o.amount.toLocaleString()}원</span><span class="d">${o.status}</span></div>`).join('')
+    : '<div class="placeholder-box">주문 내역이 없습니다.</div>';
+
+  // 견적함
+  const { data: estimates } = await sb.from('inquiries').select('*').eq('user_id', uid).eq('type', 'estimate').order('created_at', { ascending: false });
+  const estEl = document.getElementById('estimates-list');
+  estEl.className = '';
+  estEl.innerHTML = (estimates && estimates.length)
+    ? estimates.map(e => `<div class="notice-row"><span class="t">${e.message.slice(0,40)}</span><span class="d">${e.status}</span></div>`).join('')
+    : '<div class="placeholder-box">견적 문의 내역이 없습니다. <a href="/support/#estimate" style="color:var(--accent);">견적 문의하기 →</a></div>';
+
+  // 제휴 현황
+  const { data: partnerships } = await sb.from('inquiries').select('*').eq('user_id', uid).eq('type', 'partnership').order('created_at', { ascending: false });
+  const partEl = document.getElementById('partnership-list');
+  partEl.className = '';
+  partEl.innerHTML = (partnerships && partnerships.length)
+    ? partnerships.map(p => `<div class="notice-row"><span class="t">${p.message.slice(0,40)}</span><span class="d">${p.status}</span></div>`).join('')
+    : '<div class="placeholder-box">제휴 문의 내역이 없습니다. <a href="/business/#inquiry" style="color:var(--accent);">제휴 문의하기 →</a></div>';
+
+  // 회원정보
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
+  const form = document.getElementById('profile-form');
+  form.name.value = profile?.name || '';
+  form.phone.value = profile?.phone || '';
+  form.email.value = session.user.email;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msgEl = document.getElementById('profile-msg');
+    const { error } = await sb.from('profiles').update({ name: form.name.value.trim(), phone: form.phone.value.trim() }).eq('id', uid);
+    msgEl.textContent = error ? '저장에 실패했습니다.' : '저장되었습니다.';
+    msgEl.className = 'form-msg ' + (error ? 'error' : 'success');
+  });
+}
+</script>
+</body>
+</html>

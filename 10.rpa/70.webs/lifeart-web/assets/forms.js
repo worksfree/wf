@@ -1,10 +1,12 @@
 // 문의/견적/제휴 폼 공통 제출 로직 — public.inquiries 테이블에 INSERT
 async function submitInquiry(type, formEl, msgElId) {
   const msgEl = document.getElementById(msgElId);
+  const { data: { session } } = await sb.auth.getSession();
   const data = {
     tenant_id: TENANT_ID,
     type,
     env: getEnv(),
+    user_id: session?.user?.id || null,
     name: formEl.querySelector('[name=name]').value.trim(),
     phone: formEl.querySelector('[name=phone]').value.trim(),
     email: formEl.querySelector('[name=email]')?.value.trim() || null,

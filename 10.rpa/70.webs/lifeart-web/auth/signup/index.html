@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원가입 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">My Account</div>
+  <h1>회원가입</h1>
+</div>
+
+<div class="content-section" style="display:flex; justify-content:center;">
+  <form class="form-box" id="signup-form" onsubmit="event.preventDefault(); lifeartSignUp(this.name.value.trim(), this.phone.value.trim(), this.email.value.trim(), this.password.value, document.getElementById('signup-msg'));">
+    <div class="form-row"><label>이름</label><input type="text" name="name" required></div>
+    <div class="form-row"><label>연락처</label><input type="tel" name="phone" required placeholder="010-0000-0000"></div>
+    <div class="form-row"><label>이메일</label><input type="email" name="email" required></div>
+    <div class="form-row"><label>비밀번호</label><input type="password" name="password" required minlength="6" placeholder="6자 이상"></div>
+    <button type="submit" class="form-submit">가입하기</button>
+    <div class="form-msg" id="signup-msg"></div>
+    <p style="text-align:center; font-size:13px; color:var(--text-mid); margin-top:16px;">
+      이미 회원이신가요? <a href="/auth/login/" style="color:var(--accent); font-weight:600;">로그인</a>
+    </p>
+  </form>
+</div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/layout.js"></script>
+</body>
+</html>
