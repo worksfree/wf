@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>액자 주문하기 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">Products &nbsp;·&nbsp; 액자</div>
+  <h1>주문하기</h1>
+</div>
+
+<div class="content-section" id="order-gate" style="display:none; text-align:center;">
+  <p>주문은 로그인 후 이용하실 수 있습니다.</p>
+  <a href="/auth/login/" class="btn-primary" style="display:inline-block; padding:11px 24px;">로그인하러 가기</a>
+</div>
+
+<div class="content-section" id="order-body" style="display:none; display:flex; justify-content:center;">
+  <form class="form-box" id="order-form" style="max-width:480px; width:100%;">
+    <div class="form-row">
+      <label>상품 선택</label>
+      <select name="product_id" id="product-select" required></select>
+    </div>
+    <div class="form-row">
+      <label>수량</label>
+      <input type="number" name="quantity" id="qty-input" value="1" min="1" required>
+    </div>
+    <div class="form-row">
+      <label>배송지</label>
+      <textarea name="shipping_address" required placeholder="받으실 주소를 입력해주세요"></textarea>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; margin:16px 0; color:var(--text-dark);">
+      <span>결제 예정 금액</span>
+      <span id="order-amount">0원</span>
+    </div>
+    <button type="submit" class="form-submit">주문하고 결제하기</button>
+    <div class="form-msg" id="order-msg"></div>
+  </form>
+</div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/layout.js"></script>
+<script>
+document.addEventListener('layout:ready', initOrderPage);
+
+let PRODUCTS = [];
+
+async function initOrderPage() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    document.getElementById('order-gate').style.display = 'block';
+    return;
+  }
+  document.getElementById('order-body').style.display = 'flex';
+
+  const { data } = await sb.from('products').select('*').eq('category', 'frame').order('price');
+  PRODUCTS = data || [];
+  const sel = document.getElementById('product-select');
+  sel.innerHTML = PRODUCTS.map(p => `<option value="${p.id}">${p.name} — ${p.price.toLocaleString()}원</option>`).join('');
+  updateAmount();
+
+  sel.addEventListener('change', updateAmount);
+  document.getElementById('qty-input').addEventListener('input', updateAmount);
+
+  document.getElementById('order-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msgEl = document.getElementById('order-msg');
+    const product = PRODUCTS.find(p => p.id === sel.value);
+    const qty = parseInt(document.getElementById('qty-input').value, 10);
+    const amount = product.price * qty;
+    const address = e.target.shipping_address.value.trim();
+    if (!address) { msgEl.textContent = '배송지를 입력해주세요.'; msgEl.className = 'form-msg error'; return; }
+
+    msgEl.textContent = '주문 생성 중...'; msgEl.className = 'form-msg';
+    const { data: order, error } = await sb.from('orders').insert({
+      tenant_id: TENANT_ID,
+      user_id: session.user.id,
+      product_id: product.id,
+      quantity: qty,
+      amount,
+      shipping_address: address,
+      status: 'pending',
+      env: getEnv(),
+    }).select().single();
+
+    if (error) {
+      msgEl.textContent = '주문 생성에 실패했습니다.';
+      msgEl.className = 'form-msg error';
+      console.error(error);
+      return;
+    }
+    location.href = '/checkout/?order=' + order.id;
+  });
+}
+
+function updateAmount() {
+  const sel = document.getElementById('product-select');
+  const product = PRODUCTS.find(p => p.id === sel.value);
+  const qty = parseInt(document.getElementById('qty-input').value, 10) || 1;
+  document.getElementById('order-amount').textContent = product ? (product.price * qty).toLocaleString() + '원' : '0원';
+}
+</script>
+</body>
+</html>
