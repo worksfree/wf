@@ -76,8 +76,9 @@ if ($choice -eq "2") {
 
 # ── 버전 자동 증가 (확인 통과 후) ──────────────────────────────
 #   pre-test(9)=BUILD(4번째)↑ · test(1)=PATCH(3번째)↑+BUILD리셋 · production(2)=MINOR(2번째)↑+PATCH·BUILD리셋
-#   -Day 스테이징 배포 시에는 태그에 커밋된 버전을 그대로 사용(증가 안 함).
-if (-not $Day -and $VERSION -match '^(\d+)\.(\d+)\.(\d+)\.(\d+)$') {
+#   버전은 "릴리스 횟수" 카운터라 -Day 스테이징 배포에서도 대상별로 증가한다.
+#   (콘텐츠는 태그 시점 고정, 버전은 릴리스 시점 기준 → 스테이지 푸터에 주입)
+if ($VERSION -match '^(\d+)\.(\d+)\.(\d+)\.(\d+)$') {
     $p = @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4])
     switch ($choice) {
         "2" { $p[1]++; $p[2] = 0; $p[3] = 0 }   # production: MINOR↑
@@ -89,12 +90,14 @@ if (-not $Day -and $VERSION -match '^(\d+)\.(\d+)\.(\d+)\.(\d+)$') {
     $selfTxt = [System.IO.File]::ReadAllText($PSCommandPath, [System.Text.Encoding]::UTF8)
     $selfTxt = $selfTxt -replace '(\$VERSION\s*=\s*")[\d.]+"', ('${1}' + $newVer + '"')
     [System.IO.File]::WriteAllText($PSCommandPath, $selfTxt, (New-Object System.Text.UTF8Encoding($true)))
-    # 공통 푸터 파트셜의 버전 문자열 갱신 (전 페이지가 이 파트셜을 로드)
-    $footer = Join-Path $LOCAL_PATH 'assets\footer.html'
-    if (Test-Path $footer) {
-        $fTxt = [System.IO.File]::ReadAllText($footer, [System.Text.Encoding]::UTF8)
-        $fTxt = $fTxt -replace 'v\d+\.\d+\.\d+\.\d+', "v$newVer"
-        [System.IO.File]::WriteAllText($footer, $fTxt, [System.Text.Encoding]::UTF8)
+    # 일반 배포(비 -Day)만 로컬 공통 푸터를 갱신(정본). -Day 는 스테이지 푸터에만 주입(아래).
+    if (-not $Day) {
+        $footer = Join-Path $LOCAL_PATH 'assets\footer.html'
+        if (Test-Path $footer) {
+            $fTxt = [System.IO.File]::ReadAllText($footer, [System.Text.Encoding]::UTF8)
+            $fTxt = $fTxt -replace 'v\d+\.\d+\.\d+\.\d+', "v$newVer"
+            [System.IO.File]::WriteAllText($footer, $fTxt, [System.Text.Encoding]::UTF8)
+        }
     }
     $VERSION = $newVer
 }
@@ -158,10 +161,18 @@ $remotePath = $T.Path
 # Cloudflare 퍼지 권한이 없어 버전 쿼리(?v=)로 CDN·브라우저 캐시를 무력화.
 $stageWin   = Join-Path $env:TEMP "lifeart-stage-$BACKUP_TS"
 $stagePosix = '/' + $stageWin.Substring(0,1).ToLower() + ($stageWin.Substring(2) -replace '\\', '/')
-$BUST       = if ($Day) { "d$Day-$BACKUP_TS" } else { $VERSION }
+$BUST       = $VERSION   # 캐시버스트 토큰 = 릴리스 버전
 
 # 소스 → 스테이지 복사 후 불필요 폴더 제거 (배포 대상만 남김)
 & $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
+
+# 스테이지 공통 푸터에 릴리스 버전 주입 (-Day 스냅샷은 옛 버전이 박혀있으므로 덮어씀)
+$stageFooter = Join-Path $stageWin 'assets\footer.html'
+if (Test-Path $stageFooter) {
+    $sf = [System.IO.File]::ReadAllText($stageFooter, [System.Text.Encoding]::UTF8)
+    $sf = $sf -replace 'v\d+\.\d+\.\d+\.\d+', "v$VERSION"
+    [System.IO.File]::WriteAllText($stageFooter, $sf, [System.Text.Encoding]::UTF8)
+}
 
 # 캐시버스팅: 모든 *.html 과 layout.js 의 /assets/*.js|css|html 참조에 ?v=$BUST 부착
 $bustRe = [regex]'(/assets/[A-Za-z0-9_./-]+\.(?:js|css|html))'
