@@ -13,6 +13,8 @@ supabase/
 ├── complete_db_setup.sql     ← [8장 필수] 코어 DB 전체 (v3.0) — 1회 실행
 ├── seed_dev.sql              ← [개발 전용] 테스트 계정 4개 (프로덕션 실행 금지)
 │
+├── auction_setup.sql         ← 경매정보 테이블 (auction_items, auction_meta) + RLS
+│
 ├── README.md                 ← 이 파일
 │
 ├── deprecate_01_auth_profiles.sql    ← (구버전) Stage 분리 파일 → complete로 통합됨

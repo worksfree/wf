@@ -24,6 +24,7 @@
 <div id="site-footer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/config.js"></script>
+<script src="/assets/dev-toolkit.js"></script>
 <script src="/assets/auth.js"></script>
 <script src="/assets/layout.js"></script>
 <script>
@@ -53,18 +54,8 @@ async function confirmPayment() {
       return;
     }
 
-    // 주문 상태 갱신 + 결제 기록 저장
-    await sb.from('orders').update({ status: 'paid' }).eq('id', orderId);
-    await sb.from('payments').insert({
-      tenant_id: TENANT_ID,
-      order_id: orderId,
-      pg_provider: 'toss',
-      pg_tid: paymentKey,
-      amount,
-      status: 'approved',
-      env: getEnv(),
-      approved_at: new Date().toISOString(),
-    });
+    // 주문 상태 갱신(status='paid')과 결제 기록 저장은 Worker 가 service_role 로
+    // 이미 처리함(위조 방지). 클라이언트는 결과 표시만 담당한다.
 
     box.innerHTML = `
       <div style="font-size:40px; margin-bottom:12px;">✅</div>

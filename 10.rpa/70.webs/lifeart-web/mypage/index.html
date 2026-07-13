@@ -55,6 +55,7 @@
 <div id="site-footer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/config.js"></script>
+<script src="/assets/dev-toolkit.js"></script>
 <script src="/assets/auth.js"></script>
 <script src="/assets/layout.js"></script>
 <script>
@@ -80,7 +81,7 @@ async function initMypage() {
   });
 
   // 주문 내역
-  const { data: orders } = await sb.from('orders').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+  const { data: orders } = await sb.from('lifeart_orders').select('*').eq('user_id', uid).order('created_at', { ascending: false });
   const ordersEl = document.getElementById('orders-list');
   ordersEl.className = '';
   ordersEl.innerHTML = (orders && orders.length)
@@ -88,7 +89,7 @@ async function initMypage() {
     : '<div class="placeholder-box">주문 내역이 없습니다.</div>';
 
   // 견적함
-  const { data: estimates } = await sb.from('inquiries').select('*').eq('user_id', uid).eq('type', 'estimate').order('created_at', { ascending: false });
+  const { data: estimates } = await sb.from('lifeart_inquiries').select('*').eq('user_id', uid).eq('type', 'estimate').order('created_at', { ascending: false });
   const estEl = document.getElementById('estimates-list');
   estEl.className = '';
   estEl.innerHTML = (estimates && estimates.length)
@@ -96,7 +97,7 @@ async function initMypage() {
     : '<div class="placeholder-box">견적 문의 내역이 없습니다. <a href="/support/#estimate" style="color:var(--accent);">견적 문의하기 →</a></div>';
 
   // 제휴 현황
-  const { data: partnerships } = await sb.from('inquiries').select('*').eq('user_id', uid).eq('type', 'partnership').order('created_at', { ascending: false });
+  const { data: partnerships } = await sb.from('lifeart_inquiries').select('*').eq('user_id', uid).eq('type', 'partnership').order('created_at', { ascending: false });
   const partEl = document.getElementById('partnership-list');
   partEl.className = '';
   partEl.innerHTML = (partnerships && partnerships.length)

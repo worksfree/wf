@@ -55,6 +55,7 @@
 <div id="site-footer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/config.js"></script>
+<script src="/assets/dev-toolkit.js"></script>
 <script src="/assets/auth.js"></script>
 <script src="/assets/layout.js"></script>
 <script>
@@ -67,8 +68,9 @@ async function initAdmin() {
   const { data: { session } } = await sb.auth.getSession();
   if (!isLocal) {
     if (!session) return; // 게이트 표시 유지
-    const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-    if (profile?.role !== 'admin') return; // 게이트 표시 유지 (관리자 아님)
+    const { data: profile } = await sb.from('profiles').select('role, tenant_id').eq('id', session.user.id).single();
+    // LifeArt 테넌트의 admin 만 통과 (허브 admin 이 이 페이지를 열어도 차단)
+    if (profile?.role !== 'admin' || profile?.tenant_id !== TENANT_UUID) return;
   }
   document.getElementById('admin-gate').style.display = 'none';
 
@@ -86,7 +88,7 @@ async function initAdmin() {
 }
 
 async function loadOrders() {
-  const { data: orders, error } = await sb.from('orders').select('*, products(name)').order('created_at', { ascending: false });
+  const { data: orders, error } = await sb.from('lifeart_orders').select('*, lifeart_products(name)').order('created_at', { ascending: false });
   const tbody = document.querySelector('#orders-table tbody');
   if (error || !orders || !orders.length) {
     tbody.innerHTML = '<tr><td colspan="6">주문이 없습니다.</td></tr>';
@@ -95,7 +97,7 @@ async function loadOrders() {
   tbody.innerHTML = orders.map(o => `
     <tr>
       <td>${new Date(o.created_at).toLocaleDateString('ko-KR')}</td>
-      <td>${o.products?.name || '-'}</td>
+      <td>${o.lifeart_products?.name || '-'}</td>
       <td>${o.quantity}</td>
       <td>${o.amount.toLocaleString()}원</td>
       <td>${o.status}</td>
@@ -110,11 +112,11 @@ async function loadOrders() {
 }
 
 async function updateShipping(orderId, status) {
-  await sb.from('orders').update({ shipping_status: status }).eq('id', orderId);
+  await sb.from('lifeart_orders').update({ shipping_status: status }).eq('id', orderId);
 }
 
 async function loadInquiries() {
-  const { data: inquiries, error } = await sb.from('inquiries').select('*').order('created_at', { ascending: false });
+  const { data: inquiries, error } = await sb.from('lifeart_inquiries').select('*').order('created_at', { ascending: false });
   const tbody = document.querySelector('#inquiries-table tbody');
   if (error || !inquiries || !inquiries.length) {
     tbody.innerHTML = '<tr><td colspan="6">문의가 없습니다.</td></tr>';
@@ -139,7 +141,7 @@ async function loadInquiries() {
 }
 
 async function updateInquiryStatus(id, status) {
-  await sb.from('inquiries').update({ status }).eq('id', id);
+  await sb.from('lifeart_inquiries').update({ status }).eq('id', id);
 }
 </script>
 </body>

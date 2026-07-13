@@ -1,17 +1,18 @@
 /**
- * Cloudflare Worker — LifeArt 토스페이먼츠 결제 검증
+ * Cloudflare Worker — LifeArt 토스페이먼츠 결제 검증 + 주문/결제 확정
  *
- * synology-web/service/payment/toss-verify.js 패턴을 LifeArt 전용으로 분리 배포.
- * 결제 승인 후 Supabase orders/payments 테이블까지 갱신한다.
+ * 토스 결제 승인을 서버에서 시크릿 키로 검증한 뒤, 그 결과가 성공일 때만
+ * service_role 로 lifeart_orders.status='paid' 갱신 + lifeart_payments INSERT.
+ * 클라이언트는 이 두 테이블에 대한 쓰기 RLS 정책이 없어 위조 불가.
  *
  * 배포: wrangler deploy --config wrangler.toml
- * 환경 변수 (Cloudflare 대시보드 → Workers → lifeart-toss-verify → Settings → Variables):
- *   TOSS_SECRET_KEY   : 토스 시크릿 키 (현재는 토스 공용 테스트 키 사용 — 실 운영 전 교체 필수)
- *   SUPABASE_URL      : Supabase 프로젝트 URL
- *   SUPABASE_ANON_KEY : Supabase anon key (orders/payments RLS를 통과하려면 서비스 role 권장이나,
- *                       본인 주문만 갱신하도록 이미 RLS로 제한되어 있어 anon + 사용자 JWT로 처리)
+ * Worker secrets (wrangler secret put ...):
+ *   TOSS_SECRET_KEY           : 토스 시크릿 키 (현재 공용 테스트 키 — 실 운영 전 교체)
+ *   SUPABASE_URL              : Supabase 프로젝트 URL
+ *   SUPABASE_SERVICE_ROLE_KEY : Supabase service_role 키 (RLS bypass)
  *
- * 요청: POST /  { orderId: string(uuid, LifeArt orders.id), paymentKey: string, amount: number }
+ * 요청: POST /  { orderId, paymentKey, amount }
+ *   - orderId 는 lifeart_orders.id(uuid) 이자 토스 결제창에 넘긴 orderId 와 동일
  */
 
 const CORS_HEADERS = {
@@ -34,7 +35,7 @@ export default {
     }
     if (!env.TOSS_SECRET_KEY) return json({ error: 'TOSS_SECRET_KEY not configured' }, 500);
 
-    // 토스 결제 승인 API — LifeArt tossOrderId(문자열)로 검증, LifeArt orders.id(uuid)와는 별개 매핑
+    // 1) 토스 결제 승인
     const credential = btoa(env.TOSS_SECRET_KEY + ':');
     const tossRes = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
       method: 'POST',
@@ -42,9 +43,48 @@ export default {
       body: JSON.stringify({ orderId, paymentKey, amount }),
     });
     const tossData = await tossRes.json();
-
     if (!tossRes.ok) return json({ error: tossData.message || 'Toss API error' }, 400);
     if (tossData.totalAmount !== amount) return json({ error: 'Amount mismatch — possible tampering' }, 400);
+
+    // 2) service_role 로 주문 확정 + 결제 기록 (키 없으면 검증만 하고 반환 — 로컬/키 미설정 대비)
+    if (env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY) {
+      const sbHeaders = {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY,
+        'Content-Type': 'application/json',
+      };
+
+      // 주문 조회 (tenant_id/env 를 결제 기록에 복사하기 위해)
+      const ordRes = await fetch(
+        `${env.SUPABASE_URL}/rest/v1/lifeart_orders?id=eq.${orderId}&select=tenant_id,env,amount,status`,
+        { headers: sbHeaders });
+      const ords = await ordRes.json();
+      const order = Array.isArray(ords) ? ords[0] : null;
+      if (!order) return json({ error: 'order not found' }, 404);
+      if (order.amount !== amount) return json({ error: 'order amount mismatch' }, 400);
+
+      if (order.status !== 'paid') {
+        // 주문 확정
+        await fetch(`${env.SUPABASE_URL}/rest/v1/lifeart_orders?id=eq.${orderId}`, {
+          method: 'PATCH', headers: sbHeaders,
+          body: JSON.stringify({ status: 'paid' }),
+        });
+        // 결제 기록
+        await fetch(`${env.SUPABASE_URL}/rest/v1/lifeart_payments`, {
+          method: 'POST', headers: sbHeaders,
+          body: JSON.stringify({
+            tenant_id: order.tenant_id,
+            order_id: orderId,
+            pg_provider: 'toss',
+            pg_tid: paymentKey,
+            amount,
+            status: 'approved',
+            env: order.env,
+            approved_at: new Date().toISOString(),
+          }),
+        });
+      }
+    }
 
     return json({ success: true, payment: tossData });
   },

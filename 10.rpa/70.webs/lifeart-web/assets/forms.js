@@ -1,9 +1,9 @@
-// 문의/견적/제휴 폼 공통 제출 로직 — public.inquiries 테이블에 INSERT
+// 문의/견적/제휴 폼 공통 제출 로직 — public.lifeart_inquiries 테이블에 INSERT
 async function submitInquiry(type, formEl, msgElId) {
   const msgEl = document.getElementById(msgElId);
   const { data: { session } } = await sb.auth.getSession();
   const data = {
-    tenant_id: TENANT_ID,
+    tenant_id: TENANT_UUID,
     type,
     env: getEnv(),
     user_id: session?.user?.id || null,
@@ -19,7 +19,7 @@ async function submitInquiry(type, formEl, msgElId) {
   }
   msgEl.textContent = '접수 중...';
   msgEl.className = 'form-msg';
-  const { error } = await sb.from('inquiries').insert(data);
+  const { error } = await sb.from('lifeart_inquiries').insert(data);
   if (error) {
     msgEl.textContent = '접수에 실패했습니다. 잠시 후 다시 시도해주세요.';
     msgEl.className = 'form-msg error';

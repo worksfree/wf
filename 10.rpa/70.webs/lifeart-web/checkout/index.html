@@ -25,6 +25,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://js.tosspayments.com/v1/payment"></script>
 <script src="/assets/config.js"></script>
+<script src="/assets/dev-toolkit.js"></script>
 <script src="/assets/auth.js"></script>
 <script src="/assets/layout.js"></script>
 <script>
@@ -44,7 +45,7 @@ async function initCheckout() {
     return;
   }
 
-  const { data: order, error } = await sb.from('orders').select('*, products(name)').eq('id', orderId).eq('user_id', session.user.id).single();
+  const { data: order, error } = await sb.from('lifeart_orders').select('*, lifeart_products(name)').eq('id', orderId).eq('user_id', session.user.id).single();
   if (error || !order) {
     box.innerHTML = '<div class="placeholder-box">주문 정보를 찾을 수 없습니다.</div>';
     return;
@@ -57,7 +58,7 @@ async function initCheckout() {
   box.innerHTML = `
     <div style="margin-bottom:20px;">
       <div style="font-size:13px; color:var(--text-mid); margin-bottom:4px;">주문 상품</div>
-      <div style="font-size:16px; font-weight:700; color:var(--text-dark);">${order.products?.name || '상품'} × ${order.quantity}</div>
+      <div style="font-size:16px; font-weight:700; color:var(--text-dark);">${order.lifeart_products?.name || '상품'} × ${order.quantity}</div>
     </div>
     <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700; padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:20px;">
       <span>결제 금액</span><span style="color:var(--accent);">${order.amount.toLocaleString()}원</span>
@@ -71,7 +72,7 @@ async function initCheckout() {
     tossPayments.requestPayment('카드', {
       amount: order.amount,
       orderId: order.id,
-      orderName: order.products?.name || 'LifeArt 상품',
+      orderName: order.lifeart_products?.name || 'LifeArt 상품',
       customerName: session.user.user_metadata?.name || session.user.email,
       successUrl: location.origin + '/checkout/success/',
       failUrl: location.origin + '/checkout/fail/',
