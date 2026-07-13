@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비즈니스 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">Business</div>
+  <h1>기업·단체 제휴</h1>
+</div>
+
+<div class="content-section">
+  <h2 id="wedding">웨딩 · 돌잔치 패키지</h2>
+  <p>예식장·스튜디오와 제휴하여 웨딩·돌잔치 현장에서 즉석 앨범과 액자를 제공합니다.</p>
+
+  <h2 id="travel-golf">여행사 · 골프 · 산악회 B2B</h2>
+  <p>단체 여행, 골프 라운딩, 산악회 모임의 추억을 삽입식 앨범으로 즉석 제작해드립니다. 25년간 다양한 기업 단체 행사를 함께해왔습니다.</p>
+
+  <h2 id="kiosk">키오스크 제휴 <span class="badge hot">NEW</span></h2>
+  <p>LifeArt의 특허 기반 O2O 기술을 활용한 무인 키오스크 설치 제휴를 준비하고 있습니다. 카페, 관광지 등 다양한 장소에서의 협업을 검토 중입니다.</p>
+
+  <h2 id="inquiry">제휴 문의</h2>
+  <form class="form-box" id="partnership-form" onsubmit="event.preventDefault(); submitInquiry('partnership', this, 'partnership-msg');">
+    <div class="form-row">
+      <label>업체명 / 담당자명</label>
+      <input type="text" name="name" required placeholder="예) LifeArt 웨딩홀 / 홍길동">
+    </div>
+    <div class="form-row">
+      <label>연락처</label>
+      <input type="tel" name="phone" required placeholder="010-0000-0000">
+    </div>
+    <div class="form-row">
+      <label>이메일 (선택)</label>
+      <input type="email" name="email" placeholder="example@company.com">
+    </div>
+    <div class="form-row">
+      <label>제휴 문의 내용</label>
+      <textarea name="message" required placeholder="제휴 유형, 예상 규모, 희망 일정 등을 적어주세요."></textarea>
+    </div>
+    <button type="submit" class="form-submit">문의 접수</button>
+    <div class="form-msg" id="partnership-msg"></div>
+  </form>
+</div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/forms.js"></script>
+<script src="/assets/layout.js"></script>
+</body>
+</html>
