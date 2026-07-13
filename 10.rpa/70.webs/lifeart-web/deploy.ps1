@@ -22,7 +22,7 @@ $TARGETS = @{
     "9" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
 }
 
-$EXCLUDE = @("deploy.ps1","deploy.log",".git","node_modules","*.bak")
+$EXCLUDE = @("deploy.ps1","deploy.log",".git","node_modules","*.bak","worker","supabase",".wrangler")
 # ────────────────────────────────────────────────────────────────
 
 $LOCAL_PATH = $PSScriptRoot
