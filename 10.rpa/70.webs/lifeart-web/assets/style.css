@@ -354,3 +354,29 @@ footer { background: var(--deep-charcoal); color: #888; padding: 32px; font-size
 .notice-row { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
 .notice-row .t { color: var(--text-dark); }
 .notice-row .d { color: var(--text-light); font-size: 12px; flex-shrink: 0; margin-left: 16px; }
+
+/* ── 프로세스 흐름 다이어그램 (주문 흐름 등) ── */
+.flow {
+  display: flex; align-items: flex-start; justify-content: center;
+  gap: 6px; flex-wrap: wrap; margin: 28px 0 8px;
+}
+.flow-step { display: flex; flex-direction: column; align-items: center; width: 120px; text-align: center; }
+.flow-box {
+  width: 96px; height: 78px; border: 1.5px solid var(--border); border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent); background: var(--warm-white);
+  transition: border-color .2s, transform .2s;
+}
+.flow-step:hover .flow-box { border-color: var(--accent); transform: translateY(-2px); }
+.flow-box svg { width: 40px; height: 40px; }
+.flow-num {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--deep-charcoal); color: #fff;
+  font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  margin: 12px 0 8px;
+}
+.flow-label { font-size: 13px; color: var(--text-mid); font-weight: 500; }
+.flow-arrow { color: var(--border); font-size: 18px; align-self: center; margin-top: 28px; }
+@media (max-width: 640px) {
+  .flow { flex-direction: column; align-items: center; }
+  .flow-arrow { transform: rotate(90deg); margin: 2px 0; }
+}
