@@ -16,6 +16,49 @@
   document.querySelectorAll('.form-msg').forEach(function (el) {
     if (!el.getAttribute('aria-live')) { el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite'); }
   });
+
+  // KWCAG 3.3.1(오류 정정): 폼의 입력요소를 해당 폼의 상태메시지에 aria-describedby 로 연결
+  document.querySelectorAll('form').forEach(function (f) {
+    var msg = f.querySelector('.form-msg'); if (!msg) return;
+    if (!msg.id) msg.id = 'fmsg-' + Math.random().toString(36).slice(2, 6);
+    f.querySelectorAll('input, select, textarea').forEach(function (fld) {
+      var d = fld.getAttribute('aria-describedby');
+      if (!d || d.indexOf(msg.id) < 0) fld.setAttribute('aria-describedby', d ? d + ' ' + msg.id : msg.id);
+    });
+  });
+
+  // KWCAG 1.3.1(표의 구성): 데이터 표의 <th> 에 scope 자동 부여 (thead=열, 행 첫 th=행)
+  document.querySelectorAll('table').forEach(function (t) {
+    t.querySelectorAll('tr').forEach(function (tr) {
+      if (tr.closest('thead')) { tr.querySelectorAll('th').forEach(function (th) { if (!th.getAttribute('scope')) th.setAttribute('scope', 'col'); }); return; }
+      var kids = Array.prototype.slice.call(tr.children);
+      var ths = kids.filter(function (c) { return c.tagName === 'TH'; });
+      var tds = kids.filter(function (c) { return c.tagName === 'TD'; });
+      if (ths.length && !tds.length) { ths.forEach(function (th) { if (!th.getAttribute('scope')) th.setAttribute('scope', 'col'); }); }
+      else if (ths.length) { if (!ths[0].getAttribute('scope')) ths[0].setAttribute('scope', 'row'); }
+    });
+  });
+
+  // KWCAG 4.1.2(이름·역할·값): 탭 UI 에 ARIA 탭 패턴 부여 + 선택상태 동기화
+  document.querySelectorAll('.tab-row').forEach(function (row) {
+    row.setAttribute('role', 'tablist');
+    var btns = Array.prototype.slice.call(row.querySelectorAll('.tab-btn'));
+    btns.forEach(function (b) {
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', b.classList.contains('active') ? 'true' : 'false');
+      var panel = b.dataset.tab ? document.getElementById('tab-' + b.dataset.tab) : null;
+      if (panel) {
+        if (!b.id) b.id = 'tabbtn-' + b.dataset.tab;
+        panel.setAttribute('role', 'tabpanel');
+        b.setAttribute('aria-controls', panel.id);
+        panel.setAttribute('aria-labelledby', b.id);
+      }
+      b.addEventListener('click', function () {
+        btns.forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+        b.setAttribute('aria-selected', 'true');
+      });
+    });
+  });
 })();
 
 // 공통 헤더/푸터 삽입 (반복되는 30여 개 페이지의 유지보수를 위해 분리)

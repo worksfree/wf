@@ -116,7 +116,8 @@ header {
   display: none;
   z-index: 210;
 }
-.main-nav > li:hover .nav-dropdown { display: block; }
+.main-nav > li:hover .nav-dropdown,
+.main-nav > li:focus-within .nav-dropdown { display: block; }   /* KWCAG 2.1.1: 키보드 포커스로도 하위메뉴 열림 */
 .nav-dropdown a {
   display: block;
   padding: 9px 12px;
@@ -216,7 +217,7 @@ header {
 
 /* ── 개발 예정 툴팁 (href="#" 미구현 링크 전체 공통) ── */
 .wip { position: relative; cursor: default; }
-.wip:hover::after {
+.wip:hover::after, .wip:focus-visible::after {
   content: '개발 예정';
   position: absolute;
   bottom: 100%;
@@ -234,7 +235,7 @@ header {
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-.wip:hover::before {
+.wip:hover::before, .wip:focus-visible::before {
   content: '';
   position: absolute;
   bottom: 100%;
@@ -452,7 +453,8 @@ footer { background: var(--deep-charcoal); color: #888; padding: 32px; font-size
   .main-nav { flex-wrap: wrap; gap: 14px; justify-content: center; }
   .main-nav > li { padding: 8px 0; }
   .nav-dropdown { position: static; display: none; box-shadow: none; border: none; }
-  .main-nav > li:hover .nav-dropdown { display: block; }
+  .main-nav > li:hover .nav-dropdown,
+  .main-nav > li:focus-within .nav-dropdown { display: block; }
   .mega-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
   .ceo-block { flex-direction: column; }
 }
