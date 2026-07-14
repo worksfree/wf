@@ -13,6 +13,13 @@
 -- 결제 완료로 간주하는 주문 상태(매출 인식): paid/shipping/done
 --   (pending/cancelled 은 매출 제외)
 
+-- 14 에서 만든 get_users 는 반환 컬럼이 달라져 CREATE OR REPLACE 불가 → 먼저 DROP.
+-- (재실행 안전을 위해 신규 함수들도 IF EXISTS 로 정리)
+DROP FUNCTION IF EXISTS public.lifeart_admin_get_users();
+DROP FUNCTION IF EXISTS public.lifeart_admin_get_orders();
+DROP FUNCTION IF EXISTS public.lifeart_admin_get_member_orders(uuid);
+DROP FUNCTION IF EXISTS public.lifeart_admin_sales_summary();
+
 -- ── ① 회원 목록 + 구매 집계 (14 대체·수정) ──
 CREATE OR REPLACE FUNCTION public.lifeart_admin_get_users()
 RETURNS TABLE (

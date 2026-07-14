@@ -49,6 +49,11 @@
   .pay-badge.failed, .pay-badge.cancelled { background:#FDE8E8; color:#C62828; }
   .mini-orders { font-size:12px; }
   .mini-orders td { padding:6px 10px; }
+  .hero-picker { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:8px; margin-bottom:12px; }
+  .hero-picker .thumb { aspect-ratio:4/3; background-size:cover; background-position:center; border-radius:6px; cursor:pointer; border:2px solid transparent; }
+  .hero-picker .thumb:hover, .hero-picker .thumb.sel { border-color:var(--accent); }
+  .hero-preview { height:120px; background-size:cover; background-position:center; border-radius:8px; margin-bottom:10px; background-color:var(--soft-gray); }
+  #hero-table td .thumb { width:80px; height:52px; background-size:cover; background-position:center; border-radius:4px; }
 </style>
 </head>
 <body>
@@ -74,6 +79,7 @@
     <button class="tab-btn" data-tab="notices">공지사항</button>
     <button class="tab-btn" data-tab="faqs">FAQ</button>
     <button class="tab-btn needs-stage-2" data-tab="press">보도자료</button>
+    <button class="tab-btn" data-tab="hero">첫화면</button>
   </div>
 
   <!-- 매출 현황 (대시보드) -->
@@ -210,6 +216,36 @@
       </table>
     </div>
   </div>
+
+  <!-- 첫화면(히어로) 관리 -->
+  <div class="tab-panel" id="tab-hero">
+    <div class="adm-toolbar" style="justify-content:space-between; align-items:center;">
+      <span style="font-size:12px; color:var(--text-light);">홈 첫 화면에 로테이션되는 이미지입니다. 사용 중인 슬라이드가 순서대로 노출됩니다.</span>
+      <button class="adm-btn primary" onclick="openHeroEditor()">+ 슬라이드 추가</button>
+    </div>
+    <div class="adm-editor" id="hero-editor">
+      <input type="hidden" id="hero-id">
+      <label>이미지 선택 (갤러리)</label>
+      <div id="hero-picker" class="hero-picker"></div>
+      <label>또는 이미지 URL 직접 입력</label>
+      <input type="text" id="hero-url" placeholder="/assets/gallery/prod-01.png 또는 https://..." oninput="heroPreview(this.value)">
+      <div id="hero-preview" class="hero-preview"></div>
+      <div class="row">
+        <label>정렬순서 <input type="number" id="hero-sort" value="0" style="width:70px;display:inline-block;"></label>
+        <label><input type="checkbox" id="hero-active" checked> 사용</label>
+      </div>
+      <div class="adm-toolbar" style="margin:0;">
+        <button class="adm-btn" onclick="closeHeroEditor()">취소</button>
+        <button class="adm-btn primary" onclick="saveHero()">저장</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table" id="hero-table">
+        <thead><tr><th>미리보기</th><th>이미지</th><th>순서</th><th>사용</th><th></th></tr></thead>
+        <tbody><tr><td colspan="5">불러오는 중...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <div id="site-footer"></div>
@@ -249,6 +285,7 @@ async function initAdmin() {
   await loadFaqs();
   await loadPress();
   await loadUsers();
+  await loadHero();
 }
 const won = n => (Number(n)||0).toLocaleString('ko-KR') + '원';
 const PAY_LABEL = { approved:'완료', requested:'대기', failed:'실패', cancelled:'취소' };
@@ -570,6 +607,64 @@ async function setUserRole(id, role, el) {
     loadUsers();
   }
 }
+
+/* ── 첫화면(히어로) 슬라이드 관리 ── */
+const HERO_ASSETS = [
+  '/assets/gallery/prod-01.png','/assets/gallery/prod-02.png','/assets/gallery/prod-03.png',
+  '/assets/gallery/event-01.jpg','/assets/gallery/event-02.jpg','/assets/gallery/event-03.jpg','/assets/gallery/event-04.jpg',
+  '/assets/gallery/corp-01.jpg','/assets/gallery/corp-02.jpg','/assets/gallery/corp-03.jpg',
+  '/assets/img/hero-02.png','/assets/img/hero-vip.png','/assets/img/corp-album-1.jpg'
+];
+async function loadHero() {
+  const { data, error } = await sb.from('lifeart_hero_slides').select('*').order('sort_order', { ascending: true });
+  const tb = document.querySelector('#hero-table tbody');
+  if (error) { tb.innerHTML = '<tr><td colspan="5">불러올 수 없습니다. (16번 마이그레이션 미실행 또는 권한 없음)</td></tr>'; return; }
+  if (!data || !data.length) { tb.innerHTML = '<tr><td colspan="5">등록된 슬라이드가 없습니다. (기본 이미지가 노출됩니다)</td></tr>'; return; }
+  tb.innerHTML = data.map(s => `
+    <tr>
+      <td><div class="thumb" style="background-image:url('${esc(s.image_url)}');"></div></td>
+      <td style="max-width:280px;word-break:break-all;font-size:12px;">${esc(s.image_url)}</td>
+      <td>${s.sort_order}</td>
+      <td>${s.is_active?'✔':'—'}</td>
+      <td><button class="adm-btn" onclick='editHero(${JSON.stringify(s)})'>수정</button>
+          <button class="adm-btn danger" onclick="delHero('${s.id}')">삭제</button></td>
+    </tr>`).join('');
+}
+function renderHeroPicker(sel) {
+  document.getElementById('hero-picker').innerHTML = HERO_ASSETS.map(u =>
+    `<div class="thumb ${u===sel?'sel':''}" style="background-image:url('${u}');" title="${u}" onclick="pickHero('${u}')"></div>`).join('');
+}
+function pickHero(u) { document.getElementById('hero-url').value = u; renderHeroPicker(u); heroPreview(u); }
+function heroPreview(u) { document.getElementById('hero-preview').style.backgroundImage = u ? `url('${u.replace(/["'\\]/g,'')}')` : 'none'; }
+function openHeroEditor() { document.getElementById('hero-editor').classList.add('open'); renderHeroPicker(''); }
+function closeHeroEditor() {
+  document.getElementById('hero-editor').classList.remove('open');
+  document.getElementById('hero-id').value=''; document.getElementById('hero-url').value='';
+  document.getElementById('hero-sort').value='0'; document.getElementById('hero-active').checked=true;
+  heroPreview('');
+}
+function editHero(s) {
+  document.getElementById('hero-id').value=s.id;
+  document.getElementById('hero-url').value=s.image_url;
+  document.getElementById('hero-sort').value=s.sort_order;
+  document.getElementById('hero-active').checked=s.is_active;
+  renderHeroPicker(s.image_url); heroPreview(s.image_url);
+  document.getElementById('hero-editor').classList.add('open');
+}
+async function saveHero() {
+  const id=document.getElementById('hero-id').value;
+  const payload={ image_url:document.getElementById('hero-url').value.trim(),
+    sort_order:parseInt(document.getElementById('hero-sort').value,10)||0,
+    is_active:document.getElementById('hero-active').checked,
+    tenant_id:TENANT_UUID, updated_at:new Date().toISOString() };
+  if(!payload.image_url){ alert('이미지를 선택하거나 URL을 입력하세요'); return; }
+  const { error } = id
+    ? await sb.from('lifeart_hero_slides').update(payload).eq('id',id)
+    : await sb.from('lifeart_hero_slides').insert(payload);
+  if(error){ alert('저장 실패: '+error.message); return; }
+  closeHeroEditor(); loadHero();
+}
+async function delHero(id){ if(!confirm('이 슬라이드를 삭제하시겠습니까?'))return; await sb.from('lifeart_hero_slides').delete().eq('id',id); loadHero(); }
 </script>
 </body>
 </html>
