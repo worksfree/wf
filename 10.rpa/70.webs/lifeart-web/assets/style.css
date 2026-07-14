@@ -26,6 +26,8 @@ html[data-stage="4"] .needs-stage-5 { display: none !important; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* 루트 배경도 크림색으로 — 페이지 이동 시 흰 화면 번쩍임(플래시) 방지 */
+html { background: var(--warm-white); }
 body {
   font-family: 'Pretendard', 'Noto Sans KR', -apple-system, sans-serif;
   background: var(--warm-white);
