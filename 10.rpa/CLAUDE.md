@@ -179,6 +179,23 @@ $utf8bom = New-Object System.Text.UTF8Encoding $true
 
 > **예외**: 서버 간 API 데이터 교환용 CSV (사람이 직접 Excel으로 열지 않는 파일)는 순수 UTF-8(BOM 없음)도 허용.
 
+## PowerShell 스크립트 파일(.ps1) 인코딩 규칙 (전체 프로젝트 공통 — 필수)
+
+한글·이모지·박스 문자(║╔╚ 등)가 포함된 `.ps1` 파일은 **반드시 UTF-8 BOM**으로 저장한다.
+
+- **이유**: Windows PowerShell 5.1은 BOM 없는 UTF-8 스크립트 파일을 시스템 기본 코드페이지(CP949 등)로 잘못 해석한다. 한글 멀티바이트 시퀀스가 깨지면서 문자열 리터럴 안의 `"` 바이트가 우연히 노출되어 문자열이 예상보다 일찍 닫히고, 그 뒤의 `&&`/`||` 등이 코드로 파싱되어 `The token '&&' is not a valid statement separator in this version` 같은 알 수 없는 파싱 에러가 발생한다.
+- **증상**: 에러 메시지가 가리키는 줄/컬럼이 실제 문제 위치와 다르고, `Get-Content`로 열어도 한글이 `占쏙옙` 같은 문자로 깨져 보인다 — 이 증상이 보이면 BOM 문제로 우선 의심한다.
+- **적용 범위**: `deploy.ps1`, `build_*.ps1` 등 한글 문자열을 포함하는 모든 PowerShell 스크립트. Write/Edit 도구로 새로 작성한 `.ps1` 파일은 기본적으로 BOM 없이 저장되므로, 한글이 포함되면 저장 후 반드시 아래로 재저장한다.
+
+```powershell
+$path = "스크립트경로.ps1"
+$content = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8)
+$utf8Bom = New-Object System.Text.UTF8Encoding($true)
+[System.IO.File]::WriteAllText($path, $content, $utf8Bom)
+```
+
+> CSV/Excel의 UTF-8 BOM 규칙(아래 섹션)과 원리는 같지만 대상이 다르다 — 이 섹션은 **스크립트 소스 파일 자체**, 아래 섹션은 **스크립트가 생성하는 출력 파일**에 대한 규칙이다.
+
 ## Excel 숫자 포맷 규칙 (전체 프로젝트 공통 — 필수)
 
 Excel 파일(.xlsx)을 생성할 때 **숫자 셀은 반드시 정수/소수 포맷을 명시**해야 한다.
@@ -219,17 +236,18 @@ worksheet.write_number(row, col, value, fmt_int)
 
 > **예외**: 비율(%), 소수 등 정밀도가 필요한 셀은 적합한 포맷(`'0.00'`, `'0.00%'`)을 명시.
 
-## 버전 규칙 (앱 공통)
+## 버전 규칙 (전체 프로젝트 공통 — 필수)
 
 버전 형식: `MAJOR.MINOR.PATCH.BUILD` (예: `0.7.0.3`)
 
-- 각 세그먼트는 0–9. 9를 넘으면 상위 자리로 올림 (계단식).
-  - `0.7.0.9` → `0.7.1.0` / `0.7.9.9` → `0.8.0.0`
-- **BUILD** (4번째): 빌드 스크립트 실행마다 자동 증가.
-- **PATCH** (3번째) 이상: 기능 추가·수정·호환성 변경 시 수동으로 올림.
-- 자동 증가 로직은 스크립트가 자신의 파일을 읽어 `$VERSION = "X.X.X.X"` 패턴을 업데이트함.
-
-> 웹(synology-web) 버전 규칙은 별도 — `70.webs/synology-web/CLAUDE.md` 참고.
+- **MAJOR·MINOR·PATCH**: 각 자리 **0–9만 허용**. 9에서 증가하면 상위 자리로 계단식 올림(carry)하고 자기 자리는 0으로.
+  - PATCH: `0.7.9.x` → 증가 시 `0.8.0.x` / MINOR: `0.9.x.x` → 증가 시 `1.0.x.x`
+- **BUILD**: **0–9999 허용**. 9999에서 증가하면 PATCH 로 계단식 올림, BUILD=0.
+- ⛔ 어떤 자리도 규칙 범위를 넘겨 표기하지 말 것 (예: `0.7.14.1` 금지 → 올바른 값 `0.8.4.1`).
+- 배포/빌드 시 자동 증가:
+  - 앱(빌드): BUILD++ (빌드 스크립트 실행마다)
+  - 웹(단계 배포): pre-test=BUILD++ · test=PATCH++(BUILD 리셋) · production=MINOR++(PATCH·BUILD 리셋)
+- 자동 증가 로직은 스크립트가 자신의 파일을 읽어 `$VERSION = "X.X.X.X"` 패턴을 갱신하며, **반드시 위 올림 규칙을 적용**한다.
 
 ## 개발 규칙
 

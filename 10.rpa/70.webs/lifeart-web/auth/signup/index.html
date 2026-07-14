@@ -21,6 +21,16 @@
     <div class="form-row"><label>연락처</label><input type="tel" name="phone" required placeholder="010-0000-0000"></div>
     <div class="form-row"><label>이메일</label><input type="email" name="email" required></div>
     <div class="form-row"><label>비밀번호</label><input type="password" name="password" required minlength="6" placeholder="6자 이상"></div>
+    <div class="form-row" style="gap:8px; margin-top:4px;">
+      <label style="display:flex; align-items:flex-start; gap:8px; font-size:13px; color:var(--text-mid); font-weight:400;">
+        <input type="checkbox" name="agree_terms" required style="margin-top:3px; width:auto;">
+        <span><a href="/terms/" target="_blank" rel="noopener" style="color:var(--accent);">이용약관</a>에 동의합니다. <em style="color:#C62828; font-style:normal;">(필수)</em></span>
+      </label>
+      <label style="display:flex; align-items:flex-start; gap:8px; font-size:13px; color:var(--text-mid); font-weight:400;">
+        <input type="checkbox" name="agree_privacy" required style="margin-top:3px; width:auto;">
+        <span><a href="/privacy/" target="_blank" rel="noopener" style="color:var(--accent);">개인정보 수집·이용</a>에 동의합니다. <em style="color:#C62828; font-style:normal;">(필수)</em></span>
+      </label>
+    </div>
     <button type="submit" class="form-submit">가입하기</button>
     <div class="form-msg" id="signup-msg"></div>
     <div class="social-login needs-stage-2">

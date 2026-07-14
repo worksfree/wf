@@ -21,7 +21,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.7.14.1"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
+$VERSION  = "0.8.4.2"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
 
 $TARGETS = @{
     "1" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
@@ -91,6 +91,10 @@ if ($VERSION -match '^(\d+)\.(\d+)\.(\d+)\.(\d+)$') {
         "2" { $p[2]++; $p[3] = 0 }              # test: PATCH↑
         default { $p[3]++ }                      # pre-test(1): BUILD↑
     }
+    # 계단식 올림(carry): BUILD 0-9999, MAJOR/MINOR/PATCH 0-9 (CLAUDE.md 버전 규칙)
+    if ($p[3] -gt 9999) { $p[3] = 0; $p[2]++ }
+    if ($p[2] -gt 9)    { $p[2] = 0; $p[1]++ }
+    if ($p[1] -gt 9)    { $p[1] = 0; $p[0]++ }
     $newVer  = "$($p[0]).$($p[1]).$($p[2]).$($p[3])"
     # deploy.ps1 자기 자신의 $VERSION 갱신 (UTF-8 BOM 유지 — 한글 포함)
     $selfTxt = [System.IO.File]::ReadAllText($PSCommandPath, [System.Text.Encoding]::UTF8)

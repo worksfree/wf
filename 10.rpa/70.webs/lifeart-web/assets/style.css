@@ -151,6 +151,18 @@ header {
 .scan-card p { font-size: 13px; color: var(--text-mid); line-height: 1.7; margin: 0; }
 @media (max-width: 640px) { .scan-grid { grid-template-columns: 1fr; } }
 
+/* ── 법적 고지 문서 (이용약관·개인정보처리방침) ── */
+.legal-doc { max-width: 860px; margin: 0 auto; }
+.legal-doc .legal-updated { font-size: 12.5px; color: var(--text-light); margin-bottom: 24px; }
+.legal-doc h2 { font-size: 17px; margin: 30px 0 10px; color: var(--text-dark); }
+.legal-doc h3 { font-size: 14.5px; margin: 18px 0 6px; color: var(--text-mid); }
+.legal-doc p, .legal-doc li { font-size: 14px; line-height: 1.85; color: var(--text-mid); }
+.legal-doc ol, .legal-doc ul { padding-left: 20px; margin: 6px 0 10px; }
+.legal-doc ol li { margin-bottom: 4px; }
+.legal-doc .legal-table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; font-size: 13px; }
+.legal-doc .legal-table th, .legal-doc .legal-table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+.legal-doc .legal-table th { background: var(--soft-gray); color: var(--text-mid); white-space: nowrap; }
+
 /* ── 보도자료 목록 (/about/press/) ── */
 .press-item { border-bottom: 1px solid var(--border); padding: 22px 0; }
 .press-item:first-child { padding-top: 0; }
