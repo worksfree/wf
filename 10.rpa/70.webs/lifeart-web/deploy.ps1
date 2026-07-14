@@ -21,7 +21,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.8.4.3"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
+$VERSION  = "0.8.4.4"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
 
 $TARGETS = @{
     "1" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
@@ -209,7 +209,7 @@ if ((Test-Path $hdrFile) -and (Test-Path $ftrFile)) {
     Get-ChildItem -Path $stageWin -Recurse -File -Filter *.html | ForEach-Object {
         $c = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
         if ($c -match '<div id="site-header"></div>' -or $c -match '<div id="site-footer"></div>') {
-            $c = $c.Replace('<div id="site-header"></div>', '<div id="site-header">' + $hdr + '</div>')
+            $c = $c.Replace('<div id="site-header"></div>', '<div id="site-header">' + $hdr + '</div><a id="main" tabindex="-1"></a>')
             $c = $c.Replace('<div id="site-footer"></div>', '<div id="site-footer">' + $ftr + '</div>')
             [System.IO.File]::WriteAllText($_.FullName, $c, [System.Text.Encoding]::UTF8)
         }
