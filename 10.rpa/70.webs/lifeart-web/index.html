@@ -117,8 +117,9 @@
   const slides = [...box.querySelectorAll('.hero-slide')];
   if (!slides.length) return;
   slides[0].classList.add('active');
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (slides.length === 1 || reduce) return;
+  // 동작 줄이기(prefers-reduced-motion) 시에도 로테이션은 유지하되, 줌(켄번즈)만 CSS에서 제거되어
+  // 부드러운 크로스페이드만 남는다. (예전엔 여기서 중단해 데스크톱에서 정지 이미지처럼 보였음)
+  if (slides.length === 1) return;
   let i = 0;
   setInterval(() => {
     slides[i].classList.remove('active');
