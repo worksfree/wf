@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1:1 문의 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">Support</div>
+  <h1>1:1 문의</h1>
+</div>
+
+<div class="content-section">
+  <p class="guide-lead">궁금한 점을 남겨주시면 담당자가 확인 후 답변드립니다. 회원 문의는 마이페이지에서 답변을 확인하실 수 있습니다.</p>
+  <div style="display:flex; justify-content:center;">
+    <form class="form-box" id="qna-form" style="max-width:520px; width:100%;" onsubmit="event.preventDefault(); submitInquiry('qna', this, 'qna-msg');">
+      <div class="form-row"><label>이름</label><input type="text" name="name" required></div>
+      <div class="form-row"><label>연락처</label><input type="tel" name="phone" required placeholder="010-0000-0000"></div>
+      <div class="form-row"><label>이메일 (선택)</label><input type="email" name="email"></div>
+      <div class="form-row"><label>문의 내용</label><textarea name="message" required></textarea></div>
+      <button type="submit" class="form-submit">문의 접수</button>
+      <div class="form-msg" id="qna-msg"></div>
+    </form>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/dev-toolkit.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/forms.js"></script>
+<script src="/assets/layout.js"></script>
+</body>
+</html>

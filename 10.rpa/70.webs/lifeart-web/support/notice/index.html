@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공지사항 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">Support</div>
+  <h1>공지사항</h1>
+</div>
+
+<div class="content-section">
+  <div id="notice-list"><div class="placeholder-box">불러오는 중...</div></div>
+</div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/dev-toolkit.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/layout.js"></script>
+<script>
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+document.addEventListener('layout:ready', async () => {
+  const el = document.getElementById('notice-list');
+  const { data, error } = await sb.from('lifeart_notices')
+    .select('title, body, created_at, pinned')
+    .order('pinned', { ascending: false }).order('created_at', { ascending: false });
+  if (error || !data || !data.length) { el.innerHTML = '<div class="placeholder-box">등록된 공지사항이 없습니다.</div>'; return; }
+  el.innerHTML = data.map(n => `
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        ${n.pinned ? '📌 ' : ''}${esc(n.title)}
+        <span class="d" style="margin-left:auto;font-size:11px;color:var(--text-light);">${new Date(n.created_at).toLocaleDateString('ko-KR')}</span>
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a" style="white-space:pre-line;">${esc(n.body)}</div>
+    </div>`).join('');
+});
+</script>
+</body>
+</html>

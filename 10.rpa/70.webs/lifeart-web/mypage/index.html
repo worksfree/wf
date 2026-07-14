@@ -99,7 +99,7 @@ async function initMypage() {
   estEl.className = '';
   estEl.innerHTML = (estimates && estimates.length)
     ? estimates.map(e => `<div class="notice-row"><span class="t">${e.message.slice(0,40)}</span><span class="d">${e.status}</span></div>`).join('')
-    : '<div class="placeholder-box">견적 문의 내역이 없습니다. <a href="/support/#estimate" style="color:var(--accent);">견적 문의하기 →</a></div>';
+    : '<div class="placeholder-box">견적 문의 내역이 없습니다. <a href="/support/estimate/" style="color:var(--accent);">견적 문의하기 →</a></div>';
 
   // 제휴 현황 (관리자 답변이 있으면 함께 노출)
   const { data: partnerships } = await sb.from('lifeart_inquiries').select('*').eq('user_id', uid).eq('type', 'partnership').order('created_at', { ascending: false });
@@ -111,7 +111,7 @@ async function initMypage() {
     </div>`;
   partEl.innerHTML = (partnerships && partnerships.length)
     ? partnerships.map(inqRow).join('')
-    : '<div class="placeholder-box">제휴 문의 내역이 없습니다. <a href="/business/#inquiry" style="color:var(--accent);">제휴 문의하기 →</a></div>';
+    : '<div class="placeholder-box">제휴 문의 내역이 없습니다. <a href="/business/inquiry/" style="color:var(--accent);">제휴 문의하기 →</a></div>';
 
   // 회원정보
   const { data: profile } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();

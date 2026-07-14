@@ -16,33 +16,25 @@
 </div>
 
 <div class="content-section">
-  <h2 id="notice">공지사항</h2>
-  <div id="notice-list"><div class="placeholder-box">불러오는 중...</div></div>
-
-  <h2 id="faq" style="margin-top:40px;">자주 묻는 질문</h2>
-  <div id="faq-list"><div class="placeholder-box">불러오는 중...</div></div>
-
-  <h2 id="qna" style="margin-top:40px;">1:1 문의</h2>
-  <form class="form-box" id="qna-form" onsubmit="event.preventDefault(); submitInquiry('qna', this, 'qna-msg');">
-    <div class="form-row"><label>이름</label><input type="text" name="name" required></div>
-    <div class="form-row"><label>연락처</label><input type="tel" name="phone" required placeholder="010-0000-0000"></div>
-    <div class="form-row"><label>이메일 (선택)</label><input type="email" name="email"></div>
-    <div class="form-row"><label>문의 내용</label><textarea name="message" required></textarea></div>
-    <button type="submit" class="form-submit">문의 접수</button>
-    <div class="form-msg" id="qna-msg"></div>
-  </form>
-
-  <h2 id="estimate" style="margin-top:40px;">견적 문의</h2>
-  <form class="form-box" id="estimate-form" onsubmit="event.preventDefault(); submitInquiry('estimate', this, 'estimate-msg');">
-    <div class="form-row"><label>이름</label><input type="text" name="name" required></div>
-    <div class="form-row"><label>연락처</label><input type="tel" name="phone" required placeholder="010-0000-0000"></div>
-    <div class="form-row"><label>이메일 (선택)</label><input type="email" name="email"></div>
-    <div class="form-row"><label>희망 상품 · 수량 · 일정</label><textarea name="message" required placeholder="예) VIP 앨범 Tier A, 30권, 8월 초 필요"></textarea></div>
-    <button type="submit" class="form-submit">견적 요청</button>
-    <div class="form-msg" id="estimate-msg"></div>
-  </form>
-
-  <div class="placeholder-box" style="margin-top:40px;">출고 일정표는 준비 중입니다.</div>
+  <p class="guide-lead">무엇을 도와드릴까요? 공지사항·자주 묻는 질문을 확인하시거나, 1:1·견적 문의를 남겨주세요.</p>
+  <div class="product-grid">
+    <a href="/support/notice/" class="product-card">
+      <div class="thumb" style="background:var(--deep-charcoal);color:var(--muted-gold);display:flex;align-items:center;justify-content:center;font-size:34px;">📢</div>
+      <div class="body"><h3>공지사항</h3><p>서비스 소식과 안내를 확인하세요.</p></div>
+    </a>
+    <a href="/support/faq/" class="product-card">
+      <div class="thumb" style="background:var(--soft-gray);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:34px;">❓</div>
+      <div class="body"><h3>자주 묻는 질문</h3><p>제작·주문·배송 관련 FAQ.</p></div>
+    </a>
+    <a href="/support/qna/" class="product-card">
+      <div class="thumb" style="background:var(--deep-charcoal);color:var(--muted-gold);display:flex;align-items:center;justify-content:center;font-size:34px;">💬</div>
+      <div class="body"><h3>1:1 문의</h3><p>궁금한 점을 직접 남겨주세요.</p></div>
+    </a>
+    <a href="/support/estimate/" class="product-card">
+      <div class="thumb" style="background:var(--soft-gray);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:34px;">🧾</div>
+      <div class="body"><h3>견적 문의</h3><p>상품·수량·일정으로 견적을 요청하세요.</p></div>
+    </a>
+  </div>
 </div>
 
 <div id="site-footer"></div>
@@ -50,49 +42,6 @@
 <script src="/assets/config.js"></script>
 <script src="/assets/dev-toolkit.js"></script>
 <script src="/assets/auth.js"></script>
-<script src="/assets/forms.js"></script>
 <script src="/assets/layout.js"></script>
-<script>
-document.addEventListener('layout:ready', loadSupportContent);
-
-async function loadSupportContent() {
-  // 공지사항
-  const nEl = document.getElementById('notice-list');
-  const { data: notices, error: nErr } = await sb.from('lifeart_notices')
-    .select('title, body, created_at, pinned')
-    .order('pinned', { ascending: false }).order('created_at', { ascending: false });
-  if (nErr || !notices || !notices.length) {
-    nEl.innerHTML = '<div class="placeholder-box">등록된 공지사항이 없습니다.</div>';
-  } else {
-    nEl.innerHTML = notices.map(n => `
-      <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-          ${n.pinned ? '📌 ' : ''}${esc(n.title)}
-          <span class="d" style="margin-left:auto;font-size:11px;color:var(--text-light);">${new Date(n.created_at).toLocaleDateString('ko-KR')}</span>
-          <span class="arrow">▾</span>
-        </div>
-        <div class="faq-a" style="white-space:pre-line;">${esc(n.body)}</div>
-      </div>`).join('');
-  }
-
-  // FAQ
-  const fEl = document.getElementById('faq-list');
-  const { data: faqs, error: fErr } = await sb.from('lifeart_faqs')
-    .select('question, answer, sort_order').order('sort_order', { ascending: true });
-  if (fErr || !faqs || !faqs.length) {
-    fEl.innerHTML = '<div class="placeholder-box">등록된 FAQ가 없습니다.</div>';
-  } else {
-    fEl.innerHTML = faqs.map(f => `
-      <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">${esc(f.question)} <span class="arrow">▾</span></div>
-        <div class="faq-a" style="white-space:pre-line;">${esc(f.answer)}</div>
-      </div>`).join('');
-  }
-}
-
-function esc(s) {
-  return (s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
-}
-</script>
 </body>
 </html>

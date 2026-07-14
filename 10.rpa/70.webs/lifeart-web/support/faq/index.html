@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자주 묻는 질문 — LifeArt</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="kicker">Support</div>
+  <h1>자주 묻는 질문</h1>
+</div>
+
+<div class="content-section">
+  <div id="faq-list"><div class="placeholder-box">불러오는 중...</div></div>
+</div>
+
+<div id="site-footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/dev-toolkit.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/layout.js"></script>
+<script>
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+document.addEventListener('layout:ready', async () => {
+  const el = document.getElementById('faq-list');
+  const { data, error } = await sb.from('lifeart_faqs')
+    .select('question, answer, sort_order').order('sort_order', { ascending: true });
+  if (error || !data || !data.length) { el.innerHTML = '<div class="placeholder-box">등록된 FAQ가 없습니다.</div>'; return; }
+  el.innerHTML = data.map(f => `
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">${esc(f.question)} <span class="arrow">▾</span></div>
+      <div class="faq-a" style="white-space:pre-line;">${esc(f.answer)}</div>
+    </div>`).join('');
+});
+</script>
+</body>
+</html>
