@@ -18,6 +18,14 @@ function getEnv() {
   return 'production';
 }
 
+// ── 단계 배포 플래그 ─────────────────────────────────────────────
+//  0=첫화면 애니메이션 · 1=+소셜 로그인 · 2=+보도자료 관리(O&M) · 3=+토스 결제
+//  소스 기본값 3(전체 공개) — pre-test 검수는 항상 full.
+//  test/www 는 deploy.ps1 -Stage N 이 배포 사본의 이 값만 치환한다.
+const RELEASE_STAGE = 3;   /* deploy:stage */
+document.documentElement.setAttribute('data-stage', String(RELEASE_STAGE));
+function stageAtLeast(n) { return RELEASE_STAGE >= n; }
+
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // 토스페이먼츠 — WorksFree 허브에서 실제 가결제까지 검증된 테스트 클라이언트 키.

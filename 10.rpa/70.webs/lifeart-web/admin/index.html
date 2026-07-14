@@ -59,6 +59,7 @@
     <button class="tab-btn" data-tab="inquiries">문의 관리</button>
     <button class="tab-btn" data-tab="notices">공지사항</button>
     <button class="tab-btn" data-tab="faqs">FAQ</button>
+    <button class="tab-btn needs-stage-2" data-tab="press">보도자료</button>
   </div>
 
   <!-- 주문 -->
@@ -134,6 +135,35 @@
       </table>
     </div>
   </div>
+
+  <!-- 보도자료 -->
+  <div class="tab-panel" id="tab-press">
+    <div class="adm-toolbar"><button class="adm-btn primary" onclick="openPressEditor()">+ 보도자료 등록</button></div>
+    <div class="adm-editor" id="press-editor">
+      <input type="hidden" id="press-id">
+      <label>제목</label><input type="text" id="press-title" placeholder="보도자료 제목">
+      <div class="row">
+        <div style="flex:1;"><label>매체 · 출처</label><input type="text" id="press-outlet" placeholder="예: 매일경제"></div>
+        <div style="flex:1;"><label>보도일</label><input type="date" id="press-date"></div>
+      </div>
+      <label>요약 · 본문</label><textarea id="press-summary" placeholder="보도 내용 요약"></textarea>
+      <label>원문 링크 (선택)</label><input type="url" id="press-link" placeholder="https://">
+      <div class="row">
+        <label><input type="checkbox" id="press-pinned"> 상단 고정</label>
+        <label><input type="checkbox" id="press-published" checked> 게시</label>
+      </div>
+      <div class="adm-toolbar" style="margin:0;">
+        <button class="adm-btn" onclick="closePressEditor()">취소</button>
+        <button class="adm-btn primary" onclick="savePress()">저장</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table" id="press-table">
+        <thead><tr><th>제목</th><th>매체</th><th>보도일</th><th>게시</th><th>고정</th><th></th></tr></thead>
+        <tbody><tr><td colspan="6">불러오는 중...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <div id="site-footer"></div>
@@ -170,6 +200,7 @@ async function initAdmin() {
   await loadInquiries();
   await loadNotices();
   await loadFaqs();
+  await loadPress();
 }
 
 /* ── 주문 ── */
@@ -346,6 +377,59 @@ async function saveFaq(){
   closeFaqEditor(); loadFaqs();
 }
 async function delFaq(id){ if(!confirm('삭제하시겠습니까?'))return; await sb.from('lifeart_faqs').delete().eq('id',id); loadFaqs(); }
+
+/* ── 보도자료 ── */
+async function loadPress() {
+  const { data, error } = await sb.from('lifeart_press').select('*')
+    .order('pinned', { ascending: false }).order('published_on', { ascending: false, nullsFirst: false });
+  const tb = document.querySelector('#press-table tbody');
+  if (error || !data?.length) { tb.innerHTML = '<tr><td colspan="6">보도자료가 없습니다.</td></tr>'; return; }
+  tb.innerHTML = data.map(p => `
+    <tr>
+      <td>${esc(p.title)}</td>
+      <td>${esc(p.outlet)||'—'}</td>
+      <td>${p.published_on || '—'}</td>
+      <td>${p.is_published?'✔':'—'}</td>
+      <td>${p.pinned?'📌':'—'}</td>
+      <td><button class="adm-btn" onclick='editPress(${JSON.stringify(p)})'>수정</button>
+          <button class="adm-btn danger" onclick="delPress('${p.id}')">삭제</button></td>
+    </tr>`).join('');
+}
+function openPressEditor(){ document.getElementById('press-editor').classList.add('open'); }
+function closePressEditor(){
+  document.getElementById('press-editor').classList.remove('open');
+  ['press-id','press-title','press-outlet','press-date','press-summary','press-link'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('press-pinned').checked=false; document.getElementById('press-published').checked=true;
+}
+function editPress(p){
+  document.getElementById('press-id').value=p.id;
+  document.getElementById('press-title').value=p.title;
+  document.getElementById('press-outlet').value=p.outlet||'';
+  document.getElementById('press-date').value=p.published_on||'';
+  document.getElementById('press-summary').value=p.summary||'';
+  document.getElementById('press-link').value=p.link_url||'';
+  document.getElementById('press-pinned').checked=p.pinned;
+  document.getElementById('press-published').checked=p.is_published;
+  openPressEditor();
+}
+async function savePress(){
+  const id=document.getElementById('press-id').value;
+  const payload={ title:document.getElementById('press-title').value.trim(),
+    outlet:document.getElementById('press-outlet').value.trim(),
+    published_on:document.getElementById('press-date').value||null,
+    summary:document.getElementById('press-summary').value.trim(),
+    link_url:document.getElementById('press-link').value.trim()||null,
+    pinned:document.getElementById('press-pinned').checked,
+    is_published:document.getElementById('press-published').checked,
+    tenant_id:TENANT_UUID, updated_at:new Date().toISOString() };
+  if(!payload.title){ alert('제목을 입력하세요'); return; }
+  const { error } = id
+    ? await sb.from('lifeart_press').update(payload).eq('id',id)
+    : await sb.from('lifeart_press').insert(payload);
+  if(error){ alert('저장 실패: '+error.message); return; }
+  closePressEditor(); loadPress();
+}
+async function delPress(id){ if(!confirm('삭제하시겠습니까?'))return; await sb.from('lifeart_press').delete().eq('id',id); loadPress(); }
 </script>
 </body>
 </html>

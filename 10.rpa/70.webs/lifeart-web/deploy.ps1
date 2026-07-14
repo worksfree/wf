@@ -5,12 +5,12 @@
 #  사용법:
 #    PowerShell: .\deploy.ps1              (대화형)
 #    비대화형:   .\deploy.ps1 -Target 1    (1=test-lifeart, 2=production, 9=pre-test-lifeart)
-#    단계적 배포: .\deploy.ps1 -Target 1 -Day 3   (git tag lifeart-day3 시점 스냅샷만 전송)
-#    단계 공개: header.html/footer.html 소스에서 미릴리스 메뉴를 .wip("개발 예정")로 표기.
-#       (포토북과 동일 패턴 — 최상위 라벨은 <span class="wip">, 하위 링크는 <a href="#" class="wip">.
-#        릴리스 시 해당 .wip 만 제거 후 재배포. -Menus 는 하위호환용 no-op)
+#    단계 배포: .\deploy.ps1 -Target 1 -Stage 0   (기능 단계 노출: 0=애니 1=+소셜 2=+보도자료 3=+토스)
+#       └ 배포 사본의 config.js RELEASE_STAGE 만 치환. 소스는 항상 3(full) → pre-test 검수는 전체.
+#       └ dev-toolkit.js(?dev=123)는 모든 스테이지에 항상 포함(제외하지 않음).
+#    (구) -Day N: git tag lifeart-dayN 스냅샷 배포 / -Menus: 폐지(소스 .wip 로 대체)
 # ================================================================
-param([string]$Target = "", [string]$Day = "", [string]$Menus = "")
+param([string]$Target = "", [string]$Day = "", [string]$Menus = "", [string]$Stage = "")
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding          = [System.Text.Encoding]::UTF8
@@ -19,7 +19,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.7.3.0"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
+$VERSION  = "0.7.3.1"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
 
 $TARGETS = @{
     "1" = @{ Name="test-lifeart";     Path="/volume1/web/test-lifeart";     URL="https://test-lifeart.lifeart.ai.kr";     Color="Yellow"  }
@@ -170,12 +170,30 @@ $BUST       = $VERSION   # 캐시버스트 토큰 = 릴리스 버전
 # 소스 → 스테이지 복사 후 불필요 폴더 제거 (배포 대상만 남김)
 & $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
 
-# ── 릴리스 범위: 이제 소스에서 직접 관리한다 (포토북과 동일한 .wip "개발 예정" 패턴) ──
-#   미릴리스 메뉴는 header.html/footer.html에서 라벨을 <span class="wip">로 감싸고
-#   하위 링크를 <a href="#" class="wip">로 둔다. 릴리스 시 해당 .wip 만 제거 후 재배포.
-#   (-Menus 파라미터는 하위호환용으로만 남김 — 더 이상 주입하지 않는다)
+# ── 단계 배포 플래그(-Stage N): 배포 사본의 config.js RELEASE_STAGE 만 치환 ──
+#   0=첫화면 애니메이션 · 1=+소셜 로그인 · 2=+보도자료 관리(O&M) · 3=+토스 결제
+#   소스는 항상 3(full) 유지 → pre-test 검수는 전체 공개. test/www 만 -Stage 로 단계 노출.
+#   -Stage 미지정 시 소스 기본값(3) 그대로 배포.
+if ($Stage -ne "") {
+    if ($Stage -notmatch '^[0-3]$') {
+        Write-Host "  [오류] -Stage 는 0~3 만 허용." -ForegroundColor Red; exit 1
+    }
+    $cfg = Join-Path $stageWin 'assets\config.js'
+    if (Test-Path $cfg) {
+        $cTxt = [System.IO.File]::ReadAllText($cfg, [System.Text.Encoding]::UTF8)
+        $cTxt = [regex]::Replace($cTxt, 'const RELEASE_STAGE = \d+;\s*/\* deploy:stage \*/',
+                                 "const RELEASE_STAGE = $Stage;   /* deploy:stage */")
+        [System.IO.File]::WriteAllText($cfg, $cTxt, [System.Text.Encoding]::UTF8)
+        Write-Host "  ▶ 단계 배포: RELEASE_STAGE=$Stage (0=애니 1=+소셜 2=+보도자료 3=+토스)" -ForegroundColor DarkYellow
+    } else {
+        Write-Host "  [오류] 스테이지 사본에 assets/config.js 가 없습니다." -ForegroundColor Red; exit 1
+    }
+}
+
+# 미릴리스 메뉴 표기(비즈니스·고객지원 등)는 header/footer 소스의 .wip("개발 예정")로 관리.
+# (-Menus 파라미터는 하위호환용 no-op)
 if ($Menus) {
-    Write-Host "  ▶ [안내] -Menus 주입은 폐지됨. 미릴리스 표기는 header/footer 소스의 .wip 로 관리합니다." -ForegroundColor DarkYellow
+    Write-Host "  ▶ [안내] -Menus 는 폐지됨. 미릴리스 메뉴는 소스 .wip 로 관리합니다." -ForegroundColor DarkGray
 }
 
 # 스테이지 처리: (1) 모든 html의 버전 문자열을 릴리스 버전으로 치환

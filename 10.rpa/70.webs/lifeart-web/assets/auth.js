@@ -79,6 +79,61 @@ async function lifeartLogout() {
   location.href = '/';
 }
 
+/* ════════════════════════════════════════════════════════════════
+   소셜 로그인/가입 (Supabase OAuth — 구글·카카오)  · 웍스프리 허브와 동일 패턴
+   ────────────────────────────────────────────────────────────────
+   OAuth 는 이메일 가입과 달리 signUp 시점에 tenant 메타데이터를 심을 수 없다.
+   → 리다이렉트 전 localStorage 표식을 남기고, 복귀 후 claimOAuthProfile 로
+     "방금 생성된 계정(신규)"만 LifeArt 테넌트로 클레임한다.
+     이미 존재하는 타 테넌트(허브) 계정으로 로그인하면 명확히 거부.
+   공유 Supabase 라 구글/카카오 공급자는 프로젝트 전역 설정을 재사용하며,
+   운영자가 lifeart 도메인 redirect URL 을 Auth 허용목록에 추가해야 동작한다. */
+async function _oauth(provider) {
+  if (!stageAtLeast(1)) { alert('소셜 로그인은 곧 오픈됩니다.'); return; }
+  localStorage.setItem('lifeart_oauth', '1');
+  const { error } = await sb.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: location.origin + '/mypage/' },
+  });
+  if (error) { localStorage.removeItem('lifeart_oauth'); alert('소셜 로그인 실패: ' + error.message); }
+}
+function signInWithGoogle() { return _oauth('google'); }
+function signInWithKakao()  { return _oauth('kakao'); }
+
+async function claimOAuthProfile(user) {
+  // created_at 이 최근(3분 내)이면 이번 OAuth 로 갓 생성된 신규 계정으로 간주.
+  const isNew = (Date.now() - new Date(user.created_at).getTime()) < 180000;
+  const { data: existing } = await sb.from('profiles')
+    .select('id, tenant_id').eq('id', user.id).maybeSingle();
+
+  if (existing && existing.tenant_id === TENANT_UUID) return;  // 이미 LifeArt
+  if (existing && existing.tenant_id && existing.tenant_id !== TENANT_UUID && !isNew) {
+    throw new Error('이 소셜 계정은 다른 서비스(WorksFree) 계정으로 이미 사용 중입니다. LifeArt는 다른 계정으로 가입해주세요.');
+  }
+  // 신규(또는 트리거가 만든 기본행) → LifeArt 로 클레임 + 이후 식별용 메타데이터 표식
+  await sb.auth.updateUser({ data: { tenant: 'lifeart' } });
+  const nm = user.user_metadata?.name || user.user_metadata?.full_name || user.user_metadata?.nickname || null;
+  const payload = { tenant_id: TENANT_UUID, name: nm };
+  if (existing) await sb.from('profiles').update(payload).eq('id', user.id);
+  else          await sb.from('profiles').insert({ id: user.id, ...payload });
+}
+
+// OAuth 리다이렉트 복귀 처리: 표식이 있으면 세션 확인 후 클레임 → 마이페이지.
+(async function handleOAuthReturn() {
+  if (localStorage.getItem('lifeart_oauth') !== '1') return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;  // 아직 세션 미확립(취소 등) — 표식 유지, 다음 로드에서 재시도
+  localStorage.removeItem('lifeart_oauth');
+  try {
+    await claimOAuthProfile(session.user);
+    if (!location.pathname.startsWith('/mypage')) location.href = '/mypage/';
+  } catch (e) {
+    await sb.auth.signOut();
+    alert(e.message);
+    location.href = '/auth/login/';
+  }
+})();
+
 // 헤더 인증 UI 갱신 (레이아웃 주입 완료 후 실행)
 //  비로그인 : 카탈로그 · 회원가입 · 로그인
 //  회원     : 카탈로그 · 마이페이지 · 로그아웃

@@ -16,9 +16,11 @@
 </div>
 
 <div class="content-section">
-  <div class="placeholder-box">
-    콘텐츠 준비 중입니다.<br>
-    LifeArt의 보도자료와 수상 이력을 곧 이곳에서 확인하실 수 있습니다.
+  <div id="press-list">
+    <div class="placeholder-box">
+      콘텐츠 준비 중입니다.<br>
+      LifeArt의 보도자료와 수상 이력을 곧 이곳에서 확인하실 수 있습니다.
+    </div>
   </div>
 </div>
 
@@ -28,5 +30,30 @@
 <script src="/assets/dev-toolkit.js"></script>
 <script src="/assets/auth.js"></script>
 <script src="/assets/layout.js"></script>
+<script>
+function _esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+(async function loadPress(){
+  // 보도자료는 stage 2 부터 노출. 그 전에는 준비중 플레이스홀더 유지.
+  if (typeof stageAtLeast === 'function' && !stageAtLeast(2)) return;
+  try {
+    const { data, error } = await sb.from('lifeart_press').select('*')
+      .eq('is_published', true)
+      .order('pinned', { ascending: false })
+      .order('published_on', { ascending: false, nullsFirst: false });
+    if (error || !data || !data.length) return;  // 실패/빈 값 → 플레이스홀더 유지
+    document.getElementById('press-list').innerHTML = data.map(p => `
+      <article class="press-item">
+        <div class="press-meta">
+          ${p.published_on ? `<time>${p.published_on}</time>` : ''}
+          ${p.outlet ? `<span class="press-outlet">${_esc(p.outlet)}</span>` : ''}
+          ${p.pinned ? '<span class="press-pin">주요</span>' : ''}
+        </div>
+        <h3 class="press-title">${_esc(p.title)}</h3>
+        ${p.summary ? `<p class="press-summary">${_esc(p.summary)}</p>` : ''}
+        ${p.link_url ? `<a class="press-link" href="${_esc(p.link_url)}" target="_blank" rel="noopener">원문 보기 →</a>` : ''}
+      </article>`).join('');
+  } catch (_) { /* 네트워크/테이블 부재 → 플레이스홀더 유지 */ }
+})();
+</script>
 </body>
 </html>
