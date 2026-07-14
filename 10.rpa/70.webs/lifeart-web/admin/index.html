@@ -60,6 +60,7 @@
     <button class="tab-btn" data-tab="notices">공지사항</button>
     <button class="tab-btn" data-tab="faqs">FAQ</button>
     <button class="tab-btn needs-stage-2" data-tab="press">보도자료</button>
+    <button class="tab-btn" data-tab="users">회원 관리</button>
   </div>
 
   <!-- 주문 -->
@@ -164,6 +165,20 @@
       </table>
     </div>
   </div>
+
+  <!-- 회원 관리 (LifeArt 테넌트 한정) -->
+  <div class="tab-panel" id="tab-users">
+    <div class="adm-toolbar" style="justify-content:space-between; align-items:center;">
+      <span style="font-size:12px; color:var(--text-light);">LifeArt 테넌트 회원만 표시됩니다. (전체 Supabase 계정과 별개)</span>
+      <span id="users-count" style="font-size:12px; color:var(--text-mid);"></span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table" id="users-table">
+        <thead><tr><th>이메일</th><th>이름</th><th>가입경로</th><th>역할</th><th>가입일</th></tr></thead>
+        <tbody><tr><td colspan="5">불러오는 중...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <div id="site-footer"></div>
@@ -201,6 +216,7 @@ async function initAdmin() {
   await loadNotices();
   await loadFaqs();
   await loadPress();
+  await loadUsers();
 }
 
 /* ── 주문 ── */
@@ -430,6 +446,41 @@ async function savePress(){
   closePressEditor(); loadPress();
 }
 async function delPress(id){ if(!confirm('삭제하시겠습니까?'))return; await sb.from('lifeart_press').delete().eq('id',id); loadPress(); }
+
+/* ── 회원 관리 (LifeArt 테넌트 한정, SECURITY DEFINER RPC 경유) ── */
+const PROVIDER_LABEL = { email:'이메일', google:'구글', kakao:'카카오' };
+async function loadUsers() {
+  const tb = document.querySelector('#users-table tbody');
+  const cnt = document.getElementById('users-count');
+  const { data, error } = await sb.rpc('lifeart_admin_get_users');
+  if (error) {
+    tb.innerHTML = `<tr><td colspan="5">회원 목록을 불러올 수 없습니다. (RPC 미배포 또는 권한 없음)</td></tr>`;
+    cnt.textContent = ''; return;
+  }
+  if (!data || !data.length) { tb.innerHTML = '<tr><td colspan="5">등록된 회원이 없습니다.</td></tr>'; cnt.textContent='총 0명'; return; }
+  cnt.textContent = `총 ${data.length}명`;
+  tb.innerHTML = data.map(u => `
+    <tr>
+      <td>${esc(u.email)||'—'}</td>
+      <td>${esc(u.name)||'—'}</td>
+      <td>${PROVIDER_LABEL[u.provider]||esc(u.provider)||'—'}</td>
+      <td>
+        <select onchange="setUserRole('${u.id}', this.value, this)">
+          <option value="member" ${u.role==='member'?'selected':''}>일반회원</option>
+          <option value="admin"  ${u.role==='admin'?'selected':''}>관리자</option>
+        </select>
+      </td>
+      <td>${new Date(u.created_at).toLocaleDateString('ko-KR')}</td>
+    </tr>`).join('');
+}
+async function setUserRole(id, role, el) {
+  if (role === 'admin' && !confirm('이 회원을 LifeArt 관리자로 지정하시겠습니까?')) { loadUsers(); return; }
+  const { data, error } = await sb.rpc('lifeart_admin_set_role', { target_id: id, new_role: role });
+  if (error || (typeof data === 'string' && data.startsWith('error'))) {
+    alert('역할 변경 실패: ' + (error?.message || data));
+    loadUsers();
+  }
+}
 </script>
 </body>
 </html>
