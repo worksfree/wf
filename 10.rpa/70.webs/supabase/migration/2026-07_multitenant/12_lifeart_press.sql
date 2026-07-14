@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS public.lifeart_press (
 ALTER TABLE public.lifeart_press ENABLE ROW LEVEL SECURITY;
 
 -- 게시된 것 공개 읽기, 관리자 전체 CRUD (테넌트 스코프)
+-- (재실행 안전: 기존 정책 있으면 먼저 제거)
+DROP POLICY IF EXISTS "lifeart_press_public" ON public.lifeart_press;
+DROP POLICY IF EXISTS "lifeart_press_admin"  ON public.lifeart_press;
 CREATE POLICY "lifeart_press_public" ON public.lifeart_press FOR SELECT
     USING (is_published = true AND tenant_id = public.lifeart_tenant_id());
 CREATE POLICY "lifeart_press_admin" ON public.lifeart_press FOR ALL
@@ -43,4 +46,4 @@ WHERE NOT EXISTS (SELECT 1 FROM public.lifeart_press WHERE tenant_id = public.li
 
 -- ── 검증 ──
 SELECT 'press' AS t, COUNT(*) FROM public.lifeart_press;
-SELECT polname FROM pg_policies WHERE tablename = 'lifeart_press';
+SELECT policyname FROM pg_policies WHERE tablename = 'lifeart_press';
