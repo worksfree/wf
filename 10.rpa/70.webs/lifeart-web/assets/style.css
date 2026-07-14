@@ -292,7 +292,7 @@ header {
 
 /* ── Trust banner (client logos) ── */
 .trust-banner { background: var(--soft-gray); padding: 0; overflow: hidden; }
-.trust-banner img { width: 100%; display: block; }
+.trust-banner img { width: 100%; height: auto; display: block; aspect-ratio: 2500 / 850; }
 .trust-caption {
   text-align: center; font-size: 12px; color: var(--text-light);
   letter-spacing: 1px; padding: 10px 0; background: var(--soft-gray);
