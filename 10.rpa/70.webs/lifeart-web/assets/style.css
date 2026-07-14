@@ -10,15 +10,19 @@
   --accent: #B8943E;
 }
 
-/* ── 단계 배포 게이팅 (config.js RELEASE_STAGE → html[data-stage]) ──
+/* ── 단계 배포 게이팅 (config.js RELEASE_STAGE 1~5 → html[data-stage]) ──
    .needs-stage-N 요소는 현재 스테이지가 N 미만이면 숨긴다.
-   기본은 html에 data-stage 가 아직 없어도 보이지 않도록 하지 않는다(전체 노출이 기본). */
-html[data-stage="0"] .needs-stage-1,
-html[data-stage="0"] .needs-stage-2,
-html[data-stage="0"] .needs-stage-3,
+   data-stage 미설정(로컬 등)이면 전체 노출이 기본. */
 html[data-stage="1"] .needs-stage-2,
 html[data-stage="1"] .needs-stage-3,
-html[data-stage="2"] .needs-stage-3 { display: none !important; }
+html[data-stage="1"] .needs-stage-4,
+html[data-stage="1"] .needs-stage-5,
+html[data-stage="2"] .needs-stage-3,
+html[data-stage="2"] .needs-stage-4,
+html[data-stage="2"] .needs-stage-5,
+html[data-stage="3"] .needs-stage-4,
+html[data-stage="3"] .needs-stage-5,
+html[data-stage="4"] .needs-stage-5 { display: none !important; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 

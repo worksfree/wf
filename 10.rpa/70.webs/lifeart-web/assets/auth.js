@@ -89,7 +89,7 @@ async function lifeartLogout() {
    공유 Supabase 라 구글/카카오 공급자는 프로젝트 전역 설정을 재사용하며,
    운영자가 lifeart 도메인 redirect URL 을 Auth 허용목록에 추가해야 동작한다. */
 async function _oauth(provider) {
-  if (!stageAtLeast(1)) { alert('소셜 로그인은 곧 오픈됩니다.'); return; }
+  if (!stageAtLeast(2)) { alert('소셜 로그인은 곧 오픈됩니다.'); return; }
   localStorage.setItem('lifeart_oauth', '1');
   const { error } = await sb.auth.signInWithOAuth({
     provider,
@@ -164,7 +164,7 @@ document.addEventListener('layout:ready', async () => {
 
   // 관리자면 마이페이지 앞에 ⚙관리자 링크
   const { data: profile } = await sb.from('profiles').select('role, tenant_id').eq('id', session.user.id).maybeSingle();
-  if (profile?.role === 'admin' && profile?.tenant_id === TENANT_UUID) {
+  if (profile?.role === 'admin' && profile?.tenant_id === TENANT_UUID && stageAtLeast(4)) {
     if (!document.getElementById('nav-admin-btn')) {
       const a = document.createElement('a');
       a.id = 'nav-admin-btn';

@@ -5,10 +5,12 @@
 #  사용법:
 #    PowerShell: .\deploy.ps1              (대화형)
 #    비대화형:   .\deploy.ps1 -Target 1    (1=test-lifeart, 2=production, 9=pre-test-lifeart)
-#    단계 배포: .\deploy.ps1 -Target 1 -Stage 0   (기능 단계 노출: 0=애니 1=+소셜 2=+보도자료 3=+토스)
-#       └ 배포 사본의 config.js RELEASE_STAGE 만 치환. 소스는 항상 3(full) → pre-test 검수는 전체.
-#       └ dev-toolkit.js(?dev=123)는 모든 스테이지에 항상 포함(제외하지 않음).
-#    (구) -Day N: git tag lifeart-dayN 스냅샷 배포 / -Menus: 폐지(소스 .wip 로 대체)
+#    단계 배포: .\deploy.ps1 -Target 1 -Stage N   (N=1~5, 누적 공개 · 완전 가역)
+#       1=소개·상품·제작과정  2=+비즈니스·소셜  3=+고객지원·결제  4=+O&M  5=+Dev툴킷
+#       └ 배포 사본의 config.js RELEASE_STAGE 만 치환. 소스는 항상 5(full) → pre-test 검수는 전체.
+#       └ 값만 바꿔 재배포하면 1→5→다시 1 어느 단계로든 복원됨(소스 불변).
+#       └ 배포 시 header/footer 를 각 페이지에 인라인 주입 → 링크 이동 시 헤더 깜빡임 없음.
+#    (구) -Day N: git tag lifeart-dayN 스냅샷 배포 / -Menus: 폐지(-Stage 로 대체)
 # ================================================================
 param([string]$Target = "", [string]$Day = "", [string]$Menus = "", [string]$Stage = "")
 
@@ -19,7 +21,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.7.3.1"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
+$VERSION  = "0.7.5.0"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
 
 $TARGETS = @{
     "1" = @{ Name="test-lifeart";     Path="/volume1/web/test-lifeart";     URL="https://test-lifeart.lifeart.ai.kr";     Color="Yellow"  }
@@ -170,13 +172,13 @@ $BUST       = $VERSION   # 캐시버스트 토큰 = 릴리스 버전
 # 소스 → 스테이지 복사 후 불필요 폴더 제거 (배포 대상만 남김)
 & $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
 
-# ── 단계 배포 플래그(-Stage N): 배포 사본의 config.js RELEASE_STAGE 만 치환 ──
-#   0=첫화면 애니메이션 · 1=+소셜 로그인 · 2=+보도자료 관리(O&M) · 3=+토스 결제
-#   소스는 항상 3(full) 유지 → pre-test 검수는 전체 공개. test/www 만 -Stage 로 단계 노출.
-#   -Stage 미지정 시 소스 기본값(3) 그대로 배포.
+# ── 단계 배포 플래그(-Stage N, 1~5): 배포 사본의 config.js RELEASE_STAGE 만 치환 ──
+#   1=소개·상품·제작과정 · 2=+비즈니스·소셜 · 3=+고객지원·결제 · 4=+O&M · 5=+Dev툴킷
+#   소스는 항상 5(full) 유지 → pre-test 검수는 전체 공개. test/www 만 -Stage 로 단계 노출.
+#   -Stage 미지정 시 소스 기본값(5) 그대로 배포. 값만 바꿔 재배포하면 어느 단계로든 복원(가역).
 if ($Stage -ne "") {
-    if ($Stage -notmatch '^[0-3]$') {
-        Write-Host "  [오류] -Stage 는 0~3 만 허용." -ForegroundColor Red; exit 1
+    if ($Stage -notmatch '^[1-5]$') {
+        Write-Host "  [오류] -Stage 는 1~5 만 허용." -ForegroundColor Red; exit 1
     }
     $cfg = Join-Path $stageWin 'assets\config.js'
     if (Test-Path $cfg) {
@@ -184,16 +186,30 @@ if ($Stage -ne "") {
         $cTxt = [regex]::Replace($cTxt, 'const RELEASE_STAGE = \d+;\s*/\* deploy:stage \*/',
                                  "const RELEASE_STAGE = $Stage;   /* deploy:stage */")
         [System.IO.File]::WriteAllText($cfg, $cTxt, [System.Text.Encoding]::UTF8)
-        Write-Host "  ▶ 단계 배포: RELEASE_STAGE=$Stage (0=애니 1=+소셜 2=+보도자료 3=+토스)" -ForegroundColor DarkYellow
+        Write-Host "  ▶ 단계 배포: RELEASE_STAGE=$Stage (1=기본 2=+비즈/소셜 3=+지원/결제 4=+O&M 5=+Dev)" -ForegroundColor DarkYellow
     } else {
         Write-Host "  [오류] 스테이지 사본에 assets/config.js 가 없습니다." -ForegroundColor Red; exit 1
     }
 }
+if ($Menus) { Write-Host "  ▶ [안내] -Menus 는 폐지됨(단계는 -Stage 로 관리)." -ForegroundColor DarkGray }
 
-# 미릴리스 메뉴 표기(비즈니스·고객지원 등)는 header/footer 소스의 .wip("개발 예정")로 관리.
-# (-Menus 파라미터는 하위호환용 no-op)
-if ($Menus) {
-    Write-Host "  ▶ [안내] -Menus 는 폐지됨. 미릴리스 메뉴는 소스 .wip 로 관리합니다." -ForegroundColor DarkGray
+# ── 헤더/푸터 인라인 주입 (링크 이동 시 헤더 깜빡임 FOUC 제거) ──────
+#   layout.js 의 fetch 대신 배포 시점에 각 페이지의 자리표시자에 파트셜을 직접 삽입.
+#   layout.js 는 이미 채워진 경우 fetch 를 건너뛰고 layout:ready 만 발화한다.
+$hdrFile = Join-Path $stageWin 'assets\header.html'
+$ftrFile = Join-Path $stageWin 'assets\footer.html'
+if ((Test-Path $hdrFile) -and (Test-Path $ftrFile)) {
+    $hdr = [System.IO.File]::ReadAllText($hdrFile, [System.Text.Encoding]::UTF8)
+    $ftr = [System.IO.File]::ReadAllText($ftrFile, [System.Text.Encoding]::UTF8)
+    Get-ChildItem -Path $stageWin -Recurse -File -Filter *.html | ForEach-Object {
+        $c = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
+        if ($c -match '<div id="site-header"></div>' -or $c -match '<div id="site-footer"></div>') {
+            $c = $c.Replace('<div id="site-header"></div>', '<div id="site-header">' + $hdr + '</div>')
+            $c = $c.Replace('<div id="site-footer"></div>', '<div id="site-footer">' + $ftr + '</div>')
+            [System.IO.File]::WriteAllText($_.FullName, $c, [System.Text.Encoding]::UTF8)
+        }
+    }
+    Write-Host "  ▶ 헤더/푸터 인라인 주입 완료 (헤더 깜빡임 제거)" -ForegroundColor DarkGray
 }
 
 # 스테이지 처리: (1) 모든 html의 버전 문자열을 릴리스 버전으로 치환

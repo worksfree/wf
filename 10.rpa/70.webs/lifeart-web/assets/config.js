@@ -18,11 +18,15 @@ function getEnv() {
   return 'production';
 }
 
-// ── 단계 배포 플래그 ─────────────────────────────────────────────
-//  0=첫화면 애니메이션 · 1=+소셜 로그인 · 2=+보도자료 관리(O&M) · 3=+토스 결제
-//  소스 기본값 3(전체 공개) — pre-test 검수는 항상 full.
-//  test/www 는 deploy.ps1 -Stage N 이 배포 사본의 이 값만 치환한다.
-const RELEASE_STAGE = 3;   /* deploy:stage */
+// ── 단계 배포 플래그 (1~5, 누적 공개) ────────────────────────────
+//  1=소개·상품·제작과정(기본)
+//  2=+비즈니스 메뉴·소셜 로그인
+//  3=+고객지원 메뉴·결제(토스)
+//  4=+O&M(관리자 콘솔)
+//  5=+Dev 툴킷(?dev)·테스트 기능
+//  소스 기본값 5(전체 공개) — pre-test 검수는 항상 full.
+//  test/www 는 deploy.ps1 -Stage N 이 배포 사본의 이 값만 치환한다(완전 가역).
+const RELEASE_STAGE = 5;   /* deploy:stage */
 document.documentElement.setAttribute('data-stage', String(RELEASE_STAGE));
 function stageAtLeast(n) { return RELEASE_STAGE >= n; }
 

@@ -266,6 +266,8 @@ async function initAdmin() {
     const { data: profile } = await sb.from('profiles').select('role, tenant_id').eq('id', session.user.id).single();
     if (profile?.role !== 'admin' || profile?.tenant_id !== TENANT_UUID) return;
   }
+  // O&M 은 단계 4 부터 오픈 — 그 전에는 관리자여도 접근 차단(게이트 유지)
+  if (typeof stageAtLeast === 'function' && !stageAtLeast(4)) return;
   document.getElementById('admin-gate').style.display = 'none';
 
   document.querySelectorAll('.tab-btn').forEach(btn => {

@@ -11,6 +11,8 @@
     || host.startsWith('pre-test-lifeart.')
     || host === 'localhost' || host === '127.0.0.1';
   if (!DEV_HOSTS_OK) return;
+  // 단계 5 부터 오픈 (테스트 데이터·Dev 툴킷)
+  if (typeof stageAtLeast === 'function' && !stageAtLeast(5)) return;
 
   // 활성화 상태 유지 (?dev=123 최초 진입 후 세션 내 유지)
   var qs = new URLSearchParams(location.search);

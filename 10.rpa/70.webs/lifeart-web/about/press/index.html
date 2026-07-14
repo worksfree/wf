@@ -34,7 +34,7 @@
 function _esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 (async function loadPress(){
   // 보도자료는 stage 2 부터 노출. 그 전에는 준비중 플레이스홀더 유지.
-  if (typeof stageAtLeast === 'function' && !stageAtLeast(2)) return;
+  if (typeof stageAtLeast === 'function' && !stageAtLeast(1)) return;
   try {
     const { data, error } = await sb.from('lifeart_press').select('*')
       .eq('is_published', true)
