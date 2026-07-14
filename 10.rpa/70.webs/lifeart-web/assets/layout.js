@@ -12,6 +12,10 @@
       label.setAttribute('for', id);
     }
   });
+  // KWCAG 4.1.3(상태 메시지): 폼 성공/오류 메시지를 스크린리더가 자동 낭독하도록 라이브 영역화
+  document.querySelectorAll('.form-msg').forEach(function (el) {
+    if (!el.getAttribute('aria-live')) { el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite'); }
+  });
 })();
 
 // 공통 헤더/푸터 삽입 (반복되는 30여 개 페이지의 유지보수를 위해 분리)

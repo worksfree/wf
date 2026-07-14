@@ -5,9 +5,9 @@
   --soft-gray: #F0EDE8;
   --text-dark: #1A1A1A;
   --text-mid: #5A5A5A;
-  --text-light: #8A8A8A;
+  --text-light: #6B6B6B;   /* 명도대비 AA(4.5:1) 통과용 — 기존 #8A8A8A 는 3.3:1 미달 */
   --border: #E5E0D8;
-  --accent: #B8943E;
+  --accent: #8C6E24;       /* 링크·강조 텍스트 명도대비 AA 통과용 — 기존 #B8943E 는 2.7:1 미달 */
 }
 
 /* ── 단계 배포 게이팅 (config.js RELEASE_STAGE 1~5 → html[data-stage]) ──
