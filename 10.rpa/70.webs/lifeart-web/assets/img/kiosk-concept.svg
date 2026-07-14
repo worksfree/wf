@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="무인 포토 키오스크 컨셉">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0EDE8"/>
+      <stop offset="1" stop-color="#E5E0D8"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a3a3a"/>
+      <stop offset="1" stop-color="#232323"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a5568"/>
+      <stop offset="1" stop-color="#2d3748"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <ellipse cx="600" cy="720" rx="300" ry="34" fill="#000" opacity="0.10"/>
+
+  <!-- 키오스크 본체 -->
+  <rect x="430" y="120" width="340" height="560" rx="30" fill="url(#body)"/>
+  <rect x="446" y="136" width="308" height="528" rx="22" fill="#1a1a1a"/>
+
+  <!-- 상단 카메라/센서 -->
+  <circle cx="600" cy="176" r="7" fill="#C4A962"/>
+  <rect x="560" y="170" width="80" height="12" rx="6" fill="#333"/>
+
+  <!-- 터치 스크린 -->
+  <rect x="470" y="210" width="260" height="300" rx="12" fill="url(#screen)"/>
+  <!-- 화면 속 사진(앨범 펼침 느낌) -->
+  <rect x="492" y="238" width="100" height="130" rx="4" fill="#fff" opacity="0.95"/>
+  <rect x="500" y="248" width="84" height="52" rx="2" fill="#B8943E" opacity="0.85"/>
+  <rect x="500" y="308" width="84" height="10" rx="2" fill="#c9c9c9"/>
+  <rect x="500" y="324" width="60" height="10" rx="2" fill="#d7d7d7"/>
+  <rect x="608" y="238" width="100" height="130" rx="4" fill="#fff" opacity="0.95"/>
+  <rect x="616" y="248" width="84" height="52" rx="2" fill="#5a6b8c" opacity="0.85"/>
+  <rect x="616" y="308" width="84" height="10" rx="2" fill="#c9c9c9"/>
+  <rect x="616" y="324" width="60" height="10" rx="2" fill="#d7d7d7"/>
+  <!-- 화면 하단 버튼 -->
+  <rect x="492" y="404" width="216" height="82" rx="10" fill="#C4A962"/>
+  <rect x="540" y="436" width="120" height="16" rx="8" fill="#2d2d2d" opacity="0.55"/>
+
+  <!-- 출력(프린트) 슬롯 -->
+  <rect x="486" y="540" width="228" height="14" rx="7" fill="#0d0d0d"/>
+  <rect x="560" y="556" width="80" height="46" rx="3" fill="#fff" stroke="#d9d4cb"/>
+  <rect x="568" y="564" width="64" height="24" rx="2" fill="#B8943E" opacity="0.7"/>
+
+  <!-- 받침대 -->
+  <rect x="500" y="620" width="200" height="40" rx="8" fill="#2a2a2a"/>
+
+  <!-- 컨셉 라벨 -->
+  <text x="600" y="770" text-anchor="middle" font-family="'Noto Sans KR',sans-serif" font-size="30" fill="#8A8A8A" letter-spacing="2">SELF PHOTO KIOSK · O2O</text>
+</svg>
