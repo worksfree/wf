@@ -27,7 +27,9 @@ html[data-stage="4"] .needs-stage-5 { display: none !important; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 /* 루트 배경도 크림색으로 — 페이지 이동 시 흰 화면 번쩍임(플래시) 방지 */
-html { background: var(--warm-white); }
+/* scrollbar-gutter: 스크롤바 자리를 항상 확보 → 페이지마다 스크롤바 유무로 인한
+   가로 밀림(헤더/본문이 좌우로 튀는 현상) 제거. overflow-y:scroll 은 구형 폴백. */
+html { background: var(--warm-white); scrollbar-gutter: stable; overflow-y: scroll; }
 body {
   font-family: 'Pretendard', 'Noto Sans KR', -apple-system, sans-serif;
   background: var(--warm-white);
@@ -111,7 +113,8 @@ header {
 /* ── 가이드/소개 페이지 공통 (제작과정·비즈니스 하위 페이지) ── */
 .guide-lead { font-size: 16px; color: var(--text-mid); line-height: 1.85; max-width: 720px; margin: 0 auto 30px; text-align: center; }
 .guide-figure { width: 100%; border-radius: 14px; overflow: hidden; margin: 26px 0; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
-.guide-figure img { width: 100%; display: block; }
+/* aspect-ratio 로 로딩 전에도 높이를 확보 → 이미지 로드 시 레이아웃 튐(CLS) 방지 */
+.guide-figure img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
 .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 26px 0; }
 .guide-grid img { width: 100%; border-radius: 12px; display: block; aspect-ratio: 4/3; object-fit: cover; }
 .guide-steps { counter-reset: gs; max-width: 760px; margin: 26px auto; }
