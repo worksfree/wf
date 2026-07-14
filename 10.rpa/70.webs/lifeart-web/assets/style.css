@@ -415,18 +415,6 @@ footer { background: var(--deep-charcoal); color: #888; padding: 32px; font-size
 .catalog-card h3 { font-size: 15px; margin: 0 0 3px; color: var(--deep-charcoal); }
 .catalog-card p { font-size: 12.5px; color: var(--text-light); margin: 0; }
 
-/* ── 미릴리스 상위 메뉴: 마우스 오버 시 "개발중" 툴팁 (.wip 패턴과 동일) ── */
-.menu-dev { position: relative; }
-.menu-dev:hover::after {
-  content: '개발중';
-  position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-  background: var(--deep-charcoal); color: var(--muted-gold);
-  font-size: 10px; font-weight: 600; padding: 4px 9px; border-radius: 5px;
-  white-space: nowrap; margin-bottom: 8px; z-index: 300; pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,.15);
-}
-.menu-dev:hover::before {
-  content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-  margin-bottom: 3px; border: 5px solid transparent; border-top-color: var(--deep-charcoal);
-  z-index: 300; pointer-events: none;
-}
+/* 미릴리스 메뉴 표기는 포토북과 동일하게 .wip("개발 예정") 패턴을 사용한다.
+   최상위 <li>는 .has-sub::after(▾ 화살표)가 이미 ::after를 점유하므로,
+   라벨을 <span class="wip">로 감싸 툴팁을 부여한다(header/footer 소스 참조). */

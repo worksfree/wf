@@ -6,10 +6,9 @@
 #    PowerShell: .\deploy.ps1              (대화형)
 #    비대화형:   .\deploy.ps1 -Target 1    (1=test-lifeart, 2=production, 9=pre-test-lifeart)
 #    단계적 배포: .\deploy.ps1 -Target 1 -Day 3   (git tag lifeart-day3 시점 스냅샷만 전송)
-#    단계 공개: .\deploy.ps1 -Target 1 -Menus "about,products,howto"
-#       (현재 HEAD 전체를 배포하되, 목록에 없는 상위 메뉴엔 마우스 오버 시
-#        "개발중" 툴팁만 부착. 메뉴/페이지는 제거하지 않음 — 전체 트리 항상 노출)
-#       상위 메뉴 키: about products howto business support
+#    단계 공개: header.html/footer.html 소스에서 미릴리스 메뉴를 .wip("개발 예정")로 표기.
+#       (포토북과 동일 패턴 — 최상위 라벨은 <span class="wip">, 하위 링크는 <a href="#" class="wip">.
+#        릴리스 시 해당 .wip 만 제거 후 재배포. -Menus 는 하위호환용 no-op)
 # ================================================================
 param([string]$Target = "", [string]$Day = "", [string]$Menus = "")
 
@@ -20,7 +19,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.7.2.0"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
+$VERSION  = "0.7.3.0"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
 
 $TARGETS = @{
     "1" = @{ Name="test-lifeart";     Path="/volume1/web/test-lifeart";     URL="https://test-lifeart.lifeart.ai.kr";     Color="Yellow"  }
@@ -171,22 +170,12 @@ $BUST       = $VERSION   # 캐시버스트 토큰 = 릴리스 버전
 # 소스 → 스테이지 복사 후 불필요 폴더 제거 (배포 대상만 남김)
 & $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
 
-# ── 릴리스 범위(-Menus): 지정 메뉴 외에는 마우스 오버 "개발중" 툴팁 (전부 노출 유지) ──
-#   메뉴는 제거하지 않는다. 릴리스 안 된 상위 메뉴에 "개발중" 표기만 붙인다.
+# ── 릴리스 범위: 이제 소스에서 직접 관리한다 (포토북과 동일한 .wip "개발 예정" 패턴) ──
+#   미릴리스 메뉴는 header.html/footer.html에서 라벨을 <span class="wip">로 감싸고
+#   하위 링크를 <a href="#" class="wip">로 둔다. 릴리스 시 해당 .wip 만 제거 후 재배포.
+#   (-Menus 파라미터는 하위호환용으로만 남김 — 더 이상 주입하지 않는다)
 if ($Menus) {
-    $released  = $Menus.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-    $mainMenus = @('about','products','howto','business','support')
-    $wip       = $mainMenus | Where-Object { $released -notcontains $_ }
-    Write-Host "  ▶ 릴리스 범위: 정식=[$($released -join ', ')] / 개발중 표기=[$($wip -join ', ')]" -ForegroundColor DarkYellow
-    $headerFile = Join-Path $stageWin 'assets\header.html'
-    if (Test-Path $headerFile) {
-        $h = [System.IO.File]::ReadAllText($headerFile, [System.Text.Encoding]::UTF8)
-        foreach ($k in $wip) {
-            # 미릴리스 상위 메뉴 <li> 에 menu-dev 클래스 부여 → 마우스 오버 시 "개발중" 툴팁
-            $h = [regex]::Replace($h, "(<li class=""has-sub)("" data-menu=""$k"")", '${1} menu-dev${2}')
-        }
-        [System.IO.File]::WriteAllText($headerFile, $h, [System.Text.Encoding]::UTF8)
-    }
+    Write-Host "  ▶ [안내] -Menus 주입은 폐지됨. 미릴리스 표기는 header/footer 소스의 .wip 로 관리합니다." -ForegroundColor DarkYellow
 }
 
 # 스테이지 처리: (1) 모든 html의 버전 문자열을 릴리스 버전으로 치환
