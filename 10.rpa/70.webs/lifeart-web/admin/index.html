@@ -37,6 +37,18 @@
   .st-badge.closed { background:var(--soft-gray); color:var(--text-light); }
   .inq-detail { background:var(--soft-gray); border-radius:8px; padding:14px; margin-top:8px; font-size:13px; }
   .inq-detail .msg { white-space:pre-line; color:var(--text-dark); margin:8px 0; }
+  .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+  .kpi-card { background:var(--soft-gray); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+  .kpi-label { font-size:12px; color:var(--text-light); margin-bottom:6px; }
+  .kpi-val { font-size:22px; font-weight:700; color:var(--text-dark); font-variant-numeric:tabular-nums; letter-spacing:-.5px; }
+  .kpi-card.accent .kpi-val { color:var(--accent); }
+  .pay-badge { font-size:10px; padding:2px 7px; border-radius:10px; }
+  .pay-badge.approved { background:#E8F4E8; color:#2E7D32; }
+  .pay-badge.requested { background:#FDF0D8; color:#B8943E; }
+  .pay-badge.none { background:var(--soft-gray); color:var(--text-light); }
+  .pay-badge.failed, .pay-badge.cancelled { background:#FDE8E8; color:#C62828; }
+  .mini-orders { font-size:12px; }
+  .mini-orders td { padding:6px 10px; }
 </style>
 </head>
 <body>
@@ -55,19 +67,38 @@
 
 <div class="content-section" style="max-width:1040px;">
   <div class="tab-row">
-    <button class="tab-btn active" data-tab="orders">주문 관리</button>
+    <button class="tab-btn active" data-tab="dashboard">매출 현황</button>
+    <button class="tab-btn" data-tab="orders">주문 관리</button>
+    <button class="tab-btn" data-tab="users">회원 관리</button>
     <button class="tab-btn" data-tab="inquiries">문의 관리</button>
     <button class="tab-btn" data-tab="notices">공지사항</button>
     <button class="tab-btn" data-tab="faqs">FAQ</button>
     <button class="tab-btn needs-stage-2" data-tab="press">보도자료</button>
-    <button class="tab-btn" data-tab="users">회원 관리</button>
+  </div>
+
+  <!-- 매출 현황 (대시보드) -->
+  <div class="tab-panel active" id="tab-dashboard">
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">총 매출</div><div class="kpi-val" id="kpi-total">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">이번 달 매출</div><div class="kpi-val" id="kpi-month">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">결제완료 주문</div><div class="kpi-val" id="kpi-paid">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">전체 주문</div><div class="kpi-val" id="kpi-orders">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">회원 수</div><div class="kpi-val" id="kpi-members">—</div></div>
+    </div>
+    <h3 style="font-size:14px;margin:22px 0 10px;color:var(--text-mid);">최근 주문</h3>
+    <div style="overflow-x:auto;">
+      <table class="admin-table" id="recent-table">
+        <thead><tr><th>주문일</th><th>주문자</th><th>상품</th><th>금액</th><th>결제</th></tr></thead>
+        <tbody><tr><td colspan="5">불러오는 중...</td></tr></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- 주문 -->
-  <div class="tab-panel active" id="tab-orders" style="overflow-x:auto;">
+  <div class="tab-panel" id="tab-orders" style="overflow-x:auto;">
     <table class="admin-table" id="orders-table">
-      <thead><tr><th>주문일</th><th>상품</th><th>수량</th><th>금액</th><th>상태</th><th>배송상태</th></tr></thead>
-      <tbody><tr><td colspan="6">불러오는 중...</td></tr></tbody>
+      <thead><tr><th>주문일</th><th>주문자</th><th>상품</th><th>수량</th><th>금액</th><th>주문상태</th><th>결제</th><th>배송상태</th><th></th></tr></thead>
+      <tbody><tr><td colspan="9">불러오는 중...</td></tr></tbody>
     </table>
   </div>
 
@@ -174,8 +205,8 @@
     </div>
     <div style="overflow-x:auto;">
       <table class="admin-table" id="users-table">
-        <thead><tr><th>이메일</th><th>이름</th><th>가입경로</th><th>역할</th><th>가입일</th></tr></thead>
-        <tbody><tr><td colspan="5">불러오는 중...</td></tr></tbody>
+        <thead><tr><th>이메일</th><th>이름</th><th>가입경로</th><th>주문</th><th>총 구매액</th><th>최근주문</th><th>역할</th><th>가입일</th></tr></thead>
+        <tbody><tr><td colspan="8">불러오는 중...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -211,6 +242,7 @@ async function initAdmin() {
   });
   document.getElementById('inq-filter').addEventListener('change', loadInquiries);
 
+  await loadDashboard();
   await loadOrders();
   await loadInquiries();
   await loadNotices();
@@ -218,27 +250,60 @@ async function initAdmin() {
   await loadPress();
   await loadUsers();
 }
+const won = n => (Number(n)||0).toLocaleString('ko-KR') + '원';
+const PAY_LABEL = { approved:'완료', requested:'대기', failed:'실패', cancelled:'취소' };
+function payBadge(s){ const k=s||'none'; return `<span class="pay-badge ${k}">${PAY_LABEL[s]||'미결제'}</span>`; }
 
-/* ── 주문 ── */
+/* ── 매출 현황 (대시보드) ── */
+async function loadDashboard() {
+  const { data, error } = await sb.rpc('lifeart_admin_sales_summary');
+  const s = Array.isArray(data) ? data[0] : data;
+  if (!error && s) {
+    document.getElementById('kpi-total').textContent   = won(s.total_sales);
+    document.getElementById('kpi-month').textContent   = won(s.month_sales);
+    document.getElementById('kpi-paid').textContent    = (s.paid_orders||0) + '건';
+    document.getElementById('kpi-orders').textContent  = (s.total_orders||0) + '건';
+    document.getElementById('kpi-members').textContent = (s.member_count||0) + '명';
+  }
+  // 최근 주문 5건 (주문 RPC 재사용)
+  const { data: orders } = await sb.rpc('lifeart_admin_get_orders');
+  const tb = document.querySelector('#recent-table tbody');
+  if (!orders || !orders.length) { tb.innerHTML = '<tr><td colspan="5">주문이 없습니다.</td></tr>'; return; }
+  tb.innerHTML = orders.slice(0,5).map(o => `
+    <tr>
+      <td>${new Date(o.created_at).toLocaleDateString('ko-KR')}</td>
+      <td>${esc(o.member_name)||esc(o.member_email)||'비회원'}</td>
+      <td>${esc(o.product_name)||'-'}</td>
+      <td>${won(o.amount)}</td>
+      <td>${payBadge(o.pay_status)}</td>
+    </tr>`).join('');
+}
+
+/* ── 주문 관리 (회원·결제·배송 통합) ── */
+const ORDER_STATUS = { pending:'결제대기', paid:'결제완료', shipping:'배송중', done:'완료', cancelled:'취소' };
 async function loadOrders() {
-  const { data: orders, error } = await sb.from('lifeart_orders').select('*, lifeart_products(name)').order('created_at', { ascending: false });
+  const { data: orders, error } = await sb.rpc('lifeart_admin_get_orders');
   const tb = document.querySelector('#orders-table tbody');
-  if (error || !orders?.length) { tb.innerHTML = '<tr><td colspan="6">주문이 없습니다.</td></tr>'; return; }
+  if (error) { tb.innerHTML = '<tr><td colspan="9">주문 목록을 불러올 수 없습니다. (RPC 미배포 또는 권한 없음)</td></tr>'; return; }
+  if (!orders?.length) { tb.innerHTML = '<tr><td colspan="9">주문이 없습니다.</td></tr>'; return; }
   tb.innerHTML = orders.map(o => `
     <tr>
       <td>${new Date(o.created_at).toLocaleDateString('ko-KR')}</td>
-      <td>${esc(o.lifeart_products?.name) || '-'}</td>
+      <td>${esc(o.member_name)||esc(o.member_email)||'비회원'}<br><span style="font-size:11px;color:var(--text-light);">${esc(o.member_email)||''}</span></td>
+      <td>${esc(o.product_name) || '-'}</td>
       <td>${o.quantity}</td>
-      <td>${o.amount.toLocaleString()}원</td>
-      <td>${o.status}</td>
+      <td>${won(o.amount)}</td>
+      <td>${ORDER_STATUS[o.status]||o.status}</td>
+      <td>${payBadge(o.pay_status)}${o.pg_tid?`<br><span style="font-size:10px;color:var(--text-light);">${esc(o.pg_tid)}</span>`:''}</td>
       <td><select onchange="updateShipping('${o.id}', this.value)">
         <option value="ready" ${o.shipping_status==='ready'?'selected':''}>준비중</option>
         <option value="shipping" ${o.shipping_status==='shipping'?'selected':''}>배송중</option>
         <option value="delivered" ${o.shipping_status==='delivered'?'selected':''}>배송완료</option>
       </select></td>
+      <td>${o.shipping_address?`<span title="${esc(o.shipping_address)}" style="cursor:help;">📍</span>`:''}</td>
     </tr>`).join('');
 }
-async function updateShipping(id, status) { await sb.from('lifeart_orders').update({ shipping_status: status }).eq('id', id); }
+async function updateShipping(id, status) { await sb.from('lifeart_orders').update({ shipping_status: status }).eq('id', id); loadDashboard(); }
 
 /* ── 문의 (1:1/견적/제휴 통합) ── */
 const TYPE_LABEL = { qna:'1:1문의', estimate:'견적', partnership:'제휴' };
@@ -457,13 +522,17 @@ async function loadUsers() {
     tb.innerHTML = `<tr><td colspan="5">회원 목록을 불러올 수 없습니다. (RPC 미배포 또는 권한 없음)</td></tr>`;
     cnt.textContent = ''; return;
   }
-  if (!data || !data.length) { tb.innerHTML = '<tr><td colspan="5">등록된 회원이 없습니다.</td></tr>'; cnt.textContent='총 0명'; return; }
+  if (error) { tb.innerHTML = `<tr><td colspan="8">회원 목록을 불러올 수 없습니다. (RPC 미배포 또는 권한 없음)</td></tr>`; cnt.textContent=''; return; }
+  if (!data || !data.length) { tb.innerHTML = '<tr><td colspan="8">등록된 회원이 없습니다.</td></tr>'; cnt.textContent='총 0명'; return; }
   cnt.textContent = `총 ${data.length}명`;
   tb.innerHTML = data.map(u => `
     <tr>
       <td>${esc(u.email)||'—'}</td>
       <td>${esc(u.name)||'—'}</td>
       <td>${PROVIDER_LABEL[u.provider]||esc(u.provider)||'—'}</td>
+      <td>${Number(u.order_count)>0 ? `<a href="#" onclick="return toggleMemberOrders('${u.id}', this)">${u.order_count}건 ▾</a>` : '0건'}</td>
+      <td style="font-variant-numeric:tabular-nums;">${won(u.total_paid)}</td>
+      <td>${u.last_order_at ? new Date(u.last_order_at).toLocaleDateString('ko-KR') : '—'}</td>
       <td>
         <select onchange="setUserRole('${u.id}', this.value, this)">
           <option value="member" ${u.role==='member'?'selected':''}>일반회원</option>
@@ -471,7 +540,27 @@ async function loadUsers() {
         </select>
       </td>
       <td>${new Date(u.created_at).toLocaleDateString('ko-KR')}</td>
-    </tr>`).join('');
+    </tr>
+    <tr id="mo-${u.id}" style="display:none;"><td colspan="8" style="background:var(--soft-gray);"></td></tr>`).join('');
+}
+async function toggleMemberOrders(id, a) {
+  const row = document.getElementById('mo-' + id);
+  const cell = row.firstElementChild;
+  if (row.style.display !== 'none') { row.style.display = 'none'; return false; }
+  row.style.display = 'table-row';
+  cell.innerHTML = '불러오는 중...';
+  const { data, error } = await sb.rpc('lifeart_admin_get_member_orders', { member_id: id });
+  if (error || !data?.length) { cell.innerHTML = '<span style="font-size:12px;color:var(--text-light);">주문 이력이 없습니다.</span>'; return false; }
+  cell.innerHTML = `<table class="mini-orders" style="width:100%;">
+    <thead><tr><th style="text-align:left;">주문일</th><th style="text-align:left;">상품</th><th>수량</th><th style="text-align:right;">금액</th><th>상태</th></tr></thead>
+    <tbody>${data.map(o=>`<tr>
+      <td>${new Date(o.created_at).toLocaleDateString('ko-KR')}</td>
+      <td>${esc(o.product_name)||'-'}</td>
+      <td style="text-align:center;">${o.quantity}</td>
+      <td style="text-align:right;">${won(o.amount)}</td>
+      <td style="text-align:center;">${ORDER_STATUS[o.status]||o.status}</td>
+    </tr>`).join('')}</tbody></table>`;
+  return false;
 }
 async function setUserRole(id, role, el) {
   if (role === 'admin' && !confirm('이 회원을 LifeArt 관리자로 지정하시겠습니까?')) { loadUsers(); return; }
