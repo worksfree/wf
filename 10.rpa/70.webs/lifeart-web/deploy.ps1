@@ -7,8 +7,8 @@
 #    비대화형:   .\deploy.ps1 -Target 1    (1=test-lifeart, 2=production, 9=pre-test-lifeart)
 #    단계적 배포: .\deploy.ps1 -Target 1 -Day 3   (git tag lifeart-day3 시점 스냅샷만 전송)
 #    단계 공개: .\deploy.ps1 -Target 1 -Menus "about,products,howto"
-#       (현재 HEAD 전체를 배포하되, 목록에 없는 상위 메뉴엔 "개발중" 배지만 부착.
-#        메뉴/페이지는 제거하지 않음 — 전체 메뉴 트리는 항상 노출)
+#       (현재 HEAD 전체를 배포하되, 목록에 없는 상위 메뉴엔 마우스 오버 시
+#        "개발중" 툴팁만 부착. 메뉴/페이지는 제거하지 않음 — 전체 트리 항상 노출)
 #       상위 메뉴 키: about products howto business support
 # ================================================================
 param([string]$Target = "", [string]$Day = "", [string]$Menus = "")
@@ -171,7 +171,7 @@ $BUST       = $VERSION   # 캐시버스트 토큰 = 릴리스 버전
 # 소스 → 스테이지 복사 후 불필요 폴더 제거 (배포 대상만 남김)
 & $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
 
-# ── 릴리스 범위(-Menus): 지정 메뉴 외에는 "개발중" 배지 (전부 노출 유지) ──
+# ── 릴리스 범위(-Menus): 지정 메뉴 외에는 마우스 오버 "개발중" 툴팁 (전부 노출 유지) ──
 #   메뉴는 제거하지 않는다. 릴리스 안 된 상위 메뉴에 "개발중" 표기만 붙인다.
 if ($Menus) {
     $released  = $Menus.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
@@ -182,9 +182,8 @@ if ($Menus) {
     if (Test-Path $headerFile) {
         $h = [System.IO.File]::ReadAllText($headerFile, [System.Text.Encoding]::UTF8)
         foreach ($k in $wip) {
-            # 상위 메뉴 라벨 뒤에 배지 삽입 (라벨은 <li ...data-menu="k"> 바로 뒤 텍스트)
-            $h = [regex]::Replace($h, "(<li[^>]*data-menu=""$k""[^>]*>)([^\r\n<]*\S)",
-                                   '${1}${2} <span class="menu-wip">개발중</span>')
+            # 미릴리스 상위 메뉴 <li> 에 menu-dev 클래스 부여 → 마우스 오버 시 "개발중" 툴팁
+            $h = [regex]::Replace($h, "(<li class=""has-sub)("" data-menu=""$k"")", '${1} menu-dev${2}')
         }
         [System.IO.File]::WriteAllText($headerFile, $h, [System.Text.Encoding]::UTF8)
     }
