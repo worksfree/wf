@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /mypage/
+
+Sitemap: https://www.lifeart.ai.kr/sitemap.xml

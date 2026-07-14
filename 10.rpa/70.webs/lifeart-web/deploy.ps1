@@ -21,7 +21,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.8.4.2"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
+$VERSION  = "0.8.4.3"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
 
 $TARGETS = @{
     "1" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
@@ -216,6 +216,28 @@ if ((Test-Path $hdrFile) -and (Test-Path $ftrFile)) {
     }
     Write-Host "  ▶ 헤더/푸터 인라인 주입 완료 (헤더 깜빡임 제거)" -ForegroundColor DarkGray
 }
+
+# ── SEO 태그 주입: 전 페이지 <head> 에 favicon·description·OG 1회 삽입 ──
+#   og:title 은 각 페이지 <title> 사용. 재주입 방지 마커 = og:site_name.
+Get-ChildItem -Path $stageWin -Recurse -File -Filter *.html | ForEach-Object {
+    $c = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
+    if ($c -match '</head>' -and $c -notmatch 'og:site_name') {
+        $title = if ($c -match '<title>(.*?)</title>') { $Matches[1] } else { 'LifeArt' }
+        $seo = @"
+<meta name="description" content="LifeArt — 포토북·삽입식 앨범·VIP 앨범·액자. 25년 노하우의 프리미엄 포토 서비스.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LifeArt">
+<meta property="og:title" content="$title">
+<meta property="og:description" content="당신의 소중한 순간을 품격 있게 완성하는 LifeArt">
+<meta property="og:image" content="https://www.lifeart.ai.kr/assets/img/logo.jpg">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/jpeg" href="/assets/img/logo.jpg">
+"@
+        $c = $c.Replace('</head>', $seo + "</head>")
+        [System.IO.File]::WriteAllText($_.FullName, $c, [System.Text.Encoding]::UTF8)
+    }
+}
+Write-Host "  ▶ SEO 태그(favicon·OG·description) 주입 완료" -ForegroundColor DarkGray
 
 # 스테이지 처리: (1) 모든 html의 버전 문자열을 릴리스 버전으로 치환
 #   — 인라인 푸터(초기 페이지)와 공통 파트셜 footer.html 을 모두 포함

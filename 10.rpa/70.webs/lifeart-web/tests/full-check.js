@@ -15,7 +15,7 @@ const PAGES = [
   '/business/', '/business/wedding/', '/business/travel-golf/', '/business/kiosk/', '/business/inquiry/',
   '/support/', '/support/notice/', '/support/faq/', '/support/qna/', '/support/estimate/',
   '/gallery/', '/catalog/', '/auth/login/', '/auth/signup/', '/mypage/', '/checkout/', '/admin/',
-  '/terms/', '/privacy/'
+  '/terms/', '/privacy/', '/shipping/'
 ];
 
 let PASS = 0, FAIL = 0; const fails = [];

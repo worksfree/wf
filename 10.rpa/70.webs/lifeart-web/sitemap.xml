@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.lifeart.ai.kr/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/about/story/</loc><priority>0.7</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/about/ceo/</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/about/location/</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/about/press/</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/products/</loc><priority>0.9</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/products/instant-album/</loc><priority>0.8</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/products/vip-album/</loc><priority>0.8</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/products/frame/</loc><priority>0.8</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/howto/</loc><priority>0.7</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/howto/instant-album/</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/howto/vip/</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/howto/frame/</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/business/</loc><priority>0.7</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/business/wedding/</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/business/travel-golf/</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/business/kiosk/</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/business/inquiry/</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/support/</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/support/notice/</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/support/faq/</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/gallery/</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/catalog/</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/shipping/</loc><priority>0.4</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/terms/</loc><priority>0.3</priority></url>
+  <url><loc>https://www.lifeart.ai.kr/privacy/</loc><priority>0.3</priority></url>
+</urlset>
