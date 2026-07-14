@@ -14,5 +14,13 @@
     if (headerSlot) headerSlot.outerHTML = headerHtml;
     if (footerSlot) footerSlot.outerHTML = footerHtml;
   }
-  document.dispatchEvent(new CustomEvent('layout:ready'));
+  // ★ 인라인 주입 시 fetch(await)가 없어 이 IIFE가 동기적으로 끝나므로,
+  //   페이지 하단 인라인 스크립트(initAdmin 등)가 'layout:ready' 리스너를
+  //   등록하기 전에 이벤트가 터지는 레이스가 생긴다. setTimeout(0)으로 다음
+  //   매크로태스크에 발화 → 모든 인라인 리스너 등록 후 안전하게 실행되게 한다.
+  window.__layoutReady = false;
+  setTimeout(function () {
+    window.__layoutReady = true;
+    document.dispatchEvent(new CustomEvent('layout:ready'));
+  }, 0);
 })();

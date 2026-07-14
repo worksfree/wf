@@ -255,7 +255,10 @@
 <script src="/assets/auth.js"></script>
 <script src="/assets/layout.js"></script>
 <script>
+let _adminBooted = false;
 document.addEventListener('layout:ready', initAdmin);
+// 세션 복원이 layout:ready 보다 늦을 수 있어(fresh load 레이스), auth 상태 확정 시에도 재실행
+sb.auth.onAuthStateChange(() => initAdmin());
 function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 async function initAdmin() {
@@ -278,6 +281,8 @@ async function initAdmin() {
     }
   }
   gate.style.display = 'none';
+  if (_adminBooted) return;   // 게이트 해제는 매번, 무거운 초기화는 1회만
+  _adminBooted = true;
 
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
