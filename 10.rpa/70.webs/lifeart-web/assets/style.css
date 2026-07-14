@@ -102,6 +102,21 @@ header {
 }
 .nav-dropdown a:hover { background: var(--soft-gray); color: var(--accent); }
 
+/* ── 가이드/소개 페이지 공통 (제작과정·비즈니스 하위 페이지) ── */
+.guide-lead { font-size: 16px; color: var(--text-mid); line-height: 1.85; max-width: 720px; margin: 0 auto 30px; text-align: center; }
+.guide-figure { width: 100%; border-radius: 14px; overflow: hidden; margin: 26px 0; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+.guide-figure img { width: 100%; display: block; }
+.guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 26px 0; }
+.guide-grid img { width: 100%; border-radius: 12px; display: block; aspect-ratio: 4/3; object-fit: cover; }
+.guide-steps { counter-reset: gs; max-width: 760px; margin: 26px auto; }
+.guide-step { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--border); }
+.guide-step::before { counter-increment: gs; content: counter(gs); flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--deep-charcoal); color: var(--muted-gold); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+.guide-step h4 { margin: 4px 0 5px; font-size: 15.5px; color: var(--text-dark); }
+.guide-step p { font-size: 13.5px; color: var(--text-mid); margin: 0; line-height: 1.7; }
+.guide-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 22px 0; }
+.guide-tag { font-size: 12.5px; padding: 6px 14px; border-radius: 20px; background: var(--soft-gray); color: var(--text-mid); }
+.guide-cta { text-align: center; margin: 40px 0 4px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
 /* ── 보도자료 목록 (/about/press/) ── */
 .press-item { border-bottom: 1px solid var(--border); padding: 22px 0; }
 .press-item:first-child { padding-top: 0; }
