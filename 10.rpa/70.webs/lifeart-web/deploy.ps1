@@ -4,8 +4,8 @@
 #
 #  사용법:
 #    PowerShell: .\deploy.ps1              (대화형)
-#    비대화형:   .\deploy.ps1 -Target 1    (1=test-lifeart, 2=production, 9=pre-test-lifeart)
-#    단계 배포: .\deploy.ps1 -Target 1 -Stage N   (N=1~5, 누적 공개 · 완전 가역)
+#    비대화형:   .\deploy.ps1 -Target 1    (1=pre-test, 2=test-lifeart, 3=production · Enter=1 pre-test)
+#    단계 배포: .\deploy.ps1 -Target 2 -Stage N   (N=1~5, 누적 공개 · 완전 가역 · 보통 test=2 에 적용)
 #       1=소개·상품·제작과정  2=+비즈니스·소셜  3=+고객지원·결제  4=+O&M  5=+Dev툴킷
 #       └ 배포 사본의 config.js RELEASE_STAGE 만 치환. 소스는 항상 5(full) → pre-test 검수는 전체.
 #       └ 값만 바꿔 재배포하면 1→5→다시 1 어느 단계로든 복원됨(소스 불변).
@@ -24,9 +24,9 @@ $NAS_IP   = "192.168.100.38"
 $VERSION  = "0.7.5.0"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
 
 $TARGETS = @{
-    "1" = @{ Name="test-lifeart";     Path="/volume1/web/test-lifeart";     URL="https://test-lifeart.lifeart.ai.kr";     Color="Yellow"  }
-    "2" = @{ Name="production";       Path="/volume1/web/lifeart";          URL="https://www.lifeart.ai.kr";              Color="Green"   }
-    "9" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
+    "1" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
+    "2" = @{ Name="test-lifeart";     Path="/volume1/web/test-lifeart";     URL="https://test-lifeart.lifeart.ai.kr";     Color="Yellow"  }
+    "3" = @{ Name="production";       Path="/volume1/web/lifeart";          URL="https://www.lifeart.ai.kr";              Color="Green"   }
 }
 
 # 배포 제외: worker/supabase/tests/.git/node_modules/.wrangler/deploy.ps1 등
@@ -51,16 +51,17 @@ if (-not (Get-Command scp -ErrorAction SilentlyContinue)) {
 
 Write-Host "  배포 대상을 선택하세요:" -ForegroundColor White
 Write-Host ""
-Write-Host "    [1]  test-lifeart      — 고객사 공개용(단계적 공개)  (test-lifeart.lifeart.ai.kr)"     -ForegroundColor Yellow
-Write-Host "    [2]  production        — 실 서비스               (www.lifeart.ai.kr)"                  -ForegroundColor Green
-Write-Host "    [9]  pre-test-lifeart  — 비공개 검수용             (pre-test-lifeart.lifeart.ai.kr)"    -ForegroundColor Magenta
+Write-Host "    [1]  pre-test-lifeart  — 비공개 검수용(기본)         (pre-test-lifeart.lifeart.ai.kr)"    -ForegroundColor Magenta
+Write-Host "    [2]  test-lifeart      — 고객사 공개용(단계적 공개)  (test-lifeart.lifeart.ai.kr)"     -ForegroundColor Yellow
+Write-Host "    [3]  production        — 실 서비스               (www.lifeart.ai.kr)"                  -ForegroundColor Green
 Write-Host "    [Q]  취소"                                                    -ForegroundColor Gray
 Write-Host ""
 if ($Target) {
     $choice = $Target
     Write-Host "  (비대화형 모드 — Target: $Target)" -ForegroundColor DarkGray
 } else {
-    $choice = Read-Host "  선택"
+    $choice = Read-Host "  선택 (Enter=1 pre-test)"
+    if ([string]::IsNullOrWhiteSpace($choice)) { $choice = "1" }
 }
 
 if ($choice -match "^[Qq]$") { Write-Host "`n  취소됨." -ForegroundColor Gray; exit 0 }
@@ -70,7 +71,7 @@ if (-not $TARGETS.ContainsKey($choice)) {
 
 $T = $TARGETS[$choice]
 
-if ($choice -eq "2") {
+if ($choice -eq "3") {
     Write-Host ""
     Write-Host "  ⚠️  production 배포 — 실 서비스(www.lifeart.ai.kr)에 즉시 반영됩니다." -ForegroundColor Red
     if (-not $Target) {
@@ -80,15 +81,15 @@ if ($choice -eq "2") {
 }
 
 # ── 버전 자동 증가 (확인 통과 후) ──────────────────────────────
-#   pre-test(9)=BUILD(4번째)↑ · test(1)=PATCH(3번째)↑+BUILD리셋 · production(2)=MINOR(2번째)↑+PATCH·BUILD리셋
+#   pre-test(1)=BUILD(4번째)↑ · test(2)=PATCH(3번째)↑+BUILD리셋 · production(3)=MINOR(2번째)↑+PATCH·BUILD리셋
 #   버전은 "릴리스 횟수" 카운터라 -Day 스테이징 배포에서도 대상별로 증가한다.
 #   (콘텐츠는 태그 시점 고정, 버전은 릴리스 시점 기준 → 스테이지 푸터에 주입)
 if ($VERSION -match '^(\d+)\.(\d+)\.(\d+)\.(\d+)$') {
     $p = @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4])
     switch ($choice) {
-        "2" { $p[1]++; $p[2] = 0; $p[3] = 0 }   # production: MINOR↑
-        "1" { $p[2]++; $p[3] = 0 }              # test: PATCH↑
-        default { $p[3]++ }                      # pre-test: BUILD↑
+        "3" { $p[1]++; $p[2] = 0; $p[3] = 0 }   # production: MINOR↑
+        "2" { $p[2]++; $p[3] = 0 }              # test: PATCH↑
+        default { $p[3]++ }                      # pre-test(1): BUILD↑
     }
     $newVer  = "$($p[0]).$($p[1]).$($p[2]).$($p[3])"
     # deploy.ps1 자기 자신의 $VERSION 갱신 (UTF-8 BOM 유지 — 한글 포함)
