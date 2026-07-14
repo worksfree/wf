@@ -4,7 +4,7 @@
   <div class="header-inner">
     <a href="/" class="logo"><img src="/assets/img/logo.jpg" alt="LifeArt"></a>
     <ul class="main-nav">
-      <li class="has-sub">LifeArt 소개
+      <li class="has-sub" data-menu="about">LifeArt 소개
         <div class="nav-dropdown">
           <a href="/about/story/">LifeArt 이야기</a>
           <a href="/about/ceo/">CEO 인사말</a>
@@ -12,7 +12,7 @@
           <a href="/about/press/">보도자료 · 수상이력</a>
         </div>
       </li>
-      <li class="has-sub">상품
+      <li class="has-sub" data-menu="products">상품
         <div class="nav-dropdown">
           <a href="/products/">전체 상품 보기</a>
           <a href="#" class="wip" aria-label="개발 예정">포토북 <span class="badge">Coming&nbsp;Soon</span></a>
@@ -21,14 +21,14 @@
           <a href="/products/frame/">액자</a>
         </div>
       </li>
-      <li class="has-sub">제작과정
+      <li class="has-sub" data-menu="howto">제작과정
         <div class="nav-dropdown">
           <a href="/howto/#instant-album">삽입식 앨범 만들기</a>
           <a href="/howto/#vip">VIP 앨범 상담 프로세스</a>
           <a href="/howto/#frame">액자 맞춤 제작</a>
         </div>
       </li>
-      <li class="has-sub">비즈니스
+      <li class="has-sub" data-menu="business">비즈니스
         <div class="nav-dropdown">
           <a href="/business/#wedding">웨딩·돌잔치 패키지</a>
           <a href="/business/#travel-golf">여행사·골프·산악회</a>
@@ -36,7 +36,7 @@
           <a href="/business/#inquiry">제휴 문의</a>
         </div>
       </li>
-      <li class="has-sub">고객지원
+      <li class="has-sub" data-menu="support">고객지원
         <div class="nav-dropdown">
           <a href="/support/#notice">공지사항</a>
           <a href="/support/#faq">자주 묻는 질문</a>
@@ -46,9 +46,9 @@
       </li>
     </ul>
     <div class="nav-actions" id="nav-actions">
-      <a href="/catalog/" class="btn-outline">카탈로그</a>
-      <a href="/auth/signup/" class="btn-outline" id="nav-signup-btn">회원가입</a>
-      <a href="/auth/login/" class="btn-primary" id="nav-login-btn">로그인</a>
+      <a href="/catalog/" class="btn-outline" data-menu="catalog">카탈로그</a>
+      <a href="/auth/signup/" class="btn-outline" id="nav-signup-btn" data-menu="auth">회원가입</a>
+      <a href="/auth/login/" class="btn-primary" id="nav-login-btn" data-menu="auth">로그인</a>
     </div>
   </div>
 </header>

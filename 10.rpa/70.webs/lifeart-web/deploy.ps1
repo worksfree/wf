@@ -6,8 +6,11 @@
 #    PowerShell: .\deploy.ps1              (대화형)
 #    비대화형:   .\deploy.ps1 -Target 1    (1=test-lifeart, 2=production, 9=pre-test-lifeart)
 #    단계적 배포: .\deploy.ps1 -Target 1 -Day 3   (git tag lifeart-day3 시점 스냅샷만 전송)
+#    메뉴 제한 배포: .\deploy.ps1 -Target 1 -Menus "about,products,howto"
+#       (현재 HEAD를 쓰되 지정한 메뉴만 노출 — 헤더/푸터/홈 CTA/페이지 폴더 자동 정리)
+#       메뉴 키: about products howto business support catalog auth community
 # ================================================================
-param([string]$Target = "", [string]$Day = "")
+param([string]$Target = "", [string]$Day = "", [string]$Menus = "")
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding          = [System.Text.Encoding]::UTF8
@@ -16,7 +19,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.7.0.5"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
+$VERSION  = "0.7.2.0"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑)
 
 $TARGETS = @{
     "1" = @{ Name="test-lifeart";     Path="/volume1/web/test-lifeart";     URL="https://test-lifeart.lifeart.ai.kr";     Color="Yellow"  }
@@ -143,9 +146,10 @@ if ($Day) {
     New-Item -ItemType Directory -Path $tempArchiveDir -Force | Out-Null
     $tempPosix = '/' + $tempArchiveDir.Substring(0,1).ToLower() + ($tempArchiveDir.Substring(2) -replace '\\', '/')
 
-    & $gitBash -c "cd '$posixLocal0' && git archive '$tag' -- 10.rpa/70.webs/lifeart-web | tar -x -C '$tempPosix'" 2>&1 | Out-Null
+    # ':/경로' 매직 pathspec = repo 루트 기준(cwd 무관). 아카이브는 lifeart-web 하위만 담김.
+    & $gitBash -c "cd '$posixLocal0' && git archive '$tag' -- ':/10.rpa/70.webs/lifeart-web' | tar -x -C '$tempPosix'" 2>&1 | Out-Null
 
-    $SOURCE_PATH = Join-Path $tempArchiveDir "10.rpa\70.webs\lifeart-web"
+    $SOURCE_PATH = $tempArchiveDir
     if (-not (Test-Path (Join-Path $SOURCE_PATH "index.html"))) {
         Write-Host "  [오류] '$tag' 스냅샷 추출에 실패했습니다." -ForegroundColor Red
         exit 1
@@ -166,23 +170,49 @@ $BUST       = $VERSION   # 캐시버스트 토큰 = 릴리스 버전
 # 소스 → 스테이지 복사 후 불필요 폴더 제거 (배포 대상만 남김)
 & $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
 
-# 스테이지 공통 푸터에 릴리스 버전 주입 (-Day 스냅샷은 옛 버전이 박혀있으므로 덮어씀)
-$stageFooter = Join-Path $stageWin 'assets\footer.html'
-if (Test-Path $stageFooter) {
-    $sf = [System.IO.File]::ReadAllText($stageFooter, [System.Text.Encoding]::UTF8)
-    $sf = $sf -replace 'v\d+\.\d+\.\d+\.\d+', "v$VERSION"
-    [System.IO.File]::WriteAllText($stageFooter, $sf, [System.Text.Encoding]::UTF8)
+# ── 메뉴 제한(-Menus): 지정한 메뉴만 노출 ────────────────────────
+if ($Menus) {
+    $allowed = $Menus.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    $allKeys = @('about','products','howto','business','support','catalog','auth','community')
+    $deny    = $allKeys | Where-Object { $allowed -notcontains $_ }
+    # 메뉴 키 → 제거할 페이지 폴더
+    $folderMap = @{ about='about'; products='products'; howto='howto'; business='business';
+                    support='support'; catalog='catalog'; community='gallery'; auth='auth mypage admin checkout' }
+    Write-Host "  ▶ 메뉴 제한: 노출=[$($allowed -join ', ')] / 숨김=[$($deny -join ', ')]" -ForegroundColor DarkYellow
+    # 1) data-menu 요소 제거 (헤더 <li>, 푸터 mega-col, 홈 CTA <a>) — 모든 html 대상
+    Get-ChildItem -Path $stageWin -Recurse -File -Filter *.html | ForEach-Object {
+        $h = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
+        foreach ($k in $deny) {
+            $h = [regex]::Replace($h, "(?s)<li[^>]*data-menu=""$k""[^>]*>.*?</li>", '')
+            $h = [regex]::Replace($h, "(?s)<div class=""mega-col"" data-menu=""$k""[^>]*>.*?</div>", '')
+            $h = [regex]::Replace($h, "<a[^>]*data-menu=""$k""[^>]*>.*?</a>", '')
+        }
+        [System.IO.File]::WriteAllText($_.FullName, $h, [System.Text.Encoding]::UTF8)
+    }
+    # 2) 제외 메뉴의 페이지 폴더 삭제
+    $rmDirs = ($deny | ForEach-Object { $folderMap[$_] }) -join ' '
+    if ($rmDirs) { & $gitBash -c "cd '$stagePosix'; rm -rf $rmDirs" 2>&1 | Out-Null }
 }
 
-# 캐시버스팅: 모든 *.html 과 layout.js 의 /assets/*.js|css|html 참조에 ?v=$BUST 부착
+# 스테이지 처리: (1) 모든 html의 버전 문자열을 릴리스 버전으로 치환
+#   — 인라인 푸터(초기 페이지)와 공통 파트셜 footer.html 을 모두 포함
+#   (2) 모든 html·layout.js 의 /assets/*.js|css|html 참조에 ?v=$BUST 캐시버스팅
+$verRe  = [regex]'v\d+\.\d+\.\d+\.\d+'
 $bustRe = [regex]'(/assets/[A-Za-z0-9_./-]+\.(?:js|css|html))'
 Get-ChildItem -Path $stageWin -Recurse -File | Where-Object { $_.Extension -eq '.html' -or $_.Name -eq 'layout.js' } | ForEach-Object {
     $c = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
+    if ($_.Extension -eq '.html') { $c = $verRe.Replace($c, "v$VERSION") }
     $c = $bustRe.Replace($c, "`$1?v=$BUST")
     [System.IO.File]::WriteAllText($_.FullName, $c, [System.Text.Encoding]::UTF8)
 }
 
 & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} 'mkdir -p ${remotePath}'" | Out-Null
+
+# 메뉴 제한 시 원격에 남아있는 제외 폴더 삭제 (tar 추출은 기존 파일을 지우지 않으므로)
+if ($Menus -and $rmDirs) {
+    $rmRemote = ($rmDirs.Split(' ') | Where-Object { $_ } | ForEach-Object { "'${remotePath}/$_'" }) -join ' '
+    & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} 'rm -rf $rmRemote'" 2>&1 | Out-Null
+}
 
 # tar+SSH: D:\drive_files\ 는 Google Drive 클라우드 마운트라 scp -r 은 파일 누락 위험 (synology-web/deploy.ps1과 동일 이유)
 $bashCmd = "set -o pipefail; cd '$stagePosix' && tar -czf - . | " +
