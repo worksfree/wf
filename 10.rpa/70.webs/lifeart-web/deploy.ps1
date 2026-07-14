@@ -21,7 +21,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.8.4.4"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
+$VERSION  = "0.8.4.5"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
 
 $TARGETS = @{
     "1" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
