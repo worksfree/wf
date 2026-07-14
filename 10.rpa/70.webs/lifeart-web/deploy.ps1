@@ -6,9 +6,10 @@
 #    PowerShell: .\deploy.ps1              (대화형)
 #    비대화형:   .\deploy.ps1 -Target 1    (1=test-lifeart, 2=production, 9=pre-test-lifeart)
 #    단계적 배포: .\deploy.ps1 -Target 1 -Day 3   (git tag lifeart-day3 시점 스냅샷만 전송)
-#    메뉴 제한 배포: .\deploy.ps1 -Target 1 -Menus "about,products,howto"
-#       (현재 HEAD를 쓰되 지정한 메뉴만 노출 — 헤더/푸터/홈 CTA/페이지 폴더 자동 정리)
-#       메뉴 키: about products howto business support catalog auth community
+#    단계 공개: .\deploy.ps1 -Target 1 -Menus "about,products,howto"
+#       (현재 HEAD 전체를 배포하되, 목록에 없는 상위 메뉴엔 "개발중" 배지만 부착.
+#        메뉴/페이지는 제거하지 않음 — 전체 메뉴 트리는 항상 노출)
+#       상위 메뉴 키: about products howto business support
 # ================================================================
 param([string]$Target = "", [string]$Day = "", [string]$Menus = "")
 
@@ -170,28 +171,23 @@ $BUST       = $VERSION   # 캐시버스트 토큰 = 릴리스 버전
 # 소스 → 스테이지 복사 후 불필요 폴더 제거 (배포 대상만 남김)
 & $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
 
-# ── 메뉴 제한(-Menus): 지정한 메뉴만 노출 ────────────────────────
+# ── 릴리스 범위(-Menus): 지정 메뉴 외에는 "개발중" 배지 (전부 노출 유지) ──
+#   메뉴는 제거하지 않는다. 릴리스 안 된 상위 메뉴에 "개발중" 표기만 붙인다.
 if ($Menus) {
-    $allowed = $Menus.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-    $allKeys = @('about','products','howto','business','support','catalog','auth','community')
-    $deny    = $allKeys | Where-Object { $allowed -notcontains $_ }
-    # 메뉴 키 → 제거할 페이지 폴더
-    $folderMap = @{ about='about'; products='products'; howto='howto'; business='business';
-                    support='support'; catalog='catalog'; community='gallery'; auth='auth mypage admin checkout' }
-    Write-Host "  ▶ 메뉴 제한: 노출=[$($allowed -join ', ')] / 숨김=[$($deny -join ', ')]" -ForegroundColor DarkYellow
-    # 1) data-menu 요소 제거 (헤더 <li>, 푸터 mega-col, 홈 CTA <a>) — 모든 html 대상
-    Get-ChildItem -Path $stageWin -Recurse -File -Filter *.html | ForEach-Object {
-        $h = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
-        foreach ($k in $deny) {
-            $h = [regex]::Replace($h, "(?s)<li[^>]*data-menu=""$k""[^>]*>.*?</li>", '')
-            $h = [regex]::Replace($h, "(?s)<div class=""mega-col"" data-menu=""$k""[^>]*>.*?</div>", '')
-            $h = [regex]::Replace($h, "<a[^>]*data-menu=""$k""[^>]*>.*?</a>", '')
+    $released  = $Menus.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    $mainMenus = @('about','products','howto','business','support')
+    $wip       = $mainMenus | Where-Object { $released -notcontains $_ }
+    Write-Host "  ▶ 릴리스 범위: 정식=[$($released -join ', ')] / 개발중 표기=[$($wip -join ', ')]" -ForegroundColor DarkYellow
+    $headerFile = Join-Path $stageWin 'assets\header.html'
+    if (Test-Path $headerFile) {
+        $h = [System.IO.File]::ReadAllText($headerFile, [System.Text.Encoding]::UTF8)
+        foreach ($k in $wip) {
+            # 상위 메뉴 라벨 뒤에 배지 삽입 (라벨은 <li ...data-menu="k"> 바로 뒤 텍스트)
+            $h = [regex]::Replace($h, "(<li[^>]*data-menu=""$k""[^>]*>)([^\r\n<]*\S)",
+                                   '${1}${2} <span class="menu-wip">개발중</span>')
         }
-        [System.IO.File]::WriteAllText($_.FullName, $h, [System.Text.Encoding]::UTF8)
+        [System.IO.File]::WriteAllText($headerFile, $h, [System.Text.Encoding]::UTF8)
     }
-    # 2) 제외 메뉴의 페이지 폴더 삭제
-    $rmDirs = ($deny | ForEach-Object { $folderMap[$_] }) -join ' '
-    if ($rmDirs) { & $gitBash -c "cd '$stagePosix'; rm -rf $rmDirs" 2>&1 | Out-Null }
 }
 
 # 스테이지 처리: (1) 모든 html의 버전 문자열을 릴리스 버전으로 치환
@@ -207,12 +203,6 @@ Get-ChildItem -Path $stageWin -Recurse -File | Where-Object { $_.Extension -eq '
 }
 
 & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} 'mkdir -p ${remotePath}'" | Out-Null
-
-# 메뉴 제한 시 원격에 남아있는 제외 폴더 삭제 (tar 추출은 기존 파일을 지우지 않으므로)
-if ($Menus -and $rmDirs) {
-    $rmRemote = ($rmDirs.Split(' ') | Where-Object { $_ } | ForEach-Object { "'${remotePath}/$_'" }) -join ' '
-    & $gitBash -c "ssh -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP} 'rm -rf $rmRemote'" 2>&1 | Out-Null
-}
 
 # tar+SSH: D:\drive_files\ 는 Google Drive 클라우드 마운트라 scp -r 은 파일 누락 위험 (synology-web/deploy.ps1과 동일 이유)
 $bashCmd = "set -o pipefail; cd '$stagePosix' && tar -czf - . | " +
