@@ -58,7 +58,8 @@ header {
   padding: 14px 32px;
 }
 .logo { display: flex; align-items: center; gap: 8px; }
-.logo img { height: 34px; display: block; }
+.logo img { height: 96px; display: block; }   /* 로고 영역 여백 활용 위해 약 3배 확대 */
+@media (max-width: 768px) { .logo img { height: 54px; } }
 
 .main-nav { display: flex; gap: 28px; list-style: none; }
 .main-nav > li {
