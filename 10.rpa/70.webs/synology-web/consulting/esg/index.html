@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ESG 자가진단 — WorksFree</title>
+<meta name="description" content="기업 환경·사회·지배구조(ESG) 수준을 스스로 점검하는 자가진단 도구. 10분 안에 ESG 등급 확인 및 개선 포인트 파악. WorksFree 컨설팅 플랫폼 제공.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.worksfree.kr/consulting/esg/">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
 :root{
@@ -218,6 +222,31 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 .er-ins-item{font-size:12.5px;color:#78350f;padding:4px 0;display:flex;gap:8px;}
 .er-ins-item::before{content:'•';}
 
+/* ── Auth Modal ── */
+.auth-modal-bg{position:fixed;inset:0;background:#000000aa;display:none;align-items:center;justify-content:center;z-index:9999}
+.auth-modal-bg.open{display:flex}
+.auth-box{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:380px}
+.auth-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.auth-field{margin-bottom:14px}
+.auth-label{display:block;font-size:12px;color:#94a3b8;margin-bottom:5px}
+.auth-input{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;
+  color:var(--text);font-size:14px;font-family:inherit;outline:none}
+.auth-input:focus{border-color:var(--accent)}
+.auth-msg{font-size:12px;min-height:18px;margin-bottom:10px}
+.auth-btns{display:flex;gap:8px;justify-content:flex-end}
+.auth-cancel{padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:inherit}
+.auth-submit{padding:8px 20px;border-radius:7px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit}
+.auth-submit:hover{background:#059669}
+.auth-submit:disabled{opacity:.45;cursor:default}
+/* ── Auth status in topbar ── */
+.auth-chip{font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:6px;}
+.auth-chip .user-em{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* ── Save button in report ── */
+.er-btn-save{background:transparent;border:1px solid #10b981;color:#10b981;}
+.er-btn-save:hover{background:#0a2a1f;}
+.er-btn-save:disabled{opacity:.45;cursor:default;}
+
 /* ── print ── */
 @media print{
   .topbar,.report-bar,.industry-bar,.ig-panel,.tabs,.content,.dashboard{display:none!important;}
@@ -237,10 +266,11 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 <body>
 
 <div class="topbar">
-  <h1>ESG 자가진단 <small>동반성장위원회 중소기업 ESG 표준 가이드라인</small></h1>
-  <button class="btn btn-ghost" onclick="expandAll()">전체 펼치기</button>
-  <button class="btn btn-primary" onclick="showEsgReport()">📋 보고서 생성</button>
-  <button class="btn btn-danger" onclick="confirmReset()">초기화</button>
+  <h1 id="esg-page-title">ESG 자가진단 <small id="esg-page-sub">동반성장위원회 중소기업 ESG 표준 가이드라인</small></h1>
+  <div class="auth-chip" id="auth-status-bar"></div>
+  <button class="btn btn-ghost" id="esg-btn-expand" onclick="expandAll()">전체 펼치기</button>
+  <button class="btn btn-primary" id="esg-btn-report" onclick="showEsgReport()">📋 보고서 생성</button>
+  <button class="btn btn-danger" id="esg-btn-reset" onclick="confirmReset()">초기화</button>
 </div>
 
 <!-- 업종군 배너 -->
@@ -249,48 +279,48 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 <!-- 업종군 선택 패널 -->
 <div class="ig-panel" id="ig-panel">
   <div class="ig-panel-hdr">
-    <span class="ig-panel-title">업종군 선택</span>
-    <span class="ig-panel-sub">선택한 업종에 해당하지 않는 지표를 자동으로 '해당없음' 처리합니다</span>
+    <span class="ig-panel-title" id="esg-ig-panel-title">업종군 선택</span>
+    <span class="ig-panel-sub" id="esg-ig-panel-sub">선택한 업종에 해당하지 않는 지표를 자동으로 '해당없음' 처리합니다</span>
   </div>
   <div class="ig-grid" id="ig-grid"></div>
   <div class="ig-panel-foot">
-    <button class="btn btn-ghost" onclick="closeIgPanel()">닫기</button>
+    <button class="btn btn-ghost" id="esg-ig-panel-close" onclick="closeIgPanel()">닫기</button>
   </div>
 </div>
 
 <div class="dashboard">
   <div class="score-card">
-    <div class="label">전체 준수율</div>
+    <div class="label" id="esg-lbl-total">전체 준수율</div>
     <div class="value color-total" id="sc-total">—</div>
     <div class="sub" id="sc-total-sub">진단 진행 중</div>
     <div class="bar"><div class="bar-fill fill-E" id="bar-total" style="width:0%"></div></div>
   </div>
   <div class="score-card">
-    <div class="label">E 환경</div>
+    <div class="label" id="esg-lbl-E">E 환경</div>
     <div class="value color-E" id="sc-E">—</div>
     <div class="sub" id="sc-E-sub">14개 지표</div>
     <div class="bar"><div class="bar-fill fill-E" id="bar-E" style="width:0%"></div></div>
   </div>
   <div class="score-card">
-    <div class="label">S 사회</div>
+    <div class="label" id="esg-lbl-S">S 사회</div>
     <div class="value color-S" id="sc-S">—</div>
     <div class="sub" id="sc-S-sub">54개 지표</div>
     <div class="bar"><div class="bar-fill fill-S" id="bar-S" style="width:0%"></div></div>
   </div>
   <div class="score-card">
-    <div class="label">G 지배구조</div>
+    <div class="label" id="esg-lbl-G">G 지배구조</div>
     <div class="value color-G" id="sc-G">—</div>
     <div class="sub" id="sc-G-sub">11개 지표</div>
     <div class="bar"><div class="bar-fill fill-G" id="bar-G" style="width:0%"></div></div>
   </div>
   <div class="score-card">
-    <div class="label">공통 지표 준수율</div>
+    <div class="label" id="esg-lbl-common">공통 지표 준수율</div>
     <div class="value" id="sc-common" style="color:var(--text)">—</div>
     <div class="sub" id="sc-common-sub">49개 공통 지표</div>
     <div class="bar"><div class="bar-fill" id="bar-common" style="width:0%;background:var(--accent)"></div></div>
   </div>
   <div class="score-card" id="sc-ind-card" onclick="openIgPanel()" style="cursor:pointer" title="클릭하여 업종군 선택">
-    <div class="label">업종별 지표 준수율 <span id="sc-ind-ig" style="font-size:10px;color:var(--muted)"></span></div>
+    <div class="label" id="esg-lbl-ind">업종별 지표 준수율 <span id="sc-ind-ig" style="font-size:10px;color:var(--muted)"></span></div>
     <div class="value" id="sc-ind" style="color:var(--text)">—</div>
     <div class="sub" id="sc-ind-sub">30개 업종별 지표</div>
     <div class="bar"><div class="bar-fill" id="bar-ind" style="width:0%;background:#f59e0b"></div></div>
@@ -298,14 +328,14 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 </div>
 
 <div class="report-bar" id="report-bar">
-  <span class="rb-label">근로자 수:</span>
+  <span class="rb-label" id="esg-lbl-emp">근로자 수:</span>
   <select class="rb-select" id="rb-emp">
     <option value="u10">10인 미만</option>
     <option value="10to49">10~49인</option>
     <option value="50to299" selected>50~299인</option>
     <option value="300up">300인 이상</option>
   </select>
-  <span class="rb-label">연 매출:</span>
+  <span class="rb-label" id="esg-lbl-rev">연 매출:</span>
   <select class="rb-select" id="rb-rev">
     <option value="u10">10억 미만</option>
     <option value="10to50">10~50억</option>
@@ -314,18 +344,20 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
     <option value="o1000">1,000억 이상</option>
   </select>
   <div class="rb-spacer"></div>
-  <small style="color:var(--muted);font-size:11px;">진단 완료 후 보고서 생성</small>
+  <small id="esg-rb-note" style="color:var(--muted);font-size:11px;">진단 완료 후 보고서 생성</small>
 </div>
 
 <div class="tabs">
-  <div class="tab active" data-tab="E" onclick="switchTab('E')">🌿 E 환경 (14)</div>
-  <div class="tab" data-tab="S" onclick="switchTab('S')">👥 S 사회 (54)</div>
-  <div class="tab" data-tab="G" onclick="switchTab('G')">⚖ G 지배구조 (11)</div>
+  <div class="tab active" id="esg-tab-E" data-tab="E" onclick="switchTab('E')">🌿 E 환경 (14)</div>
+  <div class="tab" id="esg-tab-S" data-tab="S" onclick="switchTab('S')">👥 S 사회 (54)</div>
+  <div class="tab" id="esg-tab-G" data-tab="G" onclick="switchTab('G')">⚖ G 지배구조 (11)</div>
 </div>
 
 <div class="content" id="content"></div>
 
 <script>
+let esgLang = 'ko';
+
 // ── 업종별 지표 전체 목록 (30개 중 환경 6 + 사회 8 = 14개 환경/안전 특화) ──
 const ALL_IND_IDS = ['E-08','E-10','E-11','E-12','E-13','E-14',
                      'S-29','S-30','S-31','S-32','S-33','S-35','S-36','S-42'];
@@ -793,6 +825,356 @@ const DOMAINS = [
 ]},
 ];
 
+// ── ESG i18n ──
+const ESG_EN = {
+  ui:{
+    page_title:'ESG Self-Assessment',
+    page_sub:'Korea Co-Prosperity Committee — SME ESG Standard Guidelines',
+    btn_expand:'Expand All', btn_report:'📋 Generate Report', btn_reset:'Reset',
+    lbl_total:'Overall Compliance', lbl_E:'E Environment', lbl_S:'S Social', lbl_G:'G Governance',
+    lbl_common:'Common Indicator Rate', lbl_ind:'Industry Indicator Rate',
+    lbl_emp:'Employees:', lbl_rev:'Annual Revenue:', rb_note:'Generate report after completing assessment',
+    tab_E:'🌿 E Environment (14)', tab_S:'👥 S Social (54)', tab_G:'⚖ G Governance (11)',
+    ig_panel_title:'Select Industry Group',
+    ig_panel_sub:'Industry-specific indicators not applicable to the selected industry will be auto-marked N/A',
+    ig_panel_close:'Close',
+    ib_empty:'Select an industry group to automatically handle non-applicable indicators.',
+    ib_btn_set:'Set Industry', ib_apply:'Applicable', ib_excl:'Excluded',
+    ib_btn_change:'Change', ib_btn_clear:'Clear',
+    ig_chip_apply:'✔ Applicable', ig_chip_excl:'⊘ Excluded',
+    ig_industry_not_set:'Industry not set ▸',
+    excl_msg:'This indicator does not apply to the selected industry group. Change the industry or',
+    excl_change:'change industry',
+    na_all_label:'Mark entire indicator as N/A (industry not applicable)',
+    type_p:'Check', type_b:'Support', type_c:'Verify',
+    pill_yes:'Yes', pill_no:'No', pill_na:'N/A',
+    badge_common:'Common', badge_industry:'Industry', badge_excluded:'Excluded',
+    result_pass:'Pass', result_fail:'Fail', result_na:'N/A', result_pending:'Pending',
+    confirm_reset:'Reset all diagnostic data?\nThis action cannot be undone.',
+    auth_title:'🔐 Login', auth_sub:'Generating and saving reports is a members-only feature.',
+    auth_email_lbl:'Email', auth_pw_lbl:'Password', auth_cancel:'Cancel', auth_submit:'Login',
+    auth_logout:'Logout', auth_login_btn:'🔐 Login',
+    auth_err_empty:'Please enter email and password.',
+    auth_err_invalid:'Incorrect email or password.',
+    save_saving:'Saving…', save_done:'✓ Saved', save_fail:'❌ Save Failed', save_btn:'💾 Save',
+    emp_u10:'Under 10', emp_10to49:'10–49', emp_50to299:'50–299', emp_300up:'300+',
+    rev_u10:'Under ₩1B', rev_10to50:'₩1B–5B', rev_50to300:'₩5B–30B', rev_300to1000:'₩30B–100B', rev_o1000:'₩100B+',
+  },
+  dom:{ E:'Environment', S:'Social', G:'Governance' },
+  sec:{
+    E1:'Environmental Management', E2:'Environmental Operations',
+    S1:'Labor Conditions & Human Rights', S2:'Safety & Health',
+    S3:'Business Partners', S4:'General Stakeholders',
+    G1:'Shareholders', G2:'Board of Directors', G3:'Ethics & Compliance',
+  },
+  ig:{
+    manufacturing:{ name:'Manufacturing',       desc:'Metal processing, machinery, automotive, electronics, chemicals, textiles, etc.' },
+    construction: { name:'Construction',         desc:'General construction, specialty construction, interior, facility works, etc.' },
+    logistics:    { name:'Logistics & Transport', desc:'Freight, courier, warehousing, cargo handling, passenger transport, etc.' },
+    retail:       { name:'Wholesale & Retail',    desc:'Wholesale, retail, online distribution, food distribution, etc.' },
+    food:         { name:'Food & Hospitality',    desc:'Restaurant, café, bakery, hotel, accommodation, etc.' },
+    service:      { name:'IT, Services & Office', desc:'Software, finance, education, healthcare, consulting, etc.' },
+  },
+  ind:{
+    'E-01':'Environmental Law Compliance','E-02':'Environmental Management System',
+    'E-03':'Environmental Target Setting','E-04':'Employee Environmental Awareness',
+    'E-05':'Energy Consumption Management','E-06':'Greenhouse Gas Management',
+    'E-07':'Water Usage Management','E-08':'Wastewater Management',
+    'E-09':'Waste Management','E-10':'Chemical Substance Management',
+    'E-11':'Air Pollutant Management','E-12':'Soil & Groundwater Management',
+    'E-13':'Noise & Vibration Management','E-14':'Green Purchasing',
+    'S-01':'Employment Law Compliance','S-02':'Employment Contract Management',
+    'S-03':'Minimum Wage Compliance','S-04':'Legal Working Hours Compliance',
+    'S-05':'Statutory Leave & Holiday','S-06':'Wage Payment',
+    'S-07':'Severance Pay','S-08':'Social Insurance Enrollment',
+    'S-09':'Employment Equality','S-10':'Workplace Harassment Prevention',
+    'S-11':'Sexual Harassment Prevention','S-12':'Disability Employment',
+    'S-13':'Freedom of Association','S-14':'Prohibition of Child & Forced Labor',
+    'S-15':'Non-Regular Worker Treatment','S-16':'Parental Leave',
+    'S-17':'Recruitment & HR Management','S-18':'Employee Training Support',
+    'S-19':'Wage Fairness','S-20':'Performance Evaluation System',
+    'S-21':'Safety & Health Law Compliance','S-22':'Safety & Health Management System',
+    'S-23':'Risk Assessment','S-24':'Safety & Health Training',
+    'S-25':'Accident Investigation & Prevention','S-26':'Personal Protective Equipment',
+    'S-27':'Fire & Explosion Prevention','S-28':'Electrical Safety Management',
+    'S-29':'Machinery & Equipment Safety','S-30':'Chemical Safety Management',
+    'S-31':'Confined Space Work Safety','S-32':'Fall Prevention',
+    'S-33':'Explosive Material Management','S-34':'Occupational Disease Prevention',
+    'S-35':'Musculoskeletal Disorder Prevention','S-36':'Working Environment Measurement',
+    'S-37':'Employee Health Examination','S-38':'Employee Mental Health Support',
+    'S-39':'Childcare Support','S-40':'Flexible Work Arrangements',
+    'S-41':'Comfortable Workplace Environment','S-42':'Health Manager Appointment',
+    'S-43':'Partner ESG Capacity Support','S-44':'Partner Selection Criteria',
+    'S-45':'Fair Contracting with Partners','S-46':'Timely Payment to Partners',
+    'S-47':'Partner Technology & IP Protection','S-48':'Supply Chain Human Rights',
+    'S-49':'Partner Safety & Health Support','S-50':'Customer Safety',
+    'S-51':'Personal Data Protection','S-52':'Customer Complaint Handling',
+    'S-53':'Community Contribution','S-54':'Social Contribution Activities',
+    'G-01':'Shareholder Rights Protection','G-02':'Dividend Policy',
+    'G-03':'Board Composition & Operation','G-04':'Internal Audit Function',
+    'G-05':'Executive Compensation Fairness','G-06':'Ethics & Compliance Management',
+    'G-07':'Management Information Transparency','G-08':'Tax Strategy Compliance',
+    'G-09':'Anti-Corruption & Anti-Bribery','G-10':'Fair Trade Compliance',
+    'G-11':'Internal Reporting System',
+  },
+  items:{
+    'E-01-0':'A list of applicable environmental laws and regulations has been identified',
+    'E-01-1':'There have been no violations of environmental laws and regulations (past 3 years)',
+    'E-01-2':'The status of environmental permits and notifications is managed',
+    'E-01-3':'Records of fines and administrative actions for environmental violations are maintained',
+    'E-02-0':'An environmental management policy has been established and communicated to all employees',
+    'E-02-1':'An environmental management officer (department) has been designated',
+    'E-02-2':'An environmental management system (ISO 14001 or equivalent) is in operation',
+    'E-02-3':'A sustainability or ESG report is published',
+    'E-03-0':'Environmental goals have been established for the business site',
+    'E-03-1':'Progress toward environmental goals is regularly monitored',
+    'E-03-2':'Environmental improvement and investment plans have been established',
+    'E-04-0':'Environmental training is conducted for employees at least once a year',
+    'E-04-1':'An environmental training plan is developed and annual training records are maintained',
+    'E-04-2':'Environmental best practices are shared with employees',
+    'E-05-0':'Energy consumption is monitored and recorded',
+    'E-05-1':'Activities to reduce energy consumption are being implemented',
+    'E-05-2':'Energy consumption reduction targets have been established',
+    'E-05-3':'Energy-related certifications or audits have been conducted',
+    'E-06-0':'Greenhouse gas emissions (direct and indirect) are calculated',
+    'E-06-1':'Activities to reduce greenhouse gas emissions are being implemented',
+    'E-06-2':'Greenhouse gas emission reduction targets have been established',
+    'E-06-3':'Greenhouse gas reduction results are publicly disclosed',
+    'E-07-0':'Water consumption is monitored and recorded',
+    'E-07-1':'Water conservation activities are being implemented',
+    'E-07-2':'Water consumption reduction targets have been established',
+    'E-08-0':'Wastewater generation is identified and relevant laws are complied with',
+    'E-08-1':'Wastewater discharge quality standards are met',
+    'E-08-2':'Wastewater treatment facilities are properly maintained',
+    'E-08-3':'Activities to reduce wastewater generation are being implemented',
+    'E-09-0':'Waste generation is identified and relevant laws are complied with',
+    'E-09-1':'Waste is properly disposed of (including outsourced disposal)',
+    'E-09-2':'Activities to reduce waste generation are being implemented',
+    'E-09-3':'Efforts to improve the waste recycling rate are being made',
+    'E-10-0':'Chemical substances handled are identified and relevant laws (Chemical Substances Control Act, etc.) are complied with',
+    'E-10-1':'Safety information (MSDS, etc.) is provided to workers handling chemical substances',
+    'E-10-2':'Procedures for preventing and responding to chemical accidents are in place',
+    'E-10-3':'Activities to reduce the use of hazardous chemical substances are being implemented',
+    'E-11-0':'Air pollutant emissions are identified and relevant laws are complied with',
+    'E-11-1':'Air pollutant emission allowance standards are met',
+    'E-11-2':'Air pollutant reduction equipment is properly maintained',
+    'E-12-0':'The possibility of soil or groundwater contamination has been identified',
+    'E-12-1':'Laws related to soil and groundwater contamination are complied with',
+    'E-12-2':'Soil and groundwater contamination prevention activities are being implemented',
+    'E-13-0':'Noise and vibration generation is identified and relevant laws are complied with',
+    'E-13-1':'Noise and vibration emission standards are met',
+    'E-13-2':'Activities to reduce noise and vibration are being implemented',
+    'E-14-0':'Criteria for purchasing eco-friendly products and services have been established',
+    'E-14-1':'Records of eco-friendly product and service purchases are managed',
+    'E-14-2':'A purchasing policy considering environmental impact of the supply chain is operated',
+    'S-01-0':'Employment-related laws (Labor Standards Act, etc.) are complied with',
+    'S-01-1':'There have been no violations of employment-related laws (past 3 years)',
+    'S-01-2':'There is no history of fines or administrative actions for employment violations',
+    'S-02-0':'Written employment contracts are prepared and provided to workers',
+    'S-02-1':'Legally required items (wages, working hours, job description, etc.) are specified in the employment contract',
+    'S-02-2':'Copies of employment contracts are accessible to workers at any time',
+    'S-03-0':'All workers are paid at or above the legal minimum wage',
+    'S-03-1':'The scope of minimum wage inclusion is complied with',
+    'S-03-2':'Changes to the minimum wage are posted within the workplace',
+    'S-04-0':'Legal working hours (40 hrs/week; max 52 hrs including overtime) are complied with',
+    'S-04-1':'Overtime, night shift, and holiday work premiums are paid',
+    'S-04-2':'Working hour records are maintained and preserved',
+    'S-05-0':'Statutory holidays (weekly day off, public holidays, etc.) are granted',
+    'S-05-1':'Statutory annual paid leave is granted',
+    'S-05-2':'Wages are paid for unused annual leave',
+    'S-06-0':'Wages are paid in full on the designated date',
+    'S-06-1':'There is no history of wage withholding (past 3 years)',
+    'S-06-2':'Pay stubs are issued to workers',
+    'S-07-0':'A severance pay system (retirement allowance or pension) is in operation',
+    'S-07-1':'Severance pay is properly paid',
+    'S-07-2':'Retirement pension enrollment and accrual status are managed',
+    'S-08-0':'All workers are enrolled in the 4 major social insurances (Nat\'l Pension, Health, Employment, Accident)',
+    'S-08-1':'Social insurance premiums are paid on time',
+    'S-08-2':'Social insurance enrollment status is regularly reviewed',
+    'S-09-0':'There is no discrimination in hiring, wages, or promotions based on gender, age, nationality, disability, etc.',
+    'S-09-1':'Laws related to employment discrimination (Equal Employment Opportunity Act, etc.) are complied with',
+    'S-09-2':'Employment equality compliance is regularly reviewed',
+    'S-10-0':'Training to prevent workplace harassment is conducted',
+    'S-10-1':'Procedures for reporting and handling workplace harassment are in place',
+    'S-10-2':'Records of workplace harassment case handling are maintained',
+    'S-11-0':'Training to prevent sexual harassment in the workplace is conducted at least once a year',
+    'S-11-1':'Procedures for reporting and handling sexual harassment in the workplace are in place',
+    'S-11-2':'Results of sexual harassment prevention training are reported to the relevant labor office',
+    'S-12-0':'The Act on Employment Promotion for Persons with Disabilities is complied with',
+    'S-12-1':'The disability employment quota is met (for applicable businesses)',
+    'S-12-2':'Accessibility facilities for persons with disabilities are adequately provided',
+    'S-13-0':'Workers\' rights to organize, collectively bargain, and take collective action are guaranteed',
+    'S-13-1':'The Trade Union Act and Labor Relations Adjustment Act are complied with',
+    'S-13-2':'A labor-management council is regularly operated',
+    'S-14-0':'When employing young workers (under 18), related provisions of the Labor Standards Act are complied with',
+    'S-14-1':'Forced labor (human trafficking, wage exploitation, etc.) is not practiced',
+    'S-14-2':'When employing foreign workers, relevant laws are complied with',
+    'S-15-0':'Discrimination against non-regular workers is prohibited',
+    'S-15-1':'The Act on Protection of Fixed-Term and Part-Time Workers is complied with',
+    'S-15-2':'Efforts are being made to convert non-regular workers to regular status',
+    'S-16-0':'An environment is created where workers can request and use parental leave',
+    'S-16-1':'Disadvantageous treatment due to use of parental leave is not practiced',
+    'S-16-2':'Support is provided to return to equivalent positions after parental leave',
+    'S-17-0':'A fair and transparent recruitment process is operated',
+    'S-17-1':'Personal information is lawfully collected and managed during the recruitment process',
+    'S-17-2':'Recruitment criteria and procedures are disclosed in advance',
+    'S-18-0':'Training to improve the job capabilities of employees is supported',
+    'S-18-1':'An annual training plan is established and implemented',
+    'S-18-2':'Training records are recorded and managed',
+    'S-19-0':'A rational wage system is operated for the same job and grade',
+    'S-19-1':'Wage determination criteria are clearly defined',
+    'S-19-2':'Gender wage gaps are monitored',
+    'S-20-0':'Fair performance evaluation criteria and procedures are established',
+    'S-20-1':'Performance evaluation results are communicated to workers',
+    'S-20-2':'Procedures for filing objections to performance evaluations are established',
+    'S-21-0':'Industrial safety and health laws (OSH Act, etc.) are complied with',
+    'S-21-1':'There have been no violations of industrial safety and health laws (past 3 years)',
+    'S-21-2':'There is no history of administrative actions for safety and health violations',
+    'S-22-0':'A safety and health policy has been established and posted within the workplace',
+    'S-22-1':'Safety and health management personnel (safety manager, etc.) have been appointed',
+    'S-22-2':'A safety and health committee (or labor-management council) is operated (for applicable businesses)',
+    'S-22-3':'An occupational safety and health management system (ISO 45001 or equivalent) is in operation',
+    'S-23-0':'Hazardous and risk factors in the workplace are identified and risk assessments are conducted',
+    'S-23-1':'Corrective actions based on risk assessment results are implemented',
+    'S-23-2':'Risk assessment results are shared with workers',
+    'S-23-3':'Risk assessments are conducted on a regular annual basis',
+    'S-24-0':'Statutory safety and health training is conducted (new hire, periodic training, etc.)',
+    'S-24-1':'Records of safety and health training are maintained and preserved',
+    'S-24-2':'Safety and health training content is tailored to the specific nature of the work',
+    'S-25-0':'Root cause investigations are conducted when industrial accidents occur',
+    'S-25-1':'Measures to prevent the recurrence of industrial accidents are established and implemented',
+    'S-25-2':'Near-miss incidents are collected and analyzed',
+    'S-25-3':'Industrial accident occurrence records are maintained and managed',
+    'S-26-0':'Appropriate personal protective equipment (PPE) is provided for hazardous work',
+    'S-26-1':'PPE usage is managed and supervised',
+    'S-26-2':'Records of PPE issuance and replacement are maintained',
+    'S-27-0':'Fire-fighting equipment (extinguishers, alarms, etc.) is managed per legal standards',
+    'S-27-1':'Fire prevention and evacuation drills are conducted regularly',
+    'S-27-2':'Flammable and explosive materials are stored and managed per legal standards',
+    'S-28-0':'Statutory safety inspections are conducted for electrical equipment',
+    'S-28-1':'Electrical hazards (overload, aging equipment, etc.) are managed',
+    'S-28-2':'An electrical safety manager is designated and regular inspections are conducted',
+    'S-29-0':'Statutory safety inspections are conducted for machinery and equipment',
+    'S-29-1':'Safety guards on machinery and equipment are properly installed and maintained',
+    'S-29-2':'Safety training is provided for workers operating machinery and equipment',
+    'S-30-0':'Material Safety Data Sheets (MSDS) are on hand for all handled chemicals',
+    'S-30-1':'Safety measures in accordance with MSDS content are implemented',
+    'S-30-2':'Regular safety training is provided for workers handling chemical substances',
+    'S-31-0':'Oxygen levels and harmful gas concentrations are measured before confined space work',
+    'S-31-1':'Safety rules for confined space work (monitoring, ventilation, etc.) are complied with',
+    'S-31-2':'A confined space work permit system is operated',
+    'S-32-0':'Safety railings, nets, and other protective measures are installed at fall-risk locations',
+    'S-32-1':'Workers are required to wear safety equipment (harnesses, etc.) when working at heights',
+    'S-32-2':'Access control is implemented at fall-risk locations',
+    'S-33-0':'Explosive and flammable materials are stored and managed per relevant regulations',
+    'S-33-1':'Explosion-proof equipment is installed in explosion-risk areas',
+    'S-33-2':'Training to prevent explosion accidents is conducted',
+    'S-34-0':'Measures to prevent occupational diseases are taken',
+    'S-34-1':'When occupational diseases occur, root causes are investigated and recurrence prevention measures are established',
+    'S-34-2':'Follow-up actions are taken for workers diagnosed with occupational diseases',
+    'S-35-0':'Musculoskeletal stress work is identified and hazardous factor investigations are conducted',
+    'S-35-1':'Improvement measures for preventing musculoskeletal disorders are implemented',
+    'S-35-2':'Training for preventing musculoskeletal disorders is conducted',
+    'S-36-0':'Statutory working environment measurement is conducted regularly at applicable workplaces',
+    'S-36-1':'Corrective actions based on working environment measurement results are implemented',
+    'S-36-2':'Working environment measurement results are disclosed to workers',
+    'S-37-0':'Statutory health examinations (general, special, etc.) are conducted',
+    'S-37-1':'Follow-up actions based on health examination results are taken',
+    'S-37-2':'Health examination completion rates are managed',
+    'S-38-0':'Programs supporting workers\' mental health are operated (EAP, etc.)',
+    'S-38-1':'Activities to prevent and manage stress are being promoted',
+    'S-38-2':'The level of workplace stress is regularly assessed',
+    'S-39-0':'The obligation to establish workplace childcare facilities is met, or childcare expenses are subsidized (for applicable businesses)',
+    'S-39-1':'Programs supporting work-life balance for employees are operated',
+    'S-40-0':'Introduction of flexible work arrangements (flextime, discretionary work, etc.) is being reviewed',
+    'S-40-1':'Procedures for employees to apply for flexible work are established',
+    'S-40-2':'The number of flexible work users and their satisfaction are tracked',
+    'S-41-0':'Physical working conditions (lighting, temperature, humidity, etc.) are properly maintained',
+    'S-41-1':'Welfare facilities such as rest areas and restrooms are provided per legal standards',
+    'S-41-2':'Activities to improve the workplace environment are regularly promoted',
+    'S-42-0':'A health manager has been appointed at businesses with mandatory requirements',
+    'S-42-1':'The health manager is performing legally mandated duties',
+    'S-42-2':'Time and facilities for the health manager to perform their duties are supported',
+    'S-43-0':'Support programs to improve partners\' ESG management capabilities are operated',
+    'S-43-1':'ESG-related information is shared with partners',
+    'S-43-2':'Results of ESG support for partners are managed',
+    'S-44-0':'ESG or ethical, social, and environmental criteria are reflected in partner selection',
+    'S-44-1':'Partner selection criteria are communicated to partners',
+    'S-44-2':'Application of ESG criteria to existing partners is being reviewed',
+    'S-45-0':'Contracts with partners are concluded in writing',
+    'S-45-1':'Payment terms and delivery conditions are clearly stated in the contract',
+    'S-45-2':'Contracts are concluded only after partners fully understand the contract terms',
+    'S-46-0':'Payments to partners are made within the contractually agreed period',
+    'S-46-1':'Relevant laws such as the Subcontracting Act are complied with',
+    'S-46-2':'Partner payment status is managed',
+    'S-47-0':'Partners\' technical information and trade secrets are protected',
+    'S-47-1':'Technology theft from partners is not practiced',
+    'S-47-2':'Technology protection matters are specified in the contract',
+    'S-48-0':'Human rights violation risks within the supply chain are identified',
+    'S-48-1':'Partners\' compliance with human rights is confirmed',
+    'S-48-2':'Procedures for responding to human rights issues in the supply chain are established',
+    'S-49-0':'Measures are taken for the safety and health of in-house partner workers',
+    'S-49-1':'Safety and health training for partner workers is supported',
+    'S-49-2':'Safety and health conditions at partner workplaces are inspected',
+    'S-50-0':'The impact of products and services on customer safety and health is assessed',
+    'S-50-1':'Product safety-related laws are complied with',
+    'S-50-2':'Product safety incidents are promptly handled',
+    'S-51-0':'Laws related to personal data protection (Personal Information Protection Act, etc.) are complied with',
+    'S-51-1':'Consent for collection, use, and provision of personal data is lawfully obtained',
+    'S-51-2':'A personal data protection officer has been designated',
+    'S-51-3':'Personal data protection training is conducted',
+    'S-52-0':'Procedures for receiving and handling customer complaints are established',
+    'S-52-1':'Customer complaints are handled within a defined timeframe',
+    'S-52-2':'Customer complaint handling results are analyzed and used for improvement',
+    'S-53-0':'Activities contributing to local community development are promoted',
+    'S-53-1':'Community co-prosperity activities such as hiring local talent and purchasing from local businesses are conducted',
+    'S-53-2':'Results of community contribution activities are managed',
+    'S-54-0':'Social contribution activities such as supporting the vulnerable and volunteering are promoted',
+    'S-54-1':'Social contribution activity plans are established and executed',
+    'S-54-2':'Expenditures and results of social contribution activities are managed',
+    'G-01-0':'Shareholder rights (voting rights, information access, etc.) are guaranteed',
+    'G-01-1':'General shareholder meetings are held per the Commercial Act and relevant laws',
+    'G-01-2':'Measures to protect minority shareholder rights are taken',
+    'G-02-0':'A dividend policy or criteria has been established',
+    'G-02-1':'The dividend policy is disclosed to shareholders',
+    'G-02-2':'Appropriate dividends are paid relative to profits',
+    'G-03-0':'A board of directors (or equivalent decision-making body) is operated',
+    'G-03-1':'Board meeting minutes and other operational records are maintained',
+    'G-03-2':'Independent outside directors are appointed (for applicable corporations)',
+    'G-04-0':'An internal audit (auditor or audit committee) function is operated',
+    'G-04-1':'Corrective actions based on internal audit results are implemented',
+    'G-04-2':'Regular external accounting audits are conducted (for applicable corporations)',
+    'G-05-0':'Rational criteria for determining executive compensation have been established',
+    'G-05-1':'The link between executive compensation and performance is reviewed',
+    'G-05-2':'Executive compensation levels are publicly disclosed (for applicable corporations)',
+    'G-06-0':'An ethics management policy or code of conduct has been established',
+    'G-06-1':'Ethics training is conducted for employees',
+    'G-06-2':'Ethics management compliance is monitored',
+    'G-07-0':'Financial information is lawfully disclosed (for corporations with disclosure obligations)',
+    'G-07-1':'Key management information is disclosed to stakeholders',
+    'G-07-2':'A sustainability report or ESG report is published',
+    'G-08-0':'Tax-related laws are complied with',
+    'G-08-1':'Tax evasion or tax avoidance is not practiced',
+    'G-08-2':'Tax payment status is transparently managed',
+    'G-09-0':'Anti-corruption laws (Anti-Corruption Act, etc.) are complied with',
+    'G-09-1':'Employees are trained not to accept money or entertainment related to their duties',
+    'G-09-2':'Anti-corruption policies or guidelines have been established',
+    'G-09-3':'Procedures for reporting and handling corruption incidents are in place',
+    'G-10-0':'The Monopoly Regulation and Fair Trade Act is complied with',
+    'G-10-1':'Collusion and unfair trade practices are not conducted',
+    'G-10-2':'Fair trade compliance training is conducted',
+    'G-11-0':'Channels for employees to report unethical or illegal acts are established',
+    'G-11-1':'Measures to prevent disadvantageous treatment of whistleblowers are in place',
+    'G-11-2':'Procedures for investigating internal reports and handling results are in place',
+  },
+};
+function _eui(k){ return esgLang==='en' ? (ESG_EN.ui[k]||k) : null; }
+function getIndName(ind){ return esgLang==='en' ? (ESG_EN.ind[ind.id]||ind.name) : ind.name; }
+function getSecName(sec){ return esgLang==='en' ? (ESG_EN.sec[sec.id]||sec.name) : sec.name; }
+function getItemTx(ind,i){ return esgLang==='en' ? (ESG_EN.items[ind.id+'-'+i]||ind.items[i].tx) : ind.items[i].tx; }
+function getIgName(ig){ return esgLang==='en' ? (ESG_EN.ig[ig.id]?.name||ig.name) : ig.name; }
+function getIgDesc(ig){ return esgLang==='en' ? (ESG_EN.ig[ig.id]?.desc||ig.desc) : ig.desc; }
+
 // ── state ──
 const KEY = 'wf_esg_v1';
 let state = {};
@@ -865,7 +1247,8 @@ function updateScores(){
     totPass+=sc.pass; totEff+=sc.effective;
     const pct=sc.effective?Math.round(sc.pass/sc.effective*100):0;
     document.getElementById('sc-'+dom.id).textContent=sc.effective?pct+'%':'—';
-    document.getElementById('sc-'+dom.id+'-sub').textContent=`${sc.pass}/${sc.effective} 준수 (해당없음 ${sc.na})`;
+    const isEn=esgLang==='en';
+    document.getElementById('sc-'+dom.id+'-sub').textContent=isEn?`${sc.pass}/${sc.effective} compliant (N/A ${sc.na})`:`${sc.pass}/${sc.effective} 준수 (해당없음 ${sc.na})`;
     document.getElementById('bar-'+dom.id).style.width=(sc.effective?pct:0)+'%';
     for(const sec of dom.sections)
       for(const ind of sec.inds){
@@ -876,25 +1259,38 @@ function updateScores(){
   }
   const tp=totEff?Math.round(totPass/totEff*100):0;
   document.getElementById('sc-total').textContent=totEff?tp+'%':'—';
-  document.getElementById('sc-total-sub').textContent=totEff?`${totPass}/${totEff} 준수`:'진단 진행 중';
+  const isEn2=esgLang==='en';
+  document.getElementById('sc-total-sub').textContent=totEff?(isEn2?`${totPass}/${totEff} compliant`:`${totPass}/${totEff} 준수`):(isEn2?'Assessment in progress':'진단 진행 중');
   document.getElementById('bar-total').style.width=(totEff?tp:0)+'%';
   const cp=comEff?Math.round(comPass/comEff*100):0;
   document.getElementById('sc-common').textContent=comEff?cp+'%':'—';
-  document.getElementById('sc-common-sub').textContent=`${comPass}/${comEff} 준수 (공통)`;
+  document.getElementById('sc-common-sub').textContent=isEn2?`${comPass}/${comEff} compliant (Common)`:`${comPass}/${comEff} 준수 (공통)`;
   document.getElementById('bar-common').style.width=cp+'%';
   const ip=indEff?Math.round(indPass/indEff*100):0;
   document.getElementById('sc-ind').textContent=indEff?ip+'%':'—';
-  document.getElementById('sc-ind-sub').textContent=`${indPass}/${indEff} 준수 (업종별·유효)`;
+  document.getElementById('sc-ind-sub').textContent=isEn2?`${indPass}/${indEff} compliant (Industry·Effective)`:`${indPass}/${indEff} 준수 (업종별·유효)`;
   document.getElementById('bar-ind').style.width=ip+'%';
   const igLabel = document.getElementById('sc-ind-ig');
-  if(igLabel){ const ig=getIndustryGroup(); igLabel.textContent = ig ? ig.icon+' '+ig.name : '업종 미설정 ▸'; }
+  if(igLabel){ const ig=getIndustryGroup(); igLabel.textContent = ig ? ig.icon+' '+getIgName(ig) : (isEn2?'Industry not set ▸':'업종 미설정 ▸'); }
 }
 
 // ── ESG 보고서 생성 ──
-function empSzLabel(v){return{u10:'10인 미만','10to49':'10~49인','50to299':'50~299인','300up':'300인 이상'}[v]||v;}
-function revSzLabel(v){return{u10:'10억 미만','10to50':'10~50억','50to300':'50~300억','300to1000':'300~1,000억',o1000:'1,000억 이상'}[v]||v;}
+function empSzLabel(v){
+  const ko={u10:'10인 미만','10to49':'10~49인','50to299':'50~299인','300up':'300인 이상'};
+  const en={u10:'Under 10','10to49':'10–49','50to299':'50–299','300up':'300+'};
+  return (esgLang==='en'?en:ko)[v]||v;
+}
+function revSzLabel(v){
+  const ko={u10:'10억 미만','10to50':'10~50억','50to300':'50~300억','300to1000':'300~1,000억',o1000:'1,000억 이상'};
+  const en={u10:'Under ₩1B','10to50':'₩1B–5B','50to300':'₩5B–30B','300to1000':'₩30B–100B',o1000:'₩100B+'};
+  return (esgLang==='en'?en:ko)[v]||v;
+}
 
 function showEsgReport(){
+  if(!isMember()){
+    openAuthModal(showEsgReport,'보고서 생성 및 저장은 회원 전용 기능입니다.');
+    return;
+  }
   const el=document.getElementById('esg-report');
   el.innerHTML=buildEsgReport();
   el.classList.add('open');
@@ -904,10 +1300,11 @@ function closeEsgReport(){
 }
 
 function buildEsgReport(){
+  const isEn=esgLang==='en';
   const empSz=document.getElementById('rb-emp').value;
   const revSz=document.getElementById('rb-rev').value;
   const now=new Date();
-  const dateStr=now.getFullYear()+'년 '+(now.getMonth()+1)+'월 '+now.getDate()+'일';
+  const dateStr=isEn?`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`:now.getFullYear()+'년 '+(now.getMonth()+1)+'월 '+now.getDate()+'일';
 
   // 도메인별 점수 및 미준수 목록 수집
   let totPass=0,totEff=0;
@@ -954,146 +1351,150 @@ function buildEsgReport(){
   const grade=totalPct>=90?'AA':totalPct>=80?'A':totalPct>=70?'B+':totalPct>=60?'B':'C';
   const gradeColor=totalPct>=80?'#16a34a':totalPct>=70?'#2563eb':totalPct>=60?'#d97706':'#dc2626';
 
+  const comply=isEn?'compliant':'준수';
+  const domNames=isEn?{E:'E Environment',S:'S Social',G:'G Governance'}:{E:'E 환경',S:'S 사회',G:'G 지배구조'};
   return `<div class="er-topbar">
-  <h2>ESG 자가진단 보고서</h2>
-  <button class="er-btn er-btn-close" onclick="closeEsgReport()">✕ 닫기</button>
-  <button class="er-btn er-btn-print" onclick="window.print()">🖨 인쇄/PDF</button>
+  <h2>${isEn?'ESG Self-Assessment Report':'ESG 자가진단 보고서'}</h2>
+  <button class="er-btn er-btn-save" id="btn-save-esg" onclick="saveEsgReport()">💾 ${isEn?'Save':'저장'}</button>
+  <button class="er-btn er-btn-close" onclick="closeEsgReport()">✕ ${isEn?'Close':'닫기'}</button>
+  <button class="er-btn er-btn-print" onclick="window.print()">🖨 ${isEn?'Print/PDF':'인쇄/PDF'}</button>
 </div>
 <div class="er-body">
   <div class="er-header">
-    <h1>ESG 자가진단 보고서</h1>
-    <div class="er-header-meta">WorksFree 컨설팅 서비스 &nbsp;|&nbsp; 동반성장위원회 중소기업 ESG 표준 가이드라인 기반<br>진단일: ${dateStr} &nbsp;|&nbsp; 기업규모: ${empSzLabel(empSz)} &nbsp;|&nbsp; 연매출: ${revSzLabel(revSz)}</div>
+    <h1>${isEn?'ESG Self-Assessment Report':'ESG 자가진단 보고서'}</h1>
+    <div class="er-header-meta">${isEn?'WorksFree Consulting Services &nbsp;|&nbsp; Based on Korea Co-Prosperity Committee SME ESG Guidelines':'WorksFree 컨설팅 서비스 &nbsp;|&nbsp; 동반성장위원회 중소기업 ESG 표준 가이드라인 기반'}<br>${isEn?'Date:':'진단일:'} ${dateStr} &nbsp;|&nbsp; ${isEn?'Size:':'기업규모:'} ${empSzLabel(empSz)} &nbsp;|&nbsp; ${isEn?'Revenue:':'연매출:'} ${revSzLabel(revSz)}</div>
   </div>
 
   <div class="er-section">
-    <div class="er-hd">1. ESG 진단 점수 요약</div>
+    <div class="er-hd">${isEn?'1. ESG Assessment Score Summary':'1. ESG 진단 점수 요약'}</div>
     <div class="er-score-grid">
       <div class="er-score-card">
-        <div class="er-score-label">종합 준수율</div>
+        <div class="er-score-label">${isEn?'Overall Compliance':'종합 준수율'}</div>
         <div class="er-score-val" style="color:${gradeColor}">${totalPct}%</div>
-        <div class="er-score-sub">등급: ${grade}</div>
+        <div class="er-score-sub">${isEn?'Grade:':'등급:'} ${grade}</div>
       </div>
       <div class="er-score-card">
-        <div class="er-score-label">E 환경</div>
+        <div class="er-score-label">${isEn?'E Environment':'E 환경'}</div>
         <div class="er-score-val" style="color:#10b981">${ds.E.pct}%</div>
-        <div class="er-score-sub">${ds.E.pass}/${ds.E.eff} 준수</div>
+        <div class="er-score-sub">${ds.E.pass}/${ds.E.eff} ${comply}</div>
       </div>
       <div class="er-score-card">
-        <div class="er-score-label">S 사회</div>
+        <div class="er-score-label">${isEn?'S Social':'S 사회'}</div>
         <div class="er-score-val" style="color:#3b82f6">${ds.S.pct}%</div>
-        <div class="er-score-sub">${ds.S.pass}/${ds.S.eff} 준수</div>
+        <div class="er-score-sub">${ds.S.pass}/${ds.S.eff} ${comply}</div>
       </div>
       <div class="er-score-card">
-        <div class="er-score-label">G 지배구조</div>
+        <div class="er-score-label">${isEn?'G Governance':'G 지배구조'}</div>
         <div class="er-score-val" style="color:#a855f7">${ds.G.pct}%</div>
-        <div class="er-score-sub">${ds.G.pass}/${ds.G.eff} 준수</div>
+        <div class="er-score-sub">${ds.G.pass}/${ds.G.eff} ${comply}</div>
       </div>
     </div>
   </div>
 
   <div class="er-section">
-    <div class="er-hd">2. 미준수 항목 목록 (${failItems.length}건)</div>
+    <div class="er-hd">${isEn?`2. Non-Compliant Items (${failItems.length} items)`:`2. 미준수 항목 목록 (${failItems.length}건)`}</div>
     ${failItems.length===0
-      ? '<div style="color:#16a34a;padding:12px;background:#f0fdf4;border-radius:8px;font-weight:600;">✓ 모든 항목 준수 — 우수 ESG 경영 상태</div>'
+      ? `<div style="color:#16a34a;padding:12px;background:#f0fdf4;border-radius:8px;font-weight:600;">${isEn?'✓ All items compliant — Excellent ESG management':'✓ 모든 항목 준수 — 우수 ESG 경영 상태'}</div>`
       : ['E','S','G'].map(did=>{
           const df=failItems.filter(f=>f.domId===did);
           if(!df.length) return '';
-          const dn={E:'E 환경',S:'S 사회',G:'G 지배구조'}[did];
-          return '<div class="er-fail-section"><div class="er-fail-hd">'+dn+' — '+df.length+'건 미준수</div>'
-            +df.map(f=>'<div class="er-fail-item"><span class="er-fail-id">'+f.id+'</span>'+f.name+'</div>').join('')+'</div>';
+          const dn=domNames[did];
+          const failHd=isEn?`${dn} — ${df.length} non-compliant`:`${dn} — ${df.length}건 미준수`;
+          return '<div class="er-fail-section"><div class="er-fail-hd">'+failHd+'</div>'
+            +df.map(f=>'<div class="er-fail-item"><span class="er-fail-id">'+f.id+'</span>'+(isEn?(ESG_EN.ind[f.id]||f.name):f.name)+'</div>').join('')+'</div>';
         }).join('')}
   </div>
 
   <div class="er-section">
-    <div class="er-hd">3. 법령 위반 과징금 리스크 산정</div>
+    <div class="er-hd">${isEn?'3. Regulatory Penalty Risk Assessment':'3. 법령 위반 과징금 리스크 산정'}</div>
     <div class="er-penalty-grid">
       <div class="er-penalty-card er-penalty-card-red">
-        <div class="er-penalty-label er-penalty-label-red">예상 과태료·과징금 리스크</div>
-        <div class="er-penalty-val" style="color:#dc2626">${failItems.length>0?fmt(minFine)+' ~ '+fmt(maxFine):'해당없음'}</div>
-        <div class="er-penalty-sub">미준수 ${failItems.length}건 기준 추정. 실제 처분은 위반 경중·이행 노력에 따라 상이.</div>
+        <div class="er-penalty-label er-penalty-label-red">${isEn?'Estimated Fine / Penalty Risk':'예상 과태료·과징금 리스크'}</div>
+        <div class="er-penalty-val" style="color:#dc2626">${failItems.length>0?fmt(minFine)+' ~ '+fmt(maxFine):(isEn?'None':'해당없음')}</div>
+        <div class="er-penalty-sub">${isEn?`Estimated based on ${failItems.length} non-compliant items. Actual penalties may vary based on severity and enforcement discretion.`:`미준수 ${failItems.length}건 기준 추정. 실제 처분은 위반 경중·이행 노력에 따라 상이.`}</div>
       </div>
       <div class="er-penalty-card er-penalty-card-green">
-        <div class="er-penalty-label er-penalty-label-green">ESG 인증 시 연간 기대 편익</div>
-        <div class="er-penalty-val" style="color:#16a34a">연 ${fmt(benefitMin)} ~ ${fmt(benefitMax)}</div>
-        <div class="er-penalty-sub">금리 우대 0.3~0.5% + 공공입찰 가점 + 공급망 참여 기회 환산 추정</div>
+        <div class="er-penalty-label er-penalty-label-green">${isEn?'Expected Annual Benefit from ESG Certification':'ESG 인증 시 연간 기대 편익'}</div>
+        <div class="er-penalty-val" style="color:#16a34a">${isEn?'':'연 '}${fmt(benefitMin)} ~ ${fmt(benefitMax)}${isEn?'/yr':''}</div>
+        <div class="er-penalty-sub">${isEn?'Estimated from interest rate discount 0.3–0.5% + public tender bonus + supply chain opportunity value':'금리 우대 0.3~0.5% + 공공입찰 가점 + 공급망 참여 기회 환산 추정'}</div>
       </div>
     </div>
     <table class="er-law-table">
-      <tr><th>관련 법령</th><th>해당 지표</th><th>미준수 건수</th><th>추정 과태료</th></tr>
-      <tr><td>근로기준법·고용관계법</td><td>S1 근로조건 지표</td><td>${s1Fails.length}건</td><td>${fmt(s1Fails.length*empBase[empSz])}</td></tr>
-      <tr><td>산업안전보건법</td><td>S2 작업환경 지표</td><td>${s2Fails.length}건</td><td>${fmt(s2Fails.length*empBase[empSz])}</td></tr>
-      <tr><td>환경 관련법</td><td>E 환경 지표</td><td>${eFails.length}건</td><td>${fmt(envFine)}</td></tr>
-      <tr><td>공정거래·개인정보보호법</td><td>G·S3·S4 지표</td><td>${gFails.length+s34Fails.length}건</td><td>${fmt(govFine)}</td></tr>
+      <tr><th>${isEn?'Related Law':'관련 법령'}</th><th>${isEn?'Indicator':'해당 지표'}</th><th>${isEn?'Non-Compliant':'미준수 건수'}</th><th>${isEn?'Est. Penalty':'추정 과태료'}</th></tr>
+      <tr><td>${isEn?'Labor Standards Act & Employment Laws':'근로기준법·고용관계법'}</td><td>${isEn?'S1 Labor Condition Indicators':'S1 근로조건 지표'}</td><td>${s1Fails.length}${isEn?'':'건'}</td><td>${fmt(s1Fails.length*empBase[empSz])}</td></tr>
+      <tr><td>${isEn?'Occupational Safety and Health Act':'산업안전보건법'}</td><td>${isEn?'S2 Work Environment Indicators':'S2 작업환경 지표'}</td><td>${s2Fails.length}${isEn?'':'건'}</td><td>${fmt(s2Fails.length*empBase[empSz])}</td></tr>
+      <tr><td>${isEn?'Environmental Laws':'환경 관련법'}</td><td>${isEn?'E Environment Indicators':'E 환경 지표'}</td><td>${eFails.length}${isEn?'':'건'}</td><td>${fmt(envFine)}</td></tr>
+      <tr><td>${isEn?'Fair Trade & Personal Data Protection Act':'공정거래·개인정보보호법'}</td><td>${isEn?'G·S3·S4 Indicators':'G·S3·S4 지표'}</td><td>${gFails.length+s34Fails.length}${isEn?'':'건'}</td><td>${fmt(govFine)}</td></tr>
     </table>
-    <div style="font-size:11px;color:#9ca3af;padding:4px 0;">* 기업 규모(${empSzLabel(empSz)})·연매출(${revSzLabel(revSz)}) 기준 추정치. 과징금 산정은 개별 위반 건 및 관할 기관 재량에 따라 달라질 수 있습니다.</div>
+    <div style="font-size:11px;color:#9ca3af;padding:4px 0;">${isEn?`* Estimate based on company size (${empSzLabel(empSz)}) and annual revenue (${revSzLabel(revSz)}). Actual penalties depend on severity and regulatory authority discretion.`:`* 기업 규모(${empSzLabel(empSz)})·연매출(${revSzLabel(revSz)}) 기준 추정치. 과징금 산정은 개별 위반 건 및 관할 기관 재량에 따라 달라질 수 있습니다.`}</div>
   </div>
 
   <div class="er-section">
-    <div class="er-hd">4. ESG 인증 기대 효과</div>
+    <div class="er-hd">${isEn?'4. Expected Benefits of ESG Certification':'4. ESG 인증 기대 효과'}</div>
     <div class="er-risk-list">
       <div class="er-risk-item">
-        <div class="er-risk-item-hd">💰 금융 비용 절감</div>
-        <div class="er-risk-item-body">K-ESG·ISO 14001·ISO 45001 인증 취득 시 중진공·IBK기업은행 정책자금 금리 우대 0.3~0.5% 적용. ${fmt(loanAmt[empSz])} 대출 기준 연 ${fmt(Math.round(loanAmt[empSz]*0.003))}~${fmt(Math.round(loanAmt[empSz]*0.005))} 절감 가능.</div>
+        <div class="er-risk-item-hd">💰 ${isEn?'Financial Cost Reduction':'금융 비용 절감'}</div>
+        <div class="er-risk-item-body">${isEn?`K-ESG·ISO 14001·ISO 45001 certification qualifies for 0.3–0.5% interest rate discount on policy funds. For a ${fmt(loanAmt[empSz])} loan, annual savings of ${fmt(Math.round(loanAmt[empSz]*0.003))}–${fmt(Math.round(loanAmt[empSz]*0.005))} are possible.`:`K-ESG·ISO 14001·ISO 45001 인증 취득 시 중진공·IBK기업은행 정책자금 금리 우대 0.3~0.5% 적용. ${fmt(loanAmt[empSz])} 대출 기준 연 ${fmt(Math.round(loanAmt[empSz]*0.003))}~${fmt(Math.round(loanAmt[empSz]*0.005))} 절감 가능.`}</div>
       </div>
       <div class="er-risk-item">
-        <div class="er-risk-item-hd">🏆 공공입찰 경쟁력</div>
-        <div class="er-risk-item-body">조달청·공기업 입찰 시 ESG 우수기업 최대 3점 가점. K-ESG 자가진단 결과 제출 요구 확대. 2025년부터 공공기관 협력사 ESG 평가 의무화 추진 중.</div>
+        <div class="er-risk-item-hd">🏆 ${isEn?'Public Tender Competitiveness':'공공입찰 경쟁력'}</div>
+        <div class="er-risk-item-body">${isEn?'Up to 3 bonus points for ESG companies in government procurement. ESG self-assessment submission increasingly required. Mandatory partner ESG evaluation by public institutions planned from 2025.':'조달청·공기업 입찰 시 ESG 우수기업 최대 3점 가점. K-ESG 자가진단 결과 제출 요구 확대. 2025년부터 공공기관 협력사 ESG 평가 의무화 추진 중.'}</div>
       </div>
       <div class="er-risk-item">
-        <div class="er-risk-item-hd">🌐 공급망 참여 기회</div>
-        <div class="er-risk-item-body">EU 공급망실사법(CSDDD) 시행으로 수출 대기업이 협력사 ESG 요건 강화. ESG 인증 보유 시 대기업 1차 공급망 등록·유지에 유리. 미인증 시 거래 제한 리스크 증가.</div>
+        <div class="er-risk-item-hd">🌐 ${isEn?'Supply Chain Participation':'공급망 참여 기회'}</div>
+        <div class="er-risk-item-body">${isEn?'EU CSDDD enforcement drives large corporations to strengthen ESG requirements for partners. ESG certification helps maintain 1st-tier supply chain registration. Non-certified companies face increasing transaction restriction risks.':'EU 공급망실사법(CSDDD) 시행으로 수출 대기업이 협력사 ESG 요건 강화. ESG 인증 보유 시 대기업 1차 공급망 등록·유지에 유리. 미인증 시 거래 제한 리스크 증가.'}</div>
       </div>
     </div>
   </div>
 
   <div class="er-section">
-    <div class="er-hd">5. 유관 정부지원사업</div>
+    <div class="er-hd">${isEn?'5. Related Government Support Programs':'5. 유관 정부지원사업'}</div>
     <div class="er-gov-grid">
       <div class="er-gov-item">
-        <div class="er-gov-type">무료 컨설팅</div>
-        <div class="er-gov-name">안전보건관리체계 구축 컨설팅 (KOSHA)</div>
-        <div class="er-gov-desc">S지표 개선 전용. 5~299인 사업장 3~4개월 전문가 지원, 전액 무료. kosha.or.kr</div>
+        <div class="er-gov-type">${isEn?'Free Consulting':'무료 컨설팅'}</div>
+        <div class="er-gov-name">${isEn?'Safety & Health Management System Consulting (KOSHA)':'안전보건관리체계 구축 컨설팅 (KOSHA)'}</div>
+        <div class="er-gov-desc">${isEn?'S-indicator improvement. 3–4 months expert support for 5–299 employee businesses, fully free. kosha.or.kr':'S지표 개선 전용. 5~299인 사업장 3~4개월 전문가 지원, 전액 무료. kosha.or.kr'}</div>
       </div>
       <div class="er-gov-item">
-        <div class="er-gov-type">보조금·융자</div>
-        <div class="er-gov-name">스마트공장·환경설비 지원 (중기부·환경부)</div>
-        <div class="er-gov-desc">E지표 개선. 제조업 스마트공장 최대 1억 보조. 환경설비 융자 연 1.5%. clean.kosha.or.kr</div>
+        <div class="er-gov-type">${isEn?'Subsidy / Loan':'보조금·융자'}</div>
+        <div class="er-gov-name">${isEn?'Smart Factory & Environmental Equipment Support (MSME / ME)':'스마트공장·환경설비 지원 (중기부·환경부)'}</div>
+        <div class="er-gov-desc">${isEn?'E-indicator improvement. Smart factory subsidy up to ₩100M for manufacturers. Environmental equipment loan at 1.5% p.a. clean.kosha.or.kr':'E지표 개선. 제조업 스마트공장 최대 1억 보조. 환경설비 융자 연 1.5%. clean.kosha.or.kr'}</div>
       </div>
       <div class="er-gov-item">
-        <div class="er-gov-type">무료 컨설팅</div>
-        <div class="er-gov-name">ESG 공급망 컨설팅 (중진공·무역협회)</div>
-        <div class="er-gov-desc">EU 공급망실사법 대응. 수출 중소기업 전액 무료. G·E 지표 전반 지원. smtech.go.kr</div>
+        <div class="er-gov-type">${isEn?'Free Consulting':'무료 컨설팅'}</div>
+        <div class="er-gov-name">${isEn?'ESG Supply Chain Consulting (SBC / KITA)':'ESG 공급망 컨설팅 (중진공·무역협회)'}</div>
+        <div class="er-gov-desc">${isEn?'EU CSDDD response. Fully free for export SMEs. Covers G & E indicators. smtech.go.kr':'EU 공급망실사법 대응. 수출 중소기업 전액 무료. G·E 지표 전반 지원. smtech.go.kr'}</div>
       </div>
       <div class="er-gov-item">
-        <div class="er-gov-type">금리 우대</div>
-        <div class="er-gov-name">ESG 우수기업 정책자금 금리 우대 (중진공·IBK)</div>
-        <div class="er-gov-desc">ESG 인증 취득 시 정책자금 연 0.3~0.5% 금리 인하. 신용보증기금 보증료 0.1% 할인.</div>
+        <div class="er-gov-type">${isEn?'Interest Rate Discount':'금리 우대'}</div>
+        <div class="er-gov-name">${isEn?'ESG Company Policy Fund Interest Discount (SBC / IBK)':'ESG 우수기업 정책자금 금리 우대 (중진공·IBK)'}</div>
+        <div class="er-gov-desc">${isEn?'ESG certification grants 0.3–0.5% p.a. interest reduction on policy funds. Credit guarantee fee 0.1% discount.':'ESG 인증 취득 시 정책자금 연 0.3~0.5% 금리 인하. 신용보증기금 보증료 0.1% 할인.'}</div>
       </div>
     </div>
   </div>
 
   <div class="er-section">
-    <div class="er-hd">6. 위험관리 — 전반 및 보험 권고</div>
+    <div class="er-hd">${isEn?'6. Risk Management — Overview & Insurance Recommendations':'6. 위험관리 — 전반 및 보험 권고'}</div>
     <div class="er-risk-list">
       <div class="er-risk-item">
-        <div class="er-risk-item-hd">📋 법적 리스크 관리</div>
-        <div class="er-risk-item-body">미준수 ${failItems.length}건에 대한 즉시 시정 계획 수립 권고. 근로기준법(S1)·산안법(S2) 위반은 근로감독 강화 추세로 행정처분 위험이 상시 존재합니다. 법무·노무 전문가 자문 계약 체결을 권장합니다.</div>
+        <div class="er-risk-item-hd">📋 ${isEn?'Legal Risk Management':'법적 리스크 관리'}</div>
+        <div class="er-risk-item-body">${isEn?`Immediate corrective action plan recommended for ${failItems.length} non-compliant items. Labor Standards Act (S1) and OSH Act (S2) violations face increased enforcement and ongoing administrative action risk. Legal and labor professional advisory contracts are recommended.`:`미준수 ${failItems.length}건에 대한 즉시 시정 계획 수립 권고. 근로기준법(S1)·산안법(S2) 위반은 근로감독 강화 추세로 행정처분 위험이 상시 존재합니다. 법무·노무 전문가 자문 계약 체결을 권장합니다.`}</div>
       </div>
       <div class="er-risk-item">
-        <div class="er-risk-item-hd">🛡 산업재해 및 배상책임 리스크</div>
-        <div class="er-risk-item-body">ESG S2(작업환경) 미준수 시 산재 발생 가능성 증가. 중대재해처벌법 적용 사업장은 경영진 형사처벌·기업 과징금 위험이 있습니다. 위험성평가 선제 실시 및 안전관리 체계 구축이 선행되어야 합니다.</div>
+        <div class="er-risk-item-hd">🛡 ${isEn?'Industrial Accident & Liability Risk':'산업재해 및 배상책임 리스크'}</div>
+        <div class="er-risk-item-body">${isEn?'Non-compliance with S2 (Work Environment) increases industrial accident probability. For businesses subject to the Serious Accident Punishment Act, executive criminal liability and corporate fines are at risk. Proactive risk assessment and safety management system establishment must precede other actions.':'ESG S2(작업환경) 미준수 시 산재 발생 가능성 증가. 중대재해처벌법 적용 사업장은 경영진 형사처벌·기업 과징금 위험이 있습니다. 위험성평가 선제 실시 및 안전관리 체계 구축이 선행되어야 합니다.'}</div>
       </div>
       <div class="er-risk-item">
-        <div class="er-risk-item-hd">🔒 환경·개인정보 리스크</div>
-        <div class="er-risk-item-body">E지표 미준수 시 환경부 점검·과태료 위험. 개인정보보호법(G지표) 위반 시 과징금 매출액 3% 이하 부과 가능. 환경관리 체계 및 정보보안 정책 수립을 권장합니다.</div>
+        <div class="er-risk-item-hd">🔒 ${isEn?'Environmental & Data Privacy Risk':'환경·개인정보 리스크'}</div>
+        <div class="er-risk-item-body">${isEn?'E indicator non-compliance risks Ministry of Environment inspections and fines. Personal Information Protection Act (G indicator) violations can result in fines up to 3% of revenue. Environmental management systems and information security policies are recommended.':'E지표 미준수 시 환경부 점검·과태료 위험. 개인정보보호법(G지표) 위반 시 과징금 매출액 3% 이하 부과 가능. 환경관리 체계 및 정보보안 정책 수립을 권장합니다.'}</div>
       </div>
     </div>
     <div class="er-ins-box">
-      <div class="er-ins-hd">🏥 보험 권고 사항</div>
-      <div class="er-ins-item"><strong>근로자재해보상보험 (산재보험 초과)</strong> — 법정 산재보험 보상 초과분 보전. 중대재해·직업병 발생 시 기업 추가 배상 부담 완화.</div>
-      <div class="er-ins-item"><strong>기업배상책임보험</strong> — 제품·서비스·시설로 인한 제3자 신체·재물 피해 배상. ESG S4(고객안전) 리스크 대응.</div>
-      <div class="er-ins-item"><strong>임원배상책임보험 (D&amp;O)</strong> — ESG 이사회·지배구조 관련 주주·이해관계자 소송 위험 대비. G지표 미준수 시 임원 책임 증가.</div>
-      <div class="er-ins-item"><strong>환경오염배상책임보험</strong> — E지표 환경 사고 발생 시 정화 비용·제3자 배상 커버. 제조·물류 업종 필수 검토.</div>
+      <div class="er-ins-hd">🏥 ${isEn?'Insurance Recommendations':'보험 권고 사항'}</div>
+      <div class="er-ins-item">${isEn?'<strong>Workers\' Compensation Liability Insurance</strong> — Covers compensation beyond statutory industrial accident insurance. Reduces additional corporate liability in serious accidents or occupational diseases.':'<strong>근로자재해보상보험 (산재보험 초과)</strong> — 법정 산재보험 보상 초과분 보전. 중대재해·직업병 발생 시 기업 추가 배상 부담 완화.'}</div>
+      <div class="er-ins-item">${isEn?'<strong>Commercial General Liability Insurance</strong> — Covers third-party bodily injury and property damage from products, services, or facilities. Addresses ESG S4 (Customer Safety) risks.':'<strong>기업배상책임보험</strong> — 제품·서비스·시설로 인한 제3자 신체·재물 피해 배상. ESG S4(고객안전) 리스크 대응.'}</div>
+      <div class="er-ins-item">${isEn?'<strong>Directors & Officers Liability Insurance (D&O)</strong> — Protects against shareholder/stakeholder litigation related to ESG board governance. Increases as G-indicator non-compliance grows.':'<strong>임원배상책임보험 (D&amp;O)</strong> — ESG 이사회·지배구조 관련 주주·이해관계자 소송 위험 대비. G지표 미준수 시 임원 책임 증가.'}</div>
+      <div class="er-ins-item">${isEn?'<strong>Environmental Impairment Liability Insurance</strong> — Covers cleanup costs and third-party liability for E-indicator environmental incidents. Essential for manufacturing and logistics.':'<strong>환경오염배상책임보험</strong> — E지표 환경 사고 발생 시 정화 비용·제3자 배상 커버. 제조·물류 업종 필수 검토.'}</div>
     </div>
   </div>
 </div>`;
@@ -1101,10 +1502,11 @@ function buildEsgReport(){
 
 // ── render ──
 function resultLabel(s){
-  if(s==='pass') return '<span class="ind-result result-pass">준수</span>';
-  if(s==='fail') return '<span class="ind-result result-fail">미준수</span>';
-  if(s==='na') return '<span class="ind-result result-na">해당없음</span>';
-  return '<span class="ind-result result-pending">미완료</span>';
+  const isEn = esgLang==='en';
+  if(s==='pass') return `<span class="ind-result result-pass">${isEn?'Pass':'준수'}</span>`;
+  if(s==='fail') return `<span class="ind-result result-fail">${isEn?'Fail':'미준수'}</span>`;
+  if(s==='na')   return `<span class="ind-result result-na">${isEn?'N/A':'해당없음'}</span>`;
+  return `<span class="ind-result result-pending">${isEn?'Pending':'미완료'}</span>`;
 }
 
 function renderAll(){
@@ -1117,7 +1519,7 @@ function renderAll(){
     for(const sec of dom.sections){
       const lbl=document.createElement('div');
       lbl.className='section-label';
-      lbl.textContent=sec.name;
+      lbl.textContent=getSecName(sec);
       panel.appendChild(lbl);
       for(const ind of sec.inds){
         panel.appendChild(buildCard(ind, dom.id));
@@ -1137,8 +1539,9 @@ function buildCard(ind, domId){
   const score = scoreIndicator(ind);
   const isIndustry = ind.t==='업종별';
 
+  const isEn = esgLang==='en';
   const badgeClass = industryExcl ? 'badge-excluded' : (isIndustry ? 'badge-industry' : 'badge-common');
-  const badgeText  = industryExcl ? '업종 열외' : ind.t;
+  const badgeText  = industryExcl ? (isEn?'Excluded':'업종 열외') : (isEn?(isIndustry?'Industry':'Common'):ind.t);
 
   if(industryExcl) card.classList.add('ind-excluded');
 
@@ -1148,7 +1551,7 @@ function buildCard(ind, domId){
     card.innerHTML=`
       <div class="ind-head" onclick="toggleCard('${ind.id}')">
         <span class="ind-num">${ind.id}</span>
-        <span class="ind-name">${ind.name}</span>
+        <span class="ind-name">${getIndName(ind)}</span>
         <span class="badge ${badgeClass}">${badgeText}</span>
         ${resultLabel(score)}
         <span class="chevron">▼</span>
@@ -1156,8 +1559,8 @@ function buildCard(ind, domId){
       <div class="ind-body">
         <div class="ind-excl-body">
           <span style="font-size:16px">⊘</span>
-          선택한 업종군(<strong>${ig?ig.name:'—'}</strong>)에 해당하지 않는 지표입니다.
-          업종을 변경하거나 <button class="btn-xs btn-xs-ghost" style="font-size:11px" onclick="openIgPanel()">업종 변경</button>하세요.
+          ${isEn?`This indicator does not apply to the selected industry group (<strong>${ig?getIgName(ig):'—'}</strong>). Change the industry or`:`선택한 업종군(<strong>${ig?ig.name:'—'}</strong>)에 해당하지 않는 지표입니다. 업종을 변경하거나`}
+          <button class="btn-xs btn-xs-ghost" style="font-size:11px" onclick="openIgPanel()">${isEn?'change industry':'업종 변경'}</button>${isEn?'':'.'}
         </div>
         <div style="opacity:0.4;pointer-events:none">
           ${ind.items.map((item,i)=>buildItemRow(ind,item,i,true)).join('')}
@@ -1167,7 +1570,7 @@ function buildCard(ind, domId){
     card.innerHTML=`
       <div class="ind-head" onclick="toggleCard('${ind.id}')">
         <span class="ind-num">${ind.id}</span>
-        <span class="ind-name">${ind.name}</span>
+        <span class="ind-name">${getIndName(ind)}</span>
         <span class="badge ${badgeClass}">${badgeText}</span>
         ${resultLabel(score)}
         <span class="chevron">▼</span>
@@ -1178,7 +1581,7 @@ function buildCard(ind, domId){
             <input type="checkbox" id="na-${ind.id}" ${naAll?'checked':''} onchange="toggleNaAll('${ind.id}',this.checked)">
             <span class="slider"></span>
           </label>
-          <label for="na-${ind.id}" style="cursor:pointer;font-size:13px;">이 지표 전체 해당없음 (업종 미해당)</label>
+          <label for="na-${ind.id}" style="cursor:pointer;font-size:13px;">${isEn?'Mark entire indicator as N/A (industry not applicable)':'이 지표 전체 해당없음 (업종 미해당)'}</label>
         </div>`:''}
         <div id="items-${ind.id}">
           ${ind.items.map((item,i)=>buildItemRow(ind,item,i,naAll)).join('')}
@@ -1190,17 +1593,18 @@ function buildCard(ind, domId){
 
 function buildItemRow(ind, item, i, naAll){
   const v=getItem(ind.id,i);
-  const disabled=naAll||(item.t!=='p'&&naAll)?'disabled':'';
   const isNa=naAll;
-  const typeLabel={'p':'점검','b':'보조','c':'확인'}[item.t];
+  const isEn=esgLang==='en';
+  const typeLabel=isEn?{'p':'Check','b':'Support','c':'Verify'}[item.t]:{'p':'점검','b':'보조','c':'확인'}[item.t];
   const typeClass={'p':'type-p','b':'type-b','c':'type-c'}[item.t];
+  const tx=getItemTx(ind,i);
   return `<div class="item-row">
     <span class="item-type ${typeClass}">${typeLabel}</span>
-    <span class="item-text${isNa?' na-text':''}">${item.tx}</span>
+    <span class="item-text${isNa?' na-text':''}">${tx}</span>
     <div class="pill-group">
-      <button class="pill${v==='yes'?' active-yes':''}" ${isNa?'disabled':''} onclick="setPill('${ind.id}',${i},'yes',this)">예</button>
-      <button class="pill${v==='no'?' active-no':''}" ${isNa?'disabled':''} onclick="setPill('${ind.id}',${i},'no',this)">아니오</button>
-      <button class="pill${v==='na'?' active-na':''}" ${isNa?'disabled':''} onclick="setPill('${ind.id}',${i},'na',this)">해당없음</button>
+      <button class="pill${v==='yes'?' active-yes':''}" ${isNa?'disabled':''} onclick="setPill('${ind.id}',${i},'yes',this)">${isEn?'Yes':'예'}</button>
+      <button class="pill${v==='no'?' active-no':''}" ${isNa?'disabled':''} onclick="setPill('${ind.id}',${i},'no',this)">${isEn?'No':'아니오'}</button>
+      <button class="pill${v==='na'?' active-na':''}" ${isNa?'disabled':''} onclick="setPill('${ind.id}',${i},'na',this)">${isEn?'N/A':'해당없음'}</button>
     </div>
   </div>`;
 }
@@ -1281,21 +1685,22 @@ function clearIndustry(){
 function renderIndustryBar(){
   const bar = document.getElementById('industry-bar');
   const ig  = getIndustryGroup();
+  const isEn = esgLang==='en';
   if(!ig){
     bar.innerHTML=`
       <span style="font-size:16px;opacity:.6">🏢</span>
-      <span class="ib-empty">업종군을 선택하면 해당없음 항목을 자동으로 처리할 수 있습니다.</span>
-      <button class="btn-xs btn-xs-accent" onclick="openIgPanel()">업종군 설정</button>`;
+      <span class="ib-empty">${isEn?'Select an industry group to automatically handle non-applicable indicators.':'업종군을 선택하면 해당없음 항목을 자동으로 처리할 수 있습니다.'}</span>
+      <button class="btn-xs btn-xs-accent" onclick="openIgPanel()">${isEn?'Set Industry':'업종군 설정'}</button>`;
   } else {
     const apply = ig.applicable.length;
     const excl  = ALL_IND_IDS.length - apply;
     bar.innerHTML=`
       <span style="font-size:16px">${ig.icon}</span>
-      <span class="ib-name">${ig.name}</span>
-      <span class="ib-chip ib-chip-apply">적용 ${apply}개</span>
-      <span class="ib-chip ib-chip-excl">열외 ${excl}개</span>
-      <button class="btn-xs btn-xs-ghost" onclick="openIgPanel()">업종 변경</button>
-      <button class="btn-xs btn-xs-danger" onclick="clearIndustry()">해제</button>`;
+      <span class="ib-name">${getIgName(ig)}</span>
+      <span class="ib-chip ib-chip-apply">${isEn?'Applicable':'적용'} ${apply}${isEn?'':'개'}</span>
+      <span class="ib-chip ib-chip-excl">${isEn?'Excluded':'열외'} ${excl}${isEn?'':'개'}</span>
+      <button class="btn-xs btn-xs-ghost" onclick="openIgPanel()">${isEn?'Change':'업종 변경'}</button>
+      <button class="btn-xs btn-xs-danger" onclick="clearIndustry()">${isEn?'Clear':'해제'}</button>`;
   }
 }
 
@@ -1312,24 +1717,26 @@ function closeIgPanel(){
 function renderIgGrid(){
   const grid = document.getElementById('ig-grid');
   const cur  = getIndustryId();
+  const isEn = esgLang==='en';
   grid.innerHTML = INDUSTRY_GROUPS.map(ig=>{
     const apply = ig.applicable.length;
     const excl  = ALL_IND_IDS.length - apply;
     const sel   = ig.id === cur;
     return `<div class="ig-card${sel?' ig-selected':''}" onclick="selectIndustry('${ig.id}')">
       <div class="ig-card-icon">${ig.icon}</div>
-      <div class="ig-card-name">${ig.name}</div>
-      <div class="ig-card-desc">${ig.desc}</div>
+      <div class="ig-card-name">${getIgName(ig)}</div>
+      <div class="ig-card-desc">${getIgDesc(ig)}</div>
       <div class="ig-card-chips">
-        <span class="ig-chip-s ig-chip-s-apply">✔ 적용 ${apply}개</span>
-        <span class="ig-chip-s ig-chip-s-excl">⊘ 열외 ${excl}개</span>
+        <span class="ig-chip-s ig-chip-s-apply">✔ ${isEn?'Applicable':'적용'} ${apply}${isEn?'':'개'}</span>
+        <span class="ig-chip-s ig-chip-s-excl">⊘ ${isEn?'Excluded':'열외'} ${excl}${isEn?'':'개'}</span>
       </div>
     </div>`;
   }).join('');
 }
 
 function confirmReset(){
-  if(confirm('모든 진단 데이터를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'))
+  const msg=esgLang==='en'?'Reset all diagnostic data?\nThis action cannot be undone.':'모든 진단 데이터를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.';
+  if(confirm(msg))
     resetAll();
 }
 function resetAll(){
@@ -1379,7 +1786,220 @@ updateScores();
 if(IS_PREVIEW){
   document.querySelectorAll('.tab:not([data-tab="E"])').forEach(el=>el.classList.add('preview-disabled'));
 }
+
+/* ═══════════════════════════════════════
+   Supabase Auth
+═══════════════════════════════════════ */
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let currentUser = null;
+let _afterLogin = null;
+let tenantId    = null;   // public.tenants.id — 멀티테넌트 표준(호스트명→테넌트)
+
+function isMember(){ return currentUser !== null; }
+
+// ── 멀티테넌트: 루트 도메인 → tenants 조회 (전 노드 공통 패턴, asset 참고) ──
+function getRootDomain(){
+  const h = location.hostname;
+  if(h==='localhost'||h==='127.0.0.1') return 'worksfree.kr';
+  const p = h.split('.');
+  return p.length>=2 ? p.slice(-2).join('.') : h;
+}
+async function initTenant(){
+  try {
+    const res  = await fetch(`${SUPABASE_URL}/rest/v1/tenants?domain=eq.${encodeURIComponent(getRootDomain())}&select=id`,
+      { headers:{ 'apikey':SUPABASE_ANON } });
+    const rows = await res.json();
+    tenantId   = rows?.[0]?.id ?? null;
+  } catch(e){ /* 미해석 시 DB DEFAULT(worksfree) 적용 */ }
+}
+
+function updateAuthBar(){
+  const bar = document.getElementById('auth-status-bar');
+  if(!bar) return;
+  const isEn=esgLang==='en';
+  if(isMember()){
+    bar.innerHTML = `<span class="user-em">${currentUser.email}</span>
+      <button class="btn btn-ghost" onclick="doLogout()" style="font-size:11px;padding:3px 10px">${isEn?'Logout':'로그아웃'}</button>`;
+  } else {
+    bar.innerHTML = `<button class="btn btn-ghost" onclick="openAuthModal()" style="font-size:11px;padding:3px 10px">${isEn?'🔐 Login':'🔐 로그인'}</button>`;
+  }
+}
+
+async function initAuth(){
+  sb.auth.onAuthStateChange((event, session) => {
+    currentUser = session?.user || null;
+    updateAuthBar();
+  });
+  const { data } = await sb.auth.getSession();
+  currentUser = data.session?.user || null;
+  updateAuthBar();
+  await initTenant();
+  trackPageView();
+}
+
+async function doLogin(){
+  const email    = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const btn = document.getElementById('auth-submit');
+  const msg = document.getElementById('auth-msg');
+  const isEn=esgLang==='en';
+  if(!email || !password){ msg.textContent=isEn?'Please enter email and password.':'이메일과 비밀번호를 입력하세요.'; msg.style.color='#ef4444'; return; }
+  btn.disabled = true; msg.textContent=''; msg.style.color='';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  btn.disabled = false;
+  if(error){ msg.textContent=isEn?'Incorrect email or password.':'이메일 또는 비밀번호가 올바르지 않습니다.'; msg.style.color='#ef4444'; return; }
+  closeAuthModal();
+  if(_afterLogin){ const fn=_afterLogin; _afterLogin=null; fn(); }
+}
+
+async function doLogout(){ await sb.auth.signOut(); }
+
+function openAuthModal(afterLogin, subMsg){
+  _afterLogin = afterLogin || null;
+  const sub = document.getElementById('auth-modal-sub');
+  if(sub && subMsg) sub.textContent = subMsg;
+  document.getElementById('auth-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('auth-email').focus(), 100);
+}
+
+function closeAuthModal(){
+  document.getElementById('auth-modal').classList.remove('open');
+  document.getElementById('auth-email').value    = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-msg').textContent = '';
+}
+
+/* ── ESG 보고서 Supabase 저장 ── */
+async function saveEsgReport(){
+  if(!isMember()) return;
+  const btn = document.getElementById('btn-save-esg');
+  if(!btn) return;
+  const isEn=esgLang==='en';
+  btn.disabled = true; btn.textContent = isEn?'Saving…':'저장 중…';
+  const scores = {};
+  for(const dom of DOMAINS){
+    const sc = calcDomainScore(dom);
+    scores[dom.id] = { pass:sc.pass, eff:sc.effective, pct:sc.effective?Math.round(sc.pass/sc.effective*100):0 };
+  }
+  try {
+    const { error } = await sb.from('esg_reports').insert({
+      user_id:      currentUser.id,
+      tenant_id:    tenantId || undefined,   // 미해석 시 DB DEFAULT(worksfree)
+      state:        state,
+      scores:       scores,
+      company_size: document.getElementById('rb-emp').value,
+      revenue:      document.getElementById('rb-rev').value,
+      industry:     getIndustryId(),
+    });
+    btn.textContent = error ? (isEn?'❌ Save Failed':'❌ 저장 실패') : (isEn?'✓ Saved':'✓ 저장됨');
+  } catch(e) {
+    btn.textContent = isEn?'❌ Save Failed':'❌ 저장 실패';
+  }
+  setTimeout(()=>{ btn.disabled=false; btn.textContent=isEn?'💾 Save':'💾 저장'; }, 2500);
+}
+
+/* ── Page view tracking ── */
+async function trackPageView(){
+  if(location.hostname === 'localhost') return;
+  const env = location.hostname.startsWith('consulting.') ? 'consulting' : 'test';
+  try {
+    await sb.from('page_views').insert({
+      page:'consulting/esg/index.html', env, user_id: currentUser?.id || null,
+      tenant_id: tenantId || undefined,   // 미해석 시 DB DEFAULT(worksfree)
+    });
+  } catch(e) {}
+}
+
+initAuth();
+
+// ── language switch ──
+function setEsgLang(lang){
+  if(esgLang===lang) return;
+  esgLang=lang;
+  const isEn=lang==='en';
+  const s=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  // static chrome
+  const t=document.getElementById('esg-page-title');
+  if(t){ t.childNodes[0].nodeValue=isEn?'ESG Self-Assessment ':'ESG 자가진단 '; }
+  s('esg-page-sub',    isEn?'Korea Co-Prosperity Committee — SME ESG Standard Guidelines':'동반성장위원회 중소기업 ESG 표준 가이드라인');
+  s('esg-btn-expand',  isEn?'Expand All':'전체 펼치기');
+  s('esg-btn-report',  isEn?'📋 Generate Report':'📋 보고서 생성');
+  s('esg-btn-reset',   isEn?'Reset':'초기화');
+  s('esg-lbl-total',   isEn?'Overall Compliance':'전체 준수율');
+  s('esg-lbl-E',       isEn?'E Environment':'E 환경');
+  s('esg-lbl-S',       isEn?'S Social':'S 사회');
+  s('esg-lbl-G',       isEn?'G Governance':'G 지배구조');
+  s('esg-lbl-common',  isEn?'Common Indicator Rate':'공통 지표 준수율');
+  const indLbl=document.getElementById('esg-lbl-ind');
+  if(indLbl){
+    const ig=document.getElementById('sc-ind-ig');
+    const igHtml=ig?ig.outerHTML:'';
+    indLbl.innerHTML=(isEn?'Industry Indicator Rate ':'업종별 지표 준수율 ')+igHtml;
+  }
+  s('esg-tab-E',       isEn?'🌿 E Environment (14)':'🌿 E 환경 (14)');
+  s('esg-tab-S',       isEn?'👥 S Social (54)':'👥 S 사회 (54)');
+  s('esg-tab-G',       isEn?'⚖ G Governance (11)':'⚖ G 지배구조 (11)');
+  s('esg-lbl-emp',     isEn?'Employees:':'근로자 수:');
+  s('esg-lbl-rev',     isEn?'Annual Revenue:':'연 매출:');
+  s('esg-rb-note',     isEn?'Generate report after completing assessment':'진단 완료 후 보고서 생성');
+  s('esg-ig-panel-title', isEn?'Select Industry Group':'업종군 선택');
+  s('esg-ig-panel-sub',   isEn?'Industry-specific indicators not applicable to the selected industry will be auto-marked N/A':"선택한 업종에 해당하지 않는 지표를 자동으로 '해당없음' 처리합니다");
+  s('esg-ig-panel-close', isEn?'Close':'닫기');
+  // select options
+  const empMap=isEn?{u10:'Under 10','10to49':'10–49','50to299':'50–299','300up':'300+'}:{u10:'10인 미만','10to49':'10~49인','50to299':'50~299인','300up':'300인 이상'};
+  document.querySelectorAll('#rb-emp option').forEach(o=>{ if(empMap[o.value]) o.textContent=empMap[o.value]; });
+  const revMap=isEn?{u10:'Under ₩1B','10to50':'₩1B–5B','50to300':'₩5B–30B','300to1000':'₩30B–100B',o1000:'₩100B+'}:{u10:'10억 미만','10to50':'10~50억','50to300':'50~300억','300to1000':'300~1,000억',o1000:'1,000억 이상'};
+  document.querySelectorAll('#rb-rev option').forEach(o=>{ if(revMap[o.value]) o.textContent=revMap[o.value]; });
+  // auth modal
+  const q=sel=>document.querySelector('#auth-modal '+sel);
+  const aq=q('.auth-title'); if(aq) aq.textContent=isEn?'🔐 Login':'🔐 로그인';
+  s('auth-modal-sub', isEn?'Generating and saving reports is a members-only feature.':'보고서 생성 및 저장은 회원 전용 기능입니다.');
+  const el=q('[for="auth-email"]'); if(el) el.textContent=isEn?'Email':'이메일';
+  const pl=q('[for="auth-password"]'); if(pl) pl.textContent=isEn?'Password':'비밀번호';
+  const ac=q('.auth-cancel'); if(ac) ac.textContent=isEn?'Cancel':'취소';
+  s('auth-submit', isEn?'Login':'로그인');
+  // re-render dynamic content
+  updateAuthBar();
+  renderIndustryBar();
+  renderIgGrid();
+  renderAll();
+  updateScores();
+}
+
+window.addEventListener('message',(e)=>{
+  if(e.data?.type==='wf_lang'){
+    const lang=e.data.lang==='en'?'en':'ko';
+    setEsgLang(lang);
+  }
+});
 </script>
+
+<!-- Auth Modal -->
+<div class="auth-modal-bg" id="auth-modal" onclick="if(event.target===this)closeAuthModal()">
+  <div class="auth-box">
+    <div class="auth-title">🔐 로그인</div>
+    <div class="auth-sub" id="auth-modal-sub">보고서 생성 및 저장은 회원 전용 기능입니다.</div>
+    <div class="auth-field">
+      <label class="auth-label" for="auth-email">이메일</label>
+      <input class="auth-input" type="email" id="auth-email" placeholder="example@company.com"
+        onkeydown="if(event.key==='Enter')document.getElementById('auth-password').focus()">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label" for="auth-password">비밀번호</label>
+      <input class="auth-input" type="password" id="auth-password" placeholder="비밀번호"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="auth-msg" id="auth-msg"></div>
+    <div class="auth-btns">
+      <button class="auth-cancel" onclick="closeAuthModal()">취소</button>
+      <button class="auth-submit" id="auth-submit" onclick="doLogin()">로그인</button>
+    </div>
+  </div>
+</div>
+
 <div class="esg-report" id="esg-report"></div>
 </body>
 </html>
