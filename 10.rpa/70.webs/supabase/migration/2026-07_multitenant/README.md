@@ -38,8 +38,9 @@ pre-test-lifeart 경유 실측(가입·테넌트 스코핑·관리자 RPC·시�
 | 10 | dev 테스트 계정 | ✅ 적용됨 | 테스트 관리자 로그인 성공 |
 | **02** | **캠페인 RPC anon 잠금** | ✅ **적용됨** (2026-07-18 PUBLIC 회수 재실행) | anon 재감사 결과 전 RPC `permission denied` — proacl 에서 `=X`(PUBLIC) 제거, `service_role=X` 유지 확인 |
 | 02 | biz_contacts·profiles_backup RLS | ❓ 불명확 | anon SELECT 0행 — RLS인지 빈 테이블인지 판별 불가(유출은 미관측) |
-| 06·07 | 경매 북마크 · 이메일/캠페인 tenant_id 컬럼 | ✅ 적용됨 (2026-07-18 스키마 조회) | `information_schema` 확인 — auction_bookmarks + email/campaign 6종에 tenant_id 존재. `gov_contacts`만 테이블 미존재로 스킵(무해) |
-| 03·05 | tenants RLS · 자산 테넌트 격리 | ❓ 미검증 | 정책/rowsecurity 조회 결과 미확인(SQL Editor가 마지막 문 결과만 표시) |
+| 03 | tenants RLS + 공개 SELECT 정책 | ✅ 적용됨 (2026-07-18) | `rowsecurity=true`, 정책 `tenants_select_public(SELECT)`만 — 쓰기 정책 없음(anon write 차단) |
+| 05 | 자산(ETF) 테넌트 격리 RLS | ✅ 적용됨 (2026-07-18) | 4테이블 신규 정책 확인: portfolios_own_tenant · daily_own_tenant · div_own_tenant · snap_read/snap_write (구 정책 잔존 없음) |
+| 06·07 | 경매 북마크 · 이메일/캠페인 tenant_id 컬럼 | ✅ 적용됨 (2026-07-18 스키마 조회) | auction_bookmarks + email/campaign 6종에 tenant_id 존재. `gov_contacts`만 테이블 미존재로 스킵(무해) |
 
 ### 🔒 캠페인 RPC 익명 잠금 — 해소 완료 (2026-07-18)
 
@@ -55,7 +56,8 @@ pre-test-lifeart 경유 실측(가입·테넌트 스코핑·관리자 RPC·시�
 ## 남은 보안 TODO (계획 문서에서 이관 — 별도 승인/작업 필요)
 
 - ~~02 재실행 (캠페인 RPC 잠금)~~ ✅ 2026-07-18 해소 완료
-- 03·05·06·07 라이브 적용 여부 실검증 — 원하면 로그인 기반 감사 스크립트로 확인 가능
+- ~~03·05·06·07 라이브 적용 여부 실검증~~ ✅ 2026-07-18 전부 적용 확인
+- `portfolios` 복합 PK(user_id+tenant_id) 재설계 — 두 번째 자산 테넌트 생길 때 필요(현재 단일 테넌트라 무영향)
 - `portfolios` PK 재설계 (변경 위험 > 실익으로 보류, 문서화만)
 - `send-mail` Worker HTTP 엔드포인트 무인증 문제 (Worker 코드 수정 필요 — 후속 논의)
 - `email_campaign_setup.sql` 깨진 바이트 정리
