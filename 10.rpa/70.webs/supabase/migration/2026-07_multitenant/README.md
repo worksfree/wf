@@ -38,7 +38,8 @@ pre-test-lifeart 경유 실측(가입·테넌트 스코핑·관리자 RPC·시�
 | 10 | dev 테스트 계정 | ✅ 적용됨 | 테스트 관리자 로그인 성공 |
 | **02** | **캠페인 RPC anon 잠금** | ✅ **적용됨** (2026-07-18 PUBLIC 회수 재실행) | anon 재감사 결과 전 RPC `permission denied` — proacl 에서 `=X`(PUBLIC) 제거, `service_role=X` 유지 확인 |
 | 02 | biz_contacts·profiles_backup RLS | ❓ 불명확 | anon SELECT 0행 — RLS인지 빈 테이블인지 판별 불가(유출은 미관측) |
-| 03·05·06·07 | tenants RLS · 자산/경매/이메일 테넌트 | ❓ 미검증 | anon으로 판별 불가(로그인·service_role 필요) |
+| 06·07 | 경매 북마크 · 이메일/캠페인 tenant_id 컬럼 | ✅ 적용됨 (2026-07-18 스키마 조회) | `information_schema` 확인 — auction_bookmarks + email/campaign 6종에 tenant_id 존재. `gov_contacts`만 테이블 미존재로 스킵(무해) |
+| 03·05 | tenants RLS · 자산 테넌트 격리 | ❓ 미검증 | 정책/rowsecurity 조회 결과 미확인(SQL Editor가 마지막 문 결과만 표시) |
 
 ### 🔒 캠페인 RPC 익명 잠금 — 해소 완료 (2026-07-18)
 
