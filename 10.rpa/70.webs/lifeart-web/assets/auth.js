@@ -44,15 +44,18 @@ async function lifeartSignUp(name, phone, email, password, msgEl) {
     msgEl.className = 'form-msg error';
     return;
   }
-  try {
-    if (data.user) await ensureProfile(data.user, { name, phone });
-  } catch (e) {
-    msgEl.textContent = e.message; msgEl.className = 'form-msg error'; return;
-  }
+  // 세션이 있을 때(이메일 인증 OFF)만 프로필 테넌트 클레임 — 인증 대기 상태에선
+  // 미인증(비로그인)이라 profiles 쓰기가 RLS 로 막혀 400 에러가 난다.
+  // 이메일 인증 방식에선 첫 로그인 시 lifeartLogin → ensureProfile 이 클레임한다.
   if (data.session) {
+    try {
+      if (data.user) await ensureProfile(data.user, { name, phone });
+    } catch (e) {
+      msgEl.textContent = e.message; msgEl.className = 'form-msg error'; return;
+    }
     location.href = '/mypage/';
   } else {
-    msgEl.textContent = '가입 완료! 이메일 인증 후 로그인해주세요.';
+    msgEl.textContent = '가입 완료! 인증 메일을 확인하신 뒤 로그인해주세요.';
     msgEl.className = 'form-msg success';
   }
 }
