@@ -58,3 +58,42 @@ Selenium WebDriver 기반. 요소 탐색 실패 및 클릭 인터셉트 이슈�
 - 배포 전 회귀 점검: `lifeart-web/tests/full-check.js` 가 전 페이지 로드·콘솔에러·CLS·헤더 인라인을 자동 검사(패턴 재사용 권장).
 
 > 미완/후속(신규 위젯 도입 시 유의): 완전한 모달 포커스 트랩, 캐러셀 명시적 정지 버튼, 영문 구간 `lang` 세분화, `aria-current` 로 현재 위치 표시.
+
+---
+
+## 멀티테넌트 — 전 노드 공통 필수 (설계 표준)
+
+WorksFree 허브의 **모든 노드(기능·페이지)는 다른 사이트(테넌트)에서도 재구축될 수 있다**는 전제로 설계한다. 공유 Supabase DB 를 여러 테넌트(worksfree.kr, lifeart.ai.kr, …)가 함께 쓰므로, **DB 에 행(row)을 쓰는 모든 기능은 반드시 테넌트로 격리**되어야 한다.
+
+**핵심 원칙**: 지금 DB 를 쓰지 않는 노드(순수 계산기·localStorage 도구)는 격리 대상이 없어 무관하다. 그러나 **그런 노드가 나중에 DB 를 쓰게 되면, 그 순간 이 표준을 반드시 반영**해야 한다. "허브 전용이라 안 붙였다"는 이유로 tenant_id 를 생략하지 않는다.
+
+### 1. tenant_id 규약 (통일)
+- 공유 DB 에 테넌트/사용자별 행을 저장하는 **모든 테이블**은 다음 컬럼을 가진다:
+  ```sql
+  tenant_id uuid NOT NULL REFERENCES public.tenants(id) DEFAULT '<worksfree-uuid>'::uuid
+  ```
+- `tenants` = 도메인 레지스트리(`domain` → `id`). 기존 데이터/기존 호출부 무변경을 위해 DEFAULT 는 worksfree 테넌트.
+- 과거 `tenant_id TEXT DEFAULT 'worksfree'`(auction·email 계열)·`env TEXT`(page_views) 방식은 **레거시**. 신규는 항상 **uuid FK** 로 만든다.
+
+### 2. 클라이언트 — 호스트명으로 테넌트 해석
+페이지는 열린 도메인으로 테넌트를 판별한다(루트 도메인 → `tenants` 조회). 참고 구현: [asset](synology-web/consulting/asset/index.html) 의 `getRootDomain()`+`initTenant()`, [esg](synology-web/consulting/esg/index.html) 동일 패턴.
+- 모든 INSERT 에 `tenant_id: tenantId || undefined`(미해석 시 DB DEFAULT 로 폴백).
+- SELECT/UPDATE/DELETE 는 RLS 가 자동으로 테넌트 스코프 처리(아래) — 클라이언트에서도 `tenant_id=eq.` 필터를 병행하면 방어적.
+
+### 3. RLS 패턴 (유형별)
+- **사용자 소유 데이터**(portfolios·esg_reports 등): `FOR ALL USING(auth.uid()=user_id AND tenant_id=(SELECT tenant_id FROM profiles WHERE id=auth.uid()))` + 동일 `WITH CHECK`.
+- **Worker 기록 로그**(jobkorea_proposals·campaign·biz_contacts 등): 쓰기 정책 없음 → service_role 전용. 읽기는 `is_admin() AND tenant_id=본인테넌트`.
+- **공개 읽기 레지스트리**(tenants·site_config): `FOR SELECT USING(true)`, 쓰기 정책 없음.
+- ⚠️ `is_admin()` 은 **worksfree 테넌트 관리자로 스코핑**됨(허브 관리자가 타 테넌트로 승격되는 구멍 차단). 타 테넌트의 관리자는 `is_lifeart_admin()` 처럼 **테넌트별 헬퍼**를 쓴다.
+
+### 4. 신규 노드/테이블 추가 시 체크리스트
+- [ ] 이 노드가 Supabase 에 행을 쓰는가? → 예면 아래 전부 필수
+- [ ] 테이블에 `tenant_id uuid NOT NULL REFERENCES tenants(id)` (DEFAULT worksfree)
+- [ ] RLS 활성화 + 위 유형별 정책(테넌트 조건 **반드시** 포함)
+- [ ] 클라이언트가 `initTenant()` 로 tenant 해석 + INSERT 에 tenant_id 태깅
+- [ ] 정본 스키마(`supabase/core/`)와 마이그레이션(`supabase/migration/`) 양쪽에 반영
+- [ ] 검증: anon 으로 타 테넌트 행 접근 불가 확인
+
+### 5. 정본·마이그레이션 위치
+- DB 정본: [`supabase/core/`](supabase/core/) · 멀티테넌트 마이그레이션: [`supabase/migration/2026-07_multitenant/`](supabase/migration/2026-07_multitenant/) (적용 상태표는 그 폴더 README).
+- ⚠️ 정본 `complete_db_setup.sql` 의 `is_admin()`·`profiles`/`page_views` 정의는 마이그레이션(04·19)이 **테넌트 스코핑으로 덮어씀**. 정본을 재실행하면 되돌아가니, 재실행 시 04·19 도 이어서 적용할 것(정본 상단 경고 참조).

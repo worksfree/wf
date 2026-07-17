@@ -23,6 +23,15 @@
 -- 실행 방법: Supabase → SQL Editor → New query → 전체 붙여넣기 → Run
 -- 멱등성: 반복 실행 안전 (CREATE ... IF NOT EXISTS, OR REPLACE)
 --
+-- ⚠⚠ 멀티테넌트 주의 (2026-07~): 이 정본은 멀티테넌트 마이그레이션 이전 상태다.
+--   · is_admin() 은 여기선 테넌트 무관(role='admin')이지만, 라이브는 04 가
+--     worksfree 테넌트로 스코핑해 덮어썼다.
+--   · profiles·page_views 등에는 라이브에 tenant_id 가 추가돼 있다(04·19).
+--   → 이 파일을 재실행하면 그 스코핑/컬럼이 되돌아갈 수 있으니, 재실행 시
+--     반드시 supabase/migration/2026-07_multitenant/ 를 번호순으로 이어서 적용할 것.
+--   → 신규 테이블 추가 시 tenant_id uuid REFERENCES tenants(id) 필수
+--     (70.webs/CLAUDE.md 「멀티테넌트」 표준 참조).
+--
 -- ⚠ 개발 테스트 계정이 필요한 경우 별도로 seed_dev.sql 실행
 -- ═══════════════════════════════════════════════════════════════════
 

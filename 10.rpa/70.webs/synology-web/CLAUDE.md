@@ -209,6 +209,7 @@ function restart() { /* ... */ render(); scrollToQ(); }
 - [ ] `.page` — `padding-top:8px` (상단 여백 최소화)
 - [ ] JS — `scrollToQ()` 사용, `window.scrollTo({top:0})` 사용 금지
 - [ ] 트렌드 배너 — `<header>` 바로 아래, `.prog-wrap` 바로 위 (스티키 아님)
+- [ ] **멀티테넌트**: Supabase 에 데이터를 저장한다면 테이블에 `tenant_id uuid NOT NULL REFERENCES tenants(id)` + 테넌트 조건 RLS, 페이지는 `initTenant()` 로 tenant 해석 후 INSERT 에 태깅. 표준·RLS 패턴은 [`70.webs/CLAUDE.md` 멀티테넌트 섹션](../CLAUDE.md) 참조. 참고 구현: `consulting/asset`·`consulting/esg`. (지금 DB 를 안 쓰더라도 **나중에 쓰게 되면 반드시 반영**)
 
 ## 파일 구조
 

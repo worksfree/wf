@@ -41,6 +41,7 @@ pre-test-lifeart 경유 실측(가입·테넌트 스코핑·관리자 RPC·시�
 | 03 | tenants RLS + 공개 SELECT 정책 | ✅ 적용됨 (2026-07-18) | `rowsecurity=true`, 정책 `tenants_select_public(SELECT)`만 — 쓰기 정책 없음(anon write 차단) |
 | 05 | 자산(ETF) 테넌트 격리 RLS | ✅ 적용됨 (2026-07-18) | 4테이블 신규 정책 확인: portfolios_own_tenant · daily_own_tenant · div_own_tenant · snap_read/snap_write (구 정책 잔존 없음) |
 | 06·07 | 경매 북마크 · 이메일/캠페인 tenant_id 컬럼 | ✅ 적용됨 (2026-07-18 스키마 조회) | auction_bookmarks + email/campaign 6종에 tenant_id 존재. `gov_contacts`만 테이블 미존재로 스킵(무해) |
+| **19** | **허브 노드 일관성**(esg_reports·jobkorea_*·page_views tenant_id+RLS) | ⏳ **미적용 — 실행 필요** | 실측으로 tenant_id 누락 확인된 3계열 정비. `19_hub_node_tenant_consistency.sql` SQL Editor 실행 → 검증 (a)(b) 결과 공유 |
 
 ### 🔒 캠페인 RPC 익명 잠금 — 해소 완료 (2026-07-18)
 
@@ -57,8 +58,9 @@ pre-test-lifeart 경유 실측(가입·테넌트 스코핑·관리자 RPC·시�
 
 - ~~02 재실행 (캠페인 RPC 잠금)~~ ✅ 2026-07-18 해소 완료
 - ~~03·05·06·07 라이브 적용 여부 실검증~~ ✅ 2026-07-18 전부 적용 확인
-- `portfolios` 복합 PK(user_id+tenant_id) 재설계 — 두 번째 자산 테넌트 생길 때 필요(현재 단일 테넌트라 무영향)
-- `portfolios` PK 재설계 (변경 위험 > 실익으로 보류, 문서화만)
+- **19 실행** — esg_reports·jobkorea_*·page_views tenant_id 일관성(⏳ 위 표)
+- **jobkorea 기록 주체**(외부 자동화/Worker)가 INSERT 시 tenant_id 를 세팅하도록 반영 필요(현재는 DEFAULT worksfree). 다중 테넌트 아웃리치 생길 때 필수
+- `portfolios` 복합 PK(user_id+tenant_id) 재설계 — 두 번째 자산 테넌트 생길 때 필요(현재 자산 사용자 전부 worksfree라 무영향)
 - `send-mail` Worker HTTP 엔드포인트 무인증 문제 (Worker 코드 수정 필요 — 후속 논의)
 - `email_campaign_setup.sql` 깨진 바이트 정리
 - `profiles_backup_20260630` 삭제 여부 결정 (02로 잠기면 즉시 위험은 해소)
