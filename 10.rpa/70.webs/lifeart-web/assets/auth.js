@@ -174,4 +174,8 @@ document.addEventListener('layout:ready', async () => {
       actions.insertBefore(a, loginBtn);
     }
   }
+  // Make the actions container visible after all dynamic changes
+  if (actions) {
+    actions.classList.add('auth-ready');
+  }
 });

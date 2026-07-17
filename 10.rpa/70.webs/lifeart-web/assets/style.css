@@ -79,9 +79,14 @@ header {
   max-width: 1280px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-between;
+  /* REMOVED: justify-content: space-between; */
   align-items: center;
   padding: 14px 32px;
+}
+.header-inner nav {
+  flex-grow: 1; /* Allow the nav container to grow and take available space */
+  display: flex; /* Make the nav itself a flex container */
+  justify-content: center; /* Center the .main-nav items within the grown nav */
 }
 .logo { display: flex; align-items: center; gap: 8px; }
 .logo img { height: 96px; display: block; }   /* 로고 영역 여백 활용 위해 약 3배 확대 */
@@ -253,7 +258,16 @@ header {
 .product-card.wip:hover::after { transform: translate(-50%, -50%); }
 .product-card.wip:hover::before { transform: translate(-50%, calc(-50% + 24px)); border-top-color: transparent; border-bottom-color: var(--deep-charcoal); }
 
-.nav-actions { display: flex; gap: 12px; align-items: center; }
+.nav-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 480px; /* Prevent jittering due to dynamic content width changes */
+  visibility: hidden; /* Hide until JS has populated correctly */
+}
+.nav-actions.auth-ready {
+  visibility: visible;
+}
 .btn-outline {
   border: 1px solid var(--border);
   background: white;

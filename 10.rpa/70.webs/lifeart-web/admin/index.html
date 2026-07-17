@@ -8,8 +8,17 @@
 <style>
   #admin-gate {
     display:flex; position:fixed; inset:0; align-items:center; justify-content:center;
-    flex-direction:column; background:var(--deep-charcoal); color:white; z-index:500; gap:10px;
+    flex-direction:column; background:var(--warm-white); color:var(--text-mid); z-index:500; gap:12px;
+    transition:opacity .25s ease;
   }
+  #admin-gate.hide { opacity:0; pointer-events:none; }
+  .gate-spin {
+    width:34px; height:34px; border-radius:50%;
+    border:3px solid var(--border); border-top-color:var(--accent);
+    animation:gateSpin .8s linear infinite;
+  }
+  @keyframes gateSpin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .gate-spin { animation:none; } }
   .admin-table { width:100%; border-collapse:collapse; font-size:13px; }
   .admin-table th { background:var(--deep-charcoal); color:var(--muted-gold); padding:9px 12px; text-align:left; white-space:nowrap; }
   .admin-table td { padding:9px 12px; border-bottom:1px solid var(--border); color:var(--text-mid); vertical-align:top; }
@@ -58,9 +67,9 @@
 </head>
 <body>
 
-<div id="admin-gate">
-  <div style="font-size:15px;">🔒 관리자 전용 페이지입니다</div>
-  <a href="/auth/login/" style="color:var(--muted-gold); font-size:13px;">로그인하러 가기</a>
+<div id="admin-gate" role="status" aria-live="polite">
+  <div class="gate-spin" aria-hidden="true"></div>
+  <div style="font-size:14px;">관리자 인증을 확인하고 있습니다…</div>
 </div>
 
 <div id="site-header"></div>
@@ -255,32 +264,37 @@
 <script src="/assets/auth.js"></script>
 <script src="/assets/layout.js"></script>
 <script>
-let _adminBooted = false;
+let _adminBooted = false, _authSettled = false;
 document.addEventListener('layout:ready', initAdmin);
-// 세션 복원이 layout:ready 보다 늦을 수 있어(fresh load 레이스), auth 상태 확정 시에도 재실행
-sb.auth.onAuthStateChange(() => initAdmin());
+// 세션 복원이 layout:ready 보다 늦을 수 있어(fresh load 레이스), auth 상태 확정 시에도 재실행.
+// onAuthStateChange 는 페이지 로드시 INITIAL_SESSION 을 발화 → 이때 인증이 "확정"됐다고 본다.
+sb.auth.onAuthStateChange(() => { _authSettled = true; initAdmin(); });
+// 안전장치: 인증 신호가 끝내 안 오면 3초 후 확정으로 간주(무한 로딩 방지)
+setTimeout(() => { _authSettled = true; initAdmin(); }, 3000);
 function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 async function initAdmin() {
   const gate = document.getElementById('admin-gate');
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   const { data: { session } } = await sb.auth.getSession();
+  // 기본 게이트는 중립 "인증 확인 중" 로딩 상태 → 미인증 사유가 확정될 때만 안내 문구로 교체.
+  const denyGate = function (html) { gate.innerHTML = html; };
   if (!isLocal) {
-    if (!session) return;  // 비로그인 → 기본 게이트(로그인 안내) 유지
+    // 인증 확정 전(세션 복원 중)이면 로딩 스피너 유지 — 섣불리 '로그인' 문구 띄우지 않음
+    if (!session) { if (_authSettled) denyGate('<div style="font-size:15px;">🔒 관리자 전용 페이지입니다.</div><a href="/auth/login/" style="color:var(--accent); font-size:13px;">로그인하러 가기</a>'); return; }
     const { data: profile } = await sb.from('profiles').select('role, tenant_id').eq('id', session.user.id).maybeSingle();
     if (profile?.role !== 'admin' || profile?.tenant_id !== TENANT_UUID) {
-      gate.innerHTML = '<div style="font-size:15px;">이 계정은 LifeArt 관리자 권한이 없습니다.</div>'
-        + '<a href="/mypage/" style="color:var(--muted-gold); font-size:13px;">마이페이지로 이동</a>';
+      denyGate('<div style="font-size:15px;">이 계정은 LifeArt 관리자 권한이 없습니다.</div><a href="/mypage/" style="color:var(--accent); font-size:13px;">마이페이지로 이동</a>');
       return;
     }
-    // O&M 은 단계 4 부터 오픈 — 관리자여도 그 전이면 "준비 중"으로 안내(로그인 문구 아님)
     if (typeof stageAtLeast === 'function' && !stageAtLeast(4)) {
-      gate.innerHTML = '<div style="font-size:15px;">🔧 관리자(O&amp;M) 기능은 준비 중입니다.</div>'
-        + '<a href="/" style="color:var(--muted-gold); font-size:13px;">홈으로 이동</a>';
+      denyGate('<div style="font-size:15px;">🔧 관리자(O&amp;M) 기능은 준비 중입니다.</div><a href="/" style="color:var(--accent); font-size:13px;">홈으로 이동</a>');
       return;
     }
   }
-  gate.style.display = 'none';
+  // 인증 통과 → 게이트 페이드 아웃 후 제거
+  gate.classList.add('hide');
+  setTimeout(function () { gate.style.display = 'none'; }, 280);
   if (_adminBooted) return;   // 게이트 해제는 매번, 무거운 초기화는 1회만
   _adminBooted = true;
 

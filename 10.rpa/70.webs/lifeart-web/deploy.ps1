@@ -21,7 +21,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.8.4.9"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
+$VERSION  = "0.8.6.4"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
 
 $TARGETS = @{
     "1" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
@@ -239,6 +239,18 @@ Get-ChildItem -Path $stageWin -Recurse -File -Filter *.html | ForEach-Object {
     }
 }
 Write-Host "  ▶ SEO 태그(favicon·OG·description) 주입 완료" -ForegroundColor DarkGray
+
+# ── SPA 네비게이션 스크립트 주입 (화면 깜빡임 없는 탐색) ──────
+Get-ChildItem -Path $stageWin -Recurse -File -Filter *.html | ForEach-Object {
+    $c = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
+    $layoutJsScript = '<script src="/assets/layout.js"></script>'
+    if ($c.Contains($layoutJsScript) -and !$c.Contains('/assets/spa-navigation.js')) {
+        $injection = $layoutJsScript + "`n" + '<script src="/assets/spa-navigation.js"></script>'
+        $c = $c.Replace($layoutJsScript, $injection)
+        [System.IO.File]::WriteAllText($_.FullName, $c, [System.Text.Encoding]::UTF8)
+    }
+}
+Write-Host "  ▶ SPA 네비게이션 스크립트 주입 완료" -ForegroundColor DarkGray
 
 # 스테이지 처리: (1) 모든 html의 버전 문자열을 릴리스 버전으로 치환
 #   — 인라인 푸터(초기 페이지)와 공통 파트셜 footer.html 을 모두 포함
