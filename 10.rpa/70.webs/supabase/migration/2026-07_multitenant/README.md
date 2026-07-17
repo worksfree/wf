@@ -36,26 +36,24 @@ pre-test-lifeart 경유 실측(가입·테넌트 스코핑·관리자 RPC·시�
 | 04 | profiles.tenant_id + 관리자 스코핑 | ✅ 적용됨 | `lifeart_admin_get_users`가 lifeart 테넌트만 반환(타 테넌트 계정 제외) |
 | 08·11·12·14·15·16·17·18 | LifeArt 테이블·O&M·보도·관리자 RPC·시연데이터 | ✅ 적용됨 | 관리자 콘솔·주문/회원/매출·히어로·시연 데이터 정상 동작 |
 | 10 | dev 테스트 계정 | ✅ 적용됨 | 테스트 관리자 로그인 성공 |
-| **02** | **캠페인 RPC anon 잠금** | ❌ **미적용** | anon으로 `get_campaign_stats`·`get_campaigns_list`·`get_campaign_list` 호출 성공(데이터 반환) → REVOKE 안 됨 |
+| **02** | **캠페인 RPC anon 잠금** | ✅ **적용됨** (2026-07-18 PUBLIC 회수 재실행) | anon 재감사 결과 전 RPC `permission denied` — proacl 에서 `=X`(PUBLIC) 제거, `service_role=X` 유지 확인 |
 | 02 | biz_contacts·profiles_backup RLS | ❓ 불명확 | anon SELECT 0행 — RLS인지 빈 테이블인지 판별 불가(유출은 미관측) |
 | 03·05·06·07 | tenants RLS · 자산/경매/이메일 테넌트 | ❓ 미검증 | anon으로 판별 불가(로그인·service_role 필요) |
 
-### 🔒 확인된 보안 갭 — 02 재실행 필요 (PUBLIC 회수 버그 수정본)
-캠페인 RPC가 **익명에게 열려 있어** 허브 이메일 캠페인 통계·목록이 로그인 없이 조회됩니다.
+### 🔒 캠페인 RPC 익명 잠금 — 해소 완료 (2026-07-18)
 
-> ⚠️ **2026-07-18**: 02를 1차 실행했으나 검증 (b)에서 `proacl`에 `=X/postgres`(**PUBLIC**
-> 에 EXECUTE 부여)가 남아 있었음 → 여전히 익명 호출 가능. 함수는 생성 시 PUBLIC 에 EXECUTE
-> 가 기본 부여되고 anon/authenticated 는 그걸로 실행하는데, 원본 02는 `FROM anon, authenticated`
-> 만 회수(명시적 부여가 없어 no-op)했기 때문. **02를 `FROM PUBLIC, anon, authenticated` 회수로
-> 수정 완료** → SQL Editor에서 **재실행** 필요.
+캠페인 RPC가 익명에 열려 허브 캠페인 통계·목록이 로그인 없이 조회되던 갭.
 
-**기능 영향 없음**(실호출자는 service_role 키를 쓰는 send-mail Worker뿐이고, `service_role=X`
-명시 부여는 PUBLIC 회수 후에도 유지됨). 재실행 후 검증 (b)에서 `=X/postgres` 항목이 사라지고
-`service_role=X`·`postgres=X`만 남았는지 확인해 주시면, 제가 anon 재감사로 닫힘을 확정하겠습니다.
+- **1차 실행**: `proacl`에 `=X/postgres`(**PUBLIC** EXECUTE)가 남아 여전히 뚫림. 원본 02가
+  `FROM anon, authenticated`만 회수했는데, 이 함수들은 PUBLIC 을 통해 열려 있어 no-op이었음.
+- **수정·재실행**: `FROM PUBLIC, anon, authenticated` 회수로 변경 후 재실행 →
+  `proacl`이 `{postgres=X, service_role=X}`로 정리됨.
+- **anon 재감사 확인**: 전 캠페인 RPC가 `permission denied for function` 반환 → **닫힘 확정.**
+  service_role 명시 부여 유지로 send-mail Worker 정상(기능 영향 0).
 
 ## 남은 보안 TODO (계획 문서에서 이관 — 별도 승인/작업 필요)
 
-- **02 재실행** (위, 확인된 갭)
+- ~~02 재실행 (캠페인 RPC 잠금)~~ ✅ 2026-07-18 해소 완료
 - 03·05·06·07 라이브 적용 여부 실검증 — 원하면 로그인 기반 감사 스크립트로 확인 가능
 - `portfolios` PK 재설계 (변경 위험 > 실익으로 보류, 문서화만)
 - `send-mail` Worker HTTP 엔드포인트 무인증 문제 (Worker 코드 수정 필요 — 후속 논의)
