@@ -1393,7 +1393,7 @@ user-001 | +100  | admin_grant   | 이벤트 지급
 **메뉴 경로**:  
 `Supabase → SQL Editor → New query → complete_db_setup.sql 전체 내용 붙여넣기 → Run`
 
-파일 위치: `supabase/complete_db_setup.sql`
+파일 위치: `../supabase/core/complete_db_setup.sql` (공유 DB 정본은 `70.webs/supabase/`로 이동됨)
 
 실행 후 하단 결과 패널에서 아래 사항을 확인합니다:
 

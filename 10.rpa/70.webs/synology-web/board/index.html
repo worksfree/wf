@@ -308,8 +308,12 @@ header{
 <script>
 const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const SB_SESSION_KEY = 'sb-rkycwfpkzorfpcxfvaqt-auth-token';
+
+/* no-op storage: hub localStorage를 건드리지 않아 onAuthStateChange(SIGNED_OUT) 방지 */
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: { autoRefreshToken:true, persistSession:true }
+  auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false,
+          storage: { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} } }
 });
 
 let lang  = 'ko';
@@ -320,14 +324,21 @@ let total = 0;
 let page  = 0;
 const PER = 15;
 
-/* ── 초기화 ── */
-sb.auth.onAuthStateChange((_event, session) => {
-  user = session?.user ?? null;
-  applyUserState();
-});
+/* ── 초기화: hub localStorage에서 JWT 읽어 in-memory 세션 설정 ── */
 (async () => {
-  const { data:{ session } } = await sb.auth.getSession();
-  user = session?.user ?? null;
+  try {
+    const raw = window.parent.localStorage.getItem(SB_SESSION_KEY);
+    if (raw) {
+      const stored = JSON.parse(raw);
+      const at = stored?.access_token || stored?.currentSession?.access_token;
+      const rt = stored?.refresh_token || stored?.currentSession?.refresh_token;
+      if (at) {
+        try { await sb.auth.setSession({ access_token: at, refresh_token: rt || '' }); } catch {}
+        const payload = JSON.parse(atob(at.split('.')[1]));
+        user = { id: payload.sub, email: payload.email || '' };
+      }
+    }
+  } catch {}
   applyUserState();
 })();
 

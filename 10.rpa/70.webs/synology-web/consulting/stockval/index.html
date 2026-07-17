@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>비상장주식 가치평가 진단 — WorksFree</title>
+<meta name="description" content="비상장주식 가치평가 진단. 세법·투자·M&A·ESOP 목적별 주식 가치 산출 방법 안내. 순자산가치·수익가치 자동 계산. WorksFree 컨설팅 플랫폼 제공.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.worksfree.kr/consulting/stockval/">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
@@ -231,30 +234,30 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 <header>
   <div class="hdr-icon">📊</div>
   <div class="hdr-info">
-    <div class="hdr-title">비상장주식 가치평가 진단</div>
-    <div class="hdr-sub">평가 목적별 최적 방법론 안내 · 세무리스크 사전 차단</div>
+    <div class="hdr-title" id="sv-hdr-title">비상장주식 가치평가 진단</div>
+    <div class="hdr-sub" id="sv-hdr-sub">평가 목적별 최적 방법론 안내 · 세무리스크 사전 차단</div>
   </div>
   <div class="hdr-r" id="hdr-r"></div>
 </header>
 
 <div class="trend-banner">
   <div class="trend-inner">
-    <div class="trend-title">비상장주식 평가, 왜 중요한가</div>
+    <div class="trend-title" id="sv-trend-title">비상장주식 평가, 왜 중요한가</div>
     <div class="trend-grid">
       <div class="trend-stat">
         <div class="ts-val">3가지</div>
-        <div class="ts-label">법정 평가방법<br>(상증세법·회계·협상)</div>
+        <div class="ts-label" id="sv-ts-lbl-1">법정 평가방법<br>(상증세법·회계·협상)</div>
       </div>
       <div class="trend-stat">
         <div class="ts-val">최대 65%</div>
-        <div class="ts-label">임의 평가 시<br>증여세 추징 위험</div>
+        <div class="ts-label" id="sv-ts-lbl-2">임의 평가 시<br>증여세 추징 위험</div>
       </div>
       <div class="trend-stat">
         <div class="ts-val">5년</div>
-        <div class="ts-label">세무조사<br>소급 적용 기간</div>
+        <div class="ts-label" id="sv-ts-lbl-3">세무조사<br>소급 적용 기간</div>
       </div>
     </div>
-    <div class="trend-note"><strong>핵심:</strong> 비상장주식은 평가 목적에 따라 반드시 다른 방법론을 써야 합니다. 세금 목적에 시장가치를 쓰거나, 투자 협상에 세법상 가격을 제시하면 양쪽 모두 손해입니다.</div>
+    <div class="trend-note" id="sv-trend-note"><strong>핵심:</strong> 비상장주식은 평가 목적에 따라 반드시 다른 방법론을 써야 합니다. 세금 목적에 시장가치를 쓰거나, 투자 협상에 세법상 가격을 제시하면 양쪽 모두 손해입니다.</div>
   </div>
 </div>
 
@@ -271,6 +274,9 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 </div>
 
 <script>
+/* ── 언어 ── */
+let svLang = 'ko';
+
 /* ── 질문 트리 ── */
 const TREE = {
   /* Q0: 평가 목적 */
@@ -822,6 +828,276 @@ const CASES = [
   },
 ];
 
+/* ── 영문 번역 ── */
+const SV_EN = {
+  q: {
+    q0: { text:'What is the purpose of this stock valuation?', sub:'The required methodology and standards differ entirely based on your purpose.',
+      opts:[
+        {main:'Gift to family/relatives', sub:'Transferring shares to children, spouse, siblings — special related parties', tag:'Tax'},
+        {main:'Inter-company transfer/merger', sub:'Share transfers between affiliates, spin-offs, mergers', tag:'Tax'},
+        {main:'Startup investment (VC/Angel)', sub:'Series A–C, angel investment — external capital raising', tag:'Negotiation'},
+        {main:'Company sale (M&A/Control stake)', sub:'Sell stake or control to strategic investor or PE', tag:'Negotiation'},
+        {main:'Employee stock options/ESOP', sub:'ESOP grant, stock option exercise price determination', tag:'Hybrid'},
+        {main:'Shareholder dispute/litigation', sub:'Minority shareholder rights, appraisal rights, expert appraisal', tag:'Court'},
+      ]},
+    q1_tax: { text:'How long has the company been in business?', sub:'ITTA Enforcement Decree §54: Companies under 3 years from business commencement are assessed using net asset value only.',
+      law:'ITTA Enforcement Decree §54 — Under-3-year, inactive, dormant, or liquidating companies: net asset value 100%',
+      opts:[
+        {main:'Less than 3 years from business start', sub:'Early-stage — insufficient earnings history, weighted average not applicable', tag:'Under 3Y'},
+        {main:'3 years or more from business start', sub:'3-year earnings data available — method varies by share type', tag:'3Y+'},
+      ]},
+    q2_tax_type: { text:'What type of shares are being transferred?', sub:'ITTA valuation methods differ by share type and company financial structure.',
+      opts:[
+        {main:'Standard unlisted common stock', sub:'Typical unlisted SME equity interest', tag:'Common'},
+        {main:'Preferred stock / CB / BW', sub:'Special securities: preferred shares, convertible bonds, bonds with warrants', tag:'Special'},
+      ]},
+    q3_tax_common: { text:"What is the company's recent 3-year earnings trend?", sub:'ITTA uses a weighted average of earnings value and net asset value. Earnings trend is the key variable.',
+      opts:[
+        {main:'3 consecutive profitable years', sub:'Earnings value ×3 + Net asset value ×2 (weighted average)', tag:'Profitable'},
+        {main:'Loss-making or minimal earnings', sub:'Earnings value calculation unfavorable or not applicable → net asset value priority', tag:'Loss'},
+        {main:'Real estate-heavy company', sub:'Land/buildings 50%+ of total assets → net asset value weight 80%+', tag:'RE-Heavy'},
+      ]},
+    q2_tax_special: { text:'Specify the purpose of the special securities valuation.', sub:'Convertible bonds and preferred stock have separate tax provisions based on conversion/redemption terms.',
+      opts:[
+        {main:'Convertible bonds (CB) / Bonds with warrants (BW)', sub:'Gift income = difference between conversion price and market value', tag:'CB·BW'},
+        {main:'Preferred stock (dividend preference)', sub:'Separate valuation reflecting dividend rate and residual distribution', tag:'Preferred'},
+      ]},
+    q1_inv: { text:'What stage is the company currently at?', sub:'Business maturity and revenue scale determine which valuation method carries the most weight in negotiations.',
+      opts:[
+        {main:'Early-stage (no revenue / Seed)', sub:'No revenue/profit for DCF → team, technology, market-based valuation', tag:'Seed'},
+        {main:'Growth stage (revenue but loss or break-even)', sub:'Revenue present but unstable → DCF + comparable multiples hybrid', tag:'Growth'},
+        {main:'Mature stage (3+ years of consistent profit)', sub:'Stable cash flow → DCF primary, comparable company secondary', tag:'Mature'},
+      ]},
+    q2_inv_seed: { text:'What basis will you primarily use in investor negotiations?', sub:'For early startups, Scorecard or Berkus methodologies based on future expectations are most practical.',
+      opts:[
+        {main:'IP, technology, and team capability focus', sub:'Berkus Method: up to ~$500K per element', tag:'Berkus'},
+        {main:'Market size and target market share focus', sub:'Top-down: TAM × target share × multiple', tag:'TAM'},
+      ]},
+    q2_inv_growth: { text:'Have you identified comparable public or private companies?', sub:'Comparable Company Analysis (CCA) is most persuasive when comparables are available.',
+      opts:[
+        {main:'Yes — 3+ comparable companies identified', sub:'EV/Revenue, EV/EBITDA multiple-based negotiation', tag:'CCA'},
+        {main:'No — industry data insufficient', sub:'DCF + sensitivity analysis to present value range', tag:'DCF'},
+      ]},
+    q2_inv_mature: { text:'What is the sale or investment structure?', sub:'The applicable weighting and discount rate differs by structure.',
+      opts:[
+        {main:'Minority stake investment (below 50%)', sub:'No control premium → DLOM discount applied', tag:'Minority'},
+        {main:'Controlling stake acquisition (50%+)', sub:'Control premium 20–40% added', tag:'Control'},
+      ]},
+    q1_esop: { text:'Specify the purpose of the stock options / employee ownership plan.', sub:'Tax-qualified exercise pricing and negotiated exercise pricing have fundamentally different approaches.',
+      opts:[
+        {main:'Tax-qualified stock options (venture company etc.)', sub:'Exercise price = FMV at grant date → ITTA assessment required', tag:'Tax-Qual'},
+        {main:'Non-qualified stock options or RSU', sub:'Determined by company policy and investor agreement', tag:'Non-Qual'},
+      ]},
+    q1_dispute: { text:'What is the specific nature of the dispute?', sub:'Court-ordered appraisals are performed by court-appointed certified appraisers using court-prescribed methodology.',
+      opts:[
+        {main:'Dissenting shareholder appraisal rights (merger/split)', sub:'Court appraisal → ITTA net asset value priority', tag:'Court'},
+        {main:'Minority shareholder price negotiation', sub:'Counterparty negotiation → multiple methods for agreed price', tag:'Negotiation'},
+      ]},
+  },
+  r: {
+    result_tax_startup:{
+      badge:'ITTA — Under 3-Year Business Exception', title:'Net Asset Value 100% Applied (Earnings Value Excluded)',
+      desc:'Corporations less than 3 years from business commencement lack sufficient earnings history. Under ITTA Enforcement Decree §54, only net asset value is used. Inactive, dormant, and liquidating corporations are treated the same.',
+      gradeVal:'Net Asset Value 100%', gradeSub:'Under-3-Year Special Provision',
+      flags:['Basis: ITTA Enforcement Decree §54 ②','Business start date = actual commencement, not incorporation date','Net asset value = (Total assets − Total liabilities) ÷ Issued shares','Review whether real estate fair value adjustment applies'],
+      alerts:['<strong>Business Start Date:</strong> "Business start date" is when actual operations began, not the incorporation date. If operations started after incorporation, confirm the start date with a tax advisor.',
+              '<strong>Tax Planning Tip:</strong> Gifting when net assets are low reduces gift tax significantly compared to transferring after turning profitable. Now may be the optimal gifting window.',
+              '<strong>Reassessment at 3 Years:</strong> The valuation method changes to weighted average at 3 years. Confirm the business start date if a transfer is planned near that milestone.'],
+      phases:[
+        {tag:'Confirm Start Date', title:'Determine Actual Business Start Date and Remaining Period', items:['Compare incorporation date vs. actual business start date','Calculate elapsed period from start date to valuation date','Final confirmation with tax advisor on under-3-year exception eligibility']},
+        {tag:'Net Asset Calc.', title:'Precise Net Asset Value as of Valuation Date', items:['Total assets: balance sheet + fair value adjustments (real estate, investments)','Total liabilities: include provisions and unpaid taxes','Net asset value = (Assets − Liabilities) ÷ Issued shares at valuation date']},
+        {tag:'Transfer Strategy', title:'Optimize Gift Timing Within 3 Years', items:['Identify the point of lowest net assets → minimize gift tax','Simulate expected valuation under weighted average method post-3 years','Gift tax filing: within 3 months of gift date']},
+      ]},
+    result_tax_profit:{
+      badge:'ITTA — Weighted Average Method', title:'Earnings Value 60% + Net Asset Value 40% Weighted Average',
+      desc:'This is the mandatory ITTA valuation method for gifting or transferring shares of a profitable unlisted corporation. Applying any other price may cause the difference to be treated as a gift, subject to up to 65% tax.',
+      gradeVal:'ITTA Mandatory', gradeSub:'Deviation Risks Tax Audit',
+      flags:['Earnings value = 3-year weighted avg net income ÷ 10%','Net asset value = net assets at valuation date ÷ issued shares','3:2 weighted average → per-share valuation'],
+      alerts:['<strong>Tax Audit Risk:</strong> If shares are transferred at a price below the tax assessed value, the full difference is subject to gift tax for the recipient.',
+              '<strong>5-Year Look-back:</strong> Tax audits can apply retroactively up to 5 years from the gift date. Always obtain a certified appraisal.'],
+      phases:[
+        {tag:'Data Collection', title:'Obtain 3-Year Financial Statements', items:['Audit report or tax adjustment statement (3 years)','Shareholder register and capital change history','Asset and liability schedule as of valuation date']},
+        {tag:'Appraisal', title:'Engage Certified Appraiser or Calculate Internally', items:['Recommend certified CPA or tax advisor for formal appraisal report','Verify legal appraisal obligation for transactions over ₩1B','Internal calculation requires tax advisor review']},
+        {tag:'Filing & Record', title:'File Gift Tax Return and Retain Report', items:['File gift tax return within 3 months of gift date','Retain appraisal report 10+ years (tax audit preparation)','Share transfer registration and shareholder register update']},
+      ]},
+    result_tax_loss:{
+      badge:'ITTA — Net Asset Value Priority', title:'Loss-making Companies: Net Asset Value 100% or Weighted Floor Applied',
+      desc:'When earnings value is zero or negative, only net asset value is applied. However, even if net asset value is lower than earnings value, the floor is 80% of net asset value.',
+      gradeVal:'Net Asset Value Basis', gradeSub:'80% Floor Applied',
+      flags:['Earnings value < 0 → Net asset value 100%','Net asset value floor = net asset value × 80%','Continued losses lower per-share value — gifting timing strategy needed'],
+      alerts:['<strong>Tax Planning Tip:</strong> Gifting during a loss period when valuation is low reduces gift tax significantly. Consider a proactive gifting plan.',
+              '<strong>Floor Caution:</strong> No matter how large the losses, the valuation cannot fall below 80% of net asset value.'],
+      phases:[
+        {tag:'Loss Analysis', title:'Analyze Earnings Trend and Root Cause of Losses', items:['Distinguish temporary vs. structural losses','Forecast profit recovery timeline (for gift timing)','Identify one-time items: special losses, bad debt write-offs']},
+        {tag:'Net Asset Check', title:'Precise Net Asset Calculation at Valuation Date', items:['Verify asset revaluation (land/building fair value)','Check off-balance sheet and contingent liabilities','Assess fair value of investments in affiliates']},
+        {tag:'Tax Filing', title:'File Gift Tax Return and Monitor Going Forward', items:['File within 3 months of gift date','Retain documentation in case of profit recovery and revaluation','Set up staggered gifting plan (utilize annual exemptions)']},
+      ]},
+    result_tax_realestate:{
+      badge:'ITTA — Real Estate-Heavy Company', title:'Net Asset Value Weight 80%+ Applied (Real Estate Special Provision)',
+      desc:'Companies where real estate represents 50%+ of total assets must apply at least 80% weight to net asset value. This effectively approaches a real estate fair market value basis.',
+      gradeVal:'Net Asset Value 80%+', gradeSub:'Approaches RE Fair Market Value',
+      flags:['RE ratio = RE assets ÷ total assets × 100','50%+ → net asset value weight 80%','Watch for spike in assessed value if RE fair values have risen'],
+      alerts:['<strong>Over-Valuation Risk:</strong> If real estate fair value significantly exceeds book value, the tax-assessed value may be far higher than expected. Always pre-simulate.',
+              '<strong>Corporate Structure Review:</strong> If the company holds real estate as a core asset, a corporate split followed by transfer may be more tax-efficient than direct share transfer.'],
+      phases:[
+        {tag:'RE Ratio Check', title:'Calculate Real Estate Ratio to Total Assets', items:['Confirm RE fair value using assessed/appraised values','Determine if 50% threshold is exceeded','Confirm real estate-heavy company status with tax advisor']},
+        {tag:'RE Appraisal', title:'Obtain Real Estate Appraisal', items:['Use average of 2+ appraisal firms (recommended)','Compare standard assessed value vs. appraised value gap','Assess whether public standard value is acceptable for tax filing']},
+        {tag:'Structure Opt.', title:'Review Corporate Restructuring Options', items:['Physical split to separate RE company, then transfer','Compare sale (capital gains) vs. gift (gift tax)','Staggered gifting to spread tax burden']},
+      ]},
+    result_tax_cb:{
+      badge:'ITTA — CB/BW Deemed Gift Income', title:'Conversion/Exercise Price vs. Market Price Gap → Gift Income Taxation',
+      desc:'If a related party subscribes to CB/BW issued below market value, the difference between the market price and conversion price is taxed as gift income at the time of conversion/exercise.',
+      gradeVal:'CB/BW Special Provision', gradeSub:'Taxed at Conversion',
+      flags:['Gift income = (post-conversion share value − conversion price) × shares','Issued to related parties below market price is the key condition','Non-related party investors are generally exempt'],
+      alerts:['<strong>Below-Market Issuance Risk:</strong> Issuing CB at 30%+ discount to related parties may trigger gift tax at the time of issuance.',
+              '<strong>Expert Required:</strong> CB/BW valuation involves option pricing (Black-Scholes etc.) — a CPA is recommended over a general tax advisor.'],
+      phases:[
+        {tag:'Review Terms', title:'Verify Tax Compliance of CB/BW Issuance Terms', items:['Check whether conversion price is appropriate vs. FMV at issuance','Confirm related party status (30%+ shareholding etc.)','Verify board/shareholder meeting resolution procedures']},
+        {tag:'Valuation', title:'Determine CB Fair Value', items:['Separate option value (option model) + bond value','Assess unlisted stock FMV at issuance date (ITTA basis)','Obtain professional accountant appraisal report']},
+        {tag:'Pre-Conv. Prep', title:'Pre-Conversion Tax Simulation and Filing Prep', items:['Pre-calculate expected gift income at conversion','Plan funding for gift tax payment','Confirm deemed acquisition cost after conversion and subsequent sale']},
+      ]},
+    result_tax_preferred:{
+      badge:'ITTA — Preferred Stock Special Valuation', title:'Preferred Stock Special Valuation Reflecting Dividend Rate and Residual Distribution',
+      desc:'Preferred stock has special rights unlike common stock — dividend preference and residual asset distribution priority — so ITTA applies a separate calculation formula.',
+      gradeVal:'Preferred Stock Special', gradeSub:'Dividend/Liquidation Rights Reflected',
+      flags:['Present value of dividend preference rights summed','Verify residual asset distribution priority','Convertible preferred: add conversion option value'],
+      alerts:['<strong>Higher Than Common:</strong> Preferred stock often generates a higher assessed value than common stock. Compare whether gifting common stock would be more tax-efficient.'],
+      phases:[
+        {tag:'Review Terms', title:'Review Articles of Incorporation and Issuance Conditions', items:['Dividend rate (fixed vs. participating)','Residual asset distribution priority','Existence of conversion/redemption terms']},
+        {tag:'Valuation', title:'Perform Preferred Stock Special Valuation', items:['Calculate present value of dividend preference (apply discount rate)','Compare alongside common stock valuation','Convertible preferred → compare with common stock value post-conversion']},
+        {tag:'Transfer Strategy', title:'Determine Optimal Gift Structure: Common vs. Preferred', items:['Tax burden comparison simulation','Compare: gift before vs. after conversion','Set staggered gifting schedule']},
+      ]},
+    result_inv_berkus:{
+      badge:'Berkus Method — Early-Stage Startup', title:'Sum of Value Across 5 Elements: Idea, Team, Prototype, Market, Channel',
+      desc:'Best suited for early-stage startups with no revenue. Each element is qualitatively assessed up to a maximum value and summed. Use this as a starting point in investor negotiations.',
+      gradeVal:'Berkus Method', gradeSub:'Qualitative + Quantitative Mix',
+      flags:['5 elements: Idea, Prototype, Team, Strategy, Channel','Up to ₩500M–₩5B per element (set range)','Used as Pre-money valuation anchor'],
+      alerts:['<strong>Negotiation Tip:</strong> The Berkus method is well-known to investors. Clearly articulating the rationale for each element in your IR deck makes negotiations far smoother.',
+              '<strong>Not for Tax Use:</strong> This valuation is for investment negotiation only and is not recognized as FMV for tax purposes. If share transfer is involved, conduct an ITTA assessment in parallel.'],
+      phases:[
+        {tag:'Preparation', title:'Organize IR Materials and Valuation Rationale', items:['Business plan and market research report','Team background and core capability description','Prototype/MVP demo materials']},
+        {tag:'Valuation', title:'Create Berkus 5-Element Self-Assessment Table', items:['Set value range and rationale for each element','Research comparable startup cases (Crunchbase etc.)','Incorporate investor feedback adjustments']},
+        {tag:'Negotiation', title:'Pre-money Negotiation and Term Sheet', items:['Back-calculate dilution (equity %) → investment ÷ Post-money','Research investor valuation expectations','Review key term sheet provisions (liquidation preference, anti-dilution)']},
+      ]},
+    result_inv_tam:{
+      badge:'TAM Top-down Method', title:'Enterprise Value = Total Market × Target Share × Revenue Multiple',
+      desc:'If the market is large and growth is proven, TAM-based analysis is highly persuasive to investors. The credibility of market share assumptions is the key negotiating point.',
+      gradeVal:'TAM Top-down', gradeSub:'Market Growth-Based',
+      flags:['TAM → SAM → SOM: stepwise market narrowing','SOM × net margin × P/E multiple = enterprise value','Discount 5-year projected value to present'],
+      alerts:['<strong>Avoid Over-Estimation:</strong> Investors are very skeptical of market share assumptions in TAM analysis. Present a conservative scenario alongside.'],
+      phases:[
+        {tag:'Market Research', title:'Derive TAM, SAM, SOM', items:['Cite credible market reports (Gartner, IBISWorld, etc.)','SAM = realistically addressable market','SOM = realistic share target in 3–5 years']},
+        {tag:'Revenue Model', title:'Define Monetization Path and Unit Economics', items:['Set LTV/CAC ratio targets','Describe pricing strategy and margin structure','5-year financial projections (3 scenarios)']},
+        {tag:'Negotiation', title:'Agree on Valuation Range and Investment Terms', items:['Base/Bull/Bear 3-scenario valuation','Back-calculate investor target IRR → acceptable value range','Negotiate term sheet terms']},
+      ]},
+    result_inv_cca:{
+      badge:'Comparable Company Analysis (CCA)', title:'EV/Revenue and EV/EBITDA Multiples from Comparable Industry Companies',
+      desc:'Valuation based on multiples from comparable listed/unlisted companies. Being market-validated, it is effective for persuading investors and buyers.',
+      gradeVal:'Comparable Company Analysis', gradeSub:'EV/Revenue · EV/EBITDA',
+      flags:['Select 3+ comparable companies (similar industry/size)','EV/Revenue: suitable for growth companies (loss-making)','EV/EBITDA: suitable for profitable mid-size companies'],
+      alerts:['<strong>Discount Negotiation:</strong> Unlisted companies typically trade at a 20–40% DLOM discount vs. comparable listed peers. Use this as negotiation leverage.'],
+      phases:[
+        {tag:'Peer Selection', title:'Select 3–5 Comparable Companies and Collect Multiples', items:['Collect multiples from DART, Bloomberg, PitchBook','Assess comparability: industry, revenue scale, growth rate','Remove outliers; apply median or mean']},
+        {tag:'Apply Multiples', title:'Apply Multiples to Own Financial Metrics', items:['Finalize Revenue and EBITDA on LTM basis','Apply multiples to derive EV','Determine DLOM (20–40%) application']},
+        {tag:'Negotiation', title:'Use Multiple Range to Gain Negotiation Leverage', items:['Present optimistic/conservative scenario range','Compare with investor\'s proposed valuation','Cross-validate with DCF for credibility']},
+      ]},
+    result_inv_dcf:{
+      badge:'DCF — Discounted Cash Flow', title:'Enterprise Value = Present Value of Future Free Cash Flows (FCF)',
+      desc:'DCF is theoretically the most accurate method for capturing intrinsic business value. Results vary widely based on growth and discount rate assumptions — always include a sensitivity analysis.',
+      gradeVal:'DCF Primary', gradeSub:'WACC-Based Discounting',
+      flags:['FCF forecast period: 5–10 years','WACC = cost of equity × E/(D+E) + after-tax cost of debt × D/(D+E)','Terminal growth rate 2–3% (Terminal Value)'],
+      alerts:['<strong>Sensitivity Analysis Required:</strong> A 1%p change in WACC or growth rate can shift enterprise value by 20–40%. Always present as a range.',
+              '<strong>Investor Scrutiny:</strong> VCs and PEs run their own DCF models. Prepare evidence (contracts, pipeline) to justify your assumptions.'],
+      phases:[
+        {tag:'Financial Model', title:'5-Year Financial Projection and FCF Calculation', items:['Document revenue growth assumptions (contracts, pipeline)','EBITDA → EBIT → NOPAT → FCF calculation','Reflect CAPEX and working capital changes']},
+        {tag:'Discount Rate', title:'Calculate WACC', items:['Beta (β): use unlevered β of comparable listed companies','Risk-free rate: 10-year government bond','Add risk premium and small-company premium']},
+        {tag:'Negotiation', title:'Sensitivity Analysis → Value Range Negotiation', items:['WACC ±1%p, growth rate ±2%p scenario matrix','Compare with investor\'s proposed price vs. FCF basis','Cross-validate with CCA']},
+      ]},
+    result_inv_minority:{
+      badge:'DCF + Minority Discount', title:'Minority Stake — DLOM + DLOC Double Discount Applied',
+      desc:'Minority stakes have no control premium and low liquidity in the unlisted market, so double discounts apply. You can leverage this in negotiations to defend a lower valuation.',
+      gradeVal:'Minority Discount', gradeSub:'DLOC + DLOM Applied',
+      flags:['DLOC (Discount for Lack of Control): 15–30%','DLOM (Discount for Lack of Marketability): 20–35%','Final value after double discount = EV × (1–DLOC) × (1–DLOM)'],
+      alerts:['<strong>Investor Perspective:</strong> Investors naturally expect these discounts for minority stakes. Agreeing on reasonable discount rates upfront speeds up negotiations.'],
+      phases:[
+        {tag:'Enterprise Value', title:'Establish 100% Equity EV via DCF or CCA', items:['First determine enterprise value on a 100% equity basis','Determine stake percentage to be sold (e.g. 20%)']},
+        {tag:'Apply Discounts', title:'Negotiate DLOC and DLOM Discount Rates', items:['Present discount rate range based on research data','Reduce discount by granting voting/dividend/information rights','Set tag-along and drag-along provisions']},
+        {tag:'Contract', title:'Sign Shareholder Agreement (SHA) with Key Provisions', items:['Right of First Refusal (ROFR)','Tag-along right','Drag-along right','Anti-dilution: Full Ratchet vs. Weighted Average']},
+      ]},
+    result_inv_majority:{
+      badge:'M&A — Control Premium Included', title:'DCF Enterprise Value + Control Premium 20–40%',
+      desc:'Acquiring a controlling stake commands a higher premium than regular minority investment. Use this to set your minimum negotiation floor.',
+      gradeVal:'Control Premium', gradeSub:'20–40% Added',
+      flags:['Control premium: Korea average 23–35%','Strategic buyer may add synergy value','Buyer also factors in post-merger integration (PMI) costs'],
+      alerts:['<strong>Negotiation Strategy:</strong> Creating a competitive bidding structure with multiple potential buyers simultaneously maximizes the premium.',
+              '<strong>Tax Note:</strong> Proceeds from the sale are subject to capital gains tax. Compare tax burden: share transfer vs. business asset transfer.'],
+      phases:[
+        {tag:'Enterprise Value', title:'Establish Baseline Value via DCF + CCA', items:['Obtain Valuation Opinion from accounting firm (recommended)','3–5 year financial projection and WACC calculation','Determine control premium range']},
+        {tag:'M&A Process', title:'Design Sale Process', items:['Teaser → IM (Information Memorandum) → LOI sequence','Potential buyer long list → short list','Prepare Due Diligence after NDA signing']},
+        {tag:'Tax Planning', title:'Capital Gains Tax and Structure Optimization', items:['Compare: share transfer vs. business asset transfer tax burden','Consider staged sale (tranches) structure','Majority shareholder capital gains filing (preliminary/final)']},
+      ]},
+    result_esop_tax:{
+      badge:'Venture Company Tax-Qualified Stock Options', title:'Exercise Price = FMV at Grant Date per ITTA Assessment',
+      desc:'Tax-qualified stock options for venture companies require the exercise price to be set at or above FMV at grant date to receive preferential tax treatment. A formal ITTA assessment is mandatory.',
+      gradeVal:'Tax-Qualified SO', gradeSub:'Exercise Price = Grant Date FMV',
+      flags:['ITTA assessment at grant date → exercise price set','Exercise profit: amount above exercise price → employment income tax','Sale after 2-year holding → capital gains tax'],
+      alerts:['<strong>Tax Benefit Structure:</strong> Venture company stock options may qualify for a tax exemption (up to ₩50M/year) if requirements are met. Verify the company\'s venture certification is current.'],
+      phases:[
+        {tag:'Assessment', title:'Conduct ITTA Assessment at Grant Date', items:['Confirm valuation base date (2 months before/after grant date)','Apply weighted average method based on financial statements','Retain assessment report and board minutes']},
+        {tag:'Grant', title:'Execute Stock Option Agreement', items:['Specify exercise price, quantity, and vesting schedule','Board/shareholder meeting resolution (Commercial Code requirements)','Register and verify venture company stock option requirements']},
+        {tag:'Exercise & Sale', title:'Pre-Exercise Tax Simulation', items:['Compare exercise profit: employment income vs. separate taxation','Verify capital gains tax at sale (2-year holding requirement)','Plan funding for tax payment']},
+      ]},
+    result_esop_internal:{
+      badge:'Non-Qualified Stock Options / RSU', title:'Exercise Price and Valuation Determined by Company Policy and Investor Agreement',
+      desc:'Non-qualified stock options and RSUs have no tax preferences but offer greater design flexibility. Having objective valuation documentation builds trust with both employees and investors.',
+      gradeVal:'Non-Qualified SO', gradeSub:'High Design Flexibility',
+      flags:['Exercise price can be set freely (below market is possible)','Exercise profit subject to full employment income tax','RSU: FMV at vesting date is the tax basis'],
+      alerts:['<strong>Tax Burden:</strong> Non-qualified options subject the full exercise profit to employment income tax. Pre-simulate employee net proceeds.'],
+      phases:[
+        {tag:'Design', title:'Design Stock Option/RSU Structure', items:['Determine exercise price and vesting schedule','Set cliff period (typically 1 year)','Define terms on termination (Good Leave / Bad Leave)']},
+        {tag:'Valuation', title:'Obtain Valuation Basis for Exercise Price', items:['Use most recent round valuation agreed with investors','Consider independent 409A-equivalent appraisal','Conduct internal valuation based on financial statements in parallel']},
+        {tag:'Operations', title:'Employee Tax Education and Exercise Guide', items:['Explain withholding tax on exercise profit','Plan tax payment funding (consider Cashless Exercise)','RSU: withholding at vesting based on FMV']},
+      ]},
+    result_dispute_court:{
+      badge:'Court Appraisal — Dissenting Shareholder Rights', title:'Fair Price Determined by Court-Appointed Appraiser Based on ITTA',
+      desc:'When a shareholder exercises appraisal rights against a merger or split, the court determines the fair price. ITTA-based net asset value is the primary method.',
+      gradeVal:'Court Appraisal', gradeSub:'Fair Price Determination',
+      flags:['Court-appointed appraiser → parties may object','Base date: date of merger resolution or board resolution','ITTA + intrinsic value hybrid may be applied'],
+      alerts:['<strong>Pre-Litigation Settlement Recommended:</strong> Court appraisal can take months to over a year. Negotiating a fair price directly is far more efficient in time and cost.'],
+      phases:[
+        {tag:'Pre-Settlement', title:'Attempt Negotiation Before Court Appraisal', items:['Internal price negotiation immediately after board resolution','Jointly appoint a trusted appraiser for both parties','File court application if negotiation fails']},
+        {tag:'Court Process', title:'File for Stock Purchase Price Determination', items:['File within 20 days of merger resolution date','Submit financial data to court as of base date','Cooperate with appointed appraiser (provide documents)']},
+        {tag:'Response', title:'Objection and Appeal Against Appraisal Result', items:['File objection if appraisal value is disputed','Additional appraisal application possible','After final decision: payment and share transfer']},
+      ]},
+    result_dispute_nego:{
+      badge:'Minority Shareholder Negotiated Price', title:'Cross-Apply Multiple Methodologies to Derive an Agreed-Upon Price Range',
+      desc:'When shareholders determine share price through private negotiation without court appraisal, present results from multiple methodologies and negotiate within that range.',
+      gradeVal:'Negotiated Range', gradeSub:'Multiple Methods Cross-Applied',
+      flags:['ITTA assessed value (tax floor)','DCF or CCA market value (negotiation ceiling)','Form a band both parties can accept'],
+      alerts:['<strong>Settlement Strategy:</strong> Presenting ITTA value as the floor and DCF/CCA as the ceiling creates a rational negotiation space.'],
+      phases:[
+        {tag:'Valuation', title:'Perform Both ITTA Assessment and DCF Valuation', items:['Calculate ITTA value → set as floor','Apply DCF or CCA → set as ceiling','Document the gap and rationale between the two values']},
+        {tag:'Negotiation', title:'Range-Based Negotiation', items:['Propose settlement within floor–ceiling range','Negotiate payment method (lump sum vs. installment)','Share financial data under NDA']},
+        {tag:'Contract', title:'Execute Share Purchase Agreement', items:['Specify agreed price and payment schedule','Negotiate representations and warranties (R&W)','Update shareholder register and registration']},
+      ]},
+  },
+  cases:[
+    {tag:'Tax · Profitable Corp.', title:'Manufacturing SME — Gifting Shares to Children', sub:'3-year profitable · Common stock · Weighted average method'},
+    {tag:'Tax · Early-stage', title:'Year-2 IT Company — Share Transfer', sub:'Under-3-year exception · Net asset value 100%'},
+    {tag:'Tax · Loss-making', title:'COVID-Loss Company — Tax-Timed Gift', sub:'Gift at lowest net asset value during loss period'},
+    {tag:'Investment · DCF', title:'SaaS Startup — Series A Fundraising', sub:'Growth stage · Limited comparables · DCF method'},
+    {tag:'M&A · Control', title:'Stable Food Manufacturer — Control Sale', sub:'3-year profitable · Control premium included'},
+    {tag:'Dispute · Court', title:'Shareholder Dispute · Court Appraisal Response', sub:'Minority shareholder dividend claim · ITTA court appraisal'},
+  ],
+};
+
+function _svR(rId){ return svLang==='en' ? SV_EN.r[rId] : null; }
+function currentQId(){
+  if(path.length===0) return 'q0';
+  const last=path[path.length-1];
+  return TREE[last.qId].opts[last.optIdx].next;
+}
+
 /* ── 상태 ── */
 let path = [];   // [{qId, optIdx}]
 let result = null;
@@ -853,9 +1129,14 @@ function updateProg() {
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-pct').textContent = pct + '%';
 
+  const isEn = svLang === 'en';
   const lbl = result
-    ? (result.type === 'tax' ? '세법 기반 평가 진단 완료' : '협상 기반 평가 진단 완료')
-    : (depth === 0 ? '진단 시작' : `${depth}단계 진행 중`);
+    ? (result.type === 'tax'
+        ? (isEn ? 'Tax-Based Valuation Assessment Complete' : '세법 기반 평가 진단 완료')
+        : (isEn ? 'Negotiation-Based Valuation Assessment Complete' : '협상 기반 평가 진단 완료'))
+    : (depth === 0
+        ? (isEn ? 'Start Assessment' : '진단 시작')
+        : (isEn ? `Step ${depth} in progress` : `${depth}단계 진행 중`));
   document.getElementById('prog-lbl').textContent = lbl;
 
   const bc = document.getElementById('bc');
@@ -865,12 +1146,13 @@ function updateProg() {
     if (!q) return;
     const o = q.opts[s.optIdx];
     if (!o) return;
+    const oe = SV_EN.q[s.qId]?.opts?.[s.optIdx];
     if (i > 0) { const sep = document.createElement('span'); sep.className = 'crumb-sep'; sep.textContent = '›'; bc.appendChild(sep); }
-    const c = document.createElement('span'); c.className = 'crumb'; c.textContent = o.main; bc.appendChild(c);
+    const c = document.createElement('span'); c.className = 'crumb'; c.textContent = (isEn && oe?.main) ? oe.main : o.main; bc.appendChild(c);
   });
 
   const hr = document.getElementById('hdr-r');
-  hr.textContent = depth > 0 ? `${depth}단계 완료` : '';
+  hr.textContent = depth > 0 ? (isEn ? `Step ${depth} complete` : `${depth}단계 완료`) : '';
 }
 
 function pick(qId, optIdx) {
@@ -905,16 +1187,22 @@ function restart() {
 
 /* ── 질문 렌더링 ── */
 function buildCasesHtml() {
+  const isEn = svLang === 'en';
   return `<div class="cases-wrap no-print">
-    <div class="cases-label">대표 사례 — 원클릭 결과 보기</div>
+    <div class="cases-label">${isEn ? 'Sample Cases — One-Click Results' : '대표 사례 — 원클릭 결과 보기'}</div>
     <div class="cases-grid">
-      ${CASES.map((c,i) => `
-        <button class="case-btn" onclick="runCase(${i})">
+      ${CASES.map((c,i) => {
+        const ce = SV_EN.cases[i];
+        const tag   = (isEn && ce?.tag)   ? ce.tag   : c.tag;
+        const title = (isEn && ce?.title) ? ce.title : c.title;
+        const sub   = (isEn && ce?.sub)   ? ce.sub   : c.sub;
+        return `<button class="case-btn" onclick="runCase(${i})">
           <span class="cb-icon">${c.icon}</span>
-          <span class="cb-tag ${c.tagClass}">${c.tag}</span>
-          <span class="cb-title">${c.title}</span>
-          <span class="cb-sub">${c.sub}</span>
-        </button>`).join('')}
+          <span class="cb-tag ${c.tagClass}">${tag}</span>
+          <span class="cb-title">${title}</span>
+          <span class="cb-sub">${sub}</span>
+        </button>`;
+      }).join('')}
     </div>
   </div>`;
 }
@@ -962,27 +1250,32 @@ function fillCalc(calc) {
 function render(qId = 'q0', _prevOpt, back = false) {
   updateProg();
   const q = TREE[qId];
+  const qe = SV_EN.q[qId];
+  const isEn = svLang === 'en';
   let html = '';
   if (path.length > 0) {
-    html += `<button class="back-btn no-print" onclick="goBack()">← 이전으로</button>`;
+    html += `<button class="back-btn no-print" onclick="goBack()">${isEn ? '← Back' : '← 이전으로'}</button>`;
   }
-  // 첫 질문에서만 대표 사례 버튼 표시
   if (qId === 'q0' && path.length === 0) {
     html += buildCasesHtml();
   }
   html += `<div class="q-card">
     <div class="q-step">${q.step}</div>
-    <div class="q-text">${q.text}</div>
-    <div class="q-sub">${q.sub}</div>`;
-  if (q.law) html += `<div class="q-law">📌 ${q.law}</div>`;
+    <div class="q-text">${(isEn && qe?.text) ? qe.text : q.text}</div>
+    <div class="q-sub">${(isEn && qe?.sub) ? qe.sub : q.sub}</div>`;
+  if (q.law) html += `<div class="q-law">📌 ${(isEn && qe?.law) ? qe.law : q.law}</div>`;
   html += `<div class="options">`;
   q.opts.forEach((o, i) => {
+    const oe = qe?.opts?.[i];
+    const main = (isEn && oe?.main) ? oe.main : o.main;
+    const sub  = (isEn && oe?.sub)  ? oe.sub  : o.sub;
+    const tag  = (isEn && oe?.tag)  ? oe.tag  : o.tag;
     html += `<button class="opt" onclick="pick('${qId}',${i})">
       <span class="opt-l">
-        <span class="opt-main">${o.main}</span>
-        ${o.sub ? `<span class="opt-sub">${o.sub}</span>` : ''}
+        <span class="opt-main">${main}</span>
+        ${sub ? `<span class="opt-sub">${sub}</span>` : ''}
       </span>
-      <span class="opt-tag ${o.tagClass}">${o.tag}</span>
+      <span class="opt-tag ${o.tagClass}">${tag}</span>
       <span class="opt-arr">›</span>
     </button>`;
   });
@@ -994,38 +1287,49 @@ function render(qId = 'q0', _prevOpt, back = false) {
 function renderResult() {
   updateProg();
   const r = result;
-  let alerts = (r.alerts || []).map(a =>
-    `<div class="alert ${a.type}"><span class="alert-icon">${a.icon}</span><span>${a.text}</span></div>`
-  ).join('');
+  const id = Object.keys(RESULTS).find(k => RESULTS[k] === r) || '';
+  const re = _svR(id);
+  const isEn = svLang === 'en';
 
-  let phases = (r.phases || []).map(p => `
-    <div class="phase">
+  let alerts = (r.alerts || []).map((a, ai) => {
+    const txt = (isEn && re?.alerts?.[ai]) ? re.alerts[ai] : a.text;
+    return `<div class="alert ${a.type}"><span class="alert-icon">${a.icon}</span><span>${txt}</span></div>`;
+  }).join('');
+
+  let phases = (r.phases || []).map((p, pi) => {
+    const pe = re?.phases?.[pi];
+    const tag   = (isEn && pe?.tag)   ? pe.tag   : p.tag;
+    const title = (isEn && pe?.title) ? pe.title : p.title;
+    const items = (isEn && pe?.items) ? pe.items : p.items;
+    return `<div class="phase">
       <div class="ph-num" style="background:${p.colorBg};color:${p.color}">${p.num}</div>
       <div class="ph-body">
-        <div class="ph-tag" style="color:${p.color}">${p.tag}</div>
-        <div class="ph-title">${p.title}</div>
+        <div class="ph-tag" style="color:${p.color}">${tag}</div>
+        <div class="ph-title">${title}</div>
         <div class="ph-items">
-          ${p.items.map(it => `<div class="ph-item"><div class="ph-dot"></div><div class="ph-item-body">${it}</div></div>`).join('')}
+          ${items.map(it => `<div class="ph-item"><div class="ph-dot"></div><div class="ph-item-body">${it}</div></div>`).join('')}
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
-  let flags = (r.flags || []).map(f => `<span class="flag">${f}</span>`).join('');
+  const flagArr = (isEn && re?.flags) ? re.flags : (r.flags || []);
+  let flags = flagArr.map(f => `<span class="flag">${f}</span>`).join('');
 
   const html = `
-  <button class="back-btn no-print" onclick="goBack()">← 이전으로</button>
+  <button class="back-btn no-print" onclick="goBack()">${isEn ? '← Back' : '← 이전으로'}</button>
   <div class="result-wrap">
     <div class="r-hero">
       <div class="r-top">
         <div>
-          <div class="r-badge ${r.badgeClass}">${r.badge}</div>
-          <div class="r-title">${r.title}</div>
-          <div class="r-desc">${r.desc}</div>
+          <div class="r-badge ${r.badgeClass}">${(isEn && re?.badge) ? re.badge : r.badge}</div>
+          <div class="r-title">${(isEn && re?.title) ? re.title : r.title}</div>
+          <div class="r-desc">${(isEn && re?.desc) ? re.desc : r.desc}</div>
         </div>
         <div class="grade-box">
-          <div class="grade-label">적용 방법론</div>
-          <div class="grade-val" style="color:${r.gradeColor}">${r.gradeVal}</div>
-          <div class="grade-sub">${r.gradeSub}</div>
+          <div class="grade-label">${isEn ? 'Methodology' : '적용 방법론'}</div>
+          <div class="grade-val" style="color:${r.gradeColor}">${(isEn && re?.gradeVal) ? re.gradeVal : r.gradeVal}</div>
+          <div class="grade-sub">${(isEn && re?.gradeSub) ? re.gradeSub : r.gradeSub}</div>
         </div>
       </div>
       <div class="flags">${flags}</div>
@@ -1036,8 +1340,8 @@ function renderResult() {
     <div class="section">
       <div class="section-hd">
         <div class="section-hd-icon" style="background:rgba(59,130,246,.15);color:var(--blue)">→</div>
-        <div class="section-hd-title">실행 로드맵</div>
-        <div class="section-hd-count tag-blue">${r.phases.length}단계</div>
+        <div class="section-hd-title">${isEn ? 'Action Roadmap' : '실행 로드맵'}</div>
+        <div class="section-hd-count tag-blue">${r.phases.length}${isEn ? ' steps' : '단계'}</div>
       </div>
       ${phases}
     </div>
@@ -1045,8 +1349,8 @@ function renderResult() {
     ${buildCalc(r)}
 
     <div class="action-row no-print">
-      <button class="btn-p" onclick="window.print()">🖨 보고서 인쇄 / PDF 저장</button>
-      <button class="btn-g" onclick="restart()">↺ 처음부터 다시</button>
+      <button class="btn-p" onclick="window.print()">${isEn ? '🖨 Print Report / Save PDF' : '🖨 보고서 인쇄 / PDF 저장'}</button>
+      <button class="btn-g" onclick="restart()">${isEn ? '↺ Start Over' : '↺ 처음부터 다시'}</button>
     </div>
   </div>`;
   document.getElementById('view').innerHTML = html;
@@ -1067,219 +1371,223 @@ function buildCalc(r) {
 }
 
 function calcTaxWeighted() {
+  const isEn = svLang === 'en';
   return `
   <div class="calc-wrap no-print">
     <div class="calc-hd" onclick="toggleCalc(this)">
       <div class="calc-hd-l">
-        <div class="calc-hd-title">📐 상증세법 가치 추정 계산기</div>
-        <div class="calc-hd-badge">순손익 × 3 + 순자산 × 2 가중평균</div>
+        <div class="calc-hd-title">📐 ${isEn ? 'ITTA Valuation Estimator' : '상증세법 가치 추정 계산기'}</div>
+        <div class="calc-hd-badge">${isEn ? 'Earnings Value ×3 + Net Asset Value ×2 Weighted Avg' : '순손익 × 3 + 순자산 × 2 가중평균'}</div>
       </div>
       <div class="calc-toggle">▾</div>
     </div>
     <div class="calc-body">
-      <div class="calc-section-title">기본 정보</div>
+      <div class="calc-section-title">${isEn ? 'Basic Information' : '기본 정보'}</div>
       <div class="calc-grid">
         <div class="calc-field">
-          <div class="calc-label">발행주식수</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="c_shares" type="number" value="100000" min="1"><span class="calc-unit">주</span></div>
+          <div class="calc-label">${isEn ? 'Issued shares' : '발행주식수'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="c_shares" type="number" value="100000" min="1"><span class="calc-unit">${isEn ? 'sh' : '주'}</span></div>
         </div>
       </div>
-      <div class="calc-section-title">순손익가치 — 최근 3개년 당기순이익</div>
+      <div class="calc-section-title">${isEn ? 'Earnings Value — Net Income for Last 3 Years' : '순손익가치 — 최근 3개년 당기순이익'}</div>
       <div class="calc-grid">
         <div class="calc-field">
-          <div class="calc-label">3년 전 순이익 (가중 ×1)</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="c_ni1" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'Net income 3 yrs ago (weight ×1)' : '3년 전 순이익 (가중 ×1)'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="c_ni1" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">2년 전 순이익 (가중 ×2)</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="c_ni2" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'Net income 2 yrs ago (weight ×2)' : '2년 전 순이익 (가중 ×2)'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="c_ni2" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">최근년 순이익 (가중 ×3)</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="c_ni3" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'Net income most recent yr (weight ×3)' : '최근년 순이익 (가중 ×3)'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="c_ni3" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
       </div>
-      <div class="calc-section-title">순자산가치 — 평가기준일 재무상태표</div>
+      <div class="calc-section-title">${isEn ? 'Net Asset Value — Balance Sheet at Valuation Date' : '순자산가치 — 평가기준일 재무상태표'}</div>
       <div class="calc-grid">
         <div class="calc-field">
-          <div class="calc-label">자산 총액</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="c_asset" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'Total assets' : '자산 총액'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="c_asset" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">부채 총액</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="c_liab" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'Total liabilities' : '부채 총액'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="c_liab" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
       </div>
-      <button class="calc-btn" onclick="calcWeighted()">가치 계산하기</button>
+      <button class="calc-btn" onclick="calcWeighted()">${isEn ? 'Calculate Value' : '가치 계산하기'}</button>
       <div class="calc-result" id="calc-res-w">
-        <div class="calc-result-title">추정 결과 (상증세법 기준)</div>
-        <div class="calc-row"><span class="calc-row-label">가중평균 순손익</span><span class="calc-row-val hi" id="cr-wni"></span></div>
-        <div class="calc-row"><span class="calc-row-label">1주당 순손익가치 (÷10%)</span><span class="calc-row-val" id="cr-epv"></span></div>
-        <div class="calc-row"><span class="calc-row-label">순자산</span><span class="calc-row-val" id="cr-na"></span></div>
-        <div class="calc-row"><span class="calc-row-label">1주당 순자산가치</span><span class="calc-row-val" id="cr-nav"></span></div>
+        <div class="calc-result-title">${isEn ? 'Estimated Result (ITTA Basis)' : '추정 결과 (상증세법 기준)'}</div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Weighted avg net income' : '가중평균 순손익'}</span><span class="calc-row-val hi" id="cr-wni"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Earnings value per share (÷10%)' : '1주당 순손익가치 (÷10%)'}</span><span class="calc-row-val" id="cr-epv"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Net assets' : '순자산'}</span><span class="calc-row-val" id="cr-na"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Net asset value per share' : '1주당 순자산가치'}</span><span class="calc-row-val" id="cr-nav"></span></div>
         <hr class="calc-divider">
-        <div class="calc-row"><span class="calc-row-label">1주당 평가액 (3:2 가중)</span><span class="calc-row-val main" id="cr-final"></span></div>
-        <div class="calc-row"><span class="calc-row-label">총 주식 평가액</span><span class="calc-row-val main" id="cr-total"></span></div>
-        <div class="calc-note">※ 세법상 하한선: 1주당 순자산가치의 80% 이상 (순손익가치가 낮아도 적용). 본 계산은 추정값이며 정식 신고는 반드시 공인 세무사의 검토를 받으십시오.</div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Per-share assessed value (3:2 weighted)' : '1주당 평가액 (3:2 가중)'}</span><span class="calc-row-val main" id="cr-final"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Total equity assessed value' : '총 주식 평가액'}</span><span class="calc-row-val main" id="cr-total"></span></div>
+        <div class="calc-note">※ ${isEn ? 'Tax floor: per-share assessed value must be at least 80% of net asset value. This is an estimate — always obtain a certified tax advisor review before formal filing.' : '세법상 하한선: 1주당 순자산가치의 80% 이상 (순손익가치가 낮아도 적용). 본 계산은 추정값이며 정식 신고는 반드시 공인 세무사의 검토를 받으십시오.'}</div>
       </div>
     </div>
   </div>`;
 }
 
 function calcTaxNA() {
+  const isEn = svLang === 'en';
   return `
   <div class="calc-wrap no-print">
     <div class="calc-hd" onclick="toggleCalc(this)">
       <div class="calc-hd-l">
-        <div class="calc-hd-title">📐 순자산가치 추정 계산기</div>
-        <div class="calc-hd-badge">순자산가치 100% 적용</div>
+        <div class="calc-hd-title">📐 ${isEn ? 'Net Asset Value Estimator' : '순자산가치 추정 계산기'}</div>
+        <div class="calc-hd-badge">${isEn ? 'Net Asset Value 100% Applied' : '순자산가치 100% 적용'}</div>
       </div>
       <div class="calc-toggle">▾</div>
     </div>
     <div class="calc-body">
-      <div class="calc-section-title">기본 정보</div>
+      <div class="calc-section-title">${isEn ? 'Basic Information' : '기본 정보'}</div>
       <div class="calc-grid">
         <div class="calc-field">
-          <div class="calc-label">발행주식수</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="c_shares_na" type="number" value="100000" min="1"><span class="calc-unit">주</span></div>
+          <div class="calc-label">${isEn ? 'Issued shares' : '발행주식수'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="c_shares_na" type="number" value="100000" min="1"><span class="calc-unit">${isEn ? 'sh' : '주'}</span></div>
         </div>
       </div>
-      <div class="calc-section-title">평가기준일 재무상태표</div>
+      <div class="calc-section-title">${isEn ? 'Balance Sheet at Valuation Date' : '평가기준일 재무상태표'}</div>
       <div class="calc-grid">
         <div class="calc-field">
-          <div class="calc-label">자산 총액</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="c_asset_na" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'Total assets' : '자산 총액'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="c_asset_na" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">부채 총액</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="c_liab_na" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'Total liabilities' : '부채 총액'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="c_liab_na" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
       </div>
-      <button class="calc-btn" onclick="calcNA()">가치 계산하기</button>
+      <button class="calc-btn" onclick="calcNA()">${isEn ? 'Calculate Value' : '가치 계산하기'}</button>
       <div class="calc-result" id="calc-res-na">
-        <div class="calc-result-title">추정 결과 (순자산가치 기준)</div>
-        <div class="calc-row"><span class="calc-row-label">순자산 (자산 − 부채)</span><span class="calc-row-val hi" id="cr-na2"></span></div>
-        <div class="calc-row"><span class="calc-row-label">1주당 순자산가치</span><span class="calc-row-val main" id="cr-nav2"></span></div>
-        <div class="calc-row"><span class="calc-row-label">총 주식 평가액</span><span class="calc-row-val main" id="cr-total2"></span></div>
-        <div class="calc-row"><span class="calc-row-label">세법상 하한선 (80%)</span><span class="calc-row-val warn" id="cr-floor"></span></div>
-        <div class="calc-note">※ 본 계산은 장부가 기준 추정값입니다. 부동산·비상장주식 등 자산의 시가가 장부가와 다를 경우 실제 평가액이 달라질 수 있습니다. 정식 신고 전 공인 세무사 검토 필수.</div>
+        <div class="calc-result-title">${isEn ? 'Estimated Result (Net Asset Value Basis)' : '추정 결과 (순자산가치 기준)'}</div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Net assets (Assets − Liabilities)' : '순자산 (자산 − 부채)'}</span><span class="calc-row-val hi" id="cr-na2"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Net asset value per share' : '1주당 순자산가치'}</span><span class="calc-row-val main" id="cr-nav2"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Total equity assessed value' : '총 주식 평가액'}</span><span class="calc-row-val main" id="cr-total2"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Tax floor (80%)' : '세법상 하한선 (80%)'}</span><span class="calc-row-val warn" id="cr-floor"></span></div>
+        <div class="calc-note">※ ${isEn ? 'This is a book-value estimate. If fair value of real estate or unlisted shares differs from book value, actual assessed value will vary. Tax advisor review required before formal filing.' : '본 계산은 장부가 기준 추정값입니다. 부동산·비상장주식 등 자산의 시가가 장부가와 다를 경우 실제 평가액이 달라질 수 있습니다. 정식 신고 전 공인 세무사 검토 필수.'}</div>
       </div>
     </div>
   </div>`;
 }
 
 function calcInvDCF() {
+  const isEn = svLang === 'en';
   return `
   <div class="calc-wrap no-print">
     <div class="calc-hd" onclick="toggleCalc(this)">
       <div class="calc-hd-l">
-        <div class="calc-hd-title">📐 DCF 기업가치 추정 계산기</div>
-        <div class="calc-hd-badge">5년 FCF + Terminal Value</div>
+        <div class="calc-hd-title">📐 ${isEn ? 'DCF Enterprise Value Estimator' : 'DCF 기업가치 추정 계산기'}</div>
+        <div class="calc-hd-badge">5yr FCF + Terminal Value</div>
       </div>
       <div class="calc-toggle">▾</div>
     </div>
     <div class="calc-body">
-      <div class="calc-section-title">기본 재무 지표</div>
+      <div class="calc-section-title">${isEn ? 'Core Financial Metrics' : '기본 재무 지표'}</div>
       <div class="calc-grid">
         <div class="calc-field">
-          <div class="calc-label">최근년 EBITDA</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="d_ebitda" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'Most recent yr EBITDA' : '최근년 EBITDA'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="d_ebitda" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">CAPEX + 운전자본 증가</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="d_capex" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'CAPEX + working capital increase' : 'CAPEX + 운전자본 증가'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="d_capex" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">발행주식수</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="d_shares" type="number" value="100000" min="1"><span class="calc-unit">주</span></div>
+          <div class="calc-label">${isEn ? 'Issued shares' : '발행주식수'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="d_shares" type="number" value="100000" min="1"><span class="calc-unit">${isEn ? 'sh' : '주'}</span></div>
         </div>
       </div>
-      <div class="calc-section-title">성장·할인 가정</div>
+      <div class="calc-section-title">${isEn ? 'Growth & Discount Assumptions' : '성장·할인 가정'}</div>
       <div class="calc-grid">
         <div class="calc-field">
-          <div class="calc-label">연 성장률 (5년)</div>
+          <div class="calc-label">${isEn ? 'Annual growth rate (5yr)' : '연 성장률 (5년)'}</div>
           <div class="calc-input-wrap"><input class="calc-inp" id="d_grow" type="number" value="10" min="0" max="100"><span class="calc-unit">%</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">할인율 (WACC)</div>
+          <div class="calc-label">${isEn ? 'Discount rate (WACC)' : '할인율 (WACC)'}</div>
           <div class="calc-input-wrap"><input class="calc-inp" id="d_wacc" type="number" value="15" min="1" max="50"><span class="calc-unit">%</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">영구성장률</div>
+          <div class="calc-label">${isEn ? 'Terminal growth rate' : '영구성장률'}</div>
           <div class="calc-input-wrap"><input class="calc-inp" id="d_tgrow" type="number" value="2" min="0" max="10"><span class="calc-unit">%</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">법인세율</div>
+          <div class="calc-label">${isEn ? 'Corporate tax rate' : '법인세율'}</div>
           <div class="calc-input-wrap"><input class="calc-inp" id="d_tax" type="number" value="22" min="0" max="40"><span class="calc-unit">%</span></div>
         </div>
       </div>
-      <button class="calc-btn" onclick="calcDCF()">기업가치 계산하기</button>
+      <button class="calc-btn" onclick="calcDCF()">${isEn ? 'Calculate Enterprise Value' : '기업가치 계산하기'}</button>
       <div class="calc-result" id="calc-res-dcf">
-        <div class="calc-result-title">DCF 추정 결과</div>
-        <div class="calc-row"><span class="calc-row-label">기준 FCF (세후 EBITDA − CAPEX)</span><span class="calc-row-val hi" id="dr-fcf0"></span></div>
-        <div class="calc-row"><span class="calc-row-label">5년 FCF 현재가치 합계</span><span class="calc-row-val" id="dr-pvfcf"></span></div>
-        <div class="calc-row"><span class="calc-row-label">Terminal Value (현재가치)</span><span class="calc-row-val" id="dr-pvtv"></span></div>
+        <div class="calc-result-title">${isEn ? 'DCF Estimated Result' : 'DCF 추정 결과'}</div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Base FCF (after-tax EBITDA − CAPEX)' : '기준 FCF (세후 EBITDA − CAPEX)'}</span><span class="calc-row-val hi" id="dr-fcf0"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? '5yr FCF PV sum' : '5년 FCF 현재가치 합계'}</span><span class="calc-row-val" id="dr-pvfcf"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Terminal Value (PV)' : 'Terminal Value (현재가치)'}</span><span class="calc-row-val" id="dr-pvtv"></span></div>
         <hr class="calc-divider">
-        <div class="calc-row"><span class="calc-row-label">추정 기업가치 (EV)</span><span class="calc-row-val main" id="dr-ev"></span></div>
-        <div class="calc-row"><span class="calc-row-label">1주당 추정 가치</span><span class="calc-row-val main" id="dr-per"></span></div>
-        <div class="calc-row"><span class="calc-row-label">민감도 범위 (WACC ±2%)</span><span class="calc-row-val warn" id="dr-range"></span></div>
-        <div class="calc-note">※ EBITDA ≒ FCF로 간이 계산한 추정값입니다. 실제 DCF는 연도별 매출·비용 예측, 운전자본 변동, 자본구조를 정밀 반영해야 합니다. 협상 기준점으로만 활용하십시오.</div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Estimated enterprise value (EV)' : '추정 기업가치 (EV)'}</span><span class="calc-row-val main" id="dr-ev"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Estimated value per share' : '1주당 추정 가치'}</span><span class="calc-row-val main" id="dr-per"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Sensitivity range (WACC ±2%)' : '민감도 범위 (WACC ±2%)'}</span><span class="calc-row-val warn" id="dr-range"></span></div>
+        <div class="calc-note">※ ${isEn ? 'Simplified estimate using EBITDA ≈ FCF. Actual DCF requires precise annual revenue/cost projections, working capital changes, and capital structure. Use as a negotiation reference only.' : 'EBITDA ≒ FCF로 간이 계산한 추정값입니다. 실제 DCF는 연도별 매출·비용 예측, 운전자본 변동, 자본구조를 정밀 반영해야 합니다. 협상 기준점으로만 활용하십시오.'}</div>
       </div>
     </div>
   </div>`;
 }
 
 function calcInvMultiple() {
+  const isEn = svLang === 'en';
   return `
   <div class="calc-wrap no-print">
     <div class="calc-hd" onclick="toggleCalc(this)">
       <div class="calc-hd-l">
-        <div class="calc-hd-title">📐 멀티플 기업가치 추정 계산기</div>
+        <div class="calc-hd-title">📐 ${isEn ? 'Multiple-Based Enterprise Value Estimator' : '멀티플 기업가치 추정 계산기'}</div>
         <div class="calc-hd-badge">EV/Revenue · EV/EBITDA</div>
       </div>
       <div class="calc-toggle">▾</div>
     </div>
     <div class="calc-body">
-      <div class="calc-section-title">재무 지표</div>
+      <div class="calc-section-title">${isEn ? 'Financial Metrics' : '재무 지표'}</div>
       <div class="calc-grid">
         <div class="calc-field">
-          <div class="calc-label">연 매출 (LTM)</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="m_rev" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-label">${isEn ? 'Annual revenue (LTM)' : '연 매출 (LTM)'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="m_rev" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
         <div class="calc-field">
           <div class="calc-label">EBITDA</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="m_ebitda" type="number" value="0" placeholder="0"><span class="calc-unit">만원</span></div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="m_ebitda" type="number" value="0" placeholder="0"><span class="calc-unit">${isEn ? '₩10K' : '만원'}</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">발행주식수</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="m_shares" type="number" value="100000" min="1"><span class="calc-unit">주</span></div>
+          <div class="calc-label">${isEn ? 'Issued shares' : '발행주식수'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="m_shares" type="number" value="100000" min="1"><span class="calc-unit">${isEn ? 'sh' : '주'}</span></div>
         </div>
       </div>
-      <div class="calc-section-title">유사기업 멀티플</div>
+      <div class="calc-section-title">${isEn ? 'Comparable Company Multiples' : '유사기업 멀티플'}</div>
       <div class="calc-grid">
         <div class="calc-field">
-          <div class="calc-label">EV/Revenue 배수</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="m_rmu" type="number" value="2.0" min="0.1" step="0.1"><span class="calc-unit">배</span></div>
+          <div class="calc-label">${isEn ? 'EV/Revenue multiple' : 'EV/Revenue 배수'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="m_rmu" type="number" value="2.0" min="0.1" step="0.1"><span class="calc-unit">${isEn ? 'x' : '배'}</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">EV/EBITDA 배수</div>
-          <div class="calc-input-wrap"><input class="calc-inp" id="m_emu" type="number" value="8.0" min="0.1" step="0.1"><span class="calc-unit">배</span></div>
+          <div class="calc-label">${isEn ? 'EV/EBITDA multiple' : 'EV/EBITDA 배수'}</div>
+          <div class="calc-input-wrap"><input class="calc-inp" id="m_emu" type="number" value="8.0" min="0.1" step="0.1"><span class="calc-unit">${isEn ? 'x' : '배'}</span></div>
         </div>
         <div class="calc-field">
-          <div class="calc-label">비상장 할인율 (DLOM)</div>
+          <div class="calc-label">${isEn ? 'Unlisted discount (DLOM)' : '비상장 할인율 (DLOM)'}</div>
           <div class="calc-input-wrap"><input class="calc-inp" id="m_dlom" type="number" value="25" min="0" max="60"><span class="calc-unit">%</span></div>
         </div>
       </div>
-      <button class="calc-btn" onclick="calcMultiple()">기업가치 계산하기</button>
+      <button class="calc-btn" onclick="calcMultiple()">${isEn ? 'Calculate Enterprise Value' : '기업가치 계산하기'}</button>
       <div class="calc-result" id="calc-res-mul">
-        <div class="calc-result-title">멀티플 추정 결과</div>
-        <div class="calc-row"><span class="calc-row-label">EV/Revenue 기준 EV</span><span class="calc-row-val hi" id="mr-rev"></span></div>
-        <div class="calc-row"><span class="calc-row-label">EV/EBITDA 기준 EV</span><span class="calc-row-val hi" id="mr-ebd"></span></div>
-        <div class="calc-row"><span class="calc-row-label">평균 EV</span><span class="calc-row-val" id="mr-avg"></span></div>
+        <div class="calc-result-title">${isEn ? 'Multiple-Based Estimated Result' : '멀티플 추정 결과'}</div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'EV/Revenue based EV' : 'EV/Revenue 기준 EV'}</span><span class="calc-row-val hi" id="mr-rev"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'EV/EBITDA based EV' : 'EV/EBITDA 기준 EV'}</span><span class="calc-row-val hi" id="mr-ebd"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Average EV' : '평균 EV'}</span><span class="calc-row-val" id="mr-avg"></span></div>
         <hr class="calc-divider">
-        <div class="calc-row"><span class="calc-row-label">DLOM 적용 후 EV</span><span class="calc-row-val main" id="mr-dlom"></span></div>
-        <div class="calc-row"><span class="calc-row-label">1주당 추정 가치</span><span class="calc-row-val main" id="mr-per"></span></div>
-        <div class="calc-note">※ EBITDA 미입력 시 EV/Revenue 기준으로만 계산됩니다. DLOM은 비상장사 유동성 할인으로 통상 20~35% 적용합니다.</div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'EV after DLOM' : 'DLOM 적용 후 EV'}</span><span class="calc-row-val main" id="mr-dlom"></span></div>
+        <div class="calc-row"><span class="calc-row-label">${isEn ? 'Estimated value per share' : '1주당 추정 가치'}</span><span class="calc-row-val main" id="mr-per"></span></div>
+        <div class="calc-note">※ ${isEn ? 'If EBITDA is blank, only EV/Revenue is used. DLOM is a marketability discount for unlisted companies — typically 20–35%.' : 'EBITDA 미입력 시 EV/Revenue 기준으로만 계산됩니다. DLOM은 비상장사 유동성 할인으로 통상 20~35% 적용합니다.'}</div>
       </div>
     </div>
   </div>`;
@@ -1301,50 +1609,52 @@ let _calcType   = 'weighted'; // 'weighted' | 'na'
 
 function buildPdfUpload(calcType) {
   _calcType = calcType;
+  const isEn = svLang === 'en';
+  const ph = isEn ? 'Not extracted' : '미추출';
   const fieldRows = calcType === 'weighted' ? `
     <div class="pdf-row">
-      <span class="pdf-row-label">당기순이익 (3년 전)</span>
-      <input class="pdf-row-inp" id="pp-ni1" type="number" placeholder="미추출">
+      <span class="pdf-row-label">${isEn ? 'Net income (3 yrs ago)' : '당기순이익 (3년 전)'}</span>
+      <input class="pdf-row-inp" id="pp-ni1" type="number" placeholder="${ph}">
       <span class="pdf-row-badge pdf-badge-miss" id="pp-ni1-b">?</span>
     </div>
     <div class="pdf-row">
-      <span class="pdf-row-label">당기순이익 (2년 전)</span>
-      <input class="pdf-row-inp" id="pp-ni2" type="number" placeholder="미추출">
+      <span class="pdf-row-label">${isEn ? 'Net income (2 yrs ago)' : '당기순이익 (2년 전)'}</span>
+      <input class="pdf-row-inp" id="pp-ni2" type="number" placeholder="${ph}">
       <span class="pdf-row-badge pdf-badge-miss" id="pp-ni2-b">?</span>
     </div>
     <div class="pdf-row">
-      <span class="pdf-row-label">당기순이익 (최근년)</span>
-      <input class="pdf-row-inp" id="pp-ni3" type="number" placeholder="미추출">
+      <span class="pdf-row-label">${isEn ? 'Net income (most recent yr)' : '당기순이익 (최근년)'}</span>
+      <input class="pdf-row-inp" id="pp-ni3" type="number" placeholder="${ph}">
       <span class="pdf-row-badge pdf-badge-miss" id="pp-ni3-b">?</span>
     </div>
     <div class="pdf-row">
-      <span class="pdf-row-label">자산 총계</span>
-      <input class="pdf-row-inp" id="pp-asset" type="number" placeholder="미추출">
+      <span class="pdf-row-label">${isEn ? 'Total assets' : '자산 총계'}</span>
+      <input class="pdf-row-inp" id="pp-asset" type="number" placeholder="${ph}">
       <span class="pdf-row-badge pdf-badge-miss" id="pp-asset-b">?</span>
     </div>
     <div class="pdf-row">
-      <span class="pdf-row-label">부채 총계</span>
-      <input class="pdf-row-inp" id="pp-liab" type="number" placeholder="미추출">
+      <span class="pdf-row-label">${isEn ? 'Total liabilities' : '부채 총계'}</span>
+      <input class="pdf-row-inp" id="pp-liab" type="number" placeholder="${ph}">
       <span class="pdf-row-badge pdf-badge-miss" id="pp-liab-b">?</span>
     </div>
     <div class="pdf-row">
-      <span class="pdf-row-label">발행주식수</span>
-      <input class="pdf-row-inp" id="pp-shares" type="number" placeholder="미추출">
+      <span class="pdf-row-label">${isEn ? 'Issued shares' : '발행주식수'}</span>
+      <input class="pdf-row-inp" id="pp-shares" type="number" placeholder="${ph}">
       <span class="pdf-row-badge pdf-badge-miss" id="pp-shares-b">?</span>
     </div>` : `
     <div class="pdf-row">
-      <span class="pdf-row-label">자산 총계</span>
-      <input class="pdf-row-inp" id="pp-asset" type="number" placeholder="미추출">
+      <span class="pdf-row-label">${isEn ? 'Total assets' : '자산 총계'}</span>
+      <input class="pdf-row-inp" id="pp-asset" type="number" placeholder="${ph}">
       <span class="pdf-row-badge pdf-badge-miss" id="pp-asset-b">?</span>
     </div>
     <div class="pdf-row">
-      <span class="pdf-row-label">부채 총계</span>
-      <input class="pdf-row-inp" id="pp-liab" type="number" placeholder="미추출">
+      <span class="pdf-row-label">${isEn ? 'Total liabilities' : '부채 총계'}</span>
+      <input class="pdf-row-inp" id="pp-liab" type="number" placeholder="${ph}">
       <span class="pdf-row-badge pdf-badge-miss" id="pp-liab-b">?</span>
     </div>
     <div class="pdf-row">
-      <span class="pdf-row-label">발행주식수</span>
-      <input class="pdf-row-inp" id="pp-shares" type="number" placeholder="미추출">
+      <span class="pdf-row-label">${isEn ? 'Issued shares' : '발행주식수'}</span>
+      <input class="pdf-row-inp" id="pp-shares" type="number" placeholder="${ph}">
       <span class="pdf-row-badge pdf-badge-miss" id="pp-shares-b">?</span>
     </div>`;
 
@@ -1353,44 +1663,41 @@ function buildPdfUpload(calcType) {
     <div class="pdf-hd">
       <div class="pdf-hd-icon">📄</div>
       <div>
-        <div class="pdf-hd-title">재무제표 자동 입력</div>
-        <div class="pdf-hd-sub">PDF 업로드 → 핵심 수치 자동 추출 → 계산기 자동 채우기</div>
+        <div class="pdf-hd-title">${isEn ? 'Auto-Fill from Financial Statement' : '재무제표 자동 입력'}</div>
+        <div class="pdf-hd-sub">${isEn ? 'Upload PDF → Auto-extract key figures → Fill calculator' : 'PDF 업로드 → 핵심 수치 자동 추출 → 계산기 자동 채우기'}</div>
       </div>
     </div>
     <div class="pdf-body">
-      <div class="pdf-source-note">크레탑 · DART · 세무조정계산서 등 텍스트 기반 PDF 지원 &nbsp;|&nbsp; 추출 후 수치를 직접 확인하고 적용하세요</div>
+      <div class="pdf-source-note">${isEn ? 'Supports text-based PDFs: DART, tax statements, financial reports &nbsp;|&nbsp; Verify extracted figures before applying' : '크레탑 · DART · 세무조정계산서 등 텍스트 기반 PDF 지원 &nbsp;|&nbsp; 추출 후 수치를 직접 확인하고 적용하세요'}</div>
 
       <input type="file" id="pdf-file-input" accept=".pdf" onchange="onPdfSelected(event)" style="display:none">
       <div class="pdf-btn-row">
-        <button class="pdf-file-btn" onclick="document.getElementById('pdf-file-input').click()">📁 PDF 파일 선택</button>
+        <button class="pdf-file-btn" onclick="document.getElementById('pdf-file-input').click()">📁 ${isEn ? 'Select PDF File' : 'PDF 파일 선택'}</button>
         <span class="pdf-filename" id="pdf-filename"></span>
       </div>
       <div class="pdf-status" id="pdf-status"></div>
 
       <div class="pdf-preview" id="pdf-preview" style="display:none">
-        <div class="pdf-preview-title">추출 결과 — 수치를 확인·수정 후 [계산기에 적용]을 누르세요</div>
+        <div class="pdf-preview-title">${isEn ? 'Extracted Results — Verify and edit figures, then click [Apply to Calculator]' : '추출 결과 — 수치를 확인·수정 후 [계산기에 적용]을 누르세요'}</div>
         <div class="pdf-unit-note" id="pdf-unit-note"></div>
         ${fieldRows}
-        <button class="pdf-apply-btn" onclick="applyParsedToCalc()">↓ 계산기에 적용</button>
+        <button class="pdf-apply-btn" onclick="applyParsedToCalc()">↓ ${isEn ? 'Apply to Calculator' : '계산기에 적용'}</button>
       </div>
 
-      <!-- Claude Vision: 구현됨 / UI 비활성화 (유료 서비스) -->
-      <div class="claude-divider"><span>또는 스캔 문서인 경우</span></div>
+      <div class="claude-divider"><span>${isEn ? 'Or for scanned documents' : '또는 스캔 문서인 경우'}</span></div>
       <div class="claude-card disabled">
         <div class="claude-card-top">
           <span class="claude-icon">🤖</span>
           <div>
-            <div class="claude-title">Claude Vision AI 분석 <span class="paid-badge">유료 서비스</span></div>
-            <div class="claude-desc">스캔 PDF · 사진 파일 지원 — 99%+ 정확도 · 테이블 구조 자동 이해 · 항목 자동 매핑</div>
+            <div class="claude-title">${isEn ? 'Claude Vision AI Analysis' : 'Claude Vision AI 분석'} <span class="paid-badge">${isEn ? 'Paid Service' : '유료 서비스'}</span></div>
+            <div class="claude-desc">${isEn ? 'Scanned PDF · photo files — 99%+ accuracy · auto table parsing · field mapping' : '스캔 PDF · 사진 파일 지원 — 99%+ 정확도 · 테이블 구조 자동 이해 · 항목 자동 매핑'}</div>
           </div>
         </div>
-        <button class="claude-btn" disabled title="서비스 준비 중 — 활성화 시 API 비용 발생">
-          🔒 서비스 준비 중 (Claude Vision API)
+        <button class="claude-btn" disabled title="${isEn ? 'Service pending — API costs apply when activated' : '서비스 준비 중 — 활성화 시 API 비용 발생'}">
+          🔒 ${isEn ? 'Service Pending (Claude Vision API)' : '서비스 준비 중 (Claude Vision API)'}
         </button>
         <div class="claude-notice">
-          ⚠ <strong>회원 전용 유료 서비스</strong> — 크레딧을 소모합니다.
-          일반 텍스트 PDF는 위 PDF.js 방식으로 무료 처리됩니다.
-          스캔 문서·사진 파일 또는 PDF.js 추출 실패 시 사용을 권장합니다.
+          ⚠ <strong>${isEn ? 'Members-only paid service' : '회원 전용 유료 서비스'}</strong> — ${isEn ? 'Consumes credits. Text PDFs are processed free via PDF.js above. Recommended for scanned documents or when PDF.js extraction fails.' : '크레딧을 소모합니다. 일반 텍스트 PDF는 위 PDF.js 방식으로 무료 처리됩니다. 스캔 문서·사진 파일 또는 PDF.js 추출 실패 시 사용을 권장합니다.'}
         </div>
       </div>
     </div>
@@ -1404,12 +1711,13 @@ async function onPdfSelected(e) {
 
   document.getElementById('pdf-filename').textContent = file.name;
   const st = document.getElementById('pdf-status');
-  st.textContent = '⏳ PDF 텍스트 추출 중...';
+  const isEn = svLang === 'en';
+  st.textContent = isEn ? '⏳ Extracting PDF text...' : '⏳ PDF 텍스트 추출 중...';
   st.className = 'pdf-status loading';
   document.getElementById('pdf-preview').style.display = 'none';
 
   if (typeof pdfjsLib === 'undefined') {
-    st.textContent = '❌ PDF.js 라이브러리 로드 실패 — 네트워크 연결을 확인하세요';
+    st.textContent = isEn ? '❌ PDF.js library failed to load — check network connection' : '❌ PDF.js 라이브러리 로드 실패 — 네트워크 연결을 확인하세요';
     st.className = 'pdf-status error';
     return;
   }
@@ -1431,9 +1739,10 @@ async function onPdfSelected(e) {
       fullText += sorted.map(it => it.str).join(' ') + '\n';
     }
 
-    // 텍스트가 없으면 스캔 PDF로 판단
     if (fullText.replace(/\s/g, '').length < 200) {
-      st.textContent = '⚠ 스캔(이미지) PDF로 감지됩니다 — Claude Vision 사용을 권장합니다 (현재 비활성)';
+      st.textContent = isEn
+        ? '⚠ Scanned (image) PDF detected — Claude Vision is recommended (currently inactive)'
+        : '⚠ 스캔(이미지) PDF로 감지됩니다 — Claude Vision 사용을 권장합니다 (현재 비활성)';
       st.className = 'pdf-status warn';
       return;
     }
@@ -1443,10 +1752,12 @@ async function onPdfSelected(e) {
     showParsedPreview(parsed);
     const found  = Object.values(parsed.values).filter(v => v !== null).length;
     const total  = Object.keys(parsed.values).length;
-    st.textContent = `✅ 추출 완료 — ${found}/${total}개 항목 인식 (미인식 항목은 직접 입력하세요)`;
+    st.textContent = isEn
+      ? `✅ Extraction complete — ${found}/${total} items recognized (enter unrecognized items manually)`
+      : `✅ 추출 완료 — ${found}/${total}개 항목 인식 (미인식 항목은 직접 입력하세요)`;
     st.className = found > 0 ? 'pdf-status ok' : 'pdf-status warn';
   } catch (err) {
-    document.getElementById('pdf-status').textContent = '❌ 오류: ' + err.message;
+    document.getElementById('pdf-status').textContent = (isEn ? '❌ Error: ' : '❌ 오류: ') + err.message;
     document.getElementById('pdf-status').className = 'pdf-status error';
   }
 }
@@ -1515,7 +1826,9 @@ function parseFsText(text) {
 /* ── 미리보기 렌더링 ── */
 function showParsedPreview(parsed) {
   const { values, unitLabel } = parsed;
-  document.getElementById('pdf-unit-note').textContent = '📐 단위 변환: ' + unitLabel + ' · 아래 수치는 만원 단위입니다';
+  document.getElementById('pdf-unit-note').textContent = svLang === 'en'
+    ? '📐 Unit conversion: ' + unitLabel + ' · Figures below are in units of ₩10,000'
+    : '📐 단위 변환: ' + unitLabel + ' · 아래 수치는 만원 단위입니다';
 
   function setRow(id, val) {
     const inp = document.getElementById(id);
@@ -1583,11 +1896,20 @@ function toggleCalc(hd) {
 
 /* ── 포맷 유틸 ── */
 function fmt(v) {
+  if (svLang === 'en') {
+    if (Math.abs(v) >= 100000000) return '₩' + (v / 100000000).toFixed(2) + '억';
+    if (Math.abs(v) >= 10000) return '₩' + (v / 10000).toFixed(1) + '만';
+    return '₩' + Math.round(v).toLocaleString();
+  }
   if (Math.abs(v) >= 100000000) return (v / 100000000).toFixed(2) + '억원';
   if (Math.abs(v) >= 10000) return (v / 10000).toFixed(1) + '만원';
   return Math.round(v).toLocaleString() + '원';
 }
-function fmtPer(v) { return Math.round(v).toLocaleString() + '원/주'; }
+function fmtPer(v) {
+  return svLang === 'en'
+    ? '₩' + Math.round(v).toLocaleString() + '/sh'
+    : Math.round(v).toLocaleString() + '원/주';
+}
 function g(id) { return parseFloat(document.getElementById(id)?.value) || 0; }
 function set(id, val, cls) {
   const el = document.getElementById(id);
@@ -1686,12 +2008,43 @@ function calcMultiple() {
   const perShare = afterDlom / shares;
 
   set('mr-rev', fmt(evRev * 10000), 'hi');
-  set('mr-ebd', evEbd > 0 ? fmt(evEbd * 10000) : '미입력', evEbd > 0 ? 'hi' : '');
+  set('mr-ebd', evEbd > 0 ? fmt(evEbd * 10000) : (svLang==='en'?'N/A':'미입력'), evEbd > 0 ? 'hi' : '');
   set('mr-avg', fmt(avg * 10000));
   set('mr-dlom', fmt(afterDlom * 10000), 'main');
   set('mr-per', fmtPer(perShare * 10000), 'main');
   document.getElementById('calc-res-mul').classList.add('show');
 }
+
+/* ── 언어 전환 ── */
+function setSvLang(newLang) {
+  if (svLang === newLang) return;
+  svLang = newLang;
+  const isEn = newLang === 'en';
+  const si = (id, v) => { const e = document.getElementById(id); if (e) e.innerHTML = v; };
+  const st = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+  st('sv-hdr-title', isEn ? 'Unlisted Stock Valuation Assessment' : '비상장주식 가치평가 진단');
+  st('sv-hdr-sub',   isEn ? 'Optimal methodology by purpose · Pre-emptive tax risk management' : '평가 목적별 최적 방법론 안내 · 세무리스크 사전 차단');
+  st('sv-trend-title', isEn ? 'Why Unlisted Stock Valuation Matters' : '비상장주식 평가, 왜 중요한가');
+  si('sv-ts-lbl-1', isEn ? 'Statutory methods<br>(Tax / Accounting / Negotiation)' : '법정 평가방법<br>(상증세법·회계·협상)');
+  si('sv-ts-lbl-2', isEn ? 'Gift tax surcharge risk<br>for arbitrary valuation' : '임의 평가 시<br>증여세 추징 위험');
+  si('sv-ts-lbl-3', isEn ? 'Tax audit<br>look-back period' : '세무조사<br>소급 적용 기간');
+  si('sv-trend-note', isEn
+    ? '<strong>Key Point:</strong> Unlisted stock must use different methodologies based on purpose. Using market value for tax purposes, or presenting a tax-assessed price in investment negotiations, hurts both sides.'
+    : '<strong>핵심:</strong> 비상장주식은 평가 목적에 따라 반드시 다른 방법론을 써야 합니다. 세금 목적에 시장가치를 쓰거나, 투자 협상에 세법상 가격을 제시하면 양쪽 모두 손해입니다.');
+
+  if (result) {
+    renderResult();
+  } else {
+    render(currentQId());
+  }
+}
+
+window.addEventListener('message', (e) => {
+  if (e.data?.type === 'wf_lang') {
+    setSvLang(e.data.lang === 'en' ? 'en' : 'ko');
+  }
+});
 
 /* ── 초기 실행 ── */
 render('q0');

@@ -1,0 +1,335 @@
+<!-- <!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심플 레이아웃 홈페이지</title>
+    <style>
+        /* 기본 스타일 초기화 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 왼쪽 메뉴바 스타일 */
+        #sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #444;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        #sidebar a:hover {
+            background-color: #555;
+        }
+
+        /* 오른쪽 메인 컨텐츠 영역 스타일 */
+        #main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background-color: #f4f4f4;
+        }
+
+        .content-section {
+            display: none; /* 기본적으로 모두 숨김 */
+        }
+
+        .content-section.active {
+            display: block; /* 활성화된 섹션만 표시 */
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 왼쪽 메뉴 -->
+    <div id="sidebar">
+        <h2>메뉴</h2>
+        <a href="#" onclick="showContent('home')">홈</a>
+        <a href="#" onclick="showContent('about')">소개</a>
+        <a href="#" onclick="showContent('services')">서비스</a>
+        <a href="#" onclick="showContent('contact')">문의</a>
+    </div>
+
+    <!-- 오른쪽 메인 영역 -->
+    <div id="main-content">
+        <div id="home" class="content-section active">
+            <h1>홈 화면</h1>
+            <p>환영합니다! 왼쪽 메뉴를 클릭하여 내용을 변경해보세요.</p>
+        </div>
+        
+        <div id="about" class="content-section">
+            <h1>소개</h1>
+            <p>회사 또는 본인에 대한 소개 내용이 들어가는 곳입니다.</p>
+        </div>
+
+        <div id="services" class="content-section">
+            <h1>서비스</h1>
+            <p>제공하는 서비스 목록을 보여줍니다.</p>
+        </div>
+
+        <div id="contact" class="content-section">
+            <h1>문의</h1>
+            <p>연락처 또는 문의 폼을 작성하는 곳입니다.</p>
+        </div>
+    </div>
+
+    <script>
+        function showContent(sectionId) {
+            // 1. 모든 컨텐츠 섹션 숨기기
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // 2. 선택한 섹션만 보이기
+            document.getElementById(sectionId).classList.add('active');
+        }
+    </script>
+
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합 관리 시스템</title>
+    <!-- 라이브러리 로드 -->
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
+    <style>
+        /* 레이아웃 기본 스타일 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Pretendard', sans-serif; display: flex; height: 100vh; overflow: hidden; background-color: #f4f4f4; }
+
+        /* 사이드바 */
+        #sidebar { width: 250px; background-color: #333; color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        #sidebar h2 { text-align: center; margin-bottom: 30px; font-size: 1.2rem; }
+        #sidebar a { color: white; text-decoration: none; padding: 15px; margin-bottom: 10px; background-color: #444; border-radius: 5px; transition: 0.3s; cursor: pointer; }
+        #sidebar a:hover { background-color: #555; }
+
+        /* 메인 컨텐츠 영역 */
+        #main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        /* QR 생성기 내부 스타일 */
+        .qr-container { display: flex; gap: 20px; align-items: flex-start; }
+        .config-panel { width: 320px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .config-group { margin-bottom: 15px; position: relative; }
+        .config-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+        .tooltip-text { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 10; bottom: 105%; left: 0; opacity: 0; transition: 0.2s; font-size: 11px; pointer-events: none; }
+        .config-group:hover .tooltip-text { visibility: visible; opacity: 1; }
+        
+        #qr-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .qr-card { background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .qr-wrapper { display: inline-block; padding: 10px; border-radius: 4px; }
+        .qr-label { font-size: 12px; margin: 5px 0; font-weight: bold; }
+        
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: #2563eb; color: white; margin-top: 10px; }
+        .btn-download { background: #10b981; color: white; margin-top: 5px; font-size: 11px; padding: 5px; }
+        input[type="range"], input[type="text"], input[type="file"], select { width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- 왼쪽 메뉴 -->
+    <div id="sidebar">
+        <h2>관리 도구</h2>
+        <a onclick="showContent('home')">홈</a>
+        <a onclick="showContent('qr-generator')">QR 코드 생성기</a>
+        <a onclick="showContent('services')">서비스 현황</a>
+        <a onclick="showContent('contact')">고객 문의</a>
+    </div>
+
+    <!-- 오른쪽 메인 영역 -->
+    <div id="main-content">
+        
+        <!-- 홈 섹션 -->
+        <div id="home" class="content-section active">
+            <h1>대시보드</h1>
+            <p>환영합니다! 왼쪽의 메뉴를 통해 도구를 선택해 주세요.</p>
+        </div>
+
+        <!-- QR 생성기 섹션 (사용자가 요청한 기능) -->
+        <div id="qr-generator" class="content-section">
+            <h1>QR 코드 생성기</h1>
+            <div class="qr-container">
+                <!-- 설정 패널 -->
+                <div class="config-panel">
+                    <div class="config-group">
+                        <label>1. 목록 파일 업로드 (CSV)</label>
+                        <input type="file" id="csvFile" accept=".csv">
+                        <span class="tooltip-text">CSV 파일의 첫 번째 열 데이터를 기반으로 대량 생성합니다.</span>
+                    </div>
+                    <div class="config-group">
+                        <label>2. QR 크기 (<span id="sizeVal">128</span>px)</label>
+                        <input type="range" id="qrSize" min="64" max="300" value="128" oninput="document.getElementById('sizeVal').innerText=this.value">
+                        <span class="tooltip-text">최소 64px, 최대 300px까지 조절 가능합니다.</span>
+                    </div>
+                    <div class="config-group">
+                        <label>3. 오류 정정 수준</label>
+                        <select id="qrLevel">
+                            <option value="L">L (7% 복구)</option>
+                            <option value="M" selected>M (15% 복구)</option>
+                            <option value="Q">Q (25% 복구)</option>
+                            <option value="H">H (30% 복구)</option>
+                        </select>
+                        <span class="tooltip-text">값이 높을수록 코드가 복잡해지지만 인식률이 좋아집니다.</span>
+                    </div>
+                    <div class="config-group">
+                        <label>4. 라벨 설정 (이미지에 포함)</label>
+                        <input type="text" id="labelTop" placeholder="상단 문구">
+                        <input type="text" id="labelBottom" placeholder="하단 문구 (비우면 데이터 출력)">
+                        <span class="tooltip-text">다운로드 시 이미지 위아래에 삽입될 텍스트입니다.</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="processQRData()">QR 일괄 생성</button>
+                </div>
+
+                <!-- 결과 그리드 -->
+                <div id="qr-grid">
+                    <p style="color: #999;">파일을 업로드하고 생성 버튼을 눌러주세요.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 기타 섹션들 -->
+        <div id="services" class="content-section">
+            <h1>서비스 현황</h1>
+            <p>현재 운영 중인 서비스 리스트가 여기에 표시됩니다.</p>
+        </div>
+
+        <div id="contact" class="content-section">
+            <h1>고객 문의</h1>
+            <p>문의 내역을 확인하고 답변을 작성할 수 있습니다.</p>
+        </div>
+    </div>
+
+    <script>
+        // 메뉴 전환 함수
+        function showContent(sectionId) {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // QR 생성 로직
+        let uploadedData = [];
+
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            Papa.parse(e.target.files[0], {
+                complete: function(results) {
+                    uploadedData = results.data.map(row => row[0]).filter(d => d);
+                    alert(uploadedData.length + '개의 데이터를 불러왔습니다.');
+                }
+            });
+        });
+
+        async function processQRData() {
+            const grid = document.getElementById('qr-grid');
+            grid.innerHTML = '';
+            
+            const config = {
+                size: parseInt(document.getElementById('qrSize').value),
+                level: document.getElementById('qrLevel').value,
+                topText: document.getElementById('labelTop').value,
+                botText: document.getElementById('labelBottom').value
+            };
+
+            if (uploadedData.length === 0) {
+                alert('CSV 파일을 먼저 선택해 주세요.');
+                return;
+            }
+
+            uploadedData.forEach(data => {
+                const card = document.createElement('div');
+                card.className = 'qr-card';
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'qr-wrapper';
+                wrapper.style.backgroundColor = 'white';
+
+                if (config.topText) {
+                    const t = document.createElement('div');
+                    t.className = 'qr-label';
+                    t.innerText = config.topText;
+                    wrapper.appendChild(t);
+                }
+
+                const qrDiv = document.createElement('div');
+                wrapper.appendChild(qrDiv);
+                new QRCode(qrDiv, {
+                    text: data,
+                    width: config.size,
+                    height: config.size,
+                    correctLevel: QRCode.CorrectLevel[config.level]
+                });
+
+                const b = document.createElement('div');
+                b.className = 'qr-label';
+                b.innerText = config.botText || data;
+                wrapper.appendChild(b);
+
+                card.appendChild(wrapper);
+
+                const dlPng = document.createElement('button');
+                dlPng.className = 'btn btn-download';
+                dlPng.innerText = 'PNG 저장';
+                dlPng.onclick = () => download(wrapper, data, 'png');
+                
+                const dlJpg = document.createElement('button');
+                dlJpg.className = 'btn btn-download';
+                dlJpg.innerText = 'JPG 저장';
+                dlJpg.onclick = () => download(wrapper, data, 'jpg');
+
+                card.appendChild(dlPng);
+                card.appendChild(dlJpg);
+                grid.appendChild(card);
+            });
+        }
+
+        function download(el, name, type) {
+            html2canvas(el).then(canvas => {
+                const a = document.createElement('a');
+                a.download = `qr_${name}.${type}`;
+                a.href = canvas.toDataURL(`image/${type === 'jpg' ? 'jpeg' : 'png'}`);
+                a.click();
+            });
+        }
+    </script>
+</body>
+</html>

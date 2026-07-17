@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>지자체·공공기관 연락처 수집 — WorksFree 어드민</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --bg:#0f1117;--surface:#1c2333;--surface2:#222536;--border:#2a3347;--border2:#3a4a5c;
+  --text:#e2e8f0;--muted:#64748b;--hint:#475569;
+  --blue:#3b82f6;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65;font-size:14px}
+
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14px;padding:14px 24px;background:var(--surface);border-bottom:1px solid var(--border);min-height:72px}
+.hdr-icon{font-size:26px;flex-shrink:0}
+.hdr-info{flex:1}
+.hdr-title{font-size:17px;font-weight:600;letter-spacing:-.2px}
+.hdr-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.lang-btn{font-size:12px;font-weight:600;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;cursor:pointer;font-family:inherit}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+.page{max-width:1000px;margin:0 auto;padding:24px 20px 80px}
+.section{margin-bottom:26px}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:8px}
+.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.sc-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.sc-val{font-size:24px;font-weight:700;line-height:1}
+
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.f-label{font-size:12px;font-weight:600;color:var(--muted)}
+.f-input,.f-select,.f-textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:8px 11px;width:100%;outline:none;font-family:inherit}
+.f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--blue)}
+.f-textarea{resize:vertical;min-height:90px;font-family:'IBM Plex Mono',monospace;font-size:12px}
+.f-hint{font-size:11px;color:var(--hint)}
+.row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.row>div{flex:1;min-width:160px}
+
+.btn{padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:.15s;white-space:nowrap}
+.btn:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn-primary:hover:not(:disabled){opacity:.85;color:#fff}
+
+.status-msg{font-size:13px;padding:8px 0;min-height:20px}
+.status-msg.ok{color:#6ee7b7}
+.status-msg.err{color:#f87171}
+.status-msg.warn{color:#fbbf24}
+.status-msg.loading{color:var(--muted)}
+
+.log-box{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;margin-top:8px;padding:2px 0}
+.log-line{font-size:12px;padding:5px 10px;border-radius:5px;line-height:1.45;border-left:3px solid transparent}
+.log-ok{background:rgba(16,185,129,.08);color:#6ee7b7;border-color:#10b981}
+.log-err{background:rgba(239,68,68,.1);color:#fca5a5;border-color:#ef4444}
+.log-warn{background:rgba(245,158,11,.08);color:#fbbf24;border-color:#f59e0b}
+.log-loading{background:rgba(100,116,139,.08);color:var(--muted);border-color:var(--border)}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r)}
+table.dt{border-collapse:collapse;width:100%;font-size:12px;min-width:640px}
+table.dt th{position:sticky;top:0;background:var(--surface2);color:var(--muted);font-size:11px;font-weight:700;padding:9px 10px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+table.dt td{padding:7px 10px;border-bottom:1px solid rgba(42,51,71,.5);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:9px}
+.b-ok{background:rgba(16,185,129,.12);color:#6ee7b7}
+.b-no{background:rgba(245,158,11,.12);color:var(--yellow)}
+.b-err{background:rgba(239,68,68,.12);color:#fca5a5}
+
+#admin-gate{display:none;position:fixed;inset:0;background:var(--bg);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+#admin-gate.show{display:flex}
+#admin-gate h2{font-size:18px;color:var(--red)}
+#admin-gate p{font-size:14px;color:var(--muted)}
+#main{display:none}
+#main.visible{display:block}
+</style>
+</head>
+<body>
+
+<div id="admin-gate">
+  <h2 id="gate-title">🔒 관리자 전용</h2>
+  <p id="gate-desc">이 페이지는 관리자(admin) 계정만 접근할 수 있습니다.</p>
+</div>
+
+<div id="main">
+<header>
+  <div class="hdr-icon">🏛</div>
+  <div class="hdr-info">
+    <div class="hdr-title" id="hdr-title">지자체·공공기관 연락처 수집</div>
+    <div class="hdr-sub" id="hdr-sub">사회복지시설 표준데이터 API + 시군구 시드 CSV → 홈페이지 스크래핑 → gov_contacts</div>
+  </div>
+  <button class="lang-btn" onclick="toggleLang()" id="lang-btn">EN</button>
+</header>
+
+<div class="page">
+
+  <!-- 통계 -->
+  <div class="section">
+    <div class="section-label"><span id="lbl-stats">DB 현황</span> <button class="btn" style="padding:3px 10px;font-size:11px" onclick="loadStats()">↻</button></div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="sc-label" id="lbl-total">전체</div><div class="sc-val" id="st-total">—</div></div>
+      <div class="stat-card"><div class="sc-label" id="lbl-active">이메일 확보</div><div class="sc-val" id="st-active">—</div></div>
+      <div class="stat-card"><div class="sc-label" id="lbl-noemail">이메일 미발견</div><div class="sc-val" id="st-noemail">—</div></div>
+      <div class="stat-card"><div class="sc-label" id="lbl-unsub">수신거부</div><div class="sc-val" id="st-unsub">—</div></div>
+    </div>
+  </div>
+
+  <!-- A: 공공데이터 API 수집 -->
+  <div class="section">
+    <div class="section-label" id="lbl-api-collect">공공데이터 API 수집 — 사회복지시설(노인복지관 등)</div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <span class="f-label" id="lbl-kind-filter">시설유형 키워드 (fcltKindNm 포함)</span>
+          <input id="in-kind" class="f-input" type="text" value="노인복지관">
+        </div>
+        <div>
+          <span class="f-label" id="lbl-page">시작 페이지</span>
+          <input id="in-page" class="f-input" type="number" value="1" min="1" style="max-width:100px">
+        </div>
+        <div>
+          <span class="f-label" id="lbl-pages">수집 페이지 수</span>
+          <input id="in-pages" class="f-input" type="number" value="1" min="1" max="20" style="max-width:100px">
+        </div>
+        <div style="flex:0 0 auto">
+          <button class="btn btn-primary" id="btn-api-run" onclick="runApiCollect()">▶ <span id="lbl-api-run">수집 시작</span></button>
+        </div>
+      </div>
+      <p class="f-hint" id="hint-api">
+        ⚠ 공공데이터포털 API의 실제 응답 필드(홈페이지 URL 포함 여부)는 최초 1회 호출 후 아래 로그의 "원본 응답 보기"로 확인하고,
+        필드명이 다르면 govdata worker.js 또는 이 파일의 <code>extractGovItem()</code>만 맞춰 수정하면 됩니다.
+      </p>
+    </div>
+  </div>
+
+  <!-- B: CSV 업로드 (시군구청 시드) -->
+  <div class="section">
+    <div class="section-label" id="lbl-csv-collect">CSV 업로드 수집 — 시군구청 등 시드 리스트</div>
+    <div class="card">
+      <span class="f-label" id="lbl-csv-hint">org_name,org_type,sido,sigungu,homepage_url 헤더의 CSV를 붙여넣으세요 (org_type: local_gov / welfare_center / community_center / culture_center)</span>
+      <textarea id="in-csv" class="f-textarea" placeholder="org_name,org_type,sido,sigungu,homepage_url
+수원시청,local_gov,경기도,수원시,https://www.suwon.go.kr"></textarea>
+      <div class="row">
+        <div style="flex:0 0 auto">
+          <button class="btn btn-primary" id="btn-csv-run" onclick="runCsvCollect()">▶ <span id="lbl-csv-run">CSV 스크래핑 시작</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 진행 로그 -->
+  <div class="section">
+    <div class="section-label" id="lbl-progress">수집 진행 로그</div>
+    <div class="status-msg" id="status-msg"></div>
+    <div class="log-box" id="log-box"></div>
+  </div>
+
+  <!-- 결과 목록 -->
+  <div class="section">
+    <div class="section-label">
+      <span id="lbl-result">최근 수집 결과</span>
+      <button class="btn" style="padding:3px 10px;font-size:11px" onclick="exportCsv()" id="btn-export">⬇ CSV</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th id="th-org">기관명</th>
+            <th id="th-type">유형</th>
+            <th id="th-email">이메일</th>
+            <th id="th-status">상태</th>
+          </tr>
+        </thead>
+        <tbody id="result-tbody">
+          <tr><td colspan="4" style="text-align:center;color:var(--hint);padding:24px" id="result-empty">아직 수집된 결과가 없습니다</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* ── i18n ─────────────────────────────────────────────────────────── */
+const GOV_I18N = {
+  ko: {
+    gate_title: '🔒 관리자 전용', gate_desc: '이 페이지는 관리자(admin) 계정만 접근할 수 있습니다.',
+    hdr_title: '지자체·공공기관 연락처 수집',
+    hdr_sub: '사회복지시설 표준데이터 API + 시군구 시드 CSV → 홈페이지 스크래핑 → gov_contacts',
+    lbl_stats: 'DB 현황', lbl_total: '전체', lbl_active: '이메일 확보', lbl_noemail: '이메일 미발견', lbl_unsub: '수신거부',
+    lbl_api_collect: '공공데이터 API 수집 — 사회복지시설(노인복지관 등)',
+    lbl_kind_filter: '시설유형 키워드 (fcltKindNm 포함)', lbl_page: '시작 페이지', lbl_pages: '수집 페이지 수', lbl_api_run: '수집 시작',
+    lbl_csv_collect: 'CSV 업로드 수집 — 시군구청 등 시드 리스트',
+    lbl_csv_hint: 'org_name,org_type,sido,sigungu,homepage_url 헤더의 CSV를 붙여넣으세요 (org_type: local_gov / welfare_center / community_center / culture_center)',
+    lbl_csv_run: 'CSV 스크래핑 시작',
+    lbl_progress: '수집 진행 로그', lbl_result: '최근 수집 결과',
+    th_org: '기관명', th_type: '유형', th_email: '이메일', th_status: '상태',
+    result_empty: '아직 수집된 결과가 없습니다',
+  },
+  en: {
+    gate_title: '🔒 Admin Only', gate_desc: 'This page is restricted to admin accounts.',
+    hdr_title: 'Government Contact Collector',
+    hdr_sub: 'Public data API (welfare facilities) + seed CSV (local gov) → homepage scraping → gov_contacts',
+    lbl_stats: 'DB Status', lbl_total: 'Total', lbl_active: 'Email found', lbl_noemail: 'No email', lbl_unsub: 'Unsubscribed',
+    lbl_api_collect: 'Public Data API Collection — Welfare Facilities (senior centers, etc.)',
+    lbl_kind_filter: 'Facility type keyword (fcltKindNm contains)', lbl_page: 'Start page', lbl_pages: '# of pages', lbl_api_run: 'Start collection',
+    lbl_csv_collect: 'CSV Upload Collection — Local Government Seed List',
+    lbl_csv_hint: 'Paste CSV with header org_name,org_type,sido,sigungu,homepage_url (org_type: local_gov / welfare_center / community_center / culture_center)',
+    lbl_csv_run: 'Start CSV scraping',
+    lbl_progress: 'Collection Log', lbl_result: 'Recent Results',
+    th_org: 'Organization', th_type: 'Type', th_email: 'Email', th_status: 'Status',
+    result_empty: 'No results collected yet',
+  },
+};
+var _lang = localStorage.getItem('gov_lang') || 'ko';
+function t(k) { return GOV_I18N[_lang][k] || GOV_I18N.ko[k] || k; }
+function toggleLang() { _lang = _lang === 'ko' ? 'en' : 'ko'; localStorage.setItem('gov_lang', _lang); applyGovLang(); }
+function applyGovLang() {
+  document.getElementById('lang-btn').textContent = _lang === 'ko' ? 'EN' : 'KO';
+  document.getElementById('gate-title').textContent = t('gate_title');
+  document.getElementById('gate-desc').textContent  = t('gate_desc');
+  document.getElementById('hdr-title').textContent   = t('hdr_title');
+  document.getElementById('hdr-sub').textContent     = t('hdr_sub');
+  document.getElementById('lbl-stats').textContent   = t('lbl_stats');
+  document.getElementById('lbl-total').textContent   = t('lbl_total');
+  document.getElementById('lbl-active').textContent  = t('lbl_active');
+  document.getElementById('lbl-noemail').textContent = t('lbl_noemail');
+  document.getElementById('lbl-unsub').textContent   = t('lbl_unsub');
+  document.getElementById('lbl-api-collect').textContent = t('lbl_api_collect');
+  document.getElementById('lbl-kind-filter').textContent  = t('lbl_kind_filter');
+  document.getElementById('lbl-page').textContent    = t('lbl_page');
+  document.getElementById('lbl-pages').textContent   = t('lbl_pages');
+  document.getElementById('lbl-api-run').textContent = t('lbl_api_run');
+  document.getElementById('lbl-csv-collect').textContent = t('lbl_csv_collect');
+  document.getElementById('lbl-csv-hint').textContent = t('lbl_csv_hint');
+  document.getElementById('lbl-csv-run').textContent = t('lbl_csv_run');
+  document.getElementById('lbl-progress').textContent = t('lbl_progress');
+  document.getElementById('lbl-result').textContent  = t('lbl_result');
+  document.getElementById('th-org').textContent      = t('th_org');
+  document.getElementById('th-type').textContent      = t('th_type');
+  document.getElementById('th-email').textContent    = t('th_email');
+  document.getElementById('th-status').textContent   = t('th_status');
+  var emptyEl = document.getElementById('result-empty');
+  if (emptyEl) emptyEl.textContent = t('result_empty');
+}
+
+/* ── Supabase / Worker 설정 ───────────────────────────────────────── */
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const _noopStore = { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} };
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storage:_noopStore }
+});
+async function _injectSession() {
+  try {
+    let raw = localStorage.getItem('sb-rkycwfpkzorfpcxfvaqt-auth-token');
+    if (!raw) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
+          const v = localStorage.getItem(k);
+          if (v && v.includes('"access_token"')) { raw = v; break; }
+        }
+      }
+    }
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    const token = stored?.access_token; const uid = stored?.user?.id;
+    if (!token || !uid) return null;
+    const exp = stored?.expires_at ?? 0;
+    if (exp && (Date.now()/1000) > exp) return null;
+    return { user: stored.user, access_token: token };
+  } catch(e) { return null; }
+}
+
+const DEFAULT_BIZDB   = 'https://biz-db.worksfree.workers.dev';
+const DEFAULT_GOVDATA = 'https://govdata-api-worker.worksfree.workers.dev';
+function getBizdb()   { return localStorage.getItem('bizdb_worker_url')   || DEFAULT_BIZDB; }
+function getGovdata()  { return localStorage.getItem('govdata_worker_url') || DEFAULT_GOVDATA; }
+
+/* ── 유틸 ─────────────────────────────────────────────────────────── */
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function setStatus(type, msg) {
+  var el = document.getElementById('status-msg');
+  el.className = 'status-msg ' + type;
+  el.textContent = msg;
+}
+function appendLog(type, msg) {
+  var box = document.getElementById('log-box');
+  var line = document.createElement('div');
+  line.className = 'log-line log-' + type;
+  line.textContent = msg;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+  return line;
+}
+var _results = []; // { org_name, org_type, email, scrape_status }
+
+function renderResults() {
+  var tbody = document.getElementById('result-tbody');
+  if (!_results.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--hint);padding:24px">' + t('result_empty') + '</td></tr>';
+    return;
+  }
+  tbody.innerHTML = _results.slice(-200).reverse().map(function(r) {
+    var badge = r.email ? '<span class="badge b-ok">✓</span>' : (r.scrape_status === 'error' ? '<span class="badge b-err">✗</span>' : '<span class="badge b-no">—</span>');
+    return '<tr>' +
+      '<td title="' + escHtml(r.org_name||'') + '">' + escHtml(r.org_name||'') + '</td>' +
+      '<td>' + escHtml(r.org_type||'') + '</td>' +
+      '<td>' + escHtml(r.email||'—') + '</td>' +
+      '<td>' + badge + ' ' + escHtml(r.scrape_status||'') + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function exportCsv() {
+  if (!_results.length) return;
+  var header = 'org_name,org_type,email,scrape_status\n';
+  var body = _results.map(function(r) {
+    return '"' + (r.org_name||'').replace(/"/g,'""') + '","' + (r.org_type||'') + '","' + (r.email||'') + '","' + (r.scrape_status||'') + '"';
+  }).join('\n');
+  var bom  = '﻿';
+  var blob = new Blob([bom + header + body], { type: 'text/csv;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'gov_contacts_' + Date.now() + '.csv';
+  a.click();
+}
+
+/* ── 공통: 홈페이지 → 이메일 스크래핑 → gov_contacts upsert ─────────── */
+async function scrapeAndSave(row) {
+  // row: { org_name, org_type, dept_name?, sido?, sigungu?, address?, phone?, homepage_url? }
+  var payload = Object.assign({
+    org_name: row.org_name, org_type: row.org_type,
+    dept_name: row.dept_name || null, sido: row.sido || null, sigungu: row.sigungu || null,
+    address: row.address || null, phone: row.phone || null, homepage_url: row.homepage_url || null,
+    email: null, email_source: null, email_status: 'active', scrape_status: 'no_url',
+  }, {});
+
+  if (row.homepage_url) {
+    try {
+      var res = await fetch(getBizdb() + '/scrape?url=' + encodeURIComponent(row.homepage_url));
+      var data = await res.json();
+      if (data.emails && data.emails.length) {
+        payload.email = data.emails[0];
+        payload.email_source = data.source || 'homepage';
+        payload.scrape_status = 'done';
+      } else {
+        payload.scrape_status = 'no_email';
+      }
+    } catch(e) {
+      payload.scrape_status = 'error';
+    }
+  }
+
+  try {
+    await fetch(getBizdb() + '/gov-contacts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([payload]),
+    });
+  } catch(e) { /* 저장 실패해도 로그만 남기고 계속 진행 */ }
+
+  _results.push(payload);
+  return payload;
+}
+
+/* ── A: 공공데이터 API 수집 ───────────────────────────────────────── */
+// 공공데이터포털 표준 JSON 응답 형태 { response: { header, body: { items: { item: [...] } } } }
+// 실제 필드명이 다르면 이 함수만 맞춰 수정하면 됨 (플랜에 명시된 알려진 리스크)
+function extractGovItems(json) {
+  var body = json?.response?.body || json?.body || {};
+  var items = body.items?.item || body.items || [];
+  if (!Array.isArray(items)) items = items ? [items] : [];
+  return items;
+}
+function mapGovItem(item) {
+  return {
+    org_name:     item.fcltNm || item.corp_name || item.name || '',
+    kind:         item.fcltKindNm || '',
+    homepage_url: item.hmpgAddr || item.homepageUrl || item.hmpgUrl || '',
+    address:      item.rdnmadr || item.lnmadr || item.adres || '',
+    phone:        item.telno || item.phoneNumber || '',
+  };
+}
+
+var _apiRunning = false;
+async function runApiCollect() {
+  if (_apiRunning) return;
+  _apiRunning = true;
+  document.getElementById('btn-api-run').disabled = true;
+
+  var kindFilter = document.getElementById('in-kind').value.trim();
+  var startPage  = Math.max(1, parseInt(document.getElementById('in-page').value  || '1'));
+  var numPages   = Math.max(1, Math.min(20, parseInt(document.getElementById('in-pages').value || '1')));
+
+  setStatus('loading', '공공데이터 API 수집 중...');
+
+  try {
+    for (var p = startPage; p < startPage + numPages; p++) {
+      appendLog('loading', '페이지 ' + p + ' 조회 중...');
+      var url = getGovdata() + '/?ep=getNFcltBizInqire&pageNo=' + p + '&numOfRows=100';
+      var res = await fetch(url);
+      var json = await res.json();
+
+      var items = extractGovItems(json);
+      if (!items.length) {
+        appendLog('warn', '페이지 ' + p + ' — 결과 없음 (응답: ' + JSON.stringify(json).slice(0,200) + '...)');
+        continue;
+      }
+
+      var mapped = items.map(mapGovItem);
+      var filtered = kindFilter ? mapped.filter(function(m) { return m.kind.indexOf(kindFilter) >= 0; }) : mapped;
+
+      appendLog('ok', '페이지 ' + p + ' — ' + items.length + '건 중 ' + filtered.length + '건 필터 통과');
+
+      for (var i = 0; i < filtered.length; i++) {
+        var m = filtered[i];
+        if (!m.org_name) continue;
+        var saved = await scrapeAndSave({
+          org_name: m.org_name, org_type: 'welfare_center',
+          address: m.address, phone: m.phone, homepage_url: m.homepage_url,
+        });
+        appendLog(saved.email ? 'ok' : 'warn', '  └ ' + m.org_name + ' — ' + (saved.email || saved.scrape_status));
+        renderResults();
+      }
+    }
+    setStatus('ok', '✓ API 수집 완료');
+  } catch(e) {
+    setStatus('err', '오류: ' + e.message);
+    appendLog('err', e.message);
+  } finally {
+    _apiRunning = false;
+    document.getElementById('btn-api-run').disabled = false;
+    loadStats();
+  }
+}
+
+/* ── B: CSV 업로드 수집 ───────────────────────────────────────────── */
+function parseCsv(text) {
+  var lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
+  var header = lines[0].split(',').map(function(h) { return h.trim(); });
+  return lines.slice(1).filter(Boolean).map(function(line) {
+    var cols = line.split(',').map(function(c) { return c.trim().replace(/^"|"$/g, ''); });
+    var row = {};
+    header.forEach(function(h, i) { row[h] = cols[i] || ''; });
+    return row;
+  });
+}
+
+var _csvRunning = false;
+async function runCsvCollect() {
+  if (_csvRunning) return;
+  var rows = parseCsv(document.getElementById('in-csv').value);
+  if (!rows.length) { setStatus('err', 'CSV 데이터를 입력하세요.'); return; }
+
+  _csvRunning = true;
+  document.getElementById('btn-csv-run').disabled = true;
+  setStatus('loading', 'CSV ' + rows.length + '건 스크래핑 중...');
+
+  try {
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      if (!r.org_name) continue;
+      appendLog('loading', (i+1) + '/' + rows.length + ' ' + r.org_name + ' 처리 중...');
+      var saved = await scrapeAndSave({
+        org_name: r.org_name, org_type: r.org_type || 'local_gov',
+        sido: r.sido, sigungu: r.sigungu, homepage_url: r.homepage_url,
+      });
+      var lastLine = document.getElementById('log-box').lastChild;
+      if (lastLine) lastLine.remove();
+      appendLog(saved.email ? 'ok' : 'warn', r.org_name + ' — ' + (saved.email || saved.scrape_status));
+      renderResults();
+    }
+    setStatus('ok', '✓ CSV 수집 완료 — ' + rows.length + '건 처리');
+  } catch(e) {
+    setStatus('err', '오류: ' + e.message);
+  } finally {
+    _csvRunning = false;
+    document.getElementById('btn-csv-run').disabled = false;
+    loadStats();
+  }
+}
+
+/* ── 통계 ─────────────────────────────────────────────────────────── */
+async function loadStats() {
+  try {
+    var res = await fetch(getBizdb() + '/gov-stats');
+    var data = await res.json();
+    document.getElementById('st-total').textContent   = (data.total || 0).toLocaleString();
+    document.getElementById('st-active').textContent  = (data.with_email || 0).toLocaleString();
+    document.getElementById('st-noemail').textContent = (data.no_email || 0).toLocaleString();
+    document.getElementById('st-unsub').textContent   = (data.unsubscribed || 0).toLocaleString();
+  } catch(e) { /* 조용히 무시 — 통계는 부가 정보 */ }
+}
+
+/* ── 어드민 인증 (레이어 2) ────────────────────────────────────────── */
+(async () => {
+  document.getElementById('main').classList.add('visible');
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+    document.getElementById('admin-gate').style.display = 'none';
+    return;
+  }
+  if (window !== window.top) return;
+  try {
+    var session = await _injectSession();
+    if (session) {
+      var r = await fetch(
+        `${SUPABASE_URL}/rest/v1/profiles?id=eq.${session.user.id}&select=role&limit=1`,
+        { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` } }
+      );
+      var rows = r.ok ? await r.json() : [];
+      if (rows[0]?.role === 'admin') return;
+    }
+  } catch(e) {}
+  document.getElementById('main').classList.remove('visible');
+  document.getElementById('admin-gate').classList.add('show');
+})();
+
+/* ── 초기화 ───────────────────────────────────────────────────────── */
+applyGovLang();
+loadStats();
+renderResults();
+</script>
+</body>
+</html>

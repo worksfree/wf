@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>DART 기업공시 조회</title>
+  <title>DART 기업공시 조회 [다건 유료] — WorksFree</title>
+  <meta name="description" content="DART 기업공시 정보 조회·분석 도구. 재무제표, 사업보고서, 공시 이력 등 기업 정보 빠른 검색 및 요약. WorksFree 컨설팅 플랫폼 제공.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.worksfree.kr/consulting/dart/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -264,6 +268,29 @@
       flex-shrink:0; display:none; background:var(--panel);
       border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,.35);
     }
+
+    /* ── Auth Modal ── */
+    .auth-modal-bg{position:fixed;inset:0;background:#000000aa;display:none;align-items:center;justify-content:center;z-index:9999}
+    .auth-modal-bg.open{display:flex}
+    .auth-box{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:380px}
+    .auth-title{font-size:16px;font-weight:600;margin-bottom:6px}
+    .auth-sub{font-size:13px;color:var(--sub);margin-bottom:20px;line-height:1.5}
+    .auth-field{margin-bottom:14px}
+    .auth-label{display:block;font-size:12px;color:var(--sub);margin-bottom:5px}
+    .auth-input{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;
+      color:var(--text);font-size:14px;font-family:inherit;outline:none}
+    .auth-input:focus{border-color:var(--accent)}
+    .auth-msg{font-size:12px;min-height:18px;margin-bottom:10px}
+    .auth-btns{display:flex;gap:8px;justify-content:flex-end}
+    .auth-cancel{padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:13px;font-family:inherit}
+    .auth-submit{padding:8px 20px;border-radius:7px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit}
+    .auth-submit:hover{opacity:.85}
+    .auth-submit:disabled{opacity:.45;cursor:default}
+    /* ── Auth chip in topbar ── */
+    .auth-chip{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub)}
+    .auth-chip .user-em{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    /* ── Bulk tab member lock hint ── */
+    .tab-lock{font-size:10px;color:#a78bfa;margin-left:4px}
   </style>
 </head>
 <body>
@@ -274,6 +301,7 @@
     <h1 id="tb-title">DART 기업공시 조회</h1>
     <div class="sub" id="tb-sub">금융감독원 전자공시시스템</div>
   </div>
+  <div class="auth-chip" id="auth-status-bar"></div>
   <button class="icon-btn" onclick="toggleSettings()">⚙ <span id="lbl-settings">설정</span></button>
   <button class="icon-btn" id="btn-ko" onclick="setLang('ko')">KO</button>
   <button class="icon-btn" id="btn-en" onclick="setLang('en')">EN</button>
@@ -766,11 +794,6 @@ function selectCard(i){
   state.selectedIdx = i;
   state.detailData = null;
   document.getElementById(`card-${i}`).classList.add('selected');
-  if(IS_PREVIEW){
-    document.getElementById(`det-${i}`).innerHTML =
-      `<div class="detail-panel" style="text-align:center;padding:16px;color:var(--warn);">🔒 ${t('preview_detail_tip')}</div>`;
-    return;
-  }
   fetchDetail(i, state.results[i].corp_code);
 }
 
@@ -810,9 +833,9 @@ function buildDetail(d){
     [t('k_hm'),        fmtHm(d.hm_url)],
     [t('k_stock'),     d.stock_code&&d.stock_code.trim() ? d.stock_code : t('dash')],
   ];
-  const finBtn = IS_PREVIEW
-    ? `<button class="btn-fin-locked" onclick="event.stopPropagation()">${t('btn_fin_locked')}</button>`
-    : `<button class="btn-fin-active" onclick="event.stopPropagation();openFinSheetFromDetail()">📊 ${t('btn_fin')}</button>`;
+  const finBtn = isMember()
+    ? `<button class="btn-fin-active" onclick="event.stopPropagation();openFinSheetFromDetail()">📊 ${t('btn_fin')}</button>`
+    : `<button class="btn-fin-locked" onclick="event.stopPropagation();openAuthModal(openFinSheetFromDetail,'재무제표 조회는 회원 전용 기능입니다.')">${t('btn_fin_locked')}</button>`;
   return `<div class="detail-panel">
     <div class="detail-head">${t('detail_ttl')}: ${d.corp_name}</div>
     <div class="detail-grid">
@@ -930,9 +953,8 @@ function downloadTemplate() {
 const CHUNK = 5;
 
 async function startBulk() {
-  if (IS_PREVIEW) {
-    document.getElementById('bulk-results').innerHTML =
-      `<div class="state-box"><div class="state-icon">🔒</div><div>${t('bulk_preview')}</div></div>`;
+  if (!isMember()) {
+    openAuthModal(startBulk, '다건 조회는 회원 전용 기능입니다.');
     return;
   }
   const raw = document.getElementById('bulk-textarea').value;
@@ -1131,6 +1153,10 @@ function getSelectedBulkRows() {
 
 /* ── Bulk Excel 다운로드 (단일 xlsx: 요약+개별시트) ── */
 async function downloadBulkExcel() {
+  if (!isMember()) {
+    openAuthModal(downloadBulkExcel, '다운로드는 회원 전용 기능입니다.');
+    return;
+  }
   const selected = getSelectedBulkRows();
   if (!selected.length) return;
 
@@ -1320,7 +1346,10 @@ function openFinSheetFromDetail() {
 
 /* ── 모달 열기 ── */
 function openFinSheet(corpCode, corpName, accMt) {
-  if (IS_PREVIEW) return;
+  if (!isMember()) {
+    openAuthModal(() => openFinSheet(corpCode, corpName, accMt), '재무제표 조회는 회원 전용 기능입니다.');
+    return;
+  }
   _fsCorpName = corpName || '';
 
   document.getElementById('fs-corp-name').textContent = _fsCorpName;
@@ -1649,6 +1678,113 @@ loadSettings();
 renderRecent();
 applyLang();
 document.getElementById('bulk-textarea').addEventListener('input', updateBulkCount);
+
+/* ═══════════════════════════════════════
+   Supabase Auth
+═══════════════════════════════════════ */
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let currentUser = null;
+let _afterLogin = null;
+
+function isMember(){ return currentUser !== null; }
+
+function updateAuthBar(){
+  const bar = document.getElementById('auth-status-bar');
+  if(!bar) return;
+  if(isMember()){
+    bar.innerHTML = `<span class="user-em">${currentUser.email}</span>
+      <button class="icon-btn" onclick="doLogout()" style="font-size:11px;padding:3px 8px">로그아웃</button>`;
+  } else {
+    bar.innerHTML = `<button class="icon-btn" onclick="openAuthModal()" style="font-size:11px;padding:3px 8px">🔐 로그인</button>`;
+  }
+  // 다건 조회 탭에 잠금 뱃지 표시/해제
+  const tabBulk = document.getElementById('tab-bulk');
+  if(tabBulk){
+    tabBulk.innerHTML = t('tab_bulk') + (isMember() ? '' : ' <span class="tab-lock">🔒</span>');
+  }
+}
+
+async function initAuth(){
+  sb.auth.onAuthStateChange((event, session) => {
+    currentUser = session?.user || null;
+    updateAuthBar();
+  });
+  const { data } = await sb.auth.getSession();
+  currentUser = data.session?.user || null;
+  updateAuthBar();
+  trackPageView();
+}
+
+async function doLogin(){
+  const email    = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const btn = document.getElementById('auth-submit');
+  const msg = document.getElementById('auth-msg');
+  if(!email || !password){ msg.textContent='이메일과 비밀번호를 입력하세요.'; msg.style.color='#ef4444'; return; }
+  btn.disabled = true; msg.textContent = ''; msg.style.color = '';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  btn.disabled = false;
+  if(error){ msg.textContent='이메일 또는 비밀번호가 올바르지 않습니다.'; msg.style.color='#ef4444'; return; }
+  closeAuthModal();
+  if(_afterLogin){ const fn=_afterLogin; _afterLogin=null; fn(); }
+}
+
+async function doLogout(){ await sb.auth.signOut(); }
+
+function openAuthModal(afterLogin, subMsg){
+  _afterLogin = afterLogin || null;
+  const sub = document.getElementById('auth-modal-sub');
+  if(sub && subMsg) sub.textContent = subMsg;
+  document.getElementById('auth-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('auth-email').focus(), 100);
+}
+
+function closeAuthModal(){
+  document.getElementById('auth-modal').classList.remove('open');
+  document.getElementById('auth-email').value    = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-msg').textContent = '';
+}
+
+/* ── Page view tracking ── */
+async function trackPageView(){
+  if(location.hostname === 'localhost') return;
+  const env = location.hostname.startsWith('consulting.') ? 'consulting' : 'test';
+  try {
+    await sb.from('page_views').insert({
+      page:'consulting/dart/index.html', env, user_id: currentUser?.id || null,
+    });
+  } catch(e) {}
+}
+
+initAuth();
 </script>
+
+<!-- Auth Modal -->
+<div class="auth-modal-bg" id="auth-modal" onclick="if(event.target===this)closeAuthModal()">
+  <div class="auth-box">
+    <div class="auth-title">🔐 로그인</div>
+    <div class="auth-sub" id="auth-modal-sub">다건 조회 및 다운로드는 회원 전용 기능입니다.</div>
+    <div class="auth-field">
+      <label class="auth-label">이메일</label>
+      <input class="auth-input" type="email" id="auth-email" placeholder="example@company.com"
+        onkeydown="if(event.key==='Enter')document.getElementById('auth-password').focus()">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">비밀번호</label>
+      <input class="auth-input" type="password" id="auth-password" placeholder="비밀번호"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="auth-msg" id="auth-msg"></div>
+    <div class="auth-btns">
+      <button class="auth-cancel" onclick="closeAuthModal()">취소</button>
+      <button class="auth-submit" id="auth-submit" onclick="doLogin()">로그인</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

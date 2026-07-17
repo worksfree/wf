@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /test/
+Disallow: /load-test/
+Disallow: /test-results/
+Disallow: /node_modules/
+Disallow: /supabase/
+Disallow: /workers/
+
+Sitemap: https://www.worksfree.kr/sitemap.xml

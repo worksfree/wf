@@ -16,6 +16,13 @@
  *   DELETE /contacts               → { ids:[...] }  → { deleted }
  *   GET  /sendlist?month=YYYY-MM   → 이번달 발송 대상 { contacts, month, total, already_sent }
  *   POST /sendlog                  → 발송 이력 기록  → { ok, logged }
+ *
+ * 지자체·공공기관 연락처 (gov_contacts — biz_contacts와 완전 분리된 테이블):
+ *   GET    /gov-stats               → { total, with_email, no_email, unsubscribed }
+ *   GET    /gov-contacts?page&org_type&q → { data, count, page }
+ *   POST   /gov-contacts            → upsert (배열)  → { ok, count }
+ *   PATCH  /gov-contacts/:id        → 필드 업데이트   → { ok }
+ *   DELETE /gov-contacts            → { ids:[...] }  → { deleted }
  */
 
 const CORS = {
@@ -328,6 +335,91 @@ async function handleSentEmails(env, searchParams) {
   return jsonRes({ emails, count: emails.length });
 }
 
+/* ── gov_contacts (지자체·공공기관, biz_contacts와 완전 분리) ───────── */
+
+async function handleGovStats(env) {
+  const cnt = q => sbFetch(env, '/gov_contacts?select=count' + q)
+    .then(r => parseInt(r?.[0]?.count || 0)).catch(() => 0);
+  const [total, active, noEmail, unsub] = await Promise.all([
+    cnt(''),
+    cnt('&email=not.is.null&email_status=neq.unsubscribed'),
+    cnt('&email=is.null'),
+    cnt('&email_status=eq.unsubscribed'),
+  ]);
+  return jsonRes({ total, with_email: active, no_email: noEmail, unsubscribed: unsub });
+}
+
+async function handleGetGovContacts(env, searchParams) {
+  const page       = Math.max(1, parseInt(searchParams.get('page')   || '1'));
+  const limit      = Math.min(5000, parseInt(searchParams.get('limit') || '50'));
+  const rawOffset  = searchParams.get('offset');
+  const offset     = rawOffset !== null ? Math.max(0, parseInt(rawOffset)) : (page - 1) * limit;
+  const status     = searchParams.get('status')  || '';
+  const orgType    = searchParams.get('org_type') || '';
+  const q          = searchParams.get('q')       || '';
+  const scrapeStatus = searchParams.get('scrape_status') || '';
+  const selectCols = searchParams.get('select')  || '*';
+
+  let qs = `?select=${encodeURIComponent(selectCols)}&order=created_at.desc&limit=${limit}&offset=${offset}`;
+  if (status === 'active')        qs += '&email=not.is.null&email_status=neq.unsubscribed';
+  else if (status === 'no_email') qs += '&email=is.null';
+  else if (status === 'unsub')    qs += '&email_status=eq.unsubscribed';
+  if (scrapeStatus) {
+    if (scrapeStatus.startsWith('in.(')) qs += `&scrape_status=${encodeURIComponent(scrapeStatus)}`;
+    else                                  qs += `&scrape_status=eq.${encodeURIComponent(scrapeStatus)}`;
+  }
+  if (orgType) qs += `&org_type=eq.${encodeURIComponent(orgType)}`;
+  if (q)       qs += `&org_name=ilike.${encodeURIComponent('*' + q + '*')}`;
+
+  let filterQs = '';
+  if (status === 'active')        filterQs += '&email=not.is.null&email_status=neq.unsubscribed';
+  else if (status === 'no_email') filterQs += '&email=is.null';
+  else if (status === 'unsub')    filterQs += '&email_status=eq.unsubscribed';
+  if (scrapeStatus) {
+    if (scrapeStatus.startsWith('in.(')) filterQs += `&scrape_status=${encodeURIComponent(scrapeStatus)}`;
+    else                                  filterQs += `&scrape_status=eq.${encodeURIComponent(scrapeStatus)}`;
+  }
+  if (orgType) filterQs += `&org_type=eq.${encodeURIComponent(orgType)}`;
+  if (q)       filterQs += `&org_name=ilike.${encodeURIComponent('*' + q + '*')}`;
+
+  const [data, countRes] = await Promise.all([
+    sbFetch(env, '/gov_contacts' + qs),
+    sbFetch(env, '/gov_contacts?select=count' + filterQs).catch(() => null),
+  ]);
+
+  const total = parseInt(countRes?.[0]?.count || 0);
+  return jsonRes({ data: data || [], page, limit, total });
+}
+
+async function handleUpsertGovContacts(env, body) {
+  const rows = Array.isArray(body) ? body : [body];
+  if (!rows.length) return jsonRes({ ok: true, count: 0 });
+  const now = new Date().toISOString();
+  const stamped = rows.map(r => ({ ...r, updated_at: now }));
+  await sbFetch(env, '/gov_contacts', {
+    method: 'POST',
+    body: JSON.stringify(stamped),
+    extraHeaders: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+  });
+  return jsonRes({ ok: true, count: rows.length });
+}
+
+async function handlePatchGovContact(env, id, body) {
+  await sbFetch(env, `/gov_contacts?id=eq.${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ ...body, updated_at: new Date().toISOString() }),
+    extraHeaders: { 'Prefer': 'return=minimal' },
+  });
+  return jsonRes({ ok: true });
+}
+
+async function handleDeleteGovContacts(env, body) {
+  const ids = body?.ids || [];
+  if (!ids.length) return jsonRes({ deleted: 0 });
+  await sbFetch(env, `/gov_contacts?id=in.(${ids.join(',')})`, { method: 'DELETE' });
+  return jsonRes({ deleted: ids.length });
+}
+
 /* ── 유틸 ────────────────────────────────────────────────────────── */
 function monthKey() {
   // KST(UTC+9) 기준 월 키 — Worker는 UTC 실행이므로 +9시간 보정
@@ -362,6 +454,14 @@ export default {
       if (path === '/sendlist'    && request.method === 'GET')  return handleSendList(env, url.searchParams);
       if (path === '/sendlog'     && request.method === 'POST') return handleSendLog(env, await request.json());
       if (path === '/sent-emails' && request.method === 'GET')  return handleSentEmails(env, url.searchParams);
+
+      if (path === '/gov-stats'    && request.method === 'GET')    return handleGovStats(env);
+      if (path === '/gov-contacts' && request.method === 'GET')    return handleGetGovContacts(env, url.searchParams);
+      if (path === '/gov-contacts' && request.method === 'POST')   return handleUpsertGovContacts(env, await request.json());
+      if (path === '/gov-contacts' && request.method === 'DELETE') return handleDeleteGovContacts(env, await request.json());
+      if (/^\/gov-contacts\/[^/]+$/.test(path) && request.method === 'PATCH') {
+        return handlePatchGovContact(env, path.split('/')[2], await request.json());
+      }
 
       return jsonRes({ error: 'Not found', path }, 404);
     } catch (e) {

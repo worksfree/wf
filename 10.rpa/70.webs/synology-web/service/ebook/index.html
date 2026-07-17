@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>전자책 미리보기 — WorksFree</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
 
@@ -106,6 +107,11 @@ body{
   background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2);
   border-radius:4px; padding:3px 8px;
 }
+.admin-notice {
+  font-size:11px; color:var(--success); white-space:nowrap;
+  background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25);
+  border-radius:4px; padding:3px 8px; font-weight:600;
+}
 
 /* ── 뷰어 ── */
 .viewer-wrap {
@@ -149,6 +155,18 @@ body{
 .lock-btn-secondary:hover { background:var(--hover); }
 .lock-soon { font-size:13px; color:var(--muted); margin-top:8px; }
 
+/* ── 다중 페이지 행 ── */
+.pages-row {
+  display:flex; flex-direction:row; gap:12px;
+  align-items:flex-start; justify-content:center;
+}
+/* ── 툴바 토글 활성 ── */
+.tb-active {
+  background:var(--hover) !important;
+  border-color:var(--accent) !important;
+  color:var(--accent) !important;
+}
+
 /* ── 로딩 / 에러 ── */
 .loading-wrap {
   flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
@@ -172,6 +190,12 @@ body{
   .book-price-row { width:100%; justify-content:flex-end; }
   .toolbar { flex-wrap:wrap; gap:6px; }
 }
+.book-tab-badge.en-edition {
+  background:rgba(99,102,241,0.15); color:#818cf8;
+  border-color:rgba(99,102,241,0.3);
+}
+.cover-web-en  { background:linear-gradient(135deg,#1e3a5f,#0f1a2e); }
+.cover-mail-en { background:linear-gradient(135deg,#3b1f5f,#1a0f2e); }
 </style>
 </head>
 <body>
@@ -200,7 +224,14 @@ body{
     <button class="tb-btn" id="btnZoomOut" title="축소">−</button>
     <span class="zoom-info" id="zoomInfo">100%</span>
     <button class="tb-btn" id="btnZoomIn"  title="확대">+</button>
-    <button class="tb-btn" id="btnFit" title="너비 맞춤" style="font-size:11px;width:auto;padding:0 7px;">너비</button>
+    <button class="tb-btn tb-active" id="btnFitW" title="너비 맞춤" style="font-size:11px;width:auto;padding:0 7px;">너비</button>
+    <button class="tb-btn"           id="btnFitH" title="높이 맞춤" style="font-size:11px;width:auto;padding:0 7px;">높이</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="nav-group">
+    <button class="tb-btn tb-active" id="btn1p" title="1페이지씩 보기" style="font-size:11px;width:auto;padding:0 7px;">1p</button>
+    <button class="tb-btn"           id="btn2p" title="2페이지 함께보기" style="font-size:11px;width:auto;padding:0 7px;">2p</button>
+    <button class="tb-btn"           id="btn3p" title="3페이지 함께보기" style="font-size:11px;width:auto;padding:0 7px;">3p</button>
   </div>
   <div class="tb-spacer"></div>
   <div class="preview-notice" id="previewNotice">미리보기</div>
@@ -215,6 +246,51 @@ body{
 </div>
 
 <script>
+/* ───────────────────── SUPABASE + ADMIN CHECK ─────────────────── */
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const SB_SESSION_KEY = 'sb-rkycwfpkzorfpcxfvaqt-auth-token';
+
+/* no-op storage: hub localStorage를 건드리지 않아 onAuthStateChange(SIGNED_OUT) 방지 */
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: {
+    persistSession:    false,
+    autoRefreshToken:  false,
+    detectSessionInUrl:false,
+    storage: { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} },
+  }
+});
+
+let isAdmin = false;
+
+async function _injectSession() {
+  try {
+    const raw = window.parent.localStorage.getItem(SB_SESSION_KEY);
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    const at = stored?.access_token  || stored?.currentSession?.access_token;
+    const rt = stored?.refresh_token || stored?.currentSession?.refresh_token;
+    if (!at) return null;
+    try { await _sb.auth.setSession({ access_token: at, refresh_token: rt || '' }); } catch {}
+    return at;
+  } catch { return null; }
+}
+
+async function checkAdmin() {
+  try {
+    const token = await _injectSession();
+    if (!token) return;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const uid = payload.sub;
+    if (!uid) return;
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?select=role&id=eq.${uid}&limit=1`,
+      { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + token } }
+    );
+    const rows = await res.json();
+    if (rows?.[0]?.role === 'admin') isAdmin = true;
+  } catch {}
+}
 /* ───────────────────────── BOOKS CONFIG ───────────────────────── */
 const BOOKS = [
   {
@@ -231,8 +307,8 @@ const BOOKS = [
     lockDesc: { ko:'완전판에서 만들 수 있는 것:\n· 자체 도메인으로 웹사이트 직접 운영\n· Google·카카오 소셜 로그인 회원 시스템\n· 사용자별 크레딧·결제 이력 관리 DB\n· 온라인 결제 후 크레딧 자동 충전 시스템\n· 개발·테스트·실서비스 분리 배포 구조',
                 en:'What you can build with the full guide:\n· Run a website on your own domain\n· Social login (Google, Kakao) member system\n· User credit & payment history database\n· Online payment with auto credit top-up\n· Separated dev / test / production environments' },
     buyLinks: [
-      { label:'교보문고', url:'https://www.kyobobook.co.kr/product/detailViewKor.laf?isbn=9791199231474' },
-      { label:'예스24',  url:'https://www.yes24.com/Product/Goods/140000000' },
+      { label:'교보문고', url:'https://ebook-product.kyobobook.co.kr/dig/epd/ebook/E000013181758' },
+      { label:'예스24',  url:'https://www.yes24.com/product/goods/192563915' },
     ],
     online: true,
   },
@@ -252,20 +328,56 @@ const BOOKS = [
     buyLinks: [],
     online: false,
   },
+  {
+    id:       'web-en',
+    coverClass:'cover-web-en',
+    pdfUrl:   '/assets/books/nas-guide-web-en.pdf',
+    title:    { ko:'[EN] Synology NAS Full-Stack Infrastructure: Complete Guide',
+                en:'Synology NAS Full-Stack Infrastructure: Complete Guide' },
+    tabLabel: { ko:'웹서비스 (EN)', en:'Web Infra — EN' },
+    author:   { ko:'Lee Insung · WorksFree', en:'Lee Insung · WorksFree' },
+    price:    '$45.00',
+    previewRatio: 0.20,
+    minFreePages: 10,
+    lockDesc: { ko:'What you can build with the full guide:\n· Run a website on your own domain\n· Social login (Google, Kakao) member system\n· User credit & payment history database\n· Online payment with auto credit top-up\n· Separated dev / test / production environments',
+                en:'What you can build with the full guide:\n· Run a website on your own domain\n· Social login (Google, Kakao) member system\n· User credit & payment history database\n· Online payment with auto credit top-up\n· Separated dev / test / production environments' },
+    buyLinks: [],
+    online: false,
+    enEdition: true,
+  },
+  {
+    id:       'mail-en',
+    coverClass:'cover-mail-en',
+    pdfUrl:   '/assets/books/nas-guide-mail-en.pdf',
+    title:    { ko:'[EN] Synology NAS Email Service Setup: Complete Guide',
+                en:'Synology NAS Email Service Setup: Complete Guide' },
+    tabLabel: { ko:'메일서비스 (EN)', en:'Email Service — EN' },
+    author:   { ko:'Lee Insung · WorksFree', en:'Lee Insung · WorksFree' },
+    price:    '$25.00',
+    previewRatio: 0.20,
+    minFreePages: 10,
+    lockDesc: { ko:'Spam filtering, MailPlus webmail, and zero-cost\nself-hosted email with your own domain.',
+                en:'Spam filtering, MailPlus webmail, and zero-cost\nself-hosted email with your own domain.' },
+    buyLinks: [],
+    online: false,
+    enEdition: true,
+  },
 ];
 /* ────────────────────────────────────────────────────────────────── */
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-let lang       = 'ko';
-let currBookIdx = 0;
-let pdfDoc     = null;
-let currPage   = 1;
-let freePages  = 0;
-let scale      = 1.0;
-let fitWidth   = true;
-let rendering  = false;
+let lang         = 'ko';
+let currBookIdx  = 0;
+let pdfDoc       = null;
+let currPage     = 1;
+let freePages    = 0;
+let scale        = 1.0;
+let fitWidth     = true;
+let fitHeight    = false;
+let pagesPerView = 1;
+let rendering    = false;
 
 const I18N = {
   ko: { loading:'PDF 로딩 중…', preview:'미리보기', of:'/', free:'무료', preview_pct:'20% 무료 미리보기',
@@ -297,13 +409,18 @@ function formatLockDesc(text) {
 /* ── 탭 렌더링 ── */
 function renderTabs() {
   const wrap = document.getElementById('bookTabs');
-  wrap.innerHTML = BOOKS.map((b, i) => `
-    <button class="book-tab ${i===currBookIdx?'active':''}" onclick="switchBook(${i})">
-      ${b.tabLabel[lang]}
-      ${b.online
-        ? `<span class="book-tab-badge online">${t('online')}</span>`
-        : `<span class="book-tab-badge">${t('coming_soon').split('—')[0].trim()}</span>`}
-    </button>`).join('');
+  wrap.innerHTML = BOOKS.map((b, i) => {
+    let badge = '';
+    if (b.enEdition) {
+      badge = `<span class="book-tab-badge en-edition">EN</span>`;
+    } else if (b.online) {
+      badge = `<span class="book-tab-badge online">${t('online')}</span>`;
+    } else {
+      badge = `<span class="book-tab-badge">${t('coming_soon').split('—')[0].trim()}</span>`;
+    }
+    return `<button class="book-tab ${i===currBookIdx?'active':''}" onclick="switchBook(${i})">
+      ${b.tabLabel[lang]}${badge}</button>`;
+  }).join('');
 }
 
 /* ── 헤더 렌더링 ── */
@@ -336,44 +453,86 @@ function renderHeader() {
     </div>`;
 }
 
-/* ── 페이지 렌더링 ── */
+/* ── 뷰포트 배율 계산 ── */
+function calcScale(vp0) {
+  const wrap = document.getElementById('viewerWrap');
+  if (fitWidth) {
+    const GAP     = (pagesPerView - 1) * 12;
+    const availW  = wrap.clientWidth - 48 - GAP;
+    return (availW / pagesPerView) / vp0.width;
+  }
+  if (fitHeight) {
+    return (wrap.clientHeight - 48) / vp0.height;
+  }
+  return scale;
+}
+
+/* ── 단일 페이지 캔버스 렌더 ── */
+async function renderOnePage(pageNum, vpScale) {
+  const page     = await pdfDoc.getPage(pageNum);
+  const viewport = page.getViewport({scale: vpScale});
+
+  const CLIP_R = 2;
+  const dispW  = Math.round(viewport.width);
+  const dispH  = Math.round(viewport.height);
+  const vp2    = page.getViewport({scale: vpScale * (dispW + CLIP_R) / dispW});
+
+  const container = document.createElement('div');
+  container.className = 'page-container';
+  const canvas = document.createElement('canvas');
+  canvas.className    = 'page-canvas';
+  canvas.width        = dispW + CLIP_R;
+  canvas.height       = Math.round(vp2.height);
+  container.style.width  = dispW + 'px';
+  container.style.height = dispH + 'px';
+  container.appendChild(canvas);
+
+  await page.render({canvasContext: canvas.getContext('2d'), viewport: vp2}).promise;
+
+  if (!isAdmin) {
+    if (pageNum === freePages) showLockOverlay(container, 'half');
+    else if (pageNum > freePages) showLockOverlay(container, 'full');
+  }
+  return container;
+}
+
+/* ── 페이지 렌더링 (다중 페이지 지원) ── */
 async function renderPage(num) {
   if (!pdfDoc || rendering) return;
   rendering = true;
 
   const wrap = document.getElementById('viewerWrap');
-  const page = await pdfDoc.getPage(num);
-  const vp0  = page.getViewport({scale:1});
-  const viewport = fitWidth
-    ? page.getViewport({scale: (wrap.clientWidth - 48) / vp0.width})
-    : page.getViewport({scale});
+  wrap.querySelectorAll('.page-container, .pages-row').forEach(el => el.remove());
 
-  scale = viewport.scale;
+  // 기준 페이지로 배율 결정
+  const refPage = await pdfDoc.getPage(num);
+  const vp0     = refPage.getViewport({scale: 1});
+  const vpScale = calcScale(vp0);
+  scale = vpScale;
   document.getElementById('zoomInfo').textContent = Math.round(scale * 100) + '%';
 
-  wrap.querySelectorAll('.page-container').forEach(el => el.remove());
+  // 렌더할 페이지 번호 목록
+  const totalPdf = pdfDoc.numPages;
+  const pageNums = [];
+  for (let i = 0; i < pagesPerView; i++) {
+    const p = num + i;
+    if (p <= totalPdf) pageNums.push(p);
+  }
 
-  const container = document.createElement('div');
-  container.className = 'page-container';
-  const canvas = document.createElement('canvas');
-  canvas.className = 'page-canvas';
-  container.appendChild(canvas);
-  wrap.appendChild(container);
-
-  const CLIP_R  = 2; // clip 2px from right to hide PDF right-margin rendering artifact
-  const dispW   = Math.round(viewport.width);
-  const dispH   = Math.round(viewport.height);
-  const vp2     = page.getViewport({scale: viewport.scale * (dispW + CLIP_R) / dispW});
-
-  canvas.width  = dispW + CLIP_R;
-  canvas.height = Math.round(vp2.height);
-  container.style.width  = dispW + 'px';
-  container.style.height = dispH + 'px';
-
-  await page.render({canvasContext: canvas.getContext('2d'), viewport: vp2}).promise;
-
-  if (num === freePages) showLockOverlay(container, 'half');
-  else if (num > freePages) showLockOverlay(container, 'full');
+  if (pageNums.length === 1) {
+    // 단일 페이지 — viewer-wrap에 직접 추가
+    const container = await renderOnePage(pageNums[0], vpScale);
+    wrap.appendChild(container);
+  } else {
+    // 다중 페이지 — pages-row로 묶어서 추가
+    const row = document.createElement('div');
+    row.className = 'pages-row';
+    for (const pn of pageNums) {
+      const container = await renderOnePage(pn, vpScale);
+      row.appendChild(container);
+    }
+    wrap.appendChild(row);
+  }
 
   updateNav();
   rendering = false;
@@ -406,20 +565,47 @@ function showLockOverlay(container, mode) {
   container.appendChild(overlay);
 }
 
+/* ── 툴바 버튼 활성 상태 업데이트 ── */
+function updateFitBtns() {
+  document.getElementById('btnFitW').classList.toggle('tb-active', fitWidth);
+  document.getElementById('btnFitH').classList.toggle('tb-active', fitHeight);
+}
+function updateViewBtns() {
+  [1, 2, 3].forEach(n => {
+    document.getElementById(`btn${n}p`).classList.toggle('tb-active', pagesPerView === n);
+  });
+}
+
 /* ── 네비게이션 상태 ── */
 function updateNav() {
+  const maxPage = isAdmin && pdfDoc ? pdfDoc.numPages : freePages;
+  const notice  = document.getElementById('previewNotice');
+  const lastVisible = Math.min(currPage + pagesPerView - 1, maxPage);
+
   document.getElementById('pageInput').value = currPage;
-  document.getElementById('pageInput').max   = freePages;
+  document.getElementById('pageInput').max   = maxPage;
   document.getElementById('btnFirst').disabled = currPage <= 1;
   document.getElementById('btnPrev').disabled  = currPage <= 1;
-  document.getElementById('btnNext').disabled  = currPage >= freePages;
-  document.getElementById('btnLast').disabled  = currPage >= freePages;
-  document.getElementById('previewNotice').textContent =
-    `${t('preview')} ${currPage} ${t('of')} ${freePages}p`;
+  document.getElementById('btnNext').disabled  = lastVisible >= maxPage;
+  document.getElementById('btnLast').disabled  = lastVisible >= maxPage;
+
+  const pageLabel = pagesPerView > 1
+    ? `${currPage}–${lastVisible}`
+    : `${currPage}`;
+
+  if (isAdmin) {
+    notice.className   = 'admin-notice';
+    notice.textContent = `🔓 관리자 ${pageLabel} / ${maxPage}p`;
+  } else {
+    notice.className   = 'preview-notice';
+    notice.textContent = `${t('preview')} ${pageLabel} ${t('of')} ${freePages}p`;
+  }
 }
 
 function gotoPage(n) {
-  const p = Math.min(freePages, Math.max(1, n));
+  const maxPage = isAdmin && pdfDoc ? pdfDoc.numPages : freePages;
+  // 첫 페이지가 maxPage를 초과하지 않도록
+  const p = Math.min(maxPage, Math.max(1, n));
   currPage = p;
   renderPage(currPage);
 }
@@ -466,24 +652,50 @@ async function loadPdf() {
 
 /* ── 책 전환 ── */
 function switchBook(idx) {
-  currBookIdx = idx;
-  fitWidth = true;
+  currBookIdx  = idx;
+  fitWidth     = true;
+  fitHeight    = false;
+  pagesPerView = 1;
+  updateFitBtns();
+  updateViewBtns();
   renderTabs();
   renderHeader();
   loadPdf();
 }
 
 /* ── 이벤트 ── */
-document.getElementById('btnFirst').addEventListener('click',  () => gotoPage(1));
-document.getElementById('btnPrev').addEventListener('click',   () => gotoPage(currPage - 1));
-document.getElementById('btnNext').addEventListener('click',   () => gotoPage(currPage + 1));
-document.getElementById('btnLast').addEventListener('click',   () => gotoPage(freePages));
-document.getElementById('pageInput').addEventListener('change',  e => gotoPage(parseInt(e.target.value,10)||1));
-document.getElementById('pageInput').addEventListener('keydown', e => { if(e.key==='Enter') gotoPage(parseInt(e.target.value,10)||1); });
-document.getElementById('btnZoomOut').addEventListener('click', () => { fitWidth=false; scale=Math.max(.4,scale-.15); renderPage(currPage); });
-document.getElementById('btnZoomIn').addEventListener('click',  () => { fitWidth=false; scale=Math.min(3,scale+.15); renderPage(currPage); });
-document.getElementById('btnFit').addEventListener('click',     () => { fitWidth=true; renderPage(currPage); });
-window.addEventListener('resize', () => { if(fitWidth && pdfDoc) renderPage(currPage); });
+document.getElementById('btnFirst').addEventListener('click', () => gotoPage(1));
+document.getElementById('btnPrev').addEventListener('click',  () => gotoPage(currPage - pagesPerView));
+document.getElementById('btnNext').addEventListener('click',  () => gotoPage(currPage + pagesPerView));
+document.getElementById('btnLast').addEventListener('click',  () => {
+  const maxPage = isAdmin && pdfDoc ? pdfDoc.numPages : freePages;
+  // 마지막 뷰의 첫 페이지 = maxPage 기준으로 pagesPerView 역산
+  const lastStart = Math.max(1, maxPage - pagesPerView + 1);
+  gotoPage(lastStart);
+});
+document.getElementById('pageInput').addEventListener('change',  e => gotoPage(parseInt(e.target.value, 10) || 1));
+document.getElementById('pageInput').addEventListener('keydown', e => { if (e.key === 'Enter') gotoPage(parseInt(e.target.value, 10) || 1); });
+
+// 줌
+document.getElementById('btnZoomOut').addEventListener('click', () => { fitWidth = false; fitHeight = false; scale = Math.max(.4, scale - .15); updateFitBtns(); renderPage(currPage); });
+document.getElementById('btnZoomIn').addEventListener('click',  () => { fitWidth = false; fitHeight = false; scale = Math.min(3, scale + .15); updateFitBtns(); renderPage(currPage); });
+
+// 너비/높이 맞춤
+document.getElementById('btnFitW').addEventListener('click', () => { fitWidth = true;  fitHeight = false; updateFitBtns(); renderPage(currPage); });
+document.getElementById('btnFitH').addEventListener('click', () => { fitWidth = false; fitHeight = true;  updateFitBtns(); renderPage(currPage); });
+
+// 다중 페이지 보기
+[1, 2, 3].forEach(n => {
+  document.getElementById(`btn${n}p`).addEventListener('click', () => {
+    pagesPerView = n;
+    updateViewBtns();
+    // 다중 페이지 전환 시 너비 맞춤 기본 적용
+    if (!fitWidth && !fitHeight) { fitWidth = true; updateFitBtns(); }
+    gotoPage(currPage);
+  });
+});
+
+window.addEventListener('resize', () => { if ((fitWidth || fitHeight) && pdfDoc) renderPage(currPage); });
 
 /* ── Hub 언어 수신 ── */
 window.addEventListener('message', e => {
@@ -496,9 +708,12 @@ window.addEventListener('message', e => {
 });
 
 /* ── 초기화 ── */
-renderTabs();
-renderHeader();
-loadPdf();
+(async () => {
+  await checkAdmin();
+  renderTabs();
+  renderHeader();
+  loadPdf();
+})();
 </script>
 </body>
 </html>

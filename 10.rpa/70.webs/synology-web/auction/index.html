@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>경매지도 · AuctionMap</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%22 stop-color=%22%231565c0%22/><stop offset=%221%22 stop-color=%22%2229b6f6%22/></linearGradient></defs><path d=%22M92,4 C80,4 64,28 50,50 C36,72 20,96 8,96 C18,96 34,76 50,50 C66,24 80,4 92,4Z%22 fill=%22url(%23g)%22/><path d=%22M8,4 C20,4 36,24 50,50 C64,76 80,96 92,96 C80,96 64,72 50,50 C36,28 18,4 8,4Z%22 fill=%22url(%23g)%22/><path d=%22M4,10 Q20,14 42,42 Q20,30 4,10Z%22 fill=%22url(%23g)%22/><path d=%22M96,90 Q80,86 58,58 Q80,70 96,90Z%22 fill=%22url(%23g)%22/></svg>">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
@@ -58,7 +59,8 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
   color:#a5b4fc;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;}
 #updateBtn:hover{background:rgba(99,102,241,.25);}
 #updateBtn:disabled{opacity:.5;cursor:not-allowed;}
-.sb-footer{padding:9px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);}
+.sb-footer{padding:9px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;flex-direction:column;gap:3px;line-height:1.5;}
+.sb-footer-r2{display:flex;align-items:center;}
 
 /* ── FILTERS ── */
 .filter-sec{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:9px;}
@@ -255,6 +257,11 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 #demo-overlay .wm-main{position:absolute;top:50%;left:50%;
   transform:translate(-50%,-50%) rotate(-20deg);font-size:86px;font-weight:900;
   color:rgba(245,158,11,.38);letter-spacing:8px;user-select:none;white-space:nowrap;}
+/* ── Dev watermark (개발 중 — 항상 표시) ── */
+#dev-watermark{position:fixed;inset:0;z-index:41;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;}
+#dev-watermark span{transform:rotate(-20deg);font-size:86px;font-weight:900;
+  color:rgba(74,222,128,.22);letter-spacing:8px;user-select:none;white-space:nowrap;}
 /* ── Dev Toolbar (허브 스타일 일치) ── */
 #devToolbar{display:none;position:fixed;bottom:12px;right:12px;z-index:8999;
   background:#0f172a;border:1px solid #3b82f6;border-radius:10px;
@@ -446,9 +453,11 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
   </div><!-- /sb-main -->
 
   <div class="sb-footer" id="sbFooter">
-    v<span id="sbVer">0.7.0.1</span> · WorksFree 2026
-    <span id="sbCollectInfo" style="display:none"> · 수집 <span id="sbCollectCnt"></span></span>
-    <button id="omanBtn" onclick="toggleOman()" title="관리자 패널" style="display:none;margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 2px;line-height:1;">⚙️</button>
+    <div class="sb-footer-r1">v<span id="sbVer">0.7.0.1</span> · WorksFree 2026</div>
+    <div class="sb-footer-r2">
+      <span id="sbCollectInfo" style="display:none">수집 <span id="sbCollectCnt"></span></span>
+      <button id="omanBtn" onclick="toggleOman()" title="관리자 패널" style="display:none;margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 2px;line-height:1;">⚙️</button>
+    </div>
   </div>
 </aside>
 
@@ -565,8 +574,10 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
   </div>
 </div>
 
-<!-- 예시 데이터 워터마크 -->
+<!-- 예시 데이터 워터마크 (로그아웃 시) -->
 <div id="demo-overlay"><div class="wm-main">예시 데이터</div></div>
+<!-- 개발 중 워터마크 (항상 표시) -->
+<div id="dev-watermark"><span>개발 중</span></div>
 
 <!-- Dev 관리자 비밀번호 게이트 모달 -->
 <div id="devAucPwModal" style="display:none;position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.65);align-items:center;justify-content:center;">
@@ -856,7 +867,7 @@ function toggleMyList() {
 /* ════════════════════════════════
    ADMIN / DEV MODE
 ════════════════════════════════ */
-const AUC_VER = '0.7.4.21';
+const AUC_VER = '0.7.5.0';
 const ADMIN_EMAILS = ['insung.lee@worksfree.co.kr'];
 const IS_DEV = new URLSearchParams(location.search).get('dev') === '1'
             || localStorage.getItem('auc_dev') === '1';
@@ -1158,7 +1169,7 @@ function renderOman(){
     const hrs = Math.round((Date.now() - new Date(_dataInfo.generated_at)) / 36e5);
     dataAge = hrs < 1 ? '방금' : hrs < 24 ? `${hrs}시간 전` : `${Math.floor(hrs/24)}일 전`;
     dataClass = hrs < 48 ? 'ok' : 'warn';
-    const src = _dataInfo.total_available ? `Worker, 전체 ${_dataInfo.total_available.toLocaleString()}건 중` : '실데이터';
+    const src = _dataInfo.total_available ? `Supabase, 전체 ${_dataInfo.total_available.toLocaleString()}건 중` : '실데이터';
     itemCount = `${_dataInfo.count.toLocaleString()}건 (${src})`;
   }
 
@@ -1190,7 +1201,7 @@ function renderOman(){
       ${currentUser ? `<div class="oman-row"><span class="oman-lbl">로그인</span><span class="oman-val ok">${currentUser.email}</span></div>` : ''}
     </div>
     <div class="oman-sep"></div>
-    <div style="font-size:10px;color:var(--muted);margin-bottom:5px">🌐 Worker 데이터 수집 (테넌트: ${TENANT_ID})</div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:5px">🌐 Worker 크롤 설정 (Supabase 저장, 테넌트: ${TENANT_ID})</div>
     <div style="display:flex;flex-direction:column;gap:5px">
       <input id="oWorkerUrl" class="oman-input" type="text" placeholder="https://xxx.workers.dev" value="${wUrl}">
       <input id="oWorkerSec" class="oman-input" type="password" placeholder="X-Proxy-Secret (선택)" value="${wSec}">
@@ -1201,7 +1212,7 @@ function renderOman(){
       <button class="oman-btn primary" onclick="startCrawl()" ${!wUrl||isCrawling?'disabled':''}>
         ${isCrawling?'<span class="spin">🔄</span> 수집 중…':crawlLabel}
       </button>
-      ${_dataInfo ? `<button class="oman-btn" onclick="loadDataFromWorker()" ${!wUrl?'disabled':''}>📥 지도 새로고침</button>` : ''}
+      ${_dataInfo ? `<button class="oman-btn" onclick="loadDataFromWorker()">📥 지도 새로고침</button>` : ''}
       <button class="oman-btn danger" onclick="resetWorkerData()" ${!wUrl||isCrawling?'disabled':''}>🗑 데이터 초기화</button>
     </div>
     <div class="oman-sep"></div>
@@ -2031,41 +2042,9 @@ function _applyRealData(json, source){
   }
 }
 
-/* 지오코딩 오버레이 로드 — Worker KV 우선, NAS 파일 fallback */
-let _geoStatus = null; // { coverage, remaining } 마지막 지오코딩 현황
-async function applyGeoOverlay(){
-  try{
-    let overlay = null;
-    // 1) Worker KV 조회 (최신 데이터)
-    if(WORKER_URL){
-      try{
-        const wr = await fetch(`${WORKER_URL}/geocode-data?tenant=${TENANT_ID}`, { cache:'no-store' });
-        if(wr.ok){ const d = await wr.json(); if(Object.keys(d).length) overlay = d; }
-      }catch(_){}
-    }
-    // 2) Worker 실패 시 NAS 정적 파일 fallback
-    if(!overlay){
-      try{
-        const nr = await fetch('/data/geocode.json', { cache:'force-cache' });
-        if(nr.ok) overlay = await nr.json();
-      }catch(_){}
-    }
-    if(!overlay) return 0;
-    let merged = 0;
-    ALL.forEach(item => {
-      if(item.is_real && overlay[item.case_number]){
-        const o = overlay[item.case_number];
-        item.lat = o.lat; item.lng = o.lng;
-        merged++;
-      }
-    });
-    if(merged > 0){
-      console.log(`[geo] 오버레이 ${merged}건 좌표 적용`);
-      rebuildMarkers(filtered);
-    }
-    return merged;
-  }catch(e){ return 0; }
-}
+/* 지오코딩 오버레이 — Supabase 마이그레이션 후 불필요 (좌표가 auction_items에 포함됨) */
+let _geoStatus = null; // { total_coverage, remaining } 마지막 지오코딩 현황
+async function applyGeoOverlay(){ return 0; }
 
 /* 지오코딩 배치 실행 (관리자 패널 버튼) */
 let _geoRunning = false;
@@ -2083,9 +2062,9 @@ async function runGeocode(btn, force=false){
     if(!resp.ok){ alert('지오코딩 실패: ' + resp.status); return; }
     const d = await resp.json();
     _geoStatus = d;
-    renderAdminPanel();
-    // 결과 반영: 좌표 업데이트 후 지도 재생성
-    if(d.success > 0) applyGeoOverlay();
+    renderOman();
+    // 지오코딩 완료 후 Supabase에서 재로드 (업데이트된 lat/lng 반영)
+    if(d.success > 0){ await loadDataFromWorker(); applyFilter(); }
   }catch(e){ alert('오류: ' + e.message); }
   finally{
     _geoRunning = false;
@@ -2094,27 +2073,56 @@ async function runGeocode(btn, force=false){
   }
 }
 
+/* Supabase에서 auction_items 전체 로드 (1000건씩 페이지네이션) */
 async function loadDataFromWorker(){
-  if(!WORKER_URL) return false;
   try{
-    const resp = await fetch(`${WORKER_URL}/data?tenant=${TENANT_ID}`, { cache:'no-store' });
-    if(!resp.ok) return false;
-    const json = await resp.json();
-    if(!json.items || !json.items.length) return false;
-    _applyRealData(json, 'Worker');
+    // 1) auction_meta 로드 (generated_at, total_available)
+    const { data: metaRows, error: metaErr } = await sb
+      .from('auction_meta').select('*').eq('tenant_id', TENANT_ID).maybeSingle();
+    if(metaErr && metaErr.code !== 'PGRST116') throw metaErr;
+    const meta = metaRows || {};
+
+    // 2) auction_items 페이지네이션 로드
+    const allItems = [];
+    let from = 0;
+    const PAGE = 1000;
+    while(true){
+      const { data, error } = await sb
+        .from('auction_items')
+        .select('id,case_number,court,type,sido,gu,dong,address,area,app,min_p,avg_t,fc,bid_date,pred,detail_url,lat,lng,is_real')
+        .eq('tenant_id', TENANT_ID)
+        .range(from, from + PAGE - 1);
+      if(error) throw error;
+      if(!data?.length) break;
+      // Supabase snake_case → 프론트엔드 camelCase 정규화
+      data.forEach(it => allItems.push({ ...it, minP: it.min_p, avgT: it.avg_t }));
+      if(data.length < PAGE) break;
+      from += PAGE;
+    }
+    if(!allItems.length) return false;
+
+    const json = {
+      generated_at:    meta.generated_at || meta.finished_at || new Date().toISOString(),
+      count:           allItems.length,
+      total_available: meta.total_available || allItems.length,
+      items:           allItems,
+    };
+    _applyRealData(json, 'Supabase');
     applyFilter();
-    // 지오코딩 오버레이 비동기 로드 (지도 표시에 영향 없이 백그라운드 보완)
-    applyGeoOverlay();
     return true;
-  }catch(e){ return false; }
+  }catch(e){
+    console.error('[auction] loadDataFromWorker:', e);
+    return false;
+  }
 }
 
+/* Supabase auction_meta에서 크롤 상태 조회 */
 async function checkCrawlStatus(){
-  if(!WORKER_URL) return null;
   try{
-    const resp = await fetch(`${WORKER_URL}/status?tenant=${TENANT_ID}`, { cache:'no-store' });
-    if(!resp.ok) return null;
-    return await resp.json();
+    const { data, error } = await sb
+      .from('auction_meta').select('*').eq('tenant_id', TENANT_ID).maybeSingle();
+    if(error) return null;
+    return data || { status: 'idle', tenant_id: TENANT_ID };
   }catch(e){ return null; }
 }
 
@@ -2180,12 +2188,10 @@ function saveWorkerConfig(){
 }
 
 async function tryLoadRealData(){
-  // Worker 우선 시도
-  if(WORKER_URL){
-    const ok = await loadDataFromWorker();
-    if(ok) return true;
-  }
-  // 로컬 파일 fallback
+  // Supabase 직접 로드 우선
+  const ok = await loadDataFromWorker();
+  if(ok) return true;
+  // NAS 정적 파일 fallback (Supabase 미연동 환경)
   try{
     const resp = await fetch('data/auctions.json?_='+Date.now());
     if(!resp.ok) return false;
@@ -2212,15 +2218,13 @@ window.addEventListener('DOMContentLoaded',async()=>{
   document.getElementById('itemList').innerHTML='<div class="empty"><div class="ei" style="font-size:28px">⏳</div>데이터 준비 중…</div>';
   applyLangDOM();
   document.getElementById('langBtn').textContent=lang==='ko'?'EN':'KO';
-  // Worker 크롤 상태 확인 (진행 중이면 프로그레스바 + 폴링 재시작)
-  if(WORKER_URL){
-    const st = await checkCrawlStatus();
-    if(st){
-      _crawlStatus = st;
-      if(st.status==='crawling'){
-        _showCrawlProgress(`${(st.count||0).toLocaleString()}건 수집 중…`);
-        _startPollCrawlStatus();
-      }
+  // Supabase auction_meta 크롤 상태 확인 (진행 중이면 프로그레스바 + 폴링 재시작)
+  const st = await checkCrawlStatus();
+  if(st){
+    _crawlStatus = st;
+    if(st.status==='crawling'){
+      _showCrawlProgress(`${(st.count||0).toLocaleString()}건 수집 중…`);
+      _startPollCrawlStatus();
     }
   }
 });

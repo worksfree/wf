@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>중대재해처벌법 진단 — WorksFree</title>
+<meta name="description" content="중대재해처벌법(SAPA) 위반 위험도 자가진단. 사업장별 의무 이행 현황 점검, 핵심 리스크 파악 및 개선 방향 제시. WorksFree 컨설팅 플랫폼 제공.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.worksfree.kr/consulting/jdh/">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
 :root{
@@ -236,34 +239,34 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 <div class="topbar">
   <div class="icon">⚖</div>
   <div>
-    <h1>중대재해처벌법 컨설팅 진단</h1>
-    <div class="sub">법 적용 여부 · 의무 이행 현황 · 위험도 · 맞춤 로드맵</div>
+    <h1 id="jdh-hdr-title">중대재해처벌법 컨설팅 진단</h1>
+    <div class="sub" id="jdh-hdr-sub">법 적용 여부 · 의무 이행 현황 · 위험도 · 맞춤 로드맵</div>
   </div>
 </div>
 
 <!-- ── 트렌드 배너 ── -->
 <div class="trend-banner">
   <div class="trend-inner">
-    <div class="trend-title">중대재해처벌법 — 대응 현황과 리스크</div>
+    <div class="trend-title" id="jdh-trend-title">중대재해처벌법 — 대응 현황과 리스크</div>
     <div class="trend-grid">
       <div class="trend-stat">
         <div class="ts-val">50억</div>
-        <div class="ts-label">사망사고 법인 최대 벌금액<br>(중대재해처벌법 제11조)</div>
+        <div class="ts-label" id="jdh-ts-lbl-1">사망사고 법인 최대 벌금액<br>(중대재해처벌법 제11조)</div>
       </div>
       <div class="trend-stat">
         <div class="ts-val">1,300일</div>
-        <div class="ts-label">국가 산재보험 최대 보상 범위<br>초과분은 100% 민사배상 책임</div>
+        <div class="ts-label" id="jdh-ts-lbl-2">국가 산재보험 최대 보상 범위<br>초과분은 100% 민사배상 책임</div>
       </div>
       <div class="trend-stat">
         <div class="ts-val">68.8%</div>
-        <div class="ts-label">50인 미만 사업장<br>산업재해 발생 비율</div>
+        <div class="ts-label" id="jdh-ts-lbl-3">50인 미만 사업장<br>산업재해 발생 비율</div>
       </div>
       <div class="trend-stat">
         <div class="ts-val">2026</div>
-        <div class="ts-label">포괄임금·3.3% 프리랜서<br>집중 근로감독 시행 연도</div>
+        <div class="ts-label" id="jdh-ts-lbl-4">포괄임금·3.3% 프리랜서<br>집중 근로감독 시행 연도</div>
       </div>
     </div>
-    <div class="trend-note">
+    <div class="trend-note" id="jdh-trend-note">
       <strong>핵심 문제:</strong> 산재보험은 1,300일치 급여까지만 보상합니다. 그 이상의 민사배상 — 남은 정년·가동연한 소득 전액 — 은 대표가 <strong>100% 개인 부담</strong>합니다. 직원 1명 사망사고 하나로 회사 문을 닫는 경우가 현장에서 실제로 발생합니다.
       <strong>산재보험 = 자동차 책임보험, 단체보험 = 자동차 종합보험</strong>입니다.
       2026년부터는 포괄임금제·3.3% 프리랜서 계약·외국인 고용 사업장에 대한 집중 근로감독이 예고되어 있어 추가 리스크가 급증하고 있습니다.
@@ -285,6 +288,8 @@ body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--bg);color:var(--
 
 <script>
 // ── DATA ──
+let jdhLang = 'ko';
+
 const STEPS = [
   {
     id:'industry',
@@ -493,6 +498,7 @@ const IS_PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
 
 window.addEventListener('message', e => {
   if (e.data?.type === 'wf_role') userRole = e.data.role || 'member';
+  if (e.data?.type === 'wf_lang') setJdhLang(e.data.lang === 'en' ? 'en' : 'ko');
 });
 
 const isInsRole = () => ['partner', 'partner'].includes(userRole);
@@ -532,16 +538,203 @@ const CASES_JDH = [
     answers:{industry:'mfg',headcount:'300to499',dispatch:'both',dispatchType:'mixed',foreigner:'multi',safetyMgr:'full',healthMgr:'full',riskAssess:'regular',training:'full',hazards:['chem','confined','fire'],accidentHistory:'serious',subMgmt:'partial',budget:'full',manual:'current'} },
 ];
 
+const STEPS_EN = {
+  industry: {
+    q: 'What is the main industry of your workplace?',
+    sub: 'Industry type determines hazard criteria, special regulations, and dispatch eligibility.',
+    law: 'SAPA Enforcement Decree [Annex 1] · Scope of OSHA',
+    opts: [
+      { label: 'Manufacturing', desc: 'Metal, chemical, food, electronics, textile, etc.' },
+      { label: 'Construction', desc: 'Building, civil engineering, equipment installation (contract amount basis applies)' },
+      { label: 'Transport & Logistics', desc: 'Freight, passenger, warehousing, delivery & logistics centers' },
+      { label: 'Medical / Care / Welfare', desc: 'Hospitals, nursing homes, care facilities, childcare centers' },
+      { label: 'Services / Retail / F&B', desc: 'Retail, accommodation, food service, personal & corporate services' },
+      { label: 'IT / Professional / Finance', desc: 'Software, consulting, finance, legal, education services' },
+      { label: 'Other', desc: 'Industries not listed above' },
+    ]
+  },
+  headcount: {
+    q: 'How many regular employees do you have?',
+    sub: 'Headcount is the primary criterion for determining SAPA applicability and obligation level. Dispatched/contractor workers are addressed in the next step.',
+    law: 'SAPA §2 · Enforcement Decree §2 (Method of counting regular employees)',
+    opts: [
+      { label: 'Under 5', desc: 'Exempt from SAPA (OSHA still applies)' },
+      { label: '5 – 49', desc: 'Expanded coverage from January 27, 2024 (small workplaces included)' },
+      { label: '50 – 299', desc: 'Full coverage from January 27, 2022 (core full-coverage workplaces)' },
+      { label: '300 – 499', desc: 'Full coverage — higher safety management system standard required' },
+      { label: '500 or more', desc: 'Full coverage incl. mandatory dedicated safety & health unit' },
+    ]
+  },
+  conAmt: {
+    q: 'What is the construction contract (award) amount?',
+    sub: 'For the construction industry, SAPA applicability is determined by contract amount in addition to headcount.',
+    law: 'SAPA Supplementary Provisions §1 (Construction effective date) · Framework Act on the Construction Industry',
+    opts: [
+      { label: 'Under ₩100M', desc: 'Currently exempt from SAPA (small construction sites)' },
+      { label: '₩100M – ₩5B', desc: 'Expanded coverage target from January 27, 2024 (mid-small sites)' },
+      { label: '₩5B – ₩12B', desc: 'Coverage applies from January 27, 2022' },
+      { label: '₩12B or more', desc: 'Full coverage (includes PQ ₩50B+ scale)' },
+    ]
+  },
+  dispatch: {
+    q: 'Do you use dispatched workers or subcontractors?',
+    sub: 'Dispatched workers may be included in regular employee headcount. Principal contractors also bear safety & health obligations for subcontractor workers on-site.',
+    law: 'SAPA §5 (Safety in subcontracting relationships) · Act on Protection of Dispatched Workers',
+    opts: [
+      { label: 'None (direct employment only)', desc: 'All workers directly employed; no dispatch or subcontracting' },
+      { label: 'Dispatched workers', desc: 'Using dispatched workers under the Dispatched Workers Act (agency workers)' },
+      { label: 'Subcontractors', desc: 'On-site subcontract, outsourced service, or commissioned workers on premises' },
+      { label: 'Both dispatch & subcontractors', desc: 'Using both dispatched workers and subcontractor workers' },
+    ]
+  },
+  dispatchType: {
+    q: 'What work areas use dispatched workers?',
+    sub: 'Using dispatched workers in industries/roles prohibited under the Dispatched Workers Act exposes both parties to criminal liability.',
+    law: 'Act on Protection of Dispatched Workers §5 [Annex 1] — Permitted dispatch jobs',
+    opts: [
+      { label: 'Permitted industries / roles', desc: 'Professional/office roles (IT dev, research, legal, admin support, translation, etc.)' },
+      { label: 'Prohibited industries / roles included', desc: 'Construction site work, cargo handling, seafarers, hazardous work, etc.' },
+      { label: 'Mix of permitted & prohibited (needs verification)', desc: 'Some roles are permitted; others unclear on prohibition status' },
+      { label: 'Dispatch eligibility uncertain', desc: 'Unclear which roles are eligible for dispatch' },
+    ]
+  },
+  foreigner: {
+    q: 'Do you employ foreign workers?',
+    sub: 'Foreign workers receive the same protections under labor law and SAPA as Korean nationals. Language and cultural barriers increase accident risk — separate management is required.',
+    law: 'Act on Employment of Foreign Workers · Immigration Act · 2026 MOEL intensive inspection on foreign-worker workplaces',
+    opts: [
+      { label: 'None', desc: 'No foreign workers' },
+      { label: 'E-9 (Non-professional employment)', desc: 'Employment Permit System workers (manufacturing, agriculture, construction, fisheries, service)' },
+      { label: 'H-2 (Overseas Korean visit)', desc: 'Overseas Korean visit-employment visa (near-equal employment rights to nationals)' },
+      { label: 'Skilled professionals (E-1 – E-7)', desc: 'Professors, researchers, engineers, and other professional visa holders' },
+      { label: 'Multiple visa types', desc: 'Mix of E-9, H-2, professionals, and other visa categories' },
+    ]
+  },
+  safetyMgr: {
+    q: 'Have you appointed a safety manager?',
+    sub: 'OSHA §17 requires safety manager appointment by industry and size; linked to CEO obligations under SAPA Enforcement Decree §4(5).',
+    law: 'OSHA §17 · SAPA Enforcement Decree §4(5)',
+    opts: [
+      { label: 'Dedicated safety manager', desc: 'Full-time employee handling only safety duties (holds legal qualification)' },
+      { label: 'Concurrent safety manager', desc: 'Safety manager who also handles other duties (legally permitted in some cases)' },
+      { label: 'Outsourced to specialist agency', desc: 'Safety management delegated to an authorized specialist (permitted for <50 employees, etc.)' },
+      { label: 'No appointment obligation (small scale)', desc: 'No legal obligation based on industry and size' },
+      { label: 'Not appointed (violation)', desc: 'Obligated but not appointed — immediate corrective action required' },
+    ]
+  },
+  healthMgr: {
+    q: 'Have you appointed a health manager?',
+    sub: 'Verifies health manager status per OSHA §22. Workplaces of 500+ or certain industries must appoint a dedicated manager.',
+    law: 'OSHA §22 · Enforcement Decree [Annex 5]',
+    opts: [
+      { label: 'Dedicated health manager', desc: 'Full-time nurse, physician, or industrial health supervisor' },
+      { label: 'Outsourced to specialist agency', desc: 'Delegated to an authorized health management agency (permitted for small workplaces)' },
+      { label: 'No appointment obligation', desc: 'Under 50 employees, etc. — no current legal obligation' },
+      { label: 'Not appointed (violation)', desc: 'Obligated but not appointed — immediate appointment or agency delegation required' },
+    ]
+  },
+  riskAssess: {
+    q: 'Do you conduct risk assessments?',
+    sub: 'A legal obligation to identify workplace hazards and establish risk-reduction measures. Key evidence of CEO compliance.',
+    law: 'SAPA Enforcement Decree §4(3) · OSHA §36',
+    opts: [
+      { label: 'Conducted regularly', desc: 'Planned at least annually; results and corrective actions documented' },
+      { label: 'Partial / formalistic', desc: 'Only some areas covered, or records are superficial' },
+      { label: 'Not conducted (violation)', desc: 'Never conducted or no records — aggravates CEO criminal liability if accident occurs' },
+    ]
+  },
+  training: {
+    q: 'Do you conduct mandatory safety & health training?',
+    sub: 'Covers regular training, new-hire training, special training, and supervisor training. Foreign workers should receive training in their native language.',
+    law: 'OSHA §29 · Enforcement Rules [Annex 4–6] (mandated training hours)',
+    opts: [
+      { label: 'Fully completed', desc: 'All mandatory training conducted and attendance records maintained' },
+      { label: 'Partially completed', desc: 'Some training missed, insufficient hours, or incomplete records' },
+      { label: 'Not conducted (violation)', desc: 'Almost no mandatory training or no records — subject to administrative fine' },
+    ]
+  },
+  hazards: {
+    q: 'Select all major hazards present in your workplace.',
+    sub: 'Select all that apply, then press [Confirm]. More hazards raise the risk score and expand applicable obligations.',
+    law: 'OSHA [Annex 1] Hazards · SAPA Enforcement Decree §4',
+    opts: [
+      { label: 'Chemicals / hazardous substances', desc: 'MSDS-required substances, carcinogens, organic solvents, acids/alkalis, etc.' },
+      { label: 'Work at height (2m+)', desc: 'Scaffolding, ladders, rooftops, aerial work platforms — fall risk' },
+      { label: 'Heavy machinery / cranes / presses', desc: 'Machinery requiring guards, lifts, forklifts, etc.' },
+      { label: 'Confined space work', desc: 'Tanks, manholes, basements, water tanks — oxygen deficiency risk' },
+      { label: 'Fire / explosion / gas hazard', desc: 'Flammable materials, LPG/LNG, dust explosion risk' },
+      { label: 'Musculoskeletal strain', desc: 'Repetitive motion, heavy lifting, prolonged static postures' },
+      { label: 'Electric shock / electrical hazard', desc: 'High-voltage work, electrical equipment handling, arc welding' },
+      { label: 'Noise / vibration exposure', desc: 'Noise above 85 dB, local vibration from tools' },
+      { label: 'No special hazards', desc: 'General office, low-risk sales/service environment' },
+    ]
+  },
+  accidentHistory: {
+    q: 'Have there been any industrial accidents in the past 3 years?',
+    sub: 'Accident history is a key factor reviewed during labor inspections and investigations — it can serve as direct evidence of SAPA violations.',
+    law: 'OSHA §57 (Records & reporting) · SAPA §6 · §10',
+    opts: [
+      { label: 'No accidents', desc: 'No occupational accidents in the past 3 years' },
+      { label: 'Minor injuries only', desc: 'Injuries requiring less than 4 days off, or non-lost-time incidents' },
+      { label: 'Serious injuries', desc: 'Injury or occupational disease requiring 6+ months of treatment' },
+      { label: 'Fatality occurred', desc: 'Occupational fatality on record (constitutes a serious industrial accident under SAPA)' },
+    ]
+  },
+  subMgmt: {
+    q: 'How is safety & health managed for subcontractors?',
+    sub: 'The principal contractor (head company) bears legal safety & health obligations for subcontractor workers on its premises.',
+    law: 'SAPA §5 · OSHA §63 (Principal contractor obligations)',
+    opts: [
+      { label: 'Standards established and followed', desc: 'Documented subcontract safety standards, joint council, and on-site inspections' },
+      { label: 'Partially managed', desc: 'Standards apply to some contractors only, or applied superficially' },
+      { label: 'No separate management', desc: "Subcontractor safety left entirely to the subcontractor's discretion" },
+    ]
+  },
+  budget: {
+    q: 'Do you separately budget and spend on safety & health?',
+    sub: 'CEOs must allocate and execute a budget for safety & health personnel, facilities, and equipment to prevent disasters (Enforcement Decree §4(4)).',
+    law: 'SAPA Enforcement Decree §4(4) (Safety & health budget allocation and execution)',
+    opts: [
+      { label: 'Budgeted and executed (records maintained)', desc: 'Annual safety budget plan and execution records complete' },
+      { label: 'Budgeted only (execution records incomplete)', desc: 'Budget line exists but spending evidence insufficient' },
+      { label: 'No dedicated safety budget', desc: 'Safety-related spending exists but not tracked as a separate budget item' },
+    ]
+  },
+  manual: {
+    q: 'Do you have a response manual for serious industrial accidents?',
+    sub: 'Without pre-defined procedures for reporting, scene preservation, investigation response, and victim support, you will miss the critical window — worsening the outcome.',
+    law: 'SAPA Enforcement Decree §4(8) (Manual preparation and semi-annual review)',
+    opts: [
+      { label: 'Exists and up to date', desc: 'Manual exists and reviewed/updated within the past 6 months' },
+      { label: 'Exists but outdated', desc: 'Manual exists but not reviewed for more than a year' },
+      { label: 'Does not exist', desc: 'No established procedures for responding to an incident' },
+    ]
+  },
+};
+
+const CASES_JDH_EN = [
+  { tag: 'Manufacturing · Fatality', title: 'Factory of 20 — Fatal Accident, Hundreds of Millions Claimed', sub: "Workers' comp covers only 1,300 days of wages / CEO personally liable for the rest / Near-bankruptcy" },
+  { tag: 'Construction · Sub Fatality', title: 'Major Site Subcontractor Death — Principal Contractor Liable', sub: 'Contract ₩12B+ / Subcontractor management deficient / CEO at risk of indictment' },
+  { tag: 'IT · Under 5', title: 'Under-5 IT Startup — Confirming Exemption Scope', sub: 'SAPA not applicable / Minimum OSHA obligations still apply' },
+  { tag: 'Foreign Workers · Language Barrier', title: 'E-9 Manufacturing — Zero Native-Language Safety Training', sub: '5–49 employees / Language barrier makes safety training impossible / Chemical MSDS not understood' },
+  { tag: 'Comprehensive Wage · 2026', title: 'Service Sector All-Inclusive Pay — Target of 2026 Intensive Inspection', sub: 'Flat-rate OT contract / Effectively illegal / Fine + criminal liability upon detection' },
+  { tag: '3.3% Fake Freelancer', title: 'Manufacturing 3.3% "Freelancer" Contract — 5-Year Back Social Insurance Bomb', sub: 'Workers disguised as self-employed / NTS-MOEL data sharing / Risk of back payment' },
+];
+
 function buildCasesHtml_JDH() {
+  const isEn = jdhLang === 'en';
   return `<div class="cases-wrap no-print">
-    <div class="cases-label">대표 사례 — 원클릭 결과 보기</div>
+    <div class="cases-label">${isEn ? 'Sample Cases — One-Click Results' : '대표 사례 — 원클릭 결과 보기'}</div>
     <div class="cases-grid">
-      ${CASES_JDH.map((c,i) => `
+      ${CASES_JDH.map((c,i) => {
+        const ce = isEn ? CASES_JDH_EN[i] : null;
+        return `
         <button class="case-btn" onclick="runCase_JDH(${i})">
-          <div class="case-icon-row"><span class="case-icon">${c.icon}</span><span class="case-tag ${c.tagClass}">${c.tag}</span></div>
-          <div class="case-title">${c.title}</div>
-          <div class="case-sub">${c.sub}</div>
-        </button>`).join('')}
+          <div class="case-icon-row"><span class="case-icon">${c.icon}</span><span class="case-tag ${c.tagClass}">${(isEn && ce?.tag) || c.tag}</span></div>
+          <div class="case-title">${(isEn && ce?.title) || c.title}</div>
+          <div class="case-sub">${(isEn && ce?.sub) || c.sub}</div>
+        </button>`;
+      }).join('')}
     </div>
   </div>`;
 }
@@ -556,27 +749,30 @@ function runCase_JDH(idx) {
 
 // ── RENDER WIZARD ──
 function showPreviewGate(){
+  const isEn = jdhLang === 'en';
   const steps = visibleSteps();
   const maxStep = Math.ceil(steps.length / 3);
   document.getElementById('quiz-area').innerHTML = `
     <div class="wizard" style="text-align:center;padding:40px 24px;">
       <div style="font-size:36px;margin-bottom:16px;">🔒</div>
-      <div style="font-size:15px;font-weight:600;margin-bottom:8px;">미리보기 한도 도달</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">${maxStep} / ${steps.length} 단계 미리보기 완료<br>나머지 진단은 로그인 후 이용 가능합니다.</div>
-      <button class="back-btn" onclick="currentStep=0;answers={};renderStep()">◀ 처음부터 다시</button>
+      <div style="font-size:15px;font-weight:600;margin-bottom:8px;">${isEn ? 'Preview Limit Reached' : '미리보기 한도 도달'}</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">${isEn ? `${maxStep} / ${steps.length} steps previewed<br>Sign in to continue the full assessment.` : `${maxStep} / ${steps.length} 단계 미리보기 완료<br>나머지 진단은 로그인 후 이용 가능합니다.`}</div>
+      <button class="back-btn" onclick="currentStep=0;answers={};renderStep()">◀ ${isEn ? 'Start Over' : '처음부터 다시'}</button>
     </div>`;
 }
 
 function renderStep(){
+  const isEn = jdhLang === 'en';
   const steps = visibleSteps();
   if(currentStep >= steps.length){ showResult(); return; }
   if(IS_PREVIEW && currentStep >= Math.ceil(steps.length / 3)){ showPreviewGate(); return; }
   const step = steps[currentStep];
+  const se = isEn ? STEPS_EN[step.id] : null;
   const pct = Math.round(currentStep / steps.length * 100);
 
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-pct').textContent = pct + '%';
-  document.getElementById('prog-label').textContent = `${currentStep + 1} / ${steps.length} 단계`;
+  document.getElementById('prog-label').textContent = isEn ? `Step ${currentStep + 1} of ${steps.length}` : `${currentStep + 1} / ${steps.length} 단계`;
 
   // breadcrumbs
   const bc = document.getElementById('breadcrumbs');
@@ -584,8 +780,16 @@ function renderStep(){
     const s = STEPS.find(x => x.id === k);
     if(!s) return '';
     const lbl = Array.isArray(v)
-      ? v.map(vk => (s.opts.find(o=>o.k===vk)||{label:vk}).label).join('·')
-      : (s.opts.find(o=>o.k===v)||{label:v}).label;
+      ? v.map(vk => {
+          const o = s.opts.find(o=>o.k===vk);
+          const oIdx = s.opts.indexOf(o);
+          return (isEn && STEPS_EN[s.id]?.opts?.[oIdx]?.label) || o?.label || vk;
+        }).join('·')
+      : (() => {
+          const o = s.opts.find(o=>o.k===v);
+          const oIdx = s.opts.indexOf(o);
+          return (isEn && STEPS_EN[s.id]?.opts?.[oIdx]?.label) || o?.label || v;
+        })();
     return `<span class="crumb"><b>${shortLabel(k)}</b> ${lbl}</span>`;
   }).join('');
 
@@ -595,34 +799,34 @@ function renderStep(){
     multiSel = answers[step.id] ? [...answers[step.id]] : [];
     area.innerHTML = casesHtml + `
       <div class="wizard">
-        ${currentStep > 0 ? `<div class="back-row"><button class="back-btn" onclick="goBack()">◀ 이전</button></div>` : ''}
-        <div class="q-num">질문 ${currentStep + 1}</div>
-        <div class="q-text">${step.q}</div>
-        <div class="q-sub">${step.sub}</div>
-        ${step.law ? `<div class="q-law">📋 ${step.law}</div>` : ''}
+        ${currentStep > 0 ? `<div class="back-row"><button class="back-btn" onclick="goBack()">◀ ${isEn ? 'Back' : '이전'}</button></div>` : ''}
+        <div class="q-num">${isEn ? 'Question' : '질문'} ${currentStep + 1}</div>
+        <div class="q-text">${(isEn && se?.q) || step.q}</div>
+        <div class="q-sub">${(isEn && se?.sub) || step.sub}</div>
+        ${step.law ? `<div class="q-law">📋 ${(isEn && se?.law) || step.law}</div>` : ''}
         <div class="multi-opts" id="mopts"></div>
         <div class="multi-actions">
-          <button class="btn-next" id="multi-next" onclick="commitMulti()">선택 완료 →</button>
-          <span class="sel-count" id="sel-cnt">0개 선택됨</span>
+          <button class="btn-next" id="multi-next" onclick="commitMulti()">${isEn ? 'Confirm →' : '선택 완료 →'}</button>
+          <span class="sel-count" id="sel-cnt">${isEn ? '0 selected' : '0개 선택됨'}</span>
         </div>
       </div>`;
     renderMultiOpts(step);
   } else {
     area.innerHTML = casesHtml + `
       <div class="wizard">
-        ${currentStep > 0 ? `<div class="back-row"><button class="back-btn" onclick="goBack()">◀ 이전</button></div>` : ''}
-        <div class="q-num">질문 ${currentStep + 1}</div>
-        <div class="q-text">${step.q}</div>
-        <div class="q-sub">${step.sub}</div>
-        ${step.law ? `<div class="q-law">📋 ${step.law}</div>` : ''}
-        <div class="opts">${step.opts.map(opt => `
+        ${currentStep > 0 ? `<div class="back-row"><button class="back-btn" onclick="goBack()">◀ ${isEn ? 'Back' : '이전'}</button></div>` : ''}
+        <div class="q-num">${isEn ? 'Question' : '질문'} ${currentStep + 1}</div>
+        <div class="q-text">${(isEn && se?.q) || step.q}</div>
+        <div class="q-sub">${(isEn && se?.sub) || step.sub}</div>
+        ${step.law ? `<div class="q-law">📋 ${(isEn && se?.law) || step.law}</div>` : ''}
+        <div class="opts">${step.opts.map((opt, oi) => `
           <button class="opt${answers[step.id]===opt.k?' selected':''}" onclick="pick('${step.id}','${opt.k}')">
             ${opt.icon?`<span class="opt-icon">${opt.icon}</span>`:''}
             <span class="opt-body">
-              <span class="opt-label">${opt.label}</span>
-              <span class="opt-desc">${opt.desc}</span>
+              <span class="opt-label">${(isEn && se?.opts?.[oi]?.label) || opt.label}</span>
+              <span class="opt-desc">${(isEn && se?.opts?.[oi]?.desc) || opt.desc}</span>
             </span>
-            ${opt.risk?`<span class="opt-badge badge-${opt.risk}">${{high:'고위험',mid:'중위험',low:'저위험'}[opt.risk]}</span>`:''}
+            ${opt.risk?`<span class="opt-badge badge-${opt.risk}">${isEn ? {high:'High Risk',mid:'Medium Risk',low:'Low Risk'}[opt.risk] : {high:'고위험',mid:'중위험',low:'저위험'}[opt.risk]}</span>`:''}
           </button>`).join('')}
         </div>
       </div>`;
@@ -630,18 +834,20 @@ function renderStep(){
 }
 
 function renderMultiOpts(step){
+  const isEn = jdhLang === 'en';
+  const se = isEn ? STEPS_EN[step.id] : null;
   const wrap = document.getElementById('mopts');
   if(!wrap) return;
-  wrap.innerHTML = step.opts.map(o => `
+  wrap.innerHTML = step.opts.map((o, oi) => `
     <div class="m-opt${multiSel.includes(o.k)?' active':''}" onclick="toggleMulti('${o.k}','${step.id}')">
       <div class="m-chk">${multiSel.includes(o.k)?'✓':''}</div>
       <div>
-        <div class="m-label">${o.label}</div>
-        <div class="m-desc">${o.desc}</div>
+        <div class="m-label">${(isEn && se?.opts?.[oi]?.label) || o.label}</div>
+        <div class="m-desc">${(isEn && se?.opts?.[oi]?.desc) || o.desc}</div>
       </div>
     </div>`).join('');
   const cnt = document.getElementById('sel-cnt');
-  if(cnt) cnt.textContent = multiSel.length + '개 선택됨';
+  if(cnt) cnt.textContent = isEn ? `${multiSel.length} selected` : `${multiSel.length}개 선택됨`;
 }
 
 function toggleMulti(k, stepId){
@@ -684,6 +890,10 @@ function goBack(){
 }
 
 function shortLabel(id){
+  if(jdhLang === 'en') return {industry:'Industry',headcount:'Size',conAmt:'Contract',dispatch:'Dispatch/Sub',
+    dispatchType:'Dispatch Type',foreigner:'Foreign Workers',safetyMgr:'Safety Mgr',healthMgr:'Health Mgr',
+    riskAssess:'Risk Assess.',training:'Training',hazards:'Hazards',accidentHistory:'Accidents',
+    subMgmt:'Sub Mgmt',budget:'Budget',manual:'Manual'}[id]||id;
   return {industry:'업종',headcount:'규모',conAmt:'공사액',dispatch:'파견/도급',
     dispatchType:'파견유형',foreigner:'외국인',safetyMgr:'안전관리자',healthMgr:'보건관리자',
     riskAssess:'위험성평가',training:'안전교육',hazards:'위험요인',accidentHistory:'재해이력',
@@ -701,6 +911,7 @@ function showResult(){
 function buildReport(){
   const C = answers;
   const hz = C.hazards || [];
+  const isEn = jdhLang === 'en';
 
   // --- applicability ---
   let appl = 'full';
@@ -712,12 +923,24 @@ function buildReport(){
   }
 
   const applInfo = {
-    full:     {tag:'완전 적용 사업장', title:'중대재해처벌법 완전 적용 대상', color:'full',
-      desc:'2022년 1월 27일부터 완전 적용됩니다. 경영책임자(대표이사 등)는 법정 의무 불이행 시 사망사고 발생 시 1년 이상 징역 또는 10억원 이하 벌금에 처해질 수 있습니다.'},
-    extended: {tag:'확대 적용 사업장', title:'중대재해처벌법 확대 적용 대상 (2024.01.27~)', color:'extended',
-      desc:'2024년 1월 27일부터 적용됩니다. 소규모 사업장도 경영책임자 처벌 대상이 됩니다. 의무 이행 수준은 대규모 사업장과 동일하므로 즉시 대비가 필요합니다.'},
-    exempt:   {tag:'현행 법 미적용', title:'현재 중대재해처벌법 직접 적용 제외', color:'exempt',
-      desc:'현재 직접 적용 대상이 아닙니다. 그러나 산업안전보건법은 5인 미만 사업장에도 일부 적용되며, 향후 법 개정 시 적용 대상이 될 수 있습니다. 선제적 안전관리를 권고드립니다.'},
+    full: {
+      tag: isEn ? 'Full Coverage Workplace' : '완전 적용 사업장',
+      title: isEn ? 'Fully Subject to Serious Accidents Punishment Act' : '중대재해처벌법 완전 적용 대상',
+      color: 'full',
+      desc: isEn ? 'Fully effective from January 27, 2022. If the CEO fails to fulfill statutory obligations and a fatality occurs, they may face imprisonment of 1 year or more, or a fine of up to ₩1B.' : '2022년 1월 27일부터 완전 적용됩니다. 경영책임자(대표이사 등)는 법정 의무 불이행 시 사망사고 발생 시 1년 이상 징역 또는 10억원 이하 벌금에 처해질 수 있습니다.'
+    },
+    extended: {
+      tag: isEn ? 'Expanded Coverage Workplace' : '확대 적용 사업장',
+      title: isEn ? 'Subject to SAPA — Expanded Coverage (from 2024.01.27)' : '중대재해처벌법 확대 적용 대상 (2024.01.27~)',
+      color: 'extended',
+      desc: isEn ? 'Applies from January 27, 2024. Small workplaces are now also subject to CEO criminal liability. Obligation levels are the same as large workplaces — immediate preparation is required.' : '2024년 1월 27일부터 적용됩니다. 소규모 사업장도 경영책임자 처벌 대상이 됩니다. 의무 이행 수준은 대규모 사업장과 동일하므로 즉시 대비가 필요합니다.'
+    },
+    exempt: {
+      tag: isEn ? 'Currently Exempt' : '현행 법 미적용',
+      title: isEn ? 'Not Directly Subject to SAPA' : '현재 중대재해처벌법 직접 적용 제외',
+      color: 'exempt',
+      desc: isEn ? 'Not currently a direct subject. However, OSHA partially applies even to workplaces under 5 employees, and future amendments may extend coverage. Proactive safety management is recommended.' : '현재 직접 적용 대상이 아닙니다. 그러나 산업안전보건법은 5인 미만 사업장에도 일부 적용되며, 향후 법 개정 시 적용 대상이 될 수 있습니다. 선제적 안전관리를 권고드립니다.'
+    },
   };
   const ai = applInfo[appl];
 
@@ -753,7 +976,7 @@ function buildReport(){
   score = Math.min(Math.round(score * 10) / 10, 10);
 
   const riskClass = score >= 7 ? 'risk-critical' : score >= 4 ? 'risk-warn' : 'risk-ok';
-  const riskLabel = score >= 7 ? '위험' : score >= 4 ? '주의' : '양호';
+  const riskLabel = score >= 7 ? (isEn ? 'Critical' : '위험') : score >= 4 ? (isEn ? 'Warning' : '주의') : (isEn ? 'Good' : '양호');
 
   // --- fine risk ---
   const fineRisk = appl === 'exempt' ? 0 :
@@ -765,51 +988,107 @@ function buildReport(){
 
   if(appl !== 'exempt'){
     // 1. 방침
-    addObl('warn','안전보건 목표 및 경영방침 수립','경영책임자 명의의 문서화된 방침 필요 (시행령 제4조 제1항)');
+    addObl('warn',
+      isEn ? 'Establish Safety & Health Goals & Management Policy' : '안전보건 목표 및 경영방침 수립',
+      isEn ? 'CEO-signed written policy required (Enforcement Decree §4(1))' : '경영책임자 명의의 문서화된 방침 필요 (시행령 제4조 제1항)');
     // 2. 전담조직
     if(C.headcount === 'o500'){
-      addObl('warn','전담 안전보건 조직 설치 (500인 이상 필수)','상시근로자 500인 이상 사업장은 전담 안전보건 부서 설치 의무 (시행령 제4조 제2항)');
+      addObl('warn',
+        isEn ? 'Establish Dedicated Safety & Health Unit (Required for 500+)' : '전담 안전보건 조직 설치 (500인 이상 필수)',
+        isEn ? 'Workplaces of 500+ employees must have a dedicated safety & health department (Enforcement Decree §4(2))' : '상시근로자 500인 이상 사업장은 전담 안전보건 부서 설치 의무 (시행령 제4조 제2항)');
     } else {
-      addObl('ok','전담 안전보건 조직 (500인 미만 의무 없음)','해당 없음 — 내부 안전보건 관리 체계 구축 권고');
+      addObl('ok',
+        isEn ? 'Dedicated Safety & Health Unit (No obligation below 500)' : '전담 안전보건 조직 (500인 미만 의무 없음)',
+        isEn ? 'Not applicable — recommended to establish internal safety management system' : '해당 없음 — 내부 안전보건 관리 체계 구축 권고');
     }
     // 3. 위험성 평가
-    if(C.riskAssess === 'regular') addObl('ok','유해·위험요인 확인·개선 절차 (위험성 평가)','정기적 실시 확인됨 → 개선조치 기록 보관 철저히 유지');
-    else if(C.riskAssess === 'partial') addObl('warn','유해·위험요인 확인·개선 절차 (위험성 평가)','일부만 실시 중 → 전 사업장 대상 정기 실시 및 기록 보완 필요');
-    else if(C.riskAssess === 'none') addObl('fail','유해·위험요인 확인·개선 절차 (위험성 평가)','미실시 → 중대재해 발생 시 경영책임자 처벌 가중 사유. 즉시 실시 필요');
+    if(C.riskAssess === 'regular') addObl('ok',
+      isEn ? 'Hazard Identification & Improvement Process (Risk Assessment)' : '유해·위험요인 확인·개선 절차 (위험성 평가)',
+      isEn ? 'Regular implementation confirmed → maintain meticulous improvement action records' : '정기적 실시 확인됨 → 개선조치 기록 보관 철저히 유지');
+    else if(C.riskAssess === 'partial') addObl('warn',
+      isEn ? 'Hazard Identification & Improvement Process (Risk Assessment)' : '유해·위험요인 확인·개선 절차 (위험성 평가)',
+      isEn ? 'Partial implementation → extend to all worksites and supplement records' : '일부만 실시 중 → 전 사업장 대상 정기 실시 및 기록 보완 필요');
+    else if(C.riskAssess === 'none') addObl('fail',
+      isEn ? 'Hazard Identification & Improvement Process (Risk Assessment)' : '유해·위험요인 확인·개선 절차 (위험성 평가)',
+      isEn ? 'Not conducted → aggravates CEO criminal liability if accident occurs. Immediate action required' : '미실시 → 중대재해 발생 시 경영책임자 처벌 가중 사유. 즉시 실시 필요');
     // 4. 예산
-    if(C.budget === 'full') addObl('ok','안전보건 예산 편성 및 집행','편성·집행 기록 완비 확인됨');
-    else if(C.budget === 'allocated') addObl('warn','안전보건 예산 편성 및 집행','편성은 됐으나 집행 증빙 보완 필요 (시행령 제4조 제4항)');
-    else addObl('fail','안전보건 예산 편성 및 집행','전용 예산 미편성 → 시행령 제4조 제4항 위반. 즉시 편성 및 집행 기록 마련');
+    if(C.budget === 'full') addObl('ok',
+      isEn ? 'Safety & Health Budget — Allocation & Execution' : '안전보건 예산 편성 및 집행',
+      isEn ? 'Budget allocation and execution records complete' : '편성·집행 기록 완비 확인됨');
+    else if(C.budget === 'allocated') addObl('warn',
+      isEn ? 'Safety & Health Budget — Allocation & Execution' : '안전보건 예산 편성 및 집행',
+      isEn ? 'Budget allocated but execution evidence needs supplementing (Enforcement Decree §4(4))' : '편성은 됐으나 집행 증빙 보완 필요 (시행령 제4조 제4항)');
+    else addObl('fail',
+      isEn ? 'Safety & Health Budget — Allocation & Execution' : '안전보건 예산 편성 및 집행',
+      isEn ? 'No dedicated budget → violation of Enforcement Decree §4(4). Immediately allocate and document expenditures' : '전용 예산 미편성 → 시행령 제4조 제4항 위반. 즉시 편성 및 집행 기록 마련');
     // 5. 안전관리자
-    if(C.safetyMgr === 'full') addObl('ok','안전관리자 선임 (법정 자격자)','전담 선임 완료');
-    else if(['concurrent','outsourced','noObl'].includes(C.safetyMgr)) addObl('warn','안전관리자 선임·배치','선임됐으나 실질적 업무 수행 여부 점검 필요 (시행령 제4조 제5항)');
-    else addObl('fail','안전관리자 선임 (법정 자격자)','미선임 → 산업안전보건법 제17조 위반 및 중대재해처벌법 시행령 제4조 제5항 미이행');
+    if(C.safetyMgr === 'full') addObl('ok',
+      isEn ? 'Safety Manager Appointment (Legally Qualified)' : '안전관리자 선임 (법정 자격자)',
+      isEn ? 'Dedicated appointment complete' : '전담 선임 완료');
+    else if(['concurrent','outsourced','noObl'].includes(C.safetyMgr)) addObl('warn',
+      isEn ? 'Safety Manager Appointment & Deployment' : '안전관리자 선임·배치',
+      isEn ? 'Appointed but verify actual performance of duties (Enforcement Decree §4(5))' : '선임됐으나 실질적 업무 수행 여부 점검 필요 (시행령 제4조 제5항)');
+    else addObl('fail',
+      isEn ? 'Safety Manager Appointment (Legally Qualified)' : '안전관리자 선임 (법정 자격자)',
+      isEn ? 'Not appointed → violation of OSHA §17 and SAPA Enforcement Decree §4(5)' : '미선임 → 산업안전보건법 제17조 위반 및 중대재해처벌법 시행령 제4조 제5항 미이행');
     // 6. 보건관리자
-    if(C.healthMgr === 'full') addObl('ok','보건관리자 선임','전담 선임 완료');
-    else if(['outsourced','noObl'].includes(C.healthMgr)) addObl('warn','보건관리자 선임','위탁·의무 없음 — 50인 이상 사업장은 의무 재확인 필요');
-    else addObl('fail','보건관리자 선임','미선임 → 산업안전보건법 제22조 위반. 즉시 선임 또는 전문기관 위탁');
+    if(C.healthMgr === 'full') addObl('ok',
+      isEn ? 'Health Manager Appointment' : '보건관리자 선임',
+      isEn ? 'Dedicated appointment complete' : '전담 선임 완료');
+    else if(['outsourced','noObl'].includes(C.healthMgr)) addObl('warn',
+      isEn ? 'Health Manager Appointment' : '보건관리자 선임',
+      isEn ? 'Outsourced / No obligation — reconfirm obligation for 50+ employees' : '위탁·의무 없음 — 50인 이상 사업장은 의무 재확인 필요');
+    else addObl('fail',
+      isEn ? 'Health Manager Appointment' : '보건관리자 선임',
+      isEn ? 'Not appointed → violation of OSHA §22. Immediately appoint or delegate to specialist agency' : '미선임 → 산업안전보건법 제22조 위반. 즉시 선임 또는 전문기관 위탁');
     // 7. 교육
-    if(C.training === 'full') addObl('ok','법정 안전보건 교육 이행','전체 이행 확인됨 → 교육일지·서명부 보관 유지');
-    else if(C.training === 'partial') addObl('warn','법정 안전보건 교육 이행','일부 누락 → 정기교육·특별교육 계획 수립 및 이행 강화');
-    else addObl('fail','법정 안전보건 교육 이행','미이행 → 과태료 대상. 채용 시 교육부터 즉시 시작 필요');
+    if(C.training === 'full') addObl('ok',
+      isEn ? 'Mandatory Safety & Health Training Compliance' : '법정 안전보건 교육 이행',
+      isEn ? 'All training completed → maintain training logs and attendance records' : '전체 이행 확인됨 → 교육일지·서명부 보관 유지');
+    else if(C.training === 'partial') addObl('warn',
+      isEn ? 'Mandatory Safety & Health Training Compliance' : '법정 안전보건 교육 이행',
+      isEn ? 'Some gaps → establish regular and special training plan and strengthen compliance' : '일부 누락 → 정기교육·특별교육 계획 수립 및 이행 강화');
+    else addObl('fail',
+      isEn ? 'Mandatory Safety & Health Training Compliance' : '법정 안전보건 교육 이행',
+      isEn ? 'Not conducted → subject to administrative fine. Start new-hire training immediately' : '미이행 → 과태료 대상. 채용 시 교육부터 즉시 시작 필요');
     // 8. 의견청취
-    addObl('warn','종사자 안전보건 의견 청취 절차 마련','안전보건 회의, 건의함, 정기 면담 등 절차 문서화 필요 (시행령 제4조 제7항)');
+    addObl('warn',
+      isEn ? 'Establish Worker Safety & Health Consultation Process' : '종사자 안전보건 의견 청취 절차 마련',
+      isEn ? 'Document safety meetings, suggestion boxes, regular interviews, etc. (Enforcement Decree §4(7))' : '안전보건 회의, 건의함, 정기 면담 등 절차 문서화 필요 (시행령 제4조 제7항)');
     // 9. 매뉴얼
-    if(C.manual === 'current') addObl('ok','중대재해 발생 시 대응 매뉴얼','최신화됨 → 반기 1회 이상 점검 유지');
-    else if(C.manual === 'old') addObl('warn','중대재해 발생 시 대응 매뉴얼','있으나 업데이트 필요 → 즉시 검토·갱신 및 반기 1회 점검 일정 수립');
-    else addObl('fail','중대재해 발생 시 대응 매뉴얼','없음 → 사고 발생 시 대응 지연으로 상황 악화. 즉시 수립 필요 (시행령 제4조 제8항)');
+    if(C.manual === 'current') addObl('ok',
+      isEn ? 'Serious Accident Response Manual' : '중대재해 발생 시 대응 매뉴얼',
+      isEn ? 'Up to date → maintain semi-annual review schedule' : '최신화됨 → 반기 1회 이상 점검 유지');
+    else if(C.manual === 'old') addObl('warn',
+      isEn ? 'Serious Accident Response Manual' : '중대재해 발생 시 대응 매뉴얼',
+      isEn ? 'Exists but needs update → review and revise immediately; set semi-annual check schedule' : '있으나 업데이트 필요 → 즉시 검토·갱신 및 반기 1회 점검 일정 수립');
+    else addObl('fail',
+      isEn ? 'Serious Accident Response Manual' : '중대재해 발생 시 대응 매뉴얼',
+      isEn ? 'Does not exist → delayed response worsens the situation. Establish immediately (Enforcement Decree §4(8))' : '없음 → 사고 발생 시 대응 지연으로 상황 악화. 즉시 수립 필요 (시행령 제4조 제8항)');
     // 10. 도급
     if(['sub','both'].includes(C.dispatch)){
-      if(C.subMgmt === 'managed') addObl('ok','도급·용역·위탁 안전보건 기준 마련 및 이행','기준·절차 마련 및 이행 확인됨');
-      else if(C.subMgmt === 'partial') addObl('warn','도급·용역·위탁 안전보건 기준 마련 및 이행','일부만 적용 → 전체 수급인 대상 기준 통일 필요 (시행령 제4조 제9항)');
-      else addObl('fail','도급·용역·위탁 안전보건 기준 마련 및 이행','관리 없음 → 도급인(원청) 법적 의무 위반. 즉시 안전보건 협의체 구성 필요');
+      if(C.subMgmt === 'managed') addObl('ok',
+        isEn ? 'Subcontract Safety & Health Standards — Establishment & Compliance' : '도급·용역·위탁 안전보건 기준 마련 및 이행',
+        isEn ? 'Standards and procedures established and followed' : '기준·절차 마련 및 이행 확인됨');
+      else if(C.subMgmt === 'partial') addObl('warn',
+        isEn ? 'Subcontract Safety & Health Standards — Establishment & Compliance' : '도급·용역·위탁 안전보건 기준 마련 및 이행',
+        isEn ? 'Partial application → standardize requirements for all subcontractors (Enforcement Decree §4(9))' : '일부만 적용 → 전체 수급인 대상 기준 통일 필요 (시행령 제4조 제9항)');
+      else addObl('fail',
+        isEn ? 'Subcontract Safety & Health Standards — Establishment & Compliance' : '도급·용역·위탁 안전보건 기준 마련 및 이행',
+        isEn ? 'No management → principal contractor violating legal obligations. Establish joint safety council immediately' : '관리 없음 → 도급인(원청) 법적 의무 위반. 즉시 안전보건 협의체 구성 필요');
     }
     // 파견 금지 업종
-    if(C.dispatchType === 'restricted') addObl('fail','파견 금지 업종·업무 파견 사용 여부','파견법 금지 업종에서 파견 사용 시 형사처벌 (2년 이하 징역 or 2천만원 이하 벌금). 즉시 법적 검토 필요');
-    else if(C.dispatchType === 'unknown') addObl('warn','파견 허용 업종·업무 적합성 확인','파견 허용 여부 불확실 → 법률 전문가 자문을 통한 적합성 확인 필요');
+    if(C.dispatchType === 'restricted') addObl('fail',
+      isEn ? 'Use of Dispatch in Prohibited Industries / Roles' : '파견 금지 업종·업무 파견 사용 여부',
+      isEn ? 'Using dispatch in prohibited industries is a criminal offense (imprisonment ≤2 years or fine ≤₩20M). Immediate legal review required' : '파견법 금지 업종에서 파견 사용 시 형사처벌 (2년 이하 징역 or 2천만원 이하 벌금). 즉시 법적 검토 필요');
+    else if(C.dispatchType === 'unknown') addObl('warn',
+      isEn ? 'Verify Dispatch Eligibility for Job Roles' : '파견 허용 업종·업무 적합성 확인',
+      isEn ? 'Dispatch eligibility uncertain → consult a legal professional to verify' : '파견 허용 여부 불확실 → 법률 전문가 자문을 통한 적합성 확인 필요');
     // 외국인
     if(['e9','h2','multi'].includes(C.foreigner)){
-      addObl('warn','외국인 근로자 안전보건 교육 (모국어 제공)','2026년 외국인 고용 사업장 집중 근로감독 시행 예고 — 모국어 안전 교육자료 준비 필요');
+      addObl('warn',
+        isEn ? 'Safety Training for Foreign Workers (Native Language)' : '외국인 근로자 안전보건 교육 (모국어 제공)',
+        isEn ? '2026 intensive labor inspection on foreign-worker workplaces announced — prepare native-language safety materials' : '2026년 외국인 고용 사업장 집중 근로감독 시행 예고 — 모국어 안전 교육자료 준비 필요');
     }
   }
 
@@ -817,41 +1096,41 @@ function buildReport(){
   const phase1 = [], phase2 = [], phase3 = [];
 
   if(appl !== 'exempt'){
-    if(!['full','concurrent','outsourced'].includes(C.safetyMgr)) phase1.push('안전관리자 즉시 선임 (법정 자격자 확보)');
-    if(C.riskAssess !== 'regular') phase1.push('전 사업장 위험성 평가 실시 및 기록 보관');
-    if(C.manual !== 'current') phase1.push('중대재해 발생 시 대응 매뉴얼 즉시 수립');
-    if(C.budget === 'none') phase1.push('안전보건 전용 예산 항목 편성 및 집행 기록 체계 마련');
-    if(C.dispatchType === 'restricted') phase1.push('파견 금지 업종 즉시 법적 검토 및 시정');
-    phase1.push('경영책임자 명의 안전보건 방침·목표 공문 수립');
+    if(!['full','concurrent','outsourced'].includes(C.safetyMgr)) phase1.push(isEn ? 'Appoint safety manager immediately (obtain legally qualified person)' : '안전관리자 즉시 선임 (법정 자격자 확보)');
+    if(C.riskAssess !== 'regular') phase1.push(isEn ? 'Conduct risk assessment across all worksites and maintain records' : '전 사업장 위험성 평가 실시 및 기록 보관');
+    if(C.manual !== 'current') phase1.push(isEn ? 'Establish a serious accident response manual immediately' : '중대재해 발생 시 대응 매뉴얼 즉시 수립');
+    if(C.budget === 'none') phase1.push(isEn ? 'Allocate dedicated safety budget and set up expenditure tracking' : '안전보건 전용 예산 항목 편성 및 집행 기록 체계 마련');
+    if(C.dispatchType === 'restricted') phase1.push(isEn ? 'Immediate legal review and correction of dispatch in prohibited industries' : '파견 금지 업종 즉시 법적 검토 및 시정');
+    phase1.push(isEn ? 'Draft CEO-signed written safety & health policy and goals' : '경영책임자 명의 안전보건 방침·목표 공문 수립');
 
-    if(C.healthMgr === 'none') phase2.push('보건관리자 선임 또는 전문기관 위탁 계약');
-    if(C.training !== 'full') phase2.push('법정 안전보건 교육 계획 수립 및 교육일지 체계 구축');
-    phase2.push('종사자 안전보건 의견 청취 절차 마련 (안전보건 회의 등)');
-    if(['sub','both'].includes(C.dispatch)) phase2.push('도급업체 대상 안전보건 협의체 구성 및 기준 통일');
-    if(['e9','h2','multi'].includes(C.foreigner)) phase2.push('외국인 근로자 모국어 안전교육 자료 제작 및 교육 실시');
-    if(C.headcount === 'o500') phase2.push('전담 안전보건 조직(부서) 신설 및 인원 배치');
-    phase2.push('반기별 위험성 평가·매뉴얼 점검 일정 수립');
+    if(C.healthMgr === 'none') phase2.push(isEn ? 'Appoint health manager or contract with specialist agency' : '보건관리자 선임 또는 전문기관 위탁 계약');
+    if(C.training !== 'full') phase2.push(isEn ? 'Establish mandatory training plan and build attendance record system' : '법정 안전보건 교육 계획 수립 및 교육일지 체계 구축');
+    phase2.push(isEn ? 'Set up worker consultation processes (safety meetings, suggestion boxes, etc.)' : '종사자 안전보건 의견 청취 절차 마련 (안전보건 회의 등)');
+    if(['sub','both'].includes(C.dispatch)) phase2.push(isEn ? 'Form subcontractor joint safety council and unify safety standards' : '도급업체 대상 안전보건 협의체 구성 및 기준 통일');
+    if(['e9','h2','multi'].includes(C.foreigner)) phase2.push(isEn ? 'Prepare native-language safety materials for foreign workers and deliver training' : '외국인 근로자 모국어 안전교육 자료 제작 및 교육 실시');
+    if(C.headcount === 'o500') phase2.push(isEn ? 'Establish a dedicated safety & health department and staff it' : '전담 안전보건 조직(부서) 신설 및 인원 배치');
+    phase2.push(isEn ? 'Set semi-annual risk assessment and manual review schedule' : '반기별 위험성 평가·매뉴얼 점검 일정 수립');
 
-    phase3.push('안전보건경영시스템(ISO 45001 등) 도입 검토');
+    phase3.push(isEn ? 'Consider adopting a safety management system (ISO 45001, etc.)' : '안전보건경영시스템(ISO 45001 등) 도입 검토');
     phase3.push(isInsRole()
-      ? '산재보험 외 단체상해보험·근재보험 가입으로 민사 배상 리스크 완충'
-      : '민사 배상 리스크 대비 재무적 리스크 이전(Transfer) 전략 수립');
+      ? (isEn ? "Add group accident / employer's liability insurance to buffer civil damages beyond workers' comp" : '산재보험 외 단체상해보험·근재보험 가입으로 민사 배상 리스크 완충')
+      : (isEn ? 'Develop a financial risk-transfer strategy for civil liability exposure' : '민사 배상 리스크 대비 재무적 리스크 이전(Transfer) 전략 수립'));
     phase3.push(isInsRole()
-      ? '경영책임자·임원 배상책임보험(D&O) 검토'
-      : '경영책임자 개인 법률·배상 리스크에 대한 잔여리스크 재무적 담보 방안 검토');
+      ? (isEn ? 'Review D&O liability insurance for CEO and executives' : '경영책임자·임원 배상책임보험(D&O) 검토')
+      : (isEn ? 'Examine financial guarantees for residual legal/compensation risk to the CEO personally' : '경영책임자 개인 법률·배상 리스크에 대한 잔여리스크 재무적 담보 방안 검토'));
     if(fineRisk > 0) phase3.push(isInsRole()
-      ? '법인 벌금 대비 기업배상책임보험 검토'
-      : '법인 벌금 리스크에 대한 리스크 파이낸싱(Risk Financing) 방안 검토');
-    phase3.push('외부 안전보건 전문기관 연간 컨설팅 계약 체결');
-    phase3.push('안전보건 KPI 도입 및 경영진 성과 연동');
+      ? (isEn ? 'Review corporate liability insurance to cover potential entity fines' : '법인 벌금 대비 기업배상책임보험 검토')
+      : (isEn ? 'Explore risk financing solutions for potential entity fines' : '법인 벌금 리스크에 대한 리스크 파이낸싱(Risk Financing) 방안 검토'));
+    phase3.push(isEn ? 'Sign annual consulting contract with an external safety & health specialist' : '외부 안전보건 전문기관 연간 컨설팅 계약 체결');
+    phase3.push(isEn ? 'Introduce safety & health KPIs and link to management performance' : '안전보건 KPI 도입 및 경영진 성과 연동');
   } else {
-    phase1.push('산업안전보건법 기본 의무 이행 현황 점검');
-    phase1.push('근로자 안전보건 교육 실시 (법 미적용이나 모범 운영 필요)');
-    phase2.push('향후 적용 확대 대비 자체 점검 체크리스트 마련');
+    phase1.push(isEn ? 'Review current compliance with basic OSHA obligations' : '산업안전보건법 기본 의무 이행 현황 점검');
+    phase1.push(isEn ? 'Conduct worker safety training (SAPA exempt but best practice still required)' : '근로자 안전보건 교육 실시 (법 미적용이나 모범 운영 필요)');
+    phase2.push(isEn ? 'Prepare a self-assessment checklist for future expanded coverage' : '향후 적용 확대 대비 자체 점검 체크리스트 마련');
     phase2.push(isInsRole()
-      ? '단체보험·산재보험 적정 보장 수준 검토'
-      : '잔여리스크 재무적 담보 수준 적정성 검토');
-    phase3.push('사업 확장 시 중대재해처벌법 적용 여부 재진단');
+      ? (isEn ? "Review adequate coverage levels for group and workers' comp insurance" : '단체보험·산재보험 적정 보장 수준 검토')
+      : (isEn ? 'Assess adequacy of financial guarantees for residual risk' : '잔여리스크 재무적 담보 수준 적정성 검토'));
+    phase3.push(isEn ? 'Re-assess SAPA applicability when business expands' : '사업 확장 시 중대재해처벌법 적용 여부 재진단');
   }
 
   // --- government support programs ---
@@ -860,61 +1139,63 @@ function buildReport(){
     // 안전보건관리체계 무료 컨설팅: 5~299인 (300인 이상도 신청 가능)
     if(!['u5'].includes(C.headcount)){
       govPrograms.push({
-        type:'무료 컨설팅',
-        name:'안전보건관리체계 구축 무료 컨설팅',
-        benefit:'전액 무료 (3~4개월 전문가 지원)',
-        desc:'KOSHA 안전보건 전문가가 사업장을 5회 방문해 위험성 평가 체계를 직접 구축해 드립니다. 중대재해처벌법 핵심 의무 이행의 가장 빠른 출발점입니다.',
-        target:['5to49','50to299'].includes(C.headcount) ? '5~299인 사업장 (신청 우선)' : '300인 이상도 신청 가능 (예산 내)',
+        type: isEn ? 'Free Consulting' : '무료 컨설팅',
+        name: isEn ? 'Free Safety Management System Consulting' : '안전보건관리체계 구축 무료 컨설팅',
+        benefit: isEn ? 'Fully free (3–4 months of expert support)' : '전액 무료 (3~4개월 전문가 지원)',
+        desc: isEn ? 'A KOSHA safety expert visits your workplace 5 times to directly build a risk assessment system. The fastest starting point for fulfilling key SAPA obligations.' : 'KOSHA 안전보건 전문가가 사업장을 5회 방문해 위험성 평가 체계를 직접 구축해 드립니다. 중대재해처벌법 핵심 의무 이행의 가장 빠른 출발점입니다.',
+        target: ['5to49','50to299'].includes(C.headcount)
+          ? (isEn ? '5–299 employees (priority applications)' : '5~299인 사업장 (신청 우선)')
+          : (isEn ? '300+ employees also eligible (subject to budget)' : '300인 이상도 신청 가능 (예산 내)'),
       });
     }
     // 스마트 안전장비 보조금: 50인 미만 우선
     if(C.headcount === '5to49'){
       govPrograms.push({
-        type:'직접 보조금',
-        name:'클린사업장 스마트 안전장비 지원',
-        benefit:'최대 4,000만원 현금 보조',
-        desc:'CCTV·충돌 감지·가스 감지기 등 스마트 안전장비 구매 비용을 정부가 직접 지원합니다. 50인 미만 사업장 우선 배정, 예산 소진 시 조기 마감.',
-        target:'50인 미만 사업장 (clean.kosha.or.kr)',
+        type: isEn ? 'Direct Grant' : '직접 보조금',
+        name: isEn ? 'Clean Workplace Smart Safety Equipment Support' : '클린사업장 스마트 안전장비 지원',
+        benefit: isEn ? 'Cash subsidy up to ₩40M' : '최대 4,000만원 현금 보조',
+        desc: isEn ? 'Government directly subsidizes purchase of smart safety equipment (CCTV, collision detection, gas detectors, etc.). Priority for workplaces under 50 employees; early closure when budget runs out.' : 'CCTV·충돌 감지·가스 감지기 등 스마트 안전장비 구매 비용을 정부가 직접 지원합니다. 50인 미만 사업장 우선 배정, 예산 소진 시 조기 마감.',
+        target: isEn ? 'Under 50 employees (clean.kosha.or.kr)' : '50인 미만 사업장 (clean.kosha.or.kr)',
       });
     }
     // 산재예방시설 융자: 300인 미만 우선
     if(['5to49','50to299'].includes(C.headcount)){
       govPrograms.push({
-        type:'저금리 융자',
-        name:'산재예방시설 융자금 지원',
-        benefit:'최대 10억원 · 연 1.5%',
-        desc:'안전 설비 투자 시 시중금리 대비 파격적인 장기 저리로 자금을 조달할 수 있습니다. 거치 3년 + 상환 7년으로 초기 부담이 없습니다.',
-        target:'300인 미만 우선 (clean.kosha.or.kr)',
+        type: isEn ? 'Low-Interest Loan' : '저금리 융자',
+        name: isEn ? 'Industrial Accident Prevention Facility Loan' : '산재예방시설 융자금 지원',
+        benefit: isEn ? 'Up to ₩1B · 1.5% p.a.' : '최대 10억원 · 연 1.5%',
+        desc: isEn ? 'Long-term financing at dramatically lower rates than market for safety equipment investments. 3-year grace period + 7-year repayment — minimal upfront burden.' : '안전 설비 투자 시 시중금리 대비 파격적인 장기 저리로 자금을 조달할 수 있습니다. 거치 3년 + 상환 7년으로 초기 부담이 없습니다.',
+        target: isEn ? 'Under 300 employees priority (clean.kosha.or.kr)' : '300인 미만 우선 (clean.kosha.or.kr)',
       });
     }
     // 위험성평가 인정 → 산재보험료 최대 30% 할인: 50인 미만
     if(C.headcount === '5to49'){
       govPrograms.push({
-        type:'보험료 절감',
-        name:'위험성평가 인정 — 산재보험료 최대 30% 할인',
-        benefit:'산재보험료 매년 최대 30% 절감',
-        desc:'위험성평가를 실시하고 고용노동부 인정을 받으면 산재보험료율이 최대 30% 인하됩니다. 법적 의무 이행과 비용 절감을 동시에 달성합니다.',
-        target:'50인 미만 제조·임업 등 (근로복지공단)',
+        type: isEn ? "Premium Savings" : '보험료 절감',
+        name: isEn ? "Risk Assessment Certification — Up to 30% Workers' Comp Premium Discount" : '위험성평가 인정 — 산재보험료 최대 30% 할인',
+        benefit: isEn ? "Up to 30% annual savings on workers' comp premiums" : '산재보험료 매년 최대 30% 절감',
+        desc: isEn ? "Receive MOEL certification for risk assessment and get up to 30% off the workers' comp rate. Achieves legal compliance and cost savings simultaneously." : '위험성평가를 실시하고 고용노동부 인정을 받으면 산재보험료율이 최대 30% 인하됩니다. 법적 의무 이행과 비용 절감을 동시에 달성합니다.',
+        target: isEn ? "Under 50 employees in manufacturing, forestry, etc. (Korea Workers' Compensation & Welfare Service)" : '50인 미만 제조·임업 등 (근로복지공단)',
       });
     }
     // 소규모 안전보건 기술지원: 50인 미만
     if(C.headcount === '5to49'){
       govPrograms.push({
-        type:'무료 기술지원',
-        name:'소규모 사업장 안전보건 기술지원',
-        benefit:'전액 무료 (정기 방문 지원)',
-        desc:'안전보건 전문기관이 정기 방문해 위험요인 발굴, 개선 지도, 교육자료 제공 등을 무료로 지원합니다. 중대재해처벌법 의무 기록 구비에 직접 도움이 됩니다.',
-        target:'50인 미만 전 업종 (kosha.or.kr)',
+        type: isEn ? 'Free Technical Support' : '무료 기술지원',
+        name: isEn ? 'Small Workplace Safety & Health Technical Support' : '소규모 사업장 안전보건 기술지원',
+        benefit: isEn ? 'Fully free (regular site visits)' : '전액 무료 (정기 방문 지원)',
+        desc: isEn ? 'A specialist safety organization visits regularly to identify hazards, provide improvement guidance, and distribute training materials — all free. Directly helps build SAPA compliance records.' : '안전보건 전문기관이 정기 방문해 위험요인 발굴, 개선 지도, 교육자료 제공 등을 무료로 지원합니다. 중대재해처벌법 의무 기록 구비에 직접 도움이 됩니다.',
+        target: isEn ? 'All industries under 50 employees (kosha.or.kr)' : '50인 미만 전 업종 (kosha.or.kr)',
       });
     }
     // 대·중소기업 상생협력: 모기업 있는 경우
     if(['300to499','o500'].includes(C.headcount) || ['sub','both'].includes(C.dispatch)){
       govPrograms.push({
-        type:'상생협력 지원',
-        name:'대·중소기업 안전보건 상생협력사업',
-        benefit:'컨설팅·안전활동비 매칭 지원',
-        desc:'모기업과 협력업체가 공동 신청 시 정부가 매칭 지원. 안전보건 컨설팅, 교육, 장비 비용의 상당 부분을 지원받을 수 있습니다.',
-        target:'협력사 보유 사업장 (kosha.or.kr)',
+        type: isEn ? 'Partnership Support' : '상생협력 지원',
+        name: isEn ? 'Large–SME Safety & Health Partnership Program' : '대·중소기업 안전보건 상생협력사업',
+        benefit: isEn ? 'Matching support for consulting & safety activities' : '컨설팅·안전활동비 매칭 지원',
+        desc: isEn ? 'When a parent company and its contractors apply jointly, the government provides matching funding for safety consulting, training, and equipment costs.' : '모기업과 협력업체가 공동 신청 시 정부가 매칭 지원. 안전보건 컨설팅, 교육, 장비 비용의 상당 부분을 지원받을 수 있습니다.',
+        target: isEn ? 'Workplaces with contractors (kosha.or.kr)' : '협력사 보유 사업장 (kosha.or.kr)',
       });
     }
   }
@@ -923,27 +1204,34 @@ function buildReport(){
   const ins = [];
   if(appl !== 'exempt'){
     ins.push(isInsRole()
-      ? {tag:'필수 권고', name:'단체상해보험 / 근재보험', urgency:'high',
-          why:'산재보험은 법인세 비용이나 민사 손해배상(위자료, 일실수익)은 별도입니다. 단체상해보험·근재보험으로 민사 배상 리스크를 완충합니다.'}
-      : {tag:'재무적 완충 전략', name:'재무적 리스크 이전(Transfer) — 민사 배상 대비', urgency:'high',
-          why:'산재보험 외 민사 손해배상(위자료, 일실수익)에 대비한 재무적 리스크 이전 전략이 필요합니다. 잔여리스크 재무적 담보 방안을 검토하십시오.'});
+      ? {tag: isEn ? 'Essential' : '필수 권고', name: isEn ? "Group Accident / Employer's Liability Insurance" : '단체상해보험 / 근재보험', urgency:'high',
+          why: isEn ? "Workers' comp covers only 1,300 days of wages, but civil damages (lost lifetime income, bereavement compensation) are separate. Group accident/employer's liability insurance buffers civil liability." : '산재보험은 법인세 비용이나 민사 손해배상(위자료, 일실수익)은 별도입니다. 단체상해보험·근재보험으로 민사 배상 리스크를 완충합니다.'}
+      : {tag: isEn ? 'Financial Buffer Strategy' : '재무적 완충 전략', name: isEn ? 'Financial Risk Transfer — Civil Liability Coverage' : '재무적 리스크 이전(Transfer) — 민사 배상 대비', urgency:'high',
+          why: isEn ? "Civil damages beyond workers' comp (lost lifetime income, bereavement compensation) require a financial risk-transfer strategy." : '산재보험 외 민사 손해배상(위자료, 일실수익)에 대비한 재무적 리스크 이전 전략이 필요합니다. 잔여리스크 재무적 담보 방안을 검토하십시오.'});
     ins.push(isInsRole()
-      ? {tag:'경영책임자 보호', name:'임원배상책임보험 (D&O Insurance)', urgency:'high',
-          why:'중대재해 발생 시 경영책임자 개인에게 부과되는 벌금·법률 비용에 대한 대비. 경영진 개인 재산 보전.'}
-      : {tag:'경영책임자 리스크', name:'경영책임자 법적 리스크 재무적 담보 방안', urgency:'high',
-          why:'중대재해 발생 시 경영책임자 개인에게 부과되는 벌금·법률 비용에 대한 리스크 파이낸싱(Risk Financing) 방안을 검토하십시오.'});
+      ? {tag: isEn ? 'CEO Protection' : '경영책임자 보호', name: isEn ? 'Directors & Officers Liability Insurance (D&O)' : '임원배상책임보험 (D&O Insurance)', urgency:'high',
+          why: isEn ? 'Coverage for fines and legal costs personally charged to the CEO/executives following a serious accident. Protects personal assets.' : '중대재해 발생 시 경영책임자 개인에게 부과되는 벌금·법률 비용에 대한 대비. 경영진 개인 재산 보전.'}
+      : {tag: isEn ? 'CEO Legal Risk' : '경영책임자 리스크', name: isEn ? 'Financial Risk Guarantees for CEO Legal Liability' : '경영책임자 법적 리스크 재무적 담보 방안', urgency:'high',
+          why: isEn ? 'Explore risk financing solutions for fines and legal costs personally charged to the CEO/executives following a serious accident.' : '중대재해 발생 시 경영책임자 개인에게 부과되는 벌금·법률 비용에 대한 리스크 파이낸싱(Risk Financing) 방안을 검토하십시오.'});
     if(fineRisk > 0 || appl === 'full'){
+      const fineAmt = fineRisk > 0 ? (isEn ? '₩5B' : '50억원') : (isEn ? '₩1B' : '10억원');
       ins.push(isInsRole()
-        ? {tag:'법인 벌금 대비', name:'기업배상책임보험', urgency:'high',
-            why:`법인은 최대 ${fineRisk > 0 ? '50억원' : '10억원'} 벌금 부과 가능. 기업배상책임보험으로 법인 재무 리스크 완충.`}
-        : {tag:'법인 리스크', name:'법인 벌금 리스크 파이낸싱(Risk Financing) 방안', urgency:'high',
-            why:`법인은 최대 ${fineRisk > 0 ? '50억원' : '10억원'} 벌금 부과 가능. 리스크 파이낸싱을 통한 법인 재무 안정화 방안을 검토하십시오.`});
+        ? {tag: isEn ? 'Entity Fine Coverage' : '법인 벌금 대비', name: isEn ? 'Corporate Liability Insurance' : '기업배상책임보험', urgency:'high',
+            why: isEn ? `Entity can face fines up to ${fineAmt}. Corporate liability insurance buffers entity financial risk.` : `법인은 최대 ${fineAmt} 벌금 부과 가능. 기업배상책임보험으로 법인 재무 리스크 완충.`}
+        : {tag: isEn ? 'Entity Risk' : '법인 리스크', name: isEn ? 'Entity Fine Risk Financing Solution' : '법인 벌금 리스크 파이낸싱(Risk Financing) 방안', urgency:'high',
+            why: isEn ? `Entity can face fines up to ${fineAmt}. Explore risk financing solutions to stabilize entity finances.` : `법인은 최대 ${fineAmt} 벌금 부과 가능. 리스크 파이낸싱을 통한 법인 재무 안정화 방안을 검토하십시오.`});
     }
-    ins.push({tag:'종업원 복지', name:'종업원 재해 보상 재원 마련', urgency:'mid',
-      why:'근로자 재해 시 유족 위로금·치료비를 회사가 신속 지급할 수 있어 노사 신뢰 구축 및 민사 분쟁 예방에 효과적입니다.'});
+    ins.push({
+      tag: isEn ? 'Employee Welfare' : '종업원 복지',
+      name: isEn ? 'Disaster Compensation Fund for Employees' : '종업원 재해 보상 재원 마련',
+      urgency:'mid',
+      why: isEn ? 'Enables the company to swiftly pay condolence/treatment funds to workers and their families — building labor trust and preventing civil disputes.' : '근로자 재해 시 유족 위로금·치료비를 회사가 신속 지급할 수 있어 노사 신뢰 구축 및 민사 분쟁 예방에 효과적입니다.'});
     if(['e9','h2','multi'].includes(C.foreigner)){
-      ins.push({tag:'외국인 근로자 전용', name:'외국인 근로자 의료비 재원 확보', urgency:'mid',
-        why:'E-9·H-2 비자 외국인 근로자는 의료비 접근성 취약. 회사가 실손보장 재원을 확보하면 법적 리스크를 완화할 수 있습니다.'});
+      ins.push({
+        tag: isEn ? 'For Foreign Workers' : '외국인 근로자 전용',
+        name: isEn ? 'Medical Fund for Foreign Workers' : '외국인 근로자 의료비 재원 확보',
+        urgency:'mid',
+        why: isEn ? 'E-9/H-2 visa workers face limited healthcare access. Company-provided healthcare coverage reduces legal risk.' : 'E-9·H-2 비자 외국인 근로자는 의료비 접근성 취약. 회사가 실손보장 재원을 확보하면 법적 리스크를 완화할 수 있습니다.'});
     }
   }
 
@@ -964,42 +1252,42 @@ function buildReport(){
     <div class="alert-box">
       <div class="al-icon">🔴</div>
       <div class="al-body">
-        <div class="al-title">사망사고 이력 확인 — 즉각 법률 검토 필요</div>
-        <div class="al-text">사망사고가 발생한 사실이 있으며 중대재해처벌법 완전 적용 대상 사업장입니다. 경영책임자는 <b>1년 이상 징역 또는 10억원 이하 벌금</b>, 법인은 <b>50억원 이하 벌금</b> 대상이 될 수 있습니다. 즉시 노동법 전문 변호사 자문과 함께 의무 이행 상태를 점검해야 합니다.</div>
+        <div class="al-title">${isEn ? 'Fatality on Record — Immediate Legal Review Required' : '사망사고 이력 확인 — 즉각 법률 검토 필요'}</div>
+        <div class="al-text">${isEn ? 'A fatal occupational accident has occurred and this workplace is fully subject to SAPA. The CEO faces <b>imprisonment of 1 year or more, or a fine of up to ₩1B</b>; the entity faces <b>a fine of up to ₩5B</b>. Immediately consult a labor law attorney and review compliance status.' : '사망사고가 발생한 사실이 있으며 중대재해처벌법 완전 적용 대상 사업장입니다. 경영책임자는 <b>1년 이상 징역 또는 10억원 이하 벌금</b>, 법인은 <b>50억원 이하 벌금</b> 대상이 될 수 있습니다. 즉시 노동법 전문 변호사 자문과 함께 의무 이행 상태를 점검해야 합니다.'}</div>
       </div>
     </div>` : ''}
     ${appl !== 'exempt' && C.accidentHistory === 'serious' ? `
     <div class="alert-box">
       <div class="al-icon">🔶</div>
       <div class="al-body">
-        <div class="al-title">중상해 이력 확인 — 의무 이행 즉시 점검 권고</div>
-        <div class="al-text">6개월 이상 치료가 필요한 부상 사고 이력이 있습니다. 동종 사고가 재발하면 경영책임자는 <b>7년 이하 징역 또는 1억원 이하 벌금</b> 대상입니다. 재발 방지 대책과 법적 의무 이행 여부를 즉시 점검하십시오.</div>
+        <div class="al-title">${isEn ? 'Serious Injury on Record — Immediate Compliance Review Recommended' : '중상해 이력 확인 — 의무 이행 즉시 점검 권고'}</div>
+        <div class="al-text">${isEn ? 'There is a record of an injury requiring 6+ months of treatment. If a similar accident recurs, the CEO faces <b>imprisonment of up to 7 years or a fine of up to ₩100M</b>. Immediately review recurrence prevention measures and legal compliance.' : '6개월 이상 치료가 필요한 부상 사고 이력이 있습니다. 동종 사고가 재발하면 경영책임자는 <b>7년 이하 징역 또는 1억원 이하 벌금</b> 대상입니다. 재발 방지 대책과 법적 의무 이행 여부를 즉시 점검하십시오.'}</div>
       </div>
     </div>` : ''}
 
     <div class="score-row">
       <div class="score-card ${riskClass}">
         <div class="s-val">${score.toFixed(1)}<span style="font-size:16px">/10</span></div>
-        <div class="s-lbl">경영책임자 처벌 위험도</div>
+        <div class="s-lbl">${isEn ? 'CEO Punishment Risk Level' : '경영책임자 처벌 위험도'}</div>
         <div class="s-sub">${riskLabel}</div>
       </div>
       <div class="score-card">
-        <div class="s-val" style="color:var(--red);font-size:24px">${fail > 0 ? fail + '건' : '—'}</div>
-        <div class="s-lbl">즉시 시정 필요 항목</div>
-        <div class="s-sub" style="background:#2d1515;color:#f87171">${fail > 0 ? '위반 사항' : '없음'}</div>
+        <div class="s-val" style="color:var(--red);font-size:24px">${fail > 0 ? fail + (isEn ? '' : '건') : '—'}</div>
+        <div class="s-lbl">${isEn ? 'Violations to Fix Immediately' : '즉시 시정 필요 항목'}</div>
+        <div class="s-sub" style="background:#2d1515;color:#f87171">${fail > 0 ? (isEn ? 'Violations' : '위반 사항') : (isEn ? 'None' : '없음')}</div>
       </div>
       <div class="score-card">
-        <div class="s-val" style="color:var(--amber);font-size:24px">${warn > 0 ? warn + '건' : '—'}</div>
-        <div class="s-lbl">보완 권고 항목</div>
-        <div class="s-sub" style="background:#2d1f08;color:#fbbf24">${warn > 0 ? '개선 필요' : '없음'}</div>
+        <div class="s-val" style="color:var(--amber);font-size:24px">${warn > 0 ? warn + (isEn ? '' : '건') : '—'}</div>
+        <div class="s-lbl">${isEn ? 'Items to Improve' : '보완 권고 항목'}</div>
+        <div class="s-sub" style="background:#2d1f08;color:#fbbf24">${warn > 0 ? (isEn ? 'Improvement Needed' : '개선 필요') : (isEn ? 'None' : '없음')}</div>
       </div>
     </div>
 
     ${oblRows.length > 0 ? `
     <div class="section">
       <div class="section-head">
-        <h3>경영책임자 법정 의무 이행 현황</h3>
-        <span class="cnt ${fail>0?'cnt-red':warn>0?'cnt-amber':'cnt-green'}">${fail}건 위반 · ${warn}건 보완 · ${ok}건 이행</span>
+        <h3>${isEn ? 'CEO Statutory Obligations Compliance Status' : '경영책임자 법정 의무 이행 현황'}</h3>
+        <span class="cnt ${fail>0?'cnt-red':warn>0?'cnt-amber':'cnt-green'}">${isEn ? `${fail} violation(s) · ${warn} to improve · ${ok} compliant` : `${fail}건 위반 · ${warn}건 보완 · ${ok}건 이행`}</span>
       </div>
       ${oblRows.map(r=>`
         <div class="obl-row">
@@ -1012,22 +1300,22 @@ function buildReport(){
     </div>` : ''}
 
     <div class="section">
-      <div class="section-head"><h3>컨설팅 로드맵 (3단계)</h3></div>
+      <div class="section-head"><h3>${isEn ? 'Consulting Roadmap (3 Phases)' : '컨설팅 로드맵 (3단계)'}</h3></div>
       <div style="padding:16px">
         <div class="roadmap">
           <div class="phase ph1">
-            <div class="phase-head">PHASE 1 · 즉시~1개월</div>
-            <div class="phase-title">긴급 의무 이행</div>
+            <div class="phase-head">${isEn ? 'PHASE 1 · Immediate – 1 Month' : 'PHASE 1 · 즉시~1개월'}</div>
+            <div class="phase-title">${isEn ? 'Urgent Compliance' : '긴급 의무 이행'}</div>
             <div class="phase-items">${phase1.map(i=>`<div class="phase-item">${i}</div>`).join('')}</div>
           </div>
           <div class="phase ph2">
-            <div class="phase-head">PHASE 2 · 1~3개월</div>
-            <div class="phase-title">체계 구축</div>
+            <div class="phase-head">${isEn ? 'PHASE 2 · 1–3 Months' : 'PHASE 2 · 1~3개월'}</div>
+            <div class="phase-title">${isEn ? 'System Building' : '체계 구축'}</div>
             <div class="phase-items">${phase2.map(i=>`<div class="phase-item">${i}</div>`).join('')}</div>
           </div>
           <div class="phase ph3">
-            <div class="phase-head">PHASE 3 · 3~12개월</div>
-            <div class="phase-title">고도화·리스크 완충</div>
+            <div class="phase-head">${isEn ? 'PHASE 3 · 3–12 Months' : 'PHASE 3 · 3~12개월'}</div>
+            <div class="phase-title">${isEn ? 'Advanced Systems & Risk Buffer' : '고도화·리스크 완충'}</div>
             <div class="phase-items">${phase3.map(i=>`<div class="phase-item">${i}</div>`).join('')}</div>
           </div>
         </div>
@@ -1037,8 +1325,8 @@ function buildReport(){
     ${govPrograms.length > 0 ? `
     <div class="section">
       <div class="section-head">
-        <h3>정부지원사업 활용 — 법령 준수 비용 절감</h3>
-        <span class="cnt cnt-green">${govPrograms.length}개 사업 해당</span>
+        <h3>${isEn ? 'Government Support Programs — Reduce Compliance Costs' : '정부지원사업 활용 — 법령 준수 비용 절감'}</h3>
+        <span class="cnt cnt-green">${isEn ? `${govPrograms.length} program(s) available` : `${govPrograms.length}개 사업 해당`}</span>
       </div>
       <div style="padding:16px">
         <div class="gov-grid">
@@ -1048,20 +1336,21 @@ function buildReport(){
             <div class="gov-name">${g.name}</div>
             <div class="gov-benefit">${g.benefit}</div>
             <div class="gov-desc">${g.desc}</div>
-            <div class="gov-target">▸ 신청 대상: ${g.target}</div>
+            <div class="gov-target">▸ ${isEn ? 'Eligible:' : '신청 대상:'} ${g.target}</div>
           </div>`).join('')}
         </div>
-        <p style="font-size:12px;color:var(--muted);margin-top:8px">※ 예산 소진 시 조기 마감됩니다. 빠른 신청을 권장합니다. 통합 신청처: <strong style="color:var(--text)">KOSHA (kosha.or.kr)</strong> · <strong style="color:var(--text)">클린사업장 (clean.kosha.or.kr)</strong></p>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">${isEn ? '※ Programs may close early when budgets run out. Apply promptly. Central portal: <strong style="color:var(--text)">KOSHA (kosha.or.kr)</strong> · <strong style="color:var(--text)">Clean Workplace (clean.kosha.or.kr)</strong>' : '※ 예산 소진 시 조기 마감됩니다. 빠른 신청을 권장합니다. 통합 신청처: <strong style="color:var(--text)">KOSHA (kosha.or.kr)</strong> · <strong style="color:var(--text)">클린사업장 (clean.kosha.or.kr)</strong>'}</p>
       </div>
     </div>` : ''}
 
     ${ins.length > 0 ? `
     <div class="section">
-      <div class="section-head"><h3>위험관리 — 전반 및 보험 권고</h3></div>
+      <div class="section-head"><h3>${isEn ? 'Risk Management — Overview & Recommendations' : '위험관리 — 전반 및 보험 권고'}</h3></div>
       <div style="padding:12px 16px 4px;font-size:12.5px;color:var(--muted);line-height:1.6;border-bottom:1px solid var(--border);margin-bottom:12px;">
-        중대재해처벌법 위반 시 <strong style="color:var(--text)">경영진 형사처벌(1년 이상 징역) + 법인 과징금(10억 이하)</strong>이 동시에 발생합니다.
-        법적 의무 이행과 함께 <strong style="color:var(--text)">잔여 리스크에 대한 재무적 담보</strong>가 기업 존속의 핵심입니다.
-        ${appl==='exempt'?'(5인 미만 사업장은 현재 중처법 적용 제외이나, 근로기준법·산안법 적용은 동일하게 유지됩니다.)':''}
+        ${isEn
+          ? 'A SAPA violation triggers <strong style="color:var(--text)">CEO criminal liability (imprisonment 1+ years) + entity fine (up to ₩1B)</strong> simultaneously. Fulfilling legal obligations together with <strong style="color:var(--text)">financial guarantees for residual risk</strong> is critical for business continuity.'
+          : `중대재해처벌법 위반 시 <strong style="color:var(--text)">경영진 형사처벌(1년 이상 징역) + 법인 과징금(10억 이하)</strong>이 동시에 발생합니다. 법적 의무 이행과 함께 <strong style="color:var(--text)">잔여 리스크에 대한 재무적 담보</strong>가 기업 존속의 핵심입니다.`}
+        ${appl==='exempt'? (isEn ? '(Workplaces under 5 employees are currently exempt from SAPA, but the Labor Standards Act and OSHA still apply equally.)' : '(5인 미만 사업장은 현재 중처법 적용 제외이나, 근로기준법·산안법 적용은 동일하게 유지됩니다.)') :''}
       </div>
       <div style="padding:4px 16px 16px">
         <div class="ins-grid">
@@ -1070,21 +1359,21 @@ function buildReport(){
             <div class="ins-tag">${c.tag}</div>
             <div class="ins-name">${c.name}</div>
             <div class="ins-why">${c.why}</div>
-            <div class="ins-urgency ${c.urgency==='high'?'urg-high':'urg-mid'}">${c.urgency==='high'?'즉시 검토':'권고'}</div>
+            <div class="ins-urgency ${c.urgency==='high'?'urg-high':'urg-mid'}">${c.urgency==='high'?(isEn?'Immediate Review':'즉시 검토'):(isEn?'Recommended':'권고')}</div>
           </div>`).join('')}
         </div>
         <p style="font-size:12px;color:var(--muted);margin-top:8px">${isInsRole()
-          ? '※ 산재보험은 법적 의무보험이나 민사 손해배상(위자료·일실수익)과 형사 법률 비용은 별도 보장이 필요합니다.'
-          : '※ 산업재해에 따른 민사 손해배상(위자료·일실수익)과 형사 법률 비용은 산재보험 외 별도의 재무적 담보 방안이 필요합니다.'}</p>
+          ? (isEn ? "※ Workers' comp is a legal mandatory insurance, but civil damages (lost income, bereavement compensation) and criminal legal costs require separate coverage." : '※ 산재보험은 법적 의무보험이나 민사 손해배상(위자료·일실수익)과 형사 법률 비용은 별도 보장이 필요합니다.')
+          : (isEn ? '※ Civil damages arising from industrial accidents (lost income, bereavement compensation) and criminal legal costs require financial guarantees beyond workers\' comp.' : '※ 산업재해에 따른 민사 손해배상(위자료·일실수익)과 형사 법률 비용은 산재보험 외 별도의 재무적 담보 방안이 필요합니다.')}</p>
       </div>
     </div>` : ''}
 
     <div class="result-actions">
-      <button class="btn-print" onclick="window.print()">🖨 보고서 인쇄 / PDF 저장</button>
-      <button class="btn-restart" onclick="restart()">↺ 처음부터 다시</button>
+      <button class="btn-print" onclick="window.print()">${isEn ? '🖨 Print Report / Save PDF' : '🖨 보고서 인쇄 / PDF 저장'}</button>
+      <button class="btn-restart" onclick="restart()">↺ ${isEn ? 'Start Over' : '처음부터 다시'}</button>
     </div>
     <p style="font-size:11px;color:var(--muted);padding-bottom:24px">
-      본 진단 결과는 입력 정보에 기반한 일반적 안내이며 법률 자문이 아닙니다. 구체적 법적 판단은 노동법 전문 변호사 또는 산업안전보건 전문기관의 자문을 받으시기 바랍니다.
+      ${isEn ? 'This assessment is general guidance based on your inputs and does not constitute legal advice. For specific legal determinations, please consult a labor law attorney or industrial safety & health specialist.' : '본 진단 결과는 입력 정보에 기반한 일반적 안내이며 법률 자문이 아닙니다. 구체적 법적 판단은 노동법 전문 변호사 또는 산업안전보건 전문기관의 자문을 받으시기 바랍니다.'}
     </p>
   </div>`;
 }
@@ -1097,6 +1386,27 @@ function restart(){
   document.getElementById('progress-wrap').style.display='block';
   document.getElementById('result-area').style.display='none';
   renderStep();
+}
+
+function setJdhLang(newLang) {
+  if (jdhLang === newLang) return;
+  jdhLang = newLang;
+  const isEn = newLang === 'en';
+  const si = (id, v) => { const e = document.getElementById(id); if (e) e.innerHTML = v; };
+  const st = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  st('jdh-hdr-title', isEn ? 'Serious Accidents Punishment Act Consulting Assessment' : '중대재해처벌법 컨설팅 진단');
+  st('jdh-hdr-sub', isEn ? 'Law applicability · Obligation compliance · Risk level · Tailored roadmap' : '법 적용 여부 · 의무 이행 현황 · 위험도 · 맞춤 로드맵');
+  st('jdh-trend-title', isEn ? 'SAPA — Current Response Status & Risks' : '중대재해처벌법 — 대응 현황과 리스크');
+  si('jdh-ts-lbl-1', isEn ? 'Max. entity fine for fatality<br>(SAPA §11)' : '사망사고 법인 최대 벌금액<br>(중대재해처벌법 제11조)');
+  si('jdh-ts-lbl-2', isEn ? "Max. workers' comp coverage<br>— excess is 100% civil liability" : '국가 산재보험 최대 보상 범위<br>초과분은 100% 민사배상 책임');
+  si('jdh-ts-lbl-3', isEn ? 'Share of industrial accidents<br>in workplaces under 50' : '50인 미만 사업장<br>산업재해 발생 비율');
+  si('jdh-ts-lbl-4', isEn ? 'Year of intensive inspection<br>on comp wages & 3.3% freelancers' : '포괄임금·3.3% 프리랜서<br>집중 근로감독 시행 연도');
+  si('jdh-trend-note', isEn
+    ? "<strong>Core Problem:</strong> Workers' comp covers wages for only 1,300 days. Beyond that — the full remaining lifetime income — the CEO bears <strong>100% personal liability</strong>. A single employee fatality has led to business closures in real cases. <strong>Workers' comp = mandatory auto insurance; group accident insurance = comprehensive auto insurance.</strong> Starting in 2026, intensive inspections targeting comprehensive-wage arrangements, 3.3% freelancer contracts, and foreign-worker workplaces are scheduled, sharply increasing risk."
+    : '<strong>핵심 문제:</strong> 산재보험은 1,300일치 급여까지만 보상합니다. 그 이상의 민사배상 — 남은 정년·가동연한 소득 전액 — 은 대표가 <strong>100% 개인 부담</strong>합니다. 직원 1명 사망사고 하나로 회사 문을 닫는 경우가 현장에서 실제로 발생합니다. <strong>산재보험 = 자동차 책임보험, 단체보험 = 자동차 종합보험</strong>입니다. 2026년부터는 포괄임금제·3.3% 프리랜서 계약·외국인 고용 사업장에 대한 집중 근로감독이 예고되어 있어 추가 리스크가 급증하고 있습니다.');
+  const steps = visibleSteps();
+  if (currentStep < steps.length) renderStep();
+  else showResult();
 }
 
 // ── INIT ──

@@ -52,3 +52,9 @@ account_id         = "cfa572c2bcb9f142db8430b310cf5a32"
 [[kv_namespaces]]
 binding = "MAIL_USAGE"
 id      = "7998ad690cae40478465a16912369aee"
+
+# ── Cron Trigger — 매일 KST 09:00 (UTC 00:00) 자동 발송 ──────────────
+# 배포: wrangler deploy --config wrangler-mail.toml
+# 확인: Cloudflare 대시보드 → Workers → send-mail → Triggers → Cron
+[triggers]
+crons = ["0 0 * * *"]

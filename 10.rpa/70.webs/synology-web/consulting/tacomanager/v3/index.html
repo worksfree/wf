@@ -291,23 +291,30 @@ body{display:flex;flex-direction:column;overflow:hidden;}
   border:none;border-radius:99px;padding:5px 13px;cursor:pointer;font-family:inherit;
 }
 .demo-stop-btn:hover{opacity:.85;}
+.demo-pause-btn{
+  font-size:13px;font-weight:700;color:#a5b4fc;white-space:nowrap;
+  background:rgba(99,102,241,.18);border:1px solid rgba(99,102,241,.35);
+  border-radius:99px;padding:4px 10px;cursor:pointer;font-family:inherit;
+  transition:background .15s;line-height:1;
+}
+.demo-pause-btn:hover{background:rgba(99,102,241,.32);}
 
 .demo-callout{
-  position:fixed;left:50%;transform:translateX(-50%);
-  bottom:78px;z-index:899;
+  position:fixed;z-index:899;
   background:linear-gradient(135deg,rgba(10,17,30,.97),rgba(18,28,52,.97));
   border:1px solid rgba(99,102,241,.5);
   border-radius:18px;padding:20px 26px 17px;
   box-shadow:0 16px 56px rgba(0,0,0,.75),0 0 80px rgba(99,102,241,.14);
   min-width:310px;max-width:400px;text-align:center;
-  pointer-events:none;display:none;
+  pointer-events:auto;display:none;cursor:grab;user-select:none;
 }
+.demo-callout.dragging{cursor:grabbing;}
 .demo-callout.dc-in {animation:dcIn .42s cubic-bezier(.34,1.56,.64,1) forwards;}
 .demo-callout.dc-out{animation:dcOut .28s ease-in forwards;}
-@keyframes dcIn  {from{opacity:0;transform:translateX(-50%) translateY(14px) scale(.94)}
-                  to  {opacity:1;transform:translateX(-50%) translateY(0)    scale(1)}}
-@keyframes dcOut {from{opacity:1;transform:translateX(-50%) translateY(0)}
-                  to  {opacity:0;transform:translateX(-50%) translateY(-8px)}}
+@keyframes dcIn  {from{opacity:0;transform:translateY(14px) scale(.94)}
+                  to  {opacity:1;transform:translateY(0)    scale(1)}}
+@keyframes dcOut {from{opacity:1;transform:translateY(0)}
+                  to  {opacity:0;transform:translateY(-8px)}}
 .demo-callout-icon {font-size:34px;line-height:1;margin-bottom:10px;}
 .demo-callout-title{font-size:17px;font-weight:800;color:#e2e8f0;line-height:1.35;white-space:pre-line;letter-spacing:-.3px;margin-bottom:6px;}
 .demo-callout-sub  {font-size:12px;color:#94a3b8;line-height:1.55;}
@@ -456,9 +463,9 @@ body{display:flex;flex-direction:column;overflow:hidden;}
   </div>
 
   <div class="screen-tabs">
-    <button class="sc-btn active" onclick="gotoScreen('a')">🗺 관제탑</button>
-    <button class="sc-btn" onclick="gotoScreen('b')">📊 성과</button>
-    <button class="sc-btn" onclick="gotoScreen('c')">✦ AI 전략</button>
+    <button class="sc-btn active" id="tmBtnA" onclick="gotoScreen('a')">🗺 관제탑</button>
+    <button class="sc-btn" id="tmBtnB" onclick="gotoScreen('b')">📊 성과</button>
+    <button class="sc-btn" id="tmBtnC" onclick="gotoScreen('c')">✦ AI 전략</button>
   </div>
 
   <div class="gb-right">
@@ -487,7 +494,7 @@ body{display:flex;flex-direction:column;overflow:hidden;}
     <div class="suc-title" id="sucTitle">전략 실행 완료!</div>
     <div class="suc-desc" id="sucDesc"></div>
     <div class="suc-chips" id="sucChips"></div>
-    <button class="suc-close" onclick="closeSuccess()">확인</button>
+    <button class="suc-close" id="tmSucClose" onclick="closeSuccess()">확인</button>
   </div>
 </div>
 
@@ -497,25 +504,25 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 <div class="screen active" id="screen-a">
   <div class="a-header panel">
     <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:13px;font-weight:700;">전국 매장 실시간 현황</span>
+      <span style="font-size:13px;font-weight:700;" id="tmHqTitle">전국 매장 실시간 현황</span>
       <span class="badge badge-blue">Live</span>
     </div>
     <div class="ah-kpis">
-      <div><div class="ah-kpi-val" style="color:#60a5fa;" id="hq-rev">1,420만</div><div class="ah-kpi-lbl">오늘 예상 매출</div></div>
-      <div><div class="ah-kpi-val" style="color:var(--green);" id="hq-margin">63.2%</div><div class="ah-kpi-lbl">평균 마진율</div></div>
-      <div><div class="ah-kpi-val" style="color:var(--yellow);" id="hq-orders">487</div><div class="ah-kpi-lbl">누적 주문</div></div>
-      <div><div class="ah-kpi-val" style="color:var(--red);" id="hq-alerts">3</div><div class="ah-kpi-lbl">조치 필요</div></div>
+      <div><div class="ah-kpi-val" style="color:#60a5fa;" id="hq-rev">1,420만</div><div class="ah-kpi-lbl" id="tm-kpi-rev">오늘 예상 매출</div></div>
+      <div><div class="ah-kpi-val" style="color:var(--green);" id="hq-margin">63.2%</div><div class="ah-kpi-lbl" id="tm-kpi-margin">평균 마진율</div></div>
+      <div><div class="ah-kpi-val" style="color:var(--yellow);" id="hq-orders">487</div><div class="ah-kpi-lbl" id="tm-kpi-orders">누적 주문</div></div>
+      <div><div class="ah-kpi-val" style="color:var(--red);" id="hq-alerts">3</div><div class="ah-kpi-lbl" id="tm-kpi-alerts">조치 필요</div></div>
     </div>
   </div>
   <div class="a-body">
   <div class="map-panel panel">
-    <div class="ptitle">매장 위치 및 상태 <span class="badge badge-blue">실시간</span></div>
+    <div class="ptitle"><span id="tmMapTitle">매장 위치 및 상태</span> <span class="badge badge-blue">실시간</span></div>
     <div id="leaflet-map"></div>
   </div>
   <div class="map-resize-handle" id="mapResizeHandle"></div>
   <div class="right-col" id="rightCol">
     <div class="alert-panel panel">
-      <div class="ptitle">매장별 현황 <span class="badge badge-red">3건</span></div>
+      <div class="ptitle"><span id="tmAlertsTitle">매장별 현황</span> <span class="badge badge-red">3건</span></div>
       <div class="alert-item crit" onclick="selectStoreAndGo('pankyo','c')">
         <div class="ai-icon">🥑</div>
         <div class="ai-body"><div class="ai-store">판교점</div><div class="ai-msg">아보카도 20kg 과잉 · D-2 · 비 예보 -23%</div></div>
@@ -629,8 +636,8 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 
   <!-- 맥락 바 -->
   <div class="ctx-bar panel">
-    <span style="font-size:13px;font-weight:700;">✦ AI 마케팅 전략</span>
-    <span style="font-size:11px;color:var(--text3);">목표 × 지점 조합으로 최적 전략을 선택하세요</span>
+    <span style="font-size:13px;font-weight:700;" id="tmAiTitle">✦ AI 마케팅 전략</span>
+    <span style="font-size:11px;color:var(--text3);" id="tmAiSub">목표 × 지점 조합으로 최적 전략을 선택하세요</span>
     <div class="ctx-tags">
       <span class="ctx-tag">🌦 오후 비 예보</span>
       <span class="ctx-tag">📅 이번 주말 여의도 축제</span>
@@ -640,13 +647,13 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 
   <!-- 목표 × 지점 매트릭스 -->
   <div class="matrix-wrap panel">
-    <div class="ptitle">전략 매트릭스 — 목표 × 지점 <span class="badge badge-purple">클릭하여 실행</span></div>
+    <div class="ptitle"><span id="tmMatrixTitle">전략 매트릭스 — 목표 × 지점</span> <span class="badge badge-purple" id="tmMatrixBadge">클릭하여 실행</span></div>
     <table class="matrix-table" id="stratMatrix"></table>
   </div>
 
   <!-- 타임라인 실행 계획 -->
   <div class="timeline-panel panel">
-    <div class="ptitle">목표 기준 지점별 실행 계획 <span class="badge badge-blue">3단계</span></div>
+    <div class="ptitle"><span id="tmTimelineTitle">목표 기준 지점별 실행 계획</span> <span class="badge badge-blue">3단계</span></div>
     <div class="tl-board" id="timelineGrid"></div>
   </div>
 </div>
@@ -1194,8 +1201,8 @@ function closeKakao() {
 }
 
 function showSuccess() {
-  document.getElementById('sucTitle').textContent = '전략 실행 완료!';
-  document.getElementById('sucDesc').textContent = '키오스크 팝업 및 배달 앱 노출이 자동으로 적용됩니다.';
+  document.getElementById('sucTitle').textContent = t18('suc_title');
+  document.getElementById('sucDesc').textContent = t18('suc_desc');
   document.getElementById('sucChips').innerHTML = ['🖥 키오스크 팝업', '📱 배달 앱 등록', '💬 카카오 알림'].map(c=>`<span class="suc-chip">${c}</span>`).join('');
   document.getElementById('success-overlay').classList.add('show');
 }
@@ -1281,60 +1288,162 @@ function initMapResize() {
    3개 화면을 순환하며 핵심 가치 전달
    사용자가 화면 클릭 시 데모 종료 → 직접 사용 모드
 ══════════════════════════════════════════════════════ */
+/* ── Taco Manager i18n ─────────────────────────────── */
+let tmLang = 'ko';
+const TM18N = {
+  ko: {
+    scr_a:'🗺 관제탑', scr_b:'📊 성과', scr_c:'✦ AI 전략',
+    hq_title:'전국 매장 실시간 현황',
+    kpi_rev:'오늘 예상 매출', kpi_margin:'평균 마진율', kpi_orders:'누적 주문', kpi_alerts:'조치 필요',
+    map_title:'매장 위치 및 상태', alerts_title:'매장별 현황',
+    ai_title:'✦ AI 마케팅 전략', ai_sub:'목표 × 지점 조합으로 최적 전략을 선택하세요',
+    matrix_title:'전략 매트릭스 — 목표 × 지점', matrix_badge:'클릭하여 실행',
+    tl_title:'목표 기준 지점별 실행 계획',
+    suc_title:'전략 실행 완료!', suc_desc:'키오스크 팝업 및 배달 앱 노출이 자동으로 적용됩니다.',
+    suc_close:'확인', demo_stop:'직접 사용하기 →',
+  },
+  en: {
+    scr_a:'🗺 HQ Tower', scr_b:'📊 Performance', scr_c:'✦ AI Strategy',
+    hq_title:'All Stores · Real-time',
+    kpi_rev:'Projected Revenue', kpi_margin:'Avg. Margin', kpi_orders:'Total Orders', kpi_alerts:'Action Required',
+    map_title:'Store Locations & Status', alerts_title:'Store Alerts',
+    ai_title:'✦ AI Marketing Strategy', ai_sub:'Select the optimal strategy by goal × location',
+    matrix_title:'Strategy Matrix — Goal × Location', matrix_badge:'Click to Execute',
+    tl_title:'Location Action Plan by Goal',
+    suc_title:'Strategy Executed!', suc_desc:'Kiosk popup & delivery app listing applied automatically.',
+    suc_close:'OK', demo_stop:'Try It Yourself →',
+  }
+};
+function t18(k) { return TM18N[tmLang]?.[k] ?? TM18N.ko[k] ?? k; }
+function setTmLang(lang) {
+  tmLang = lang; DEMO.lang = lang;
+  const g = id => document.getElementById(id);
+  const set = (id, k) => { const e=g(id); if(e) e.textContent=t18(k); };
+  set('tmBtnA','scr_a'); set('tmBtnB','scr_b'); set('tmBtnC','scr_c');
+  set('tmHqTitle','hq_title');
+  set('tm-kpi-rev','kpi_rev'); set('tm-kpi-margin','kpi_margin'); set('tm-kpi-orders','kpi_orders'); set('tm-kpi-alerts','kpi_alerts');
+  set('tmMapTitle','map_title'); set('tmAlertsTitle','alerts_title');
+  set('tmAiTitle','ai_title'); set('tmAiSub','ai_sub');
+  set('tmMatrixTitle','matrix_title'); set('tmMatrixBadge','matrix_badge');
+  set('tmTimelineTitle','tl_title');
+  set('sucTitle','suc_title'); set('tmSucClose','suc_close');
+  const stopBtn = document.querySelector('.demo-stop-btn');
+  if (stopBtn) stopBtn.textContent = t18('demo_stop');
+}
+
 const DEMO = {
   active: false,
   step: 0,
   timer: null,
   _clickHandler: null,
+  lang: 'ko',
 
   steps: [
     {
       screen:'a', icon:'🗺',
-      title:'전국 4개 매장\n실시간 모니터링',
-      sub:'AI가 매장별 상황을 자동으로 감지하고 이상 신호를 즉시 알립니다',
+      title:{ko:'전국 4개 매장\n실시간 모니터링',      en:'4 Stores Nationwide\nReal-time Monitoring'},
+      sub:  {ko:'AI가 매장별 상황을 자동으로 감지하고 이상 신호를 즉시 알립니다', en:'AI instantly detects anomalies at each store and sends alerts'},
       duration:4000,
     },
     {
       screen:'a', icon:'⚡',
-      title:'재고 위기를 AI가\n자동으로 포착',
-      sub:'아보카도 D-2 소진 불가 → 연남점 이동 권장 · 손실 최소화 자동 실행',
+      title:{ko:'재고 위기를 AI가\n자동으로 포착',       en:'AI Captures\nInventory Crises Instantly'},
+      sub:  {ko:'아보카도 D-2 소진 불가 → 연남점 이동 권장 · 손실 최소화 자동 실행', en:'Avocado D-2 sellout risk → Yeonnam transfer recommended · Loss minimization executed'},
       duration:3500,
     },
     {
       screen:'b', icon:'📊',
-      title:'매출 1,420만 · 마진 63.2%\n핵심 KPI 한눈에',
-      sub:'목표 달성률 · 객단가 · 배달 비중 · 재고 효율 실시간 추적',
+      title:{ko:'매출 1,420만 · 마진 63.2%\n핵심 KPI 한눈에', en:'₩14.2M Revenue · 63.2% Margin\nCore KPIs at a Glance'},
+      sub:  {ko:'목표 달성률 · 객단가 · 배달 비중 · 재고 효율 실시간 추적', en:'Goal attainment · Avg. ticket · Delivery ratio · Inventory efficiency'},
       duration:4000,
     },
     {
       screen:'b', icon:'💎',
-      title:'메뉴 엔지니어링으로\n고마진 전략 시각화',
-      sub:'스타 · 프리미엄 · 주력 · 조정 — 메뉴별 수익 포지션 한눈에',
+      title:{ko:'메뉴 엔지니어링으로\n고마진 전략 시각화', en:'Menu Engineering\nHigh-Margin Strategy Visualization'},
+      sub:  {ko:'스타 · 프리미엄 · 주력 · 조정 — 메뉴별 수익 포지션 한눈에', en:'Star · Premium · Core · Reposition — profit position by menu at a glance'},
       duration:3500,
     },
     {
       screen:'c', icon:'🧠',
-      title:'AI 전략 매트릭스\n목표 × 지점 최적 조합',
-      sub:'클릭 한 번으로 맞춤 전략과 3단계 실행 계획이 자동 생성됩니다',
+      title:{ko:'AI 전략 매트릭스\n목표 × 지점 최적 조합', en:'AI Strategy Matrix\nGoal × Location Optimal Pairing'},
+      sub:  {ko:'클릭 한 번으로 맞춤 전략과 3단계 실행 계획이 자동 생성됩니다', en:'One click generates a tailored strategy with 3-step action plan'},
       duration:4000,
     },
     {
       screen:'c', icon:'🚀',
-      title:'전략 선택 즉시\n오늘 · 주간 · 월간 로드맵',
-      sub:'선택한 전략이 실행 계획으로 즉시 변환 · 카카오 알림으로 자동 발송',
+      title:{ko:'전략 선택 즉시\n오늘 · 주간 · 월간 로드맵', en:'Strategy Selected Instantly\nToday · Weekly · Monthly Roadmap'},
+      sub:  {ko:'선택한 전략이 실행 계획으로 즉시 변환 · 카카오 알림으로 자동 발송', en:'Chosen strategy instantly becomes an action plan · auto-sent via KakaoTalk'},
       autoClick:true,
       duration:3500,
     },
   ],
 
+  userId: '',
+  paused: false,
+
+  _posKey() { return 'taco_demo_pos_' + (this.userId || 'guest'); },
+
+  _savePos(calloutEl) {
+    localStorage.setItem(this._posKey(), JSON.stringify({ left: calloutEl.style.left, top: calloutEl.style.top }));
+  },
+
+  _loadPos(calloutEl) {
+    const raw = localStorage.getItem(this._posKey());
+    if (raw) {
+      try {
+        const { left, top } = JSON.parse(raw);
+        calloutEl.style.left = left;
+        calloutEl.style.top  = top;
+        return true;
+      } catch {}
+    }
+    return false;
+  },
+
+  _centerPos(calloutEl) {
+    const w = calloutEl.offsetWidth  || 340;
+    const h = calloutEl.offsetHeight || 190;
+    calloutEl.style.left = Math.round((window.innerWidth  - w) / 2) + 'px';
+    calloutEl.style.top  = Math.round((window.innerHeight - h) / 2) + 'px';
+  },
+
+  _initDrag(calloutEl) {
+    let ox = 0, oy = 0, startX = 0, startY = 0, dragging = false;
+    calloutEl.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      dragging = true;
+      startX = e.clientX; startY = e.clientY;
+      ox = parseInt(calloutEl.style.left) || 0;
+      oy = parseInt(calloutEl.style.top)  || 0;
+      calloutEl.classList.add('dragging');
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const nx = ox + (e.clientX - startX);
+      const ny = oy + (e.clientY - startY);
+      const maxX = window.innerWidth  - (calloutEl.offsetWidth  || 340);
+      const maxY = window.innerHeight - (calloutEl.offsetHeight || 190);
+      calloutEl.style.left = Math.max(0, Math.min(nx, maxX)) + 'px';
+      calloutEl.style.top  = Math.max(0, Math.min(ny, maxY)) + 'px';
+    });
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      calloutEl.classList.remove('dragging');
+      this._savePos(calloutEl);
+    });
+  },
+
   start() {
     this.active = true;
+    this.paused = false;
     this.step   = 0;
     this._buildUI();
     const pill = document.getElementById('demoPill');
     if (pill) pill.classList.add('visible');
     this._runStep();
-    // 화면 클릭 → 데모 종료
+    // 화면 클릭 → 데모 종료 (callout/pill 영역 제외)
     this._clickHandler = (e) => {
       if (!e.target.closest('#demoCallout') && !e.target.closest('#demoPill')) {
         this.stop();
@@ -1345,6 +1454,7 @@ const DEMO = {
 
   stop() {
     this.active = false;
+    this.paused = false;
     clearTimeout(this.timer);
     if (this._clickHandler) {
       document.removeEventListener('click', this._clickHandler, true);
@@ -1357,6 +1467,23 @@ const DEMO = {
       callout.classList.remove('dc-in');
       callout.classList.add('dc-out');
       setTimeout(() => { callout.style.display = 'none'; callout.classList.remove('dc-out'); }, 300);
+    }
+  },
+
+  togglePause() {
+    if (!this.active) return;
+    if (this.paused) {
+      this.paused = false;
+      const btn = document.getElementById('demoPauseBtn');
+      if (btn) btn.textContent = '⏸';
+      this._runStep();
+    } else {
+      this.paused = true;
+      clearTimeout(this.timer);
+      const fill = document.getElementById('demoFill');
+      if (fill) { fill.style.transition = 'none'; }
+      const btn = document.getElementById('demoPauseBtn');
+      if (btn) btn.textContent = '▶';
     }
   },
 
@@ -1374,6 +1501,17 @@ const DEMO = {
       '<div class="demo-callout-bar"><div class="demo-callout-fill" id="demoFill"></div></div>';
     document.body.appendChild(calloutEl);
 
+    // 초기 위치: 저장값 or 화면 중앙
+    calloutEl.style.display = 'block';
+    calloutEl.style.visibility = 'hidden';
+    requestAnimationFrame(() => {
+      if (!this._loadPos(calloutEl)) this._centerPos(calloutEl);
+      calloutEl.style.display = 'none';
+      calloutEl.style.visibility = '';
+    });
+
+    this._initDrag(calloutEl);
+
     // Pill
     const pillEl  = document.createElement('div');
     pillEl.id     = 'demoPill';
@@ -1384,12 +1522,13 @@ const DEMO = {
       '<span class="demo-pill-label">🎬 AUTO DEMO</span>' +
       '<div class="demo-pill-dots">' + dots + '</div>' +
       '<div class="demo-pill-sep"></div>' +
-      '<button class="demo-stop-btn" onclick="DEMO.stop();event.stopPropagation();">직접 사용하기 →</button>';
+      '<button class="demo-pause-btn" id="demoPauseBtn" onclick="DEMO.togglePause();event.stopPropagation();">⏸</button>' +
+      '<button class="demo-stop-btn" onclick="DEMO.stop();event.stopPropagation();">' + t18('demo_stop') + '</button>';
     document.body.appendChild(pillEl);
   },
 
   _runStep() {
-    if (!this.active) return;
+    if (!this.active || this.paused) return;
     const s = this.steps[this.step];
 
     // 화면 전환
@@ -1417,11 +1556,14 @@ const DEMO = {
     if (callout) {
       callout.classList.remove('dc-in', 'dc-out');
       callout.style.display = 'block';
+      // 위치가 아직 없으면 중앙으로
+      if (!callout.style.left) this._centerPos(callout);
       void callout.offsetWidth;                       // reflow
       callout.classList.add('dc-in');
+      const lang = DEMO.lang || 'ko';
       document.getElementById('demoIcon').textContent  = s.icon;
-      document.getElementById('demoTitle').textContent = s.title;
-      document.getElementById('demoSub').textContent   = s.sub;
+      document.getElementById('demoTitle').textContent = (typeof s.title === 'object') ? (s.title[lang] ?? s.title.ko) : s.title;
+      document.getElementById('demoSub').textContent   = (typeof s.sub   === 'object') ? (s.sub[lang]   ?? s.sub.ko)   : s.sub;
       // progress bar
       if (fill) {
         fill.style.transition = 'none';
@@ -1435,12 +1577,22 @@ const DEMO = {
 
     // 다음 스텝 예약
     this.timer = setTimeout(() => {
-      if (!this.active) return;
+      if (!this.active || this.paused) return;
       this.step = (this.step + 1) % this.steps.length;
       this._runStep();
     }, s.duration);
   },
 };
+
+window.addEventListener('message', (e) => {
+  if (e.data?.type === 'wf_user' && e.data.userId) {
+    DEMO.userId = e.data.userId;
+  }
+  if (e.data?.type === 'wf_lang') {
+    const lang = e.data.lang === 'en' ? 'en' : 'ko';
+    if (lang !== tmLang) setTmLang(lang);
+  }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   initMap();

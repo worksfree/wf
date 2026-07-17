@@ -1,6 +1,6 @@
 ﻿# WorksFree Hub — 제품 명세서 (GS인증 대응)
 
-**버전**: 0.8.3.0 · **작성일**: 2026-06-05  
+**버전**: 0.8.5.32 · **작성일**: 2026-07-01  
 **제품명**: WorksFree Hub — B2B 마케팅 자동화 플랫폼  
 **개발사**: WorksFree · **문의**: support@worksfree.kr
 
@@ -41,12 +41,16 @@ DART(금융감독원 전자공시) 공개 데이터 기반 기업 이메일 DB �
 
 ### 대상 사용자 (역할 체계)
 
-| 역할 | 영문 | 접근 범위 |
+| 역할 | 코드 (`profiles.role`) | 접근 범위 |
 |------|------|---------|
-| 일반 회원 | general | 서비스 소개, 무료 컨설팅 |
-| 컨설턴트 | consultant | 경영 진단, B2B DB, 마케팅 발송 |
-| 파트너 | gfc | 컨설턴트 전체 + 보험 중심 콘텐츠 |
-| 관리자 | admin | 전체 기능 + DB 수집, 채용, 사용자 관리 |
+| 비회원 | `non-member` | 공개 서비스 (QR, 파일명 복원 등) |
+| 일반 회원 | `member` | 앱스토어 (솔리드웍스·기타 앱) |
+| 컨설턴트 | `consultant` | 컨설팅·재무·파일럿 전체 |
+| 파트너 | `partner` | 컨설턴트 전체 + 보험 중심 콘텐츠 (GFC) |
+| 관리자 | `admin` | 전체 기능 + O&M 관리 (사용자·채용·시스템) |
+
+> `canConsult()` = consultant ∨ partner ∨ admin  
+> `IS_PARTNER` = partner ∨ admin (GFC 보험 콘텐츠 활성화)
 
 ---
 
@@ -82,7 +86,7 @@ DART(금융감독원 전자공시) 공개 데이터 기반 기업 이메일 DB �
 
 배포 환경:
   시놀로지 NAS ←→ Cloudflare Tunnel ←→ 인터넷
-  포트: test(8081) · staging(8082) · portal(8080)
+  포트: test(8081) · staging(8082) · www(8080)
 ```
 
 ### 인증 흐름
@@ -91,8 +95,40 @@ DART(금융감독원 전자공시) 공개 데이터 기반 기업 이메일 DB �
 브라우저 → Supabase Auth (OAuth/Email)
   → profiles 테이블 role 확인
   → Hub 역할 적용 (메뉴 표시·콘텐츠 분기)
+  → onAuthComplete() 실행
+      ├─ URL hash 존재 → navigateToHash(hash)  (딥링크 복원)
+      └─ hash 없음    → showHome()             (섹션 타일 홈)
   → iframe postMessage { type:'wf_role', role } 전달
   → 각 iframe 페이지에서 역할별 UI 렌더
+```
+
+### Hub-and-Spoke 네비게이션 아키텍처
+
+v0.8.5에서 도입한 **허브 앤 스포크(Hub-and-Spoke)** 구조:
+
+```
+홈 (Hub)
+  → 섹션 타일 6개 (서비스/컨설팅/재무관리/파일럿/앱스토어/O&M)
+      → 섹션 대시 (Spoke)
+          → 사이드바: 해당 섹션 메뉴만 표시
+          → 기능 카드 → iframe (Leaf)
+```
+
+- **홈**: `showHome()` — 전체 사이드바 복원 + 섹션 타일 화면
+- **섹션 진입**: `showSectionDash(node)` — 사이드바를 해당 섹션 메뉴로 필터링
+- **리프 페이지**: `loadIframe()` — `_activateSectionForIframe()`로 자동 섹션 감지
+- **URL 복원**: 새로고침 시 `location.hash`로 상태 복원 (sessionStorage 불사용)
+
+### Hash 기반 URL 라우팅
+
+```
+URL 형식:  https://www.worksfree.kr/#섹션slug/서브path
+예시:       #consulting/ceo    →  컨설팅 > CEO 플랜
+           #finance           →  재무관리 섹션 대시
+           #service/qr        →  서비스 > QR 생성기
+
+iframeToSlug(src)  :  iframe 경로 → URL slug 변환
+navigateToHash(h)  :  hash → 섹션 대시 또는 리프 iframe 라우팅
 ```
 
 ---
@@ -140,6 +176,24 @@ DART(금융감독원 전자공시) 공개 데이터 기반 기업 이메일 DB �
 | GFC-05 | 원클릭 사례 | 8개 대표 케이스 자동 채우기 | — |
 | GFC-06 | 인쇄/PDF | 결과 페이지 직접 인쇄 | — |
 | GFC-07 | 다국어 | KO/EN 전환 (Hub 언어 설정 연동) | — |
+
+### 3.4 섹션별 TREE 구조 및 접근 권한
+
+| 섹션 slug | 섹션명 | 아이콘 | 접근 조건 | 주요 메뉴 |
+|-----------|------|------|---------|---------|
+| `service` | 서비스 | 🛠 | 전체 공개 | QR 생성기, 파일명 자소복원, 변환 검증, 게시판, 전자책 미리보기 |
+| `consulting` | 컨설팅 | ◈ | `canConsult()` | 마인드맵, 예비창업, 소상공인, 현장클리닉, 중대재해, ESG, DART, B2B DB, 마케팅, 상속·증여, 비상장주식, 경영진단, CEO 플랜 |
+| `finance` | 재무관리 | 💰 | `canConsult()` | 연금 시뮬레이터(v1/v2), 자산 통합 관리 |
+| `pilot` | 파일럿 | 🧪 | 혼합 | 타코 매니저(v1/v2/v3, consultantOnly), Naver Blog Commenter |
+| `app-store` | 앱스토어 | 📦 | `member+` | SolidWorks BOM 추출/속성 초기화, 도면 출력 자동화 |
+| `admin` | O&M 관리 | ⚙ | `adminOnly` | 사용자 관리, 이메일 캠페인, 시스템 모니터, 콘텐츠 관리, 페이지 권한, 채용 관리 |
+
+### 3.5 프라이버시 블러 (자산 통합 관리)
+
+`consulting/asset/index.html` 내 **숨김처리** 토글:
+- 위치: 대시보드 헤더 좌측 (타이틀과 탭 버튼 사이)
+- 적용 대상: 금액 필드 (`#totalAsset`, `#totalInvest`, `#realEstateAmt`, `#otherAmt`), 테이블 금액 컬럼 (`td:nth-child(3/5/6)`), 가격 스팬 (`.amt-price`)
+- 비율 필드는 블러 제외 (운용 현황 파악 허용)
 
 ---
 
@@ -484,8 +538,11 @@ wrangler secret put MAIL_FROM            --config service/payment/wrangler-mail.
 # 메뉴 선택:
 # [1] test     → test.worksfree.kr     (버전 BUILD 증가)
 # [2] staging  → staging.worksfree.kr  (버전 PATCH 증가)
-# [3] portal   → portal.worksfree.kr   (버전 MINOR 증가)
+# [3] www      → www.worksfree.kr      (버전 MINOR 증가)
 ```
+
+**배포 제외 파일** (`$EXCLUDE`):  
+`deploy.ps1`, `deploy.bat`, `deploy.log`, `.vscode`, `*.log`, `*.bak`, `.git`, `node_modules`, `*.sh`, `.claude`, `test-results`, `playwright-report`
 
 ### 8.6 환경별 URL
 
@@ -494,7 +551,7 @@ wrangler secret put MAIL_FROM            --config service/payment/wrangler-mail.
 | 개발 | `http://localhost:3001` | — | — |
 | 테스트 | `https://test.worksfree.kr` | `/volume1/web/test` | 8081 |
 | 스테이징 | `https://staging.worksfree.kr` | `/volume1/web/staging` | 8082 |
-| 프로덕션 | `https://portal.worksfree.kr` | `/volume1/web/portal` | 8080 |
+| 프로덕션 | `https://www.worksfree.kr` | `/volume1/web/portal` | 8080 |
 
 ---
 
@@ -576,12 +633,13 @@ npx playwright show-report
 
 | 파일 | 테스트 수 | 커버 영역 |
 |------|---------|---------|
-| smoke.spec.js | 8 | 페이지 로드, 기본 구조 |
+| smoke.spec.js | 10 | 페이지 로드, 기본 구조, 버전 표시 |
+| navigation.spec.js | 18 | Hub-and-Spoke 섹션 네비게이션, 해시 라우팅, 딥링크, 백 버튼, 로고 홈 이동 |
+| auth.spec.js | 20 | 로그인·로그아웃·동의·세션 복원·해시 기반 페이지 복원·역할별 메뉴 분기 |
+| permissions.spec.js | 22 | 역할별 접근 제어 (member/consultant/partner/admin), adminOnly/consultantOnly 메뉴 가시성, getAccessLevel 블러/숨김/readonly |
 | bizdb.spec.js | 16 | 수집, DB 현황, 발송, 보안 |
 | marketing.spec.js | 15 | 발송 현황, 단건, 대량, 법적 항목 |
-| auth.spec.js | — | 로그인·로그아웃·동의 |
-| navigation.spec.js | — | 사이드바, 탭 전환 |
-| i18n.spec.js | — | KO/EN 다국어 전환 |
+| privacy.spec.js | 8 | 자산 숨김처리 블러 토글, 금액 필드 선택적 블러 |
 
 ### 10.3 수동 인증 체크리스트 (GS인증 대응)
 
@@ -662,6 +720,9 @@ npx playwright show-report
 
 | 버전 | 날짜 | 변경 유형 | 주요 내용 |
 |------|------|---------|---------|
+| 0.8.5.32 | 2026-07-01 | 문서 | PRODUCT_SPEC.md v0.8.5 반영 (Hub-and-Spoke, 해시 라우팅, TREE 재구성, 역할 체계 정확화) |
+| 0.8.5.x | 2026-06-30 | 기능 | Hub-and-Spoke 네비게이션 (홈→섹션→리프), 섹션별 사이드바 필터링, 해시 기반 URL 라우팅 (#section/slug), TREE 6섹션 재구성 (finance·pilot 분리), sessionStorage 제거·hash 복원 |
+| 0.8.4.x | 2026-06-30 | 기능·버그 | 자산 통합 관리 숨김처리 버튼 헤더 좌측 재배치, portal → www URL 전체 수정, *.bak 배포 제외 추가, 로고 클릭 시 showHome() 연결 |
 | 0.8.3.0 | 2026-06-05 | 기능·문서 | 페이지 권한 관리(3-layer) 추가, site_config DB 테이블, admin/permissions UI, schema.sql 통합, temp SQL 아카이브, PRODUCT_SPEC.md GS인증 수준 개정 |
 | 0.8.2.0 | 2026-06-05 | 보안·버그 | SSRF 취약점 수정, DART 한도 조기 감지, monthKey KST 수정, 자정 날짜 계산 수정, 발송 버튼 중복 방지 |
 | 0.8.1.x | 2026-06-04 | 기능 | 채용 관리 향후개발 오버레이, GFC 보험 이원화, 발송 현황 UI, CSV 발송 이력 배지 |

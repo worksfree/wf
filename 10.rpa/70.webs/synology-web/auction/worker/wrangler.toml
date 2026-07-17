@@ -1,0 +1,24 @@
+name = "auction-proxy"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+# KV는 더 이상 사용하지 않음 (Supabase로 마이그레이션 완료)
+# [[kv_namespaces]]
+# binding = "AUCTION_DATA"
+# id = "bfb12326cfb9493d8a34adaee5de8e79"
+
+[triggers]
+# 시간별 이어서 수집 (수집 완료 후 자동 중단)
+# 주간 리셋: 매주 월요일 03:00 KST = 일요일 18:00 UTC
+crons = ["0 * * * *", "0 18 * * SUN"]
+
+[vars]
+# ──────────────────────────────────────────────
+# 아래 시크릿은 Workers → Settings → Variables → Encrypt 후 추가
+# (절대 이 파일에 값을 넣지 말 것)
+#
+#  SUPABASE_URL         https://rkycwfpkzorfpcxfvaqt.supabase.co
+#  SUPABASE_SERVICE_KEY <service_role JWT>
+#  PROXY_SECRET         <임의 문자열, /reset 보호용>
+#  KAKAO_API_KEY        <카카오 REST API 키, 지오코딩용>
+# ──────────────────────────────────────────────

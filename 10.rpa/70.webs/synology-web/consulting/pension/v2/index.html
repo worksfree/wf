@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>연금 최적 인출 전략 v2 — WorksFree</title>
+<title>연금 최적 인출 전략 v2 — 2026 세법 기준 인출순서 시뮬레이터 | WorksFree</title>
+<meta name="description" content="2026 세법 기준 연금 최적 인출 전략 시뮬레이터. 개인연금·퇴직연금·국민연금 인출 순서에 따른 종합소득세·건강보험료 자동 계산 및 절세 전략 제안. WorksFree 컨설팅 플랫폼 제공.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.worksfree.kr/consulting/pension/v2/">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
@@ -30,12 +33,17 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .badge-green{background:var(--green-bg);color:var(--green);border-color:rgba(16,185,129,.3)}
 
 /* ─ Layout ─── */
-.layout{display:grid;grid-template-columns:310px 1fr 240px;height:calc(100vh - 56px);overflow:hidden}
-@media(max-width:1100px){.layout{grid-template-columns:310px 1fr}}
-@media(max-width:900px){.layout{grid-template-columns:1fr;height:auto;overflow:visible}}
+.layout{display:flex;height:calc(100vh - 56px);overflow:hidden}
+@media(max-width:900px){.layout{flex-direction:column;height:auto;overflow:visible}}
+
+/* ─ Drag Handle ─── */
+.drag-handle{width:5px;background:var(--border);cursor:col-resize;flex-shrink:0;position:relative;transition:background .12s}
+.drag-handle::after{content:'';position:absolute;inset:0 -5px;z-index:10}
+.drag-handle:hover,.drag-handle.active{background:rgba(59,130,246,.6)}
+@media(max-width:900px){.drag-handle{display:none}}
 
 /* ─ Input Panel ─── */
-.input-col{border-right:1px solid var(--border);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.input-col{width:clamp(220px,35%,500px);flex-shrink:0;overflow-y:auto;overflow-x:hidden;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .input-col::-webkit-scrollbar{width:4px}
 .input-col::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
@@ -46,25 +54,26 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 
 .frow{display:flex;align-items:center;gap:6px;margin-bottom:5px}
 .frow:last-child{margin-bottom:0}
-.fl{font-size:11.5px;color:var(--muted);min-width:76px;flex-shrink:0}
-.inp{background:#0f1520;border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:inherit;font-size:13px;padding:4px 8px;width:100%;outline:none;transition:.12s}
+.fl{font-size:11.5px;color:var(--muted);width:76px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inp{background:#0f1520;border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:inherit;font-size:13px;padding:4px 8px;width:100%;min-width:0;max-width:100%;outline:none;transition:.12s}
 .inp:focus{border-color:var(--blue)}
 .inp-sm{width:58px;text-align:right}
 .inp-md{width:96px;text-align:right}
-.unit{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.g2-ctrl .inp-sm,.g2-ctrl .inp-md{width:auto;flex:1;min-width:28px}
+.unit{font-size:11.5px;color:var(--muted);white-space:nowrap;flex-shrink:0}
 
 /* 2-컬럼 그리드 (모든 카드 공통) */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:5px 10px;margin-bottom:5px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:5px 10px;margin-bottom:5px;min-width:0}
 .grid2:last-child{margin-bottom:0}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 6px;margin-bottom:5px}
 .grid3:last-child{margin-bottom:0}
-.grid3w{display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px 6px;margin-bottom:5px}
+.grid3w{display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px 6px;margin-bottom:5px;overflow:hidden;min-width:0}
 .grid3w:last-child{margin-bottom:0}
-.g2-item{display:flex;flex-direction:column;gap:2px}
-.g2-label{font-size:10.5px;color:var(--muted)}
-.g2-ctrl{display:flex;align-items:center;gap:4px}
+.g2-item{display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
+.g2-label{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g2-ctrl{display:flex;align-items:center;gap:4px;min-width:0}
 
-.sl-row{display:flex;align-items:center;gap:8px;flex:1}
+.sl-row{display:flex;align-items:center;gap:8px;flex:1;min-width:0;overflow:hidden}
 .slider{flex:1;accent-color:var(--blue);cursor:pointer;height:4px}
 .sl-val{font-size:12px;font-weight:600;color:var(--blue);min-width:34px;text-align:right;font-family:'IBM Plex Mono',monospace}
 
@@ -86,12 +95,13 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .strat-sub{font-size:9.5px;color:var(--hint);margin-top:2px;line-height:1.3}
 
 /* ─ Result Panel ─── */
-.result-col{overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.result-col{overflow-y:auto;overflow-x:hidden;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
 .result-col::-webkit-scrollbar{width:4px}
 .result-col::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
-.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;min-width:0}
 @media(max-width:1200px){.summary-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.summary-grid{grid-template-columns:1fr}}
 
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px}
 .stat-label{font-size:10.5px;color:var(--muted);margin-bottom:4px}
@@ -129,24 +139,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .td-muted{color:var(--muted)}.td-warn{background:rgba(245,158,11,.07)!important}
 
 /* ─ Summary Panel ─── */
-.summary-col{border-left:1px solid var(--border);overflow-y:auto;padding:14px 12px;background:var(--bg)}
-.summary-col::-webkit-scrollbar{width:4px}
-.summary-col::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-@media(max-width:1100px){.summary-col{display:none}}
-.sp-ctrl{padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:2px}
-.sp-ctrl-title{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:5px}
-.sp-ctrl-row{display:flex;align-items:center;gap:6px}
-.sp-ctrl-row .slider{flex:1}
-.sp-age-lbl{font-size:12px;font-weight:700;color:var(--blue);min-width:32px;text-align:right}
-.sp-empty{text-align:center;color:var(--hint);font-size:11px;padding:30px 0}
-.sp-section{padding:8px 0}
-.sp-divider{border-top:1px solid var(--border);margin:0 -12px}
-.sp-section-title{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
-.sp-row{display:flex;align-items:center;gap:5px;margin-bottom:5px}
-.sp-lbl{font-size:10px;color:var(--muted);min-width:56px;flex-shrink:0}
-.sp-bar-wrap{flex:1;height:10px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
-.sp-bar{height:100%;border-radius:2px;transition:width .35s}
-.sp-val{font-size:10.5px;font-weight:600;min-width:40px;text-align:right;font-family:'IBM Plex Mono',monospace}
 
 /* ─ Target Tracking Toggle ─── */
 .tt-row{display:flex;align-items:center;gap:9px;padding:5px 2px;cursor:pointer;margin-top:4px}
@@ -168,7 +160,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .ys-card{margin-top:10px;padding:12px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:calc(var(--r) - 2px)}
 .ys-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
 .ys-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
-.ys-lbl{font-size:10.5px;color:var(--muted);min-width:62px;flex-shrink:0}
+.ys-lbl{font-size:10.5px;color:var(--muted);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ys-track{flex:1;height:12px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
 .ys-fill{height:100%;border-radius:3px;transition:width .35s}
 .ys-val{font-size:11px;font-weight:600;min-width:44px;text-align:right;font-family:'IBM Plex Mono',monospace}
@@ -200,7 +192,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .tl-age-mk{position:absolute;font-size:9px;color:var(--hint);transform:translateX(-50%)}
 .tl-rows{display:flex;flex-direction:column;gap:7px}
 .tl-row{display:flex;align-items:center;gap:8px}
-.tl-lbl{font-size:10.5px;color:var(--muted);min-width:60px;text-align:right;flex-shrink:0}
+.tl-lbl{font-size:10.5px;color:var(--muted);width:100px;text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tl-lane{flex:1;height:22px;position:relative;background:rgba(255,255,255,.03);border-radius:3px}
 .tl-bar{position:absolute;top:0;bottom:0;border-radius:3px;display:flex;align-items:center;padding:0 7px;overflow:hidden}
 .tl-bar-txt{font-size:9px;white-space:nowrap;font-weight:500}
@@ -208,11 +200,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .pv-toggle input{accent-color:var(--blue);width:12px;height:12px;cursor:pointer;flex-shrink:0;margin:0}
 body.pv .ys-val,body.pv .ph-amt,body.pv .result-num{filter:blur(5px);user-select:none;transition:filter .2s}
 body.pv .pv-amt{filter:blur(4px);user-select:none;transition:filter .2s}
-body.pv .chart-canvas{filter:blur(8px);transition:filter .2s}
 .demo-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);white-space:nowrap}
 #demo-overlay{display:none;position:fixed;inset:0;z-index:40;pointer-events:none}
 #demo-overlay.show{display:block}
-#demo-overlay .wm-main{position:absolute;top:33%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);font-size:86px;font-weight:900;color:rgba(245,158,11,.38);letter-spacing:8px;user-select:none;white-space:nowrap}
+#demo-overlay .wm-main{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);font-size:86px;font-weight:900;color:rgba(245,158,11,.38);letter-spacing:8px;user-select:none;white-space:nowrap}
 </style>
 </head>
 <body class="pv">
@@ -226,7 +217,7 @@ body.pv .chart-canvas{filter:blur(8px);transition:filter .2s}
   <span class="badge">v2</span>
   <span class="badge badge-green">건보료 프리패스</span>
   <span class="demo-badge" id="modeBadge" style="display:none"></span>
-  <label class="pv-toggle" title="금액 숨김 처리"><input type="checkbox" id="pvChk" checked onchange="document.body.classList.toggle('pv',this.checked)">숨김처리</label>
+  <label class="pv-toggle" title="금액 숨김 처리"><input type="checkbox" id="pvChk" checked onchange="document.body.classList.toggle('pv',this.checked);barChart?.update();lineChart?.update()">숨김처리</label>
 </header>
 
 <div id="demo-overlay"><div class="wm-main">예시 데이터</div></div>
@@ -446,6 +437,8 @@ body.pv .chart-canvas{filter:blur(8px);transition:filter .2s}
 
   </section>
 
+  <div class="drag-handle" id="dragHandle" title="좌우로 드래그하여 패널 너비 조절"></div>
+
   <!-- ═══════════════ RESULT PANEL ═══════════════ -->
   <section class="result-col" id="resultCol">
     <div class="empty">
@@ -455,17 +448,6 @@ body.pv .chart-canvas{filter:blur(8px);transition:filter .2s}
     </div>
   </section>
 
-  <!-- ═══════════════ SUMMARY PANEL ═══════════════ -->
-  <section class="summary-col">
-    <div class="sp-ctrl">
-      <span class="sp-ctrl-title">수입 구성</span>
-      <div class="sp-ctrl-row">
-        <input type="range" class="slider" id="spAgeSlider" min="55" max="90" value="55" oninput="onSpAgeSlide()">
-        <span class="sp-age-lbl" id="spAgeLbl">—</span>
-      </div>
-    </div>
-    <div id="summaryPanel"><div class="sp-empty">계산 후 표시됩니다</div></div>
-  </section>
 
 </main>
 
@@ -789,6 +771,7 @@ function simulate(p) {
 
 // ─── 렌더링 ──────────────────────────────────────────
 let barChart = null, lineChart = null, flowChart = null;
+const isPv = () => document.body.classList.contains('pv');
 let _lastRes = null, _lastP = null;
 let _playTimer = null, _autoTimer = null;
 
@@ -824,17 +807,17 @@ function renderResult(p, res, baseRes = null) {
     <div class="summary-grid">
       <div class="stat-card info">
         <div class="stat-label">Phase 1 월 평균 (${ph1Label})</div>
-        <div class="stat-val tc-blue">${krw(res.avg1)}<span style="font-size:13px;font-weight:400">만원</span></div>
+        <div class="stat-val tc-blue pv-amt">${krw(res.avg1)}<span style="font-size:13px;font-weight:400">만원</span></div>
         <div class="stat-sub">국민연금 개시 전 사적연금 평균</div>
       </div>
       <div class="stat-card info">
         <div class="stat-label">Phase 2 월 평균 (${ph2Label})</div>
-        <div class="stat-val tc-teal">${krw(res.avg2)}<span style="font-size:13px;font-weight:400">만원</span></div>
+        <div class="stat-val tc-teal pv-amt">${krw(res.avg2)}<span style="font-size:13px;font-weight:400">만원</span></div>
         <div class="stat-sub">국민연금 포함 합산 평균</div>
       </div>
       <div class="stat-card highlight">
         <div class="stat-label">절세 효과 (vs 16.5% 중과세)</div>
-        <div class="stat-val tc-green">${krw(res.taxSavings)}<span style="font-size:13px;font-weight:400">만원</span></div>
+        <div class="stat-val tc-green pv-amt">${krw(res.taxSavings)}<span style="font-size:13px;font-weight:400">만원</span></div>
         <div class="stat-sub">최적화 전략 누적 절세 추정액</div>
       </div>
       <div class="stat-card ${res.exhaustAge && res.exhaustAge <= 85 ? 'warn' : ''}">
@@ -844,7 +827,7 @@ function renderResult(p, res, baseRes = null) {
       </div>
       <div class="stat-card">
         <div class="stat-label">납부 예상 총 세금</div>
-        <div class="stat-val tc-muted">${krw(res.totTax)}<span style="font-size:13px;font-weight:400">만원</span></div>
+        <div class="stat-val tc-muted pv-amt">${krw(res.totTax)}<span style="font-size:13px;font-weight:400">만원</span></div>
         <div class="stat-sub">건보료 0원 (사적연금 프리패스)</div>
       </div>
       <div class="stat-card ${shortfallCount > 0 ? 'warn' : ''}">
@@ -888,14 +871,6 @@ function renderResult(p, res, baseRes = null) {
     </div>
 
     <div class="chart-wrap">
-      <div class="chart-title">
-        <span>세후 수입 vs 납부 세금</span>
-        <span style="font-size:10.5px;color:var(--hint)">▲ 세후 수입(원천별) &nbsp;▼ 납부 세금 &nbsp;점선=목표</span>
-      </div>
-      <canvas id="flowChart" class="chart-canvas"></canvas>
-    </div>
-
-    <div class="chart-wrap">
       <div class="chart-title">Phase별 월 현금흐름 요약</div>
       <div id="phaseCards"></div>
     </div>
@@ -928,16 +903,8 @@ function renderResult(p, res, baseRes = null) {
   eid('yearAgeLbl').textContent = simStart + '세';
   renderYearSnapshot(res, p, simStart);
 
-  // 요약 패널 슬라이더 초기화
-  const spSl = eid('spAgeSlider');
-  if (spSl) { spSl.min = simStart; spSl.max = 90; spSl.value = simStart; }
-  const spLbl = eid('spAgeLbl');
-  if (spLbl) spLbl.textContent = simStart + '세';
-  renderSummaryPanel(res, p, simStart);
-
   renderBarChart(res, p, baseRes);
   renderLineChart(res, p, baseRes);
-  renderFlowChart(res, p);
   renderPhaseCards(res, p);
   renderTimeline(res, p);
   renderTable(res, p);
@@ -1083,24 +1050,29 @@ function renderBarChart(res, p, baseRes = null) {
         legend:{ labels:{ color:'#94a3b8', font:{size:11} } },
         tooltip:{
           mode:'index', intersect:false,
-          filter: item => item.dataset.type === 'line' || (item.raw || 0) > 0,
+          filter: item => item.dataset.stack === 'a' && (item.raw || 0) > 0,
+          itemSort: (a, b) => b.datasetIndex - a.datasetIndex,
           callbacks:{
-            label: c => `${c.dataset.label}: ${c.raw}만원`,
-            footer: items => {
-              const total = items
-                .filter(i => i.dataset.stack === 'a')
-                .reduce((s, i) => s + (i.raw || 0), 0);
-              return total > 0 ? `월 합계: ${Math.round(total)}만원` : null;
-            }
+            title: items => items[0]?.label || '',
+            beforeBody: items => {
+              const idx = items[0]?.dataIndex;
+              const ds  = barChart?.data?.datasets;
+              const lineDs = ds?.find(d => d.type === 'line');
+              const total  = items.reduce((s, i) => s + (i.raw || 0), 0);
+              const target = lineDs?.data?.[idx];
+              const lines  = [];
+              if (total  > 0) lines.push(isPv() ? '월 합계: —' : `월 합계: ${Math.round(total)}만원`);
+              if (target > 0) lines.push(isPv() ? '목표: —'   : `목표: ${Math.round(target)}만원`);
+              return lines;
+            },
+            label: c => ` ${c.dataset.label}: ${isPv() ? '—' : c.raw + '만원'}`,
           },
-          footerFont:{ weight:'bold' },
-          footerColor:'#e2e8f0',
         },
       },
       interaction:{ mode:'index', intersect:false },
       scales:{
         x:{ stacked:true, ticks:{color:'#64748b',font:{size:10},maxRotation:0}, grid:{color:'rgba(42,51,71,.5)'} },
-        y:{ stacked:true, ticks:{color:'#64748b',font:{size:10},callback:v=>v+'만'}, grid:{color:'rgba(42,51,71,.5)'} },
+        y:{ stacked:true, ticks:{color:'#64748b',font:{size:10},callback:v=>isPv()?'—':v+'만'}, grid:{color:'rgba(42,51,71,.5)'} },
       }
     }
   });
@@ -1165,7 +1137,7 @@ function renderLineChart(res, p, baseRes = null) {
             label: c => {
               const val = posToOk(c.raw);
               if (val === null) return '';
-              return `${c.dataset.label}: ${val.toFixed(2)}억`;
+              return isPv() ? `${c.dataset.label}: —` : `${c.dataset.label}: ${val.toFixed(2)}억`;
             }
           }
         }
@@ -1178,7 +1150,7 @@ function renderLineChart(res, p, baseRes = null) {
             color:'#64748b', font:{size:10},
             callback: v => {
               const i = Math.round(v);
-              return i === v && ticks[i] !== undefined ? ticks[i]+'억' : '';
+              return i === v && ticks[i] !== undefined ? (isPv() ? '—' : ticks[i]+'억') : '';
             },
           },
           afterBuildTicks: axis => { axis.ticks = ticks.map((_, i) => ({value:i})); },
@@ -1206,17 +1178,17 @@ function renderTable(res, p) {
     const rowClass = r.shortfall ? 'td-warn' : (r.extCash > 1000 ? 'td-gap' : '');
     html += `<tr class="${rowClass}">
       <td style="font-family:inherit;font-weight:600">${r.age}세${np}</td>
-      <td>${Math.round(r.targetMonthly/10000)}</td>
-      <td style="color:var(--teal)">${r.npNet>0?Math.round(r.npNet/12/10000):'-'}</td>
-      <td style="color:var(--teal)">${r.paNet>0?Math.round(r.paNet/12/10000):'-'}</td>
-      <td style="color:var(--purple)">${r.isNet>0?Math.round(r.isNet/12/10000):'-'}</td>
-      <td class="td-amber">${r.icNet>0?Math.round(r.icNet/12/10000):'-'}</td>
-      <td style="font-weight:600;color:${r.shortfall?'var(--amber)':'var(--text)'}">${Math.round(r.totalNet/10000)}</td>
-      <td class="td-muted">${Math.round((r.paTax+r.isTax+r.icTax)/10000)}</td>
-      ${hasGap ? `<td style="color:var(--amber)">${r.extCash>1000?Math.round(r.extCash/12/10000):'-'}</td>` : ''}
-      <td style="color:var(--teal)">${(r.paBal/1e8).toFixed(2)}</td>
-      <td style="color:var(--purple)">${(r.isBal/1e8).toFixed(2)}</td>
-      <td class="td-amber">${(r.icBal/1e8).toFixed(2)}</td>
+      <td class="pv-amt">${Math.round(r.targetMonthly/10000)}</td>
+      <td class="pv-amt" style="color:var(--teal)">${r.npNet>0?Math.round(r.npNet/12/10000):'-'}</td>
+      <td class="pv-amt" style="color:var(--teal)">${r.paNet>0?Math.round(r.paNet/12/10000):'-'}</td>
+      <td class="pv-amt" style="color:var(--purple)">${r.isNet>0?Math.round(r.isNet/12/10000):'-'}</td>
+      <td class="td-amber pv-amt">${r.icNet>0?Math.round(r.icNet/12/10000):'-'}</td>
+      <td class="pv-amt" style="font-weight:600;color:${r.shortfall?'var(--amber)':'var(--text)'}">${Math.round(r.totalNet/10000)}</td>
+      <td class="td-muted pv-amt">${Math.round((r.paTax+r.isTax+r.icTax)/10000)}</td>
+      ${hasGap ? `<td class="pv-amt" style="color:var(--amber)">${r.extCash>1000?Math.round(r.extCash/12/10000):'-'}</td>` : ''}
+      <td class="pv-amt" style="color:var(--teal)">${(r.paBal/1e8).toFixed(2)}</td>
+      <td class="pv-amt" style="color:var(--purple)">${(r.isBal/1e8).toFixed(2)}</td>
+      <td class="td-amber pv-amt">${(r.icBal/1e8).toFixed(2)}</td>
     </tr>`;
   });
 
@@ -1250,11 +1222,11 @@ function renderFlowChart(res, p) {
       responsive:true, maintainAspectRatio:true,
       plugins: {
         legend:{ labels:{ color:'#94a3b8', font:{size:11} } },
-        tooltip:{ callbacks:{ label: c => `${c.dataset.label}: ${c.raw}만원` } }
+        tooltip:{ callbacks:{ label: c => `${c.dataset.label}: ${isPv() ? '—' : c.raw+'만원'}` } }
       },
       scales: {
         x:{ stacked:true, ticks:{color:'#64748b',font:{size:10},maxRotation:0}, grid:{color:'rgba(42,51,71,.5)'} },
-        y:{ stacked:true, ticks:{color:'#64748b',font:{size:10},callback:v=>v+'만'}, grid:{color:'rgba(42,51,71,.5)'} },
+        y:{ stacked:true, ticks:{color:'#64748b',font:{size:10},callback:v=>isPv()?'—':v+'만'}, grid:{color:'rgba(42,51,71,.5)'} },
       }
     }
   });
@@ -1383,11 +1355,12 @@ function renderTimeline(res, p) {
   const marks = [];
   for (let a=simStart; a<=simEnd; a+=5) marks.push(a);
 
-  let html = '<div class="tl-header">';
+  let html = '<div class="tl-rows">';
+  html += '<div class="tl-row" style="margin-bottom:4px"><div class="tl-lbl"></div><div class="tl-lane" style="height:16px;background:transparent">';
   marks.forEach(a => {
     html += `<div class="tl-age-mk" style="left:${((a-simStart)/span*100).toFixed(1)}%">${a}</div>`;
   });
-  html += '</div><div class="tl-rows">';
+  html += '</div></div>';
 
   sources.forEach(s => {
     const mn = Math.round(s.avg/10000);
@@ -1395,7 +1368,7 @@ function renderTimeline(res, p) {
       <div class="tl-lbl">${s.label}</div>
       <div class="tl-lane">
         <div class="tl-bar" style="left:${left(s.start)};width:${wid(s.start,s.end)};background:${s.color}28;border:1.5px solid ${s.color}70">
-          ${mn>0?`<span class="tl-bar-txt" style="color:${s.color}">월 ${mn}만 세후 평균</span>`:''}
+          ${mn>0?`<span class="tl-bar-txt pv-amt" style="color:${s.color}">월 ${mn}만 세후 평균</span>`:''}
         </div>
       </div>
     </div>`;
@@ -1408,117 +1381,9 @@ function renderTimeline(res, p) {
 function onYearSlide() {
   const age = parseInt(eid('yearSlider').value);
   eid('yearAgeLbl').textContent = age + '세';
-  const spSl = eid('spAgeSlider');
-  if (spSl) { spSl.value = age; eid('spAgeLbl').textContent = age + '세'; }
-  if (_lastRes && _lastP) {
-    renderYearSnapshot(_lastRes, _lastP, age);
-    renderSummaryPanel(_lastRes, _lastP, age);
-  }
+  if (_lastRes && _lastP) renderYearSnapshot(_lastRes, _lastP, age);
 }
 
-function onSpAgeSlide() {
-  const age = parseInt(eid('spAgeSlider').value);
-  eid('spAgeLbl').textContent = age + '세';
-  const yrSl = eid('yearSlider');
-  if (yrSl) { yrSl.value = age; eid('yearAgeLbl').textContent = age + '세'; }
-  if (_lastRes && _lastP) {
-    renderYearSnapshot(_lastRes, _lastP, age);
-    renderSummaryPanel(_lastRes, _lastP, age);
-  }
-}
-
-function renderSummaryPanel(res, p, age) {
-  const wrap = eid('summaryPanel');
-  if (!wrap || !res || !p) return;
-  const row = res.rows.find(r => r.age === age);
-  if (!row) { wrap.innerHTML = ''; return; }
-
-  const mn = v => Math.round(v / 10000);
-  const ach = row.targetMonthly > 0 ? Math.round(row.totalNet / row.targetMonthly * 100) : 100;
-  const achCol = ach >= 90 ? 'var(--green)' : ach >= 70 ? 'var(--amber)' : 'var(--red)';
-  const tgtMon = mn(row.targetMonthly);
-  const totMon = mn(row.totalNet);
-  const yearAD = age + (new Date().getFullYear() - p.curAge);
-  const totBar = tgtMon > 0 ? Math.min(100, totMon / Math.max(tgtMon, totMon) * 100) : 0;
-
-  const maxBar = Math.max(row.targetMonthly, row.totalNet) * 1.05 / 12 || 1;
-
-  const srcDefs = [
-    { label:'IRP회사',    val:row.icNet/12,           color:'#f59e0b' },
-    { label:'IRP본인',    val:row.isNet/12,           color:'#a855f7' },
-    { label:'개인연금',   val:row.paNet/12,           color:'#14b8a6' },
-    { label:'NP(본인)',   val:row.npNet/12,           color:'#6366f1' },
-    { label:'NP(배우자)', val:(row.spouseNpNet||0)/12, color:'#8b5cf6' },
-  ];
-
-  const srcHtml = srcDefs.map(s => {
-    const pct = Math.min(100, Math.max(0, s.val / maxBar * 100));
-    const dim = s.val < 100;
-    return `<div class="sp-row" style="${dim ? 'opacity:.3' : ''}">
-      <div class="sp-lbl">${s.label}</div>
-      <div class="sp-bar-wrap"><div class="sp-bar" style="width:${pct.toFixed(1)}%;background:${s.color}"></div></div>
-      <div class="sp-val" style="color:${s.color}">${s.val > 100 ? '+'+mn(s.val)+'만' : '—'}</div>
-    </div>`;
-  }).join('');
-
-  const totalTaxMon = mn((row.paTax + row.isTax + row.icTax) / 12);
-  const taxPct = Math.min(100, totalTaxMon / mn(maxBar) * 100);
-  const taxRow = totalTaxMon > 0 ? `<div class="sp-row">
-    <div class="sp-lbl" style="color:#f87171">세금</div>
-    <div class="sp-bar-wrap"><div class="sp-bar" style="width:${taxPct.toFixed(1)}%;background:#f87171;opacity:.75"></div></div>
-    <div class="sp-val" style="color:#f87171">-${totalTaxMon}만</div>
-  </div>` : '';
-
-  const balDefs = [
-    { label:'개인연금', val:row.paBal, color:'#14b8a6' },
-    { label:'IRP본인',  val:row.isBal, color:'#a855f7' },
-    { label:'IRP회사',  val:row.icBal, color:'#f59e0b' },
-  ];
-  const balHtml = balDefs.map(b => {
-    const valStr = (b.val / 1e8).toFixed(2) + '억';
-    const valCol = b.val > 0 ? b.color : 'var(--hint)';
-    return `<div style="display:flex;justify-content:space-between;margin-bottom:3px">
-      <span style="font-size:10px;color:${b.color}">${b.label}</span>
-      <span style="font-size:10.5px;font-weight:600;color:${valCol};font-family:'IBM Plex Mono',monospace">${valStr}</span>
-    </div>`;
-  }).join('');
-
-  const totalBal = row.paBal + row.isBal + row.icBal;
-
-  wrap.innerHTML = `
-    <div class="sp-section">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
-        <span style="font-size:22px;font-weight:700;color:var(--text)">${age}세</span>
-        <span style="font-size:10px;color:var(--hint)">${yearAD}년</span>
-      </div>
-      <div style="font-size:10.5px;color:var(--muted);margin-bottom:3px">목표 ${tgtMon}만/월</div>
-      <div style="height:14px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;margin-bottom:3px">
-        <div style="height:100%;width:${totBar.toFixed(1)}%;background:${achCol};border-radius:3px;transition:width .35s"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:13px;font-weight:700;color:${achCol}">${totMon}만원/월</span>
-        <span style="font-size:11px;color:${achCol};font-weight:600">${ach}%</span>
-      </div>
-      <div style="font-size:10px;margin-top:5px;color:${row.shortfall ? 'var(--amber)' : 'var(--green)'}">
-        ${row.shortfall ? '⚠ ' + mn(row.targetMonthly - row.totalNet) + '만원 부족' : '✅ 목표 달성'}
-      </div>
-    </div>
-    <div class="sp-divider"></div>
-    <div class="sp-section">
-      <div class="sp-section-title">소득원</div>
-      ${srcHtml}${taxRow}
-    </div>
-    <div class="sp-divider"></div>
-    <div class="sp-section">
-      <div class="sp-section-title">연금 잔고</div>
-      ${balHtml}
-      <div style="border-top:1px solid rgba(255,255,255,.07);margin-top:4px;padding-top:4px;display:flex;justify-content:space-between">
-        <span style="font-size:10px;color:var(--muted)">총 잔고</span>
-        <span style="font-size:11px;font-weight:700;color:var(--text);font-family:'IBM Plex Mono',monospace">${(totalBal/1e8).toFixed(2)}억</span>
-      </div>
-    </div>
-  `;
-}
 
 function togglePlay() {
   const btn = eid('playBtn');
@@ -1571,11 +1436,11 @@ function renderYearSnapshot(res, p, age) {
     <div class="ys-head">
       <div>
         <div style="font-size:20px;font-weight:700;color:var(--text);line-height:1">${age}세</div>
-        <div style="font-size:10.5px;color:var(--muted)">${yearAD}년 · 목표 ${mn(row.targetMonthly)}만/월</div>
+        <div style="font-size:10.5px;color:var(--muted)">${yearAD}년 · 목표 <span class="pv-amt">${mn(row.targetMonthly)}만</span>/월</div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:15px;font-weight:700;color:${col}">${mn(row.totalNet)}만원/월</div>
-        <div style="font-size:10.5px;color:${col}">${ach}% 달성 · 세금 ${mn(totalTax)}만/월</div>
+        <div style="font-size:15px;font-weight:700;color:${col}"><span class="pv-amt">${mn(row.totalNet)}만원</span>/월</div>
+        <div style="font-size:10.5px;color:${col}">${ach}% 달성 · 세금 <span class="pv-amt">${mn(totalTax)}만</span>/월</div>
       </div>
     </div>`;
 
@@ -1589,7 +1454,7 @@ function renderYearSnapshot(res, p, age) {
         <div class="ys-fill" style="width:${w(s.net)}%;background:${s.color}"></div>
       </div>
       <div class="ys-val" style="color:${s.color}">${s.net > 100 ? '+'+mn(s.net)+'만' : '—'}</div>
-      <div class="ys-bal">${s.bal !== null ? (s.bal/1e8).toFixed(2)+'억' : ''}</div>
+      <div class="ys-bal pv-amt">${s.bal !== null ? (s.bal/1e8).toFixed(2)+'억' : ''}</div>
     </div>`;
     if (active && divRein && divRein > 100) {
       html += `<div class="ys-row" style="opacity:.65;margin-top:-3px">
@@ -1612,9 +1477,9 @@ function renderYearSnapshot(res, p, age) {
 
   html += `<div style="border-top:1px dashed rgba(255,255,255,.07);margin:7px 0"></div>
     <div style="display:flex;justify-content:space-between;font-size:11px">
-      <span style="color:var(--muted)">총 잔고 ${(totalBal/1e8).toFixed(2)}억원</span>
+      <span style="color:var(--muted)">총 잔고 <span class="pv-amt">${(totalBal/1e8).toFixed(2)}억원</span></span>
       <span style="font-weight:700;color:${row.shortfall?'var(--amber)':'var(--muted)'}">
-        ${row.shortfall ? '⚠ 목표 미달 ' + mn(row.targetMonthly - row.totalNet) + '만 부족' : '✅ 목표 달성'}
+        ${row.shortfall ? '⚠ 목표 미달 <span class="pv-amt">' + mn(row.targetMonthly - row.totalNet) + '만</span> 부족' : '✅ 목표 달성'}
       </span>
     </div>
   </div>`;
@@ -1668,6 +1533,33 @@ document.addEventListener('DOMContentLoaded', () => {
   eid('stratDesc').textContent = stratDesc(1);
   run();
   initAuth().then(applyMode);
+
+  // Drag-to-resize divider
+  const handle = document.getElementById('dragHandle');
+  const col    = document.querySelector('.input-col');
+  if (handle && col) {
+    let dragging = false, startX = 0, startW = 0;
+    handle.addEventListener('mousedown', e => {
+      dragging = true;
+      startX   = e.clientX;
+      startW   = col.getBoundingClientRect().width;
+      handle.classList.add('active');
+      document.body.style.cursor     = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      col.style.width = Math.max(220, Math.min(620, startW + e.clientX - startX)) + 'px';
+    });
+    window.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      handle.classList.remove('active');
+      document.body.style.cursor     = '';
+      document.body.style.userSelect = '';
+    });
+  }
 });
 </script>
 </body>

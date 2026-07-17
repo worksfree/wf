@@ -448,14 +448,28 @@ body {
       .replace(/단체 재해보장보험/g,        '중대재해 보장 솔루션')
       .replace(/단체보험/g,                 '임직원 보장')
       .replace(/법인보험/g,                 '파트너 솔루션')
+      .replace(/임원배상책임보험/g,         '임원 리스크 솔루션')
+      .replace(/기업중대사고배상책임보험/g, '중대재해배상 솔루션')
+      .replace(/기업재해보장보험/g,         '중대재해 보장 솔루션')
+      .replace(/중대재해보험/g,             '중대재해 솔루션')
+      .replace(/임원보험 가입/g,            '임원 리스크 솔루션 도입')
       .replace(/임원보험/g,                 '임원 리스크 대비 솔루션')
+      .replace(/책임보험/g,                 '책임 보장')
+      .replace(/보험사/g,                   '파트너사')
+      .replace(/D&O 보험/g,                 'D&O 솔루션')
+      .replace(/보험 설계/g,                '솔루션 설계')
+      .replace(/보험 구조/g,                '솔루션 구조')
+      .replace(/보험개발원/g,               '@@KIDI@@')
+      .replace(/보험연구원/g,               '@@KIRI@@')
       .replace(/보험료/g,                   '플랜 비용')
       .replace(/보험 가입/g,               '파트너 솔루션 적용')
       .replace(/보험으로/g,                '파트너 상담으로')
       .replace(/보험이/g,                  '리스크 솔루션이')
       .replace(/보험을/g,                  '리스크 솔루션을')
       .replace(/보험과/g,                  '리스크 솔루션과')
-      .replace(/보험/g,                    '파트너 상담');
+      .replace(/보험/g,                    '파트너 상담')
+      .replace(/@@KIDI@@/g,                '보험개발원')
+      .replace(/@@KIRI@@/g,                '보험연구원');
   }
   function sanitize(n){
     if(n.nodeType === 3){ n.textContent = replace(n.textContent); }

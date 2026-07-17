@@ -1,0 +1,9 @@
+name               = "govdata-api-worker"
+main               = "worker.js"
+compatibility_date = "2025-01-01"
+account_id         = "cfa572c2bcb9f142db8430b310cf5a32"
+
+# 시크릿 키는 아래 명령으로 설정 (여기에 직접 쓰지 말 것):
+#   npx wrangler secret put GOVDATA_SERVICE_KEY --config wrangler.toml
+# GOVDATA_SERVICE_KEY: data.go.kr 마이페이지 → 활용신청 내역에서 발급받은
+#                      일반 인증키(Decoding) 값. 여러 개 API를 같은 키로 씀.

@@ -1,22 +1,21 @@
 /**
- * Cloudflare Worker — 법원경매 크롤러 + 데이터 서비스
+ * Cloudflare Worker — 법원경매 크롤러 (Supabase 버전)
  *
- * KV 바인딩 (Workers 설정에서 추가):
- *   이름: AUCTION_DATA   (namespace 생성 후 연결)
+ * Worker Secrets (Settings → Variables → Encrypt):
+ *   SUPABASE_URL         Supabase 프로젝트 URL (예: https://xxx.supabase.co)
+ *   SUPABASE_SERVICE_KEY Supabase service_role 키
+ *   PROXY_SECRET         관리자 API 보호용 (옵션)
+ *   KAKAO_API_KEY        지오코딩 Kakao REST API 키
  *
- * 환경변수 (Workers Settings → Variables):
- *   PROXY_SECRET   아무 문자열 (관리자 API 보호용)
- *
- * KV 키 구조 (멀티테넌트):
- *   data:{tenant}       경매 데이터 JSON
- *   meta:{tenant}       { status, started_at, finished_at, count, next_page, total }
+ * KV 바인딩: 더 이상 사용하지 않음 (wrangler.toml에서 제거 가능)
  *
  * 엔드포인트:
- *   GET  /health                  동작 확인
- *   GET  /data?tenant=X           데이터 조회 (공개)
- *   GET  /status?tenant=X         수집 상태 조회 (공개)
- *   POST /crawl?tenant=X          수집 실행 (공개 — 인증 불필요)
- *   POST /reset?tenant=X          데이터 초기화 (PROXY_SECRET 필요)
+ *   GET  /health               동작 확인
+ *   GET  /data?tenant=X        데이터 조회 (Supabase에서 직접 로드)
+ *   GET  /status?tenant=X      수집 상태 조회
+ *   POST /crawl?tenant=X       수집 실행
+ *   POST /geocode?tenant=X&max=50&force=0  지오코딩 배치
+ *   POST /reset?tenant=X       데이터 초기화 (PROXY_SECRET 필요)
  */
 
 const COURT_BASE = 'https://www.courtauction.go.kr';
@@ -30,21 +29,137 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, X-Proxy-Secret',
 };
 
-/* ── 응답 헬퍼 ── */
 const jsonResp = (data, status = 200) =>
   new Response(JSON.stringify(data, null, 0), {
     status,
     headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS },
   });
 
-/* ── 인증 ── */
 function checkAuth(request, env) {
   const secret = env.PROXY_SECRET;
-  if (!secret) return true; // 미설정 시 통과 (개발용)
+  if (!secret) return true;
   return request.headers.get('X-Proxy-Secret') === secret;
 }
 
-/* ── 세션 쿠키 획득 ── */
+/* ══════════════════════════════════════
+   Supabase REST API 헬퍼
+══════════════════════════════════════ */
+
+function sbBase(env) { return `${env.SUPABASE_URL}/rest/v1`; }
+
+function sbHeaders(env, extra = {}) {
+  return {
+    'Content-Type': 'application/json',
+    'apikey': env.SUPABASE_SERVICE_KEY,
+    'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+    ...extra,
+  };
+}
+
+/** auction_meta 조회 */
+async function sbGetMeta(env, tenant) {
+  const r = await fetch(
+    `${sbBase(env)}/auction_meta?tenant_id=eq.${encodeURIComponent(tenant)}&select=*`,
+    { headers: sbHeaders(env) }
+  );
+  if (!r.ok) return {};
+  const rows = await r.json();
+  return rows[0] || {};
+}
+
+/** auction_meta upsert */
+async function sbUpsertMeta(env, tenant, data) {
+  const r = await fetch(`${sbBase(env)}/auction_meta`, {
+    method: 'POST',
+    headers: sbHeaders(env, { 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+    body: JSON.stringify({ tenant_id: tenant, ...data, updated_at: new Date().toISOString() }),
+  });
+  if (!r.ok) throw new Error(`sbUpsertMeta: ${r.status} ${await r.text()}`);
+}
+
+/** auction_items upsert (배치) */
+async function sbUpsertItems(env, rows) {
+  if (!rows.length) return;
+  const r = await fetch(`${sbBase(env)}/auction_items`, {
+    method: 'POST',
+    headers: sbHeaders(env, { 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+    body: JSON.stringify(rows),
+  });
+  if (!r.ok) throw new Error(`sbUpsertItems: ${r.status} ${await r.text()}`);
+}
+
+/** auction_items 건수 조회 (Content-Range 헤더 이용) */
+async function sbCountItems(env, tenant, extra = '') {
+  const r = await fetch(
+    `${sbBase(env)}/auction_items?tenant_id=eq.${encodeURIComponent(tenant)}${extra}&select=id`,
+    { headers: sbHeaders(env, { 'Prefer': 'count=exact', 'Range': '0-0', 'Range-Unit': 'items' }) }
+  );
+  const cr = r.headers.get('Content-Range');
+  if (!cr) return 0;
+  const total = cr.split('/')[1];
+  return total ? parseInt(total) : 0;
+}
+
+/** auction_items 전체 조회 (1000건씩 페이지네이션) */
+async function sbFetchAllItems(env, tenant, fields = '*') {
+  const items = [];
+  let from = 0;
+  const PAGE = 1000;
+  while (true) {
+    const r = await fetch(
+      `${sbBase(env)}/auction_items?tenant_id=eq.${encodeURIComponent(tenant)}&select=${encodeURIComponent(fields)}&order=created_at.asc`,
+      { headers: sbHeaders(env, { 'Range': `${from}-${from + PAGE - 1}`, 'Range-Unit': 'items' }) }
+    );
+    if (r.status === 416) break;  // out of range
+    if (!r.ok) throw new Error(`sbFetchAllItems: ${r.status}`);
+    const data = await r.json();
+    if (!data?.length) break;
+    items.push(...data);
+    if (data.length < PAGE) break;
+    from += PAGE;
+  }
+  return items;
+}
+
+/** 지오코딩 필요 항목 조회 */
+async function sbFetchNeedGeocode(env, tenant, limit = 50, force = false) {
+  const filter = force
+    ? `&address=not.is.null`
+    : `&lat=is.null&address=not.is.null`;
+  const r = await fetch(
+    `${sbBase(env)}/auction_items?tenant_id=eq.${encodeURIComponent(tenant)}${filter}&select=id,case_number,address&limit=${limit}&order=created_at.asc`,
+    { headers: sbHeaders(env) }
+  );
+  if (!r.ok) throw new Error(`sbFetchNeedGeocode: ${r.status}`);
+  return r.json();
+}
+
+/** 단건 좌표 업데이트 */
+async function sbUpdateGeocode(env, tenant, id, lat, lng) {
+  const r = await fetch(
+    `${sbBase(env)}/auction_items?id=eq.${encodeURIComponent(id)}&tenant_id=eq.${encodeURIComponent(tenant)}`,
+    {
+      method: 'PATCH',
+      headers: sbHeaders(env, { 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ lat, lng, geocoded_at: new Date().toISOString(), updated_at: new Date().toISOString() }),
+    }
+  );
+  if (!r.ok) throw new Error(`sbUpdateGeocode: ${r.status}`);
+}
+
+/** auction_items 전체 삭제 */
+async function sbDeleteAllItems(env, tenant) {
+  const r = await fetch(
+    `${sbBase(env)}/auction_items?tenant_id=eq.${encodeURIComponent(tenant)}`,
+    { method: 'DELETE', headers: sbHeaders(env) }
+  );
+  if (!r.ok) throw new Error(`sbDeleteAllItems: ${r.status}`);
+}
+
+/* ══════════════════════════════════════
+   법원경매 API
+══════════════════════════════════════ */
+
 async function getSessionCookies() {
   const resp = await fetch(PAGE_URL, {
     headers: { 'User-Agent': UA, 'Accept': 'text/html,*/*', 'Accept-Language': 'ko-KR,ko;q=0.9' },
@@ -60,7 +175,6 @@ async function getSessionCookies() {
   return parts.join('; ');
 }
 
-/* ── 법원 API 1페이지 호출 ── */
 async function fetchCourtPage(cookies, pageNo, pageSize = 20) {
   const body = {
     dma_pageInfo: {
@@ -107,14 +221,9 @@ async function fetchCourtPage(cookies, pageNo, pageSize = 20) {
   return { items, total };
 }
 
-/* ── 지오코딩 헬퍼 ── */
-function _needsGeocode(item) {
-  const lat = item.lat, lng = item.lng;
-  if (lat == null || lng == null) return true;
-  const ld = String(lat).includes('.') ? String(lat).split('.')[1].length : 0;
-  const rd = String(lng).includes('.') ? String(lng).split('.')[1].length : 0;
-  return ld < 3 || rd < 3;
-}
+/* ══════════════════════════════════════
+   지오코딩
+══════════════════════════════════════ */
 
 function _cleanAddress(address) {
   return address.replace(/\s*\(.*?\)\s*$/, '').trim();
@@ -123,7 +232,6 @@ function _cleanAddress(address) {
 async function _kakaoGeocode(address, apiKey) {
   const base = _cleanAddress(address);
 
-  // 건물명이 있으면 keyword search 우선 — 필지 중심점 대신 건물 POI 좌표를 반환해 아파트 정확도 ↑
   const bm = address.match(/\(([^)]+)\)/);
   if (bm) {
     const keyword = `${base} ${bm[1].trim()}`;
@@ -139,10 +247,11 @@ async function _kakaoGeocode(address, apiKey) {
     } catch {}
   }
 
-  // fallback: address search (토지·상업용 등 건물명 없는 경우)
-  const url = `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(base)}&size=1`;
   try {
-    const resp = await fetch(url, { headers: { Authorization: `KakaoAK ${apiKey}` } });
+    const resp = await fetch(
+      `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(base)}&size=1`,
+      { headers: { Authorization: `KakaoAK ${apiKey}` } }
+    );
     if (!resp.ok) return null;
     const docs = (await resp.json()).documents;
     if (!docs?.length) return null;
@@ -150,18 +259,20 @@ async function _kakaoGeocode(address, apiKey) {
   } catch { return null; }
 }
 
-// 소수점 4자리 미만 or 정수값(법원 기본 "37.0000") = 법원/지역 수준 좌표 → null 처리
+/* ══════════════════════════════════════
+   아이템 파싱 (Supabase 컬럼명 snake_case)
+══════════════════════════════════════ */
+
 function preciseCoord(s) {
   if (!s) return null;
   const str = String(s).trim();
   const dot = str.indexOf('.');
   if (dot < 0 || str.length - dot - 1 < 4) return null;
   const v = parseFloat(str);
-  if (Number.isInteger(v)) return null; // "37.0000" → 정수 → 법원 기본값 제거
+  if (Number.isInteger(v)) return null;
   return v;
 }
 
-/* ── 아이템 파싱 ── */
 function parseItem(item) {
   const sido  = item.hjguSido  || item.bgPlaceSido  || '';
   const sigu  = item.hjguSigu  || item.bgPlaceSigu  || '';
@@ -182,7 +293,7 @@ function parseItem(item) {
 
   const toDate = s => s && s.length === 8 ? `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}` : null;
   const app  = parseInt(item.gamevalAmt  || 0) || 0;
-  const minP = parseInt(item.minmaePrice || 0) || 0;
+  const min_p = parseInt(item.minmaePrice || 0) || 0;
   const fc   = parseInt(item.yuchalCnt  || 0) || 0;
 
   return {
@@ -193,12 +304,11 @@ function parseItem(item) {
     lat: preciseCoord(item.wgs84Ycordi),
     lng: preciseCoord(item.wgs84Xcordi),
     area: parseFloat(item.objctAr || item.objctArDts || '') || null,
-    floor: null, yr: null,
-    app, minP,
-    avgT: app ? Math.round(app * 1.15 / 500000) * 500000 : 0,
+    app, min_p,
+    avg_t: app ? Math.round(app * 1.15 / 500000) * 500000 : 0,
     fc,
     bid_date: toDate(item.maeGiil),
-    pred: Math.round(Math.max(55, Math.min(95, (minP / (app || 1)) * 100 - fc * 3))),
+    pred: Math.round(Math.max(55, Math.min(95, (min_p / (app || 1)) * 100 - fc * 3))),
     detail_url: item.docid
       ? `${COURT_BASE}/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F02.xml&docid=${item.docid}`
       : '',
@@ -206,26 +316,28 @@ function parseItem(item) {
   };
 }
 
-/* ── 크롤 실행 (ctx.waitUntil에서 호출) ── */
+/* ══════════════════════════════════════
+   크롤 실행
+══════════════════════════════════════ */
+
 async function doCrawl(env, tenant, maxItems) {
-  const metaKey = `meta:${tenant}`;
-  const dataKey = `data:${tenant}`;
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
+    console.error('doCrawl: SUPABASE_URL/SUPABASE_SERVICE_KEY 미설정');
+    return;
+  }
 
   try {
-    // 현재 meta 확인 → next_page 이어서 수집
-    const prevMetaRaw = await env.AUCTION_DATA.get(metaKey);
-    const prevMeta = prevMetaRaw ? JSON.parse(prevMetaRaw) : {};
+    // 현재 meta에서 next_page 확인
+    const prevMeta = await sbGetMeta(env, tenant);
     const startPage = prevMeta.next_page || 1;
-    // startPage가 1이어도 기존 데이터를 유지 — 재시작 시 전체 데이터 유실 방지
-    const prevItems = JSON.parse(await env.AUCTION_DATA.get(dataKey) || '{"items":[]}').items;
 
-    // 상태 업데이트
-    await env.AUCTION_DATA.put(metaKey, JSON.stringify({
-      ...prevMeta,
+    await sbUpsertMeta(env, tenant, {
       status: 'crawling',
-      started_at: new Date().toISOString(),
+      started_at: prevMeta.started_at || new Date().toISOString(),
       next_page: startPage,
-    }));
+      count: prevMeta.count || 0,
+      error: null,
+    });
 
     const cookies = await getSessionCookies();
     const pageSize = 20;
@@ -238,52 +350,61 @@ async function doCrawl(env, tenant, maxItems) {
       const { items, total, blocked } = await fetchCourtPage(cookies, currentPage, pageSize);
       if (blocked) throw new Error('IP_BLOCKED');
       if (!items.length) break;
-      if (currentPage === startPage) totalCount = total;
+      if (i === 0) totalCount = total;
       newItems.push(...items.map(parseItem));
       currentPage++;
       if (newItems.length >= maxItems) break;
-      await new Promise(r => setTimeout(r, 400)); // rate limit
+      await new Promise(r => setTimeout(r, 400));
     }
 
-    // 사건번호(id) 기준 중복 제거 — prevItems + 동일 배치 내 중복 모두 처리
-    const seen = new Set(prevItems.map(i => i.id).filter(Boolean));
-    const uniqueNew = newItems.filter(i => {
-      if (!i.id || seen.has(i.id)) return false;
-      seen.add(i.id);
+    // 배치 내 중복 제거 — 법원 API가 동일 사건번호를 여러 페이지에 반환할 수 있음
+    const seen = new Set();
+    const uniqueItems = newItems.filter(it => {
+      if (!it.id || seen.has(it.id)) return false;
+      seen.add(it.id);
       return true;
     });
-    const allItems = [...prevItems, ...uniqueNew];
-    const hasMore = totalCount > allItems.length;
-    const payload = {
-      generated_at: new Date().toISOString(),
-      count: allItems.length,
-      total_available: totalCount,
-      items: allItems,
-    };
 
-    await env.AUCTION_DATA.put(dataKey, JSON.stringify(payload));
-    await env.AUCTION_DATA.put(metaKey, JSON.stringify({
+    // Supabase upsert (500건씩 배치)
+    const BATCH = 500;
+    for (let i = 0; i < uniqueItems.length; i += BATCH) {
+      const batch = uniqueItems.slice(i, i + BATCH).map(it => ({ ...it, tenant_id: tenant }));
+      await sbUpsertItems(env, batch);
+    }
+
+    // 실제 DB 건수 조회 (upsert 후 최신 상태)
+    const actualCount = await sbCountItems(env, tenant);
+    const hasMore = totalCount > actualCount;
+
+    await sbUpsertMeta(env, tenant, {
       status: 'done',
       started_at: prevMeta.started_at || new Date().toISOString(),
       finished_at: new Date().toISOString(),
-      count: allItems.length,
+      generated_at: new Date().toISOString(),
+      count: actualCount,
       total_available: totalCount,
-      next_page: hasMore ? currentPage : 1, // 다음 수집 시 이어서 or 처음부터
+      next_page: hasMore ? currentPage : 1,
       has_more: hasMore,
-    }));
+      error: null,
+    });
+
   } catch (err) {
-    const prevMetaRaw = await env.AUCTION_DATA.get(metaKey);
-    const prevMeta = prevMetaRaw ? JSON.parse(prevMetaRaw) : {};
-    await env.AUCTION_DATA.put(metaKey, JSON.stringify({
-      ...prevMeta,
-      status: 'error',
-      error: err.message,
-      finished_at: new Date().toISOString(),
-    }));
+    try {
+      const prevMeta = await sbGetMeta(env, tenant);
+      await sbUpsertMeta(env, tenant, {
+        ...prevMeta,
+        status: 'error',
+        error: err.message,
+        finished_at: new Date().toISOString(),
+      });
+    } catch {}
   }
 }
 
-/* ── 메인 핸들러 ── */
+/* ══════════════════════════════════════
+   메인 핸들러
+══════════════════════════════════════ */
+
 export default {
   async fetch(request, env, ctx) {
     const url    = new URL(request.url);
@@ -292,101 +413,92 @@ export default {
 
     if (method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
 
-    // ── GET /health ──
-    if (url.pathname === '/health') {
-      const kvOk = !!env.AUCTION_DATA;
-      return jsonResp({ ok: true, kv: kvOk, ts: Date.now() });
+    if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
+      if (url.pathname !== '/health') {
+        return jsonResp({ error: 'SUPABASE_URL / SUPABASE_SERVICE_KEY not configured in Worker secrets' }, 503);
+      }
     }
 
-    // ── GET /data?tenant=X ── (공개)
-    if (url.pathname === '/data' && method === 'GET') {
-      if (!env.AUCTION_DATA) return jsonResp({ error: 'KV not configured' }, 503);
-      const raw = await env.AUCTION_DATA.get(`data:${tenant}`);
-      if (!raw) return jsonResp({ count: 0, items: [], message: 'No data yet. Run /crawl first.' });
-      return new Response(raw, {
-        headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS },
+    // ── GET /health ──
+    if (url.pathname === '/health') {
+      return jsonResp({
+        ok: true,
+        supabase: !!(env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY),
+        ts: Date.now(),
       });
     }
 
-    // ── GET /status?tenant=X ── (공개)
-    if (url.pathname === '/status' && method === 'GET') {
-      if (!env.AUCTION_DATA) return jsonResp({ error: 'KV not configured' }, 503);
-      const raw = await env.AUCTION_DATA.get(`meta:${tenant}`);
-      const meta = raw ? JSON.parse(raw) : { status: 'idle' };
-      return jsonResp(meta);
+    // ── GET /data?tenant=X ── Supabase에서 전체 아이템 반환
+    if (url.pathname === '/data' && method === 'GET') {
+      const meta  = await sbGetMeta(env, tenant);
+      const items = await sbFetchAllItems(env, tenant);
+      return jsonResp({
+        generated_at:    meta.generated_at || meta.finished_at || new Date().toISOString(),
+        count:           items.length,
+        total_available: meta.total_available || items.length,
+        items,
+      });
     }
 
-    // ── POST /crawl?tenant=X&max=200 ── (인증 불필요)
-    if (url.pathname === '/crawl' && method === 'POST') {
-      if (!env.AUCTION_DATA) return jsonResp({ error: 'KV not configured. Add AUCTION_DATA KV binding.' }, 503);
+    // ── GET /status?tenant=X ──
+    if (url.pathname === '/status' && method === 'GET') {
+      const meta = await sbGetMeta(env, tenant);
+      return jsonResp(Object.keys(meta).length ? meta : { status: 'idle', tenant_id: tenant });
+    }
 
-      // 이미 수집 중이면 거부
-      const metaRaw = await env.AUCTION_DATA.get(`meta:${tenant}`);
-      const meta = metaRaw ? JSON.parse(metaRaw) : {};
+    // ── POST /crawl?tenant=X&max=200 ──
+    if (url.pathname === '/crawl' && method === 'POST') {
+      const meta = await sbGetMeta(env, tenant);
       if (meta.status === 'crawling') {
         return jsonResp({ status: 'crawling', message: '이미 수집 중입니다.' });
       }
-
       const maxItems = parseInt(url.searchParams.get('max') || '200');
-
-      // 비동기 크롤 시작 (응답은 즉시 반환)
       ctx.waitUntil(doCrawl(env, tenant, maxItems));
-
       return jsonResp({ status: 'started', tenant, max: maxItems });
     }
 
-    // ── GET /geocode-data?tenant=X ── Worker KV 지오코딩 오버레이 조회 (공개)
-    if (url.pathname === '/geocode-data' && method === 'GET') {
-      if (!env.AUCTION_DATA) return jsonResp({ error: 'KV not configured' }, 503);
-      const raw = await env.AUCTION_DATA.get(`geocode:${tenant}`);
-      if (!raw) return jsonResp({});
-      return new Response(raw, {
-        headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS },
-      });
-    }
-
-    // ── POST /geocode?tenant=X&max=50 ── 카카오 API 지오코딩 배치 (관리자 전용)
+    // ── POST /geocode?tenant=X&max=50&force=0 ── (지오코딩 배치)
     if (url.pathname === '/geocode' && method === 'POST') {
-      if (!env.AUCTION_DATA) return jsonResp({ error: 'KV not configured' }, 503);
       const apiKey = env.KAKAO_API_KEY;
-      if (!apiKey) return jsonResp({ error: 'KAKAO_API_KEY not set in Worker environment variables' }, 500);
+      if (!apiKey) return jsonResp({ error: 'KAKAO_API_KEY not configured' }, 500);
 
       const max   = Math.min(parseInt(url.searchParams.get('max')   || '50'), 200);
       const force = url.searchParams.get('force') === '1';
 
-      const dataRaw = await env.AUCTION_DATA.get(`data:${tenant}`);
-      if (!dataRaw) return jsonResp({ error: 'No data. Run /crawl first.' }, 404);
-      const items = JSON.parse(dataRaw).items || [];
-
-      const overlayRaw = await env.AUCTION_DATA.get(`geocode:${tenant}`);
-      const overlay = overlayRaw ? JSON.parse(overlayRaw) : {};
-
-      const need = items.filter(it => it.address && (_needsGeocode(it) || force) && (!overlay[it.case_number] || force));
-      const batch = need.slice(0, max);
+      const need = await sbFetchNeedGeocode(env, tenant, max, force);
 
       let ok = 0, fail = 0;
-      for (const item of batch) {
+      for (const item of need) {
         const result = await _kakaoGeocode(item.address, apiKey);
-        if (result) { overlay[item.case_number] = result; ok++; }
-        else fail++;
-        await new Promise(r => setTimeout(r, 120)); // 카카오 API 속도 제한 준수
+        if (result) {
+          await sbUpdateGeocode(env, tenant, item.id, result.lat, result.lng);
+          ok++;
+        } else {
+          fail++;
+        }
+        await new Promise(r => setTimeout(r, 120));
       }
 
-      if (ok > 0) {
-        await env.AUCTION_DATA.put(`geocode:${tenant}`, JSON.stringify(overlay));
-      }
+      // 커버리지 통계
+      const total_coverage = await sbCountItems(env, tenant, '&lat=not.is.null');
+      const remaining      = await sbCountItems(env, tenant, '&lat=is.null&address=not.is.null');
 
-      const remaining = items.filter(it => it.address && _needsGeocode(it) && !overlay[it.case_number]).length;
-      return jsonResp({ processed: batch.length, success: ok, fail, total_coverage: Object.keys(overlay).length, remaining });
+      return jsonResp({ processed: need.length, success: ok, fail, total_coverage, remaining });
     }
 
+    // ── GET /geocode-data ── deprecated, 빈 객체 반환 (프론트는 Supabase에서 직접 읽음)
+    if (url.pathname === '/geocode-data' && method === 'GET') {
+      return jsonResp({});
+    }
 
     // ── POST /reset?tenant=X ── (관리자 전용)
     if (url.pathname === '/reset' && method === 'POST') {
       if (!checkAuth(request, env)) return jsonResp({ error: 'Unauthorized' }, 401);
-      if (!env.AUCTION_DATA) return jsonResp({ error: 'KV not configured' }, 503);
-      await env.AUCTION_DATA.delete(`data:${tenant}`);
-      await env.AUCTION_DATA.delete(`meta:${tenant}`);
+      await sbDeleteAllItems(env, tenant);
+      await sbUpsertMeta(env, tenant, {
+        status: 'idle', next_page: 1, count: 0, total_available: 0,
+        has_more: false, started_at: null, finished_at: null, generated_at: null, error: null,
+      });
       return jsonResp({ status: 'reset', tenant });
     }
 
@@ -395,39 +507,37 @@ export default {
 
   /* ── Cron Trigger 핸들러 ── */
   async scheduled(event, env, ctx) {
+    if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) return;
+
     const tenant = 'worksfree';
 
     // 주간 리셋: 매주 월요일 03:00 KST (= 일요일 18:00 UTC)
-    // → 법원 데이터는 upcoming 경매만 반환하므로 완전 재수집이 가장 깔끔함
     if (event.cron === '0 18 * * SUN') {
-      await env.AUCTION_DATA.delete(`data:${tenant}`);
-      await env.AUCTION_DATA.delete(`meta:${tenant}`);
+      await sbDeleteAllItems(env, tenant);
+      await sbUpsertMeta(env, tenant, {
+        status: 'idle', next_page: 1, count: 0, total_available: 0,
+        has_more: false, started_at: null, finished_at: null, generated_at: null, error: null,
+      });
       ctx.waitUntil(doCrawl(env, tenant, 500));
       return;
     }
 
-    // 시간별: 수집이 남아있을 때만 실행
-    const metaRaw = await env.AUCTION_DATA.get(`meta:${tenant}`);
-    const meta = metaRaw ? JSON.parse(metaRaw) : {};
+    // 시간별: stale 크롤 처리 + 이어서 수집
+    const meta = await sbGetMeta(env, tenant);
 
-    // stale 크롤 처리: 2시간 이상 crawling 상태 = 타임아웃으로 간주 → 재시작
     if (meta.status === 'crawling') {
       const age = Date.now() - new Date(meta.started_at || 0).getTime();
-      if (age < 2 * 3600000) return; // 아직 진행 중
-      await env.AUCTION_DATA.put(`meta:${tenant}`, JSON.stringify({
+      if (age < 2 * 3600000) return;  // 아직 진행 중
+      await sbUpsertMeta(env, tenant, {
         ...meta, status: 'error', error: 'timeout_stale',
         finished_at: new Date().toISOString(),
-      }));
+      });
     }
 
-    // 미수집 or 에러 or has_more → 이어서 수집
     const needsCrawl = !meta.status
       || meta.status === 'error'
       || (meta.status === 'done' && meta.has_more);
 
-    if (needsCrawl) {
-      ctx.waitUntil(doCrawl(env, tenant, 500));
-    }
-    // status==='done' && !has_more → 전체 수집 완료, 주간 크론까지 대기
+    if (needsCrawl) ctx.waitUntil(doCrawl(env, tenant, 500));
   },
 };

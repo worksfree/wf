@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>상속·증여 종합진단</title>
+<title>상속·증여 종합진단 — WorksFree</title>
+<meta name="description" content="상속세·증여세 종합진단. 총 자산·부동산·금융자산 기준 예상 세액 자동 계산, 공제 전략·절세 방법 안내. 상속인·피상속인 역할별 맞춤 진단. WorksFree 컨설팅 플랫폼 제공.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.worksfree.kr/consulting/inheritance/">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap');
 :root{
@@ -229,8 +232,8 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 <header>
   <div class="hdr-icon">🏛</div>
   <div class="hdr-info">
-    <div class="hdr-title">상속·증여 종합진단</div>
-    <div class="hdr-sub">상속세 위험도 · 자산 구조 · 절세 전략 종합 진단</div>
+    <div class="hdr-title" id="inh-hdr-title">상속·증여 종합진단</div>
+    <div class="hdr-sub" id="inh-hdr-sub">상속세 위험도 · 자산 구조 · 절세 전략 종합 진단</div>
   </div>
   <div class="hdr-r" id="hdr-r">파트너 전용</div>
 </header>
@@ -238,22 +241,22 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 <!-- ── 트렌드 배너 ── -->
 <div class="trend-banner">
   <div class="trend-inner">
-    <div class="trend-title">상속세 위기 트렌드 — 왜 지금인가</div>
+    <div class="trend-title" id="inh-trend-title">상속세 위기 트렌드 — 왜 지금인가</div>
     <div class="trend-grid">
       <div class="trend-stat">
         <div class="ts-val">30년</div>
-        <div class="ts-label">기본공제 10억·세율 구조<br>동결 기간 (1996년 이후 미개편)</div>
+        <div class="ts-label" id="inh-ts-lbl-1">기본공제 10억·세율 구조<br>동결 기간 (1996년 이후 미개편)</div>
       </div>
       <div class="trend-stat">
         <div class="ts-val">9.9억</div>
-        <div class="ts-label">비상장주식 30억 일반증여 시<br>예상 증여세 (과세특례 적용 시 0원)</div>
+        <div class="ts-label" id="inh-ts-lbl-2">비상장주식 30억 일반증여 시<br>예상 증여세 (과세특례 적용 시 0원)</div>
       </div>
       <div class="trend-stat">
         <div class="ts-val">15년</div>
-        <div class="ts-label">명의신탁·상속 누락<br>최장 부과제척기간</div>
+        <div class="ts-label" id="inh-ts-lbl-3">명의신탁·상속 누락<br>최장 부과제척기간</div>
       </div>
     </div>
-    <div class="trend-note">
+    <div class="trend-note" id="inh-trend-note">
       <strong>핵심 문제:</strong> 상속세 기본공제 10억은 30년간 단 한 번도 개편되지 않았습니다.
       비상장주식 30억을 자녀에게 일반증여 시 예상 증여세만 9.9억 — 하지만 가업주식 과세특례 요건을 갖추면 세율 10~20%로 대폭 절감 가능합니다.
       수도권 중형 아파트 2채만 보유해도 <strong>최고세율(50%) 구간</strong>에 진입하며,
@@ -270,29 +273,29 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
     <div class="sim-hd" onclick="toggleSim()">
       <div class="sim-hd-l">
         <span style="font-size:14px;color:var(--gold)">⚖</span>
-        <span class="sim-hd-title">상속세 기본 산정 시뮬레이터</span>
+        <span class="sim-hd-title" id="inh-sim-title">상속세 기본 산정 시뮬레이터</span>
         <span class="sim-hd-badge">인적공제 기준 · 추정값</span>
       </div>
-      <button class="sim-toggle"><span id="sim-chev">▲</span> 접기</button>
+      <button class="sim-toggle"><span id="sim-chev">▲</span> <span id="inh-sim-toggle-lbl">접기</span></button>
     </div>
     <div class="sim-body" id="sim-body">
       <div class="sim-inputs">
         <div class="sim-field">
-          <div class="sim-label">총 상속재산</div>
+          <div class="sim-label" id="inh-sim-lbl-asset">총 상속재산</div>
           <div style="display:flex;align-items:center;gap:6px">
             <input type="number" class="sim-num" id="sim-asset" value="50" min="0" step="1" oninput="calcTax()">
-            <span class="sim-unit">억원</span>
+            <span class="sim-unit" id="inh-sim-unit">억원</span>
           </div>
         </div>
         <div class="sim-field">
-          <div class="sim-label">배우자</div>
+          <div class="sim-label" id="inh-sim-lbl-spouse">배우자</div>
           <div style="display:flex;gap:8px">
             <button class="sim-tog-btn on" id="btn-sp-y" onclick="setSpouse(true)">있음</button>
             <button class="sim-tog-btn off" id="btn-sp-n" onclick="setSpouse(false)">없음</button>
           </div>
         </div>
         <div class="sim-field">
-          <div class="sim-label">자녀 수</div>
+          <div class="sim-label" id="inh-sim-lbl-children">자녀 수</div>
           <div style="display:flex;align-items:center">
             <button class="sim-cnt-btn" onclick="adjChildren(-1)">−</button>
             <div class="sim-cnt-val" id="sim-child-disp">2</div>
@@ -308,10 +311,10 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 <!-- ── 시작점 선택 배너 ── -->
 <div class="entry-banner">
   <div class="entry-inner">
-    <span class="entry-label">진단 시작점 :</span>
-    <button class="entry-btn active" id="btn-role-heir" onclick="setRole('heir')">상속받을 예정 (상속인)</button>
-    <button class="entry-btn" id="btn-role-donor" onclick="setRole('donor')">자산 이전 준비 중 (피상속인·증여자)</button>
-    <button class="entry-btn" id="btn-role-ongoing" onclick="setRole('ongoing')">상속 절차 진행 중</button>
+    <span class="entry-label" id="inh-entry-label">진단 시작점 :</span>
+    <button class="entry-btn active" id="btn-role-heir" onclick="setRole('heir')"><span id="inh-role-heir-lbl">상속받을 예정 (상속인)</span></button>
+    <button class="entry-btn" id="btn-role-donor" onclick="setRole('donor')"><span id="inh-role-donor-lbl">자산 이전 준비 중 (피상속인·증여자)</span></button>
+    <button class="entry-btn" id="btn-role-ongoing" onclick="setRole('ongoing')"><span id="inh-role-ongoing-lbl">상속 절차 진행 중</span></button>
   </div>
 </div>
 
@@ -353,7 +356,10 @@ function adjChildren(d) {
 function toggleSim() {
   const b = document.getElementById('sim-body');
   b.classList.toggle('collapsed');
-  document.getElementById('sim-chev').textContent = b.classList.contains('collapsed')?'▼':'▲';
+  const col = b.classList.contains('collapsed');
+  document.getElementById('sim-chev').textContent = col?'▼':'▲';
+  const lbl = document.getElementById('inh-sim-toggle-lbl');
+  if (lbl) lbl.textContent = col ? (inhLang==='en'?'Expand':'펼치기') : (inhLang==='en'?'Collapse':'접기');
 }
 function fmtA(억) {
   if (!억 || 억 <= 0) return '0원';
@@ -392,42 +398,54 @@ function calcTax() {
   }
   renderSimResult({total, basicDed, childDed, personalTotal, blanketDed, spouseAmt, spouseDed, spouseLegal, totalDed, taxBase, rows, totalTax});
 }
+function fmtAen(억) {
+  if (!억 || 억 <= 0) return '₩0';
+  const man = Math.round(억 * 10000);
+  const ok = Math.floor(man / 10000);
+  const rem = man % 10000;
+  let s = '';
+  if (ok > 0) s += '₩' + (ok * 100).toLocaleString() + 'M';
+  else if (rem > 0) s += '₩' + (rem / 100).toFixed(0) + 'M';
+  return s || '₩0';
+}
 function renderSimResult(R) {
+  const isEn = inhLang === 'en';
+  const fmt = isEn ? fmtAen : fmtA;
   const el = document.getElementById('sim-result');
   if (R.total <= 0) {
-    el.innerHTML = '<div class="sim-zero">총 상속재산을 입력하면 결과가 표시됩니다.</div>';
+    el.innerHTML = `<div class="sim-zero">${isEn?'Enter total assets above to see results.':'총 상속재산을 입력하면 결과가 표시됩니다.'}</div>`;
     return;
   }
   const spRow = simSpouse
-    ? `<div class="sim-ded-row"><span class="sim-ded-label">배우자공제 (법정지분 ${(R.spouseLegal*100).toFixed(1)}% 기준, 최대 30억)</span><span class="sim-ded-val">−${fmtA(R.spouseDed)}</span></div>`
+    ? `<div class="sim-ded-row"><span class="sim-ded-label">${isEn?`Spouse deduction (legal share ${(R.spouseLegal*100).toFixed(1)}%, max ₩3B)`:`배우자공제 (법정지분 ${(R.spouseLegal*100).toFixed(1)}% 기준, 최대 30억)`}</span><span class="sim-ded-val">−${fmt(R.spouseDed)}</span></div>`
     : '';
   const ded = `<div class="sim-ded">
-    <div class="sim-ded-title">공제 내역 (인적공제 기준)</div>
-    <div class="sim-ded-row"><span class="sim-ded-label">기초공제 2억 + 자녀공제 (${simChildren}명×5천만)</span><span class="sim-ded-val">합계 ${fmtA(R.personalTotal)}</span></div>
-    <div class="sim-ded-row"><span class="sim-ded-label">일괄공제 적용 (인적공제 vs 5억 중 큰 금액)</span><span class="sim-ded-val">−${fmtA(R.blanketDed)}</span></div>
+    <div class="sim-ded-title">${isEn?'Deduction Breakdown (personal deduction basis)':'공제 내역 (인적공제 기준)'}</div>
+    <div class="sim-ded-row"><span class="sim-ded-label">${isEn?`Basic ₩200M + child deduction (${simChildren}×₩50M)`:`기초공제 2억 + 자녀공제 (${simChildren}명×5천만)`}</span><span class="sim-ded-val">${isEn?'subtotal':'합계'} ${fmt(R.personalTotal)}</span></div>
+    <div class="sim-ded-row"><span class="sim-ded-label">${isEn?'Lump-sum deduction applied (personal deductions vs ₩500M, whichever is larger)':'일괄공제 적용 (인적공제 vs 5억 중 큰 금액)'}</span><span class="sim-ded-val">−${fmt(R.blanketDed)}</span></div>
     ${spRow}
-    <div class="sim-ded-row total"><span class="sim-ded-label">총 공제액</span><span class="sim-ded-val">−${fmtA(R.totalDed)}</span></div>
+    <div class="sim-ded-row total"><span class="sim-ded-label">${isEn?'Total Deductions':'총 공제액'}</span><span class="sim-ded-val">−${fmt(R.totalDed)}</span></div>
   </div>`;
   const tb = `<div class="sim-taxbase">
-    <span class="sim-taxbase-label">▶ 과세표준 (${fmtA(R.total)} − ${fmtA(R.totalDed)})</span>
-    <span class="sim-taxbase-val">${fmtA(R.taxBase)}</span>
+    <span class="sim-taxbase-label">▶ ${isEn?'Tax Base':'과세표준'} (${fmt(R.total)} − ${fmt(R.totalDed)})</span>
+    <span class="sim-taxbase-val">${fmt(R.taxBase)}</span>
   </div>`;
   let tbl = '';
   if (R.taxBase <= 0) {
-    tbl = '<div class="sim-zero">과세표준 0원 이하 — 상속세 없음</div>';
+    tbl = `<div class="sim-zero">${isEn?'Tax base ≤ ₩0 — No inheritance tax':'과세표준 0원 이하 — 상속세 없음'}</div>`;
   } else {
     const rowsHtml = R.rows.map(r =>
-      `<tr><td>${r.label}</td><td>${fmtA(r.amount)}</td><td class="rate">${(r.rate*100).toFixed(0)}%</td><td>${fmtA(r.tax)}</td></tr>`
+      `<tr><td>${r.label}</td><td>${fmt(r.amount)}</td><td class="rate">${(r.rate*100).toFixed(0)}%</td><td>${fmt(r.tax)}</td></tr>`
     ).join('');
     tbl = `<div style="overflow-x:auto;margin-top:10px"><table class="sim-table">
-      <thead><tr><th>과세표준 구간</th><th>구간 내 과세금액</th><th>세율</th><th>구간별 산출세액</th></tr></thead>
-      <tbody>${rowsHtml}<tr class="total-row"><td>합계 (총 과세표준)</td><td>${fmtA(R.taxBase)}</td><td>—</td><td>${fmtA(R.totalTax)}</td></tr></tbody>
+      <thead><tr><th>${isEn?'Tax Base Bracket':'과세표준 구간'}</th><th>${isEn?'Amount in Bracket':'구간 내 과세금액'}</th><th>${isEn?'Rate':'세율'}</th><th>${isEn?'Tax per Bracket':'구간별 산출세액'}</th></tr></thead>
+      <tbody>${rowsHtml}<tr class="total-row"><td>${isEn?'Total (full tax base)':'합계 (총 과세표준)'}</td><td>${fmt(R.taxBase)}</td><td>—</td><td>${fmt(R.totalTax)}</td></tr></tbody>
     </table></div>`;
   }
   const res = R.taxBase > 0
     ? `<div class="sim-result-box">
-        <div><div class="srb-label">산출 상속세 (인적공제 기준 추정)</div><div class="srb-val">${fmtA(R.totalTax)}</div></div>
-        <div class="srb-note">※ 세액공제·추가공제 미포함 추정값<br>실제 절세 설계 후 세액은 전문 진단에서 확인</div>
+        <div><div class="srb-label">${isEn?'Calculated Inheritance Tax (personal deduction estimate)':'산출 상속세 (인적공제 기준 추정)'}</div><div class="srb-val">${fmt(R.totalTax)}</div></div>
+        <div class="srb-note">${isEn?'※ Estimated value excluding tax credits/additional deductions<br>Actual tax after planning confirmed via expert diagnostic':'※ 세액공제·추가공제 미포함 추정값<br>실제 절세 설계 후 세액은 전문 진단에서 확인'}</div>
       </div>`
     : '';
   el.innerHTML = ded + tb + tbl + res;
@@ -484,16 +502,31 @@ const CASES_INH = [
     picks:['30억 ~ 100억','비상장 법인 지분 포함','자녀만 (배우자 없음)','소액 증여 (3,000만원 미만)','지역가입자 (자영업·프리랜서)','금융소득 1,000만원 미만','비상장법인 지분 보유 (중소기업·스타트업 등)','일부 보유 (50% 수준)','5~10년','막연하게 자녀에게 줘야 한다고만 생각'] },
 ];
 
+const CASES_INH_EN = [
+  { tag:'Gangnam Apt · Tax Bomb', title:'₩3B Gangnam Apt — ₩1B Inheritance Tax, No Payment Funds', sub:'₩300M property now worth ₩3B / exceeds ₩1B basic deduction / no payment funds at all' },
+  { tag:'Nominee Stock · 15yr Lookback', title:'Nominee Shares in Corporation — 15-year Retroactive Tax Risk', sub:'Unlisted company shares held under another name / deemed gift / 15-year statute of limitations' },
+  { tag:'No Prior Gift · 10yr Aggregation', title:'No Prior Gifts — Full 10-year Aggregation if Inheritance Opens', sub:'Gifts within 10 years added to inheritance base / lost opportunity for staged distribution' },
+  { tag:'Corp Shares · Succession Plan', title:'Unlisted Company CEO — Child Succession + Inheritance Tax Together', sub:'Rising share valuation / succession needed within 5–10 years / pre-gift and surcharge considerations' },
+  { tag:'10yr Staged Gift · Insurance', title:'10-year Staged Gift + Whole Life Insurance Funding', sub:'₩1.5B–₩3B assets / staged gifting in progress / insurance payment funds secured' },
+  { tag:'Forced Share · Family Dispute', title:'Forced Share Lawsuit — Dispute After Uneven Gift to One Child', sub:'Post-death sibling forced-share claim / retroactive dispute over prior uneven gifts' },
+  { tag:'Corp CEO · Share Redemption', title:'CEO with 80% Corp Shares — ₩1.1B Tax, No Cash', sub:'Life insurance secures death benefit / heirs redeem shares / tax-efficient structure' },
+  { tag:'Family Business · Tax Privilege', title:'₩3B Corp Gift — Tax ₩990M → Special Privilege Applied', sub:'10+ years in business / 40%+ shares held 10+ years / privilege limit ₩60B · rate 10–20%' },
+  { tag:'Business Trust · Succession', title:'Eldest Son Only Gets Management Rights — Prevent Share Disposal', sub:'Business succession trust enforces donor\'s intent during life / post-death 5-year disposal ban possible' },
+];
+
 function buildCasesHtml_INH() {
+  const isEn = inhLang === 'en';
   return `<div class="cases-wrap no-print">
-    <div class="cases-label">대표 사례 — 원클릭 결과 보기</div>
+    <div class="cases-label">${isEn ? 'Sample Cases — One-Click Results' : '대표 사례 — 원클릭 결과 보기'}</div>
     <div class="cases-grid">
-      ${CASES_INH.map((c,i)=>`
-        <button class="case-btn" onclick="runCase_INH(${i})">
-          <div class="case-icon-row"><span class="case-icon">${c.icon}</span><span class="case-tag ${c.tagClass}">${c.tag}</span></div>
-          <div class="case-title">${c.title}</div>
-          <div class="case-sub">${c.sub}</div>
-        </button>`).join('')}
+      ${CASES_INH.map((c,i)=>{
+        const ce = isEn ? CASES_INH_EN[i] : null;
+        return `<button class="case-btn" onclick="runCase_INH(${i})">
+          <div class="case-icon-row"><span class="case-icon">${c.icon}</span><span class="case-tag ${c.tagClass}">${(isEn && ce?.tag) || c.tag}</span></div>
+          <div class="case-title">${(isEn && ce?.title) || c.title}</div>
+          <div class="case-sub">${(isEn && ce?.sub) || c.sub}</div>
+        </button>`;
+      }).join('')}
     </div>
   </div>`;
 }
@@ -513,7 +546,7 @@ function runCase_INH(idx) {
     const optIdx = q.opts.findIndex(o => o.t === ans);
     if (optIdx < 0) break;
     const o = q.opts[optIdx];
-    history.push({answer: o.t});
+    history.push({answer: o.t, answer_en: o.t_en});
     Object.assign(C, o.d || {});
   }
   render();
@@ -524,6 +557,8 @@ function runCase_INH(idx) {
    역할별 진단 질문 정의
 ═══════════════════════════════════════════════════ */
 let ROLE = 'heir';   // 'heir' | 'donor' | 'ongoing'
+let inhLang = 'ko';
+let userRole = 'member';
 let history = [];
 let C = {};
 
@@ -538,128 +573,152 @@ function setRole(r) {
 
 /* ── 공통 질문 ── */
 const Q_ASSET = {
-  id:'assetTotal', step:'총 자산 규모',
+  id:'assetTotal', step:'총 자산 규모', step_en:'Total Asset Size',
   q:'예상 상속·증여 대상 순자산 규모는? (부동산+금융+사업체 − 채무)',
+  q_en:'What is the expected net asset value subject to inheritance/gift? (Real estate + financial + business − liabilities)',
   sub:'부동산은 공시지가가 아닌 시가로 평가합니다. 배우자공제(최대 30억)·일괄공제(5억) 적용 후 과세 여부 결정',
+  sub_en:'Real estate is assessed at market value, not official price. Spouse deduction (up to ₩3B) · lump-sum deduction (₩500M) applied to determine taxability.',
   law:'상속세법 기초공제 2억 + 인적공제 합산 vs 일괄공제 5억 중 큰 금액 적용. 배우자 단독 상속 시 최소 5억 공제.',
+  law_en:'Inheritance Tax Act: basic ₩200M + personal deductions vs. lump-sum ₩500M (whichever is larger). Spouse-only inheritance: minimum ₩500M deduction.',
   opts:[
-    {t:'5억 미만',sub:'기초공제·일괄공제 이하 — 상속세 없음',tag:'안전',d:{asset:'safe',assetLabel:'5억 미만'}},
-    {t:'5억 ~ 15억',sub:'배우자 있으면 세금 없거나 소액, 없으면 수천만원 발생',tag:'주의',d:{asset:'low',assetLabel:'5~15억'}},
-    {t:'15억 ~ 30억',sub:'상속세 수천만~수억원 발생 — 설계 효과 최대',tag:'설계 필요',d:{asset:'mid',assetLabel:'15~30억'}},
-    {t:'30억 ~ 100억',sub:'최고세율(50%) 구간 진입 — 납부 재원 확보 시급',tag:'긴급',d:{asset:'high',assetLabel:'30~100억'}},
-    {t:'100억 초과',sub:'이미 최고세율 구간 — 장기 플랜 즉시 착수',tag:'위기',d:{asset:'vhigh',assetLabel:'100억 초과'}},
+    {t:'5억 미만',t_en:'Under ₩500M',sub:'기초공제·일괄공제 이하 — 상속세 없음',sub_en:'Below basic/lump-sum deduction — no inheritance tax',tag:'안전',tag_en:'Safe',d:{asset:'safe',assetLabel:'5억 미만'}},
+    {t:'5억 ~ 15억',t_en:'₩500M–₩1.5B',sub:'배우자 있으면 세금 없거나 소액, 없으면 수천만원 발생',sub_en:'With spouse: minimal or no tax; without spouse: up to tens of millions',tag:'주의',tag_en:'Watch',d:{asset:'low',assetLabel:'5~15억'}},
+    {t:'15억 ~ 30억',t_en:'₩1.5B–₩3B',sub:'상속세 수천만~수억원 발생 — 설계 효과 최대',sub_en:'Inheritance tax hundreds of millions — maximum benefit from planning',tag:'설계 필요',tag_en:'Plan Now',d:{asset:'mid',assetLabel:'15~30억'}},
+    {t:'30억 ~ 100억',t_en:'₩3B–₩10B',sub:'최고세율(50%) 구간 진입 — 납부 재원 확보 시급',sub_en:'Entering top rate (50%) bracket — securing payment funds is urgent',tag:'긴급',tag_en:'Urgent',d:{asset:'high',assetLabel:'30~100억'}},
+    {t:'100억 초과',t_en:'Over ₩10B',sub:'이미 최고세율 구간 — 장기 플랜 즉시 착수',sub_en:'Already in top rate bracket — start long-term plan immediately',tag:'위기',tag_en:'Critical',d:{asset:'vhigh',assetLabel:'100억 초과'}},
   ]
 };
 
 const Q_ASSET_TYPE = {
-  id:'assetType', step:'자산 구성',
+  id:'assetType', step:'자산 구성', step_en:'Asset Composition',
   q:'자산의 주요 구성 비율은?',
+  q_en:'What is the primary composition of your assets?',
   sub:'자산 종류에 따라 납부 재원 확보 난이도와 최적 설계 방법이 달라집니다',
+  sub_en:'Asset type affects the difficulty of securing payment funds and the optimal planning approach.',
   opts:[
-    {t:'부동산 위주 (70% 이상)',sub:'현금화 어려움 — 납부 재원 부족 위험 높음',tag:'납부 위험',d:{atype:'realestate',atypeLabel:'부동산 위주'}},
-    {t:'금융자산 위주 (예금·주식·펀드)',sub:'유동성 높음 — 납부 재원 확보 용이',tag:'유리',d:{atype:'financial',atypeLabel:'금융자산 위주'}},
-    {t:'비상장 법인 지분 포함',sub:'지분 가치 평가 문제 — 상속 전 구조 정비 필수',tag:'복잡',d:{atype:'corp',atypeLabel:'법인지분 포함'}},
-    {t:'혼합형 (부동산 50% 내외 + 금융)',sub:'균형 잡힌 구조 — 납부 재원 일부 확보 가능',tag:'보통',d:{atype:'mixed',atypeLabel:'혼합형'}},
+    {t:'부동산 위주 (70% 이상)',t_en:'Mostly Real Estate (70%+)',sub:'현금화 어려움 — 납부 재원 부족 위험 높음',sub_en:'Hard to liquidate — high risk of insufficient payment funds',tag:'납부 위험',tag_en:'Payment Risk',d:{atype:'realestate',atypeLabel:'부동산 위주'}},
+    {t:'금융자산 위주 (예금·주식·펀드)',t_en:'Mostly Financial Assets (deposits, stocks, funds)',sub:'유동성 높음 — 납부 재원 확보 용이',sub_en:'High liquidity — payment funds easy to secure',tag:'유리',tag_en:'Favorable',d:{atype:'financial',atypeLabel:'금융자산 위주'}},
+    {t:'비상장 법인 지분 포함',t_en:'Includes Unlisted Company Shares',sub:'지분 가치 평가 문제 — 상속 전 구조 정비 필수',sub_en:'Valuation issues — restructuring before inheritance is essential',tag:'복잡',tag_en:'Complex',d:{atype:'corp',atypeLabel:'법인지분 포함'}},
+    {t:'혼합형 (부동산 50% 내외 + 금융)',t_en:'Mixed (Real Estate ~50% + Financial)',sub:'균형 잡힌 구조 — 납부 재원 일부 확보 가능',sub_en:'Balanced structure — partial payment funds available',tag:'보통',tag_en:'Moderate',d:{atype:'mixed',atypeLabel:'혼합형'}},
   ]
 };
 
 const Q_FAMILY = {
-  id:'family', step:'법정 상속인',
+  id:'family', step:'법정 상속인', step_en:'Legal Heirs',
   q:'법정 상속인 구성은?',
+  q_en:'Who are your legal heirs?',
   sub:'상속인 구성에 따라 상속세 공제 금액과 세율 구간이 달라집니다',
+  sub_en:'Heir composition determines the deduction amount and tax bracket.',
   law:'배우자+자녀: 배우자공제 최대 30억 + 자녀 1인당 5천만원 / 자녀만: 일괄공제 5억 / 직계존속: 공제 한도 제한적',
+  law_en:'Spouse + children: spouse deduction up to ₩3B + ₩50M per child / Children only: lump-sum ₩500M / Direct ancestors: limited deductions',
   opts:[
-    {t:'배우자 + 자녀 1~2명',sub:'배우자공제 최대 30억 → 공제 최대 구간',tag:'공제 최대',d:{family:'spouse_child',familyLabel:'배우자+자녀 1~2'}},
-    {t:'배우자 + 자녀 3명 이상',sub:'자녀 공제 합산 상승 → 세부담 분산',tag:'유리',d:{family:'spouse_children',familyLabel:'배우자+자녀 3+'}},
-    {t:'자녀만 (배우자 없음)',sub:'배우자공제 없음 — 일괄공제 5억만 적용, 세부담 급증',tag:'주의',d:{family:'child_only',familyLabel:'자녀만'}},
-    {t:'배우자만 (자녀 없음)',sub:'배우자공제 최대 적용 가능하나 차기 상속 설계 필요',tag:'중간',d:{family:'spouse_only',familyLabel:'배우자만'}},
-    {t:'부모 또는 형제 (직계비속 없음)',sub:'공제 혜택 제한 — 세율 구간 불리',tag:'불리',d:{family:'parent',familyLabel:'직계존속/형제'}},
+    {t:'배우자 + 자녀 1~2명',t_en:'Spouse + 1–2 Children',sub:'배우자공제 최대 30억 → 공제 최대 구간',sub_en:'Spouse deduction up to ₩3B → maximum deduction bracket',tag:'공제 최대',tag_en:'Max Deduction',d:{family:'spouse_child',familyLabel:'배우자+자녀 1~2'}},
+    {t:'배우자 + 자녀 3명 이상',t_en:'Spouse + 3+ Children',sub:'자녀 공제 합산 상승 → 세부담 분산',sub_en:'Accumulated child deductions → spread tax burden',tag:'유리',tag_en:'Favorable',d:{family:'spouse_children',familyLabel:'배우자+자녀 3+'}},
+    {t:'자녀만 (배우자 없음)',t_en:'Children Only (No Spouse)',sub:'배우자공제 없음 — 일괄공제 5억만 적용, 세부담 급증',sub_en:'No spouse deduction — only ₩500M lump-sum; tax burden increases sharply',tag:'주의',tag_en:'Caution',d:{family:'child_only',familyLabel:'자녀만'}},
+    {t:'배우자만 (자녀 없음)',t_en:'Spouse Only (No Children)',sub:'배우자공제 최대 적용 가능하나 차기 상속 설계 필요',sub_en:'Max spouse deduction available, but next-generation planning needed',tag:'중간',tag_en:'Moderate',d:{family:'spouse_only',familyLabel:'배우자만'}},
+    {t:'부모 또는 형제 (직계비속 없음)',t_en:'Parents or Siblings (No Direct Descendants)',sub:'공제 혜택 제한 — 세율 구간 불리',sub_en:'Limited deductions — unfavorable tax bracket',tag:'불리',tag_en:'Unfavorable',d:{family:'parent',familyLabel:'직계존속/형제'}},
   ]
 };
 
 const Q_GIFT_HISTORY = {
-  id:'giftHistory', step:'사전 증여 이력',
+  id:'giftHistory', step:'사전 증여 이력', step_en:'Prior Gift History',
   q:'최근 10년 내 사전 증여 이력이 있습니까?',
+  q_en:'Do you have a history of gifts within the last 10 years?',
   sub:'상속 전 10년 내 증여액은 상속세 과세가액에 합산됩니다 (상속세법 §13)',
+  sub_en:'Gifts within 10 years before death are added to the inheritance tax base (Inheritance Tax Act §13).',
   law:'10년 내 증여 = 상속세 합산 과세. 배우자 증여 한도 6억 / 자녀 5천만원 / 미성년 자녀 2천만원 (10년 기준)',
+  law_en:'Gifts within 10 years = added to inheritance tax. Spouse ₩600M / child ₩50M / minor child ₩20M (per 10-year cycle)',
   opts:[
-    {t:'없음',sub:'사전 증여 전무 — 지금 시작이 최적 타이밍',tag:'시작 권장',d:{gift:'none',giftLabel:'없음'}},
-    {t:'소액 증여 (3,000만원 미만)',sub:'한도 여유 충분 — 추가 증여 설계 가능',tag:'여유',d:{gift:'small',giftLabel:'소액 증여'}},
-    {t:'5,000만원 이상 증여 완료',sub:'한도 일부 소진 — 잔여 한도 및 추가 절세 방법 점검',tag:'일부 소진',d:{gift:'mid',giftLabel:'5천만원 이상'}},
-    {t:'부동산 현물 증여 이력 있음',sub:'취득세·증여세 이미 납부 — 이후 상속세와의 합산 계획 필요',tag:'복합 검토',d:{gift:'realestate',giftLabel:'부동산 증여'}},
+    {t:'없음',t_en:'None',sub:'사전 증여 전무 — 지금 시작이 최적 타이밍',sub_en:'No prior gifts — now is the optimal time to start',tag:'시작 권장',tag_en:'Start Now',d:{gift:'none',giftLabel:'없음'}},
+    {t:'소액 증여 (3,000만원 미만)',t_en:'Small Gifts (Under ₩30M)',sub:'한도 여유 충분 — 추가 증여 설계 가능',sub_en:'Plenty of allowance remaining — additional gift planning possible',tag:'여유',tag_en:'Room to Go',d:{gift:'small',giftLabel:'소액 증여'}},
+    {t:'5,000만원 이상 증여 완료',t_en:'Gifts of ₩50M+ Completed',sub:'한도 일부 소진 — 잔여 한도 및 추가 절세 방법 점검',sub_en:'Allowance partially used — review remaining limit and additional tax-saving options',tag:'일부 소진',tag_en:'Partly Used',d:{gift:'mid',giftLabel:'5천만원 이상'}},
+    {t:'부동산 현물 증여 이력 있음',t_en:'Real Estate Gift on Record',sub:'취득세·증여세 이미 납부 — 이후 상속세와의 합산 계획 필요',sub_en:'Transfer/gift taxes already paid — plan aggregation with future inheritance',tag:'복합 검토',tag_en:'Multi-layer Review',d:{gift:'realestate',giftLabel:'부동산 증여'}},
   ]
 };
 
 const Q_NHIS = {
-  id:'nhis', step:'건강보험 형태',
+  id:'nhis', step:'건강보험 형태', step_en:'NHIS Category',
   q:'현재 건강보험 부과 형태는?',
+  q_en:'What is your current National Health Insurance (NHIS) category?',
   sub:'증여 후 자산·소득 증가 시 피부양자 자격 박탈 → 지역가입자 전환 → 건강보험료 폭탄 가능성',
+  sub_en:'Asset/income increase from gift can strip dependent status → switch to regional insured → premium shock',
   law:'피부양자 탈락 기준: 금융소득 연 1,000만원 초과 / 임대소득 400만원 초과 / 사업소득 있음 / 재산세 과표 5.4억 초과',
+  law_en:'Dependent loss criteria: financial income over ₩10M/yr / rental income over ₩4M / any business income / property tax base over ₩540M',
   opts:[
-    {t:'직장가입자 (근로소득 위주)',sub:'증여 후에도 당장 피부양자 탈락 없음 — 단, 부모·배우자 세대분리 점검',tag:'안전',d:{nhis:'work',nhisLabel:'직장가입자'}},
-    {t:'피부양자 (직장인 가족)',sub:'증여 후 소득·재산 기준 초과 시 즉시 탈락 → 월 30만원+ 건보료 추가',tag:'위험',d:{nhis:'dep',nhisLabel:'피부양자'}},
-    {t:'지역가입자 (자영업·프리랜서)',sub:'이미 자산 기준 적용 — 증여 후 재산 점수 상승 우려',tag:'모니터링',d:{nhis:'local',nhisLabel:'지역가입자'}},
+    {t:'직장가입자 (근로소득 위주)',t_en:'Workplace Insured (Employment Income)',sub:'증여 후에도 당장 피부양자 탈락 없음 — 단, 부모·배우자 세대분리 점검',sub_en:'No immediate dependent loss after gift — check parent/spouse household separation',tag:'안전',tag_en:'Safe',d:{nhis:'work',nhisLabel:'직장가입자'}},
+    {t:'피부양자 (직장인 가족)',t_en:'Dependent (Workplace Insured Family)',sub:'증여 후 소득·재산 기준 초과 시 즉시 탈락 → 월 30만원+ 건보료 추가',sub_en:'Asset/income threshold exceeded after gift → immediate loss → ₩300K+/mo added premium',tag:'위험',tag_en:'Risky',d:{nhis:'dep',nhisLabel:'피부양자'}},
+    {t:'지역가입자 (자영업·프리랜서)',t_en:'Regional Insured (Self-employed/Freelancer)',sub:'이미 자산 기준 적용 — 증여 후 재산 점수 상승 우려',sub_en:'Already on asset-based calculation — premium rise risk if assets increase from gift',tag:'모니터링',tag_en:'Monitor',d:{nhis:'local',nhisLabel:'지역가입자'}},
   ]
 };
 
 const Q_FINANCE_INCOME = {
-  id:'finIncome', step:'금융·임대소득',
+  id:'finIncome', step:'금융·임대소득', step_en:'Financial / Rental Income',
   q:'연간 금융소득(이자+배당) 및 임대소득 수준은?',
+  q_en:'What is your level of annual financial income (interest + dividends) and rental income?',
   sub:'금융소득 2,000만원 초과 시 종합과세 전환, 1,000만원 초과 시 피부양자 탈락',
+  sub_en:'Financial income over ₩20M/yr triggers comprehensive taxation; over ₩10M causes dependent loss.',
   opts:[
-    {t:'금융소득 1,000만원 미만',sub:'피부양자 유지 가능, 종합과세 無',tag:'안전',d:{finIncome:'safe',finLabel:'금융 1천 미만'}},
-    {t:'금융소득 1,000만원 ~ 2,000만원',sub:'피부양자 탈락 구간 — 증여 추가 시 주의 필요',tag:'경계',d:{finIncome:'warn',finLabel:'금융 1~2천'}},
-    {t:'금융소득 2,000만원 이상',sub:'종합과세 대상 — 최고세율 49.5% 가능성',tag:'종합과세',d:{finIncome:'tax',finLabel:'금융 2천+ 종합과세'}},
-    {t:'임대소득 400만원 이상 있음',sub:'피부양자 탈락 기준 충족 — 건보료 별도 부과',tag:'탈락 위험',d:{finIncome:'rent',finLabel:'임대소득 400만+'}},
+    {t:'금융소득 1,000만원 미만',t_en:'Financial Income Under ₩10M',sub:'피부양자 유지 가능, 종합과세 無',sub_en:'Dependent status maintainable; no comprehensive taxation',tag:'안전',tag_en:'Safe',d:{finIncome:'safe',finLabel:'금융 1천 미만'}},
+    {t:'금융소득 1,000만원 ~ 2,000만원',t_en:'Financial Income ₩10M–₩20M',sub:'피부양자 탈락 구간 — 증여 추가 시 주의 필요',sub_en:'Dependent loss bracket — caution if adding more gifts',tag:'경계',tag_en:'Borderline',d:{finIncome:'warn',finLabel:'금융 1~2천'}},
+    {t:'금융소득 2,000만원 이상',t_en:'Financial Income ₩20M+',sub:'종합과세 대상 — 최고세율 49.5% 가능성',sub_en:'Subject to comprehensive taxation — up to 49.5% marginal rate',tag:'종합과세',tag_en:'Comp. Tax',d:{finIncome:'tax',finLabel:'금융 2천+ 종합과세'}},
+    {t:'임대소득 400만원 이상 있음',t_en:'Rental Income ₩4M+',sub:'피부양자 탈락 기준 충족 — 건보료 별도 부과',sub_en:'Meets dependent loss criteria — separate NHIS premium imposed',tag:'탈락 위험',tag_en:'Loss Risk',d:{finIncome:'rent',finLabel:'임대소득 400만+'}},
   ]
 };
 
 const Q_CORP = {
-  id:'corpStock', step:'사업체 지분',
+  id:'corpStock', step:'사업체 지분', step_en:'Business Shares',
   q:'경영에 참여하는 사업체 지분을 보유하고 있습니까?',
+  q_en:'Do you hold shares in a business you actively manage?',
   sub:'여기서 묻는 것은 주식 투자(ETF·소액 주식)가 아니라 직접 운영하거나 설립에 참여한 사업체 지분입니다. 투자용 주식·ETF는 아래 안내를 확인하세요.',
+  sub_en:'This refers to shares in a business you founded or directly operate — NOT investment stocks or ETFs. Check the note below for investment shares.',
   law:'비상장주식: 순자산가치 40% + 순이익가치 60% 가중평균 평가 (세법상 복잡). 상장주식 대주주(종목당 10억 이상 또는 지분율 1% 이상): 양도소득세 중과 대상. 일반 투자자 주식·ETF: 사망일 전후 2개월 평균 종가로 단순 시가 평가 — 별도 전문 감정 불필요.',
+  law_en:'Unlisted stocks: weighted avg. 40% net assets + 60% net income (complex). Listed major shareholder (₩1B+ or 1%+ per ticker): capital gains tax surcharge. Regular stocks/ETFs: simple market value based on 2-month avg. price — no expert appraisal needed.',
   opts:[
-    {t:'없음 — 사업체 지분 미보유',sub:'주식·ETF 투자만 있다면 이 항목 선택. 투자 주식은 시가로 단순 평가됩니다.',tag:null,d:{corp:'none',corpLabel:'사업지분 無'}},
-    {t:'비상장법인 지분 보유 (중소기업·스타트업 등)',sub:'복잡한 가치평가 필요 — 이익잉여금 규모·업력에 따라 평가액 급변',tag:'전문 평가 필요',d:{corp:'unlisted',corpLabel:'비상장지분'}},
-    {t:'상장사 대주주 지분 (종목당 10억 이상 또는 지분율 1%+)',sub:'양도세 중과·상속 후 처분 전략 별도 필요. 일반 투자용 주식과 다릅니다.',tag:'대주주 해당',d:{corp:'listed_major',corpLabel:'상장 대주주'}},
-    {t:'비상장·상장 둘 다 해당',sub:null,tag:'복합',d:{corp:'both',corpLabel:'복합 지분'}},
+    {t:'없음 — 사업체 지분 미보유',t_en:'None — No Business Shares',sub:'주식·ETF 투자만 있다면 이 항목 선택. 투자 주식은 시가로 단순 평가됩니다.',sub_en:'If you only hold investment stocks/ETFs, select this. They are valued at simple market price.',tag:null,tag_en:null,d:{corp:'none',corpLabel:'사업지분 無'}},
+    {t:'비상장법인 지분 보유 (중소기업·스타트업 등)',t_en:'Unlisted Company Shares (SMEs, Startups)',sub:'복잡한 가치평가 필요 — 이익잉여금 규모·업력에 따라 평가액 급변',sub_en:'Complex valuation needed — value swings sharply with retained earnings and company age',tag:'전문 평가 필요',tag_en:'Expert Val. Needed',d:{corp:'unlisted',corpLabel:'비상장지분'}},
+    {t:'상장사 대주주 지분 (종목당 10억 이상 또는 지분율 1%+)',t_en:'Listed Major Shareholder (₩1B+ or 1%+/ticker)',sub:'양도세 중과·상속 후 처분 전략 별도 필요. 일반 투자용 주식과 다릅니다.',sub_en:'Capital gains surcharge and disposal strategy needed. Different from regular investment shares.',tag:'대주주 해당',tag_en:'Major Shareholder',d:{corp:'listed_major',corpLabel:'상장 대주주'}},
+    {t:'비상장·상장 둘 다 해당',t_en:'Both Unlisted and Listed',sub:null,sub_en:null,tag:'복합',tag_en:'Complex',d:{corp:'both',corpLabel:'복합 지분'}},
   ]
 };
 
 const Q_RESERVE = {
-  id:'reserve', step:'납부 재원',
+  id:'reserve', step:'납부 재원', step_en:'Payment Funds',
   q:'상속세 납부 재원 현황은?',
+  q_en:'What is the status of funds for paying inheritance tax?',
   sub:'상속세는 상속 개시일로부터 6개월 이내 현금 납부 원칙 (연부연납·물납 가능)',
+  sub_en:'Inheritance tax must be paid in cash within 6 months of death (installment/in-kind payment available).',
   opts:[
-    {t:'충분한 현금·금융자산 보유',sub:'납부 재원 확보 — 절세 최적화에 집중',tag:'양호',d:{reserve:'ok',reserveLabel:'재원 충분'}},
-    {t:'일부 보유 (50% 수준)',sub:'부족분은 연부연납(최대 5년 분할) 또는 대출 필요',tag:'보완 필요',d:{reserve:'partial',reserveLabel:'재원 일부'}},
-    {t:'생명보험(종신) 활용 가능',sub:'보험금 = 상속세 납부 재원으로 최적 — 사전 설계 완료 여부 확인',tag:'보험 활용',d:{reserve:'insurance',reserveLabel:'종신보험 있음'}},
-    {t:'납부 재원 전혀 없음',sub:'부동산 매각 또는 대출 불가피 — 플랜 즉시 수립 필요',tag:'긴급',d:{reserve:'none',reserveLabel:'재원 없음'}},
+    {t:'충분한 현금·금융자산 보유',t_en:'Sufficient Cash / Financial Assets',sub:'납부 재원 확보 — 절세 최적화에 집중',sub_en:'Payment funds secured — focus on tax optimization',tag:'양호',tag_en:'Good',d:{reserve:'ok',reserveLabel:'재원 충분'}},
+    {t:'일부 보유 (50% 수준)',t_en:'Partial (Approx. 50%)',sub:'부족분은 연부연납(최대 5년 분할) 또는 대출 필요',sub_en:'Shortfall will require installment payments (max 5 years) or a loan',tag:'보완 필요',tag_en:'Needs Supplement',d:{reserve:'partial',reserveLabel:'재원 일부'}},
+    {t:'생명보험(종신) 활용 가능',t_en:'Whole Life Insurance Available',sub:'보험금 = 상속세 납부 재원으로 최적 — 사전 설계 완료 여부 확인',sub_en:'Insurance payout = optimal payment source — verify pre-planning completeness',tag:'보험 활용',tag_en:'Using Insurance',d:{reserve:'insurance',reserveLabel:'종신보험 있음'}},
+    {t:'납부 재원 전혀 없음',t_en:'No Payment Funds At All',sub:'부동산 매각 또는 대출 불가피 — 플랜 즉시 수립 필요',sub_en:'Forced to sell real estate or take a loan — plan must be established immediately',tag:'긴급',tag_en:'Urgent',d:{reserve:'none',reserveLabel:'재원 없음'}},
   ]
 };
 
 const Q_URGENCY = {
-  id:'urgency', step:'긴급도',
+  id:'urgency', step:'긴급도', step_en:'Urgency',
   q:'상속·증여 준비의 시간적 긴급도는?',
+  q_en:'How much time do you have to prepare for inheritance/gift?',
   sub:'준비 시간이 길수록 합법적 절세 여지가 큽니다. 상속 개시 후에는 절세 선택지가 대부분 사라집니다.',
+  sub_en:'The more time you have, the more legal tax-saving options are available. Once inheritance begins, most options disappear.',
   opts:[
-    {t:'충분 (10년 이상 여유)',sub:'장기 설계 — 분산 증여, 보험 적립, 특정법인 설계 가능',tag:'여유',d:{urg:'ample',urgLabel:'10년 이상'}},
-    {t:'5~10년',sub:'중기 플랜 — 단계별 증여 + 납부 재원 보험 설계',tag:'중기',d:{urg:'mid',urgLabel:'5~10년'}},
-    {t:'3~5년',sub:'빠른 실행 필요 — 핵심 절세부터 우선 착수',tag:'시급',d:{urg:'short',urgLabel:'3~5년'}},
-    {t:'3년 미만 또는 진행 중',sub:'긴급 대응 모드 — 즉시 플랜 수립 후 실행',tag:'긴급',d:{urg:'now',urgLabel:'3년 이내'}},
+    {t:'충분 (10년 이상 여유)',t_en:'Ample (10+ Years)',sub:'장기 설계 — 분산 증여, 보험 적립, 특정법인 설계 가능',sub_en:'Long-term planning — staged gifts, insurance build-up, special corporation possible',tag:'여유',tag_en:'Ample',d:{urg:'ample',urgLabel:'10년 이상'}},
+    {t:'5~10년',t_en:'5–10 Years',sub:'중기 플랜 — 단계별 증여 + 납부 재원 보험 설계',sub_en:'Mid-term plan — phased gifts + insurance for payment funds',tag:'중기',tag_en:'Mid-term',d:{urg:'mid',urgLabel:'5~10년'}},
+    {t:'3~5년',t_en:'3–5 Years',sub:'빠른 실행 필요 — 핵심 절세부터 우선 착수',sub_en:'Swift action needed — prioritize key tax-saving measures first',tag:'시급',tag_en:'Urgent',d:{urg:'short',urgLabel:'3~5년'}},
+    {t:'3년 미만 또는 진행 중',t_en:'Under 3 Years or In Progress',sub:'긴급 대응 모드 — 즉시 플랜 수립 후 실행',sub_en:'Emergency mode — establish and execute plan immediately',tag:'긴급',tag_en:'Critical',d:{urg:'now',urgLabel:'3년 이내'}},
   ]
 };
 
 const Q_PLAN = {
-  id:'plan', step:'현재 준비 현황',
+  id:'plan', step:'현재 준비 현황', step_en:'Current Plan Status',
   q:'현재 상속·증여 플랜 수립 현황은?',
-  sub:null,
+  q_en:'What is the current status of your inheritance/gift plan?',
+  sub:null, sub_en:null,
   opts:[
-    {t:'전혀 없음 — 처음 생각하는 단계',sub:null,tag:'초기',d:{plan:'none',planLabel:'미수립'}},
-    {t:'막연하게 자녀에게 줘야 한다고만 생각',sub:null,tag:'인식 단계',d:{plan:'vague',planLabel:'인식만'}},
-    {t:'세무사 상담은 받아봤음',sub:null,tag:'상담 완료',d:{plan:'consulted',planLabel:'상담 완료'}},
-    {t:'구체적 실행 중 (증여 계약·보험 등)',sub:null,tag:'진행 중',d:{plan:'wip',planLabel:'실행 중'}},
+    {t:'전혀 없음 — 처음 생각하는 단계',t_en:'None — Just Starting to Think About It',sub:null,sub_en:null,tag:'초기',tag_en:'Initial',d:{plan:'none',planLabel:'미수립'}},
+    {t:'막연하게 자녀에게 줘야 한다고만 생각',t_en:'Vaguely Know I Should Give to My Children',sub:null,sub_en:null,tag:'인식 단계',tag_en:'Awareness',d:{plan:'vague',planLabel:'인식만'}},
+    {t:'세무사 상담은 받아봤음',t_en:'Have Consulted a Tax Accountant',sub:null,sub_en:null,tag:'상담 완료',tag_en:'Consulted',d:{plan:'consulted',planLabel:'상담 완료'}},
+    {t:'구체적 실행 중 (증여 계약·보험 등)',t_en:'In Progress (Gift Contracts, Insurance, etc.)',sub:null,sub_en:null,tag:'진행 중',tag_en:'In Progress',d:{plan:'wip',planLabel:'실행 중'}},
   ]
 };
 
@@ -690,41 +749,54 @@ function tagColor(tag) {
 }
 
 function render() {
+  const isEn = inhLang === 'en';
   const qs = getQS();
   const pos = history.length;
   const pct = qs.length===0 ? 100 : Math.round(pos/qs.length*100);
   document.getElementById('prog-fill').style.width = (pos>=qs.length?100:pct)+'%';
   document.getElementById('prog-pct').textContent = (pos>=qs.length?100:pct)+'%';
-  document.getElementById('prog-lbl').textContent = pos>=qs.length?'진단 완료':`항목 ${pos+1} / ${qs.length}`;
-  document.getElementById('hdr-r').textContent = pos>=qs.length?'결과 확인':`파트너 전용 · ${pos+1}/${qs.length}`;
-  document.getElementById('bc').innerHTML = history.map((h,i)=>
-    `<span class="crumb">${h.answer}</span>${i<history.length-1?'<span class="crumb-sep">›</span>':''}`
-  ).join('');
+  document.getElementById('prog-lbl').textContent = pos>=qs.length
+    ? (isEn ? 'Assessment Complete' : '진단 완료')
+    : (isEn ? `Item ${pos+1} / ${qs.length}` : `항목 ${pos+1} / ${qs.length}`);
+  document.getElementById('hdr-r').textContent = pos>=qs.length
+    ? (isEn ? 'View Results' : '결과 확인')
+    : (isEn ? `Partner Only · ${pos+1}/${qs.length}` : `파트너 전용 · ${pos+1}/${qs.length}`);
+  document.getElementById('bc').innerHTML = history.map((h,i)=>{
+    const label = isEn ? (h.answer_en || h.answer) : h.answer;
+    return `<span class="crumb">${label}</span>${i<history.length-1?'<span class="crumb-sep">›</span>':''}`;
+  }).join('');
 
   if (pos >= qs.length) { renderResult(); return; }
 
   const q = qs[pos];
+  const qText  = isEn ? (q.q_en   || q.q)   : q.q;
+  const qSub   = isEn ? (q.sub_en || q.sub)  : q.sub;
+  const qLaw   = isEn ? (q.law_en || q.law)  : q.law;
+  const qStep  = isEn ? (q.step_en|| q.step) : q.step;
   const casesHtml = pos === 0 ? buildCasesHtml_INH() : '';
   document.getElementById('view').innerHTML = casesHtml + `
     ${history.length>0?`<button class="back-btn" onclick="goBack()">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 3L5 8L10 13"/></svg>
-      이전 항목으로
+      ${isEn ? 'Back' : '이전 항목으로'}
     </button>`:''}
     <div class="q-card">
-      <div class="q-step">체크포인트 ${pos+1} / ${qs.length} &nbsp;—&nbsp; ${q.step}</div>
-      <div class="q-text">${q.q}</div>
-      ${q.sub?`<div class="q-sub">${q.sub}</div>`:''}
-      ${q.law?`<div class="q-law">📋 법령 근거: ${q.law}</div>`:''}
+      <div class="q-step">${isEn ? 'Checkpoint' : '체크포인트'} ${pos+1} / ${qs.length} &nbsp;—&nbsp; ${qStep}</div>
+      <div class="q-text">${qText}</div>
+      ${qSub?`<div class="q-sub">${qSub}</div>`:''}
+      ${qLaw?`<div class="q-law">📋 ${isEn?'Legal Basis:':'법령 근거:'} ${qLaw}</div>`:''}
       <div class="options">
-        ${q.opts.map((o,i)=>`
-          <button class="opt" onclick="pick(${pos},${i})">
+        ${q.opts.map((o,i)=>{
+          const oText = isEn ? (o.t_en || o.t) : o.t;
+          const oSub  = isEn ? (o.sub_en || o.sub) : o.sub;
+          const oTag  = isEn ? (o.tag_en || o.tag) : o.tag;
+          return `<button class="opt" onclick="pick(${pos},${i})">
             <div class="opt-l">
-              <div class="opt-main">${o.t}</div>
-              ${o.sub?`<div class="opt-sub">${o.sub}</div>`:''}
+              <div class="opt-main">${oText}</div>
+              ${oSub?`<div class="opt-sub">${oSub}</div>`:''}
             </div>
-            ${o.tag?`<span class="opt-tag tag-${tagColor(o.tag)}">${o.tag}</span>`:`<span class="opt-arr">›</span>`}
-          </button>
-        `).join('')}
+            ${oTag?`<span class="opt-tag tag-${tagColor(o.tag)}">${oTag}</span>`:`<span class="opt-arr">›</span>`}
+          </button>`;
+        }).join('')}
       </div>
     </div>`;
 }
@@ -738,7 +810,7 @@ function pick(pos, optIdx) {
   if (pos !== history.length) return;
   const qs = getQS();
   const o = qs[pos].opts[optIdx];
-  history.push({answer:o.t});
+  history.push({answer:o.t, answer_en:o.t_en});
   Object.assign(C, o.d||{});
   render();
   scrollToQ();
@@ -803,22 +875,24 @@ function buildResult() {
   if (planNone && assetHigh) score += 1;
   if (ongoingRole) score += 1;
 
+  const isEn = inhLang === 'en';
+
   /* ── 파트너 전용 등급 ── */
   let grade, gradeSub, gradeColor, gradeBadge;
   if (assetSafe) {
-    grade = 'SAFE'; gradeSub = '상속세 부담 없음';
+    grade = 'SAFE'; gradeSub = isEn ? 'No Inheritance Tax' : '상속세 부담 없음';
     gradeColor = '#10b981'; gradeBadge = 'tag-green';
   } else if (score <= 2) {
-    grade = 'PLAN-A'; gradeSub = '절세 최적화 구간';
+    grade = 'PLAN-A'; gradeSub = isEn ? 'Tax Optimization Bracket' : '절세 최적화 구간';
     gradeColor = '#3b82f6'; gradeBadge = 'tag-blue';
   } else if (score <= 4) {
-    grade = 'PLAN-B'; gradeSub = '시급 설계 권장';
+    grade = 'PLAN-B'; gradeSub = isEn ? 'Urgent Planning Recommended' : '시급 설계 권장';
     gradeColor = '#f59e0b'; gradeBadge = 'tag-amber';
   } else if (score <= 7) {
-    grade = 'ALERT'; gradeSub = '상속세 폭탄 경보';
+    grade = 'ALERT'; gradeSub = isEn ? 'Inheritance Tax Bomb Alert' : '상속세 폭탄 경보';
     gradeColor = '#ef4444'; gradeBadge = 'tag-red';
   } else {
-    grade = 'CRITICAL'; gradeSub = '즉각 대응 필요';
+    grade = 'CRITICAL'; gradeSub = isEn ? 'Immediate Action Required' : '즉각 대응 필요';
     gradeColor = '#a855f7'; gradeBadge = 'tag-purple';
   }
 
@@ -826,143 +900,143 @@ function buildResult() {
   const points = [];
 
   if (!assetSafe && giftNone) points.push({
-    pri:'기회', priC:'#0d2620', priTC:'#10b981',
-    title:'사전 증여 전무 — 지금이 시작 타이밍',
-    desc:'배우자 6억 / 자녀 1인당 5,000만원 / 손주 2,000만원(미성년 1,000만원)을 10년 단위로 비과세 증여 가능합니다. 지금 시작하면 10년 후 한 번 더 증여 기회가 생깁니다.',
-    link:'→ 세대별 증여 한도 활용 플랜 수립'
+    pri: isEn?'Opportunity':'기회', priC:'#0d2620', priTC:'#10b981',
+    title: isEn?'No Prior Gifts — Now Is the Starting Point':'사전 증여 전무 — 지금이 시작 타이밍',
+    desc: isEn?'Spouse ₩600M / ₩50M per child / ₩20M per grandchild (₩10M minor) can be gifted tax-free on a 10-year cycle. Starting now creates another opportunity in 10 years.':'배우자 6억 / 자녀 1인당 5,000만원 / 손주 2,000만원(미성년 1,000만원)을 10년 단위로 비과세 증여 가능합니다. 지금 시작하면 10년 후 한 번 더 증여 기회가 생깁니다.',
+    link: isEn?'→ Build a generational gift allowance utilization plan':'→ 세대별 증여 한도 활용 플랜 수립'
   });
 
   if (C.atype === 'realestate' && assetHigh) points.push({
-    pri:'긴급', priC:'#2d1515', priTC:'#ef4444',
-    title:'부동산 위주 자산 — 납부 재원 확보 불가 우려',
-    desc:`부동산만 있으면 상속세를 낼 현금이 없습니다. 상속세는 원칙적으로 현금 납부이며, 물납(부동산으로 납부)은 국세청 수용 여부가 불확실합니다. 종신보험으로 납부 재원을 미리 마련해두는 것이 핵심입니다.`,
-    link:'→ 상속세 납부 재원용 종신보험 설계'
+    pri: isEn?'Urgent':'긴급', priC:'#2d1515', priTC:'#ef4444',
+    title: isEn?'Real Estate Dominant — Risk of Insufficient Payment Funds':'부동산 위주 자산 — 납부 재원 확보 불가 우려',
+    desc: isEn?'If only real estate exists, there is no cash to pay inheritance tax. Tax must principally be paid in cash; in-kind payment (real estate) is subject to NTS discretion. Preparing funds via whole life insurance is the key solution.':'부동산만 있으면 상속세를 낼 현금이 없습니다. 상속세는 원칙적으로 현금 납부이며, 물납(부동산으로 납부)은 국세청 수용 여부가 불확실합니다. 종신보험으로 납부 재원을 미리 마련해두는 것이 핵심입니다.',
+    link: isEn?'→ Design whole life insurance for inheritance tax payment funds':'→ 상속세 납부 재원용 종신보험 설계'
   });
 
   if (corpUnlisted) points.push({
-    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
-    title:'비상장 법인 지분 — 평가 구조 점검 필요',
-    desc:'비상장주식은 순자산가치+순이익가치로 평가합니다. 이익잉여금이 많을수록 주식가치가 올라 상속세가 급증합니다. 업력에 따라 액면가 증여 타이밍이 있으며, 특정법인 설립을 통한 분산도 검토 대상입니다.',
-    link:'→ 법인 지분 상속·증여 구조 점검'
+    pri: isEn?'Caution':'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title: isEn?'Unlisted Shares — Valuation Structure Review Needed':'비상장 법인 지분 — 평가 구조 점검 필요',
+    desc: isEn?'Unlisted shares are valued at net assets + net income. High retained earnings inflate share value and inheritance tax. Timing gift at face value and distributing via a special corporation are both worth exploring.':'비상장주식은 순자산가치+순이익가치로 평가합니다. 이익잉여금이 많을수록 주식가치가 올라 상속세가 급증합니다. 업력에 따라 액면가 증여 타이밍이 있으며, 특정법인 설립을 통한 분산도 검토 대상입니다.',
+    link: isEn?'→ Review corporate share inheritance/gift structure':'→ 법인 지분 상속·증여 구조 점검'
   });
   if (corpListedMajor) points.push({
-    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
-    title:'상장사 대주주 지분 — 양도세·상속 처분 전략 필요',
-    desc:'종목당 10억 이상 또는 지분율 1% 이상 보유자는 상장주식 대주주로 분류됩니다. 상속 후 처분 시 양도소득세 20~25%가 중과됩니다. 상속인이 대주주 요건을 피하도록 지분을 분산하거나, 처분 시점·방법을 사전에 설계해야 합니다.',
-    link:'→ 상장사 대주주 상속·처분 전략 수립'
+    pri: isEn?'Caution':'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title: isEn?'Listed Major Shareholder — Capital Gains & Disposal Strategy Needed':'상장사 대주주 지분 — 양도세·상속 처분 전략 필요',
+    desc: isEn?'Holding ₩1B+ or 1%+ per ticker classifies as a listed major shareholder. Disposal after inheritance triggers 20–25% capital gains surcharge. Distribute shares to avoid major shareholder threshold, and pre-plan disposal timing.':'종목당 10억 이상 또는 지분율 1% 이상 보유자는 상장주식 대주주로 분류됩니다. 상속 후 처분 시 양도소득세 20~25%가 중과됩니다. 상속인이 대주주 요건을 피하도록 지분을 분산하거나, 처분 시점·방법을 사전에 설계해야 합니다.',
+    link: isEn?'→ Establish listed major shareholder inheritance & disposal strategy':'→ 상장사 대주주 상속·처분 전략 수립'
   });
 
   if (nhisDep && (finTax || finWarn)) points.push({
-    pri:'위험', priC:'#2d1515', priTC:'#ef4444',
-    title:'피부양자 탈락 — 건강보험료 폭탄 위험',
-    desc:'증여를 받으면 재산·소득 기준 초과로 건강보험 피부양자 자격을 잃을 수 있습니다. 탈락 시 지역가입자로 전환되어 월 30만원~100만원 이상 건보료가 추가됩니다. 증여 전 소득·재산 시뮬레이션이 필수입니다.',
-    link:'→ 증여 후 건강보험 시뮬레이션 사전 점검'
+    pri: isEn?'Risk':'위험', priC:'#2d1515', priTC:'#ef4444',
+    title: isEn?'Losing Dependent Status — NHIS Premium Shock Risk':'피부양자 탈락 — 건강보험료 폭탄 위험',
+    desc: isEn?'A gift can push assets/income above the threshold and strip dependent status. Upon loss, switching to regional insured can add ₩300K–₩1M+/mo in premiums. An income/asset simulation before the gift is essential.':'증여를 받으면 재산·소득 기준 초과로 건강보험 피부양자 자격을 잃을 수 있습니다. 탈락 시 지역가입자로 전환되어 월 30만원~100만원 이상 건보료가 추가됩니다. 증여 전 소득·재산 시뮬레이션이 필수입니다.',
+    link: isEn?'→ Pre-check NHIS impact simulation before gift':'→ 증여 후 건강보험 시뮬레이션 사전 점검'
   });
 
   if (nhisLocal && C.atype === 'realestate') points.push({
-    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
-    title:'지역가입자 + 부동산 증가 → 건보료 상승',
-    desc:'지역가입자는 보유 부동산의 재산세 과표를 점수화해 건보료에 반영합니다. 증여로 재산이 늘면 건보료가 즉시 오릅니다. 전월세 수익 구조로 전환하거나 자녀 명의로 이전하는 방법을 검토해야 합니다.',
-    link:'→ 지역가입자 건보료 절감 설계'
+    pri: isEn?'Caution':'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title: isEn?'Regional Insured + Real Estate Increase → Premium Rise':'지역가입자 + 부동산 증가 → 건보료 상승',
+    desc: isEn?'Regional insured have their property tax base scored and included in NHIS premiums. Gifts that increase real estate holdings immediately raise premiums. Consider converting to a rental income structure or transferring to a child\'s name.':'지역가입자는 보유 부동산의 재산세 과표를 점수화해 건보료에 반영합니다. 증여로 재산이 늘면 건보료가 즉시 오릅니다. 전월세 수익 구조로 전환하거나 자녀 명의로 이전하는 방법을 검토해야 합니다.',
+    link: isEn?'→ Design NHIS premium reduction for regional insured':'→ 지역가입자 건보료 절감 설계'
   });
 
   if (finTax) points.push({
-    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
-    title:'금융소득 종합과세 — 최고 세율 49.5% 노출',
-    desc:'이자+배당이 연 2,000만원을 초과하면 종합소득세 대상이 됩니다. 세율은 최고 49.5%(지방세 포함). 금융상품을 분산하거나 연금·보험 구조로 전환해 과세 소득을 줄이는 설계가 필요합니다.',
-    link:'→ 금융소득 종합과세 절감 포트폴리오 구성'
+    pri: isEn?'Caution':'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title: isEn?'Comprehensive Financial Income Tax — Up to 49.5% Exposure':'금융소득 종합과세 — 최고 세율 49.5% 노출',
+    desc: isEn?'Interest + dividends exceeding ₩20M/yr become subject to comprehensive income tax. Rate reaches up to 49.5% (incl. local tax). Diversify financial products or convert to pension/insurance structure to reduce taxable income.':'이자+배당이 연 2,000만원을 초과하면 종합소득세 대상이 됩니다. 세율은 최고 49.5%(지방세 포함). 금융상품을 분산하거나 연금·보험 구조로 전환해 과세 소득을 줄이는 설계가 필요합니다.',
+    link: isEn?'→ Build portfolio to reduce comprehensive financial income tax':'→ 금융소득 종합과세 절감 포트폴리오 구성'
   });
 
   if (assetHigh && noReserve) points.push({
-    pri:'긴급', priC:'#2d1515', priTC:'#ef4444',
-    title:'납부 재원 없음 — 강제 매각·대출 위기',
-    desc:'상속세는 6개월 이내 납부 원칙입니다. 재원이 없으면 부동산을 급매로 팔거나 자녀가 대출을 받아야 합니다. 연부연납(최대 5년 분할)을 활용하더라도 이자가 발생합니다. 종신보험 납부 재원 마련이 가장 합리적입니다.',
-    link:'→ 상속세 납부 재원 종신보험 긴급 설계'
+    pri: isEn?'Urgent':'긴급', priC:'#2d1515', priTC:'#ef4444',
+    title: isEn?'No Payment Funds — Forced Sale / Loan Crisis':'납부 재원 없음 — 강제 매각·대출 위기',
+    desc: isEn?'Inheritance tax must principally be paid within 6 months. Without funds, real estate must be sold at a discount or children must take a loan. Even installment payment (max 5 years) incurs interest. Whole life insurance is the most rational solution.':'상속세는 6개월 이내 납부 원칙입니다. 재원이 없으면 부동산을 급매로 팔거나 자녀가 대출을 받아야 합니다. 연부연납(최대 5년 분할)을 활용하더라도 이자가 발생합니다. 종신보험 납부 재원 마련이 가장 합리적입니다.',
+    link: isEn?'→ Emergency whole life insurance design for inheritance tax payment':'→ 상속세 납부 재원 종신보험 긴급 설계'
   });
 
   if (!assetSafe && C.family === 'child_only') points.push({
-    pri:'주의', priC:'#2d1f08', priTC:'#f59e0b',
-    title:'배우자 없음 — 공제 축소로 세부담 증가',
-    desc:'배우자가 없으면 배우자공제(최대 30억)를 받을 수 없습니다. 일괄공제 5억만 적용되므로 자산이 동일해도 세금이 크게 늘어납니다. 자녀에게 분산 증여해 상속 재산 자체를 줄이는 전략이 필요합니다.',
-    link:'→ 배우자 없는 경우 자녀 사전 증여 플랜'
+    pri: isEn?'Caution':'주의', priC:'#2d1f08', priTC:'#f59e0b',
+    title: isEn?'No Spouse — Reduced Deductions Increase Tax Burden':'배우자 없음 — 공제 축소로 세부담 증가',
+    desc: isEn?'Without a spouse, the spouse deduction (up to ₩3B) is unavailable. Only the ₩500M lump-sum deduction applies, so the same asset level incurs significantly more tax. Staged gifts to children to reduce the inheritance base are essential.':'배우자가 없으면 배우자공제(최대 30억)를 받을 수 없습니다. 일괄공제 5억만 적용되므로 자산이 동일해도 세금이 크게 늘어납니다. 자녀에게 분산 증여해 상속 재산 자체를 줄이는 전략이 필요합니다.',
+    link: isEn?'→ Pre-gift plan to children when no spouse':'→ 배우자 없는 경우 자녀 사전 증여 플랜'
   });
 
   /* ── 건보료 시뮬레이션 박스 ── */
   const nhisSimul = (nhisDep || nhisLocal) ? {
-    탈락기준: nhisDep ? '피부양자 — 금융소득 1,000만원 초과 시 즉시 탈락' : '지역가입자 — 증여 재산 점수화 적용',
-    전환후보험료: noReserve ? '월 50만원+ 예상' : '월 30~80만원 (자산·소득 규모별)',
-    절감방법: '증여 전 소득 분산·재산 이전 설계 → 전문 시뮬레이션 제공',
-    주의사항: '증여 계약 전 반드시 건보료 사전 시뮬레이션 필수',
+    [isEn?'Dependent Loss Criteria':'탈락기준']: nhisDep ? (isEn?'Dependent — immediate loss if financial income exceeds ₩10M':'피부양자 — 금융소득 1,000만원 초과 시 즉시 탈락') : (isEn?'Regional insured — gift property scored into premium':'지역가입자 — 증여 재산 점수화 적용'),
+    [isEn?'Premium After Switching':'전환후보험료']: noReserve ? (isEn?'₩500K+/mo expected':'월 50만원+ 예상') : (isEn?'₩300K–₩800K/mo (by asset/income level)':'월 30~80만원 (자산·소득 규모별)'),
+    [isEn?'Cost Reduction Method':'절감방법']: isEn?'Pre-gift income distribution & asset transfer design → expert simulation provided':'증여 전 소득 분산·재산 이전 설계 → 전문 시뮬레이션 제공',
+    [isEn?'Important Note':'주의사항']: isEn?'NHIS simulation before gift contract is mandatory':'증여 계약 전 반드시 건보료 사전 시뮬레이션 필수',
   } : null;
 
   /* ── 로드맵 ── */
   const phase1 = [], phase2 = [], phase3 = [];
   if (giftNone && !assetSafe) phase1.push({
-    text:'자녀·배우자에게 지금 바로 증여 시작 — 10년 면세 한도 활용',
-    sub:'자녀 1인당 5,000만원, 배우자 6억원까지 세금 없이 줄 수 있습니다(10년마다 한도 리셋). 예시: 자녀 2명에게 오늘 각 5,000만원 → 10년 후 다시 각 5,000만원 → 20년간 총 2억원 무세 이전. 증여세 신고는 증여일이 속한 달의 말일로부터 3개월 이내에 해야 가산세가 없습니다.',
-    link:{label:'국세청 증여세 신고 안내', url:'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2340&cntntsId=7744'}
+    text: isEn?'Start Gifting to Children/Spouse Now — Use 10-year Tax-Free Limit':'자녀·배우자에게 지금 바로 증여 시작 — 10년 면세 한도 활용',
+    sub: isEn?'Up to ₩50M per child, ₩600M to spouse can be given tax-free (limit resets every 10 years). Example: 2 children × ₩50M today → ₩50M each again in 10 years → ₩200M transferred tax-free over 20 years. Gift tax filing must be done within 3 months from the end of the month of the gift date.':'자녀 1인당 5,000만원, 배우자 6억원까지 세금 없이 줄 수 있습니다(10년마다 한도 리셋). 예시: 자녀 2명에게 오늘 각 5,000만원 → 10년 후 다시 각 5,000만원 → 20년간 총 2억원 무세 이전. 증여세 신고는 증여일이 속한 달의 말일로부터 3개월 이내에 해야 가산세가 없습니다.',
+    link:{label: isEn?'NTS Gift Tax Filing Guide':'국세청 증여세 신고 안내', url:'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2340&cntntsId=7744'}
   });
   if (corpUnlisted) phase1.push({
-    text:'비상장주식 — 회사 이익이 낮을 때 빨리 증여해야 세금이 적습니다',
-    sub:'비상장주식 가치는 순자산 + 순이익으로 계산합니다. 회사 실적이 좋을수록 주식 가치가 오르고 증여세도 늘어납니다. 매출이 일시적으로 낮거나 결손이 발생한 시점에 공인평가기관에 가치평가를 의뢰하고 그 가격으로 자녀에게 증여하면 세금을 크게 아낄 수 있습니다.'
+    text: isEn?'Unlisted Shares — Gift When Company Profit is Low to Minimize Tax':'비상장주식 — 회사 이익이 낮을 때 빨리 증여해야 세금이 적습니다',
+    sub: isEn?'Unlisted share value = net assets + net income. Better performance → higher share value → more gift tax. When revenue temporarily dips or a loss occurs, commission a certified valuation and gift shares to your children at that price to save significantly on tax.':'비상장주식 가치는 순자산 + 순이익으로 계산합니다. 회사 실적이 좋을수록 주식 가치가 오르고 증여세도 늘어납니다. 매출이 일시적으로 낮거나 결손이 발생한 시점에 공인평가기관에 가치평가를 의뢰하고 그 가격으로 자녀에게 증여하면 세금을 크게 아낄 수 있습니다.'
   });
   if (corpListedMajor) phase1.push({
-    text:'상장주식 대주주라면 — 지분율 먼저 확인하세요',
-    sub:'종목당 보유액 10억 이상 또는 지분율 1% 이상이면 상장주식 대주주입니다. 대주주가 주식을 팔면 양도세 20~25%가 붙는데, 상속인이 상속으로 이 주식을 물려받으면 대주주 요건을 그대로 이어받습니다. 지금 배우자·자녀에게 지분을 분산해 대주주 요건을 벗어나두면 향후 양도세 부담을 크게 줄일 수 있습니다.'
+    text: isEn?'Listed Major Shareholder — Check Your Ownership Percentage First':'상장주식 대주주라면 — 지분율 먼저 확인하세요',
+    sub: isEn?'Holding ₩1B+ or 1%+ per ticker qualifies as major shareholder. Major shareholders pay 20–25% capital gains tax on disposal, and heirs inherit this status. Distribute shares to spouse/children now to fall below major shareholder threshold and significantly reduce future capital gains exposure.':'종목당 보유액 10억 이상 또는 지분율 1% 이상이면 상장주식 대주주입니다. 대주주가 주식을 팔면 양도세 20~25%가 붙는데, 상속인이 상속으로 이 주식을 물려받으면 대주주 요건을 그대로 이어받습니다. 지금 배우자·자녀에게 지분을 분산해 대주주 요건을 벗어나두면 향후 양도세 부담을 크게 줄일 수 있습니다.'
   });
   if (nhisDep || nhisLocal) phase1.push({
-    text:'증여 전 건강보험료 영향 반드시 확인하세요 — 매달 수십만원이 달라질 수 있습니다',
-    sub:'자녀가 직장가입자의 피부양자라면, 증여받은 재산이 기준(재산과표 5.4억 초과 또는 금융소득 연 1,000만원 초과)을 넘는 순간 피부양자 자격을 잃습니다. 이후 지역가입자로 전환돼 재산·소득에 따라 월 30~100만원 이상 건보료가 새로 생깁니다. 예시: 공시가 3억 아파트를 자녀에게 증여 시 건보료 월 약 22~30만원 추가 예상. 증여 계약서 쓰기 전에 시뮬레이션 필수.',
-    link:{label:'건강보험공단 피부양자 자격 확인', url:'https://www.nhis.or.kr/nhis/policy/wbhaca03600m01.do'}
+    text: isEn?'Check NHIS Premium Impact Before Gifting — Could Change Monthly by ₩100K+':'증여 전 건강보험료 영향 반드시 확인하세요 — 매달 수십만원이 달라질 수 있습니다',
+    sub: isEn?'If a child is a dependent under a workplace insured family, a gift that pushes assets above the threshold (property tax base ₩540M+ or financial income ₩10M+/yr) immediately strips dependent status. They switch to regional insured, adding ₩300K–₩1M+/mo in premiums. Example: gifting a ₩300M apartment to a child adds approx. ₩220K–₩300K/mo. Simulation before signing a gift contract is mandatory.':'자녀가 직장가입자의 피부양자라면, 증여받은 재산이 기준(재산과표 5.4억 초과 또는 금융소득 연 1,000만원 초과)을 넘는 순간 피부양자 자격을 잃습니다. 이후 지역가입자로 전환돼 재산·소득에 따라 월 30~100만원 이상 건보료가 새로 생깁니다. 예시: 공시가 3억 아파트를 자녀에게 증여 시 건보료 월 약 22~30만원 추가 예상. 증여 계약서 쓰기 전에 시뮬레이션 필수.',
+    link:{label: isEn?'NHIS Dependent Qualification Check':'건강보험공단 피부양자 자격 확인', url:'https://www.nhis.or.kr/nhis/policy/wbhaca03600m01.do'}
   });
   if (finTax) phase1.push({
-    text:'이자·배당이 연 2,000만원 넘으면 세율이 최고 49.5%로 급등 — 지금 구조를 바꾸세요',
-    sub:'예금이자 + 주식 배당금 합계가 연 2,000만원을 초과하면 금융소득종합과세 대상이 됩니다. ISA(개인종합자산관리계좌)에 넣은 금융소득은 최대 500만원까지 비과세이고, 연금저축·IRP로 이전하면 저율 분리과세(3.3~5.5%)가 적용됩니다. 상품 교체만으로 수백만 원 절세가 가능한 영역입니다.'
+    text: isEn?'Interest + Dividends Over ₩20M/yr → Rate Jumps to Max 49.5% — Restructure Now':'이자·배당이 연 2,000만원 넘으면 세율이 최고 49.5%로 급등 — 지금 구조를 바꾸세요',
+    sub: isEn?'When interest + dividends exceed ₩20M/yr, comprehensive income tax applies. ISA account financial income is tax-free up to ₩5M; transferring to pension savings or IRP applies a low separate tax rate (3.3–5.5%). Switching products alone can save millions annually.':'예금이자 + 주식 배당금 합계가 연 2,000만원을 초과하면 금융소득종합과세 대상이 됩니다. ISA(개인종합자산관리계좌)에 넣은 금융소득은 최대 500만원까지 비과세이고, 연금저축·IRP로 이전하면 저율 분리과세(3.3~5.5%)가 적용됩니다. 상품 교체만으로 수백만 원 절세가 가능한 영역입니다.'
   });
   phase1.push({
-    text:'지금 상속이 개시된다면 세금이 얼마나 나올까? — 미리 계산해두세요',
-    sub:'자산 총액에서 기본공제(일괄 5억), 배우자공제(최대 30억), 금융재산공제(순금융재산의 20%, 최대 2억) 등을 차감한 뒤 세율 10~50%를 적용합니다. 예시: 자산 20억 / 배우자+자녀 2명 → 공제 후 과세표준 약 9억 → 상속세 약 1억 9,000만원. 국세청 상속세 계산 서비스로 직접 확인할 수 있습니다.',
-    link:{label:'국세청 상속세 계산 서비스', url:'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2338'}
+    text: isEn?'If Inheritance Opened Today, How Much Tax? — Calculate in Advance':'지금 상속이 개시된다면 세금이 얼마나 나올까? — 미리 계산해두세요',
+    sub: isEn?'Deduct basic deduction (₩500M lump-sum), spouse deduction (up to ₩3B), financial property deduction (20% of net financial assets, max ₩200M) from total assets, then apply 10–50% rates. Example: ₩2B assets / spouse + 2 children → taxable base after deductions approx. ₩900M → inheritance tax approx. ₩190M. Verify with the NTS inheritance tax calculator.':'자산 총액에서 기본공제(일괄 5억), 배우자공제(최대 30억), 금융재산공제(순금융재산의 20%, 최대 2억) 등을 차감한 뒤 세율 10~50%를 적용합니다. 예시: 자산 20억 / 배우자+자녀 2명 → 공제 후 과세표준 약 9억 → 상속세 약 1억 9,000만원. 국세청 상속세 계산 서비스로 직접 확인할 수 있습니다.',
+    link:{label: isEn?'NTS Inheritance Tax Calculator':'국세청 상속세 계산 서비스', url:'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2338'}
   });
 
   if (assetHigh && (noReserve || partReserve)) phase2.push({
-    text:'상속세 낼 현금이 없다면 — 종신보험으로 납부 재원을 미리 마련하세요',
-    sub:'상속세는 원칙적으로 현금만 납부 가능합니다. 부동산·주식으로는 낼 수 없습니다(물납은 국세청이 거부할 수 있음). 피상속인(부모)을 피보험자로, 상속인(자녀)을 수익자로 종신보험을 가입하면 부모 사망 시 보험금이 즉시 나와 상속세 납부에 사용합니다. 가입이 5년만 빨라도 보험료가 20~30% 저렴해집니다.'
+    text: isEn?'No Cash to Pay Inheritance Tax — Prepare Payment Funds with Whole Life Insurance Now':'상속세 낼 현금이 없다면 — 종신보험으로 납부 재원을 미리 마련하세요',
+    sub: isEn?'Inheritance tax can only be paid in cash — not real estate or stocks (in-kind payment may be rejected by NTS). A whole life policy with the deceased (parent) as insured and heir (child) as beneficiary pays out immediately at death and funds the tax. Starting 5 years earlier reduces premiums by 20–30%.':'상속세는 원칙적으로 현금만 납부 가능합니다. 부동산·주식으로는 낼 수 없습니다(물납은 국세청이 거부할 수 있음). 피상속인(부모)을 피보험자로, 상속인(자녀)을 수익자로 종신보험을 가입하면 부모 사망 시 보험금이 즉시 나와 상속세 납부에 사용합니다. 가입이 5년만 빨라도 보험료가 20~30% 저렴해집니다.'
   });
   if (!assetSafe) phase2.push({
-    text:'10년 단위 증여 스케줄표 만들기 — 계획 없이는 절세도 없습니다',
-    sub:'자녀 1명에게 매 10년마다 5,000만원 무세 증여 가능. 예시: 자녀 3명 / 2025년 각 5,000만원(총 1.5억) → 2035년 각 5,000만원(총 1.5억) → 2045년 각 5,000만원(총 1.5억). 20년간 총 4.5억을 세금 없이 이전. 단, 증여일 기준 10년 이내 금액은 합산되므로 날짜 관리가 핵심입니다.'
+    text: isEn?'Build a 10-year Gift Schedule — No Planning, No Tax Savings':'10년 단위 증여 스케줄표 만들기 — 계획 없이는 절세도 없습니다',
+    sub: isEn?'₩50M tax-free gift per child every 10 years. Example: 3 children / 2025: ₩50M each (total ₩150M) → 2035: ₩50M each (₩150M) → 2045: ₩50M each (₩150M). Total ₩450M transferred tax-free over 20 years. Note: amounts within 10 years of the gift date are aggregated — date management is critical.':'자녀 1명에게 매 10년마다 5,000만원 무세 증여 가능. 예시: 자녀 3명 / 2025년 각 5,000만원(총 1.5억) → 2035년 각 5,000만원(총 1.5억) → 2045년 각 5,000만원(총 1.5억). 20년간 총 4.5억을 세금 없이 이전. 단, 증여일 기준 10년 이내 금액은 합산되므로 날짜 관리가 핵심입니다.'
   });
   if (corpUnlisted) phase2.push({
-    text:'법인에 쌓인 이익잉여금 — 그냥 두면 상속세 폭탄이 됩니다',
-    sub:'법인의 이익잉여금이 많을수록 비상장주식 평가액이 오르고 상속세도 늘어납니다. 3단계 출구전략: ① 임원퇴직금 규정 개정 → 대표이사 퇴직 시 합법적 고액 지급(퇴직소득세 분리과세로 세율 낮음) ② 경영인정기보험 가입 → 보험료를 회사 비용으로 처리하며 대표 사망 리스크도 해결 ③ 법인보험 활용 → 이익잉여금을 보험료로 전환해 자산 구조 개선.'
+    text: isEn?'Retained Earnings in Your Company — Leave Them and Face an Inheritance Tax Bomb':'법인에 쌓인 이익잉여금 — 그냥 두면 상속세 폭탄이 됩니다',
+    sub: isEn?'Higher retained earnings = higher unlisted share valuation = more inheritance tax. 3-step exit strategy: ① Revise executive retirement policy → pay high legal retirement pay to CEO (low tax via separate retirement income rate) ② Executive term life insurance → treat premiums as corporate expense, covering death risk ③ Corporate insurance → convert retained earnings into premium to restructure assets.':'법인의 이익잉여금이 많을수록 비상장주식 평가액이 오르고 상속세도 늘어납니다. 3단계 출구전략: ① 임원퇴직금 규정 개정 → 대표이사 퇴직 시 합법적 고액 지급(퇴직소득세 분리과세로 세율 낮음) ② 경영인정기보험 가입 → 보험료를 회사 비용으로 처리하며 대표 사망 리스크도 해결 ③ 법인보험 활용 → 이익잉여금을 보험료로 전환해 자산 구조 개선.'
   });
   if (corpListedMajor) phase2.push({
-    text:'대주주 요건에서 벗어나는 것만으로 양도세가 확 줄어듭니다',
-    sub:'상장주식 대주주(지분 1% 이상 또는 보유액 10억 이상)는 주식 매도 시 양도세 20~25%가 붙습니다. 배우자·자녀에게 지분을 증여해 각자의 보유액을 10억 미만·지분율 1% 미만으로 낮추면 대주주 요건에서 벗어나 소액주주 세율(없음~22%)이 적용됩니다. 증여 가격은 시가로 평가하며 증여세 신고가 필요합니다.'
+    text: isEn?'Exiting Major Shareholder Status Alone Drastically Reduces Capital Gains Tax':'대주주 요건에서 벗어나는 것만으로 양도세가 확 줄어듭니다',
+    sub: isEn?'Listed major shareholders (1%+ or ₩1B+ per ticker) pay 20–25% capital gains tax on disposal. Gifting shares to spouse/children to keep each below ₩1B and 1% exits major shareholder status and applies the minor shareholder rate (0–22%). Gift price is assessed at market value and gift tax filing is required.':'상장주식 대주주(지분 1% 이상 또는 보유액 10억 이상)는 주식 매도 시 양도세 20~25%가 붙습니다. 배우자·자녀에게 지분을 증여해 각자의 보유액을 10억 미만·지분율 1% 미만으로 낮추면 대주주 요건에서 벗어나 소액주주 세율(없음~22%)이 적용됩니다. 증여 가격은 시가로 평가하며 증여세 신고가 필요합니다.'
   });
   phase2.push({
-    text:'유언장이 없으면 자녀들이 법대로 싸웁니다 — 미리 정해두는 것이 가족을 지킵니다',
-    sub:'유언장 없이 사망하면 법정상속 비율(배우자 1.5 : 자녀 각 1)로 강제 분할됩니다. 자녀 간 합의가 안 되면 법원 소송까지 수년이 걸립니다(2022년 상속 관련 소송 7,200건 이상). 유언대용신탁은 생전에 재산을 신탁사에 맡겨 내가 정한 대로 자동 분배되는 제도로, 유언장보다 법적 분쟁 방지 효과가 높습니다.'
+    text: isEn?'No Will = Children Fight by Law — Decide in Advance to Protect Your Family':'유언장이 없으면 자녀들이 법대로 싸웁니다 — 미리 정해두는 것이 가족을 지킵니다',
+    sub: isEn?'Without a will, assets are forcibly divided by legal inheritance ratios (spouse 1.5 : each child 1). If children cannot agree, court litigation can take years (7,200+ inheritance lawsuits in 2022). A testamentary trust deposits assets with a trust company during your lifetime and distributes them exactly as you specify — more legally dispute-proof than a will.':'유언장 없이 사망하면 법정상속 비율(배우자 1.5 : 자녀 각 1)로 강제 분할됩니다. 자녀 간 합의가 안 되면 법원 소송까지 수년이 걸립니다(2022년 상속 관련 소송 7,200건 이상). 유언대용신탁은 생전에 재산을 신탁사에 맡겨 내가 정한 대로 자동 분배되는 제도로, 유언장보다 법적 분쟁 방지 효과가 높습니다.'
   });
 
   if (assetVhigh) phase3.push({
-    text:'자산 30억 이상이라면 — 특정법인으로 장기 절세 구조를 만드세요',
-    sub:'자녀가 대주주인 새 법인(특정법인)에 부동산이나 사업권을 이전하면, 법인 가치가 늘어날수록 자녀 지분 가치도 올라 증여세 없이 자산을 이전하는 효과가 생깁니다. 10년 이상 장기 플랜이므로 지금 설계를 시작해야 효과가 납니다. 설계 시 특수관계자 거래 이슈를 반드시 세무사와 검토해야 합니다.'
+    text: isEn?'Assets Over ₩3B — Build a Long-term Tax Structure with a Special Corporation':'자산 30억 이상이라면 — 특정법인으로 장기 절세 구조를 만드세요',
+    sub: isEn?'Transferring real estate or business rights to a new corporation (special corp) where your children are major shareholders causes the children\'s share value to grow as the company grows — effectively transferring assets tax-free. This is a 10+ year plan, so design must start now. Always review related-party transaction issues with a tax accountant.':'자녀가 대주주인 새 법인(특정법인)에 부동산이나 사업권을 이전하면, 법인 가치가 늘어날수록 자녀 지분 가치도 올라 증여세 없이 자산을 이전하는 효과가 생깁니다. 10년 이상 장기 플랜이므로 지금 설계를 시작해야 효과가 납니다. 설계 시 특수관계자 거래 이슈를 반드시 세무사와 검토해야 합니다.'
   });
   if (!assetSafe) phase3.push({
-    text:'매년 1월 공시지가 발표 때 상속세가 달라집니다 — 연 1회 재계산 필수',
-    sub:'아파트·토지의 상속세 산정 기준은 시가(실거래가)이며, 시가 불분명 시 공시지가로 대체합니다. 국토부가 매년 1월(공동주택) / 5월(표준주택·토지) 발표하는 공시지가가 오르면 세금도 같이 오릅니다. 공시지가 하락 연도(예: 2023년 공동주택 공시가 전년 대비 −18.6%)는 증여 적기입니다. 매년 공시지가 발표 후 예상 세금을 다시 계산해보세요.',
-    link:{label:'부동산 공시가격 알리미 (국토부)', url:'https://www.realtyprice.kr/notice/main/mainBody.htm'}
+    text: isEn?'Annual Official Price Announcement Changes Inheritance Tax — Recalculate Once a Year':'매년 1월 공시지가 발표 때 상속세가 달라집니다 — 연 1회 재계산 필수',
+    sub: isEn?'Inheritance tax on apartments/land is based on market price (actual transaction), and official price is used when market price is unclear. When the Ministry of Land publishes official prices each January (apartments) / May (standard homes, land), tax rises with the price. Years when official prices fall (e.g., apartments fell 18.6% YoY in 2023) are ideal gifting windows. Recalculate expected tax each year after the announcement.':'아파트·토지의 상속세 산정 기준은 시가(실거래가)이며, 시가 불분명 시 공시지가로 대체합니다. 국토부가 매년 1월(공동주택) / 5월(표준주택·토지) 발표하는 공시지가가 오르면 세금도 같이 오릅니다. 공시지가 하락 연도(예: 2023년 공동주택 공시가 전년 대비 −18.6%)는 증여 적기입니다. 매년 공시지가 발표 후 예상 세금을 다시 계산해보세요.',
+    link:{label: isEn?'Real Estate Official Price Notification (MOLIT)':'부동산 공시가격 알리미 (국토부)', url:'https://www.realtyprice.kr/notice/main/mainBody.htm'}
   });
   phase3.push({
-    text:'종신보험은 10년 이상 납입하면 해지해도 낸 돈을 돌려받습니다 — 매년 점검하세요',
-    sub:'종신보험 해지환급금은 초기엔 납입보험료보다 적지만, 보통 가입 후 10~15년 시점에 납입 총액을 넘어섭니다(환급률 100% 초과). 이 시점부터는 상속세 납부 재원 확보 + 저축 효과가 동시에 생깁니다. 매년 보험사에서 보내는 연간 안내장(환급금·사망보험금 현황)으로 납부 재원이 충분한지 확인하고, 부족하면 추가 계약을 검토하세요.'
+    text: isEn?'Whole Life Insurance Returns Paid Premiums After 10+ Years — Check Annually':'종신보험은 10년 이상 납입하면 해지해도 낸 돈을 돌려받습니다 — 매년 점검하세요',
+    sub: isEn?'The surrender value of a whole life policy is lower than total premiums early on, but typically exceeds total paid premiums after 10–15 years (return rate exceeds 100%). From that point, it simultaneously serves as inheritance tax payment funding AND a savings vehicle. Each year, use the annual policy statement (surrender value and death benefit) to verify funding sufficiency; add a new contract if insufficient.':'종신보험 해지환급금은 초기엔 납입보험료보다 적지만, 보통 가입 후 10~15년 시점에 납입 총액을 넘어섭니다(환급률 100% 초과). 이 시점부터는 상속세 납부 재원 확보 + 저축 효과가 동시에 생깁니다. 매년 보험사에서 보내는 연간 안내장(환급금·사망보험금 현황)으로 납부 재원이 충분한지 확인하고, 부족하면 추가 계약을 검토하세요.'
   });
   if (ongoingRole) phase3.push({
-    text:'상속 개시 후 6개월이 법적 신고 기한 — 하루라도 늦으면 가산세 20%',
-    sub:'부모님이 돌아가신 날로부터 6개월 이내에 상속세 신고·납부를 마쳐야 합니다. 기한을 넘기면 ① 무신고가산세 납부세액의 20% ② 납부지연가산세 하루 0.022%(연 8%)가 추가로 붙습니다. 세무사(세금 계산·신고)와 법무사(부동산 이전등기)가 동시에 진행해야 기한 내 처리가 가능합니다. 상속 개시 즉시 전문가에게 연락하세요.',
-    link:{label:'국세청 상속세 신고 안내', url:'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2338'}
+    text: isEn?'6 Months After Inheritance is the Legal Filing Deadline — 20% Surcharge if One Day Late':'상속 개시 후 6개월이 법적 신고 기한 — 하루라도 늦으면 가산세 20%',
+    sub: isEn?'Inheritance tax must be filed and paid within 6 months from the date of death. Missing the deadline triggers: ① non-filing surcharge of 20% of tax owed ② late payment surcharge of 0.022%/day (approx. 8%/yr). A tax accountant (calculation and filing) and a judicial scrivener (property registration transfer) must proceed simultaneously to finish within the deadline. Contact professionals immediately when inheritance begins.':'부모님이 돌아가신 날로부터 6개월 이내에 상속세 신고·납부를 마쳐야 합니다. 기한을 넘기면 ① 무신고가산세 납부세액의 20% ② 납부지연가산세 하루 0.022%(연 8%)가 추가로 붙습니다. 세무사(세금 계산·신고)와 법무사(부동산 이전등기)가 동시에 진행해야 기한 내 처리가 가능합니다. 상속 개시 즉시 전문가에게 연락하세요.',
+    link:{label: isEn?'NTS Inheritance Tax Filing Guide':'국세청 상속세 신고 안내', url:'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2338'}
   });
 
   return { grade, gradeSub, gradeColor, gradeBadge, score, points, nhisSimul, phase1, phase2, phase3,
@@ -972,12 +1046,13 @@ function buildResult() {
 function renderResult() {
   const R = buildResult();
   const { noReserve, assetSafe, assetHigh, realEstate, insReserve, partReserve, corpUnlisted } = R;
+  const isEn = inhLang === 'en';
   const flagPairs = [
-    ['역할', ROLE==='heir'?'상속인':ROLE==='donor'?'증여자·피상속인':'진행 중'],
-    ['자산 규모', C.assetLabel], ['자산 구성', C.atypeLabel], ['상속인', C.familyLabel],
-    ['사전 증여', C.giftLabel], ['건강보험', C.nhisLabel], ['금융소득', C.finLabel],
-    ['법인 지분', C.corpLabel], ['납부 재원', C.reserveLabel],
-    ['긴급도', C.urgLabel], ['현재 준비', C.planLabel],
+    [isEn?'Role':'역할', ROLE==='heir'?(isEn?'Heir':'상속인'):ROLE==='donor'?(isEn?'Donor/Deceased':'증여자·피상속인'):(isEn?'In Progress':'진행 중')],
+    [isEn?'Asset Size':'자산 규모', C.assetLabel], [isEn?'Asset Type':'자산 구성', C.atypeLabel], [isEn?'Heirs':'상속인', C.familyLabel],
+    [isEn?'Prior Gifts':'사전 증여', C.giftLabel], [isEn?'Health Ins.':'건강보험', C.nhisLabel], [isEn?'Fin. Income':'금융소득', C.finLabel],
+    [isEn?'Corp Shares':'법인 지분', C.corpLabel], [isEn?'Payment Funds':'납부 재원', C.reserveLabel],
+    [isEn?'Urgency':'긴급도', C.urgLabel], [isEn?'Plan Status':'현재 준비', C.planLabel],
   ].filter(([,v])=>v);
 
   const pointsHtml = R.points.map(p=>`
@@ -995,11 +1070,11 @@ function renderResult() {
     <div class="section" style="margin-bottom:14px">
       <div class="section-hd">
         <div class="section-hd-icon" style="background:#0c1a2a;color:#3b82f6">🏥</div>
-        <span class="section-hd-title" style="color:#3b82f6">건강보험료 영향 시뮬레이션</span>
+        <span class="section-hd-title" style="color:#3b82f6">${isEn?'NHIS Premium Impact Simulation':'건강보험료 영향 시뮬레이션'}</span>
       </div>
       <div style="padding:16px 22px">
         <div class="nhis-box">
-          <div class="nhis-title">건강보험 부과 시나리오</div>
+          <div class="nhis-title">${isEn?'NHIS Premium Assessment Scenario':'건강보험 부과 시나리오'}</div>
           ${Object.entries(R.nhisSimul).map(([k,v])=>`
             <div class="nhis-row">
               <span class="nhis-label">${k}</span>
@@ -1023,30 +1098,30 @@ function renderResult() {
   document.getElementById('view').innerHTML = `
     <div class="result-wrap">
       ${R.grade !== 'SAFE' && R.score >= 5 ? `<div class="alert alert-red"><div class="alert-icon">⚠</div>
-        <div>현재 상속·증여 준비 상태가 <strong>위험 수준</strong>입니다. 자산 규모, 부동산 비중, 납부 재원 부족이 복합적으로 작용하고 있습니다. 전문 진단 상담을 권장합니다.</div>
+        <div>${isEn?'Current inheritance/gift preparation status is at a <strong>risk level</strong>. Asset size, real estate concentration, and payment fund shortage are compounding risks. Expert diagnostic consultation is recommended.':'현재 상속·증여 준비 상태가 <strong>위험 수준</strong>입니다. 자산 규모, 부동산 비중, 납부 재원 부족이 복합적으로 작용하고 있습니다. 전문 진단 상담을 권장합니다.'}</div>
       </div>` : ''}
       ${ROLE==='ongoing' ? `<div class="alert alert-amber"><div class="alert-icon">⏰</div>
-        <div>상속 개시 후 <strong>6개월 이내</strong>에 상속세 신고·납부 의무가 있습니다. 기한을 넘기면 가산세(20%+)가 부과됩니다. 즉시 세무사·법무사와 함께 진행하세요.</div>
+        <div>${isEn?'Inheritance tax must be filed and paid within <strong>6 months</strong> of inheritance commencing. Missing the deadline triggers a surcharge (20%+). Proceed immediately with a tax accountant and judicial scrivener.':'상속 개시 후 <strong>6개월 이내</strong>에 상속세 신고·납부 의무가 있습니다. 기한을 넘기면 가산세(20%+)가 부과됩니다. 즉시 세무사·법무사와 함께 진행하세요.'}</div>
       </div>` : ''}
 
       <div class="r-hero">
         <div class="r-top">
           <div>
-            <div class="r-badge tag-gold">상속·증여 등급</div>
+            <div class="r-badge tag-gold">${isEn?'Inheritance/Gift Grade':'상속·증여 등급'}</div>
             <div class="r-title" style="color:${R.gradeColor}">${R.grade} <span style="font-size:14px;color:var(--muted);font-weight:400">— ${R.gradeSub}</span></div>
             <div class="r-desc">
-              ${R.grade==='SAFE' ? '현재 자산 규모 기준 상속세 과세 대상에 해당하지 않습니다. 향후 자산 변화에 대비한 모니터링만 유지하세요.' : ''}
-              ${R.grade==='PLAN-A' ? '절세 최적화 설계로 세부담을 크게 줄일 수 있는 구간입니다. 사전 증여·분산 설계를 지금 착수하세요.' : ''}
-              ${R.grade==='PLAN-B' ? '납부 재원 부족 또는 설계 공백이 있습니다. 핵심 항목부터 빠르게 실행해야 합니다.' : ''}
-              ${R.grade==='ALERT' ? '상속세 폭탄 위험 수준입니다. 부동산 자산 비중과 납부 재원 부족이 복합 리스크를 만들고 있습니다.' : ''}
-              ${R.grade==='CRITICAL' ? '즉각 대응이 필요한 위기 상황입니다. 상속 개시가 임박하거나 준비가 전혀 없는 상태입니다.' : ''}
+              ${R.grade==='SAFE' ? (isEn?'Current asset level does not qualify for inheritance tax. Maintain monitoring to track future asset changes.':'현재 자산 규모 기준 상속세 과세 대상에 해당하지 않습니다. 향후 자산 변화에 대비한 모니터링만 유지하세요.') : ''}
+              ${R.grade==='PLAN-A' ? (isEn?'Tax optimization design can significantly reduce tax burden at this bracket. Start pre-gift and distribution planning now.':'절세 최적화 설계로 세부담을 크게 줄일 수 있는 구간입니다. 사전 증여·분산 설계를 지금 착수하세요.') : ''}
+              ${R.grade==='PLAN-B' ? (isEn?'Payment funds are insufficient or planning gaps exist. Act quickly on key items first.':'납부 재원 부족 또는 설계 공백이 있습니다. 핵심 항목부터 빠르게 실행해야 합니다.') : ''}
+              ${R.grade==='ALERT' ? (isEn?'Inheritance tax bomb risk level. Heavy real estate concentration and insufficient payment funds are creating compound risk.':'상속세 폭탄 위험 수준입니다. 부동산 자산 비중과 납부 재원 부족이 복합 리스크를 만들고 있습니다.') : ''}
+              ${R.grade==='CRITICAL' ? (isEn?'Immediate action required. Inheritance is imminent or no preparation has been made.':'즉각 대응이 필요한 위기 상황입니다. 상속 개시가 임박하거나 준비가 전혀 없는 상태입니다.') : ''}
             </div>
           </div>
           <div class="grade-box">
-            <div class="grade-label">진단 등급</div>
+            <div class="grade-label">${isEn?'GRADE':'진단 등급'}</div>
             <div class="grade-val" style="color:${R.gradeColor}">${R.grade}</div>
             <div class="grade-sub">${R.gradeSub}</div>
-            <div style="font-size:10px;color:var(--hint);margin-top:6px">리스크 점수 ${R.score}점</div>
+            <div style="font-size:10px;color:var(--hint);margin-top:6px">${isEn?`Risk Score ${R.score}`:`리스크 점수 ${R.score}점`}</div>
           </div>
         </div>
         <div class="flags">${flagPairs.map(([k,v])=>`<span class="flag">${k}: ${v}</span>`).join('')}</div>
@@ -1058,8 +1133,8 @@ function renderResult() {
       <div class="section">
         <div class="section-hd">
           <div class="section-hd-icon" style="background:var(--gold-bg);color:var(--gold)">!</div>
-          <span class="section-hd-title" style="color:var(--gold)">절세·리스크 포인트</span>
-          <span class="section-hd-count" style="background:var(--gold-bg);color:var(--gold)">${R.points.length}건</span>
+          <span class="section-hd-title" style="color:var(--gold)">${isEn?'Tax-Saving & Risk Points':'절세·리스크 포인트'}</span>
+          <span class="section-hd-count" style="background:var(--gold-bg);color:var(--gold)">${R.points.length}${isEn?'':'건'}</span>
         </div>
         ${pointsHtml}
       </div>` : ''}
@@ -1067,27 +1142,27 @@ function renderResult() {
       <div class="section">
         <div class="section-hd">
           <div class="section-hd-icon" style="background:var(--blue-bg);color:var(--blue)">→</div>
-          <span class="section-hd-title" style="color:var(--blue)">상속·증여 로드맵</span>
+          <span class="section-hd-title" style="color:var(--blue)">${isEn?'Inheritance/Gift Roadmap':'상속·증여 로드맵'}</span>
         </div>
-        ${roadHtml(R.phase1,'1','즉시 실행 (1~3개월)','핵심 점검 및 증여 착수','#10b981')}
-        ${roadHtml(R.phase2,'2','단기 실행 (3~12개월)','납부 재원 확보 및 설계 확정','#3b82f6')}
-        ${roadHtml(R.phase3,'3','중장기 관리 (1~10년)','지속 실행 및 모니터링','#a855f7')}
+        ${roadHtml(R.phase1,'1',isEn?'Immediate (1–3 Months)':'즉시 실행 (1~3개월)',isEn?'Core checks & start gifting':'핵심 점검 및 증여 착수','#10b981')}
+        ${roadHtml(R.phase2,'2',isEn?'Short-term (3–12 Months)':'단기 실행 (3~12개월)',isEn?'Secure payment funds & finalize design':'납부 재원 확보 및 설계 확정','#3b82f6')}
+        ${roadHtml(R.phase3,'3',isEn?'Mid–Long-term (1–10 Years)':'중장기 관리 (1~10년)',isEn?'Ongoing execution & monitoring':'지속 실행 및 모니터링','#a855f7')}
       </div>
 
       <div class="section">
         <div class="section-hd">
           <div class="section-hd-icon" style="background:var(--green-bg);color:var(--green)">▸</div>
-          <span class="section-hd-title" style="color:var(--green)">유관 정부지원사업 및 법적 제도</span>
+          <span class="section-hd-title" style="color:var(--green)">${isEn?'Relevant Government Programs & Legal Schemes':'유관 정부지원사업 및 법적 제도'}</span>
         </div>
         ${(()=>{
           const govItems=[];
-          govItems.push({icon:'🏭',type:'세액 공제',name:'가업상속공제 (최대 600억)',benefit:'피상속인 10년 이상 영위 중소·중견기업 최대 600억 공제',desc:'매출 5,000억 이하 중견기업도 적용. 사전에 업종 해당 여부 확인 필수. 사후 관리 요건(고용 유지 등) 준수 시 추가 혜택.'});
-          govItems.push({icon:'💰',type:'절세 한도',name:'증여세 공제 한도 (10년마다 갱신)',benefit:'직계비속 5,000만원 · 배우자 6억원 비과세',desc:'10년 단위로 리셋. 자녀에게 매 10년마다 5,000만원 무세 증여 가능. 지금 착수할수록 총 증여 가능 금액이 증가합니다.'});
+          govItems.push({icon:'🏭',type:isEn?'Tax Deduction':'세액 공제',name:isEn?'Family Business Inheritance Deduction (up to ₩60B)':'가업상속공제 (최대 600억)',benefit:isEn?'Up to ₩60B deduction for SME/mid-sized business operated 10+ years by deceased':'피상속인 10년 이상 영위 중소·중견기업 최대 600억 공제',desc:isEn?'Applies to mid-sized companies with annual revenue under ₩500B. Must verify industry eligibility in advance. Additional benefits if post-management requirements (employment maintenance, etc.) are met.':'매출 5,000억 이하 중견기업도 적용. 사전에 업종 해당 여부 확인 필수. 사후 관리 요건(고용 유지 등) 준수 시 추가 혜택.'});
+          govItems.push({icon:'💰',type:isEn?'Tax-free Limit':'절세 한도',name:isEn?'Gift Tax Exemption Limit (renews every 10 years)':'증여세 공제 한도 (10년마다 갱신)',benefit:isEn?'Direct descendants ₩50M · Spouse ₩600M tax-free':'직계비속 5,000만원 · 배우자 6억원 비과세',desc:isEn?'Resets every 10 years. Can give ₩50M to each child tax-free every 10 years. The sooner you start, the more total tax-free transfers you can complete.':'10년 단위로 리셋. 자녀에게 매 10년마다 5,000만원 무세 증여 가능. 지금 착수할수록 총 증여 가능 금액이 증가합니다.'});
           if(['unlisted','both'].includes(C.corp||'')||['mid','high','vhigh'].includes(C.asset||'')){
-            govItems.push({icon:'🏢',type:'세율 특례',name:'가업승계 증여세 과세특례 (중소기업)',benefit:'100억 이하 10%, 500억 이하 20% 특례세율',desc:'일반 증여세(최고 50%)에서 파격 인하. 수증자(자녀)가 7년 이상 가업에 종사해야 하며 대표이사 취임 의무 있음.'});
+            govItems.push({icon:'🏢',type:isEn?'Special Rate':'세율 특례',name:isEn?'Family Business Gift Tax Special Rate (SMEs)':'가업승계 증여세 과세특례 (중소기업)',benefit:isEn?'Under ₩10B: 10%, under ₩50B: 20% special rate':'100억 이하 10%, 500억 이하 20% 특례세율',desc:isEn?'Dramatic reduction from general gift tax (up to 50%). Recipient (child) must be employed in the business for 7+ years and assume the CEO role.':'일반 증여세(최고 50%)에서 파격 인하. 수증자(자녀)가 7년 이상 가업에 종사해야 하며 대표이사 취임 의무 있음.'});
           }
-          govItems.push({icon:'📋',type:'무료 상담',name:'국세청 상속세 신고 납세 지원',benefit:'영세납세자 무료 세무 도움 서비스',desc:'상속세 신고 기한(6개월) 내 국세청 세무 도우미 신청 가능. 공익법인 출연 시 추가 공제 전략도 문의 가능.'});
-          govItems.push({icon:'🌾',type:'세액 공제',name:'영농·영어 상속공제 (최대 30억)',benefit:'농지·어업 자산 상속 시 최대 30억 공제',desc:'피상속인이 2년 이상 영농에 종사하고 상속인이 계속 영위할 것 조건. 농업인 자산 승계 최우선 활용 제도.'});
+          govItems.push({icon:'📋',type:isEn?'Free Consultation':'무료 상담',name:isEn?'NTS Inheritance Tax Filing Assistance':'국세청 상속세 신고 납세 지원',benefit:isEn?'Free tax assistance service for small taxpayers':'영세납세자 무료 세무 도움 서비스',desc:isEn?'NTS tax helper application available within the 6-month inheritance tax filing deadline. Can also inquire about additional deduction strategies for contributions to public-interest foundations.':'상속세 신고 기한(6개월) 내 국세청 세무 도우미 신청 가능. 공익법인 출연 시 추가 공제 전략도 문의 가능.'});
+          govItems.push({icon:'🌾',type:isEn?'Tax Deduction':'세액 공제',name:isEn?'Farming/Fishing Inheritance Deduction (up to ₩3B)':'영농·영어 상속공제 (최대 30억)',benefit:isEn?'Up to ₩3B deduction when inheriting farmland/fishery assets':'농지·어업 자산 상속 시 최대 30억 공제',desc:isEn?'Requires deceased to have been engaged in farming 2+ years and heir to continue. Primary priority scheme for agricultural asset succession.':'피상속인이 2년 이상 영농에 종사하고 상속인이 계속 영위할 것 조건. 농업인 자산 승계 최우선 활용 제도.'});
           return `<div style="padding:4px 22px 16px;">
             ${govItems.map(g=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);">
               <div style="font-size:18px;flex-shrink:0;padding-top:2px">${g.icon}</div>
@@ -1107,41 +1182,39 @@ function renderResult() {
       <div class="section">
         <div class="section-hd">
           <div class="section-hd-icon" style="background:var(--purple-bg);color:var(--purple)">⚠</div>
-          <span class="section-hd-title" style="color:var(--purple)">위험관리 — 전반 및 보험 권고</span>
+          <span class="section-hd-title" style="color:var(--purple)">${isEn?'Risk Management — Overall & Insurance Recommendations':'위험관리 — 전반 및 보험 권고'}</span>
         </div>
         ${(()=>{
           const risks=[];
-          // 납부 재원 부족 위험
           if(noReserve && !assetSafe){
-            risks.push({lv:'red',title:'납부 재원 없음 — 즉각 대응 필요',
-              desc:'상속세는 현금으로만 납부 가능합니다. 부동산·비상장주식 등 현물로는 세금을 낼 수 없습니다. 재원이 없으면 분할납부 또는 물납 외에 선택지가 없으며, 법정 기한(6개월) 초과 시 가산세 20% 이상 부과됩니다.'});
+            risks.push({lv:'red',title:isEn?'No Payment Funds — Immediate Action Required':'납부 재원 없음 — 즉각 대응 필요',
+              desc:isEn?'Inheritance tax can only be paid in cash. Real estate and unlisted shares cannot be used to pay tax. Without funds, the only options are installment payment or in-kind payment, and exceeding the 6-month legal deadline triggers a 20%+ surcharge.':'상속세는 현금으로만 납부 가능합니다. 부동산·비상장주식 등 현물로는 세금을 낼 수 없습니다. 재원이 없으면 분할납부 또는 물납 외에 선택지가 없으며, 법정 기한(6개월) 초과 시 가산세 20% 이상 부과됩니다.'});
           }
           if(realEstate && !insReserve){
-            risks.push({lv:'red',title:'부동산 과중 → 현금 부족 리스크',
-              desc:'자산의 70% 이상이 부동산인 경우 급매 처분 시 손실이 크고 기한 내 처분도 어렵습니다. 종신보험 또는 금융자산으로 최소 예상 상속세의 50% 이상을 현금으로 준비해 두어야 합니다.'});
+            risks.push({lv:'red',title:isEn?'Heavy Real Estate → Cash Shortage Risk':'부동산 과중 → 현금 부족 리스크',
+              desc:isEn?'When 70%+ of assets are real estate, forced sales result in large losses and disposing within the deadline is difficult. Prepare at least 50% of expected inheritance tax in cash via whole life insurance or financial assets.':'자산의 70% 이상이 부동산인 경우 급매 처분 시 손실이 크고 기한 내 처분도 어렵습니다. 종신보험 또는 금융자산으로 최소 예상 상속세의 50% 이상을 현금으로 준비해 두어야 합니다.'});
           }
           if(assetHigh || R.grade==='ALERT'||R.grade==='CRITICAL'){
-            risks.push({lv:'amber',title:'고액 자산 → 최고세율(50%) 구간',
-              desc:'30억 초과 자산은 최고세율 50%(최대주주 할증 시 60%) 적용. 사전 증여를 통한 과세표준 분산이 가장 효과적인 절세 수단입니다. 10년 이상의 장기 플랜이 필요합니다.'});
+            risks.push({lv:'amber',title:isEn?'High Asset Level → Top Rate (50%) Bracket':'고액 자산 → 최고세율(50%) 구간',
+              desc:isEn?'Assets over ₩3B are subject to the top rate of 50% (60% with major shareholder surcharge). Distributing the taxable base through pre-gifting is the most effective tax-saving measure. A 10+ year long-term plan is required.':'30억 초과 자산은 최고세율 50%(최대주주 할증 시 60%) 적용. 사전 증여를 통한 과세표준 분산이 가장 효과적인 절세 수단입니다. 10년 이상의 장기 플랜이 필요합니다.'});
           }
-          risks.push({lv:'info',title:'신탁 활용 — 재산 이전 리스크 관리',
-            desc:'유언대용신탁·수익자연속신탁으로 상속 분쟁을 사전 차단하고 재산 이전을 유연하게 설계할 수 있습니다. 특히 자녀 간 지분 분쟁 가능성이 있는 경우 신탁을 통한 명확한 승계 구조 설계를 권장합니다.'});
+          risks.push({lv:'info',title:isEn?'Trust Utilization — Asset Transfer Risk Management':'신탁 활용 — 재산 이전 리스크 관리',
+            desc:isEn?'Testamentary trusts and successive beneficiary trusts can pre-empt inheritance disputes and flexibly structure asset transfers. Especially when inter-sibling share disputes are possible, a clear succession structure via trust is recommended.':'유언대용신탁·수익자연속신탁으로 상속 분쟁을 사전 차단하고 재산 이전을 유연하게 설계할 수 있습니다. 특히 자녀 간 지분 분쟁 가능성이 있는 경우 신탁을 통한 명확한 승계 구조 설계를 권장합니다.'});
 
-          // 보험 권고
           const insRecs=[];
           if(!insReserve){
-            insRecs.push({name:'종신보험 (상속세 납부 재원)',urgency:'🔴 최우선 가입 권고',
-              desc:'상속세 납부 재원으로 유일하게 현금을 사전 적립할 수 있는 수단. 사망보험금은 상속세 과세 대상이지만, 보험료를 사전에 납부하여 현금을 준비하는 효과가 있습니다. 가입 시기가 빠를수록 보험료가 저렴합니다.'});
+            insRecs.push({name:isEn?'Whole Life Insurance (Inheritance Tax Payment Funds)':'종신보험 (상속세 납부 재원)',urgency:isEn?'🔴 Top Priority Enrollment Recommended':'🔴 최우선 가입 권고',
+              desc:isEn?'The only means to pre-accumulate cash for inheritance tax payment. Death benefit is subject to inheritance tax, but prepaying premiums creates a cash reserve effect. Earlier enrollment means lower premiums.':'상속세 납부 재원으로 유일하게 현금을 사전 적립할 수 있는 수단. 사망보험금은 상속세 과세 대상이지만, 보험료를 사전에 납부하여 현금을 준비하는 효과가 있습니다. 가입 시기가 빠를수록 보험료가 저렴합니다.'});
           }
           if(partReserve){
-            insRecs.push({name:'종신보험 추가 설계 (보장 부족 보완)',urgency:'🟡 보장액 점검 후 보완',
-              desc:'기존 종신보험의 사망보험금이 예상 상속세 전액을 커버하는지 확인하세요. 부족분에 대해 추가 계약 또는 보장 업그레이드가 필요합니다.'});
+            insRecs.push({name:isEn?'Additional Whole Life Insurance (Fill Coverage Gap)':'종신보험 추가 설계 (보장 부족 보완)',urgency:isEn?'🟡 Review Coverage, Then Supplement':'🟡 보장액 점검 후 보완',
+              desc:isEn?'Verify whether the existing whole life policy\'s death benefit covers the full expected inheritance tax. If insufficient, an additional contract or coverage upgrade is needed.':'기존 종신보험의 사망보험금이 예상 상속세 전액을 커버하는지 확인하세요. 부족분에 대해 추가 계약 또는 보장 업그레이드가 필요합니다.'});
           }
-          insRecs.push({name:'연금보험 / 즉시연금 (건강보험료 절감)',urgency:'🟢 부부 동시 가입 검토',
-            desc:'금융소득(이자·배당)이 연 2,000만원 이상이면 건강보험료가 급증합니다. 즉시연금은 금융소득 과세 제외 구조로 건강보험료 절감에 유리합니다. 상속 전 자산 이전 방법으로도 활용.'});
+          insRecs.push({name:isEn?'Annuity Insurance / Immediate Annuity (NHIS Premium Reduction)':'연금보험 / 즉시연금 (건강보험료 절감)',urgency:isEn?'🟢 Consider Joint Enrollment for Couple':'🟢 부부 동시 가입 검토',
+            desc:isEn?'Financial income (interest + dividends) of ₩20M+/yr dramatically increases NHIS premiums. Immediate annuities are excluded from financial income taxation and are advantageous for premium reduction. Also usable as a pre-inheritance asset transfer method.':'금융소득(이자·배당)이 연 2,000만원 이상이면 건강보험료가 급증합니다. 즉시연금은 금융소득 과세 제외 구조로 건강보험료 절감에 유리합니다. 상속 전 자산 이전 방법으로도 활용.'});
           if(corpUnlisted||['mid','high','vhigh'].includes(C.asset||'')){
-            insRecs.push({name:'기업경영인 특화 보험 (가업승계 연계)',urgency:'🟡 사업체 규모에 맞게 설계',
-              desc:'비상장법인 대주주는 사망 시 기업가치 전체가 상속세 대상. 경영인정기보험(비용처리)과 종신보험(상속세 재원)을 동시에 설계하여 기업 존속과 절세를 함께 해결하세요.'});
+            insRecs.push({name:isEn?'Business Executive Insurance (Linked to Family Business Succession)':'기업경영인 특화 보험 (가업승계 연계)',urgency:isEn?'🟡 Design by Business Scale':'🟡 사업체 규모에 맞게 설계',
+              desc:isEn?'For unlisted company major shareholders, the entire company value becomes subject to inheritance tax upon death. Design executive term life insurance (expense deduction) and whole life insurance (inheritance tax funds) simultaneously to solve both business continuity and tax savings.':'비상장법인 대주주는 사망 시 기업가치 전체가 상속세 대상. 경영인정기보험(비용처리)과 종신보험(상속세 재원)을 동시에 설계하여 기업 존속과 절세를 함께 해결하세요.'});
           }
 
           return `<div style="padding:4px 22px 16px;">
@@ -1153,7 +1226,7 @@ function renderResult() {
               </div>
             </div>`).join('')}
             <div style="background:var(--gold-bg);border:1px solid #352b0a;border-left:3px solid var(--gold);border-radius:8px;padding:14px;margin-top:12px;">
-              <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px;">🏥 보험 권고 사항</div>
+              <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px;">🏥 ${isEn?'Insurance Recommendations':'보험 권고 사항'}</div>
               ${insRecs.map(i=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #352b0a;">
                 <div style="min-width:160px;flex-shrink:0;">
                   <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:1px;">${i.name}</div>
@@ -1167,12 +1240,50 @@ function renderResult() {
       </div>
 
       <div class="action-row no-print">
-        <button class="btn-p" onclick="window.print()">🖨 결과 인쇄 / PDF 저장</button>
-        <button class="btn-p" onclick="alert('전담 컨설턴트에게 상담을 요청합니다.')">상속·증여 전문 상담 신청</button>
-        <button class="btn-g" onclick="restart()">처음부터 다시 진단</button>
+        <button class="btn-p" onclick="window.print()">🖨 ${isEn?'Print Report / Save PDF':'결과 인쇄 / PDF 저장'}</button>
+        <button class="btn-p" onclick="alert('${isEn?'Requesting consultation with a dedicated consultant.':'전담 컨설턴트에게 상담을 요청합니다.'}')">${isEn?'Request Expert Consultation':'상속·증여 전문 상담 신청'}</button>
+        <button class="btn-g" onclick="restart()">↺ ${isEn?'Start Over':'처음부터 다시 진단'}</button>
       </div>
     </div>`;
 }
+
+function setInhLang(newLang) {
+  if (inhLang === newLang) return;
+  inhLang = newLang;
+  const isEn = newLang === 'en';
+  const st = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  const si = (id, v) => { const e = document.getElementById(id); if (e) e.innerHTML = v; };
+  st('inh-hdr-title', isEn ? 'Inheritance & Gift Tax Comprehensive Assessment' : '상속·증여 종합진단');
+  st('inh-hdr-sub',   isEn ? 'Inheritance tax risk · Asset structure · Tax-saving strategy comprehensive assessment' : '상속세 위험도 · 자산 구조 · 절세 전략 종합 진단');
+  st('inh-trend-title', isEn ? 'Inheritance Tax Crisis Trend — Why Now?' : '상속세 위기 트렌드 — 왜 지금인가');
+  si('inh-ts-lbl-1', isEn ? '₩1B basic deduction & rate structure<br>frozen period (no revision since 1996)' : '기본공제 10억·세율 구조<br>동결 기간 (1996년 이후 미개편)');
+  si('inh-ts-lbl-2', isEn ? 'Expected gift tax on ₩3B unlisted shares<br>(₩0 with family business tax privilege)' : '비상장주식 30억 일반증여 시<br>예상 증여세 (과세특례 적용 시 0원)');
+  si('inh-ts-lbl-3', isEn ? 'Nominee trust & inheritance omission<br>maximum statute of limitations' : '명의신탁·상속 누락<br>최장 부과제척기간');
+  si('inh-trend-note', isEn ? '<strong>Core Problem:</strong> The ₩1B inheritance tax basic deduction has not been revised even once in 30 years. Gifting ₩3B in unlisted shares to children with a general gift incurs an estimated ₩990M in gift tax — but qualifying for the family business tax privilege cuts the rate to 10–20%. Owning just 2 mid-size apartments in the Seoul metro area already puts you in the <strong>top rate (50%) bracket</strong>, and nominee trusts/unreported prior gifts are subject to up to 15 years of retroactive assessment. Without a 10-year staged gift strategy and insurance payment fund planning, inheritance may force property sales or children to take loans to pay the tax.' : '<strong>핵심 문제:</strong> 상속세 기본공제 10억은 30년간 단 한 번도 개편되지 않았습니다. 비상장주식 30억을 자녀에게 일반증여 시 예상 증여세만 9.9억 — 하지만 가업주식 과세특례 요건을 갖추면 세율 10~20%로 대폭 절감 가능합니다. 수도권 중형 아파트 2채만 보유해도 <strong>최고세율(50%) 구간</strong>에 진입하며, 명의신탁·사전증여 누락은 최장 15년 소급과세 대상입니다. 10년 단위 사전증여 분산 전략과 보험 재원 설계 없이 상속이 개시되면 부동산 매각 또는 자녀 대출로 세금을 납부해야 하는 상황이 됩니다.');
+  st('inh-sim-title', isEn ? 'Inheritance Tax Basic Calculator' : '상속세 기본 산정 시뮬레이터');
+  st('inh-sim-lbl-asset', isEn ? 'Total Estate' : '총 상속재산');
+  st('inh-sim-unit', isEn ? '×100M KRW' : '억원');
+  st('inh-sim-lbl-spouse', isEn ? 'Spouse' : '배우자');
+  st('inh-sim-lbl-children', isEn ? 'Children' : '자녀 수');
+  st('btn-sp-y', isEn ? 'Yes' : '있음');
+  st('btn-sp-n', isEn ? 'No' : '없음');
+  const simBody = document.getElementById('sim-body');
+  const simCollapsed = simBody && simBody.classList.contains('collapsed');
+  st('inh-sim-toggle-lbl', simCollapsed ? (isEn?'Expand':'펼치기') : (isEn?'Collapse':'접기'));
+  st('inh-entry-label', isEn ? 'Start Point:' : '진단 시작점 :');
+  st('inh-role-heir-lbl', isEn ? 'Planning to Inherit (Heir)' : '상속받을 예정 (상속인)');
+  st('inh-role-donor-lbl', isEn ? 'Preparing Asset Transfer (Donor/Deceased)' : '자산 이전 준비 중 (피상속인·증여자)');
+  st('inh-role-ongoing-lbl', isEn ? 'Inheritance In Progress' : '상속 절차 진행 중');
+  calcTax();
+  const qs = getQS();
+  if (history.length < qs.length) render();
+  else renderResult();
+}
+
+window.addEventListener('message', e => {
+  if (e.data?.type === 'wf_role') userRole = e.data.role || 'member';
+  if (e.data?.type === 'wf_lang') setInhLang(e.data.lang === 'en' ? 'en' : 'ko');
+});
 
 /* 초기 실행 */
 calcTax();
