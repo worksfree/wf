@@ -28,7 +28,12 @@ BEGIN
   END IF;
 END $$;
 
--- ③ 캠페인 RPC 익명/로그인 사용자 실행 권한 회수 (시그니처 무관하게 이름으로 전부)
+-- ③ 캠페인 RPC 실행 권한 회수 (시그니처 무관하게 이름으로 전부)
+--   ⚠️ 반드시 PUBLIC 부터 회수해야 함. 함수는 생성 시 PUBLIC 에 EXECUTE 가
+--      기본 부여되고(proacl 의 '=X/...' 항목), anon/authenticated 는 그 PUBLIC 을
+--      통해 실행한다. FROM anon, authenticated 만 회수하면 명시적 부여가 없어 no-op →
+--      PUBLIC 부여가 남아 익명 호출이 계속 뚫린다. service_role 은 별도 명시 부여
+--      (proacl 의 'service_role=X')를 유지하므로 PUBLIC 회수 후에도 Worker 는 정상.
 DO $$
 DECLARE fn RECORD;
 BEGIN
@@ -40,7 +45,7 @@ BEGIN
                         'get_campaigns_list','get_campaign_runs','get_campaign_stats_v2',
                         'get_campaign_stats','get_campaign_list')
   LOOP
-    EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM anon, authenticated', fn.sig);
+    EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM PUBLIC, anon, authenticated', fn.sig);
   END LOOP;
 END $$;
 
@@ -50,7 +55,9 @@ SELECT tablename, rowsecurity FROM pg_tables
 WHERE schemaname='public'
   AND tablename IN ('profiles_backup_20260630','biz_contacts','biz_send_log');
 
--- (b) 캠페인 RPC 권한에서 anon/authenticated 가 사라졌는지 (proacl에 anon= 없어야 함)
+-- (b) 캠페인 RPC 권한 확인. 회수 성공 시 proacl 에서 '=X/...'(PUBLIC) 항목이 사라지고
+--     service_role=X/... 와 postgres=X/... 만 남아야 한다. '=X/' 가 남아 있으면 PUBLIC 에
+--     실행권한이 남은 것(=익명 호출 가능) → 아직 안 닫힘.
 SELECT p.oid::regprocedure AS signature, p.proacl
 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
 WHERE n.nspname='public'
