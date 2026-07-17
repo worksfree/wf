@@ -39,6 +39,9 @@ td{padding:10px 14px;vertical-align:middle}
 tr.dragging .drag-handle{cursor:grabbing;}
 .page-name{font-weight:600;font-size:13px}
 .page-path{font-size:11px;color:var(--hint);font-family:monospace;margin-top:2px}
+.page-section{font-size:10px;color:var(--hint);font-weight:500;text-transform:uppercase;letter-spacing:.4px;margin-top:1px}
+/* 비활성(자기 자신) 행 */
+tr.row-self{opacity:.45;pointer-events:none}
 
 /* 역할별 select */
 .role-sel{
@@ -215,25 +218,58 @@ async function _injectSession() {
   } catch(e) { return null; }
 }
 
-// 설정 가능한 페이지 목록 — 왼쪽 트리 노드와 동일한 순서 유지
-const CONFIGURABLE_PAGES = [
-  { label:'컨설팅 마인드맵',           path:'consulting/mindmap/index.html' },
-  { label:'예비창업패키지',             path:'consulting/prebiz/index.html' },
-  { label:'소상공인·자영업자 지원',     path:'consulting/soho/index.html' },
-  { label:'중대재해처벌법',             path:'consulting/jdh/index.html' },
-  { label:'ESG 자가진단',             path:'consulting/esg/index.html' },
-  { label:'기업공시 조회',             path:'consulting/dart/index.html' },
-  { label:'B2B 이메일 DB',            path:'consulting/bizdb/index.html' },
-  { label:'마케팅 자료',               path:'consulting/marketing/index.html' },
-  { label:'상속·증여 진단',            path:'consulting/inheritance/index.html' },
-  { label:'비상장주식 가치평가',        path:'consulting/stockval/index.html' },
-  { label:'경영종합진단',               path:'consulting/gfc/index.html' },
-  { label:'CEO 플랜',                 path:'consulting/ceo/index.html' },
-  { label:'연금 절세 시뮬레이터',       path:'consulting/pension/index.html' },
-  { label:'타코매니저 AI (v1)',        path:'consulting/tacomanager/v1/index.html' },
-  { label:'타코매니저 AI (v2)',        path:'consulting/tacomanager/v2/index.html' },
-  { label:'타코매니저 AI (v3)',        path:'consulting/tacomanager/v3/index.html' },
-];
+// 자기 자신(페이지 권한) 경로 — 권한 편집 불가 행
+const SELF_PATH = 'admin/permissions/index.html';
+
+// 부모 허브의 TREE에서 동적으로 페이지 목록 구성
+function _flattenTree(nodes, sectionName, seen) {
+  const result = [];
+  for (const node of nodes) {
+    const label = typeof node.label === 'object'
+      ? (node.label.ko || node.label.en || '')
+      : (node.label || '');
+    if (node.iframe && !seen.has(node.iframe)) {
+      seen.add(node.iframe);
+      result.push({ label, path: node.iframe, section: sectionName, self: node.iframe === SELF_PATH });
+    }
+    if (node.children) {
+      const childSection = node.slug ? label : sectionName;
+      _flattenTree(node.children, childSection, seen).forEach(p => result.push(p));
+    }
+  }
+  return result;
+}
+
+function buildPageList() {
+  try {
+    const tree = (window !== window.top) ? window.parent._HUB_TREE : null;
+    if (tree && Array.isArray(tree)) return _flattenTree(tree, '', new Set());
+  } catch(e) {}
+  // 스탠드얼론 접속 시 폴백 — 컨설팅 기본 목록
+  return [
+    { label:'ESG 자가진단',            path:'consulting/esg/index.html',          section:'컨설팅' },
+    { label:'중대재해처벌법',           path:'consulting/jdh/index.html',          section:'컨설팅' },
+    { label:'소상공인·자영업자 지원',   path:'consulting/soho/index.html',         section:'컨설팅' },
+    { label:'현장클리닉 관리',          path:'consulting/g1/index.html',           section:'컨설팅' },
+    { label:'예비창업패키지',           path:'consulting/prebiz/index.html',       section:'컨설팅' },
+    { label:'컨설팅 마인드맵',          path:'consulting/mindmap/index.html',      section:'컨설팅' },
+    { label:'기업공시 조회',            path:'consulting/dart/index.html',         section:'컨설팅' },
+    { label:'상속·증여 진단',          path:'consulting/inheritance/index.html',  section:'컨설팅' },
+    { label:'비상장주식 가치평가',      path:'consulting/stockval/index.html',     section:'컨설팅' },
+    { label:'CEO 플랜',               path:'consulting/ceo/index.html',          section:'컨설팅' },
+    { label:'자산 통합 관리',          path:'consulting/asset/index.html',        section:'재무관리' },
+    { label:'연금 시뮬레이터 v1',      path:'consulting/pension/index.html',      section:'재무관리' },
+    { label:'연금 시뮬레이터 v2',      path:'consulting/pension/v2/index.html',   section:'재무관리' },
+    { label:'타코매니저 v1',           path:'consulting/tacomanager/v1/index.html', section:'파일럿' },
+    { label:'타코매니저 v2',           path:'consulting/tacomanager/v2/index.html', section:'파일럿' },
+    { label:'타코매니저 v3',           path:'consulting/tacomanager/v3/index.html', section:'파일럿' },
+    { label:'페이지 권한',             path:'admin/permissions/index.html',        section:'O&M 관리', self:true },
+    { label:'채용 관리',               path:'admin/recruit/index.html',            section:'O&M 관리' },
+  ];
+}
+
+// 동적으로 구성된 페이지 목록 (boot()에서 초기화)
+let CONFIGURABLE_PAGES = [];
 
 const DEFAULT_RULES = {
   'consulting/gfc/index.html':         { general:'hidden', member:'hidden', consultant:'blur',  gfc:'full', admin:'full' },
@@ -277,8 +313,7 @@ const ROLES = [
 ];
 
 let currentRules = {};
-// 현재 표시 순서 (CONFIGURABLE_PAGES의 path 배열)
-let pageOrder = CONFIGURABLE_PAGES.map(p => p.path);
+let pageOrder = [];   // boot()에서 buildPageList() 이후 초기화
 let _dragSrcIdx = -1;
 
 // ── 어드민 게이트 ────────────────────────────────────────────────────
@@ -300,6 +335,8 @@ let _dragSrcIdx = -1;
 
 async function boot() {
   document.getElementById('main-content').style.display = 'block';
+  CONFIGURABLE_PAGES = buildPageList();
+  pageOrder = CONFIGURABLE_PAGES.map(p => p.path);
   renderThemeOptions();
   await loadRules();
   renderTable();
@@ -346,6 +383,27 @@ function renderTable() {
   const tbody = document.getElementById('perm-tbody');
   const sorted = getSortedPages();
   tbody.innerHTML = sorted.map((page, i) => {
+    const sectionHtml = page.section
+      ? `<div class="page-section">${page.section}</div>` : '';
+
+    // 자기 자신(페이지 권한) 행: 편집 불가
+    if (page.self) {
+      const fixedCells = ROLES.map(() =>
+        `<td><span class="level-badge lb-full" style="padding:4px 10px">항상 full</span></td>`
+      ).join('');
+      return `<tr class="row-self" data-drag-idx="${i}">
+        <td style="padding:10px 8px;text-align:center;color:var(--hint)">—</td>
+        <td>
+          ${sectionHtml}
+          <div class="page-name">${page.label}
+            <span style="display:inline-block;font-size:10px;background:rgba(59,130,246,.15);color:#60a5fa;border-radius:6px;padding:2px 7px;margin-left:6px;font-weight:700">이 페이지</span>
+          </div>
+          <div class="page-path">${page.path}</div>
+        </td>
+        ${fixedCells}
+      </tr>`;
+    }
+
     const roleCells = ROLES.map(role => {
       if (role.fixed) {
         return `<td><span class="level-badge lb-full" style="padding:4px 10px">항상 full</span></td>`;
@@ -364,6 +422,7 @@ function renderTable() {
       ondragend="onDragEnd(event)">
       <td style="padding:10px 8px;text-align:center;"><span class="drag-handle" title="드래그하여 순서 변경">⠿</span></td>
       <td>
+        ${sectionHtml}
         <div class="page-name">${page.label}</div>
         <div class="page-path">${page.path}</div>
       </td>
@@ -449,6 +508,8 @@ function resetToDefaults() {
   renderTable();
   setMsg('기본값으로 초기화됐습니다. 저장하려면 [저장] 버튼을 누르세요.');
 }
+
+
 
 function setMsg(msg, type = '') {
   const el = document.getElementById('save-msg');

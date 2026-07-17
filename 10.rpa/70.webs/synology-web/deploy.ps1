@@ -24,8 +24,8 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.8.7.28"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
-$AUC_VER  = "0.7.4.22"            # 경매지도 버전 (auction 배포 시 4번째↑)
+$VERSION  = "0.8.7.34"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$AUC_VER  = "0.7.0.3"           # 경매지도 버전 (auction 배포 시 4번째↑)
 
 # 배포 대상 환경
 $TARGETS = @{
@@ -376,14 +376,13 @@ if (Test-Path $gitBash) {
 }
 
 # ── 로그 기록 ───────────────────────────────────────────────────
-$deployVer = if ($choice -eq "8") { $AUC_VER } else { $VERSION }
-"[$TIMESTAMP] v$deployVer → $($T.Name) : $(if ($ok){'SUCCESS'}else{'FAILED'})" | Add-Content $LOG_FILE
+"[$TIMESTAMP] v$VERSION → $($T.Name) : $(if ($ok){'SUCCESS'}else{'FAILED'})" | Add-Content $LOG_FILE
 
 # ── 결과 출력 ───────────────────────────────────────────────────
 Write-Host ""
 if ($ok) {
     Write-Host "  ╔════════════════════════════════════════╗" -ForegroundColor $T.Color
-    Write-Host "  ║  ✅ 배포 완료  v$deployVer                 ║" -ForegroundColor $T.Color
+    Write-Host "  ║  ✅ 배포 완료  v$VERSION                 ║" -ForegroundColor $T.Color
     Write-Host "  ║  → $($T.Name.PadRight(36))║" -ForegroundColor $T.Color
     Write-Host "  ║  $($T.URL.PadRight(40))║" -ForegroundColor $T.Color
     Write-Host "  ╚════════════════════════════════════════╝" -ForegroundColor $T.Color
@@ -413,56 +412,6 @@ if ($ok) {
     }
     if ($verifyResult -match 'WARN:') {
         Write-Host "  ⚠️  .claude 폴더가 NAS에 남아있습니다. 수동으로 삭제하세요." -ForegroundColor Yellow
-    }
-
-    # ── nginx auction Cache-Control user.conf 자동 적용 (auction 전용) ──
-    # 경로: /usr/local/etc/nginx/conf.d/832f75cf-5eb3-4e86-8754-2d03c520ec3c/user.conf
-    if ($deployKey -eq "8") {
-        $nginxConfLocal = Join-Path $PSScriptRoot "nginx-auction.conf"
-        $AUC_NGINX_DIR  = "/usr/local/etc/nginx/conf.d/832f75cf-5eb3-4e86-8754-2d03c520ec3c"
-        $AUC_NGINX_CONF = "$AUC_NGINX_DIR/user.conf"
-        if (Test-Path $nginxConfLocal) {
-            Write-Host ""
-            Write-Host "  ▶ auction nginx Cache-Control 적용 중..." -ForegroundColor Blue
-            $nginxContent = (Get-Content $nginxConfLocal -Raw -Encoding UTF8) -replace "'", "'\\'''"
-            $nginxRemote  = "sudo mkdir -p '$AUC_NGINX_DIR' && printf '%s' '$nginxContent' | sudo tee '$AUC_NGINX_CONF' > /dev/null && sudo nginx -s reload && echo NGINX_OK || echo NGINX_FAIL"
-            $nginxResult  = & $gitBash -c "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} `"$nginxRemote`"" 2>&1
-            $nginxStr     = ($nginxResult -join "`n")
-            if ($nginxStr -match 'NGINX_OK') {
-                Write-Host "    OK Cache-Control no-cache 적용 완료 (nginx reload 성공)" -ForegroundColor Green
-            } else {
-                Write-Host "    INFO sudo 권한 없음 — 수동 적용 필요 (1회)" -ForegroundColor DarkYellow
-                Write-Host "    SSH: sudo mkdir -p $AUC_NGINX_DIR" -ForegroundColor DarkGray
-                Write-Host "    SSH: sudo tee $AUC_NGINX_CONF < nginx-auction.conf (참조파일: /volume1/web/auction/nginx-auction.conf)" -ForegroundColor DarkGray
-                Write-Host "    SSH: sudo nginx -s reload" -ForegroundColor DarkGray
-            }
-        }
-    }
-
-    # ── geocode.json 자동 업로드 (auction 전용) ───────────────────
-    if ($deployKey -eq "8") {
-        $geoLocalPath = Join-Path $LOCAL_PATH "auction\data\geocode.json"
-        Write-Host ""
-        if (Test-Path $geoLocalPath) {
-            Write-Host "  ▶ geocode.json 업로드 중..." -ForegroundColor Blue
-            $geoDirPosix = '/' + $LOCAL_PATH.Substring(0,1).ToLower() + ($LOCAL_PATH.Substring(2) -replace '\\','/') + '/auction/data'
-            # tar로 파일만 추출 → SSH 파이프 → NAS에서 풀기 (SCP 대신 tar: 디렉터리 자동 생성 + 클라우드 파일 대응)
-            $geoCmd = "set -o pipefail; cd '$geoDirPosix' && tar -czf - geocode.json | " +
-                      "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} " +
-                      "'mkdir -p /volume1/web/auction/data && tar -xzf - -C /volume1/web/auction/data/ --no-same-permissions --no-same-owner 2>&1; echo GEO_EXIT:`$?'"
-            $geoResult    = & $gitBash -c $geoCmd 2>&1
-            $geoResultStr = ($geoResult -join "`n")
-            $geoOk = ($LASTEXITCODE -eq 0) -and ($geoResultStr -match 'GEO_EXIT:[012]')
-            if ($geoOk) {
-                $geoKB = [math]::Round((Get-Item $geoLocalPath).Length / 1KB)
-                Write-Host "    OK geocode.json 업로드 완료 (${geoKB} KB)" -ForegroundColor Green
-            } else {
-                Write-Host "    WARN geocode.json 업로드 실패" -ForegroundColor Yellow
-                Write-Host ($geoResult | Where-Object { $_ -notmatch 'WARNING|post-quantum' }) -ForegroundColor DarkYellow
-            }
-        } else {
-            Write-Host "  INFO geocode.json 없음 — 지오코딩 미실행 상태" -ForegroundColor DarkGray
-        }
     }
 
     # ── 블로그 자동화 추가 배포 (consulting 전용) ──────────────────

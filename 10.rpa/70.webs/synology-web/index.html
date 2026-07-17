@@ -34,7 +34,7 @@
 <meta name="twitter:image" content="https://www.worksfree.kr/assets/logo-481KB.png">
 
 <!-- Favicon -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%22 stop-color=%22%231565c0%22/><stop offset=%221%22 stop-color=%22%2229b6f6%22/></linearGradient></defs><path d=%22M92,4 C80,4 64,28 50,50 C36,72 20,96 8,96 C18,96 34,76 50,50 C66,24 80,4 92,4Z%22 fill=%22url(%23g)%22/><path d=%22M8,4 C20,4 36,24 50,50 C64,76 80,96 92,96 C80,96 64,72 50,50 C36,28 18,4 8,4Z%22 fill=%22url(%23g)%22/><path d=%22M4,10 Q20,14 42,42 Q20,30 4,10Z%22 fill=%22url(%23g)%22/><path d=%22M96,90 Q80,86 58,58 Q80,70 96,90Z%22 fill=%22url(%23g)%22/></svg>">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -85,7 +85,7 @@
     --success: #10b981;
     --warn:    #f59e0b;
     --text:    #e2e8f0;
-    --muted:   #64748b;
+    --muted:   #7e9ab5;  /* #64748b → 3.25:1 on panel → #7e9ab5 → 5.2:1 (WCAG AA) */
     --hover:   #243049;
     --active:  #1e3a5f;
     --radius:  8px;
@@ -520,6 +520,12 @@
     position:absolute; top:10px; right:10px;
     font-size:12px; background:#0a1f1a; color:#34d399;
     border:1px solid #065f46; border-radius:10px;
+    padding:2px 7px; font-weight:600;
+  }
+  .card-dev {
+    position:absolute; top:10px; right:10px;
+    font-size:12px; background:#0f1e0f; color:#4ade80;
+    border:1px solid #166534; border-radius:10px;
     padding:2px 7px; font-weight:600;
   }
   .tree-gfc-tag {
@@ -1629,6 +1635,7 @@ const HUB_I18N = {
     tooltip_gfc:   '파트너 전용 메뉴입니다',
     tooltip_coming:'준비 중인 메뉴입니다',
     coming_tag:    '준비중',
+    dev_tag:       '개발 중',
     card_lock:       '파트너 전용',
     card_locked:     '접근 제한',
     card_coming:     '개발 예정',
@@ -1759,6 +1766,7 @@ const HUB_I18N = {
     tooltip_gfc:   'Partner exclusive menu',
     tooltip_coming:'This menu is coming soon',
     coming_tag:    'Coming Soon',
+    dev_tag:       'Dev',
     card_lock:       'Partner Only',
     card_locked:     'Restricted',
     card_coming:     'Coming Soon',
@@ -2002,7 +2010,8 @@ function applyHubLang() {
   treeRoot.appendChild(buildTree(TREE));
   // 대시보드 카드 재렌더 (홈 화면일 때)
   if (document.getElementById('home-screen').style.display !== 'none') {
-    renderDashCards();
+    if (currentSection) renderDashCards(currentSection.slug);
+    else renderHomeSections();
   }
   // 브레드크럼 재렌더
   if (currentLabel) setBreadcrumb(currentPath, currentLabel);
@@ -2045,7 +2054,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.28';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.7.34';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2125,7 +2134,7 @@ const TREE = [
         ]
       },
       { label:{ko:'Naver Blog Commenter', en:'Naver Blog Commenter'}, icon:'💬', iframe:'app-store/web/naver-blog-commenter/index.html' },
-      { label:{ko:'경매 정보', en:'Auction Info'}, icon:'🏛', iframe:'auction/index.html' },
+      { label:{ko:'경매 정보', en:'Auction Info'}, icon:'🏛', iframe:'auction/index.html', dev:true },
     ]
   },
   {
@@ -2159,6 +2168,7 @@ const TREE = [
     ]
   },
 ];
+window._HUB_TREE = TREE; // 페이지 권한 iframe이 동적으로 읽어옴
 
 /* 대시보드 카드 — section 필드로 섹션 서브 대시보드 필터링 */
 const DASH_CARDS = [
@@ -2257,7 +2267,7 @@ const DASH_CARDS = [
   { section:'pilot', icon:'🏛',
     title:{ko:'경매 정보',            en:'Auction Info'},
     desc: {ko:'법원 경매 물건 검색 · 입찰 분석 · 낙찰가율 조회', en:'Court auction search · bid analysis · winning bid rate'},
-    iframe:'auction/index.html' },
+    iframe:'auction/index.html', dev:true },
   /* ── 앱스토어 ───────────────────────────────── */
   { section:'app-store', icon:'⚙',
     title:{ko:'BOM 추출',            en:'BOM Exporter'},
@@ -2484,8 +2494,14 @@ function buildTree(nodes, depth=0, path=[]) {
       labelEl.style.cursor = node.coming ? 'default' : 'pointer';
       if (node.coming) {
         const tag = document.createElement('span');
-        tag.style.cssText = 'font-size:12px;background:#1c2333;color:#475569;border:1px solid #334155;border-radius:10px;padding:1px 7px;';
+        tag.style.cssText = 'font-size:12px;background:#1c2333;color:#7a8fa8;border:1px solid #334155;border-radius:10px;padding:1px 7px;';
         tag.textContent = t('coming_tag');
+        labelEl.appendChild(tag);
+      }
+      if (node.dev) {
+        const tag = document.createElement('span');
+        tag.style.cssText = 'font-size:12px;background:#0f1e0f;color:#4ade80;border:1px solid #166534;border-radius:10px;padding:1px 7px;flex-shrink:0;';
+        tag.textContent = t('dev_tag');
         labelEl.appendChild(tag);
       }
       // 리프 노드: memberOnly는 클릭 차단용으로만 사용, 시각 태그 제거
@@ -2666,7 +2682,9 @@ function renderDashCards(sectionFilter=null) {
             ? `<div class="card-lock">${t('card_lock')}</div>`
             : card.proTag
               ? `<div class="card-pro">${t('pro_tag')}</div>`
-              : '';
+              : card.dev
+                ? `<div class="card-dev">${t('dev_tag')}</div>`
+                : '';
       el.innerHTML = `
         <div class="card-icon${card.icon.length > 2 && !card.icon.startsWith('<') ? ' text' : ''}">${card.icon}</div>
         <div class="card-title">${titleStr}</div>
