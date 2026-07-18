@@ -237,7 +237,7 @@
       <label>이미지 선택 (갤러리)</label>
       <div id="hero-picker" class="hero-picker"></div>
       <label>또는 이미지 URL 직접 입력</label>
-      <input type="text" id="hero-url" placeholder="/assets/gallery/prod-01.png 또는 https://..." oninput="heroPreview(this.value)">
+      <input type="text" id="hero-url" placeholder="/assets/gallery/prod-01.jpg 또는 https://..." oninput="heroPreview(this.value)">
       <div id="hero-preview" class="hero-preview"></div>
       <div class="row">
         <label>정렬순서 <input type="number" id="hero-sort" value="0" style="width:70px;display:inline-block;"></label>
@@ -307,6 +307,9 @@ async function initAdmin() {
     });
   });
   document.getElementById('inq-filter').addEventListener('change', loadInquiries);
+
+  // 로컬 무세션 미리보기(게이트 우회)에서는 데이터 로드를 생략 — RLS 400 콘솔 오류 방지
+  if (!session) return;
 
   await loadDashboard();
   await loadOrders();
@@ -640,10 +643,10 @@ async function setUserRole(id, role, el) {
 
 /* ── 첫화면(히어로) 슬라이드 관리 ── */
 const HERO_ASSETS = [
-  '/assets/gallery/prod-01.png','/assets/gallery/prod-02.png','/assets/gallery/prod-03.png',
+  '/assets/gallery/prod-01.jpg','/assets/gallery/prod-02.jpg','/assets/gallery/prod-03.jpg',
   '/assets/gallery/event-01.jpg','/assets/gallery/event-02.jpg','/assets/gallery/event-03.jpg','/assets/gallery/event-04.jpg',
   '/assets/gallery/corp-01.jpg','/assets/gallery/corp-02.jpg','/assets/gallery/corp-03.jpg',
-  '/assets/img/hero-02.png','/assets/img/hero-vip.png'
+  '/assets/img/hero-02.jpg','/assets/img/hero-vip.jpg'
 ];
 async function loadHero() {
   const { data, error } = await sb.from('lifeart_hero_slides').select('*').order('sort_order', { ascending: true });

@@ -21,7 +21,7 @@ chcp 65001 | Out-Null
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"
 $NAS_IP   = "192.168.100.38"
-$VERSION  = "0.8.6.5"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
+$VERSION  = "0.8.6.7"   # 배포 시 자동 증가 (pre-test=BUILD↑, test=PATCH↑, production=MINOR↑) · MAJOR/MINOR/PATCH 0-9, BUILD 0-9999 계단식 올림
 
 $TARGETS = @{
     "1" = @{ Name="pre-test-lifeart"; Path="/volume1/web/pre-test-lifeart"; URL="https://pre-test-lifeart.lifeart.ai.kr"; Color="Magenta" }
@@ -175,7 +175,7 @@ $stagePosix = '/' + $stageWin.Substring(0,1).ToLower() + ($stageWin.Substring(2)
 $BUST       = $VERSION   # 캐시버스트 토큰 = 릴리스 버전
 
 # 소스 → 스테이지 복사 후 불필요 폴더 제거 (배포 대상만 남김)
-& $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
+& $gitBash -c "rm -rf '$stagePosix'; mkdir -p '$stagePosix'; cp -r '$srcPosix'/. '$stagePosix'/; cd '$stagePosix'; rm -rf worker supabase tests docs .git node_modules .wrangler; rm -f deploy.ps1 deploy.log *.bak *.log" 2>&1 | Out-Null
 
 # ── 단계 배포 플래그(-Stage N, 1~5): 배포 사본의 config.js RELEASE_STAGE 만 치환 ──
 #   1=소개·상품·제작과정 · 2=+비즈니스·소셜 · 3=+고객지원·결제 · 4=+O&M · 5=+Dev툴킷

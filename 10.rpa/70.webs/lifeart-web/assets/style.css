@@ -265,6 +265,10 @@ header {
   min-width: 480px; /* Prevent jittering due to dynamic content width changes */
   visibility: hidden; /* Hide until JS has populated correctly */
 }
+/* 모바일: 고정 min-width 가 뷰포트(375px)보다 넓어 가로 스크롤을 유발하므로 해제 */
+@media (max-width: 860px) {
+  .nav-actions { min-width: 0; flex-wrap: wrap; justify-content: flex-end; }
+}
 .nav-actions.auth-ready {
   visibility: visible;
 }
@@ -306,12 +310,20 @@ header {
 .hero-slide {
   position: absolute; inset: 0;
   background-size: cover; background-position: center;
-  opacity: 0; transform: scale(1.05); will-change: opacity, transform;
+  opacity: 0; transform: scale(1); will-change: opacity, transform;
   transition: opacity 1.2s ease-in-out;
 }
+/* 줌 1.0 → 1.14, easeOutCubic 5.5s: 초반이 빠른 곡선이라 첫 1초 안에 +6% 이상
+   움직여 "줌인 중"임이 즉시 체감된다 (기존 1.05→1.13/6.5s 는 초반 변화가 미미했음) */
 .hero-slide.active {
-  opacity: 1; transform: scale(1.13);
-  transition: opacity 1.2s ease-in-out, transform 6.5s ease-out;
+  opacity: 1; transform: scale(1.14);
+  transition: opacity 1.2s ease-in-out, transform 5.5s cubic-bezier(0.33, 1, 0.68, 1);
+}
+/* 나가는 슬라이드: 페이드아웃 동안 줌 상태를 유지해야 '줌 풀림' 깜빡임이 없다.
+   (active 제거 시 기본값 scale(1)로 즉시 스냅되는 것을 막는다) */
+.hero-slide.leaving {
+  opacity: 0; transform: scale(1.14);
+  transition: opacity 1.2s ease-in-out, transform 5.5s cubic-bezier(0.33, 1, 0.68, 1);
 }
 .hero-overlay {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
@@ -320,6 +332,7 @@ header {
 @media (prefers-reduced-motion: reduce) {
   .hero-slide { transition: opacity .6s ease; transform: none; }
   .hero-slide.active { transform: none; }
+  .hero-slide.leaving { transform: none; transition: opacity .6s ease; }
 }
 
 .hero h1 {

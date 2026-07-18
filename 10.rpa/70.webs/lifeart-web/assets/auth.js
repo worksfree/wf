@@ -147,38 +147,42 @@ document.addEventListener('layout:ready', async () => {
   const signupBtn = document.getElementById('nav-signup-btn');
   if (!actions || !loginBtn) return;
 
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) return;  // 비로그인 → 회원가입/로그인 그대로
+  // ★ 어떤 경로로 끝나든(비로그인·세션조회 실패 포함) 버튼 영역은 반드시 노출한다.
+  //   예전엔 비로그인 시 auth-ready 를 붙이기 전에 return 해서
+  //   회원가입/로그인 버튼이 영영 visibility:hidden 으로 남는 버그가 있었다.
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;  // 비로그인 → 회원가입/로그인 그대로 노출
 
-  // 로그인 상태: 회원가입 숨김, 로그인 → 마이페이지, 로그아웃 추가
-  if (signupBtn) signupBtn.style.display = 'none';
-  loginBtn.textContent = '마이페이지';
-  loginBtn.href = '/mypage/';
+    // 로그인 상태: 회원가입 숨김, 로그인 → 마이페이지, 로그아웃 추가
+    if (signupBtn) signupBtn.style.display = 'none';
+    loginBtn.textContent = '마이페이지';
+    loginBtn.href = '/mypage/';
 
-  if (!document.getElementById('nav-logout-btn')) {
-    const out = document.createElement('a');
-    out.id = 'nav-logout-btn';
-    out.href = '#';
-    out.className = 'btn-outline';
-    out.textContent = '로그아웃';
-    out.addEventListener('click', (e) => { e.preventDefault(); lifeartLogout(); });
-    actions.appendChild(out);
-  }
-
-  // 관리자면 마이페이지 앞에 ⚙관리자 링크
-  const { data: profile } = await sb.from('profiles').select('role, tenant_id').eq('id', session.user.id).maybeSingle();
-  if (profile?.role === 'admin' && profile?.tenant_id === TENANT_UUID && stageAtLeast(4)) {
-    if (!document.getElementById('nav-admin-btn')) {
-      const a = document.createElement('a');
-      a.id = 'nav-admin-btn';
-      a.href = '/admin/';
-      a.className = 'btn-outline';
-      a.textContent = '⚙ 관리자';
-      actions.insertBefore(a, loginBtn);
+    if (!document.getElementById('nav-logout-btn')) {
+      const out = document.createElement('a');
+      out.id = 'nav-logout-btn';
+      out.href = '#';
+      out.className = 'btn-outline';
+      out.textContent = '로그아웃';
+      out.addEventListener('click', (e) => { e.preventDefault(); lifeartLogout(); });
+      actions.appendChild(out);
     }
-  }
-  // Make the actions container visible after all dynamic changes
-  if (actions) {
+
+    // 관리자면 마이페이지 앞에 ⚙관리자 링크
+    const { data: profile } = await sb.from('profiles').select('role, tenant_id').eq('id', session.user.id).maybeSingle();
+    if (profile?.role === 'admin' && profile?.tenant_id === TENANT_UUID && stageAtLeast(4)) {
+      if (!document.getElementById('nav-admin-btn')) {
+        const a = document.createElement('a');
+        a.id = 'nav-admin-btn';
+        a.href = '/admin/';
+        a.className = 'btn-outline';
+        a.textContent = '⚙ 관리자';
+        actions.insertBefore(a, loginBtn);
+      }
+    }
+  } catch (_) { /* 세션 조회 실패 → 기본(비로그인) 버튼 노출 */ }
+  finally {
     actions.classList.add('auth-ready');
   }
 });
