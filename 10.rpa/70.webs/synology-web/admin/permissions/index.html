@@ -205,7 +205,47 @@ const _noopStore = { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} };
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storage:_noopStore }
 });
-// iframe 모드에서는 부모(index.html)의 인증된 클라이언트를 사용
+// localStorage에서 JWT를 직접 추출 (SDK 세션 상태에 의존하지 않음)
+async function _getJWT() {
+  // 방법 1: 부모 Supabase 클라이언트의 현재 세션
+  try {
+    if (window !== window.top && window.parent._SB) {
+      const { data } = await window.parent._SB.auth.getSession();
+      if (data?.session?.access_token) return data.session.access_token;
+    }
+  } catch(e) {}
+  // 방법 2: localStorage 직접 검색 (SB_SESSION_KEY 우선, 폴백 전탐색)
+  try {
+    const raw = localStorage.getItem(SB_SESSION_KEY) ||
+      Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i))
+        .filter(k => k?.startsWith('sb-') && k?.endsWith('-auth-token'))
+        .map(k => localStorage.getItem(k))
+        .find(v => v?.includes('"access_token"'));
+    if (raw) {
+      const tok = JSON.parse(raw)?.access_token;
+      if (tok) return tok;
+    }
+  } catch(e) {}
+  return null;
+}
+// Supabase REST 직접 upsert (RLS에 JWT를 확실히 전달)
+async function _scUpsert(jwt, key, value) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/site_config`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON,
+      'Authorization': `Bearer ${jwt}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates'
+    },
+    body: JSON.stringify([{ key, value, updated_at: new Date().toISOString() }])
+  });
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    throw new Error(e.message || e.hint || e.code || `HTTP ${r.status}`);
+  }
+}
+// 하위 호환용 (loadRules 등 읽기에만 사용)
 function getSb() {
   try {
     if (window !== window.top && window.parent._SB) return window.parent._SB;
@@ -527,19 +567,12 @@ async function saveRules() {
   btn.disabled = true;
   setMsg('저장 중...');
   try {
-    const now = new Date().toISOString();
-    const [r1, r2] = await Promise.all([
-      getSb().from('site_config').upsert(
-        { key: 'page_access_rules', value: currentRules, updated_at: now },
-        { onConflict: 'key' }
-      ),
-      getSb().from('site_config').upsert(
-        { key: 'page_node_order', value: pageOrder, updated_at: now },
-        { onConflict: 'key' }
-      ),
+    const jwt = await _getJWT();
+    if (!jwt) throw new Error('로그인 세션 없음 — 허브에서 로그인 후 다시 시도하세요');
+    await Promise.all([
+      _scUpsert(jwt, 'page_access_rules', currentRules),
+      _scUpsert(jwt, 'page_node_order', pageOrder),
     ]);
-    if (r1.error) throw r1.error;
-    if (r2.error) throw r2.error;
     setMsg('✅ 저장 완료 — Hub 재방문 시 즉시 적용됩니다', 'ok');
   } catch(e) {
     setMsg('❌ 저장 실패: ' + e.message, 'err');
@@ -571,11 +604,9 @@ async function saveTheme() {
   msgEl.textContent = '저장 중...';
   msgEl.className   = '';
   try {
-    const r = await getSb().from('site_config').upsert(
-      { key: 'hub_theme', value: _currentTheme, updated_at: new Date().toISOString() },
-      { onConflict: 'key' }
-    );
-    if (r.error) throw r.error;
+    const jwt = await _getJWT();
+    if (!jwt) throw new Error('로그인 세션 없음');
+    await _scUpsert(jwt, 'hub_theme', _currentTheme);
     msgEl.textContent = '✅ 저장 완료 — Hub 재방문 시 즉시 적용됩니다';
     msgEl.className   = 'ok';
   } catch(e) {
@@ -598,11 +629,9 @@ async function saveBlur() {
   msgEl.textContent = '저장 중...';
   msgEl.className   = '';
   try {
-    const r = await getSb().from('site_config').upsert(
-      { key: 'blur_intensity', value: v, updated_at: new Date().toISOString() },
-      { onConflict: 'key' }
-    );
-    if (r.error) throw r.error;
+    const jwt = await _getJWT();
+    if (!jwt) throw new Error('로그인 세션 없음');
+    await _scUpsert(jwt, 'blur_intensity', v);
     msgEl.textContent = '✅ 저장 완료 — Hub 재방문 시 즉시 적용됩니다';
     msgEl.className   = 'ok';
   } catch(e) {
