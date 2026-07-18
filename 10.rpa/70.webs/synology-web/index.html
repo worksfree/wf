@@ -2054,7 +2054,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.44';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.7.46';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2566,16 +2566,14 @@ function buildTree(nodes, depth=0, path=[]) {
           pageAccessRules, node.iframe.split('?')[0]);
         if (!_hasDbRule) {
           if (node.partnerOnly && !IS_PARTNER) {
-            loadIframe(node.iframe, path, node.label); setActive(labelEl);
-            showAccessBlur('partner'); return;
+            // 보안: loadIframe() 없이 overlay만 표시 — iframe 콘텐츠 미로드
+            setActive(labelEl); showAccessBlur('partner'); return;
           }
           if (node.adminOnly && userRole !== 'admin') {
-            loadIframe(node.iframe, path, node.label); setActive(labelEl);
-            showAccessBlur('admin'); return;
+            setActive(labelEl); showAccessBlur('admin'); return;
           }
           if (node.consultantOnly && !canConsult()) {
-            loadIframe(node.iframe, path, node.label); setActive(labelEl);
-            showAccessBlur('consultant'); return;
+            setActive(labelEl); showAccessBlur('consultant'); return;
           }
         }
         if (node.memberOnly && !authUser) {
@@ -2685,9 +2683,10 @@ function renderDashCards(sectionFilter=null) {
         </div>
       `;
       el.onclick = () => {
-        if (card.adminOnly) { loadIframe(card.iframe, [], card.title); showAccessBlur('admin'); return; }
-        if (card.consultantOnly) { loadIframe(card.iframe, [], card.title); showAccessBlur('consultant'); return; }
-        if (card.partnerOnly) { loadIframe(card.iframe, [], card.title); showAccessBlur('partner'); return; }
+        // 보안: 대시보드 잠금 카드도 loadIframe() 없이 overlay만 — 콘텐츠 미로드
+        if (card.adminOnly)      { showAccessBlur('admin');      return; }
+        if (card.consultantOnly) { showAccessBlur('consultant'); return; }
+        if (card.partnerOnly)    { showAccessBlur('partner');    return; }
         showDenied('denied_title', 'denied_desc');
       };
     } else {
@@ -2897,7 +2896,7 @@ function showHome() {
   fc.style.display = 'none';
   fc.classList.remove('access-blur', 'access-readonly');
   document.getElementById('access-overlay')?.classList.remove('active');
-  document.getElementById('contentFrame').src = '';
+  document.getElementById('contentFrame').src = 'about:blank';
   document.getElementById('bc-trail').innerHTML = '';
   if (typeof renderHomeSections === 'function') renderHomeSections();
 }
@@ -3087,6 +3086,12 @@ const DEFAULT_ACCESS_RULES = {
   }
 };
 let pageAccessRules = { ...DEFAULT_ACCESS_RULES };
+// window.pageAccessRules 게터/세터 — DevTools·Playwright 테스트용 (프로덕션 무해)
+Object.defineProperty(window, 'pageAccessRules', {
+  get() { return pageAccessRules; },
+  set(v) { pageAccessRules = v; },
+  configurable: true, enumerable: false
+});
 
 async function loadPageAccessRules() {
   if (!_sbReady || !_sb) return;
@@ -3193,7 +3198,12 @@ function _reapplyCurrentPageAccess() {
   if (hasDbRule) {
     // DB 규칙이 있으면 최우선 — adminOnly 등 노드 플래그보다 우선
     const level = getAccessLevel(src);
-    if (level === 'hidden') { showDenied(); return; }
+    if (level === 'hidden') { showDenied(); showHome(); return; }
+    if (level !== 'full') {
+      // 접근 제한 → iframe 콘텐츠 제거 후 overlay (showAccessBlur가 담당)
+      const _iframe = document.getElementById('contentFrame');
+      if (_iframe) _iframe.src = 'about:blank';
+    }
     applyAccessOverlay(level);
   } else {
     // DB 규칙 없으면 노드 플래그로 폴백
@@ -3224,7 +3234,13 @@ function showAccessBlur(type) {
   if (aoDesc)  aoDesc.innerHTML    = type === 'admin'   ? t('denied_admin_desc')
                                    : type === 'partner' ? t('denied_partner_desc')
                                    :                      t('denied_consultant_desc');
-  if (fc)      fc.classList.add('access-blur');
+  // 보안: iframe 콘텐츠 완전 제거 (pointer-events:none만으로는 키보드·포커스 접근 차단 불충분)
+  const iframe = document.getElementById('contentFrame');
+  if (iframe) iframe.src = 'about:blank';
+  // overlay 카드를 표시하기 위해 frame-container 활성화
+  const hs = document.getElementById('home-screen');
+  if (hs) hs.style.display = 'none';
+  if (fc) { fc.style.display = 'block'; fc.classList.remove('access-readonly'); fc.classList.add('access-blur'); }
   if (overlay) overlay.classList.add('active');
 }
 
@@ -3426,6 +3442,18 @@ async function _loadUserProfile(userId) {
   };
 }
 
+// 계정 전환 감지: 이전 사용자 ID 추적 (null = 비로그인)
+let _prevAuthUserId = null;
+
+// Hub 상태 window 접근자 — DevTools·Playwright 테스트용 (프로덕션 무해)
+;(function(){
+  const _def = (name, g, s) => Object.defineProperty(window, name, { get: g, set: s, configurable: true, enumerable: false });
+  _def('authUser',       () => authUser,       v => { authUser = v; });
+  _def('userRole',       () => userRole,       v => { userRole = v; });
+  _def('IS_PARTNER',     () => IS_PARTNER,     v => { IS_PARTNER = v; });
+  _def('_prevAuthUserId',() => _prevAuthUserId,v => { _prevAuthUserId = v; });
+})();
+
 // devLogin 실제 로그인 성공 시 현재 열린 iframe 재로드 요청 플래그
 let _devLoginReload = false;
 // devLogin 실제 Supabase 세션 성공 플래그 (페이지뷰 추적 허용 여부)
@@ -3439,8 +3467,24 @@ function onAuthComplete() {
   hidePreviewOverlay();
   localStorage.setItem('wf_last_login', '1');
   updateAuthUI();
+
+  // ── 계정 전환 감지 ────────────────────────────────────────────────────
+  // 다른 사용자로 로그인하면 이전 고권한 콘텐츠를 즉시 차단하고 홈으로 귀환
+  const _curUserId = authUser?.id ?? null;
+  const _userChanged = _prevAuthUserId !== _curUserId;
+  _prevAuthUserId = _curUserId;
+
   refreshTreeAndCards();
-  _reapplyCurrentPageAccess(); // 역할 변경 시 현재 iframe 접근 권한 즉시 갱신
+
+  if (_userChanged) {
+    // 계정 전환: iframe 콘텐츠 즉시 제거 + 홈으로 (접근 권한 재평가 불필요)
+    const _secIframe = document.getElementById('contentFrame');
+    if (_secIframe) _secIframe.src = 'about:blank';
+    showHome();
+  } else {
+    _reapplyCurrentPageAccess(); // 같은 사용자 재인증 시 접근 권한 재평가
+  }
+
   updateDevStatus();
   loadCreditBalance();
   loadPageAccessRules(); // 페이지 접근 규칙 로드
