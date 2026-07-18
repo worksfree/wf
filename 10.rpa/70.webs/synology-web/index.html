@@ -2054,7 +2054,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.34';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.7.43';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2403,7 +2403,14 @@ const canConsult = () => userRole === 'consultant' || userRole === 'partner' || 
 
 /* 현재 역할 기준으로 노드 접근 불가 여부 */
 function _isNodeLocked(node) {
-  if (node.iframe && getAccessLevel(node.iframe) === 'hidden') return true;
+  if (node.iframe) {
+    const clean = node.iframe.split('?')[0];
+    // DB 규칙이 명시적으로 있으면 그것만으로 잠금 여부 결정 (노드 플래그 무시)
+    if (Object.prototype.hasOwnProperty.call(pageAccessRules, clean)) {
+      return getAccessLevel(node.iframe) === 'hidden';
+    }
+  }
+  // DB 규칙 없으면 노드 플래그로 폴백
   if (node.adminOnly    && userRole !== 'admin') return true;
   if (node.partnerOnly  && !IS_PARTNER)          return true;
   if (node.consultantOnly && !canConsult())       return true;
@@ -2633,12 +2640,18 @@ function renderDashCards(sectionFilter=null) {
     // 페이지 접근 규칙: hidden → 대시보드에서 완전 숨김
     if (card.iframe && getAccessLevel(card.iframe) === 'hidden') return;
 
-    const isLocked =
-      (card.adminOnly && userRole !== 'admin') ||
-      (card.consultantOnly && !canConsult()) ||
-      (card.partnerOnly && !IS_PARTNER) ||
-      (card.roleOnly && userRole !== 'admin' && userRole !== card.roleOnly) ||
-      (card.memberOnly  && !authUser);
+    // DB 규칙이 있으면 그것으로 판단 (노드 플래그 무시), 없으면 노드 플래그 사용
+    const _cardClean = card.iframe?.split('?')[0];
+    const _hasCardRule = _cardClean && Object.prototype.hasOwnProperty.call(pageAccessRules, _cardClean);
+    const isLocked = _hasCardRule
+      ? false  // hidden은 위에서 이미 필터됨 → 나머지는 잠금 없음
+      : (
+          (card.adminOnly && userRole !== 'admin') ||
+          (card.consultantOnly && !canConsult()) ||
+          (card.partnerOnly && !IS_PARTNER) ||
+          (card.roleOnly && userRole !== 'admin' && userRole !== card.roleOnly) ||
+          (card.memberOnly  && !authUser)
+        );
 
     const titleStr = getLabel(card.title);
     const descStr  = getLabel(card.desc);
@@ -3064,9 +3077,7 @@ function applyThemeToIframe(doc) {
 ── */
 const DEFAULT_ACCESS_RULES = {
   'consulting/gfc/index.html': {
-    general: 'hidden', member: 'hidden',
-    consultant: 'blur',  // 컨설턴트: 블러로 표시
-    partner: 'full', gfc: 'full', admin: 'full'
+    guest: 'hidden', member: 'hidden', consultant: 'blur', partner: 'full', admin: 'full'
   }
 };
 let pageAccessRules = { ...DEFAULT_ACCESS_RULES };
@@ -3122,16 +3133,16 @@ function applyPageNodeOrder(orderedPaths) {
 }
 
 function getAccessLevel(src) {
-  // src는 iframe에 넣는 상대경로 (HUB_VERSION query 제외)
   const clean = src.split('?')[0];
   const rule  = pageAccessRules[clean];
   if (!rule) return 'full';
-  const role = authUser ? userRole : 'member';
-  // 상위 역할은 하위 역할의 hidden 제한을 상속하지 않음
+  // 비로그인은 'guest', 로그인 일반 회원은 'member'로 구분
+  const role = authUser ? userRole : 'guest';
   if (role === 'admin')      return rule['admin']      ?? 'full';
   if (role === 'partner')    return rule['partner']    ?? rule['consultant'] ?? 'full';
   if (role === 'consultant') return rule['consultant'] ?? 'full';
-  return rule[role] ?? rule['general'] ?? rule['member'] ?? 'full';
+  if (role === 'guest')      return rule['guest']      ?? rule['member']    ?? 'full';
+  return rule['member'] ?? 'full';
 }
 
 function applyAccessOverlay(level) {
@@ -3170,24 +3181,29 @@ function _reapplyCurrentPageAccess() {
   const relSrc = rawSrc.split('?')[0].replace(location.origin + '/', '');
   const src    = normalizeIframeSrc(relSrc);
 
-  // 노드 플래그 기반 체크 (adminOnly / partnerOnly / consultantOnly)
-  const node = _findNodeByIframe(TREE, src);
-  if (node) {
-    if (node.adminOnly    && userRole !== 'admin') { showAccessBlur('admin');      return; }
-    if (node.partnerOnly  && !IS_PARTNER)          { showAccessBlur('partner');    return; }
-    if (node.consultantOnly && !canConsult())       { showAccessBlur('consultant'); return; }
+  const clean = src.split('?')[0];
+  const hasDbRule = Object.prototype.hasOwnProperty.call(pageAccessRules, clean);
+
+  if (hasDbRule) {
+    // DB 규칙이 있으면 최우선 — adminOnly 등 노드 플래그보다 우선
+    const level = getAccessLevel(src);
+    if (level === 'hidden') { showDenied(); return; }
+    applyAccessOverlay(level);
+  } else {
+    // DB 규칙 없으면 노드 플래그로 폴백
+    const node = _findNodeByIframe(TREE, src);
+    if (node) {
+      if (node.adminOnly    && userRole !== 'admin') { showAccessBlur('admin');      return; }
+      if (node.partnerOnly  && !IS_PARTNER)          { showAccessBlur('partner');    return; }
+      if (node.consultantOnly && !canConsult())       { showAccessBlur('consultant'); return; }
+    }
+    applyAccessOverlay('full');
   }
 
-  // page_access_rules 기반 체크
-  const level = getAccessLevel(src);
-  if (level === 'hidden') { showDenied(); return; }
-
-  // 접근 가능 — 기존 블러/오버레이 해제
-  applyAccessOverlay(level);
-  // 역할 변경 시 iframe 내부 콘텐츠가 즉시 갱신되도록 wf_role 재전송
+  // 역할 변경 시 iframe 내부 콘텐츠 즉시 갱신
   const iframeEl = document.getElementById('contentFrame');
   if (iframeEl?.contentWindow) {
-    iframeEl.contentWindow.postMessage({ type:'wf_role', role: userRole }, '*');
+    iframeEl.contentWindow.postMessage({ type:'wf_role', role: userRole }, location.origin);
   }
 }
 
@@ -3226,6 +3242,7 @@ try {
     _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
       auth: { autoRefreshToken:true, persistSession:true, detectSessionInUrl:true }
     });
+    window._SB = _sb; // admin iframe들이 인증된 클라이언트를 공유
     _sbReady = true;
 
     // ── onAuthStateChange 핸들러 ──────────────────────────────────────

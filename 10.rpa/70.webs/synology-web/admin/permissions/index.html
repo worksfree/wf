@@ -133,8 +133,9 @@ tr.row-self{opacity:.45;pointer-events:none}
     <thead>
       <tr>
         <th style="width:30px"></th>
-        <th style="width:280px">페이지</th>
-        <th>비로그인·일반</th>
+        <th style="width:260px">페이지</th>
+        <th>비회원</th>
+        <th>일반 회원</th>
         <th>컨설턴트</th>
         <th style="color:var(--hint)">파트너</th>
         <th style="color:var(--hint)">관리자</th>
@@ -304,15 +305,16 @@ function buildPageList() {
 let CONFIGURABLE_PAGES = [];
 
 const DEFAULT_RULES = {
-  'admin/permissions/index.html': { member:'hidden', consultant:'hidden', partner:'hidden', admin:'full' },
-  'consulting/gfc/index.html':    { member:'hidden', consultant:'blur',   partner:'full',  admin:'full' },
+  'admin/permissions/index.html': { guest:'hidden', member:'hidden', consultant:'hidden', partner:'hidden', admin:'full' },
+  'consulting/gfc/index.html':    { guest:'hidden', member:'hidden', consultant:'blur',   partner:'full',  admin:'full' },
   // 나머지 페이지는 getRule()에서 'full'로 폴백 (전체 공개)
 };
 
 const LEVELS = ['full', 'blur', 'readonly', 'hidden'];
 const LEVEL_LABELS = { full:'전체 공개', blur:'블러', readonly:'읽기 전용', hidden:'숨김' };
 const ROLES = [
-  { key:'member',     label:'비로그인·일반' },
+  { key:'guest',      label:'비회원(비로그인)' },
+  { key:'member',     label:'일반 회원' },
   { key:'consultant', label:'컨설턴트' },
   { key:'partner',    label:'파트너' },
   { key:'admin',      label:'관리자', fixed:'full' },
@@ -402,7 +404,7 @@ function renderTable() {
   groups.forEach(({ sec, pages }) => {
     const icon = SEC_ICONS[sec] || '📄';
     rows.push(`<tr class="section-hdr" ondragover="event.preventDefault()" ondrop="event.preventDefault()">
-      <td colspan="6">
+      <td colspan="7">
         <div class="sec-hdr-inner">
           <span class="sec-hdr-icon">${icon}</span>
           <span>${sec || '기타'}</span>
