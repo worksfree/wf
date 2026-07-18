@@ -39,7 +39,17 @@ td{padding:10px 14px;vertical-align:middle}
 tr.dragging .drag-handle{cursor:grabbing;}
 .page-name{font-weight:600;font-size:13px}
 .page-path{font-size:11px;color:var(--hint);font-family:monospace;margin-top:2px}
-.page-section{font-size:10px;color:var(--hint);font-weight:500;text-transform:uppercase;letter-spacing:.4px;margin-top:1px}
+/* 섹션 헤더 행 */
+tr.section-hdr td{
+  background:var(--surface2);border-top:1px solid var(--border);
+  padding:7px 14px;font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.8px;user-select:none;
+}
+tr.section-hdr:first-child td{border-top:none}
+.sec-hdr-inner{display:flex;align-items:center;gap:8px}
+.sec-hdr-icon{font-size:14px;line-height:1}
+.sec-hdr-count{margin-left:auto;font-size:10px;font-weight:500;color:var(--hint);
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1px 7px}
 /* 비활성(자기 자신) 행 */
 tr.row-self{opacity:.45;pointer-events:none}
 
@@ -195,6 +205,13 @@ const _noopStore = { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} };
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storage:_noopStore }
 });
+// iframe 모드에서는 부모(index.html)의 인증된 클라이언트를 사용
+function getSb() {
+  try {
+    if (window !== window.top && window.parent._SB) return window.parent._SB;
+  } catch(e) {}
+  return sb;
+}
 async function _injectSession() {
   try {
     let raw = localStorage.getItem(SB_SESSION_KEY);
@@ -272,12 +289,9 @@ function buildPageList() {
 let CONFIGURABLE_PAGES = [];
 
 const DEFAULT_RULES = {
-  'consulting/gfc/index.html':         { general:'hidden', member:'hidden', consultant:'blur',  gfc:'full', admin:'full' },
-  'consulting/ceo/index.html':         { general:'hidden', member:'hidden', consultant:'full',  gfc:'full', admin:'full' },
-  'consulting/inheritance/index.html': { general:'hidden', member:'hidden', consultant:'full',  gfc:'full', admin:'full' },
-  'consulting/stockval/index.html':    { general:'hidden', member:'hidden', consultant:'full',  gfc:'full', admin:'full' },
-  'consulting/bizdb/index.html':       { general:'hidden', member:'hidden', consultant:'full',  gfc:'full', admin:'full' },
-  'consulting/marketing/index.html':   { general:'hidden', member:'hidden', consultant:'full',  gfc:'full', admin:'full' },
+  'admin/permissions/index.html': { member:'hidden', consultant:'hidden', partner:'hidden', admin:'full' },
+  'consulting/gfc/index.html':    { member:'hidden', consultant:'blur',   partner:'full',  admin:'full' },
+  // 나머지 페이지는 getRule()에서 'full'로 폴백 (전체 공개)
 };
 
 // 허브 테마 정의 — index.html의 HUB_THEMES와 동기화 유지
@@ -306,10 +320,10 @@ function selectTheme(key) {
 const LEVELS = ['full', 'blur', 'readonly', 'hidden'];
 const LEVEL_LABELS = { full:'전체 공개', blur:'블러', readonly:'읽기 전용', hidden:'숨김' };
 const ROLES = [
-  { key:'member',    label:'비로그인·일반' },
+  { key:'member',     label:'비로그인·일반' },
   { key:'consultant', label:'컨설턴트' },
-  { key:'partner',        label:'파트너',       fixed:'full' },
-  { key:'admin',      label:'관리자',       fixed:'full' },
+  { key:'partner',    label:'파트너' },
+  { key:'admin',      label:'관리자', fixed:'full' },
 ];
 
 let currentRules = {};
@@ -318,7 +332,7 @@ let _dragSrcIdx = -1;
 
 // ── 어드민 게이트 ────────────────────────────────────────────────────
 (async () => {
-  if (window !== window.top) { boot(); return; }
+  if (window !== window.top) { await _injectSession(); boot(); return; }
   const session = await _injectSession();
   if (session) {
     try {
@@ -345,10 +359,10 @@ async function boot() {
 async function loadRules() {
   try {
     const [rulesRes, orderRes, blurRes, themeRes] = await Promise.all([
-      sb.from('site_config').select('value').eq('key','page_access_rules').maybeSingle(),
-      sb.from('site_config').select('value').eq('key','page_node_order').maybeSingle(),
-      sb.from('site_config').select('value').eq('key','blur_intensity').maybeSingle(),
-      sb.from('site_config').select('value').eq('key','hub_theme').maybeSingle(),
+      getSb().from('site_config').select('value').eq('key','page_access_rules').maybeSingle(),
+      getSb().from('site_config').select('value').eq('key','page_node_order').maybeSingle(),
+      getSb().from('site_config').select('value').eq('key','blur_intensity').maybeSingle(),
+      getSb().from('site_config').select('value').eq('key','hub_theme').maybeSingle(),
     ]);
     currentRules = rulesRes.data?.value ? { ...DEFAULT_RULES, ...rulesRes.data.value } : { ...DEFAULT_RULES };
     if (orderRes.data?.value && Array.isArray(orderRes.data.value)) {
@@ -379,56 +393,88 @@ function getSortedPages() {
   return pageOrder.map(path => CONFIGURABLE_PAGES.find(p => p.path === path)).filter(Boolean);
 }
 
+// 섹션별 아이콘
+const SEC_ICONS = {
+  '홈':'⌂', '서비스':'🛠', '컨설팅':'◈', '재무관리':'💰',
+  '파일럿':'🧪', '앱스토어':'📦', 'O&M 관리':'⚙', '':'📄'
+};
+
 function renderTable() {
   const tbody = document.getElementById('perm-tbody');
   const sorted = getSortedPages();
-  tbody.innerHTML = sorted.map((page, i) => {
-    const sectionHtml = page.section
-      ? `<div class="page-section">${page.section}</div>` : '';
 
-    // 자기 자신(페이지 권한) 행: 편집 불가
-    if (page.self) {
-      const fixedCells = ROLES.map(() =>
-        `<td><span class="level-badge lb-full" style="padding:4px 10px">항상 full</span></td>`
-      ).join('');
-      return `<tr class="row-self" data-drag-idx="${i}">
-        <td style="padding:10px 8px;text-align:center;color:var(--hint)">—</td>
+  // 섹션 순서 보존하며 그룹핑
+  const groups = [];
+  const secIdx  = {};
+  sorted.forEach((page, i) => {
+    const sec = page.section || '';
+    if (secIdx[sec] === undefined) { secIdx[sec] = groups.length; groups.push({ sec, pages:[] }); }
+    groups[secIdx[sec]].pages.push({ page, i });
+  });
+
+  const rows = [];
+  groups.forEach(({ sec, pages }) => {
+    const icon = SEC_ICONS[sec] || '📄';
+    rows.push(`<tr class="section-hdr" ondragover="event.preventDefault()" ondrop="event.preventDefault()">
+      <td colspan="6">
+        <div class="sec-hdr-inner">
+          <span class="sec-hdr-icon">${icon}</span>
+          <span>${sec || '기타'}</span>
+          <span class="sec-hdr-count">${pages.length}</span>
+        </div>
+      </td>
+    </tr>`);
+
+    pages.forEach(({ page, i }) => {
+      // 자기 자신(페이지 권한) 행: 편집 불가
+      if (page.self) {
+        const fixedCells = ROLES.map(role => {
+          if (role.key === 'admin') {
+            return `<td><span class="level-badge lb-full" style="padding:4px 10px">항상 full</span></td>`;
+          }
+          const level = getRule(page.path, role.key);
+          return `<td><span class="level-badge lb-${level}" style="padding:4px 10px">${LEVEL_LABELS[level] || level}</span></td>`;
+        }).join('');
+        rows.push(`<tr class="row-self" data-drag-idx="${i}">
+          <td style="padding:10px 8px;text-align:center;color:var(--hint)">—</td>
+          <td>
+            <div class="page-name">${page.label}
+              <span style="display:inline-block;font-size:10px;background:rgba(59,130,246,.15);color:#60a5fa;border-radius:6px;padding:2px 7px;margin-left:6px;font-weight:700">이 페이지</span>
+            </div>
+            <div class="page-path">${page.path}</div>
+          </td>
+          ${fixedCells}
+        </tr>`);
+        return;
+      }
+
+      const roleCells = ROLES.map(role => {
+        if (role.fixed) {
+          return `<td><span class="level-badge lb-full" style="padding:4px 10px">항상 full</span></td>`;
+        }
+        const cur = getRule(page.path, role.key);
+        const opts = LEVELS.map(l =>
+          `<option value="${l}" ${l===cur?'selected':''}>${LEVEL_LABELS[l]}</option>`
+        ).join('');
+        return `<td><select class="role-sel level-${cur}" data-path="${page.path}" data-role="${role.key}" onchange="onSelChange(this)">${opts}</select></td>`;
+      }).join('');
+      rows.push(`<tr draggable="true" data-drag-idx="${i}"
+        ondragstart="onDragStart(event,${i})"
+        ondragover="onDragOver(event,${i})"
+        ondragleave="onDragLeave(event)"
+        ondrop="onDrop(event,${i})"
+        ondragend="onDragEnd(event)">
+        <td style="padding:10px 8px;text-align:center;"><span class="drag-handle" title="드래그하여 순서 변경">⠿</span></td>
         <td>
-          ${sectionHtml}
-          <div class="page-name">${page.label}
-            <span style="display:inline-block;font-size:10px;background:rgba(59,130,246,.15);color:#60a5fa;border-radius:6px;padding:2px 7px;margin-left:6px;font-weight:700">이 페이지</span>
-          </div>
+          <div class="page-name">${page.label}</div>
           <div class="page-path">${page.path}</div>
         </td>
-        ${fixedCells}
-      </tr>`;
-    }
+        ${roleCells}
+      </tr>`);
+    });
+  });
 
-    const roleCells = ROLES.map(role => {
-      if (role.fixed) {
-        return `<td><span class="level-badge lb-full" style="padding:4px 10px">항상 full</span></td>`;
-      }
-      const cur = getRule(page.path, role.key);
-      const opts = LEVELS.map(l =>
-        `<option value="${l}" ${l===cur?'selected':''}>${LEVEL_LABELS[l]}</option>`
-      ).join('');
-      return `<td><select class="role-sel level-${cur}" data-path="${page.path}" data-role="${role.key}" onchange="onSelChange(this)">${opts}</select></td>`;
-    }).join('');
-    return `<tr draggable="true" data-drag-idx="${i}"
-      ondragstart="onDragStart(event,${i})"
-      ondragover="onDragOver(event,${i})"
-      ondragleave="onDragLeave(event)"
-      ondrop="onDrop(event,${i})"
-      ondragend="onDragEnd(event)">
-      <td style="padding:10px 8px;text-align:center;"><span class="drag-handle" title="드래그하여 순서 변경">⠿</span></td>
-      <td>
-        ${sectionHtml}
-        <div class="page-name">${page.label}</div>
-        <div class="page-path">${page.path}</div>
-      </td>
-      ${roleCells}
-    </tr>`;
-  }).join('');
+  tbody.innerHTML = rows.join('');
 }
 
 /* ── 드래그 앤 드롭 ──────────────────────────────────────────────────── */
@@ -440,7 +486,8 @@ function onDragStart(e, idx) {
 function onDragOver(e, idx) {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
-  document.querySelectorAll('#perm-tbody tr').forEach(tr => tr.classList.remove('drag-over'));
+  // 섹션 헤더 행(.section-hdr)은 drop 하이라이트 제외
+  document.querySelectorAll('#perm-tbody tr:not(.section-hdr)').forEach(tr => tr.classList.remove('drag-over'));
   if (idx !== _dragSrcIdx) e.currentTarget.classList.add('drag-over');
 }
 function onDragLeave(e) {
@@ -458,7 +505,7 @@ function onDrop(e, idx) {
 }
 function onDragEnd(e) {
   e.currentTarget.classList.remove('dragging');
-  document.querySelectorAll('#perm-tbody tr').forEach(tr => tr.classList.remove('drag-over'));
+  document.querySelectorAll('#perm-tbody tr:not(.section-hdr)').forEach(tr => tr.classList.remove('drag-over'));
   _dragSrcIdx = -1;
 }
 
@@ -482,11 +529,11 @@ async function saveRules() {
   try {
     const now = new Date().toISOString();
     const [r1, r2] = await Promise.all([
-      sb.from('site_config').upsert(
+      getSb().from('site_config').upsert(
         { key: 'page_access_rules', value: currentRules, updated_at: now },
         { onConflict: 'key' }
       ),
-      sb.from('site_config').upsert(
+      getSb().from('site_config').upsert(
         { key: 'page_node_order', value: pageOrder, updated_at: now },
         { onConflict: 'key' }
       ),
@@ -524,7 +571,7 @@ async function saveTheme() {
   msgEl.textContent = '저장 중...';
   msgEl.className   = '';
   try {
-    const r = await sb.from('site_config').upsert(
+    const r = await getSb().from('site_config').upsert(
       { key: 'hub_theme', value: _currentTheme, updated_at: new Date().toISOString() },
       { onConflict: 'key' }
     );
@@ -551,7 +598,7 @@ async function saveBlur() {
   msgEl.textContent = '저장 중...';
   msgEl.className   = '';
   try {
-    const r = await sb.from('site_config').upsert(
+    const r = await getSb().from('site_config').upsert(
       { key: 'blur_intensity', value: v, updated_at: new Date().toISOString() },
       { onConflict: 'key' }
     );
