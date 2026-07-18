@@ -2054,7 +2054,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.43';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.7.44';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2560,17 +2560,23 @@ function buildTree(nodes, depth=0, path=[]) {
       labelEl.addEventListener('click', () => {
         if (node.coming) return;
         if (node.action) { node.action(); setActive(labelEl); return; }
-        if (node.partnerOnly && !IS_PARTNER) {
-          loadIframe(node.iframe, path, node.label); setActive(labelEl);
-          showAccessBlur('partner'); return;
-        }
-        if (node.adminOnly && userRole !== 'admin') {
-          loadIframe(node.iframe, path, node.label); setActive(labelEl);
-          showAccessBlur('admin'); return;
-        }
-        if (node.consultantOnly && !canConsult()) {
-          loadIframe(node.iframe, path, node.label); setActive(labelEl);
-          showAccessBlur('consultant'); return;
+        // DB 규칙이 명시적으로 있으면 노드 플래그(adminOnly 등) 무시
+        // → loadIframe() 내부에서 getAccessLevel()로 올바른 overlay 적용
+        const _hasDbRule = node.iframe && Object.prototype.hasOwnProperty.call(
+          pageAccessRules, node.iframe.split('?')[0]);
+        if (!_hasDbRule) {
+          if (node.partnerOnly && !IS_PARTNER) {
+            loadIframe(node.iframe, path, node.label); setActive(labelEl);
+            showAccessBlur('partner'); return;
+          }
+          if (node.adminOnly && userRole !== 'admin') {
+            loadIframe(node.iframe, path, node.label); setActive(labelEl);
+            showAccessBlur('admin'); return;
+          }
+          if (node.consultantOnly && !canConsult()) {
+            loadIframe(node.iframe, path, node.label); setActive(labelEl);
+            showAccessBlur('consultant'); return;
+          }
         }
         if (node.memberOnly && !authUser) {
           loadIframePreview(node.iframe, path, node.label);
