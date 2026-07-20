@@ -136,6 +136,7 @@ const I18N = {
     ph:"예: 직원 5명 제조업인데 연구소를 만들려고 합니다",
     results:n=>`관련 제도 ${n}건 (관련도 순)`,
     loading:"제도 카드 로드 중...", load_err:"데이터 로드 실패 — 새로고침 해주세요",
+    no_results:"관련도 높은 제도를 찾지 못했습니다. 다른 표현으로 다시 질문해 보세요.",
     target:"대상", benefit:"혜택", how:"방법", when:"시기",
     more:"상세 요건·신청방법 보기",
     catalog:"※ 개요 카드 — 상세는 원문·최신 공고 확인",
@@ -152,6 +153,7 @@ const I18N = {
     ph:"e.g. We are a 5-person manufacturer planning an R&D lab",
     results:n=>`${n} related programs (by relevance)`,
     loading:"Loading program cards...", load_err:"Failed to load data — please refresh",
+    no_results:"No sufficiently relevant program found. Try rephrasing your question.",
     target:"Eligibility", benefit:"Benefit", how:"How", when:"When",
     more:"View details & how to apply",
     catalog:"※ Overview card — check source docs / latest notices",
@@ -197,7 +199,14 @@ const _FV = new URLSearchParams(location.search).get("v") || Date.now();
 let CARDS = [], VECS = [], IDF = {};
 
 /* ───────── 검색: 문자 바이그램 TF-IDF 코사인 + 키워드 가점 ─────────
-   (biz-support/scripts/validate_static_search.py 와 동일 로직 — 검증됨) */
+   (biz-support/scripts/validate_static_search.py 와 동일 로직 — 19문항 검증됨) */
+const STOPWORDS = ["혜택은","혜택이","혜택","받을 수 있는","받으면","받고 싶어요","있나요","있죠",
+  "뭐가 좋아요","뭐가","무엇","어떻게","해주는","해야 할까요","궁금해요","싶은데","싶어요","싶습니다"];
+function stripStop(q) {
+  let out = q;
+  for (const s of STOPWORDS) out = out.split(s).join(" ");
+  return out;
+}
 function bigrams(s) {
   s = s.toLowerCase().replace(/[^0-9a-z가-힣]+/g, " ");
   const grams = [];
@@ -233,24 +242,36 @@ function buildIndex() {
     return v;
   });
 }
-function search(q, topK = 8) {
+// 관련도 임계값 — 무관한 카드로 결과를 채우지 않기 위한 컷오프
+// (top-1 대비 상대비율, 절대 하한, 무매칭 판정선 — validate_static_search.py 파라미터 스윕으로 확정)
+const REL_CUTOFF = 0.45, ABS_MIN = 0.07, NO_MATCH_FLOOR = 0.06;
+
+function search(q, topK = 6) {
+  const q2raw = stripStop(q);
+  const q2 = wordsOf(q2raw).length ? q2raw : q; // 전부 불용어면 원문 사용
   const qtf = {};
-  for (const g of bigrams(q)) qtf[g] = (qtf[g] || 0) + 1;
+  for (const g of bigrams(q2)) qtf[g] = (qtf[g] || 0) + 1;
   const qv = {}; let ss = 0;
   for (const g in qtf) { const x = (1 + Math.log(qtf[g])) * (IDF[g] !== undefined ? IDF[g] : 0.3); qv[g] = x; ss += x * x; }
   const qnorm = Math.sqrt(ss) || 1;
   for (const g in qv) qv[g] /= qnorm;
-  const qwords = wordsOf(q);
+  const qwords = wordsOf(q2);
   const scored = CARDS.map((c, i) => {
     let cos = 0;
     for (const g in qv) if (VECS[i][g]) cos += qv[g] * VECS[i][g];
     const hay = c.name + " " + (c.purpose || []).join(" ");
     let hits = 0;
-    for (const w of qwords) if (hay.includes(w)) hits++;
+    for (const w of qwords) {
+      if (hay.includes(w)) hits += 1;
+      else if (w.length > 2 && hay.includes(w.slice(0, 2))) hits += 0.5; // 조사 제거 근사
+    }
     return { c, score: cos + Math.min(hits * 0.03, 0.09) };
   });
   scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, topK);
+  const top = scored[0] ? scored[0].score : 0;
+  if (top < NO_MATCH_FLOOR) return [];
+  const cutoff = Math.max(ABS_MIN, top * REL_CUTOFF);
+  return scored.filter(s => s.score >= cutoff).slice(0, topK);
 }
 
 /* ───────── 렌더링 ───────── */
@@ -298,6 +319,10 @@ function doSearch(q) {
   status.textContent = t("searching");
   results.innerHTML = "";
   const top = search(q);
+  if (!top.length) {
+    status.textContent = t("no_results");
+    return;
+  }
   status.textContent = t("results")(top.length);
   for (const { c } of top) results.appendChild(renderCard(c));
 }
