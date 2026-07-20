@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>중소기업 지원제도 검색 (로컬 검증)</title>
+<style>
+  :root { --accent:#1a5c9e; --bg:#f7f8fa; --card:#ffffff; --text:#22303e; --muted:#5b6b7b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+  .wrap { max-width:860px; margin:0 auto; padding:24px 16px 60px; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  h1 { font-size:1.35rem; color:var(--accent); }
+  .lang-btn { border:1px solid #c8d2dc; background:#fff; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:.85rem; }
+  .lang-btn:focus-visible, input:focus-visible, button:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
+  p.desc { color:var(--muted); font-size:.9rem; margin-bottom:18px; }
+  form { display:flex; gap:8px; margin-bottom:10px; }
+  label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+  input[type=text] { flex:1; padding:12px 14px; border:1.5px solid #c8d2dc; border-radius:8px; font-size:1rem; }
+  button.go { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:0 22px; font-size:1rem; cursor:pointer; }
+  .samples { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:22px; }
+  .samples button { border:1px solid #d3dce5; background:#fff; color:var(--muted); border-radius:14px; padding:3px 12px; font-size:.8rem; cursor:pointer; }
+  .samples button:hover { border-color:var(--accent); color:var(--accent); }
+  #status { min-height:1.4em; color:var(--muted); font-size:.9rem; margin-bottom:10px; }
+  .card { background:var(--card); border:1px solid #e3e9ef; border-radius:10px; padding:16px 18px; margin-bottom:12px; }
+  .card h2 { font-size:1.05rem; color:var(--accent); display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .badge { font-size:.72rem; background:#eaf1f8; color:var(--accent); border-radius:10px; padding:2px 9px; align-self:center; white-space:nowrap; }
+  .score { font-size:.75rem; color:#8b98a5; font-weight:normal; }
+  .card p.sum { margin:8px 0 10px; }
+  .kv { font-size:.86rem; color:var(--muted); }
+  .kv b { color:var(--text); font-weight:600; }
+  .kv div { margin-bottom:3px; }
+  .src { font-size:.75rem; color:#94a1ae; margin-top:8px; }
+  .catalog-note { font-size:.75rem; color:#b06a00; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 data-i18n="title">중소기업 지원제도 검색 (로컬 검증)</h1>
+    <button class="lang-btn" id="langBtn" aria-label="Switch language">EN</button>
+  </header>
+  <p class="desc" data-i18n="desc">기업 현황이나 궁금한 점을 자연어로 입력하면 학습자료 기반 지원제도 카드를 유사도 순으로 보여줍니다. (외부 API 없음 · 로컬 임베딩)</p>
+
+  <form id="f" role="search">
+    <label class="sr" for="q" data-i18n="qlabel">질문 입력</label>
+    <input type="text" id="q" placeholder="예: 직원 5명 제조업인데 연구소를 만들려고 합니다" autocomplete="off">
+    <button class="go" type="submit" data-i18n="search">검색</button>
+  </form>
+
+  <div class="samples" id="samples" aria-label="샘플 질문"></div>
+  <div id="status" role="status" aria-live="polite"></div>
+  <div id="results"></div>
+</div>
+
+<script>
+const I18N = {
+  ko: {
+    title: "중소기업 지원제도 검색 (로컬 검증)",
+    desc: "기업 현황이나 궁금한 점을 자연어로 입력하면 학습자료 기반 지원제도 카드를 유사도 순으로 보여줍니다. (외부 API 없음 · 로컬 임베딩)",
+    qlabel: "질문 입력", search: "검색", searching: "검색 중...",
+    results: n => `관련 제도 ${n}건 (유사도 순)`,
+    target: "대상", benefit: "혜택", how: "방법", when: "시기",
+    catalogNote: "※ 개요 카드 — 상세는 원문 문서 참조", error: "검색 실패: 서버가 실행 중인지 확인하세요",
+    placeholder: "예: 직원 5명 제조업인데 연구소를 만들려고 합니다"
+  },
+  en: {
+    title: "SME Support Program Search (Local Test)",
+    desc: "Type your company situation or question in natural language to see matching support-program cards ranked by similarity. (No external API · local embeddings)",
+    qlabel: "Enter question", search: "Search", searching: "Searching...",
+    results: n => `${n} related programs (by similarity)`,
+    target: "Eligibility", benefit: "Benefit", how: "How", when: "When",
+    catalogNote: "※ Overview card — see source document for details", error: "Search failed: check that the server is running",
+    placeholder: "e.g. We are a 5-person manufacturer planning to set up an R&D lab"
+  }
+};
+let lang = "ko";
+const t = k => I18N[lang][k];
+
+const SAMPLES = [
+  "직원을 새로 뽑으면 받을 수 있는 혜택은?",
+  "개인사업자인데 법인전환 해야 할까요",
+  "연구소 설립 요건이 궁금해요",
+  "벤처기업 인증 받으면 뭐가 좋아요?",
+  "회사에 가수금이 많이 쌓여있어요",
+  "자녀에게 회사를 물려주고 싶습니다",
+  "설비 투자 계획이 있는데 세금 혜택이 있나요",
+  "육아휴직 간 직원 대체인력 지원"
+];
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.getElementById("q").placeholder = t("placeholder");
+  document.getElementById("langBtn").textContent = lang === "ko" ? "EN" : "KO";
+}
+
+document.getElementById("langBtn").addEventListener("click", () => {
+  lang = lang === "ko" ? "en" : "ko"; applyLang();
+});
+
+const samplesEl = document.getElementById("samples");
+SAMPLES.forEach(s => {
+  const b = document.createElement("button");
+  b.type = "button"; b.textContent = s;
+  b.addEventListener("click", () => { document.getElementById("q").value = s; doSearch(s); });
+  samplesEl.appendChild(b);
+});
+
+document.getElementById("f").addEventListener("submit", e => {
+  e.preventDefault();
+  const q = document.getElementById("q").value.trim();
+  if (q) doSearch(q);
+});
+
+async function doSearch(q) {
+  const status = document.getElementById("status");
+  const results = document.getElementById("results");
+  status.textContent = t("searching"); results.innerHTML = "";
+  try {
+    const r = await fetch("/api/search?q=" + encodeURIComponent(q));
+    const data = await r.json();
+    status.textContent = t("results")(data.results.length);
+    data.results.forEach(c => results.appendChild(renderCard(c)));
+  } catch (err) {
+    status.textContent = t("error");
+  }
+}
+
+function esc(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+
+function renderCard(c) {
+  const div = document.createElement("article");
+  div.className = "card";
+  div.innerHTML = `
+    <h2>${esc(c.name)}
+      <span><span class="badge">${esc(c.category)}</span>
+      <span class="score">${(c.score*100).toFixed(1)}%</span></span></h2>
+    <p class="sum">${esc(c.summary)}</p>
+    <div class="kv">
+      <div><b>${t("target")}:</b> ${esc(c.target)}</div>
+      <div><b>${t("benefit")}:</b> ${esc(c.benefit)}</div>
+      <div><b>${t("how")}:</b> ${esc(c.how)}</div>
+      <div><b>${t("when")}:</b> ${esc(c.when)}</div>
+    </div>
+    ${c.level === "catalog" ? `<div class="catalog-note">${t("catalogNote")}</div>` : ""}
+    <div class="src">📄 ${esc(c.source)}</div>`;
+  return div;
+}
+
+applyLang();
+</script>
+</body>
+</html>

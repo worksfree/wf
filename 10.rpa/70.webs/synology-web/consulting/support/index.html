@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- iframe hide 스크립트 없음 — 추가 금지 (허브 iframe 로드 시 헤더 유지) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중소기업 지원제도 내비게이터 — WorksFree</title>
+<style>
+:root {
+  --surface:#ffffff; --bg:#f6f7f9; --border:#e4e8ee;
+  --text:#22303e; --muted:#5b6b7b; --hint:#8b98a5;
+  --blue:#1a5c9e; --blue-soft:#eaf1f8; --amber:#b06a00; --green:#0e7a4e;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+/* ── 헤더 (스티키, 72px) ── */
+header {
+  position:sticky; top:0; z-index:100;
+  min-height:72px; padding:14px 24px;
+  display:flex; align-items:center; gap:14px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+}
+.hdr-icon  { font-size:26px; flex-shrink:0; }
+.hdr-info  { flex:1; }
+.hdr-title { font-size:17px; font-weight:600; letter-spacing:-.2px; }
+.hdr-sub   { font-size:13px; color:var(--muted); margin-top:2px; }
+.hdr-r     { margin-left:auto; flex-shrink:0; }
+.lang-btn  { border:1px solid var(--border); background:var(--surface); border-radius:6px; padding:4px 10px; cursor:pointer; font-size:12px; color:var(--muted); }
+
+button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
+
+/* ── 트렌드 배너 ── */
+.trend-banner { background:linear-gradient(135deg,#173f66,#1a5c9e); color:#fff; padding:26px 24px; }
+.trend-inner  { max-width:840px; margin:0 auto; }
+.trend-title  { font-size:15px; font-weight:600; margin-bottom:14px; opacity:.95; }
+.trend-grid   { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+.trend-stat   { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); border-radius:10px; padding:12px 14px; }
+.ts-val   { font-size:22px; font-weight:700; letter-spacing:-.5px; }
+.ts-label { font-size:12px; opacity:.85; margin-top:2px; }
+.trend-note { font-size:12px; opacity:.8; margin-top:12px; }
+
+/* ── 콘텐츠 ── */
+.page { max-width:840px; margin:0 auto; padding:22px 18px 72px; }
+form.search { display:flex; gap:8px; }
+label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+input[type=text] { flex:1; padding:13px 15px; border:1.5px solid var(--border); border-radius:10px; font-size:15px; background:var(--surface); }
+button.go { background:var(--blue); color:#fff; border:none; border-radius:10px; padding:0 24px; font-size:15px; cursor:pointer; }
+.samples { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 4px; }
+.samples button { border:1px solid var(--border); background:var(--surface); color:var(--muted); border-radius:14px; padding:3px 12px; font-size:12px; cursor:pointer; }
+.samples button:hover { border-color:var(--blue); color:var(--blue); }
+#status { min-height:1.5em; color:var(--muted); font-size:13px; margin:10px 0; }
+
+/* ── 결과 카드 + 헤드라인 배지 ── */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0; margin-bottom:14px; overflow:hidden; }
+.card-head { display:flex; gap:14px; align-items:stretch; }
+.headline {
+  flex:0 0 148px; background:var(--blue-soft); padding:14px 12px;
+  display:flex; flex-direction:column; justify-content:center; text-align:center;
+  border-right:1px solid var(--border);
+}
+.hl-value { font-size:21px; font-weight:800; color:var(--blue); letter-spacing:-.5px; line-height:1.2; }
+.hl-label { font-size:11.5px; color:var(--muted); margin-top:3px; font-weight:600; }
+.hl-note  { font-size:10.5px; color:var(--hint); margin-top:2px; }
+.headline.none { background:var(--surface); }
+.hl-icon { font-size:30px; }
+.card-main { flex:1; padding:14px 16px 6px 2px; min-width:0; }
+.card h2 { font-size:15.5px; color:var(--blue); display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.badge { font-size:11px; background:var(--blue-soft); color:var(--blue); border-radius:10px; padding:2px 9px; align-self:center; white-space:nowrap; font-weight:500; }
+.card p.sum { margin:7px 0 0; font-size:13.5px; }
+.card-body { padding:0 16px 14px; }
+.kv { font-size:12.5px; color:var(--muted); margin-top:8px; }
+.kv b { color:var(--text); font-weight:600; }
+.kv div { margin-bottom:3px; }
+.src { font-size:11px; color:var(--hint); margin-top:8px; }
+.catalog-note { font-size:11px; color:var(--amber); margin-top:6px; }
+details.more summary { cursor:pointer; font-size:12px; color:var(--blue); margin-top:8px; }
+.disclaim { font-size:11.5px; color:var(--hint); margin-top:26px; border-top:1px solid var(--border); padding-top:12px; }
+@media (max-width:560px) {
+  .card-head { flex-direction:column; }
+  .headline { flex-basis:auto; border-right:none; border-bottom:1px solid var(--border); flex-direction:row; gap:10px; align-items:baseline; justify-content:flex-start; padding:10px 16px; }
+  .card-main { padding:12px 16px 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">🎯</div>
+  <div class="hdr-info">
+    <div class="hdr-title" id="hdr-title">중소기업 지원제도 내비게이터</div>
+    <div class="hdr-sub" id="hdr-sub">기업 상황을 입력하면 맞는 지원제도를 찾아드립니다 · 조세감면 | 고용지원금 | 정책자금 | 벤처·연구소</div>
+  </div>
+  <div class="hdr-r"><button class="lang-btn" id="langBtn" aria-label="Switch language">EN</button></div>
+</header>
+
+<div class="trend-banner">
+  <div class="trend-inner">
+    <div class="trend-title" id="tb-title">놓치면 손해 — 중소기업이 받을 수 있는 대표 혜택</div>
+    <div class="trend-grid">
+      <div class="trend-stat"><div class="ts-val">100%</div><div class="ts-label" id="ts1">창업·벤처 법인세 감면 (5년, 최대)</div></div>
+      <div class="trend-stat"><div class="ts-val">2,000만원</div><div class="ts-label" id="ts2">고용증가 인당 세액공제 (3년, 최대)</div></div>
+      <div class="trend-stat"><div class="ts-val">25~40%</div><div class="ts-label" id="ts3">R&D 비용 세액공제</div></div>
+      <div class="trend-stat"><div class="ts-val" id="ts4-val">52건</div><div class="ts-label" id="ts4">지원제도 카드 (원문 문서 기반)</div></div>
+    </div>
+    <div class="trend-note" id="tb-note"><strong>핵심 문제:</strong> 제도는 있는데 우리 회사에 뭐가 해당되는지 모른다 — 아래에 상황을 그대로 적어보세요.</div>
+  </div>
+</div>
+
+<div class="page">
+  <form class="search" id="f" role="search">
+    <label class="sr" for="q" id="q-label">질문 입력</label>
+    <input type="text" id="q" placeholder="예: 직원 5명 제조업인데 연구소를 만들려고 합니다" autocomplete="off">
+    <button class="go" type="submit" id="goBtn">검색</button>
+  </form>
+  <div class="samples" id="samples" aria-label="샘플 질문"></div>
+  <div id="status" role="status" aria-live="polite"></div>
+  <div id="results"></div>
+  <div class="disclaim" id="disclaim">
+    ※ 본 자료는 2024~2026년 발간 공공자료(중소기업 조세지원, 고용장려금 지원제도, 중소벤처기업 지원사업 통합공고 등)를 기반으로 요약한 참고 정보입니다.
+    지원율·금액·요건은 연도별로 변경되므로 실행 전 반드시 최신 공고와 전문가 확인이 필요합니다.
+  </div>
+</div>
+
+<script>
+/* ───────── i18n ───────── */
+const I18N = {
+  ko: {
+    hdr_title:"중소기업 지원제도 내비게이터",
+    hdr_sub:"기업 상황을 입력하면 맞는 지원제도를 찾아드립니다 · 조세감면 | 고용지원금 | 정책자금 | 벤처·연구소",
+    tb_title:"놓치면 손해 — 중소기업이 받을 수 있는 대표 혜택",
+    ts1:"창업·벤처 법인세 감면 (5년, 최대)", ts2:"고용증가 인당 세액공제 (3년, 최대)",
+    ts3:"R&D 비용 세액공제", ts4:"지원제도 카드 (원문 문서 기반)",
+    tb_note:"<strong>핵심 문제:</strong> 제도는 있는데 우리 회사에 뭐가 해당되는지 모른다 — 아래에 상황을 그대로 적어보세요.",
+    q_label:"질문 입력", go:"검색", searching:"검색 중...",
+    ph:"예: 직원 5명 제조업인데 연구소를 만들려고 합니다",
+    results:n=>`관련 제도 ${n}건 (관련도 순)`,
+    loading:"제도 카드 로드 중...", load_err:"데이터 로드 실패 — 새로고침 해주세요",
+    target:"대상", benefit:"혜택", how:"방법", when:"시기",
+    more:"상세 요건·신청방법 보기",
+    catalog:"※ 개요 카드 — 상세는 원문·최신 공고 확인",
+    disclaim:"※ 본 자료는 2024~2026년 발간 공공자료(중소기업 조세지원, 고용장려금 지원제도, 중소벤처기업 지원사업 통합공고 등)를 기반으로 요약한 참고 정보입니다. 지원율·금액·요건은 연도별로 변경되므로 실행 전 반드시 최신 공고와 전문가 확인이 필요합니다."
+  },
+  en: {
+    hdr_title:"SME Support Program Navigator",
+    hdr_sub:"Describe your company's situation to find matching programs · Tax relief | Hiring subsidies | Policy funds | Venture·R&D",
+    tb_title:"Don't miss out — key benefits for SMEs",
+    ts1:"Corporate tax relief for startups/ventures (5yr, max)", ts2:"Tax credit per new hire (3yr, max)",
+    ts3:"R&D expense tax credit", ts4:"Program cards (from source documents)",
+    tb_note:"<strong>The problem:</strong> programs exist, but which ones apply to you? Just type your situation below.",
+    q_label:"Enter question", go:"Search", searching:"Searching...",
+    ph:"e.g. We are a 5-person manufacturer planning an R&D lab",
+    results:n=>`${n} related programs (by relevance)`,
+    loading:"Loading program cards...", load_err:"Failed to load data — please refresh",
+    target:"Eligibility", benefit:"Benefit", how:"How", when:"When",
+    more:"View details & how to apply",
+    catalog:"※ Overview card — check source docs / latest notices",
+    disclaim:"※ Summarized from public documents published 2024–2026 (SME tax support, employment subsidies, SME support program notices). Rates, amounts and criteria change yearly — always verify the latest notice and consult a professional before acting."
+  }
+};
+let lang = "ko";
+const t = k => I18N[lang][k];
+
+const SAMPLES = [
+  "직원을 새로 뽑으면 받을 수 있는 혜택은?",
+  "개인사업자인데 법인전환 해야 할까요",
+  "연구소 설립 요건이 궁금해요",
+  "벤처기업 인증 받으면 뭐가 좋아요?",
+  "창업자금 대출 받고 싶어요",
+  "수출을 시작하려는데 지원이 있나요",
+  "스마트공장 만들고 싶어요",
+  "자녀에게 회사를 물려주고 싶습니다",
+  "매출이 급감해서 인건비가 부담돼요",
+  "회사에 가지급금이 쌓여있어요"
+];
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.getElementById("hdr-title").textContent = t("hdr_title");
+  document.getElementById("hdr-sub").textContent = t("hdr_sub");
+  document.getElementById("tb-title").textContent = t("tb_title");
+  document.getElementById("ts1").textContent = t("ts1");
+  document.getElementById("ts2").textContent = t("ts2");
+  document.getElementById("ts3").textContent = t("ts3");
+  document.getElementById("ts4").textContent = t("ts4");
+  document.getElementById("tb-note").innerHTML = t("tb_note");
+  document.getElementById("q-label").textContent = t("q_label");
+  document.getElementById("goBtn").textContent = t("go");
+  document.getElementById("q").placeholder = t("ph");
+  document.getElementById("disclaim").textContent = t("disclaim");
+  document.getElementById("langBtn").textContent = lang === "ko" ? "EN" : "KO";
+}
+document.getElementById("langBtn").addEventListener("click", () => { lang = lang === "ko" ? "en" : "ko"; applyLang(); });
+
+/* ───────── 데이터 로드 (캐시 버스팅: 허브 ?v= 재사용) ───────── */
+const _FV = new URLSearchParams(location.search).get("v") || Date.now();
+let CARDS = [], VECS = [], IDF = {};
+
+/* ───────── 검색: 문자 바이그램 TF-IDF 코사인 + 키워드 가점 ─────────
+   (biz-support/scripts/validate_static_search.py 와 동일 로직 — 검증됨) */
+function bigrams(s) {
+  s = s.toLowerCase().replace(/[^0-9a-z가-힣]+/g, " ");
+  const grams = [];
+  for (const tok of s.split(" ")) {
+    if (!tok) continue;
+    if (tok.length === 1) grams.push(tok);
+    for (let i = 0; i < tok.length - 1; i++) grams.push(tok.slice(i, i + 2));
+  }
+  return grams;
+}
+function wordsOf(s) {
+  return s.toLowerCase().split(/[^0-9a-z가-힣]+/).filter(w => w.length >= 2);
+}
+function cardText(c) {
+  const head = c.name + " " + (c.purpose || []).join(" ");
+  return [head, head, head, c.category || "", c.summary || "", c.target || "", c.benefit || ""].join(" ");
+}
+function buildIndex() {
+  const docs = CARDS.map(c => {
+    const tf = {};
+    for (const g of bigrams(cardText(c))) tf[g] = (tf[g] || 0) + 1;
+    return tf;
+  });
+  const n = docs.length, df = {};
+  for (const d of docs) for (const g in d) df[g] = (df[g] || 0) + 1;
+  IDF = {};
+  for (const g in df) IDF[g] = Math.log(1 + n / (1 + df[g]));
+  VECS = docs.map(d => {
+    const v = {}; let ss = 0;
+    for (const g in d) { const x = (1 + Math.log(d[g])) * (IDF[g] || 0); v[g] = x; ss += x * x; }
+    const norm = Math.sqrt(ss) || 1;
+    for (const g in v) v[g] /= norm;
+    return v;
+  });
+}
+function search(q, topK = 8) {
+  const qtf = {};
+  for (const g of bigrams(q)) qtf[g] = (qtf[g] || 0) + 1;
+  const qv = {}; let ss = 0;
+  for (const g in qtf) { const x = (1 + Math.log(qtf[g])) * (IDF[g] !== undefined ? IDF[g] : 0.3); qv[g] = x; ss += x * x; }
+  const qnorm = Math.sqrt(ss) || 1;
+  for (const g in qv) qv[g] /= qnorm;
+  const qwords = wordsOf(q);
+  const scored = CARDS.map((c, i) => {
+    let cos = 0;
+    for (const g in qv) if (VECS[i][g]) cos += qv[g] * VECS[i][g];
+    const hay = c.name + " " + (c.purpose || []).join(" ");
+    let hits = 0;
+    for (const w of qwords) if (hay.includes(w)) hits++;
+    return { c, score: cos + Math.min(hits * 0.03, 0.09) };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, topK);
+}
+
+/* ───────── 렌더링 ───────── */
+const CAT_ICONS = { "조세지원":"🧾", "고용지원금":"👥", "R&D·인증":"🔬", "정책자금·지원사업":"🏦", "법인운영·승계":"🏢" };
+function esc(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+
+function renderCard(c) {
+  const art = document.createElement("article");
+  art.className = "card";
+  const hl = c.headline
+    ? `<div class="headline">
+         <div class="hl-value">${esc(c.headline.value)}</div>
+         <div class="hl-label">${esc(c.headline.label)}</div>
+         ${c.headline.note ? `<div class="hl-note">${esc(c.headline.note)}</div>` : ""}
+       </div>`
+    : `<div class="headline none"><div class="hl-icon" aria-hidden="true">${CAT_ICONS[c.category] || "📌"}</div></div>`;
+  art.innerHTML = `
+    <div class="card-head">
+      ${hl}
+      <div class="card-main">
+        <h2>${esc(c.name)} <span class="badge">${esc(c.category)}</span></h2>
+        <p class="sum">${esc(c.summary)}</p>
+      </div>
+    </div>
+    <div class="card-body">
+      <details class="more">
+        <summary>${t("more")}</summary>
+        <div class="kv">
+          <div><b>${t("target")}:</b> ${esc(c.target)}</div>
+          <div><b>${t("benefit")}:</b> ${esc(c.benefit)}</div>
+          <div><b>${t("how")}:</b> ${esc(c.how)}</div>
+          <div><b>${t("when")}:</b> ${esc(c.when)}</div>
+        </div>
+      </details>
+      ${c.level === "catalog" ? `<div class="catalog-note">${t("catalog")}</div>` : ""}
+      <div class="src">📄 ${esc(c.source)}</div>
+    </div>`;
+  return art;
+}
+
+function doSearch(q) {
+  const status = document.getElementById("status");
+  const results = document.getElementById("results");
+  if (!CARDS.length) { status.textContent = t("loading"); return; }
+  status.textContent = t("searching");
+  results.innerHTML = "";
+  const top = search(q);
+  status.textContent = t("results")(top.length);
+  for (const { c } of top) results.appendChild(renderCard(c));
+}
+
+document.getElementById("f").addEventListener("submit", e => {
+  e.preventDefault();
+  const q = document.getElementById("q").value.trim();
+  if (q) doSearch(q);
+});
+const samplesEl = document.getElementById("samples");
+for (const s of SAMPLES) {
+  const b = document.createElement("button");
+  b.type = "button"; b.textContent = s;
+  b.addEventListener("click", () => { document.getElementById("q").value = s; doSearch(s); });
+  samplesEl.appendChild(b);
+}
+
+fetch("cards.json?v=" + _FV)
+  .then(r => r.json())
+  .then(data => {
+    CARDS = data;
+    buildIndex();
+    const el = document.getElementById("ts4-val");
+    if (el) el.textContent = CARDS.length + (lang === "ko" ? "건" : "");
+  })
+  .catch(() => { document.getElementById("status").textContent = t("load_err"); });
+
+applyLang();
+</script>
+</body>
+</html>
