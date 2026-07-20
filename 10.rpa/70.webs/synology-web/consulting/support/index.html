@@ -52,8 +52,9 @@ button.go { background:var(--blue); color:#fff; border:none; border-radius:10px;
 #status { min-height:1.5em; color:var(--muted); font-size:13px; margin:10px 0; }
 
 /* ── 결과 카드 + 헤드라인 배지 ── */
-.card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0; margin-bottom:14px; overflow:hidden; }
-.card-head { display:flex; gap:14px; align-items:stretch; }
+.card { position:relative; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0; margin-bottom:14px; overflow:hidden; }
+.card.picked { outline:2px solid var(--blue); outline-offset:-2px; }
+.card-head { display:flex; gap:14px; align-items:stretch; padding-right:36px; }
 .headline {
   flex:0 0 148px; background:var(--blue-soft); padding:14px 12px;
   display:flex; flex-direction:column; justify-content:center; text-align:center;
@@ -80,6 +81,56 @@ details.more summary { cursor:pointer; font-size:12px; color:var(--blue); margin
   .card-head { flex-direction:column; }
   .headline { flex-basis:auto; border-right:none; border-bottom:1px solid var(--border); flex-direction:row; gap:10px; align-items:baseline; justify-content:flex-start; padding:10px 16px; }
   .card-main { padding:12px 16px 0 16px; }
+}
+
+/* ── 카드 선택 체크박스 (카드 우상단 오버레이) ── */
+.pick-wrap { position:absolute; top:12px; right:12px; z-index:2; }
+.pick-cb { width:19px; height:19px; cursor:pointer; accent-color:var(--blue); }
+
+/* ── 선택 액션 바 (스티키, 하단) ── */
+.pick-bar {
+  position:sticky; bottom:0; z-index:50; display:flex;
+  background:var(--surface); border-top:1px solid var(--border);
+  box-shadow:0 -4px 14px rgba(20,40,70,.08);
+  padding:10px 18px; margin:18px -18px 0; align-items:center; gap:12px;
+}
+.pick-count { font-size:13px; color:var(--muted); flex:1; }
+.pick-count b { color:var(--text); }
+.pick-bar button { border:none; border-radius:8px; padding:9px 16px; font-size:13.5px; cursor:pointer; }
+.pick-clear { background:var(--surface); border:1px solid var(--border) !important; color:var(--muted); }
+.pick-report { background:var(--blue); color:#fff; font-weight:600; }
+.pick-report:disabled { background:#a9bfd4; cursor:not-allowed; }
+
+/* ── 보고서 오버레이 ── */
+.report-overlay { display:none; position:fixed; inset:0; background:#fff; z-index:200; overflow-y:auto; }
+.report-overlay.open { display:block; }
+.rpt-topbar {
+  position:sticky; top:0; z-index:2; background:var(--surface);
+  border-bottom:1px solid var(--border); padding:14px 22px;
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+}
+.rpt-topbar .rpt-h { font-size:15px; font-weight:700; color:var(--blue); }
+.rpt-actions button { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; margin-left:8px; }
+.rpt-actions .rpt-print { background:var(--blue); color:#fff; border-color:var(--blue); }
+.rpt-body { max-width:760px; margin:0 auto; padding:26px 22px 60px; }
+.rpt-meta { font-size:12.5px; color:var(--muted); margin-bottom:22px; }
+.rpt-meta div { margin-bottom:3px; }
+.rpt-cat { font-size:12px; font-weight:700; color:var(--blue); text-transform:uppercase; letter-spacing:.4px; margin:22px 0 10px; padding-bottom:5px; border-bottom:2px solid var(--blue-soft); }
+.rpt-cat:first-of-type { margin-top:0; }
+.rpt-item { border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:12px; }
+.rpt-item-head { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+.rpt-item-name { font-size:14.5px; font-weight:700; color:var(--text); }
+.rpt-item-hl { font-size:13px; font-weight:700; color:var(--blue); background:var(--blue-soft); border-radius:6px; padding:1px 8px; }
+.rpt-item p { font-size:13px; margin:4px 0; }
+.rpt-item .rpt-kv b { color:var(--text); }
+.rpt-item .rpt-kv { font-size:12.5px; color:var(--muted); }
+.rpt-item .rpt-src { font-size:11px; color:var(--hint); margin-top:6px; }
+.rpt-foot { font-size:11.5px; color:var(--hint); margin-top:30px; border-top:1px solid var(--border); padding-top:14px; }
+@media print {
+  body > *:not(.report-overlay) { display:none !important; }
+  .report-overlay { display:block !important; position:static !important; }
+  .rpt-topbar { display:none !important; }
+  .rpt-item { break-inside:avoid; }
 }
 </style>
 </head>
@@ -116,10 +167,26 @@ details.more summary { cursor:pointer; font-size:12px; color:var(--blue); margin
   <div class="samples" id="samples" aria-label="샘플 질문"></div>
   <div id="status" role="status" aria-live="polite"></div>
   <div id="results"></div>
+  <div class="pick-bar" id="pickBar">
+    <div class="pick-count" id="pickCount"></div>
+    <button class="pick-clear" id="pickClearBtn" type="button">선택 해제</button>
+    <button class="pick-report" id="pickReportBtn" type="button" disabled>📋 보고서 생성</button>
+  </div>
   <div class="disclaim" id="disclaim">
     ※ 본 자료는 2024~2026년 발간 공공자료(중소기업 조세지원, 고용장려금 지원제도, 중소벤처기업 지원사업 통합공고 등)를 기반으로 요약한 참고 정보입니다.
     지원율·금액·요건은 연도별로 변경되므로 실행 전 반드시 최신 공고와 전문가 확인이 필요합니다.
   </div>
+</div>
+
+<div class="report-overlay" id="reportOverlay" role="dialog" aria-modal="true" aria-labelledby="rptHeading">
+  <div class="rpt-topbar">
+    <div class="rpt-h" id="rptHeading">선택 제도 검토 보고서</div>
+    <div class="rpt-actions">
+      <button type="button" class="rpt-print" onclick="window.print()" id="rptPrintBtn">인쇄</button>
+      <button type="button" id="rptCloseBtn">닫기</button>
+    </div>
+  </div>
+  <div class="rpt-body" id="rptBody"></div>
 </div>
 
 <script>
@@ -140,7 +207,15 @@ const I18N = {
     target:"대상", benefit:"혜택", how:"방법", when:"시기",
     more:"상세 요건·신청방법 보기",
     catalog:"※ 개요 카드 — 상세는 원문·최신 공고 확인",
-    disclaim:"※ 본 자료는 2024~2026년 발간 공공자료(중소기업 조세지원, 고용장려금 지원제도, 중소벤처기업 지원사업 통합공고 등)를 기반으로 요약한 참고 정보입니다. 지원율·금액·요건은 연도별로 변경되므로 실행 전 반드시 최신 공고와 전문가 확인이 필요합니다."
+    disclaim:"※ 본 자료는 2024~2026년 발간 공공자료(중소기업 조세지원, 고용장려금 지원제도, 중소벤처기업 지원사업 통합공고 등)를 기반으로 요약한 참고 정보입니다. 지원율·금액·요건은 연도별로 변경되므로 실행 전 반드시 최신 공고와 전문가 확인이 필요합니다.",
+    pick_label:c=>`${c} 선택`,
+    pick_count:n=>n>0?`<b>${n}건</b> 선택됨`:"검토할 제도를 체크하세요",
+    pick_clear:"선택 해제", pick_report:"📋 보고서 생성",
+    rpt_heading:"선택 제도 검토 보고서", rpt_print:"인쇄", rpt_close:"닫기",
+    rpt_generated:"생성일", rpt_count:n=>`선택된 제도 ${n}건`,
+    rpt_target:"대상", rpt_benefit:"혜택", rpt_how:"신청방법", rpt_when:"시기",
+    rpt_foot:"※ 본 보고서는 선택한 제도의 원문 요약을 조합해 자동 생성되었습니다. 실행 전 반드시 최신 공고와 전문가 확인이 필요합니다.",
+    cat_names:{"조세지원":"조세지원","고용지원금":"고용지원금","R&D·인증":"R&D·인증","정책자금·지원사업":"정책자금·지원사업","법인운영·승계":"법인운영·승계"}
   },
   en: {
     hdr_title:"SME Support Program Navigator",
@@ -157,7 +232,15 @@ const I18N = {
     target:"Eligibility", benefit:"Benefit", how:"How", when:"When",
     more:"View details & how to apply",
     catalog:"※ Overview card — check source docs / latest notices",
-    disclaim:"※ Summarized from public documents published 2024–2026 (SME tax support, employment subsidies, SME support program notices). Rates, amounts and criteria change yearly — always verify the latest notice and consult a professional before acting."
+    disclaim:"※ Summarized from public documents published 2024–2026 (SME tax support, employment subsidies, SME support program notices). Rates, amounts and criteria change yearly — always verify the latest notice and consult a professional before acting.",
+    pick_label:c=>`Select ${c}`,
+    pick_count:n=>n>0?`<b>${n}</b> selected`:"Check programs to review",
+    pick_clear:"Clear selection", pick_report:"📋 Generate Report",
+    rpt_heading:"Selected Programs — Review Report", rpt_print:"Print", rpt_close:"Close",
+    rpt_generated:"Generated", rpt_count:n=>`${n} programs selected`,
+    rpt_target:"Eligibility", rpt_benefit:"Benefit", rpt_how:"How to apply", rpt_when:"When",
+    rpt_foot:"※ This report was auto-assembled from the summaries of the selected programs. Always verify the latest notice and consult a professional before acting.",
+    cat_names:{"조세지원":"Tax Relief","고용지원금":"Employment Subsidy","R&D·인증":"R&D · Certification","정책자금·지원사업":"Policy Fund · Program","법인운영·승계":"Corp. Mgmt · Succession"}
   }
 };
 let lang = "ko";
@@ -191,6 +274,17 @@ function applyLang() {
   document.getElementById("q").placeholder = t("ph");
   document.getElementById("disclaim").textContent = t("disclaim");
   document.getElementById("langBtn").textContent = lang === "ko" ? "EN" : "KO";
+  document.getElementById("pickClearBtn").textContent = t("pick_clear");
+  document.getElementById("pickReportBtn").textContent = t("pick_report");
+  document.getElementById("rptHeading").textContent = t("rpt_heading");
+  document.getElementById("rptPrintBtn").textContent = t("rpt_print");
+  document.getElementById("rptCloseBtn").textContent = t("rpt_close");
+  updatePickBar();
+  document.querySelectorAll(".pick-cb").forEach(cb => {
+    const c = CARDS.find(x => x.id === cb.dataset.id);
+    if (c) cb.setAttribute("aria-label", t("pick_label")(c.name));
+  });
+  if (document.getElementById("reportOverlay").classList.contains("open")) renderReport();
 }
 document.getElementById("langBtn").addEventListener("click", () => { lang = lang === "ko" ? "en" : "ko"; applyLang(); });
 
@@ -277,10 +371,12 @@ function search(q, topK = 6) {
 /* ───────── 렌더링 ───────── */
 const CAT_ICONS = { "조세지원":"🧾", "고용지원금":"👥", "R&D·인증":"🔬", "정책자금·지원사업":"🏦", "법인운영·승계":"🏢" };
 function esc(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+function escAttr(s) { return esc(s).replace(/"/g, "&quot;"); }
 
 function renderCard(c) {
   const art = document.createElement("article");
-  art.className = "card";
+  art.className = "card" + (SELECTED.has(c.id) ? " picked" : "");
+  art.dataset.id = c.id;
   const hl = c.headline
     ? `<div class="headline">
          <div class="hl-value">${esc(c.headline.value)}</div>
@@ -289,6 +385,10 @@ function renderCard(c) {
        </div>`
     : `<div class="headline none"><div class="hl-icon" aria-hidden="true">${CAT_ICONS[c.category] || "📌"}</div></div>`;
   art.innerHTML = `
+    <div class="pick-wrap">
+      <input type="checkbox" class="pick-cb" data-id="${escAttr(c.id)}"
+        aria-label="${escAttr(t("pick_label")(c.name))}" ${SELECTED.has(c.id) ? "checked" : ""}>
+    </div>
     <div class="card-head">
       ${hl}
       <div class="card-main">
@@ -311,6 +411,80 @@ function renderCard(c) {
     </div>`;
   return art;
 }
+
+/* ───────── 카드 선택 & 보고서 조립 ───────── */
+const SELECTED = new Map(); // id -> card (검색 결과가 바뀌어도 선택은 유지)
+
+function updatePickBar() {
+  const n = SELECTED.size;
+  document.getElementById("pickCount").innerHTML = t("pick_count")(n);
+  document.getElementById("pickReportBtn").disabled = n === 0;
+}
+
+document.getElementById("results").addEventListener("change", e => {
+  if (!e.target.classList.contains("pick-cb")) return;
+  const id = e.target.dataset.id;
+  const card = CARDS.find(c => c.id === id);
+  if (!card) return;
+  if (e.target.checked) SELECTED.set(id, card); else SELECTED.delete(id);
+  e.target.closest(".card").classList.toggle("picked", e.target.checked);
+  updatePickBar();
+});
+
+document.getElementById("pickClearBtn").addEventListener("click", () => {
+  SELECTED.clear();
+  document.querySelectorAll(".pick-cb").forEach(cb => { cb.checked = false; cb.closest(".card").classList.remove("picked"); });
+  updatePickBar();
+});
+
+function renderReport() {
+  const body = document.getElementById("rptBody");
+  const cards = Array.from(SELECTED.values());
+  const byCat = {};
+  for (const c of cards) (byCat[c.category] = byCat[c.category] || []).push(c);
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString(lang === "ko" ? "ko-KR" : "en-US", { year:"numeric", month:"long", day:"numeric" });
+
+  let html = `
+    <div class="rpt-meta">
+      <div>${t("rpt_generated")}: ${esc(dateStr)}</div>
+      <div>${esc(t("rpt_count")(cards.length))}</div>
+    </div>`;
+
+  for (const cat of Object.keys(byCat)) {
+    const catLabel = (I18N[lang].cat_names && I18N[lang].cat_names[cat]) || cat;
+    html += `<div class="rpt-cat">${esc(catLabel)}</div>`;
+    for (const c of byCat[cat]) {
+      html += `
+        <div class="rpt-item">
+          <div class="rpt-item-head">
+            <div class="rpt-item-name">${esc(c.name)}</div>
+            ${c.headline ? `<div class="rpt-item-hl">${esc(c.headline.value)} · ${esc(c.headline.label)}</div>` : ""}
+          </div>
+          <p>${esc(c.summary)}</p>
+          <div class="rpt-kv">
+            <div><b>${t("rpt_target")}:</b> ${esc(c.target)}</div>
+            <div><b>${t("rpt_benefit")}:</b> ${esc(c.benefit)}</div>
+            <div><b>${t("rpt_how")}:</b> ${esc(c.how)}</div>
+            <div><b>${t("rpt_when")}:</b> ${esc(c.when)}</div>
+          </div>
+          <div class="rpt-src">📄 ${esc(c.source)}</div>
+        </div>`;
+    }
+  }
+  html += `<div class="rpt-foot">${esc(t("rpt_foot"))}</div>`;
+  body.innerHTML = html;
+}
+
+document.getElementById("pickReportBtn").addEventListener("click", () => {
+  if (!SELECTED.size) return;
+  renderReport();
+  document.getElementById("reportOverlay").classList.add("open");
+});
+document.getElementById("rptCloseBtn").addEventListener("click", () => {
+  document.getElementById("reportOverlay").classList.remove("open");
+});
 
 function doSearch(q) {
   const status = document.getElementById("status");
