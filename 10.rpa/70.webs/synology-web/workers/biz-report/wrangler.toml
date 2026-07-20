@@ -1,0 +1,6 @@
+name               = "biz-report"
+main               = "worker.js"
+compatibility_date = "2025-01-01"
+
+# ANTHROPIC_API_KEY 는 시크릿으로만 설정한다 (여기 평문 기재 금지):
+#   npx wrangler secret put ANTHROPIC_API_KEY

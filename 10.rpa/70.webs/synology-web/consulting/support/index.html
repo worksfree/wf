@@ -125,7 +125,27 @@ details.more summary { cursor:pointer; font-size:12px; color:var(--blue); margin
 .rpt-item .rpt-kv b { color:var(--text); }
 .rpt-item .rpt-kv { font-size:12.5px; color:var(--muted); }
 .rpt-item .rpt-src { font-size:11px; color:var(--hint); margin-top:6px; }
+.rpt-detail { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
+.rpt-d-sec { font-size:12.5px; margin-bottom:8px; }
+.rpt-d-sec b { display:block; color:var(--text); margin-bottom:3px; }
+.rpt-d-sec ul, .rpt-d-sec ol { margin:0 0 0 18px; padding:0; color:var(--muted); }
+.rpt-d-sec li { margin-bottom:2px; }
+.rpt-d-grid { display:flex; flex-wrap:wrap; gap:16px; font-size:12.5px; color:var(--muted); margin-bottom:8px; }
+.rpt-d-grid b { color:var(--text); }
+.rpt-caution b { color:var(--amber); }
+.rpt-caution ul { color:var(--amber); }
 .rpt-foot { font-size:11.5px; color:var(--hint); margin-top:30px; border-top:1px solid var(--border); padding-top:14px; }
+
+/* ── AI 종합 분석 블록 (유료, Cloudflare Worker 경유) ── */
+.rpt-ai { background:linear-gradient(135deg,#f3f7fc,#eaf1f8); border:1px solid #cfe0f0; border-radius:10px; padding:16px; margin-bottom:22px; }
+.rpt-ai-h { font-size:13.5px; font-weight:700; color:var(--blue); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.ai-gen-btn { background:var(--blue); color:#fff; border:none; border-radius:8px; padding:9px 16px; font-size:13px; cursor:pointer; font-weight:600; }
+.ai-gen-btn:disabled { background:#a9bfd4; cursor:wait; }
+.ai-msg { font-size:12.5px; padding:10px 12px; border-radius:8px; margin-top:8px; }
+.ai-warn { background:#fff3e0; color:var(--amber); }
+.ai-error { background:#fdecea; color:#b3261e; }
+.ai-text { font-size:13px; margin-top:6px; white-space:pre-wrap; }
+.ai-regen { background:none; border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:4px 10px; font-size:11.5px; cursor:pointer; margin-top:10px; }
 @media print {
   body > *:not(.report-overlay) { display:none !important; }
   .report-overlay { display:block !important; position:static !important; }
@@ -189,6 +209,7 @@ details.more summary { cursor:pointer; font-size:12px; color:var(--blue); margin
   <div class="rpt-body" id="rptBody"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ───────── i18n ───────── */
 const I18N = {
@@ -214,7 +235,12 @@ const I18N = {
     rpt_heading:"선택 제도 검토 보고서", rpt_print:"인쇄", rpt_close:"닫기",
     rpt_generated:"생성일", rpt_count:n=>`선택된 제도 ${n}건`,
     rpt_target:"대상", rpt_benefit:"혜택", rpt_how:"신청방법", rpt_when:"시기",
+    rpt_documents:"필요서류", rpt_agency:"소관·신청기관", rpt_period:"처리기간", rpt_cautions:"유의사항", rpt_next_steps:"실행 체크리스트",
     rpt_foot:"※ 본 보고서는 선택한 제도의 원문 요약을 조합해 자동 생성되었습니다. 실행 전 반드시 최신 공고와 전문가 확인이 필요합니다.",
+    ai_heading:"🧠 AI 종합 분석", ai_generate_btn:"AI 종합 분석 생성 (크레딧 1개 사용)", ai_generating:"생성 중...",
+    ai_regenerate:"다시 생성 (크레딧 1개 추가 사용)",
+    ai_login_required:"로그인 후 이용 가능한 유료 기능입니다.", ai_no_credit:"크레딧이 부족합니다. 크레딧 충전 후 다시 시도해 주세요.",
+    ai_error:"AI 분석 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.",
     cat_names:{"조세지원":"조세지원","고용지원금":"고용지원금","R&D·인증":"R&D·인증","정책자금·지원사업":"정책자금·지원사업","법인운영·승계":"법인운영·승계"}
   },
   en: {
@@ -239,7 +265,12 @@ const I18N = {
     rpt_heading:"Selected Programs — Review Report", rpt_print:"Print", rpt_close:"Close",
     rpt_generated:"Generated", rpt_count:n=>`${n} programs selected`,
     rpt_target:"Eligibility", rpt_benefit:"Benefit", rpt_how:"How to apply", rpt_when:"When",
+    rpt_documents:"Required Documents", rpt_agency:"Agency / Where to Apply", rpt_period:"Processing Time", rpt_cautions:"Cautions", rpt_next_steps:"Action Checklist",
     rpt_foot:"※ This report was auto-assembled from the summaries of the selected programs. Always verify the latest notice and consult a professional before acting.",
+    ai_heading:"🧠 AI Combined Analysis", ai_generate_btn:"Generate AI Analysis (uses 1 credit)", ai_generating:"Generating...",
+    ai_regenerate:"Regenerate (uses 1 more credit)",
+    ai_login_required:"Sign in to use this paid feature.", ai_no_credit:"Insufficient credits. Please top up and try again.",
+    ai_error:"Failed to generate AI analysis. Please try again shortly.",
     cat_names:{"조세지원":"Tax Relief","고용지원금":"Employment Subsidy","R&D·인증":"R&D · Certification","정책자금·지원사업":"Policy Fund · Program","법인운영·승계":"Corp. Mgmt · Succession"}
   }
 };
@@ -446,16 +477,20 @@ function renderReport() {
   const now = new Date();
   const dateStr = now.toLocaleDateString(lang === "ko" ? "ko-KR" : "en-US", { year:"numeric", month:"long", day:"numeric" });
 
+  const cardsKey = cards.map(c => c.id).slice().sort().join(",");
+
   let html = `
     <div class="rpt-meta">
       <div>${t("rpt_generated")}: ${esc(dateStr)}</div>
       <div>${esc(t("rpt_count")(cards.length))}</div>
-    </div>`;
+    </div>
+    <div class="rpt-ai" id="rptAiBlock">${renderAiBlock(cardsKey)}</div>`;
 
   for (const cat of Object.keys(byCat)) {
     const catLabel = (I18N[lang].cat_names && I18N[lang].cat_names[cat]) || cat;
     html += `<div class="rpt-cat">${esc(catLabel)}</div>`;
     for (const c of byCat[cat]) {
+      const rd = c.report_detail;
       html += `
         <div class="rpt-item">
           <div class="rpt-item-head">
@@ -469,12 +504,27 @@ function renderReport() {
             <div><b>${t("rpt_how")}:</b> ${esc(c.how)}</div>
             <div><b>${t("rpt_when")}:</b> ${esc(c.when)}</div>
           </div>
+          ${rd ? renderReportDetail(rd) : ""}
           <div class="rpt-src">📄 ${esc(c.source)}</div>
         </div>`;
     }
   }
   html += `<div class="rpt-foot">${esc(t("rpt_foot"))}</div>`;
   body.innerHTML = html;
+}
+
+function renderReportDetail(rd) {
+  const li = arr => (arr || []).map(x => `<li>${esc(x)}</li>`).join("");
+  return `
+    <div class="rpt-detail">
+      ${rd.documents && rd.documents.length ? `<div class="rpt-d-sec"><b>${t("rpt_documents")}</b><ul>${li(rd.documents)}</ul></div>` : ""}
+      <div class="rpt-d-grid">
+        ${rd.agency ? `<div><b>${t("rpt_agency")}:</b> ${esc(rd.agency)}</div>` : ""}
+        ${rd.period ? `<div><b>${t("rpt_period")}:</b> ${esc(rd.period)}</div>` : ""}
+      </div>
+      ${rd.cautions && rd.cautions.length ? `<div class="rpt-d-sec rpt-caution"><b>${t("rpt_cautions")}</b><ul>${li(rd.cautions)}</ul></div>` : ""}
+      ${rd.next_steps && rd.next_steps.length ? `<div class="rpt-d-sec"><b>${t("rpt_next_steps")}</b><ol>${li(rd.next_steps)}</ol></div>` : ""}
+    </div>`;
 }
 
 document.getElementById("pickReportBtn").addEventListener("click", () => {
@@ -485,6 +535,106 @@ document.getElementById("pickReportBtn").addEventListener("click", () => {
 document.getElementById("rptCloseBtn").addEventListener("click", () => {
   document.getElementById("reportOverlay").classList.remove("open");
 });
+
+/* ───────── AI 종합 분석 (유료 · Cloudflare Worker 경유) ─────────
+   무료 템플릿 보고서와 별도 블록. 클릭 시에만 호출되며,
+   호출 전 Worker가 Supabase 세션 검증 + 크레딧 차감을 먼저 수행하고
+   실패하면 Claude API 자체를 호출하지 않는다. */
+const AI_WORKER_URL = "https://biz-report.worksfree.workers.dev";
+let AI_CACHE = null; // { key: "id1,id2,...", text: "..." } — 같은 선택으로 재조회 시 크레딧 재차감 방지
+
+let sbClient = null;
+try {
+  if (window.supabase) {
+    sbClient = window.supabase.createClient(
+      "https://rkycwfpkzorfpcxfvaqt.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs",
+      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } }
+    );
+  }
+} catch (e) { /* SDK 로드 실패 시 sbClient는 null로 유지 — 버튼이 로그인 필요 메시지를 표시함 */ }
+
+function renderAiBlock(cardsKey) {
+  if (AI_CACHE && AI_CACHE.key === cardsKey) {
+    return `
+      <div class="rpt-ai-h">${t("ai_heading")}</div>
+      <div class="ai-text">${esc(AI_CACHE.text)}</div>
+      <button type="button" class="ai-regen" id="aiGenBtn" data-mode="regen">${t("ai_regenerate")}</button>`;
+  }
+  return `
+    <div class="rpt-ai-h">${t("ai_heading")}</div>
+    <button type="button" class="ai-gen-btn" id="aiGenBtn" data-mode="new">${t("ai_generate_btn")}</button>
+    <div id="aiResultArea"></div>`;
+}
+
+document.getElementById("rptBody").addEventListener("click", e => {
+  const btn = e.target.closest("#aiGenBtn");
+  if (btn) handleAiGenerate();
+});
+
+async function handleAiGenerate() {
+  const btn = document.getElementById("aiGenBtn");
+  const resultArea = document.getElementById("aiResultArea"); // regen 모드에서는 없을 수 있음
+  const selectedCards = Array.from(SELECTED.values());
+  const cardsKey = selectedCards.map(c => c.id).slice().sort().join(",");
+  if (!selectedCards.length || !btn) return;
+
+  const mode = btn.dataset.mode;
+  btn.disabled = true;
+  btn.textContent = t("ai_generating");
+  if (resultArea) resultArea.innerHTML = "";
+
+  const showMsg = (cls, text) => {
+    const target = resultArea || btn.parentElement;
+    const msg = document.createElement("div");
+    msg.className = "ai-msg " + cls;
+    msg.textContent = text;
+    target.appendChild(msg);
+  };
+  // 실패 시에도 버튼을 반드시 재활성화 (로그인 후 재시도 등 가능하도록)
+  const reEnable = () => {
+    btn.disabled = false;
+    btn.textContent = mode === "regen" ? t("ai_regenerate") : t("ai_generate_btn");
+  };
+
+  try {
+    if (!sbClient) { showMsg("ai-warn", t("ai_login_required")); reEnable(); return; }
+    const { data: { session } } = await sbClient.auth.getSession();
+    if (!session) { showMsg("ai-warn", t("ai_login_required")); reEnable(); return; }
+
+    const resp = await fetch(AI_WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        access_token: session.access_token,
+        cards: selectedCards.map(c => ({
+          id: c.id, name: c.name, category: c.category,
+          target: c.target, benefit: c.benefit, how: c.how, when: c.when,
+        })),
+      }),
+    });
+    let data = {};
+    try { data = await resp.json(); } catch {}
+
+    if (resp.status === 401 || data.error === "unauthenticated" || data.error === "invalid_session") {
+      showMsg("ai-warn", t("ai_login_required"));
+      reEnable();
+    } else if (resp.status === 402 || data.error === "insufficient_credits") {
+      showMsg("ai-warn", t("ai_no_credit"));
+      reEnable();
+    } else if (!resp.ok || !data.ok) {
+      showMsg("ai-error", t("ai_error"));
+      reEnable();
+    } else {
+      AI_CACHE = { key: cardsKey, text: data.text };
+      document.getElementById("rptAiBlock").innerHTML = renderAiBlock(cardsKey);
+      // 성공 시 블록 전체가 새로 그려지므로(버튼 포함) 여기서는 재활성화 불필요
+    }
+  } catch (err) {
+    showMsg("ai-error", t("ai_error"));
+    reEnable();
+  }
+}
 
 function doSearch(q) {
   const status = document.getElementById("status");
