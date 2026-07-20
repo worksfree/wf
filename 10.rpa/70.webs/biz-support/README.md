@@ -33,7 +33,15 @@ python scripts/app.py     # → http://localhost:8777
 1. 새 PDF를 학습자료 폴더에 추가
 2. `scripts/extract_text.py` 의 PRIORITY 목록에 추가 후 실행
 3. **Claude Code 세션을 열고**: "extracted/새문서.txt 읽고 cards/에 카드 추가해줘"
-4. `python scripts/build_index.py` 재실행
+4. `python scripts/build_index.py` 재실행 (로컬 검증 서버용)
+5. **허브 반영**: `python scripts/export_hub.py` → `synology-web/deploy.ps1 -Target 1`
+
+## 허브 배포 (test.worksfree.kr)
+
+- 노드: `synology-web/consulting/support/` (index.html + cards.json) — 사이드바 "지원제도 내비게이터" (consultantOnly)
+- 검색: 클라이언트사이드 문자 바이그램 TF-IDF (제도명·목적 3배 가중 + 키워드 가점) — 서버·API 불필요, 완전 정적
+- 품질: 16문항 top-1 13/16, top-3 16/16 (`scripts/validate_static_search.py` 로 재검증 — JS와 동일 로직)
+- 헤드라인 수치 배지: `scripts/add_headlines.py` 의 HEADLINES 맵으로 관리 (원문 확인 수치만 등록)
 
 ## 카드 스키마
 
