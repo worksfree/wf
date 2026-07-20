@@ -352,6 +352,15 @@
     font-weight: 500;
   }
   .bc-home:hover { background: var(--hover); color: var(--text); }
+  .bc-back {
+    background: none; border: none;
+    color: var(--muted); cursor: pointer;
+    padding: 2px 7px; border-radius: 4px;
+    font-size: 18px; line-height: 1;
+    transition: background .15s, color .15s;
+    flex-shrink: 0;
+  }
+  .bc-back:hover { background: var(--hover); color: var(--text); }
   .bc-sep {
     color: var(--border);
     margin: 0 4px;
@@ -1530,6 +1539,7 @@
   <!-- 브레드크럼 상단바 -->
   <div id="topbar">
     <button id="sidebar-toggle" onclick="toggleSidebar()" aria-label="메뉴">☰</button>
+    <button id="nav-back-btn" onclick="navBack()" style="display:none" class="bc-back" aria-label="뒤로가기">‹</button>
     <span class="bc-home" onclick="showHome()">⌂ <span id="bc-home-text">홈</span></span>
     <span id="bc-trail"></span>
   </div>
@@ -1908,6 +1918,7 @@ function setLang(l) {
 
 let currentPath = [];
 let currentLabel = '';
+let currentSrc   = '';  // 현재 표시 중인 iframe src (히스토리 복원용)
 
 function applyHubLang() {
   // 언어 버튼 상태
@@ -2054,7 +2065,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.47';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.7.49';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2326,6 +2337,7 @@ const DASH_CARDS = [
 let activeLabel      = null;
 let currentSection   = null; // null=홈, 섹션 node=섹션 진입 상태
 let _fullSidebarMode = true; // true=전체 트리 표시, false=섹션 전용 (hash 직접 접속)
+let _navStack        = [];   // 앱 내비게이션 히스토리 스택
 
 const SECTION_DESCS = {
   service:    { ko:'업무 자동화 및 유틸리티 도구',       en:'Work automation & utility tools' },
@@ -2832,7 +2844,12 @@ function normalizeIframeSrc(src) {
 }
 
 function loadIframe(src, path=[], label='') {
+  _navStackPush();
+  _loadIframeImpl(src, path, label, true);
+}
+function _loadIframeImpl(src, path=[], label='', _pushHist=false) {
   src = normalizeIframeSrc(src);
+  currentSrc = src;
   _activateSectionForIframe(src);
   trackPageView(src);
   closeSidebar();
@@ -2867,9 +2884,11 @@ function loadIframe(src, path=[], label='') {
       iframe.contentWindow.postMessage({ type:'wf_user',   userId: authUser?.id ?? '' }, '*');
     }
   };
-  // URL에서 hash 제거 — 세부 URL 노출 방지 (관리자 🔗 버튼으로 공유)
-  history.replaceState({}, '', location.pathname + location.search);
-  // 브라우저 탭 타이틀 업데이트 (북마크·히스토리 가독성)
+  // URL hash 제거 — 세부 URL 노출 방지 (관리자 🔗 버튼으로 공유)
+  const _hs2 = { type:'page', src, path, label };
+  if (_pushHist) history.pushState(_hs2, '', location.pathname + location.search);
+  else           history.replaceState(_hs2, '', location.pathname + location.search);
+  // 브라우저 탭 타이틀 업데이트
   const pageTitle = typeof label === 'object' ? (label[lang] || label.ko || '') : (label || '');
   document.title = pageTitle ? pageTitle + ' — WorksFree Hub' : 'WorksFree Hub';
 }
@@ -2882,12 +2901,49 @@ window.addEventListener('message', e => {
   }
 });
 
+/* ── 앱 내비게이션 히스토리 ────────────────────────────────────────────
+   _navStackPush : 현재 상태를 스택에 저장 (공개 네비게이션 함수에서만 호출)
+   navBack       : 스택에서 이전 상태를 복원
+   _showHomeImpl / _showSectionDashImpl / _loadIframeImpl : 히스토리 저장 없이 이동
+────────────────────────────────────────────────────────────────────── */
+function _refreshBackBtn() {
+  const btn = document.getElementById('nav-back-btn');
+  if (btn) btn.style.display = _navStack.length > 0 ? '' : 'none';
+}
+function _navStackPush() {
+  const fc = document.getElementById('frame-container');
+  const onPage = fc?.style.display !== 'none' && currentSrc;
+  const state = onPage
+    ? { type: 'page', src: currentSrc, path: currentPath, label: currentLabel }
+    : currentSection
+    ? { type: 'section', node: currentSection, keepFull: _fullSidebarMode }
+    : { type: 'home' };
+  const last = _navStack[_navStack.length - 1];
+  if (last && last.type === state.type && last.src === state.src && last.node === state.node) return;
+  _navStack.push(state);
+  if (_navStack.length > 15) _navStack.shift();
+  _refreshBackBtn();
+}
+function navBack() {
+  if (!_navStack.length) return;
+  const s = _navStack.pop();
+  _refreshBackBtn();
+  if (s.type === 'home') _showHomeImpl();
+  else if (s.type === 'section') _showSectionDashImpl(s.node, s.keepFull, false);
+  else _loadIframeImpl(s.src, s.path, s.label, false);
+}
+
 function showHome() {
+  _navStackPush();
+  _showHomeImpl();
+}
+function _showHomeImpl() {
   previewBaseSrc = null;
   hidePreviewOverlay();
   sessionStorage.removeItem('wf_last_page');
-  history.replaceState(null, '', location.pathname + location.search);
+  history.replaceState({type:'home'}, '', location.pathname + location.search);
   document.title = 'WorksFree Hub — 경영지도사·파트너 통합 컨설팅 플랫폼';
+  currentSrc = '';
   currentSection = null;
   _fullSidebarMode = true;
   _buildFullSidebar();
@@ -2902,15 +2958,18 @@ function showHome() {
 }
 
 function showSectionDash(node, keepFullSidebar=false) {
+  _navStackPush();
+  _showSectionDashImpl(node, keepFullSidebar, true);
+}
+function _showSectionDashImpl(node, keepFullSidebar=false, _pushHist=false) {
   previewBaseSrc = null;
   hidePreviewOverlay();
   sessionStorage.removeItem('wf_last_page');
   currentSection = node;
+  currentSrc = '';
   if (keepFullSidebar) {
-    // 전체 사이드바 유지 + 해당 섹션 확장
     _expandSectionInFullSidebar(node.slug);
   } else {
-    // 직접 URL 접속 모드 → 해당 섹션만 표시
     _buildSectionSidebar(node);
   }
   document.getElementById('home-screen').style.display = 'block';
@@ -2918,13 +2977,14 @@ function showSectionDash(node, keepFullSidebar=false) {
   fc.style.display = 'none';
   fc.classList.remove('access-blur', 'access-readonly');
   document.getElementById('access-overlay')?.classList.remove('active');
-  document.getElementById('contentFrame').src = '';
+  document.getElementById('contentFrame').src = 'about:blank';
   const titleEl = document.querySelector('#home-screen .home-title');
   if (titleEl) titleEl.textContent = getLabel(node.label);
   setBreadcrumb([], node.label);
   renderDashCards(node.slug);
-  // URL hash 노출 방지 — 섹션 탐색 시에도 주소창은 기본 URL 유지
-  history.replaceState({}, '', location.pathname + location.search);
+  const _hs = { type:'section', slug:node.slug, keepFull:keepFullSidebar };
+  if (_pushHist) history.pushState(_hs, '', location.pathname + location.search);
+  else           history.replaceState(_hs, '', location.pathname + location.search);
 }
 
 // ── Hash 라우팅 ──────────────────────────────────────────────────
@@ -2979,11 +3039,26 @@ function navigateToHash(hash) {
   }
 }
 
-// 브라우저 뒤로/앞으로: hash로 라우팅
-window.addEventListener('popstate', () => {
+/* 브라우저 뒤로/앞으로 — history.state 기반 복원 */
+window.addEventListener('popstate', e => {
+  // 앱 내부 스택도 동기화 (브라우저 back 사용 시)
+  if (_navStack.length > 0) { _navStack.pop(); _refreshBackBtn(); }
+  const s = e.state;
+  if (!s || s.type === 'home') { _showHomeImpl(); return; }
+  if (s.type === 'section') {
+    const node = TREE.find(n => n.slug === s.slug);
+    if (node) _showSectionDashImpl(node, s.keepFull ?? true, false);
+    else      _showHomeImpl();
+    return;
+  }
+  if (s.type === 'page') {
+    _loadIframeImpl(s.src, Array.isArray(s.path) ? s.path : [], s.label ?? '', false);
+    return;
+  }
+  // 해시 fallback (직접 URL 접속 후 popstate)
   const h = location.hash;
   if (h && h !== '#') navigateToHash(h);
-  else showHome();
+  else _showHomeImpl();
 });
 
 function showDenied(titleKey='denied_title', descKey='denied_desc') {
@@ -3198,7 +3273,7 @@ function _reapplyCurrentPageAccess() {
   if (hasDbRule) {
     // DB 규칙이 있으면 최우선 — adminOnly 등 노드 플래그보다 우선
     const level = getAccessLevel(src);
-    if (level === 'hidden') { showDenied(); showHome(); return; }
+    if (level === 'hidden') { showDenied(); _showHomeImpl(); return; }
     if (level !== 'full') {
       // 접근 제한 → iframe 콘텐츠 제거 후 overlay (showAccessBlur가 담당)
       const _iframe = document.getElementById('contentFrame');
@@ -3480,7 +3555,7 @@ function onAuthComplete() {
     // 계정 전환: iframe 콘텐츠 즉시 제거 + 홈으로 (접근 권한 재평가 불필요)
     const _secIframe = document.getElementById('contentFrame');
     if (_secIframe) _secIframe.src = 'about:blank';
-    showHome();
+    _showHomeImpl(); // 계정 전환 보안 리다이렉트 — 히스토리 저장 안 함
   } else {
     _reapplyCurrentPageAccess(); // 같은 사용자 재인증 시 접근 권한 재평가
   }
@@ -3511,7 +3586,7 @@ function onAuthComplete() {
     if (initHash && initHash !== '#') {
       navigateToHash(initHash);
     } else {
-      showHome();
+      _showHomeImpl(); // 초기 라우팅 — 히스토리 저장 안 함
     }
   }
 }
