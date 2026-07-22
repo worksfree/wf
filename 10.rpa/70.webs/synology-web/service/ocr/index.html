@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- iframe hide 스크립트 없음 — 추가 금지 (허브 iframe 로드 시 헤더 유지) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCR 텍스트 추출 — WorksFree</title>
+<style>
+:root {
+  --surface:#ffffff; --bg:#f6f7f9; --border:#e4e8ee;
+  --text:#22303e; --muted:#5b6b7b; --hint:#8b98a5;
+  --blue:#1a5c9e; --blue-soft:#eaf1f8;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+header {
+  position:sticky; top:0; z-index:100;
+  min-height:72px; padding:14px 24px;
+  display:flex; align-items:center; gap:14px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+}
+.hdr-icon  { font-size:26px; flex-shrink:0; }
+.hdr-info  { flex:1; }
+.hdr-title { font-size:17px; font-weight:600; letter-spacing:-.2px; }
+.hdr-sub   { font-size:13px; color:var(--muted); margin-top:2px; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
+
+.page { max-width:760px; margin:0 auto; padding:22px 18px 72px; }
+.intro { font-size:13px; color:var(--muted); margin-bottom:16px; }
+
+.drop { border:2px dashed var(--border); border-radius:12px; padding:32px 20px; text-align:center; background:var(--surface); }
+.drop.drag { border-color:var(--blue); background:var(--blue-soft); }
+label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+.pick-btn { background:var(--blue); color:#fff; border:none; border-radius:10px; padding:10px 22px; font-size:14.5px; cursor:pointer; }
+.drop-hint { font-size:12px; color:var(--hint); margin-top:10px; }
+
+.preview-wrap { margin-top:14px; display:none; }
+.preview-wrap.show { display:block; }
+.preview-wrap img { display:block; max-width:100%; max-height:360px; border:1px solid var(--border); border-radius:10px; margin:0 auto; background:var(--surface); }
+.preview-cap { font-size:11.5px; color:var(--hint); margin-top:6px; text-align:center; }
+.rotate-row { display:flex; justify-content:center; margin-top:8px; }
+.rotate-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:6px 14px; font-size:12.5px; cursor:pointer; color:var(--muted); }
+.rotate-btn:disabled { opacity:.5; cursor:not-allowed; }
+
+.ask-row { display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
+.remaining { font-size:12px; color:var(--hint); }
+
+#status { min-height:1.4em; color:var(--muted); font-size:13px; margin:14px 0; }
+#status.err { color:#b3261e; }
+
+.result-wrap { margin-top:10px; }
+.result-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.result-head h2 { font-size:14px; color:var(--blue); }
+.copy-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:6px 14px; font-size:12.5px; cursor:pointer; color:var(--muted); }
+textarea#result { width:100%; min-height:260px; padding:14px 16px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; background:var(--surface); resize:vertical; font-family:inherit; white-space:pre-wrap; }
+
+.disclaim { font-size:11.5px; color:var(--hint); margin-top:26px; border-top:1px solid var(--border); padding-top:12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">🔎</div>
+  <div class="hdr-info">
+    <div class="hdr-title" id="hdr-title">OCR 텍스트 추출</div>
+    <div class="hdr-sub" id="hdr-sub">이미지·PDF에서 텍스트를 추출합니다</div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="intro" id="intro">PNG·JPG 이미지 또는 PDF 파일을 올리면 텍스트를 추출합니다. PDF는 페이지별로 처리되며 페이지 수만큼 사용 횟수를 소모합니다.</div>
+
+  <div class="drop" id="drop">
+    <label class="sr" for="fileInput" id="pick-label">파일 선택</label>
+    <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" style="display:none">
+    <button class="pick-btn" type="button" id="pickBtn">파일 선택</button>
+    <div class="drop-hint" id="drop-hint">또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)</div>
+  </div>
+
+  <div class="ask-row">
+    <span id="fileName" style="font-size:13px;color:var(--muted);"></span>
+    <span class="remaining" id="remaining" aria-live="polite"></span>
+  </div>
+
+  <div class="preview-wrap" id="previewWrap">
+    <img id="previewImg" alt="">
+    <div class="preview-cap" id="previewCap"></div>
+    <div class="rotate-row">
+      <button class="rotate-btn" type="button" id="rotateBtn">🔄 회전 후 다시 인식</button>
+    </div>
+  </div>
+
+  <div id="status" role="status" aria-live="polite"></div>
+
+  <div class="result-wrap" id="resultWrap" style="display:none;">
+    <div class="result-head">
+      <h2 id="result-h">추출된 텍스트</h2>
+      <button class="copy-btn" type="button" id="copyBtn">복사</button>
+    </div>
+    <textarea id="result" readonly aria-labelledby="result-h"></textarea>
+  </div>
+
+  <div class="disclaim" id="disclaim">
+    ※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다.
+    추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요.
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+/* ───────── i18n ───────── */
+const I18N = {
+  ko: {
+    hdr_title:"OCR 텍스트 추출", hdr_sub:"이미지·PDF에서 텍스트를 추출합니다",
+    intro:"PNG·JPG 이미지 또는 PDF 파일을 올리면 텍스트를 추출합니다. PDF는 페이지별로 처리되며 페이지 수만큼 사용 횟수를 소모합니다.",
+    pick_label:"파일 선택", pick_btn:"파일 선택",
+    drop_hint:"또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)",
+    remaining:n=>`오늘 남은 처리 ${n}회`,
+    processing:"처리 중...", processing_page:(i,n)=>`처리 중... (${i}/${n} 페이지)`,
+    result_h:"추출된 텍스트", copy_btn:"복사", copied:"복사됨",
+    login_required:"로그인 후 이용 가능한 기능입니다.",
+    rate_limited:"오늘 사용 가능한 횟수를 모두 사용했습니다. 내일 다시 시도해 주세요.",
+    pc_offline:"로컬 AI 서버가 오프라인입니다. 잠시 후 다시 시도해 주세요.",
+    error:"텍스트 추출에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    unsupported:"지원하지 않는 파일 형식입니다 (PNG, JPG, PDF만 가능).",
+    too_large:"파일이 너무 큽니다.",
+    preview_pdf:n=>`PDF 미리보기 (1/${n} 페이지)`,
+    rotate_btn:"🔄 회전 후 다시 인식",
+    disclaim:"※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다. 추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요."
+  },
+  en: {
+    hdr_title:"OCR Text Extraction", hdr_sub:"Extract text from images and PDFs",
+    intro:"Upload a PNG/JPG image or a PDF to extract text. PDFs are processed page by page, consuming one use per page.",
+    pick_label:"Choose file", pick_btn:"Choose file",
+    drop_hint:"or drag and drop a file here (PNG, JPG, PDF)",
+    remaining:n=>`${n} uses left today`,
+    processing:"Processing...", processing_page:(i,n)=>`Processing... (page ${i}/${n})`,
+    result_h:"Extracted text", copy_btn:"Copy", copied:"Copied",
+    login_required:"Sign in to use this feature.",
+    rate_limited:"You've used all your uses for today. Please try again tomorrow.",
+    pc_offline:"The local AI server is offline. Please try again shortly.",
+    error:"Failed to extract text. Please try again shortly.",
+    unsupported:"Unsupported file type (PNG, JPG, PDF only).",
+    too_large:"File is too large.",
+    preview_pdf:n=>`PDF preview (page 1/${n})`,
+    rotate_btn:"🔄 Rotate & retry",
+    disclaim:"※ This feature only works while the local PC server is on. If it's offline, a notice is shown. Extraction accuracy depends on the source image/font quality — always check the original for important documents."
+  }
+};
+// 언어 토글은 이 페이지에 두지 않는다 — 허브 사이드바 상단의 공용 KO/EN 토글이
+// wf_lang postMessage로 전파해주는 값을 그대로 따른다 (다른 iframe 노드들과 동일한 패턴).
+let lang = localStorage.getItem("wf_lang") || "ko";
+const t = k => I18N[lang][k];
+
+let _lastStatusKey = null; // 마지막으로 표시한 동적 상태 메시지 키 — 언어 전환 시 재번역용
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.getElementById("hdr-title").textContent = t("hdr_title");
+  document.getElementById("hdr-sub").textContent = t("hdr_sub");
+  document.getElementById("intro").textContent = t("intro");
+  document.getElementById("pick-label").textContent = t("pick_label");
+  document.getElementById("pickBtn").textContent = t("pick_btn");
+  document.getElementById("drop-hint").textContent = t("drop_hint");
+  document.getElementById("result-h").textContent = t("result_h");
+  document.getElementById("copyBtn").textContent = t("copy_btn");
+  document.getElementById("rotateBtn").textContent = t("rotate_btn");
+  document.getElementById("disclaim").textContent = t("disclaim");
+  if (_lastStatusKey) {
+    const status = document.getElementById("status");
+    status.textContent = t(_lastStatusKey);
+  }
+}
+function setStatus(status, key, isErr) {
+  _lastStatusKey = key;
+  status.className = isErr ? "err" : "";
+  status.textContent = key ? t(key) : "";
+}
+window.addEventListener("message", (e) => {
+  if (e.data && e.data.type === "wf_lang" && I18N[e.data.lang]) {
+    lang = e.data.lang;
+    applyLang();
+  }
+});
+
+/* ───────── Supabase ───────── */
+const OCR_WORKER_URL = "https://ocr-service.worksfree.workers.dev/ocr";
+let sbClient = null;
+try {
+  if (window.supabase) {
+    sbClient = window.supabase.createClient(
+      "https://rkycwfpkzorfpcxfvaqt.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs",
+      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } }
+    );
+  }
+} catch (e) {}
+
+function canvasToBase64(canvas) {
+  return canvas.toDataURL("image/png").split(",")[1];
+}
+
+function loadImageElement(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
+    img.src = url;
+  });
+}
+
+// 긴 변 상한(px) — 스마트폰 원본 사진(4000x3000 등)을 그대로 보내면 OCR 모델의 컨텍스트
+// 예산을 넘겨 응답이 몇 글자만에 끊기는 현상이 실측으로 확인됨(회전 문제로 오인하기 쉬움).
+// 워커 쪽 num_ctx(6144)에 맞춘 값 — 워커의 OCR_MODEL을 바꾸면 이 값도 함께 재검토할 것.
+const MAX_OCR_DIM = 1800;
+
+// 90도 단위 회전 — swap=true(90/270)면 캔버스 가로/세로를 바꿔서 잘림 없이 재구성하고,
+// 긴 변이 MAX_OCR_DIM을 넘으면 같은 비율로 축소해서 그린다.
+function rotateImageToBase64(img, degrees) {
+  const rad = (degrees % 360) * Math.PI / 180;
+  const swap = degrees % 180 !== 0;
+  const srcW = img.naturalWidth || img.width, srcH = img.naturalHeight || img.height;
+  let drawW = srcW, drawH = srcH;
+  let canvasW = swap ? srcH : srcW, canvasH = swap ? srcW : srcH;
+  const maxDim = Math.max(canvasW, canvasH);
+  if (maxDim > MAX_OCR_DIM) {
+    const scale = MAX_OCR_DIM / maxDim;
+    drawW *= scale; drawH *= scale;
+    canvasW *= scale; canvasH *= scale;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(canvasW);
+  canvas.height = Math.round(canvasH);
+  const ctx = canvas.getContext("2d");
+  // 가벼운 대비 보정 — 실측(olmOCR-2 + 자동차등록증/영수증/손글씨)으로 부작용 없이
+  // 영수증류에서만 오차율이 소폭 개선됨을 확인(0.5~1%p, 정상 문서는 변화 없음).
+  ctx.filter = "contrast(1.15)";
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.rotate(rad);
+  ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+  return canvasToBase64(canvas);
+}
+
+async function pdfToPageImages(file, rotation, onFirstPage) {
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  const images = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 2.0, rotation }); // OCR 정확도를 위해 2배 렌더링 + 사용자 지정 회전
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext("2d");
+    ctx.filter = "contrast(1.15)"; // 이미지 경로와 동일한 가벼운 대비 보정 (rotateImageToBase64 참고)
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    const b64 = canvasToBase64(canvas);
+    images.push(b64);
+    if (i === 1 && onFirstPage) onFirstPage(b64, pdf.numPages);
+  }
+  return images;
+}
+
+// _previewUrl은 "현재 화면에 떠 있는 blob URL"만 추적한다 — 호출부가 미리 만들어 넘긴 새 URL을
+// 이전 URL로 착각해 즉시 revoke해버리는 실수(이미지가 뜨기도 전에 무효화됨)를 피하기 위해
+// revoke 판단은 반드시 이 함수 내부에서, 새 src를 저장하기 "직전"에만 한다.
+let _previewUrl = null;
+function showPreview(src, caption) {
+  if (_previewUrl && _previewUrl !== src && _previewUrl.startsWith("blob:")) {
+    URL.revokeObjectURL(_previewUrl);
+  }
+  _previewUrl = src.startsWith("blob:") ? src : null;
+  document.getElementById("previewImg").src = src;
+  document.getElementById("previewCap").textContent = caption || "";
+  document.getElementById("previewWrap").classList.add("show");
+}
+function hidePreview() {
+  if (_previewUrl && _previewUrl.startsWith("blob:")) { URL.revokeObjectURL(_previewUrl); }
+  _previewUrl = null;
+  document.getElementById("previewWrap").classList.remove("show");
+}
+
+/* ───────── OCR 호출 ───────── */
+async function callOcr(session, imageBase64) {
+  const resp = await fetch(OCR_WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ access_token: session.access_token, image_base64: imageBase64 }),
+  });
+  let data = {};
+  try { data = await resp.json(); } catch {}
+  return { resp, data };
+}
+
+function applyErrorStatus(status, resp, data) {
+  if (resp.status === 401 || data.error === "unauthenticated" || data.error === "invalid_session") {
+    setStatus(status, "login_required", true);
+  } else if (resp.status === 429 || data.error === "rate_limited") {
+    setStatus(status, "rate_limited", true);
+  } else if (resp.status === 503 || data.error === "pc_offline") {
+    setStatus(status, "pc_offline", true);
+  } else {
+    setStatus(status, "error", true);
+  }
+}
+
+// 현재 로드된 파일의 회전 가능한 상태 — 회전 버튼이 파일을 다시 고를 필요 없이
+// 같은 파일을 재렌더링(PDF는 viewport rotation, 이미지는 canvas 회전)해서 재인식할 수 있도록 유지한다.
+let _currentFile = null;
+let _currentIsPdf = false;
+let _currentImgEl = null;
+let _rotationDeg = 0;
+let _rotateBusy = false;
+
+async function buildRotatedImages(rotationDeg, onFirstPage) {
+  if (_currentIsPdf) {
+    return await pdfToPageImages(_currentFile, rotationDeg, onFirstPage);
+  }
+  const b64 = rotateImageToBase64(_currentImgEl, rotationDeg);
+  if (onFirstPage) onFirstPage(b64);
+  return [b64];
+}
+
+async function runOcrPipeline(images, session) {
+  const status = document.getElementById("status");
+  const resultWrap = document.getElementById("resultWrap");
+  const resultEl = document.getElementById("result");
+
+  const texts = [];
+  for (let i = 0; i < images.length; i++) {
+    if (images.length > 1) {
+      _lastStatusKey = null; // 페이지 진행 문구는 함수형이라 재번역 캐시 대상에서 제외
+      status.className = ""; status.textContent = t("processing_page")(i + 1, images.length);
+    }
+    const { resp, data } = await callOcr(session, images[i]);
+    console.log("[ocr] response:", resp.status, data);
+    if (!resp.ok || !data.ok) {
+      applyErrorStatus(status, resp, data);
+      if (texts.length === 0) return; // 첫 페이지부터 실패면 결과 없이 종료
+      break; // 일부 페이지까지는 성공 — 여기까지 결과 표시
+    }
+    texts.push(images.length > 1 ? `--- Page ${i + 1} ---\n${data.text}` : data.text);
+    if (typeof data.remaining_today === "number") {
+      document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
+    }
+  }
+
+  if (texts.length) {
+    setStatus(status, null, false);
+    resultEl.value = texts.join("\n\n");
+    resultWrap.style.display = "block";
+  }
+}
+
+async function handleFile(file) {
+  const status = document.getElementById("status");
+  const resultWrap = document.getElementById("resultWrap");
+  setStatus(status, null, false);
+  resultWrap.style.display = "none";
+  hidePreview();
+  document.getElementById("fileName").textContent = file.name;
+  console.log("[ocr] handleFile:", file.name, file.type, file.size, "bytes");
+
+  const isImage = /^image\/(png|jpe?g)$/.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
+  const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+  if (!isImage && !isPdf) {
+    setStatus(status, "unsupported", true);
+    return;
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    setStatus(status, "too_large", true);
+    return;
+  }
+
+  _currentFile = file;
+  _currentIsPdf = isPdf;
+  _rotationDeg = 0;
+  _currentImgEl = null;
+
+  if (isImage) {
+    try {
+      _currentImgEl = await loadImageElement(file);
+      showPreview(URL.createObjectURL(file), "");
+      console.log("[ocr] preview shown:", _previewUrl);
+    } catch (e) {
+      console.error("[ocr] preview failed:", e);
+    }
+  }
+
+  if (!sbClient) { setStatus(status, "login_required", true); return; }
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (!session) { setStatus(status, "login_required", true); return; }
+
+  setStatus(status, "processing", false);
+
+  try {
+    const images = await buildRotatedImages(_rotationDeg, isPdf
+      ? (b64, numPages) => showPreview("data:image/png;base64," + b64, t("preview_pdf")(numPages))
+      : null);
+    await runOcrPipeline(images, session);
+  } catch (err) {
+    console.error("[ocr] exception:", err);
+    setStatus(status, "error", true);
+  }
+}
+
+async function handleRotate() {
+  if (_rotateBusy || !_currentFile) return;
+  _rotateBusy = true;
+  const rotateBtn = document.getElementById("rotateBtn");
+  rotateBtn.disabled = true;
+  const status = document.getElementById("status");
+  document.getElementById("resultWrap").style.display = "none";
+
+  try {
+    if (!sbClient) { setStatus(status, "login_required", true); return; }
+    const { data: { session } } = await sbClient.auth.getSession();
+    if (!session) { setStatus(status, "login_required", true); return; }
+
+    _rotationDeg = (_rotationDeg + 90) % 360;
+    setStatus(status, "processing", false);
+    const images = await buildRotatedImages(_rotationDeg, _currentIsPdf
+      ? (b64, numPages) => showPreview("data:image/png;base64," + b64, t("preview_pdf")(numPages))
+      : (b64) => showPreview("data:image/png;base64," + b64, ""));
+    await runOcrPipeline(images, session);
+  } catch (err) {
+    console.error("[ocr] rotate exception:", err);
+    setStatus(status, "error", true);
+  } finally {
+    _rotateBusy = false;
+    rotateBtn.disabled = false;
+  }
+}
+
+document.getElementById("pickBtn").addEventListener("click", () => document.getElementById("fileInput").click());
+document.getElementById("fileInput").addEventListener("change", (e) => {
+  if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+document.getElementById("rotateBtn").addEventListener("click", handleRotate);
+
+const dropEl = document.getElementById("drop");
+["dragenter", "dragover"].forEach(ev => dropEl.addEventListener(ev, (e) => { e.preventDefault(); dropEl.classList.add("drag"); }));
+["dragleave", "drop"].forEach(ev => dropEl.addEventListener(ev, (e) => { e.preventDefault(); dropEl.classList.remove("drag"); }));
+dropEl.addEventListener("drop", (e) => {
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const resultEl = document.getElementById("result");
+  try {
+    await navigator.clipboard.writeText(resultEl.value);
+    const btn = document.getElementById("copyBtn");
+    const orig = btn.textContent;
+    btn.textContent = t("copied");
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  } catch (e) {}
+});
+
+applyLang();
+</script>
+</body>
+</html>
