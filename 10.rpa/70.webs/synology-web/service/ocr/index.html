@@ -146,6 +146,7 @@ const I18N = {
     preview_pdf:n=>`PDF 미리보기 (1/${n} 페이지)`,
     rotate_btn:"🔄 회전 후 다시 인식",
     zoom_out:"축소", zoom_in:"확대", zoom_fit:"원래 크기",
+    low_confidence_tip:"⚠ 원본이 흐릿하거나 구겨져 있어 인식이 불안정할 수 있습니다. 최대한 평평하게 펴서 밝은 곳에서 다시 촬영하거나, 회전 버튼으로 다시 시도해 보세요.",
     disclaim:"※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다. 추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요."
   },
   en: {
@@ -165,6 +166,7 @@ const I18N = {
     preview_pdf:n=>`PDF preview (page 1/${n})`,
     rotate_btn:"🔄 Rotate & retry",
     zoom_out:"Zoom out", zoom_in:"Zoom in", zoom_fit:"Reset zoom",
+    low_confidence_tip:"⚠ The source may be blurry or creased, so results could be unreliable. Try flattening it and retaking the photo in good light, or use the rotate button to retry.",
     disclaim:"※ This feature only works while the local PC server is on. If it's offline, a notice is shown. Extraction accuracy depends on the source image/font quality — always check the original for important documents."
   }
 };
@@ -371,6 +373,7 @@ async function runOcrPipeline(images, session) {
   const resultEl = document.getElementById("result");
 
   const texts = [];
+  let lowConfidence = false;
   for (let i = 0; i < images.length; i++) {
     if (images.length > 1) {
       _lastStatusKey = null; // 페이지 진행 문구는 함수형이라 재번역 캐시 대상에서 제외
@@ -383,6 +386,7 @@ async function runOcrPipeline(images, session) {
       if (texts.length === 0) return; // 첫 페이지부터 실패면 결과 없이 종료
       break; // 일부 페이지까지는 성공 — 여기까지 결과 표시
     }
+    if (data.low_confidence) lowConfidence = true;
     texts.push(images.length > 1 ? `--- Page ${i + 1} ---\n${data.text}` : data.text);
     if (typeof data.remaining_today === "number") {
       document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
@@ -390,7 +394,9 @@ async function runOcrPipeline(images, session) {
   }
 
   if (texts.length) {
-    setStatus(status, null, false);
+    // low_confidence: 워커가 반복 폭주를 감지해 재시도까지 했던 페이지가 있었다는 뜻 —
+    // 결과는 그대로 보여주되(막지 않음), 원본 상태를 개선해 재시도해볼 것을 안내한다.
+    setStatus(status, lowConfidence ? "low_confidence_tip" : null, false);
     resultEl.value = texts.join("\n\n");
     resultWrap.style.display = "block";
   }

@@ -213,6 +213,13 @@ const BASE_OPTIONS = { temperature: 0, num_predict: 3000, num_ctx: 6144 };
 // 같은 이미지를 한 번 더 호출한다(흔치 않은 실패 케이스에서만 추가 지연 발생).
 const REPEAT_RETRY_OPTIONS = { ...BASE_OPTIONS, repeat_penalty: 1.3, repeat_last_n: 256 };
 
+// 반복 폭주가 감지됐다는 것은 원본 이미지 자체가 모델이 다루기 어려운 상태였다는
+// 신뢰할 만한 신호다(실측: 심하게 흐릿한 사진·구겨진 영수증에서 반복적으로 재현됨).
+// 기하 왜곡 보정(UVDoc 등 최신 document dewarping 모델)을 별도 PC 서비스로 도입하는
+// 방안도 검토했으나, 합성 왜곡·그림자로 통제 실험을 해본 결과 olmOCR-2는 이미 이런
+// 왜곡에 상당히 강건해서 사전 보정이 오히려 정확도를 깎는 경우도 있었다(실측: CER
+// 0.246→0.281 악화) — 그래서 별도 전처리 인프라 대신, 폭주가 감지되면 결과와 함께
+// "낮은 신뢰도" 신호만 반환해 클라이언트가 사용자에게 재촬영을 안내하도록 한다.
 async function runOcr(env, imageBase64) {
   const first = await callOllamaGenerate(env, imageBase64, BASE_OPTIONS);
   // 순서 중요: 마크업 제거를 먼저 해야 한다 — 서로 다른 줄이 마크업 때문에 앞부분이 우연히
@@ -220,19 +227,20 @@ async function runOcr(env, imageBase64) {
   const firstCleaned = stripMarkupArtifacts(first);
   const firstFinal = truncateRunawayRepetition(firstCleaned);
   if (firstFinal.length === firstCleaned.length) {
-    return firstFinal; // 반복 폭주가 감지되지 않았음 — 재시도 없이 그대로 반환
+    return { text: firstFinal, lowConfidence: false }; // 반복 폭주 없음 — 재시도 없이 그대로 반환
   }
   // 반복이 감지된 경우에만 repeat_penalty를 걸어 재시도 — 원본이 폭주로 잘려나간 결과보다
-  // 길고(더 많은 내용을 건졌고) 반복도 없다면 재시도 결과를 채택한다.
+  // 길고(더 많은 내용을 건졌고) 반복도 없다면 재시도 결과를 채택한다. 재시도로 살아나든
+  // 못 살아나든, 1차 시도에서 폭주가 있었다는 사실 자체가 "낮은 신뢰도" 신호이므로 유지한다.
   try {
     const retry = await callOllamaGenerate(env, imageBase64, REPEAT_RETRY_OPTIONS);
     const retryCleaned = stripMarkupArtifacts(retry);
     const retryFinal = truncateRunawayRepetition(retryCleaned);
-    if (retryFinal.length > firstFinal.length) return retryFinal;
+    if (retryFinal.length > firstFinal.length) return { text: retryFinal, lowConfidence: true };
   } catch (e) {
     console.error(`ocr retry failed: ${e}`);
   }
-  return firstFinal;
+  return { text: firstFinal, lowConfidence: true };
 }
 
 export default {
@@ -275,13 +283,17 @@ export default {
       return json({ error: "server_misconfigured" }, 500, origin);
     }
 
-    let text;
+    let result;
     try {
-      text = await runOcr(env, image_base64);
+      result = await runOcr(env, image_base64);
     } catch (e) {
       return json({ error: "pc_offline", detail: String(e) }, 503, origin);
     }
 
-    return json({ ok: true, text, remaining_today: rate.remaining }, 200, origin);
+    return json(
+      { ok: true, text: result.text, low_confidence: result.lowConfidence, remaining_today: rate.remaining },
+      200,
+      origin
+    );
   },
 };
