@@ -37,8 +37,15 @@ label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(
 
 .preview-wrap { margin-top:14px; display:none; }
 .preview-wrap.show { display:block; }
-.preview-wrap img { display:block; max-width:100%; max-height:360px; border:1px solid var(--border); border-radius:10px; margin:0 auto; background:var(--surface); }
+.preview-scroll { max-height:420px; overflow:auto; border:1px solid var(--border); border-radius:10px; background:var(--surface); }
+.preview-scroll:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
+.preview-wrap img { display:block; width:100%; border-radius:10px; }
 .preview-cap { font-size:11.5px; color:var(--hint); margin-top:6px; text-align:center; }
+.zoom-row { display:flex; justify-content:center; align-items:center; gap:8px; margin-top:8px; }
+.zoom-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; width:30px; height:30px; font-size:15px; line-height:1; cursor:pointer; color:var(--muted); }
+.zoom-btn:disabled { opacity:.4; cursor:not-allowed; }
+.zoom-pct { font-size:12px; color:var(--hint); min-width:38px; text-align:center; }
+.zoom-fit-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; color:var(--muted); }
 .rotate-row { display:flex; justify-content:center; margin-top:8px; }
 .rotate-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:6px 14px; font-size:12.5px; cursor:pointer; color:var(--muted); }
 .rotate-btn:disabled { opacity:.5; cursor:not-allowed; }
@@ -84,8 +91,16 @@ textarea#result { width:100%; min-height:260px; padding:14px 16px; border:1.5px 
   </div>
 
   <div class="preview-wrap" id="previewWrap">
-    <img id="previewImg" alt="">
+    <div class="preview-scroll" id="previewScroll" tabindex="0">
+      <img id="previewImg" alt="">
+    </div>
     <div class="preview-cap" id="previewCap"></div>
+    <div class="zoom-row">
+      <button class="zoom-btn" type="button" id="zoomOutBtn">−</button>
+      <span class="zoom-pct" id="zoomPct" aria-live="polite">100%</span>
+      <button class="zoom-btn" type="button" id="zoomInBtn">+</button>
+      <button class="zoom-fit-btn" type="button" id="zoomFitBtn">원래 크기</button>
+    </div>
     <div class="rotate-row">
       <button class="rotate-btn" type="button" id="rotateBtn">🔄 회전 후 다시 인식</button>
     </div>
@@ -130,6 +145,7 @@ const I18N = {
     too_large:"파일이 너무 큽니다.",
     preview_pdf:n=>`PDF 미리보기 (1/${n} 페이지)`,
     rotate_btn:"🔄 회전 후 다시 인식",
+    zoom_out:"축소", zoom_in:"확대", zoom_fit:"원래 크기",
     disclaim:"※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다. 추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요."
   },
   en: {
@@ -148,6 +164,7 @@ const I18N = {
     too_large:"File is too large.",
     preview_pdf:n=>`PDF preview (page 1/${n})`,
     rotate_btn:"🔄 Rotate & retry",
+    zoom_out:"Zoom out", zoom_in:"Zoom in", zoom_fit:"Reset zoom",
     disclaim:"※ This feature only works while the local PC server is on. If it's offline, a notice is shown. Extraction accuracy depends on the source image/font quality — always check the original for important documents."
   }
 };
@@ -168,6 +185,9 @@ function applyLang() {
   document.getElementById("result-h").textContent = t("result_h");
   document.getElementById("copyBtn").textContent = t("copy_btn");
   document.getElementById("rotateBtn").textContent = t("rotate_btn");
+  document.getElementById("zoomOutBtn").setAttribute("aria-label", t("zoom_out"));
+  document.getElementById("zoomInBtn").setAttribute("aria-label", t("zoom_in"));
+  document.getElementById("zoomFitBtn").textContent = t("zoom_fit");
   document.getElementById("disclaim").textContent = t("disclaim");
   if (_lastStatusKey) {
     const status = document.getElementById("status");
@@ -277,11 +297,31 @@ function showPreview(src, caption) {
   document.getElementById("previewImg").src = src;
   document.getElementById("previewCap").textContent = caption || "";
   document.getElementById("previewWrap").classList.add("show");
+  resetZoom();
 }
 function hidePreview() {
   if (_previewUrl && _previewUrl.startsWith("blob:")) { URL.revokeObjectURL(_previewUrl); }
   _previewUrl = null;
   document.getElementById("previewWrap").classList.remove("show");
+}
+
+/* ───────── 미리보기 확대/축소 ─────────
+   현장에서 원본과 OCR 결과를 대조할 수 있도록 확대/축소 + 스크롤 팬 지원.
+   실제 OCR에 전송되는 이미지 데이터와는 무관 — 화면 표시 크기만 조절한다. */
+const ZOOM_MIN = 50, ZOOM_MAX = 300, ZOOM_STEP = 25;
+let _zoomPct = 100;
+function applyZoom() {
+  document.getElementById("previewImg").style.width = _zoomPct + "%";
+  document.getElementById("zoomPct").textContent = _zoomPct + "%";
+  document.getElementById("zoomOutBtn").disabled = _zoomPct <= ZOOM_MIN;
+  document.getElementById("zoomInBtn").disabled = _zoomPct >= ZOOM_MAX;
+}
+function resetZoom() {
+  _zoomPct = 100;
+  applyZoom();
+  const scroll = document.getElementById("previewScroll");
+  scroll.scrollTop = 0;
+  scroll.scrollLeft = 0;
 }
 
 /* ───────── OCR 호출 ───────── */
@@ -441,6 +481,16 @@ document.getElementById("fileInput").addEventListener("change", (e) => {
   if (e.target.files[0]) handleFile(e.target.files[0]);
 });
 document.getElementById("rotateBtn").addEventListener("click", handleRotate);
+
+document.getElementById("zoomInBtn").addEventListener("click", () => {
+  _zoomPct = Math.min(ZOOM_MAX, _zoomPct + ZOOM_STEP);
+  applyZoom();
+});
+document.getElementById("zoomOutBtn").addEventListener("click", () => {
+  _zoomPct = Math.max(ZOOM_MIN, _zoomPct - ZOOM_STEP);
+  applyZoom();
+});
+document.getElementById("zoomFitBtn").addEventListener("click", resetZoom);
 
 const dropEl = document.getElementById("drop");
 ["dragenter", "dragover"].forEach(ev => dropEl.addEventListener(ev, (e) => { e.preventDefault(); dropEl.classList.add("drag"); }));
