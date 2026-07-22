@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- iframe hide 스크립트 없음 — 추가 금지 (허브 iframe 로드 시 헤더 유지) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 상담사 — WorksFree</title>
+<style>
+:root {
+  --surface:#ffffff; --bg:#f6f7f9; --border:#e4e8ee;
+  --text:#22303e; --muted:#5b6b7b; --hint:#8b98a5;
+  --blue:#1a5c9e; --blue-soft:#eaf1f8; --amber:#b06a00; --green:#0e7a4e;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+header {
+  position:sticky; top:0; z-index:100;
+  min-height:72px; padding:14px 24px;
+  display:flex; align-items:center; gap:14px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+}
+.hdr-icon  { font-size:26px; flex-shrink:0; }
+.hdr-info  { flex:1; }
+.hdr-title { font-size:17px; font-weight:600; letter-spacing:-.2px; }
+.hdr-sub   { font-size:13px; color:var(--muted); margin-top:2px; }
+button:focus-visible, textarea:focus-visible, a:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
+
+.page { max-width:760px; margin:0 auto; padding:22px 18px 72px; }
+.intro { font-size:13px; color:var(--muted); margin-bottom:16px; }
+
+form.ask { display:flex; flex-direction:column; gap:8px; }
+label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+textarea { width:100%; padding:13px 15px; border:1.5px solid var(--border); border-radius:10px; font-size:15px; background:var(--surface); resize:vertical; min-height:64px; font-family:inherit; }
+.ask-row { display:flex; justify-content:flex-end; gap:8px; align-items:center; }
+.opt-row { display:flex; align-items:center; gap:6px; margin-right:auto; font-size:12.5px; color:var(--muted); }
+.opt-row input { accent-color:var(--blue); cursor:pointer; }
+.opt-row label { cursor:pointer; }
+.remaining { font-size:12px; color:var(--hint); margin-right:auto; }
+button.ask-btn { background:var(--blue); color:#fff; border:none; border-radius:10px; padding:10px 22px; font-size:14.5px; cursor:pointer; }
+button.ask-btn:disabled { background:#a9bfd4; cursor:not-allowed; }
+
+#status { min-height:1.4em; color:var(--muted); font-size:13px; margin:10px 0; }
+#status.err { color:#b3261e; }
+
+.thread { display:flex; flex-direction:column; gap:18px; margin-top:18px; }
+.qa { border:1px solid var(--border); border-radius:12px; background:var(--surface); overflow:hidden; }
+.qa-q { background:var(--blue-soft); color:var(--blue); font-weight:600; font-size:14px; padding:12px 16px; }
+.qa-a { padding:14px 16px; font-size:14.5px; white-space:pre-wrap; }
+.qa-a.streaming::after { content:"▌"; animation:blink 1s step-start infinite; color:var(--blue); }
+@keyframes blink { 50% { opacity:0; } }
+.qa-src { padding:0 16px 14px; font-size:11.5px; color:var(--hint); }
+.qa-src ul { margin:4px 0 0 18px; }
+
+.disclaim { font-size:11.5px; color:var(--hint); margin-top:26px; border-top:1px solid var(--border); padding-top:12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">🤖</div>
+  <div class="hdr-info">
+    <div class="hdr-title" id="hdr-title">AI 상담사</div>
+    <div class="hdr-sub" id="hdr-sub">지원제도 카드·NAS 구축 가이드 자료를 근거로 답변합니다</div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="intro" id="intro">등록된 문서(지원제도 카드, NAS 풀스택 가이드, NAS 구축 블로그) 범위 안에서만 답변합니다. 범위 밖 질문은 "확인할 수 없습니다"로 답할 수 있습니다.</div>
+
+  <form class="ask" id="f">
+    <label class="sr" for="q" id="q-label">질문 입력</label>
+    <textarea id="q" placeholder="예: 지원제도 카드는 몇 건이 등록되어 있어?" autocomplete="off"></textarea>
+    <div class="ask-row">
+      <div class="opt-row">
+        <input type="checkbox" id="streamToggle">
+        <label for="streamToggle" id="streamLabel">실시간 스트리밍</label>
+      </div>
+      <span class="remaining" id="remaining" aria-live="polite"></span>
+      <button class="ask-btn" type="submit" id="askBtn">물어보기</button>
+    </div>
+  </form>
+
+  <div id="status" role="status" aria-live="polite"></div>
+  <div class="thread" id="thread" aria-live="polite"></div>
+
+  <div class="disclaim" id="disclaim">
+    ※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다.
+    답변은 등록된 문서 요약을 근거로 생성되며, 실행 전 반드시 원문·최신 공고를 확인하세요.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ───────── i18n ───────── */
+const I18N = {
+  ko: {
+    hdr_title:"AI 상담사",
+    hdr_sub:"지원제도 카드·NAS 구축 가이드 자료를 근거로 답변합니다",
+    intro:"등록된 문서(지원제도 카드, NAS 풀스택 가이드, NAS 구축 블로그) 범위 안에서만 답변합니다. 범위 밖 질문은 \"확인할 수 없습니다\"로 답할 수 있습니다.",
+    q_label:"질문 입력", ph:"예: 지원제도 카드는 몇 건이 등록되어 있어?",
+    ask_btn:"물어보기", asking:"생성 중...",
+    stream_label:"실시간 스트리밍",
+    remaining:n=>`오늘 남은 질문 ${n}회`, remaining_unlimited:"오늘 질문 횟수 무제한 (관리자)",
+    login_required:"로그인 후 이용 가능한 기능입니다.",
+    rate_limited:"오늘 사용 가능한 질문 횟수를 모두 사용했습니다. 내일 다시 시도해 주세요.",
+    pc_offline:"로컬 AI 서버가 오프라인입니다. 잠시 후 다시 시도해 주세요.",
+    error:"답변 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    sources:"참고 문서",
+    disclaim:"※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다. 답변은 등록된 문서 요약을 근거로 생성되며, 실행 전 반드시 원문·최신 공고를 확인하세요."
+  },
+  en: {
+    hdr_title:"AI Assistant",
+    hdr_sub:"Answers grounded in support program cards and NAS build guides",
+    intro:"Answers are limited to the registered documents (support program cards, NAS full-stack guide, NAS build blog). Out-of-scope questions may be answered with \"cannot be confirmed\".",
+    q_label:"Enter question", ph:"e.g. How many support program cards are registered?",
+    ask_btn:"Ask", asking:"Generating...",
+    stream_label:"Stream response",
+    remaining:n=>`${n} questions left today`, remaining_unlimited:"Unlimited today (admin)",
+    login_required:"Sign in to use this feature.",
+    rate_limited:"You've used all your questions for today. Please try again tomorrow.",
+    pc_offline:"The local AI server is offline. Please try again shortly.",
+    error:"Failed to generate an answer. Please try again shortly.",
+    sources:"Sources",
+    disclaim:"※ This feature only works while the local PC server is on. If it's offline, a notice is shown. Answers are generated from registered document summaries — always verify the original source before acting."
+  }
+};
+// 언어 토글은 이 페이지에 두지 않는다 — 허브 사이드바 상단의 공용 KO/EN 토글이
+// wf_lang postMessage로 전파해주는 값을 그대로 따른다 (다른 iframe 노드들과 동일한 패턴).
+let lang = localStorage.getItem("wf_lang") || "ko";
+const t = k => I18N[lang][k];
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.getElementById("hdr-title").textContent = t("hdr_title");
+  document.getElementById("hdr-sub").textContent = t("hdr_sub");
+  document.getElementById("intro").textContent = t("intro");
+  document.getElementById("q-label").textContent = t("q_label");
+  document.getElementById("q").placeholder = t("ph");
+  document.getElementById("askBtn").textContent = t("ask_btn");
+  document.getElementById("disclaim").textContent = t("disclaim");
+  document.getElementById("streamLabel").textContent = t("stream_label");
+}
+window.addEventListener("message", (e) => {
+  if (e.data && e.data.type === "wf_lang" && I18N[e.data.lang]) {
+    lang = e.data.lang;
+    applyLang();
+  }
+});
+
+/* ───────── Supabase (허브와 동일 anon key 사용) ───────── */
+const RAG_WORKER_URL = "https://biz-rag.worksfree.workers.dev/chat";
+let sbClient = null;
+try {
+  if (window.supabase) {
+    sbClient = window.supabase.createClient(
+      "https://rkycwfpkzorfpcxfvaqt.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs",
+      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } }
+    );
+  }
+} catch (e) { /* SDK 로드 실패 시 sbClient는 null로 유지 — 질문 시 로그인 필요 메시지 표시 */ }
+
+function esc(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+
+function sourcesHtml(sources) {
+  return sources && sources.length
+    ? `<div class="qa-src"><b>${t("sources")}</b><ul>${sources.map(s => `<li>${esc(s.title)} — ${esc(s.source)}</li>`).join("")}</ul></div>`
+    : "";
+}
+
+// answer가 null이면 스트리밍용 빈 말풍선을 만들어 반환(이후 updateStreamingQA로 채움)
+function appendQA(question, answer, sources) {
+  const thread = document.getElementById("thread");
+  const box = document.createElement("div");
+  box.className = "qa";
+  const streaming = answer === null;
+  // 스트리밍 중엔 #thread의 aria-live가 토큰마다 반응하지 않도록 답변 영역만 aria-live="off"
+  box.innerHTML = `
+    <div class="qa-q">${esc(question)}</div>
+    <div class="qa-a${streaming ? " streaming" : ""}"${streaming ? ' aria-live="off"' : ""}>${esc(answer || "")}</div>
+    ${streaming ? "" : sourcesHtml(sources)}`;
+  thread.appendChild(box);
+  box.scrollIntoView({ behavior: "smooth", block: "start" });
+  return box;
+}
+
+function finalizeStreamingQA(box, sources) {
+  const aEl = box.querySelector(".qa-a");
+  aEl.classList.remove("streaming");
+  const srcDiv = document.createElement("div");
+  srcDiv.innerHTML = sourcesHtml(sources);
+  if (srcDiv.firstChild) box.appendChild(srcDiv.firstChild);
+}
+
+/* ───────── 재접속 시 기존 대화 로딩 (Supabase 직접 조회, RLS로 본인 행만 반환) ───────── */
+async function loadHistory(session) {
+  const { data, error } = await sbClient
+    .from("ai_helper_messages")
+    .select("role,content,sources,created_at")
+    .order("created_at", { ascending: true })
+    .limit(50);
+  if (error || !data || !data.length) return;
+  let pendingQ = null;
+  for (const row of data) {
+    if (row.role === "user") {
+      pendingQ = row.content;
+    } else if (row.role === "assistant" && pendingQ !== null) {
+      appendQA(pendingQ, row.content, row.sources);
+      pendingQ = null;
+    }
+  }
+}
+
+/* ───────── 질의 — 스트리밍 / 비스트리밍 공통 진입점 ───────── */
+document.getElementById("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const qEl = document.getElementById("q");
+  const question = qEl.value.trim();
+  if (!question) return;
+
+  const btn = document.getElementById("askBtn");
+  const status = document.getElementById("status");
+  status.className = "";
+  status.textContent = "";
+
+  if (!sbClient) { status.className = "err"; status.textContent = t("login_required"); return; }
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (!session) { status.className = "err"; status.textContent = t("login_required"); return; }
+
+  const useStream = document.getElementById("streamToggle").checked;
+  btn.disabled = true;
+  btn.textContent = t("asking");
+  status.textContent = t("asking");
+
+  try {
+    if (useStream) {
+      await askStreaming(session, question, status);
+    } else {
+      await askOnce(session, question, status);
+    }
+    qEl.value = "";
+  } catch (err) {
+    status.className = "err"; status.textContent = t("error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = t("ask_btn");
+  }
+});
+
+function applyErrorStatus(status, resp, data) {
+  if (resp.status === 401 || data.error === "unauthenticated" || data.error === "invalid_session") {
+    status.className = "err"; status.textContent = t("login_required");
+  } else if (resp.status === 429 || data.error === "rate_limited") {
+    status.className = "err"; status.textContent = t("rate_limited");
+  } else if (resp.status === 503 || data.error === "pc_offline") {
+    status.className = "err"; status.textContent = t("pc_offline");
+  } else {
+    status.className = "err"; status.textContent = t("error");
+  }
+}
+
+async function askOnce(session, question, status) {
+  const resp = await fetch(RAG_WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ access_token: session.access_token, question, stream: false }),
+  });
+  let data = {};
+  try { data = await resp.json(); } catch {}
+
+  if (!resp.ok || !data.ok) {
+    applyErrorStatus(status, resp, data);
+    return;
+  }
+  status.textContent = "";
+  appendQA(question, data.answer, data.sources);
+  if (data.unlimited) {
+    document.getElementById("remaining").textContent = t("remaining_unlimited");
+  } else if (typeof data.remaining_today === "number") {
+    document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
+  }
+}
+
+async function askStreaming(session, question, status) {
+  const resp = await fetch(RAG_WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ access_token: session.access_token, question, stream: true }),
+  });
+
+  if (!resp.ok || !resp.body) {
+    let data = {};
+    try { data = await resp.json(); } catch {}
+    applyErrorStatus(status, resp, data);
+    return;
+  }
+
+  status.textContent = "";
+  const box = appendQA(question, null, null);
+  const aEl = box.querySelector(".qa-a");
+
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let sawError = false;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let idx;
+    while ((idx = buffer.indexOf("\n")) >= 0) {
+      const line = buffer.slice(0, idx).trim();
+      buffer = buffer.slice(idx + 1);
+      if (!line) continue;
+      let obj;
+      try { obj = JSON.parse(line); } catch { continue; }
+      if (obj.type === "chunk") {
+        aEl.textContent += obj.text;
+        box.scrollIntoView({ behavior: "smooth", block: "end" });
+      } else if (obj.type === "done") {
+        finalizeStreamingQA(box, obj.sources);
+        if (obj.unlimited) {
+          document.getElementById("remaining").textContent = t("remaining_unlimited");
+        } else if (typeof obj.remaining_today === "number") {
+          document.getElementById("remaining").textContent = t("remaining")(obj.remaining_today);
+        }
+      } else if (obj.type === "error") {
+        sawError = true;
+        aEl.classList.remove("streaming");
+        status.className = "err";
+        status.textContent = t("pc_offline");
+      }
+    }
+  }
+  if (sawError && !aEl.textContent.trim()) {
+    box.remove(); // 텍스트를 하나도 못 받은 채 실패했으면 빈 말풍선을 남기지 않음
+  }
+}
+
+(async () => {
+  applyLang();
+  if (sbClient) {
+    const { data: { session } } = await sbClient.auth.getSession();
+    if (session) await loadHistory(session);
+  }
+})();
+</script>
+</body>
+</html>

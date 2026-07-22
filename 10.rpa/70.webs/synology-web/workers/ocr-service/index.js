@@ -51,7 +51,7 @@ const ALLOWED_ORIGINS = new Set([
   "https://portal.worksfree.kr",
 ]);
 
-const DAILY_LIMIT = 30; // 이미지 1장 = 1회 (PDF는 페이지당 1회 소모)
+const DAILY_LIMIT = 30; // 이미지 1장 = 1회 (PDF는 페이지당 1회 소모). 관리자(profiles.role)는 무제한 — isAdmin() 참고
 const OCR_MODEL = "richardyoung/olmocr2:7b-q8";
 // 프롬프트는 짧고 단순하게 유지한다 — 실측으로 "HTML/Markdown 표를 쓰지 마라" 같은
 // 부정 지시를 추가하면 오히려 결과가 더 불안정해짐을 확인했다(정상 문서에서 CER
@@ -86,6 +86,17 @@ async function verifyUser(accessToken) {
   if (!r.ok) return null;
   const u = await r.json();
   return u && u.id ? u : null;
+}
+
+// 관리자는 일일 횟수 제한 없이 사용 — profiles.role은 클라이언트가 아니라 서버(여기)에서
+// 직접 조회해 신뢰한다(클라이언트가 role을 보내는 방식은 위조 가능해 금지 패턴).
+async function isAdmin(accessToken, userId) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=role`, {
+    headers: { Authorization: `Bearer ${accessToken}`, apikey: SUPABASE_ANON },
+  });
+  if (!r.ok) return false;
+  const rows = await r.json().catch(() => []);
+  return rows?.[0]?.role === "admin";
 }
 
 async function checkAndBumpRateLimit(env, userId) {
@@ -276,8 +287,12 @@ export default {
     const user = await verifyUser(access_token);
     if (!user) return json({ error: "invalid_session" }, 401, origin);
 
-    const rate = await checkAndBumpRateLimit(env, user.id);
-    if (!rate.ok) return json({ error: "rate_limited", limit: DAILY_LIMIT }, 429, origin);
+    const admin = await isAdmin(access_token, user.id);
+    let rate = { ok: true, remaining: null, unlimited: true };
+    if (!admin) {
+      rate = await checkAndBumpRateLimit(env, user.id);
+      if (!rate.ok) return json({ error: "rate_limited", limit: DAILY_LIMIT }, 429, origin);
+    }
 
     if (!env.PC_AI_URL || !env.CF_ACCESS_CLIENT_ID || !env.CF_ACCESS_CLIENT_SECRET) {
       return json({ error: "server_misconfigured" }, 500, origin);
@@ -291,7 +306,13 @@ export default {
     }
 
     return json(
-      { ok: true, text: result.text, low_confidence: result.lowConfidence, remaining_today: rate.remaining },
+      {
+        ok: true,
+        text: result.text,
+        low_confidence: result.lowConfidence,
+        remaining_today: rate.remaining,
+        unlimited: !!rate.unlimited,
+      },
       200,
       origin
     );

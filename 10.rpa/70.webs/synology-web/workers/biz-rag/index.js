@@ -40,7 +40,7 @@ const ALLOWED_ORIGINS = new Set([
   "https://portal.worksfree.kr",
 ]);
 
-const DAILY_LIMIT = 20;
+const DAILY_LIMIT = 20; // 관리자(profiles.role)는 무제한 — isAdmin() 참고
 const TOP_K = 5;
 const CONTEXT_TURNS = 3; // 최근 3턴(6개 메시지)만 생성 프롬프트에 포함 — 보관 상한과는 별개
 const EMBED_MODEL = "bge-m3";
@@ -73,6 +73,18 @@ async function verifyUser(accessToken) {
   if (!r.ok) return null;
   const u = await r.json();
   return u && u.id ? u : null;
+}
+
+// 관리자는 일일 횟수 제한 없이 사용 — profiles.role은 클라이언트가 아니라 서버(여기)에서
+// 직접 조회해 신뢰한다(클라이언트가 role을 보내는 방식은 위조 가능해 금지 패턴). ocr-service와
+// 동일 패턴.
+async function isAdmin(accessToken, userId) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=role`, {
+    headers: { Authorization: `Bearer ${accessToken}`, apikey: SUPABASE_ANON },
+  });
+  if (!r.ok) return false;
+  const rows = await r.json().catch(() => []);
+  return rows?.[0]?.role === "admin";
 }
 
 async function checkAndBumpRateLimit(env, userId) {
@@ -282,9 +294,13 @@ export default {
     const user = await verifyUser(access_token);
     if (!user) return json({ error: "invalid_session" }, 401, origin);
 
-    // 2) 일일 사용량 제한
-    const rate = await checkAndBumpRateLimit(env, user.id);
-    if (!rate.ok) return json({ error: "rate_limited", limit: DAILY_LIMIT }, 429, origin);
+    // 2) 일일 사용량 제한 (관리자는 무제한)
+    const admin = await isAdmin(access_token, user.id);
+    let rate = { ok: true, remaining: null, unlimited: true };
+    if (!admin) {
+      rate = await checkAndBumpRateLimit(env, user.id);
+      if (!rate.ok) return json({ error: "rate_limited", limit: DAILY_LIMIT }, 429, origin);
+    }
 
     if (!env.PC_AI_URL || !env.CF_ACCESS_CLIENT_ID || !env.CF_ACCESS_CLIENT_SECRET || !env.RAG_VECTORIZE) {
       return json({ error: "server_misconfigured" }, 500, origin);
@@ -310,6 +326,7 @@ export default {
     const sourcesPayload = {
       sources: chunks.map((c) => ({ title: c.title, source: c.source })),
       remaining_today: rate.remaining,
+      unlimited: !!rate.unlimited,
     };
 
     // 6) 생성 — stream 여부에 따라 분기

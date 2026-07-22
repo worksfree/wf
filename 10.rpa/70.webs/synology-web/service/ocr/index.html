@@ -134,7 +134,7 @@ const I18N = {
     intro:"PNG·JPG 이미지 또는 PDF 파일을 올리면 텍스트를 추출합니다. PDF는 페이지별로 처리되며 페이지 수만큼 사용 횟수를 소모합니다.",
     pick_label:"파일 선택", pick_btn:"파일 선택",
     drop_hint:"또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)",
-    remaining:n=>`오늘 남은 처리 ${n}회`,
+    remaining:n=>`오늘 남은 처리 ${n}회`, remaining_unlimited:"오늘 처리 횟수 무제한 (관리자)",
     processing:"처리 중...", processing_page:(i,n)=>`처리 중... (${i}/${n} 페이지)`,
     result_h:"추출된 텍스트", copy_btn:"복사", copied:"복사됨",
     login_required:"로그인 후 이용 가능한 기능입니다.",
@@ -154,7 +154,7 @@ const I18N = {
     intro:"Upload a PNG/JPG image or a PDF to extract text. PDFs are processed page by page, consuming one use per page.",
     pick_label:"Choose file", pick_btn:"Choose file",
     drop_hint:"or drag and drop a file here (PNG, JPG, PDF)",
-    remaining:n=>`${n} uses left today`,
+    remaining:n=>`${n} uses left today`, remaining_unlimited:"Unlimited today (admin)",
     processing:"Processing...", processing_page:(i,n)=>`Processing... (page ${i}/${n})`,
     result_h:"Extracted text", copy_btn:"Copy", copied:"Copied",
     login_required:"Sign in to use this feature.",
@@ -388,7 +388,9 @@ async function runOcrPipeline(images, session) {
     }
     if (data.low_confidence) lowConfidence = true;
     texts.push(images.length > 1 ? `--- Page ${i + 1} ---\n${data.text}` : data.text);
-    if (typeof data.remaining_today === "number") {
+    if (data.unlimited) {
+      document.getElementById("remaining").textContent = t("remaining_unlimited");
+    } else if (typeof data.remaining_today === "number") {
       document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
     }
   }
