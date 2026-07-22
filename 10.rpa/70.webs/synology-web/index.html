@@ -1911,7 +1911,7 @@ function setLang(l) {
   applyHubLang();
   // 현재 iframe에 언어 변경 전파
   const iframe = document.getElementById('contentFrame');
-  if (iframe && iframe.src && iframe.contentWindow) {
+  if (iframe && currentSrc && iframe.contentWindow) {
     iframe.contentWindow.postMessage({ type: 'wf_lang', lang: l }, '*');
   }
 }
@@ -2065,7 +2065,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.50';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.7.63';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2104,6 +2104,7 @@ const TREE = [
       { label:{ko:'변환 결과 검증',   en:'Conversion Verifier'}, icon:'✦', iframe:'service/conversion-verifier/index.html' },
       { label:{ko:'앱 요청 게시판',   en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
       { label:{ko:'전자책 미리보기',   en:'eBook Preview'},       icon:'📖', iframe:'service/ebook/index.html' },
+      { label:{ko:'OCR 텍스트 추출',   en:'OCR Text Extraction'}, icon:'🔎', iframe:'service/ocr/index.html' },
     ]
   },
   {
@@ -2113,6 +2114,7 @@ const TREE = [
       { label:{ko:'중대재해처벌법',         en:'Serious Accident Act'}, icon:'⚖', iframe:'consulting/jdh/index.html',         consultantOnly:true },
       { label:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'},   icon:'🏪', iframe:'consulting/soho/index.html',        consultantOnly:true },
       { label:{ko:'지원제도 내비게이터',    en:'Support Navigator'},    icon:'🎯', iframe:'consulting/support/index.html',     consultantOnly:true },
+      { label:{ko:'AI 상담사',             en:'AI Assistant'},         icon:'🤖', iframe:'consulting/ai-helper/index.html',   consultantOnly:true },
       { label:{ko:'현장클리닉 관리',        en:'Field Clinic'},         icon:'🏥', iframe:'consulting/g1/index.html',          consultantOnly:true },
       { label:{ko:'예비창업패키지',         en:'Pre-Startup Package'},  icon:'🚀', iframe:'consulting/prebiz/index.html',      consultantOnly:true },
       { label:{ko:'컨설팅 마인드맵',        en:'Consulting Mindmap'},   icon:MINDMAP_ICON, iframe:'consulting/mindmap/index.html', consultantOnly:true },
@@ -2247,6 +2249,10 @@ const DASH_CARDS = [
     desc: {ko:'CEO 리스크·세금 전략 · 임원보험 제안서 도구', en:'CEO risk & tax strategy · executive insurance proposal tools'},
     iframe:'consulting/ceo/index.html', partnerOnly:true },
   /* ── 재무관리 ───────────────────────────────── */
+  { section:'finance', icon:'📊',
+    title:{ko:'자산 통합 관리',     en:'Asset Portfolio'},
+    desc: {ko:'주식·ETF 수익률 · 월배당 현황 · 순자산 추이', en:'Stocks & ETF P&L · Monthly dividends · Net worth'},
+    iframe:'consulting/asset/index.html', consultantOnly:true },
   { section:'finance', icon:'💰',
     title:{ko:'연금 시뮬레이터 v1',  en:'Pension Simulator v1'},
     desc: {ko:'개인·퇴직연금 절세 설계 · 2026 세법 · GFC 상담용', en:'Pension payout tax planning · 2026 KR Tax Law · GFC Advisory'},
@@ -2255,10 +2261,6 @@ const DASH_CARDS = [
     title:{ko:'연금 시뮬레이터 v2',  en:'Pension Simulator v2'},
     desc: {ko:'물가연동 최적 인출 전략 · 세금·건보료 최소화 엔진', en:'Inflation-adjusted optimal withdrawal · tax & premium minimizer'},
     iframe:'consulting/pension/v2/index.html', consultantOnly:true },
-  { section:'finance', icon:'📊',
-    title:{ko:'자산 통합 관리',     en:'Asset Portfolio'},
-    desc: {ko:'주식·ETF 수익률 · 월배당 현황 · 순자산 추이', en:'Stocks & ETF P&L · Monthly dividends · Net worth'},
-    iframe:'consulting/asset/index.html', consultantOnly:true },
   /* ── 파일럿 ─────────────────────────────────── */
   { section:'pilot', icon:'🌮',
     title:{ko:'타코매니저 AI v1',    en:'Taco Manager AI v1'},
@@ -2619,6 +2621,17 @@ function setActive(el) {
 ════════════════════════════════════════════ */
 const dashGrid = document.getElementById('dashGrid');
 
+/* TREE 순서로 섹션의 리프 노드(iframe 있는 노드) 재귀 수집 */
+function _collectSectionLeaves(sectionNode) {
+  const leaves = [];
+  function collect(node) {
+    if (node.iframe) { leaves.push(node); return; }
+    if (node.children) node.children.forEach(collect);
+  }
+  if (sectionNode.children) sectionNode.children.forEach(collect);
+  return leaves;
+}
+
 /* 홈 화면 — 섹션 타일 렌더 */
 function renderHomeSections() {
   dashGrid.innerHTML = '';
@@ -2626,9 +2639,9 @@ function renderHomeSections() {
   if (titleEl) titleEl.textContent = t('dashboard');
   TREE.forEach(node => {
     if (!node.slug) return;
-    const count = DASH_CARDS.filter(c =>
-      c.section === node.slug &&
-      !(c.iframe && getAccessLevel(c.iframe) === 'hidden')
+    // TREE 기반으로 리프 노드 수집 — TREE에 노드 추가 시 자동 반영
+    const count = _collectSectionLeaves(node).filter(leaf =>
+      !(leaf.iframe && getAccessLevel(leaf.iframe.split('?')[0]) === 'hidden')
     ).length;
     if (count === 0) return;
     const descObj = SECTION_DESCS[node.slug] || {};
@@ -2651,43 +2664,64 @@ function renderHomeSections() {
 
 function renderDashCards(sectionFilter=null) {
   dashGrid.innerHTML = '';
-  DASH_CARDS.forEach(card => {
-    // 섹션 필터 (서브 대시보드)
-    if (sectionFilter && card.section !== sectionFilter) return;
-    // 페이지 접근 규칙: hidden → 대시보드에서 완전 숨김
-    if (card.iframe && getAccessLevel(card.iframe) === 'hidden') return;
 
-    // DB 규칙이 있으면 그것으로 판단 (노드 플래그 무시), 없으면 노드 플래그 사용
-    const _cardClean = card.iframe?.split('?')[0];
-    const _hasCardRule = _cardClean && Object.prototype.hasOwnProperty.call(pageAccessRules, _cardClean);
+  // DASH_CARDS를 iframe 경로 기준 메타데이터 맵으로 변환 (desc·제목·태그 보조)
+  const cardMeta = {};
+  DASH_CARDS.forEach(card => {
+    const key = card.iframe?.split('?')[0];
+    if (key && !cardMeta[key]) cardMeta[key] = card;
+  });
+
+  // TREE 순서로 리프 노드 수집 — 사이드바와 항상 동기화
+  const leaves = [];
+  if (sectionFilter) {
+    const sectionNode = TREE.find(n => n.slug === sectionFilter);
+    if (sectionNode) leaves.push(..._collectSectionLeaves(sectionNode));
+  } else {
+    TREE.forEach(n => { if (n.slug) leaves.push(..._collectSectionLeaves(n)); });
+  }
+
+  leaves.forEach(node => {
+    const cleanSrc = node.iframe?.split('?')[0];
+    if (!cleanSrc) return;
+
+    // 페이지 접근 규칙: hidden → 대시보드에서 완전 숨김
+    if (getAccessLevel(cleanSrc) === 'hidden') return;
+
+    // DASH_CARDS 메타데이터 보조맵 — desc·풍부한 제목·태그 제공 (없으면 TREE 기본값)
+    const meta = cardMeta[cleanSrc] || {};
+    const icon     = meta.icon  || node.icon || '';
+    const titleStr = meta.title ? getLabel(meta.title) : getLabel(node.label);
+    const descStr  = meta.desc  ? getLabel(meta.desc)  : '';
+
+    // DB 규칙이 있으면 hidden은 위에서 걸렀으므로 잠금 없음, 없으면 TREE 노드 플래그 사용
+    const _hasCardRule = Object.prototype.hasOwnProperty.call(pageAccessRules, cleanSrc);
     const isLocked = _hasCardRule
-      ? false  // hidden은 위에서 이미 필터됨 → 나머지는 잠금 없음
+      ? false
       : (
-          (card.adminOnly && userRole !== 'admin') ||
-          (card.consultantOnly && !canConsult()) ||
-          (card.partnerOnly && !IS_PARTNER) ||
-          (card.roleOnly && userRole !== 'admin' && userRole !== card.roleOnly) ||
-          (card.memberOnly  && !authUser)
+          (node.adminOnly      && userRole !== 'admin')                           ||
+          (node.consultantOnly && !canConsult())                                  ||
+          (node.partnerOnly    && !IS_PARTNER)                                    ||
+          (node.roleOnly       && userRole !== 'admin' && userRole !== node.roleOnly) ||
+          (node.memberOnly     && !authUser)
         );
 
-    const titleStr = getLabel(card.title);
-    const descStr  = getLabel(card.desc);
     const el = document.createElement('div');
 
     if (isLocked) {
       /* ── 잠금 카드: 제목 위에, 아이콘·설명은 card-locked-body 안 ── */
       el.className = 'dash-card locked';
-      const lockLabel = card.adminOnly
+      const lockLabel = node.adminOnly
         ? t('denied_admin_title')
-        : card.consultantOnly
+        : node.consultantOnly
           ? t('card_locked')    // 접근 제한 — 컨설턴트 전용
-          : card.memberOnly
+          : node.memberOnly
             ? t('login_req')    // 로그인 필요 — 앱스토어
             : t('card_coming'); // 개발 예정 — 파트너 전용
       el.innerHTML = `
         <div class="card-title">${titleStr}</div>
         <div class="card-locked-body">
-          <div class="card-icon${card.icon.length > 2 && !card.icon.startsWith('<') ? ' text' : ''}">${card.icon}</div>
+          <div class="card-icon${icon.length > 2 && !icon.startsWith('<') ? ' text' : ''}">${icon}</div>
           <div class="card-desc">${descStr}</div>
           <div class="card-lock-overlay">
             <span class="lock-icon">🔒</span>
@@ -2697,34 +2731,37 @@ function renderDashCards(sectionFilter=null) {
       `;
       el.onclick = () => {
         // 보안: 대시보드 잠금 카드도 loadIframe() 없이 overlay만 — 콘텐츠 미로드
-        if (card.adminOnly)      { showAccessBlur('admin');      return; }
-        if (card.consultantOnly) { showAccessBlur('consultant'); return; }
-        if (card.partnerOnly)    { showAccessBlur('partner');    return; }
+        if (node.adminOnly)      { showAccessBlur('admin');      return; }
+        if (node.consultantOnly) { showAccessBlur('consultant'); return; }
+        if (node.partnerOnly)    { showAccessBlur('partner');    return; }
         showDenied('denied_title', 'denied_desc');
       };
     } else {
       /* ── 접근 가능 카드 ── */
-      el.className = `dash-card${card.gfcTag ? ' gfc-card' : ''}`;
-      const chipHtml = card.memberOnly
+      const gfcTag = meta.gfcTag || false;
+      const proTag = meta.proTag || false;
+      const dev    = meta.dev    || false;
+      el.className = `dash-card${gfcTag ? ' gfc-card' : ''}`;
+      const chipHtml = node.memberOnly
         ? `<div class="card-member">${t('member_tag')}</div>`
-        : card.consultantOnly
+        : node.consultantOnly
           ? `<div class="card-consultant">${t('consultant_tag')}</div>`
-          : card.gfcTag
+          : gfcTag
             ? `<div class="card-lock">${t('card_lock')}</div>`
-            : card.proTag
+            : proTag
               ? `<div class="card-pro">${t('pro_tag')}</div>`
-              : card.dev
+              : dev
                 ? `<div class="card-dev">${t('dev_tag')}</div>`
                 : '';
       el.innerHTML = `
-        <div class="card-icon${card.icon.length > 2 && !card.icon.startsWith('<') ? ' text' : ''}">${card.icon}</div>
+        <div class="card-icon${icon.length > 2 && !icon.startsWith('<') ? ' text' : ''}">${icon}</div>
         <div class="card-title">${titleStr}</div>
         <div class="card-desc">${descStr}</div>
         ${chipHtml}
       `;
       el.onclick = () => {
-        if (card.memberOnly && !authUser) { loadIframePreview(card.iframe, [], card.title); return; }
-        loadIframe(card.iframe, [], card.title);
+        if (node.memberOnly && !authUser) { loadIframePreview(node.iframe, [], node.label); return; }
+        loadIframe(node.iframe, [], node.label);
       };
     }
     dashGrid.appendChild(el);
@@ -2844,6 +2881,17 @@ function normalizeIframeSrc(src) {
   return s.replace(/^\/+/, '');
 }
 
+/* iframe 네비게이션 — location.replace() 사용으로 브라우저 히스토리 엔트리 생성 방지 */
+function _navIframe(url) {
+  const iframe = document.getElementById('contentFrame');
+  if (!iframe) return;
+  try {
+    iframe.contentWindow.location.replace(url);
+  } catch(e) {
+    iframe.src = url;
+  }
+}
+
 function loadIframe(src, path=[], label='') {
   _navStackPush();
   _loadIframeImpl(src, path, label, true);
@@ -2869,7 +2917,7 @@ function _loadIframeImpl(src, path=[], label='', _pushHist=false) {
   const fc = document.getElementById('frame-container');
   fc.style.display = 'block';
   const iframe = document.getElementById('contentFrame');
-  iframe.src = src + '?v=' + HUB_VERSION;
+  _navIframe(src + '?v=' + HUB_VERSION);
   setBreadcrumb(path, label);
 
   // 접근 제한 오버레이 적용
@@ -2953,7 +3001,7 @@ function _showHomeImpl() {
   fc.style.display = 'none';
   fc.classList.remove('access-blur', 'access-readonly');
   document.getElementById('access-overlay')?.classList.remove('active');
-  document.getElementById('contentFrame').src = 'about:blank';
+  _navIframe('about:blank');
   document.getElementById('bc-trail').innerHTML = '';
   if (typeof renderHomeSections === 'function') renderHomeSections();
 }
@@ -2978,7 +3026,7 @@ function _showSectionDashImpl(node, keepFullSidebar=false, _pushHist=false) {
   fc.style.display = 'none';
   fc.classList.remove('access-blur', 'access-readonly');
   document.getElementById('access-overlay')?.classList.remove('active');
-  document.getElementById('contentFrame').src = 'about:blank';
+  _navIframe('about:blank');
   const titleEl = document.querySelector('#home-screen .home-title');
   if (titleEl) titleEl.textContent = getLabel(node.label);
   setBreadcrumb([], node.label);
@@ -3574,9 +3622,8 @@ function onAuthComplete() {
     _devLoginReload = false;
     const iframe = document.getElementById('contentFrame');
     const fc     = document.getElementById('frame-container');
-    if (fc?.style.display !== 'none' && iframe?.src && currentPath.length > 0) {
-      const baseSrc = iframe.src.split('?')[0].replace(location.origin + '/', '');
-      loadIframe(baseSrc, currentPath, currentLabel);
+    if (fc?.style.display !== 'none' && currentSrc && currentPath.length > 0) {
+      loadIframe(currentSrc, currentPath, currentLabel);
     }
   } else if (!_initialNavDone) {
     // hash → 홈 순서로 처리 (sessionStorage 복원은 hash 라우팅이 대체)
