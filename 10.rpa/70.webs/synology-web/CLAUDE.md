@@ -228,7 +228,7 @@ synology-web/
 
 ```powershell
 .\deploy.ps1   # 또는 deploy.bat 더블클릭
-# [1] test → [2] staging → [3] portal 순서 권장
+# [1] test → [2] staging → [3] www 순서 권장
 ```
 
 ### 자동 처리 항목 (매 배포 시)
@@ -279,7 +279,7 @@ function openFlyer(src) {
 
 NAS nginx가 HTML 파일에 `Cache-Control: no-cache, no-store, must-revalidate`를 보내면 브라우저가 항상 서버에 재검증 요청을 보낸다. `?v=` 파라미터 없이도 최신 HTML이 서빙된다.
 
-`nginx-wfhub.conf`에 설정이 이미 작성돼 있다. **DSM → 웹 스테이션 → 가상 호스트 → 각 환경(test/staging/portal) → 사용자 설정 → 사용자 nginx 설정**에 아래 블록을 추가하면 적용된다.
+`nginx-wfhub.conf`에 설정이 이미 작성돼 있다. **DSM → 웹 스테이션 → 가상 호스트 → 각 환경(test/staging/www) → 사용자 설정 → 사용자 nginx 설정**에 아래 블록을 추가하면 적용된다.
 
 ```nginx
 # HTML은 항상 재검증 (브라우저 휴리스틱 캐시 방지)
@@ -336,7 +336,7 @@ sudo nginx -s reload
 |------|----------|------|------|
 | test (1번) | BUILD (4번째) | 자연 증가, 상한 없음 | `0.7.4.9` → `0.7.4.10` |
 | staging (2번) | PATCH (3번째) | BUILD를 0으로 리셋 | `0.7.4.15` → `0.7.5.0` |
-| portal (3번) | MINOR (2번째) | PATCH·BUILD를 0으로 리셋 | `0.7.5.3` → `0.8.0.0` |
+| www (3번) | MINOR (2번째) | PATCH·BUILD를 0으로 리셋 | `0.7.5.3` → `0.8.0.0` |
 | g1consulting (4번) | BUILD (4번째) | test와 동일 | `0.7.4.9` → `0.7.4.10` |
 
 - BUILD는 test 반복 횟수 — 상한 없이 자연 증가 (`0.7.4.9 → 0.7.4.10`, 캐스케이드 없음).
@@ -358,11 +358,13 @@ sudo nginx -s reload
 |------|-----|----------|------|
 | test | test.worksfree.kr | /volume1/web/test | 8081 |
 | staging | staging.worksfree.kr | /volume1/web/staging | 8082 |
-| portal | www.worksfree.kr | /volume1/web/portal | 8080 |
+| www | www.worksfree.kr | /volume1/web/portal | 8080 |
+
+> NAS 경로(`/volume1/web/portal`)는 폴더명이라 그대로 남아 있다 — 환경 이름은 "www"로 부른다("portal"이라는 이름은 더 이상 쓰지 않음).
 
 ## 결제 데이터 환경 격리 (env 컬럼)
 
-test/staging/portal 세 환경이 **동일한 Supabase DB**를 공유하므로, 결제 관련 테이블에 `env` 컬럼으로 출처를 구분한다.
+test/staging/www 세 환경이 **동일한 Supabase DB**를 공유하므로, 결제 관련 테이블에 `env` 컬럼으로 출처를 구분한다.
 
 ### 컬럼 추가 SQL (최초 1회)
 
@@ -797,7 +799,7 @@ if (!pw) return;
 // ✅ 올바른 패턴
 if (inp) inp.value = (location.hostname.startsWith('test.') || location.hostname === 'localhost')
   ? 'Tank@003412' : '';
-// staging / www(portal) 환경에서는 pre-fill 제거
+// staging / www 환경에서는 pre-fill 제거
 ```
 
 ### postMessage targetOrigin
@@ -890,7 +892,7 @@ NAS scp 배포 전에 반드시 아래 순서를 따른다:
 1. **버전 증가** — `deploy.ps1`의 `$VERSION`과 `index.html`의 `HUB_VERSION`을 동일하게 올린다.
    - test 배포 → BUILD(4번째) 증가: `0.8.7.13` → `0.8.7.14`
    - staging 배포 → PATCH(3번째) 증가, BUILD 리셋
-   - portal 배포 → MINOR(2번째) 증가, PATCH·BUILD 리셋
+   - www 배포 → MINOR(2번째) 증가, PATCH·BUILD 리셋
 
 2. **git commit** — 변경된 파일 전체를 스테이징하고 커밋한다. scp 배포만 하고 커밋하지 않으면 미커밋 상태로 쌓여 나중에 덮어써짐.
 
