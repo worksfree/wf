@@ -163,53 +163,8 @@ body{
 <div class="page-title"><span id="lbl-page-title">QR 코드 생성기</span> <span id="qr-status-badge" class="status-badge badge-wait">⬤ <span id="lbl-status-text">대기중</span></span></div>
 <div class="page-desc" id="lbl-page-desc">URL 또는 텍스트를 입력하고 파라미터를 설정한 후 QR을 생성하세요.</div>
 
-<!-- MODE TABS -->
-<div class="mode-tabs">
-  <button class="mode-tab active" id="tab-single" onclick="switchQrMode('single')">단건 생성</button>
-  <button class="mode-tab" id="tab-bulk" onclick="switchQrMode('bulk')">다건 생성</button>
-</div>
-
-<!-- BULK MODE -->
-<div id="mode-bulk" style="display:none">
-  <div class="bulk-layout">
-    <div class="dropzone" id="dropzone"
-         onclick="document.getElementById('bulk-file').click()"
-         ondragover="event.preventDefault();this.classList.add('drag-over')"
-         ondragleave="this.classList.remove('drag-over')"
-         ondrop="onBulkFileDrop(event)">
-      <input type="file" id="bulk-file" accept=".csv,.txt" style="display:none" onchange="onBulkFileSelect(event)">
-      <div class="drop-icon">📄</div>
-      <div class="drop-msg" id="drop-msg">CSV 파일을 드래그하거나 클릭하여 업로드</div>
-      <div class="drop-sub" id="drop-sub">또는 아래에 URL을 줄바꿈으로 구분해서 입력</div>
-      <div class="drop-file" id="drop-file"></div>
-    </div>
-    <textarea class="bulk-textarea" id="bulk-textarea" rows="4"></textarea>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:10px;" id="lbl-bulk-inherit">현재 단건 설정 (크기·색상·라벨) 상속</div>
-    <div class="bulk-actions">
-      <button class="btn btn-primary btn-sm" id="btn-bulk-start" onclick="startBulk()">생성 시작</button>
-      <button class="btn btn-outline btn-sm" id="btn-bulk-tmpl" onclick="downloadBulkTemplate()">템플릿 다운로드</button>
-      <span class="bulk-count" id="bulk-count"></span>
-      <button class="btn-stop" id="btn-bulk-stop" onclick="stopBulk()" style="display:none">중지</button>
-    </div>
-    <div class="bulk-progress" id="bulk-progress">
-      <div class="progress-bar"><div class="progress-fill" id="bulk-progress-fill"></div></div>
-      <div class="progress-info" id="bulk-progress-info"></div>
-    </div>
-    <div id="bulk-result-wrap" style="display:none">
-      <div class="bulk-result-bar">
-        <button class="btn-dl-zip" id="btn-bulk-dl" onclick="downloadBulkZip()">ZIP 다운로드</button>
-        <span class="bulk-result-meta" id="bulk-result-meta"></span>
-      </div>
-      <div class="bulk-grid" id="bulk-grid"></div>
-    </div>
-  </div>
-</div>
-
-<!-- SINGLE MODE -->
-<div id="mode-single">
-
 <div class="qr-layout">
-  <!-- 설정 패널 -->
+  <!-- 설정 패널 — 단건/다건 공용, 항상 노출(좌측 고정) -->
   <div>
     <div class="panel">
       <div class="panel-title" id="lbl-panel-basic">입력 · 기본 설정</div>
@@ -293,36 +248,81 @@ body{
         </div>
       </div>
       <button class="btn btn-primary" id="btn-generate" onclick="generateQR()">⚡ QR 생성</button>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px;" id="lbl-settings-shared">이 설정은 단건·다건 생성에 공통 적용됩니다. 다건 CSV에서 개별 값을 지정하면 그 값이 우선합니다.</div>
     </div>
   </div>
 
-  <!-- 프리뷰 -->
-  <div class="preview-panel">
-    <div class="panel">
-      <div class="panel-title" id="lbl-panel-preview">미리보기</div>
-      <div class="preview-box">
-        <div class="preview-empty" id="previewEmpty">
-          <div class="icon">▣</div>
-          <p id="lbl-preview-empty">URL을 입력하면<br>QR 코드가 여기에 표시됩니다</p>
+  <!-- 우측: 탭 + 탭별 콘텐츠 -->
+  <div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab-single" onclick="switchQrMode('single')">단건 생성</button>
+      <button class="mode-tab" id="tab-bulk" onclick="switchQrMode('bulk')">다건 생성</button>
+    </div>
+
+    <!-- SINGLE MODE -->
+    <div id="mode-single">
+      <div class="preview-panel">
+        <div class="panel">
+          <div class="panel-title" id="lbl-panel-preview">미리보기</div>
+          <div class="preview-box">
+            <div class="preview-empty" id="previewEmpty">
+              <div class="icon">▣</div>
+              <p id="lbl-preview-empty">URL을 입력하면<br>QR 코드가 여기에 표시됩니다</p>
+            </div>
+            <div id="qr-preview-wrapper">
+              <div id="qr-top-label"></div>
+              <div id="qr-canvas-area"><div id="qr-output"></div></div>
+              <div id="qr-bottom-label"></div>
+            </div>
+          </div>
         </div>
-        <div id="qr-preview-wrapper">
-          <div id="qr-top-label"></div>
-          <div id="qr-canvas-area"><div id="qr-output"></div></div>
-          <div id="qr-bottom-label"></div>
+        <div class="preview-actions">
+          <div class="panel-title" id="lbl-panel-download">다운로드</div>
+          <div class="preview-meta" id="previewMeta"><span id="lbl-status-prefix">상태:</span> <span id="lbl-meta-status">대기중</span></div>
+          <div class="btn-group">
+            <button class="btn btn-success btn-sm" onclick="downloadQR('png')" id="btnPng" disabled>⬇ <span id="lbl-btn-png">PNG 저장</span></button>
+            <button class="btn btn-outline btn-sm" onclick="downloadQR('jpg')" id="btnJpg" disabled>⬇ <span id="lbl-btn-jpg">JPG 저장</span></button>
+          </div>
         </div>
       </div>
     </div>
-    <div class="preview-actions">
-      <div class="panel-title" id="lbl-panel-download">다운로드</div>
-      <div class="preview-meta" id="previewMeta"><span id="lbl-status-prefix">상태:</span> <span id="lbl-meta-status">대기중</span></div>
-      <div class="btn-group">
-        <button class="btn btn-success btn-sm" onclick="downloadQR('png')" id="btnPng" disabled>⬇ <span id="lbl-btn-png">PNG 저장</span></button>
-        <button class="btn btn-outline btn-sm" onclick="downloadQR('jpg')" id="btnJpg" disabled>⬇ <span id="lbl-btn-jpg">JPG 저장</span></button>
+
+    <!-- BULK MODE -->
+    <div id="mode-bulk" style="display:none">
+      <div class="bulk-layout">
+        <div class="dropzone" id="dropzone"
+             onclick="document.getElementById('bulk-file').click()"
+             ondragover="event.preventDefault();this.classList.add('drag-over')"
+             ondragleave="this.classList.remove('drag-over')"
+             ondrop="onBulkFileDrop(event)">
+          <input type="file" id="bulk-file" accept=".csv,.txt" style="display:none" onchange="onBulkFileSelect(event)">
+          <div class="drop-icon">📄</div>
+          <div class="drop-msg" id="drop-msg">CSV 파일을 드래그하거나 클릭하여 업로드</div>
+          <div class="drop-sub" id="drop-sub">또는 아래에 URL을 줄바꿈으로 구분해서 입력</div>
+          <div class="drop-file" id="drop-file"></div>
+        </div>
+        <textarea class="bulk-textarea" id="bulk-textarea" rows="4"></textarea>
+        <div class="bulk-actions">
+          <button class="btn btn-primary btn-sm" id="btn-bulk-start" onclick="startBulk()">생성 시작</button>
+          <button class="btn btn-outline btn-sm" id="btn-bulk-tmpl" onclick="downloadBulkTemplate()">템플릿 다운로드</button>
+          <span class="bulk-count" id="bulk-count"></span>
+          <button class="btn-stop" id="btn-bulk-stop" onclick="stopBulk()" style="display:none">중지</button>
+        </div>
+        <div class="bulk-progress" id="bulk-progress">
+          <div class="progress-bar"><div class="progress-fill" id="bulk-progress-fill"></div></div>
+          <div class="progress-info" id="bulk-progress-info"></div>
+        </div>
+        <div id="bulk-result-wrap" style="display:none">
+          <div class="bulk-result-bar">
+            <button class="btn-dl-zip" id="btn-bulk-dl" onclick="downloadBulkZip()">ZIP 다운로드</button>
+            <span class="bulk-result-meta" id="bulk-result-meta"></span>
+          </div>
+          <div class="bulk-grid" id="bulk-grid"></div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-</div><!-- /mode-single -->
 
 <script>
 let qrInstance=null, qrReady=false, debounceTimer=null;
@@ -376,7 +376,7 @@ const I18N = {
     bulkRows:'{n}건 입력됨',
     bulkProcessing:'{done} / {total} 생성 중…',
     bulkDone:'완료 {ok}건 · 오류 {err}건',
-    bulkInherit:'현재 단건 설정 (크기·색상·라벨) 상속',
+    settingsShared:'이 설정은 단건·다건 생성에 공통 적용됩니다. 다건 CSV에서 개별 값을 지정하면 그 값이 우선합니다.',
   },
   en: {
     pageTitle: 'QR Code Generator',
@@ -425,7 +425,7 @@ const I18N = {
     bulkRows:'{n} rows entered',
     bulkProcessing:'{done} / {total} generating…',
     bulkDone:'Done: {ok} · Errors: {err}',
-    bulkInherit:'Inherit current settings (size, colors, labels)',
+    settingsShared:'These settings apply to both single and bulk generation. Per-row CSV values override them.',
   }
 };
 
@@ -476,7 +476,7 @@ function applyLang(l) {
   document.getElementById('btn-bulk-tmpl').textContent  = t.btnTmpl;
   const dlBtn = document.getElementById('btn-bulk-dl');
   if (dlBtn) dlBtn.textContent = t.btnDlZip;
-  document.getElementById('lbl-bulk-inherit').textContent = t.bulkInherit;
+  document.getElementById('lbl-settings-shared').textContent = t.settingsShared;
 }
 
 window.addEventListener('message', function(e) {

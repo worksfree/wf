@@ -29,8 +29,12 @@ header {
 .hdr-sub   { font-size:13px; color:var(--muted); margin-top:2px; }
 button:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
 
-.page { max-width:780px; margin:0 auto; padding:22px 18px 72px; }
+.page { max-width:1080px; margin:0 auto; padding:22px 18px 72px; }
 .intro { font-size:13px; color:var(--muted); margin-bottom:16px; }
+
+/* 좌: 설정(상시 노출) · 우: 탭+콘텐츠 — QR 생성기(service/qr)와 동일 패턴 */
+.ocr-layout { display:grid; grid-template-columns:320px 1fr; gap:18px; align-items:start; }
+@media (max-width:760px) { .ocr-layout { grid-template-columns:1fr; } }
 
 /* 단건/다건 탭 — QR 생성기(service/qr)와 동일 패턴 */
 .mode-tabs { display:flex; gap:4px; margin-bottom:14px; }
@@ -49,13 +53,10 @@ label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(
 .ask-row { display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
 .remaining { font-size:12px; color:var(--hint); }
 
-/* 설정 패널 — 단건은 기본 접힘, 다건은 기본 펼침 */
-.settings-panel { border:1px solid var(--border); border-radius:10px; background:var(--surface); margin-top:14px; overflow:hidden; }
-.settings-toggle { width:100%; display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:none; border:none; cursor:pointer; font-size:13px; color:var(--muted); font-weight:600; }
-.settings-toggle .chev { transition:transform .15s; }
-.settings-panel.open .settings-toggle .chev { transform:rotate(90deg); }
-.settings-body { display:none; padding:2px 14px 16px; }
-.settings-panel.open .settings-body { display:block; }
+/* 설정 패널 — 좌측 사이드바에 항상 노출(QR 생성기와 동일 패턴), 단건/다건 공유 */
+.settings-panel { border:1px solid var(--border); border-radius:10px; background:var(--surface); padding:14px; }
+.settings-label { font-size:13px; color:var(--muted); font-weight:600; margin-bottom:10px; }
+.settings-shared-hint { font-size:11px; color:var(--hint); margin-top:12px; }
 .setting-row { margin:12px 0; }
 .setting-row label { display:flex; justify-content:space-between; font-size:12.5px; color:var(--text); margin-bottom:6px; }
 .setting-row input[type="range"] { width:100%; accent-color:var(--blue); }
@@ -121,123 +122,127 @@ table.rcp-table td.num { text-align:right; }
 <div class="page">
   <div class="intro" id="intro">파일을 올리면 선택한 출력 형식(텍스트·마크다운·CSV/엑셀·문서)으로 변환합니다. 다건 모드에서는 폴더/여러 파일을 한 번에 처리하고 예상 소요 시간을 함께 보여줍니다.</div>
 
-  <div class="mode-tabs">
-    <button class="mode-tab active" type="button" id="tabSingle" onclick="switchMode('single')">단건 처리</button>
-    <button class="mode-tab" type="button" id="tabBulk" onclick="switchMode('bulk')">다건 처리</button>
-  </div>
-
-  <!-- 단건 -->
-  <div id="modeSingle">
-    <div class="drop" id="dropSingle">
-      <label class="sr" for="cameraInput" id="pick-camera-label">사진 촬영</label>
-      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
-      <label class="sr" for="fileInput" id="pick-label">파일 선택</label>
-      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" style="display:none">
-      <div class="pick-row">
-        <button class="pick-btn" type="button" id="pickCameraBtn">📷 사진 촬영</button>
-        <button class="pick-btn secondary" type="button" id="pickBtn">🖼 파일 선택</button>
-      </div>
-      <div class="drop-hint" id="drop-hint">또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)</div>
-    </div>
-  </div>
-
-  <!-- 다건 -->
-  <div id="modeBulk" style="display:none;">
-    <div class="drop" id="dropBulk">
-      <label class="sr" for="folderInput" id="pick-folder-label">폴더 선택</label>
-      <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none">
-      <label class="sr" for="filesInput" id="pick-files-label">여러 파일 선택</label>
-      <input type="file" id="filesInput" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" multiple style="display:none">
-      <div class="pick-row">
-        <button class="pick-btn" type="button" id="pickFolderBtn">📁 폴더 선택</button>
-        <button class="pick-btn secondary" type="button" id="pickFilesBtn">여러 파일 선택</button>
-      </div>
-      <div class="drop-hint" id="drop-hint-bulk">또는 이 영역에 여러 파일을 끌어다 놓으세요</div>
-    </div>
-  </div>
-
-  <div class="settings-panel" id="settingsPanel">
-    <button class="settings-toggle" type="button" id="settingsToggle" onclick="toggleSettings()">
-      <span id="settings-label">⚙ 설정</span>
-      <span class="chev">▸</span>
-    </button>
-    <div class="settings-body">
-      <div class="setting-row">
-        <label for="fmtSelect"><span id="lbl-fmt">출력 형식</span></label>
-        <select id="fmtSelect" onchange="onFormatChange()">
-          <option value="text" id="opt-text">텍스트 (.txt) — 손글씨·일반 문서 추천</option>
-          <option value="markdown" id="opt-md">마크다운 (.md) — PDF·긴 문서 추천</option>
-          <option value="excel" id="opt-excel">CSV/엑셀 (.xlsx) — 영수증 추천</option>
-          <option value="doc" id="opt-doc">문서 (.doc) — 워드에서 바로 열기</option>
-        </select>
-        <div class="setting-hint" id="fmt-hint"></div>
-      </div>
-      <div class="setting-row">
-        <label for="contrastRange"><span id="lbl-contrast">대비(콘트라스트)</span><span id="contrastVal">+15%</span></label>
-        <input type="range" id="contrastRange" min="-20" max="50" value="15" step="5">
-      </div>
-      <div class="setting-row">
-        <label for="sharpenRange"><span id="lbl-sharpen">샤프니스</span><span id="sharpenVal">25%</span></label>
-        <input type="range" id="sharpenRange" min="0" max="100" value="25" step="5">
-      </div>
-      <div class="setting-check" id="includeRawRow">
-        <input type="checkbox" id="includeRaw" checked>
-        <label for="includeRaw" id="include-raw-label">원본 인식 텍스트도 함께 저장(검증용, 엑셀 출력 시)</label>
+  <div class="ocr-layout">
+    <!-- 좌측: 설정 — 단건/다건 공유, 항상 노출(QR 생성기와 동일 패턴) -->
+    <div>
+      <div class="settings-panel" id="settingsPanel">
+        <div class="settings-label" id="settings-label">⚙ 설정</div>
+        <div class="setting-row">
+          <label for="fmtSelect"><span id="lbl-fmt">출력 형식</span></label>
+          <select id="fmtSelect" onchange="onFormatChange()">
+            <option value="text" id="opt-text">텍스트 (.txt) — 손글씨·일반 문서 추천</option>
+            <option value="markdown" id="opt-md">마크다운 (.md) — PDF·긴 문서 추천</option>
+            <option value="excel" id="opt-excel">CSV/엑셀 (.xlsx) — 영수증 추천</option>
+            <option value="doc" id="opt-doc">문서 (.doc) — 워드에서 바로 열기</option>
+          </select>
+          <div class="setting-hint" id="fmt-hint"></div>
+        </div>
+        <div class="setting-row">
+          <label for="contrastRange"><span id="lbl-contrast">대비(콘트라스트)</span><span id="contrastVal">+15%</span></label>
+          <input type="range" id="contrastRange" min="-20" max="50" value="15" step="5">
+        </div>
+        <div class="setting-row">
+          <label for="sharpenRange"><span id="lbl-sharpen">샤프니스</span><span id="sharpenVal">25%</span></label>
+          <input type="range" id="sharpenRange" min="0" max="100" value="25" step="5">
+        </div>
+        <div class="setting-check" id="includeRawRow">
+          <input type="checkbox" id="includeRaw" checked>
+          <label for="includeRaw" id="include-raw-label">원본 인식 텍스트도 함께 저장(검증용, 엑셀 출력 시)</label>
+        </div>
+        <div class="settings-shared-hint" id="settings-shared-hint">이 설정은 단건·다건 처리에 공통 적용됩니다. 단건에서 파일 하나로 미리 결과를 확인한 뒤 다건으로 넘어가면 같은 설정으로 처리됩니다.</div>
       </div>
     </div>
-  </div>
 
-  <div class="ask-row">
-    <span id="fileName" style="font-size:13px;color:var(--muted);"></span>
-    <span class="remaining" id="remaining" aria-live="polite"></span>
-  </div>
+    <!-- 우측: 탭 + 탭별 콘텐츠 -->
+    <div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" type="button" id="tabSingle" onclick="switchMode('single')">단건 처리</button>
+        <button class="mode-tab" type="button" id="tabBulk" onclick="switchMode('bulk')">다건 처리</button>
+      </div>
 
-  <div class="preview-wrap" id="previewWrap">
-    <div class="preview-scroll" id="previewScroll" tabindex="0">
-      <img id="previewImg" alt="">
-    </div>
-    <div class="preview-cap" id="previewCap"></div>
-    <div class="zoom-row">
-      <button class="zoom-btn" type="button" id="zoomOutBtn">−</button>
-      <span class="zoom-pct" id="zoomPct" aria-live="polite">100%</span>
-      <button class="zoom-btn" type="button" id="zoomInBtn">+</button>
-      <button class="zoom-fit-btn" type="button" id="zoomFitBtn">원래 크기</button>
-    </div>
-    <div class="rotate-row">
-      <button class="rotate-btn" type="button" id="rotateBtn">🔄 회전 후 다시 인식</button>
-    </div>
-  </div>
+      <!-- 단건 -->
+      <div id="modeSingle">
+        <div class="drop" id="dropSingle">
+          <label class="sr" for="cameraInput" id="pick-camera-label">사진 촬영</label>
+          <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+          <label class="sr" for="fileInput" id="pick-label">파일 선택</label>
+          <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" style="display:none">
+          <div class="pick-row">
+            <button class="pick-btn" type="button" id="pickCameraBtn">📷 사진 촬영</button>
+            <button class="pick-btn secondary" type="button" id="pickBtn">🖼 파일 선택</button>
+          </div>
+          <div class="drop-hint" id="drop-hint">또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)</div>
+        </div>
+      </div>
 
-  <div class="batch-wrap" id="batchWrap">
-    <progress class="batch-progress" id="batchProgress" value="0" max="100"></progress>
-    <div class="batch-status-row">
-      <span id="batchStatusText"></span>
-      <span id="batchEtaText"></span>
-    </div>
-    <div class="batch-summary" id="batchSummary" aria-live="polite"></div>
-  </div>
+      <!-- 다건 -->
+      <div id="modeBulk" style="display:none;">
+        <div class="drop" id="dropBulk">
+          <label class="sr" for="folderInput" id="pick-folder-label">폴더 선택</label>
+          <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none">
+          <label class="sr" for="filesInput" id="pick-files-label">여러 파일 선택</label>
+          <input type="file" id="filesInput" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" multiple style="display:none">
+          <div class="pick-row">
+            <button class="pick-btn" type="button" id="pickFolderBtn">📁 폴더 선택</button>
+            <button class="pick-btn secondary" type="button" id="pickFilesBtn">여러 파일 선택</button>
+          </div>
+          <div class="drop-hint" id="drop-hint-bulk">또는 이 영역에 여러 파일을 끌어다 놓으세요</div>
+        </div>
+      </div>
 
-  <div id="status" role="status" aria-live="polite"></div>
+      <div class="ask-row">
+        <span id="fileName" style="font-size:13px;color:var(--muted);"></span>
+        <span class="remaining" id="remaining" aria-live="polite"></span>
+      </div>
 
-  <div class="result-wrap" id="resultWrap" style="display:none;">
-    <div class="result-head">
-      <h2 id="result-h">추출된 텍스트</h2>
-      <div class="btn-group">
-        <button class="copy-btn" type="button" id="copyBtn">복사</button>
-        <button class="copy-btn" type="button" id="downloadBtn">다운로드</button>
+      <div class="preview-wrap" id="previewWrap">
+        <div class="preview-scroll" id="previewScroll" tabindex="0">
+          <img id="previewImg" alt="">
+        </div>
+        <div class="preview-cap" id="previewCap"></div>
+        <div class="zoom-row">
+          <button class="zoom-btn" type="button" id="zoomOutBtn">−</button>
+          <span class="zoom-pct" id="zoomPct" aria-live="polite">100%</span>
+          <button class="zoom-btn" type="button" id="zoomInBtn">+</button>
+          <button class="zoom-fit-btn" type="button" id="zoomFitBtn">원래 크기</button>
+        </div>
+        <div class="rotate-row">
+          <button class="rotate-btn" type="button" id="rotateBtn">🔄 회전 후 다시 인식</button>
+        </div>
+      </div>
+
+      <div class="batch-wrap" id="batchWrap">
+        <progress class="batch-progress" id="batchProgress" value="0" max="100"></progress>
+        <div class="batch-status-row">
+          <span id="batchStatusText"></span>
+          <span id="batchEtaText"></span>
+        </div>
+        <div class="batch-summary" id="batchSummary" aria-live="polite"></div>
+      </div>
+
+      <div id="status" role="status" aria-live="polite"></div>
+
+      <div class="result-wrap" id="resultWrap" style="display:none;">
+        <div class="result-head">
+          <h2 id="result-h">추출된 텍스트</h2>
+          <div class="btn-group">
+            <button class="copy-btn" type="button" id="copyBtn">복사</button>
+            <button class="copy-btn" type="button" id="downloadBtn">다운로드</button>
+          </div>
+        </div>
+        <textarea id="result" readonly aria-labelledby="result-h"></textarea>
+      </div>
+
+      <div class="result-wrap" id="rcpResultWrap" style="display:none;">
+        <div class="result-head">
+          <h2 id="rcp-result-h">인식 결과</h2>
+          <button class="copy-btn" type="button" id="downloadXlsxBtn">엑셀 다운로드</button>
+        </div>
+        <dl class="rcp-fields" id="rcpFields"></dl>
+        <div class="rcp-table-wrap"><table class="rcp-table" id="rcpItemsTable"></table></div>
+        <div class="rcp-warn" id="rcpWarn"></div>
       </div>
     </div>
-    <textarea id="result" readonly aria-labelledby="result-h"></textarea>
-  </div>
-
-  <div class="result-wrap" id="rcpResultWrap" style="display:none;">
-    <div class="result-head">
-      <h2 id="rcp-result-h">인식 결과</h2>
-      <button class="copy-btn" type="button" id="downloadXlsxBtn">엑셀 다운로드</button>
-    </div>
-    <dl class="rcp-fields" id="rcpFields"></dl>
-    <div class="rcp-table-wrap"><table class="rcp-table" id="rcpItemsTable"></table></div>
-    <div class="rcp-warn" id="rcpWarn"></div>
   </div>
 
   <div class="disclaim" id="disclaim">
@@ -261,11 +266,13 @@ const I18N = {
     tab_single:"단건 처리", tab_bulk:"다건 처리",
     pick_label:"파일 선택", pick_btn:"🖼 파일 선택",
     pick_camera_label:"사진 촬영", pick_camera_btn:"📷 사진 촬영",
+    no_camera_alert:"이 기기에서 카메라를 찾을 수 없습니다.",
     drop_hint:"또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)",
     pick_folder_label:"폴더 선택", pick_folder_btn:"📁 폴더 선택",
     pick_files_label:"여러 파일 선택", pick_files_btn:"여러 파일 선택",
     drop_hint_bulk:"또는 이 영역에 여러 파일을 끌어다 놓으세요",
     settings_label:"⚙ 설정",
+    settings_shared_hint:"이 설정은 단건·다건 처리에 공통 적용됩니다. 단건에서 파일 하나로 미리 결과를 확인한 뒤 다건으로 넘어가면 같은 설정으로 처리됩니다.",
     lbl_fmt:"출력 형식",
     opt_text:"텍스트 (.txt) — 손글씨·일반 문서 추천",
     opt_md:"마크다운 (.md) — PDF·긴 문서 추천",
@@ -312,11 +319,13 @@ const I18N = {
     tab_single:"Single", tab_bulk:"Batch",
     pick_label:"Choose file", pick_btn:"🖼 Choose file",
     pick_camera_label:"Take photo", pick_camera_btn:"📷 Take photo",
+    no_camera_alert:"No camera was found on this device.",
     drop_hint:"or drag and drop a file here (PNG, JPG, PDF)",
     pick_folder_label:"Choose folder", pick_folder_btn:"📁 Choose folder",
     pick_files_label:"Choose multiple files", pick_files_btn:"Choose multiple files",
     drop_hint_bulk:"or drag and drop multiple files here",
     settings_label:"⚙ Settings",
+    settings_shared_hint:"These settings apply to both single and batch processing. Preview a sample in single mode first, then switch to batch — it'll use the same settings.",
     lbl_fmt:"Output format",
     opt_text:"Text (.txt) — best for handwriting/general docs",
     opt_md:"Markdown (.md) — best for PDFs/long docs",
@@ -382,6 +391,7 @@ function applyLang() {
   document.getElementById("pickFilesBtn").textContent = t("pick_files_btn");
   document.getElementById("drop-hint-bulk").textContent = t("drop_hint_bulk");
   document.getElementById("settings-label").textContent = t("settings_label");
+  document.getElementById("settings-shared-hint").textContent = t("settings_shared_hint");
   document.getElementById("lbl-fmt").textContent = t("lbl_fmt");
   document.getElementById("opt-text").textContent = t("opt_text");
   document.getElementById("opt-md").textContent = t("opt_md");
@@ -421,17 +431,11 @@ function switchMode(mode) {
   document.getElementById("tabBulk").classList.toggle("active", mode === "bulk");
   document.getElementById("modeSingle").style.display = mode === "single" ? "block" : "none";
   document.getElementById("modeBulk").style.display = mode === "bulk" ? "block" : "none";
-  // 사용자 요청: 단건은 설정 기본 숨김(빠르게 결과만 보고 싶은 경우가 많음),
-  // 다건은 기본 표시(잘못된 설정으로 여러 건을 다시 처리하는 낭비를 막기 위해 미리 확인).
-  document.getElementById("settingsPanel").classList.toggle("open", mode === "bulk");
   document.getElementById("previewWrap").classList.remove("show");
   document.getElementById("resultWrap").style.display = "none";
   document.getElementById("rcpResultWrap").style.display = "none";
   document.getElementById("batchWrap").classList.remove("show");
   setStatus(document.getElementById("status"), null, false);
-}
-function toggleSettings() {
-  document.getElementById("settingsPanel").classList.toggle("open");
 }
 function updateFormatHint() {
   const fmt = document.getElementById("fmtSelect").value;
@@ -797,7 +801,19 @@ async function handleRotate() {
 
 document.getElementById("pickBtn").addEventListener("click", () => document.getElementById("fileInput").click());
 document.getElementById("fileInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
-document.getElementById("pickCameraBtn").addEventListener("click", () => document.getElementById("cameraInput").click());
+// enumerateDevices는 권한 승인 전에도 kind(videoinput 여부)는 조회 가능 — 라벨만 비어 있음.
+// API 자체가 없거나 조회에 실패하면 판단 불가로 보고 기존 동작(그냥 시도)을 유지한다(오탐 방지).
+async function hasCameraDevice() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return true;
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.some(d => d.kind === "videoinput");
+  } catch (e) { return true; }
+}
+document.getElementById("pickCameraBtn").addEventListener("click", async () => {
+  if (!(await hasCameraDevice())) { alert(t("no_camera_alert")); return; }
+  document.getElementById("cameraInput").click();
+});
 document.getElementById("cameraInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
 document.getElementById("rotateBtn").addEventListener("click", handleRotate);
 document.getElementById("zoomInBtn").addEventListener("click", () => { _zoomPct = Math.min(ZOOM_MAX, _zoomPct + ZOOM_STEP); applyZoom(); });

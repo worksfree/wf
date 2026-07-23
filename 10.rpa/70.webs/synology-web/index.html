@@ -2077,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.8.2';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.8.4';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -3714,7 +3714,7 @@ function onAuthComplete() {
       loadIframe(currentSrc, currentPath, currentLabel);
     }
   } else if (!_initialNavDone) {
-    // hash → 홈 순서로 처리 (sessionStorage 복원은 hash 라우팅이 대체)
+    // hash → sessionStorage 복원 → 홈 순서로 처리
     // _initialNavDone 이후에는 스킵 — Supabase 탭 복귀 시 SIGNED_IN 재발화로
     // iframe이 리로드되는 버그 방지
     _initialNavDone = true;
@@ -3722,7 +3722,20 @@ function onAuthComplete() {
     if (initHash && initHash !== '#') {
       navigateToHash(initHash);
     } else {
-      _showHomeImpl(); // 초기 라우팅 — 히스토리 저장 안 함
+      // 모바일에서 카메라 촬영 등으로 브라우저가 탭 프로세스를 회수했다가
+      // 복귀 시 탭 전체를 처음부터 다시 로드하는 경우가 있다 — URL에는
+      // 현재 페이지를 남기지 않는 설계(위 hash 처리 참고)라 이 경우 그냥
+      // 두면 무조건 홈으로 떨어진다. 매 페이지 이동마다 이미 기록해 두는
+      // sessionStorage(wf_last_page)로 복원해 이 클래스의 버그를 막는다.
+      let _restored = false;
+      try {
+        const saved = sessionStorage.getItem('wf_last_page');
+        if (saved) {
+          const { src, path, label } = JSON.parse(saved);
+          if (src) { loadIframe(src, path || [], label || ''); _restored = true; }
+        }
+      } catch (_e) {}
+      if (!_restored) _showHomeImpl(); // 초기 라우팅 — 히스토리 저장 안 함
     }
   }
 }
