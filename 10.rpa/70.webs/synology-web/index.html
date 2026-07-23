@@ -654,9 +654,11 @@
   }
   .btn-oauth:last-of-type { margin-bottom:0; }
   .btn-oauth:hover { filter:brightness(1.08); }
-  .btn-google { background:#fff; color:#3c4043; border:1px solid #dadce0; }
-  .btn-kakao  { background:#fee500; color:#191919; border:none; }
+  .btn-google   { background:#fff; color:#3c4043; border:1px solid #dadce0; }
+  .btn-kakao    { background:#fee500; color:#191919; border:none; }
+  .btn-synology { background:#2a3347; color:#e2e8f0; border:1px solid #3a4560; }
   .oauth-icon { width:18px; height:18px; flex-shrink:0; }
+  #el-sso-divider { margin-top:14px; }
 
   /* ── 로그인 탭 ───────────────────────────────── */
   .auth-tabs {
@@ -1177,6 +1179,12 @@
       <div class="auth-msg" id="el-msg"></div>
       <button class="auth-btn-email" id="el-login-btn" onclick="doEmailLogin()">로그인</button>
       <div class="auth-switch" id="el-no-acct">처음이신가요? <span onclick="switchAuthTab('signup')">회원가입</span></div>
+      <!-- 직원용 SSO 로그인 — Synology SSO Server(OIDC) 연동, Supabase 커스텀 프로바이더 custom:synology-sso -->
+      <div class="auth-or-divider" id="el-sso-divider"><span>또는 사내 계정으로</span></div>
+      <button class="btn-oauth btn-synology" onclick="signInWithSynologySSO()">
+        <span class="oauth-icon" aria-hidden="true">🔐</span>
+        <span>Synology SSO로 로그인</span>
+      </button>
     </div>
 
     <!-- 회원가입 패널 (이메일 가입 + 소셜 가입) -->
@@ -1660,6 +1668,8 @@ const HUB_I18N = {
     denied_partner_desc:     '이 서비스는 파트너 이상의 권한이 필요합니다.<br>WorksFree에 문의하시면 파트너 서비스를 이용하실 수 있습니다.',
     denied_admin_title:      'O&M 관리자 전용',
     denied_admin_desc:       '이 기능은 관리자 계정에서만 사용할 수 있습니다.<br>담당자에게 문의해 주세요.',
+    denied_staff_title:      '사내 직원 전용',
+    denied_staff_desc:       '그룹웨어는 WorksFree 직원 전용 기능입니다.<br>담당자에게 문의해 주세요.',
     login_btn:       '로그인 / 회원가입',
     auth_title:      'WorksFree에 로그인',
     auth_desc:       '회원 전용 콘텐츠에 접근하려면<br>로그인이 필요합니다.',
@@ -1791,6 +1801,8 @@ const HUB_I18N = {
     denied_partner_desc:     'This service requires partner-level access or above.<br>Contact WorksFree to learn about partner services.',
     denied_admin_title:      'O&M Admin Only',
     denied_admin_desc:       'This feature requires an administrator account.<br>Please contact your account manager.',
+    denied_staff_title:      'Staff Only',
+    denied_staff_desc:       'Groupware is available to WorksFree staff only.<br>Please contact your account manager.',
     login_btn:       'Sign In / Sign Up',
     auth_title:      'Sign in to WorksFree',
     auth_desc:       'Login required to access<br>member-only content.',
@@ -2065,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.7.63';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.8.1';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2105,6 +2117,8 @@ const TREE = [
       { label:{ko:'앱 요청 게시판',   en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
       { label:{ko:'전자책 미리보기',   en:'eBook Preview'},       icon:'📖', iframe:'service/ebook/index.html' },
       { label:{ko:'OCR 텍스트 추출',   en:'OCR Text Extraction'}, icon:'🔎', iframe:'service/ocr/index.html' },
+      { label:{ko:'산업용 OCR',       en:'Industrial OCR'},      icon:'🗂', iframe:'service/ocr-pro/index.html' },
+      { label:{ko:'그룹웨어 자동 데모', en:'Groupware Auto Demo'}, icon:'🎬', iframe:'groupware/demo/index.html' },
     ]
   },
   {
@@ -2168,6 +2182,19 @@ const TREE = [
     ]
   },
   {
+    slug:'groupware',
+    label:{ko:'그룹웨어', en:'Groupware'}, icon:'🏢', staffOnly:true, children:[
+      { label:{ko:'전자결재', en:'Approval'},  icon:'📝', iframe:'groupware/approval/index.html', staffOnly:true },
+      { label:{ko:'게시판',   en:'Board'},     icon:'📢', iframe:'groupware/board/index.html',    staffOnly:true },
+      { label:{ko:'주소록/조직도', en:'Directory'}, icon:'👥', iframe:'groupware/directory/index.html', staffOnly:true },
+      { label:{ko:'메신저 (Synology Chat)',   en:'Chat (Synology)'},     icon:'💬', iframe:'groupware/launch/index.html#chat',     staffOnly:true },
+      { label:{ko:'드라이브 (Synology Drive)', en:'Drive (Synology)'},   icon:'📁', iframe:'groupware/launch/index.html#drive',    staffOnly:true },
+      { label:{ko:'캘린더 (Synology Calendar)', en:'Calendar (Synology)'}, icon:'📅', iframe:'groupware/launch/index.html#calendar', staffOnly:true },
+      { label:{ko:'메일 (MailPlus)',          en:'Mail (MailPlus)'},    icon:'✉️', iframe:'groupware/launch/index.html#mail',     staffOnly:true },
+      { label:{ko:'양식 관리 (관리자)', en:'Form Templates (Admin)'}, icon:'🧾', iframe:'groupware/form-admin/index.html', adminOnly:true },
+    ]
+  },
+  {
     slug:'admin',
     label:{ko:'O&M 관리', en:'O&M Admin'}, icon:'⚙', adminOnly:true, children:[
       { label:{ko:'사용자 관리',   en:'User Mgmt'},       icon:'👥', iframe:'admin/users/index.html',             adminOnly:true },
@@ -2207,6 +2234,10 @@ const DASH_CARDS = [
     title:{ko:'전자책 미리보기',       en:'eBook Preview'},
     desc: {ko:'NAS 풀스택 가이드 20% 무료 미리보기',  en:'20% free preview of NAS Full-Stack Guide'},
     iframe:'service/ebook/index.html' },
+  { section:'service', icon:'🎬',
+    title:{ko:'그룹웨어 자동 데모',     en:'Groupware Auto Demo'},
+    desc: {ko:'연차 신청서가 팀원→팀장→임원→대표로 흐르는 과정을 자동 재생', en:'Auto-plays a leave request flowing through the approval chain'},
+    iframe:'groupware/demo/index.html' },
   /* ── 컨설팅 ─────────────────────────────────── */
   { section:'consulting', icon:'🏢',
     title:{ko:'ESG 자가진단',          en:'ESG Assessment'},
@@ -2295,6 +2326,39 @@ const DASH_CARDS = [
     title:{ko:'도면 출력 자동화',     en:'DWG Batch Print'},
     desc: {ko:'DWG 파일 일괄 자동 출력',             en:'Batch print DWG files automatically'},
     iframe:'app-store/etc/dwg-batch-print/index.html' },
+  /* ── 그룹웨어 (직원 전용 — is_staff(), 70_gw_staff_role.sql) ── */
+  { section:'groupware', icon:'📝',
+    title:{ko:'전자결재', en:'Approval'},
+    desc: {ko:'기안 · 결재라인 · 승인/반려',          en:'Draft, approval line, approve/reject'},
+    iframe:'groupware/approval/index.html', staffOnly:true },
+  { section:'groupware', icon:'📢',
+    title:{ko:'게시판', en:'Board'},
+    desc: {ko:'사내 공지 · 자유게시판',               en:'Company notices & free board'},
+    iframe:'groupware/board/index.html', staffOnly:true },
+  { section:'groupware', icon:'👥',
+    title:{ko:'주소록/조직도', en:'Directory'},
+    desc: {ko:'부서 · 직급 · 연락처',                 en:'Departments, positions & contacts'},
+    iframe:'groupware/directory/index.html', staffOnly:true },
+  { section:'groupware', icon:'💬',
+    title:{ko:'메신저', en:'Chat'},
+    desc: {ko:'Synology Chat로 이동 (새 창)',         en:'Open Synology Chat (new tab)'},
+    iframe:'groupware/launch/index.html#chat', staffOnly:true },
+  { section:'groupware', icon:'📁',
+    title:{ko:'드라이브', en:'Drive'},
+    desc: {ko:'Synology Drive로 이동 (새 창)',        en:'Open Synology Drive (new tab)'},
+    iframe:'groupware/launch/index.html#drive', staffOnly:true },
+  { section:'groupware', icon:'📅',
+    title:{ko:'캘린더', en:'Calendar'},
+    desc: {ko:'Synology Calendar로 이동 (새 창)',     en:'Open Synology Calendar (new tab)'},
+    iframe:'groupware/launch/index.html#calendar', staffOnly:true },
+  { section:'groupware', icon:'✉️',
+    title:{ko:'메일', en:'Mail'},
+    desc: {ko:'MailPlus 웹메일로 이동 (새 창)',       en:'Open MailPlus webmail (new tab)'},
+    iframe:'groupware/launch/index.html#mail', staffOnly:true },
+  { section:'groupware', icon:'🧾',
+    title:{ko:'양식 관리', en:'Form Templates'},
+    desc: {ko:'전자결재 양식·결재선 사전 설정 (관리자)', en:'Manage approval form templates & lines (admin)'},
+    iframe:'groupware/form-admin/index.html', adminOnly:true },
   /* ── O&M 관리 (어드민 전용) ─────────────────── */
   { section:'admin', icon:'👥',
     title:{ko:'사용자 관리',   en:'User Mgmt'},
@@ -2427,6 +2491,7 @@ function _isNodeLocked(node) {
   }
   // DB 규칙 없으면 노드 플래그로 폴백
   if (node.adminOnly    && userRole !== 'admin') return true;
+  if (node.staffOnly    && !IS_STAFF)            return true;
   if (node.partnerOnly  && !IS_PARTNER)          return true;
   if (node.consultantOnly && !canConsult())       return true;
   return false;
@@ -2478,8 +2543,8 @@ function buildTree(nodes, depth=0, path=[]) {
       const children = buildTree(node.children, depth+1, [...path, node.label]);
       children.classList.add('tree-children');
       // 섹션 헤더 항상 표시 — 자식이 모두 잠겨 있어도 숨기지 않음
-      // 섹션 헤더에 잠금 아이콘 (adminOnly 섹션 + 비관리자)
-      if (depth === 0 && node.adminOnly && userRole !== 'admin') {
+      // 섹션 헤더에 잠금 아이콘 (adminOnly/staffOnly 섹션 + 권한 없음)
+      if (depth === 0 && ((node.adminOnly && userRole !== 'admin') || (node.staffOnly && !IS_STAFF))) {
         const lockEl = document.createElement('span');
         lockEl.className = 'tree-lock';
         lockEl.textContent = '🔒';
@@ -2586,6 +2651,9 @@ function buildTree(nodes, depth=0, path=[]) {
           }
           if (node.adminOnly && userRole !== 'admin') {
             setActive(labelEl); showAccessBlur('admin'); return;
+          }
+          if (node.staffOnly && !IS_STAFF) {
+            setActive(labelEl); showAccessBlur('staff'); return;
           }
           if (node.consultantOnly && !canConsult()) {
             setActive(labelEl); showAccessBlur('consultant'); return;
@@ -2700,6 +2768,7 @@ function renderDashCards(sectionFilter=null) {
       ? false
       : (
           (node.adminOnly      && userRole !== 'admin')                           ||
+          (node.staffOnly      && !IS_STAFF)                                      ||
           (node.consultantOnly && !canConsult())                                  ||
           (node.partnerOnly    && !IS_PARTNER)                                    ||
           (node.roleOnly       && userRole !== 'admin' && userRole !== node.roleOnly) ||
@@ -2713,7 +2782,9 @@ function renderDashCards(sectionFilter=null) {
       el.className = 'dash-card locked';
       const lockLabel = node.adminOnly
         ? t('denied_admin_title')
-        : node.consultantOnly
+        : node.staffOnly
+          ? t('denied_staff_title')
+          : node.consultantOnly
           ? t('card_locked')    // 접근 제한 — 컨설턴트 전용
           : node.memberOnly
             ? t('login_req')    // 로그인 필요 — 앱스토어
@@ -2732,6 +2803,7 @@ function renderDashCards(sectionFilter=null) {
       el.onclick = () => {
         // 보안: 대시보드 잠금 카드도 loadIframe() 없이 overlay만 — 콘텐츠 미로드
         if (node.adminOnly)      { showAccessBlur('admin');      return; }
+        if (node.staffOnly)      { showAccessBlur('staff');      return; }
         if (node.consultantOnly) { showAccessBlur('consultant'); return; }
         if (node.partnerOnly)    { showAccessBlur('partner');    return; }
         showDenied('denied_title', 'denied_desc');
@@ -3071,6 +3143,10 @@ function navigateToHash(hash) {
       loadIframe(node.iframe, pathLabels, node.label);
       showAccessBlur('admin'); return;
     }
+    if (node.staffOnly && !IS_STAFF) {
+      loadIframe(node.iframe, pathLabels, node.label);
+      showAccessBlur('staff'); return;
+    }
     if (node.partnerOnly && !IS_PARTNER) {
       loadIframe(node.iframe, pathLabels, node.label);
       showAccessBlur('partner'); return;
@@ -3157,6 +3233,10 @@ let _sb       = null;
 let authUser  = null;  // 현재 로그인 사용자 (null = 비로그인)
 let _sbReady  = false; // Supabase 초기화 성공 여부
 let userRole  = 'member'; // 사용자 역할: non-member | member | consultant | partner | admin
+// "직원" 여부 — role 사다리(고객 등급)와 독립된 축. profiles.is_staff 플래그 +
+// admin은 자동 포함(onAuthComplete에서 최종 확정). 그룹웨어(전자결재/게시판/조직도 등)
+// 접근 게이트로 씀 — 70_gw_staff_role.sql 참고.
+let IS_STAFF  = false;
 let _isIntentionalSignOut = false; // signOut() 호출 시 true → SIGNED_OUT 즉시 처리 (재로그인 방지)
 
 /* ── 허브 테마 ────────────────────────────────────────────────────
@@ -3334,6 +3414,7 @@ function _reapplyCurrentPageAccess() {
     const node = _findNodeByIframe(TREE, src);
     if (node) {
       if (node.adminOnly    && userRole !== 'admin') { showAccessBlur('admin');      return; }
+      if (node.staffOnly    && !IS_STAFF)            { showAccessBlur('staff');      return; }
       if (node.partnerOnly  && !IS_PARTNER)          { showAccessBlur('partner');    return; }
       if (node.consultantOnly && !canConsult())       { showAccessBlur('consultant'); return; }
     }
@@ -3353,9 +3434,11 @@ function showAccessBlur(type) {
   const aoTitle = document.getElementById('ao-title');
   const aoDesc  = document.getElementById('ao-desc');
   if (aoTitle) aoTitle.textContent = type === 'admin'   ? t('denied_admin_title')
+                                   : type === 'staff'   ? t('denied_staff_title')
                                    : type === 'partner' ? t('denied_partner_title')
                                    :                      t('denied_consultant_title');
   if (aoDesc)  aoDesc.innerHTML    = type === 'admin'   ? t('denied_admin_desc')
+                                   : type === 'staff'   ? t('denied_staff_desc')
                                    : type === 'partner' ? t('denied_partner_desc')
                                    :                      t('denied_consultant_desc');
   // 보안: iframe 콘텐츠 완전 제거 (pointer-events:none만으로는 키보드·포커스 접근 차단 불충분)
@@ -3517,8 +3600,9 @@ async function handleAuthStateChange(user) {
   }
 
   // ── 역할·동의 로드 (_loadUserProfile — wf_role 캐시 포함) ──
-  const { role, agreed } = await _loadUserProfile(user.id);
+  const { role, agreed, isStaff } = await _loadUserProfile(user.id);
   userRole = role;
+  IS_STAFF = isStaff;
 
   const isInternal = ['partner', 'consultant', 'admin'].includes(userRole);
   if (!agreed && !isInternal) {
@@ -3537,21 +3621,23 @@ async function handleAuthStateChange(user) {
 async function _loadUserProfile(userId) {
   const cachedRole = localStorage.getItem('wf_role');
   if (cachedRole) userRole = cachedRole; // 캐시 즉시 반영 — DB 응답 전 메뉴 깜빡임 방지
+  const cachedStaff = localStorage.getItem('wf_is_staff') === '1';
 
   if (_sbReady && _sb) {
     try {
       const { data, error: sbErr } = await _sb.from('profiles')
-        .select('role, agreed_at').eq('id', userId).maybeSingle();
+        .select('role, agreed_at, is_staff').eq('id', userId).maybeSingle();
       if (sbErr) {
         console.warn('[_loadUserProfile] Supabase 오류:', sbErr.message);
       } else if (data?.role) {
         localStorage.setItem('wf_role', data.role); // 캐시 갱신
-        return { role: data.role, agreed: !!data.agreed_at };
+        localStorage.setItem('wf_is_staff', data.is_staff ? '1' : '0');
+        return { role: data.role, agreed: !!data.agreed_at, isStaff: !!data.is_staff };
       }
       // 행은 있으나 role 미설정: agreed_at만 있을 때도 agreed 처리
       if (data && !data.role && data.agreed_at) {
         const r = cachedRole || 'member';
-        return { role: r, agreed: true };
+        return { role: r, agreed: true, isStaff: !!data.is_staff };
       }
     } catch (_e) {
       console.warn('[_loadUserProfile] 예외, 폴백 사용:', _e?.message);
@@ -3561,8 +3647,9 @@ async function _loadUserProfile(userId) {
   // IS_DEV mock 모드: devLogin이 설정한 wf_dev_session 역할을 보존
   const devSessionRole = IS_DEV ? (localStorage.getItem('wf_dev_session') || '') : '';
   return {
-    role:   cachedRole || devSessionRole || 'member',
-    agreed: !!localStorage.getItem('wf_agreed_' + userId)
+    role:    cachedRole || devSessionRole || 'member',
+    agreed:  !!localStorage.getItem('wf_agreed_' + userId),
+    isStaff: cachedStaff,
   };
 }
 
@@ -3575,6 +3662,7 @@ let _prevAuthUserId = null;
   _def('authUser',       () => authUser,       v => { authUser = v; });
   _def('userRole',       () => userRole,       v => { userRole = v; });
   _def('IS_PARTNER',     () => IS_PARTNER,     v => { IS_PARTNER = v; });
+  _def('IS_STAFF',       () => IS_STAFF,       v => { IS_STAFF = v; });
   _def('_prevAuthUserId',() => _prevAuthUserId,v => { _prevAuthUserId = v; });
 })();
 
@@ -3588,6 +3676,7 @@ let _initialNavDone = false;
 
 function onAuthComplete() {
   IS_PARTNER = userRole === 'partner' || userRole === 'admin';
+  IS_STAFF   = IS_STAFF || userRole === 'admin'; // admin은 별도 플래그 없이 자동 직원 취급
   hidePreviewOverlay();
   localStorage.setItem('wf_last_login', '1');
   updateAuthUI();
@@ -3708,6 +3797,19 @@ async function signInWithKakao() {
   if (!_sbReady) { alert('Supabase 설정 후 이용 가능합니다. (?dev=1 로 테스트)'); return; }
   await _sb.auth.signInWithOAuth({
     provider: 'kakao',
+    options:  { redirectTo: location.origin + location.pathname }
+  });
+}
+
+/* Synology SSO Server(OIDC) — Supabase Auth 커스텀 프로바이더.
+   프로바이더 식별자는 Supabase 대시보드 Authentication → Sign In / Up →
+   Auth Providers → Add custom OIDC provider 에서 등록한 이름과 정확히 일치해야 함
+   (등록 규칙: custom:<이름> — 아래는 'synology-sso'로 등록했다고 가정).
+   설정 절차 전체는 SSO_설정가이드.md 참고. */
+async function signInWithSynologySSO() {
+  if (!_sbReady) { alert('Supabase 설정 후 이용 가능합니다. (?dev=1 로 테스트)'); return; }
+  await _sb.auth.signInWithOAuth({
+    provider: 'custom:synology-sso',
     options:  { redirectTo: location.origin + location.pathname }
   });
 }
