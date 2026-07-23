@@ -35,6 +35,10 @@
  * PDF는 이 워커에서 처리하지 않는다 — 클라이언트(PDF.js)가 페이지별로 이미지 렌더링 후
  * 페이지마다 이 엔드포인트를 호출하는 구조 (service/ocr/index.html 참고).
  *
+ * POST /receipt — 영수증 키/밸류 구조화(service/ocr-pro/index.html 전용). 1단계는 /ocr과
+ * 동일한 runOcr()을 그대로 재사용하고, 2단계로 그 텍스트만(이미지 없이) 다시 한 번 호출해
+ * Ollama format(JSON Schema)로 구조화한다 — structureReceipt() 주석 참고.
+ *
  * 시크릿(전부 `wrangler secret put`으로만 설정, 평문 기재 금지):
  *   CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET — biz-rag와 동일 Service Token 재사용 가능
  *   PC_AI_URL          — 예: https://pc-ai.worksfree.kr
@@ -254,6 +258,122 @@ async function runOcr(env, imageBase64) {
   return { text: firstFinal, lowConfidence: true };
 }
 
+// ── 영수증 키/밸류 구조화 (2단계: 이미지 OCR은 그대로 두고, 이미 검증된 텍스트를
+// 텍스트 전용으로 다시 한 번 호출해 JSON으로 구조화한다) ──
+//
+// 왜 이미지+JSON스키마 한 번에가 아니라 2단계인가: 실측 검증된 자유 텍스트 추출
+// 프롬프트(OCR_PROMPT)를 건드리지 않고 그대로 재사용할 수 있고, "이미지+문법제약
+// 디코딩" 조합은 이 커뮤니티 GGUF 패키지에서 검증된 적이 없어 리스크가 있다(이
+// 프로젝트에서 여러 번 확인된 패턴: 검증 안 된 조합은 사전 실측 없이 신뢰하지 않는다).
+// 이미 정확도가 검증된 텍스트에서 구조만 뽑아내는 게 더 안전하다.
+const RECEIPT_SCHEMA = {
+  type: "object",
+  properties: {
+    store_name: { type: "string" },
+    business_reg_no: { type: "string" },
+    date: { type: "string" },
+    phone: { type: "string" },
+    items: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          qty: { type: "number" },
+          price: { type: "number" },
+        },
+      },
+    },
+    subtotal: { type: "number" },
+    tax: { type: "number" },
+    total: { type: "number" },
+  },
+  required: ["store_name", "items", "total"],
+};
+
+const RECEIPT_STRUCTURE_PROMPT_HEAD =
+  "다음은 영수증에서 추출한 텍스트입니다. 아래 항목을 이 텍스트에서만 찾아 JSON으로 정리하세요. " +
+  "텍스트에 없는 값은 빈 문자열이나 0으로 두고 지어내지 마세요.\n" +
+  "- store_name: 상호명\n" +
+  "- business_reg_no: 사업자등록번호\n" +
+  "- date: 거래일시\n" +
+  "- phone: 전화번호\n" +
+  "- items: 품목 배열, 각 항목은 name(품명)/qty(수량)/price(금액)\n" +
+  "- subtotal: 공급가액\n- tax: 부가세\n- total: 합계금액\n\n[영수증 텍스트]\n";
+
+// JSON Schema를 Ollama의 format 파라미터로 넘기면 문법(GBNF) 제약으로 구조는 보장되지만,
+// 스키마 자체가 프롬프트에 자동 주입되지는 않는다 — 그래서 위 프롬프트에 필드 설명을
+// 직접 적어준다(실측 근거: Ollama 공식 문서 "The model has no visibility into the schema").
+async function structureReceipt(env, rawText, options) {
+  const r = await fetchWithTimeout(
+    `${env.PC_AI_URL}/api/generate`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "CF-Access-Client-Id": env.CF_ACCESS_CLIENT_ID,
+        "CF-Access-Client-Secret": env.CF_ACCESS_CLIENT_SECRET,
+      },
+      body: JSON.stringify({
+        model: OCR_MODEL,
+        prompt: RECEIPT_STRUCTURE_PROMPT_HEAD + rawText.slice(0, 4000),
+        format: RECEIPT_SCHEMA,
+        stream: false,
+        options,
+      }),
+    },
+    OCR_TIMEOUT_MS
+  );
+  if (!r.ok) {
+    const detail = await r.text().catch(() => "");
+    console.error(`receipt structure failed: status=${r.status} body=${detail.slice(0, 500)}`);
+    throw new Error(`receipt structure failed: ${r.status}`);
+  }
+  const data = await r.json();
+  return JSON.parse(data.response || "{}");
+}
+
+// 사업자등록번호·합계금액처럼 형식이 고정적인 고신뢰 필드는 모델 출력만 믿지 않고
+// 이미 정확도가 검증된 원본 텍스트에서 정규식으로도 뽑아 대조용으로 함께 반환한다
+// (연구 결과 권장 패턴 — 모델이 숫자 서식을 바꾸거나 누락하는 경우의 안전망).
+function regexFallback(rawText) {
+  const bizNoMatch = rawText.match(/\d{3}[-\s]?\d{2}[-\s]?\d{5}/);
+  const totalMatch = rawText.match(/(?:합\s*계|총\s*액|총\s*합\s*계)[^\d₩]{0,10}([\d,]{3,})/);
+  return {
+    business_reg_no: bizNoMatch ? bizNoMatch[0].replace(/\s/g, "") : null,
+    total: totalMatch ? parseInt(totalMatch[1].replace(/,/g, ""), 10) : null,
+  };
+}
+
+async function runReceiptExtraction(env, imageBase64) {
+  const ocrResult = await runOcr(env, imageBase64); // 1단계: 기존 검증된 OCR 그대로 재사용
+  let structured;
+  try {
+    structured = await structureReceipt(env, ocrResult.text, { temperature: 0, num_predict: 1500 });
+  } catch (e) {
+    console.error(`structure attempt 1 failed: ${e}`);
+    // JSON 파싱 실패·반복 폭주 등으로 실패하면 penalty를 걸어 한 번 더 시도
+    // (일반 OCR의 감지-후-재시도 패턴과 동일한 사고방식 — 항상 걸지 않고 실패 시에만).
+    try {
+      structured = await structureReceipt(env, ocrResult.text, {
+        temperature: 0,
+        num_predict: 1500,
+        repeat_penalty: 1.3,
+        repeat_last_n: 256,
+      });
+    } catch (e2) {
+      console.error(`structure retry failed: ${e2}`);
+      structured = null;
+    }
+  }
+  return {
+    rawText: ocrResult.text,
+    lowConfidence: ocrResult.lowConfidence || !structured,
+    structured,
+    regexCheck: regexFallback(ocrResult.text),
+  };
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -262,7 +382,7 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
-    if (request.method !== "POST" || url.pathname !== "/ocr") {
+    if (request.method !== "POST" || (url.pathname !== "/ocr" && url.pathname !== "/receipt")) {
       return json({ error: "not_found" }, 404, origin);
     }
 
@@ -296,6 +416,28 @@ export default {
 
     if (!env.PC_AI_URL || !env.CF_ACCESS_CLIENT_ID || !env.CF_ACCESS_CLIENT_SECRET) {
       return json({ error: "server_misconfigured" }, 500, origin);
+    }
+
+    if (url.pathname === "/receipt") {
+      let result;
+      try {
+        result = await runReceiptExtraction(env, image_base64);
+      } catch (e) {
+        return json({ error: "pc_offline", detail: String(e) }, 503, origin);
+      }
+      return json(
+        {
+          ok: true,
+          text: result.rawText,
+          structured: result.structured,
+          regex_check: result.regexCheck,
+          low_confidence: result.lowConfidence,
+          remaining_today: rate.remaining,
+          unlimited: !!rate.unlimited,
+        },
+        200,
+        origin
+      );
     }
 
     let result;
