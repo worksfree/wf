@@ -129,9 +129,14 @@ table.rcp-table td.num { text-align:right; }
   <!-- 단건 -->
   <div id="modeSingle">
     <div class="drop" id="dropSingle">
+      <label class="sr" for="cameraInput" id="pick-camera-label">사진 촬영</label>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
       <label class="sr" for="fileInput" id="pick-label">파일 선택</label>
       <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" style="display:none">
-      <button class="pick-btn" type="button" id="pickBtn">파일 선택</button>
+      <div class="pick-row">
+        <button class="pick-btn" type="button" id="pickCameraBtn">📷 사진 촬영</button>
+        <button class="pick-btn secondary" type="button" id="pickBtn">🖼 파일 선택</button>
+      </div>
       <div class="drop-hint" id="drop-hint">또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)</div>
     </div>
   </div>
@@ -254,7 +259,8 @@ const I18N = {
     hdr_title:"OCR 텍스트 추출", hdr_sub:"이미지·PDF·영수증을 텍스트/마크다운/엑셀/문서로 변환합니다",
     intro:"파일을 올리면 선택한 출력 형식(텍스트·마크다운·CSV/엑셀·문서)으로 변환합니다. 다건 모드에서는 폴더/여러 파일을 한 번에 처리하고 예상 소요 시간을 함께 보여줍니다.",
     tab_single:"단건 처리", tab_bulk:"다건 처리",
-    pick_label:"파일 선택", pick_btn:"파일 선택",
+    pick_label:"파일 선택", pick_btn:"🖼 파일 선택",
+    pick_camera_label:"사진 촬영", pick_camera_btn:"📷 사진 촬영",
     drop_hint:"또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)",
     pick_folder_label:"폴더 선택", pick_folder_btn:"📁 폴더 선택",
     pick_files_label:"여러 파일 선택", pick_files_btn:"여러 파일 선택",
@@ -304,7 +310,8 @@ const I18N = {
     hdr_title:"OCR Text Extraction", hdr_sub:"Convert images, PDFs, and receipts to text/markdown/excel/doc",
     intro:"Upload a file to convert it to the selected output format (text, markdown, CSV/Excel, or doc). Batch mode processes a folder or multiple files with an estimated time remaining.",
     tab_single:"Single", tab_bulk:"Batch",
-    pick_label:"Choose file", pick_btn:"Choose file",
+    pick_label:"Choose file", pick_btn:"🖼 Choose file",
+    pick_camera_label:"Take photo", pick_camera_btn:"📷 Take photo",
     drop_hint:"or drag and drop a file here (PNG, JPG, PDF)",
     pick_folder_label:"Choose folder", pick_folder_btn:"📁 Choose folder",
     pick_files_label:"Choose multiple files", pick_files_btn:"Choose multiple files",
@@ -366,6 +373,8 @@ function applyLang() {
   document.getElementById("tabBulk").textContent = t("tab_bulk");
   document.getElementById("pick-label").textContent = t("pick_label");
   document.getElementById("pickBtn").textContent = t("pick_btn");
+  document.getElementById("pick-camera-label").textContent = t("pick_camera_label");
+  document.getElementById("pickCameraBtn").textContent = t("pick_camera_btn");
   document.getElementById("drop-hint").textContent = t("drop_hint");
   document.getElementById("pick-folder-label").textContent = t("pick_folder_label");
   document.getElementById("pickFolderBtn").textContent = t("pick_folder_btn");
@@ -788,6 +797,8 @@ async function handleRotate() {
 
 document.getElementById("pickBtn").addEventListener("click", () => document.getElementById("fileInput").click());
 document.getElementById("fileInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
+document.getElementById("pickCameraBtn").addEventListener("click", () => document.getElementById("cameraInput").click());
+document.getElementById("cameraInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
 document.getElementById("rotateBtn").addEventListener("click", handleRotate);
 document.getElementById("zoomInBtn").addEventListener("click", () => { _zoomPct = Math.min(ZOOM_MAX, _zoomPct + ZOOM_STEP); applyZoom(); });
 document.getElementById("zoomOutBtn").addEventListener("click", () => { _zoomPct = Math.max(ZOOM_MIN, _zoomPct - ZOOM_STEP); applyZoom(); });
