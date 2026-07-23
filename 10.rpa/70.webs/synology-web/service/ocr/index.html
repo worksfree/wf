@@ -6,13 +6,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OCR 텍스트 추출 — WorksFree</title>
 <style>
+/* 허브 다크 테마(HUB_THEMES.claude)와 동일 팔레트 — service/qr, service/ebook 등
+   기존 컨설팅/서비스 페이지들과 통일. 허브가 iframe에 테마를 자동 주입해주지
+   않아서(기본 테마일 때는 각 페이지가 자체 CSS로 맞춰야 함) 직접 맞춘다. */
 :root {
-  --surface:#ffffff; --bg:#f6f7f9; --border:#e4e8ee;
-  --text:#22303e; --muted:#5b6b7b; --hint:#8b98a5;
-  --blue:#1a5c9e; --blue-soft:#eaf1f8;
+  --bg:#0f1117; --surface:#1c2333; --surface2:#222536; --border:#2a3347;
+  --text:#e2e8f0; --muted:#7e9ab5; --hint:#64748b;
+  --blue:#3b82f6; --blue-bg:#0c1a30; --amber:#f59e0b; --green:#10b981;
 }
 * { box-sizing:border-box; margin:0; padding:0; }
-body { font-family:'Segoe UI','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+body { font-family:'IBM Plex Sans KR','Segoe UI','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
 
 header {
   position:sticky; top:0; z-index:100;
@@ -24,16 +27,42 @@ header {
 .hdr-info  { flex:1; }
 .hdr-title { font-size:17px; font-weight:600; letter-spacing:-.2px; }
 .hdr-sub   { font-size:13px; color:var(--muted); margin-top:2px; }
-button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
+button:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
 
-.page { max-width:760px; margin:0 auto; padding:22px 18px 72px; }
+.page { max-width:780px; margin:0 auto; padding:22px 18px 72px; }
 .intro { font-size:13px; color:var(--muted); margin-bottom:16px; }
 
+/* 단건/다건 탭 — QR 생성기(service/qr)와 동일 패턴 */
+.mode-tabs { display:flex; gap:4px; margin-bottom:14px; }
+.mode-tab { padding:8px 18px; font-size:13px; font-weight:600; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:20px; cursor:pointer; }
+.mode-tab.active { color:#fff; background:var(--blue); border-color:var(--blue); }
+
 .drop { border:2px dashed var(--border); border-radius:12px; padding:32px 20px; text-align:center; background:var(--surface); }
-.drop.drag { border-color:var(--blue); background:var(--blue-soft); }
+.drop.drag { border-color:var(--blue); background:var(--blue-bg); }
 label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+.pick-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 .pick-btn { background:var(--blue); color:#fff; border:none; border-radius:10px; padding:10px 22px; font-size:14.5px; cursor:pointer; }
+.pick-btn.secondary { background:var(--surface2); color:var(--blue); border:1.5px solid var(--blue); }
+.pick-btn:disabled { opacity:.5; cursor:not-allowed; }
 .drop-hint { font-size:12px; color:var(--hint); margin-top:10px; }
+
+.ask-row { display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
+.remaining { font-size:12px; color:var(--hint); }
+
+/* 설정 패널 — 단건은 기본 접힘, 다건은 기본 펼침 */
+.settings-panel { border:1px solid var(--border); border-radius:10px; background:var(--surface); margin-top:14px; overflow:hidden; }
+.settings-toggle { width:100%; display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:none; border:none; cursor:pointer; font-size:13px; color:var(--muted); font-weight:600; }
+.settings-toggle .chev { transition:transform .15s; }
+.settings-panel.open .settings-toggle .chev { transform:rotate(90deg); }
+.settings-body { display:none; padding:2px 14px 16px; }
+.settings-panel.open .settings-body { display:block; }
+.setting-row { margin:12px 0; }
+.setting-row label { display:flex; justify-content:space-between; font-size:12.5px; color:var(--text); margin-bottom:6px; }
+.setting-row input[type="range"] { width:100%; accent-color:var(--blue); }
+.setting-row select { width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:13px; }
+.setting-check { display:flex; align-items:center; gap:8px; font-size:12.5px; margin-top:10px; }
+.setting-check input { accent-color:var(--blue); cursor:pointer; }
+.setting-hint { font-size:11px; color:var(--hint); margin-top:4px; }
 
 .preview-wrap { margin-top:14px; display:none; }
 .preview-wrap.show { display:block; }
@@ -50,17 +79,31 @@ label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(
 .rotate-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:6px 14px; font-size:12.5px; cursor:pointer; color:var(--muted); }
 .rotate-btn:disabled { opacity:.5; cursor:not-allowed; }
 
-.ask-row { display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
-.remaining { font-size:12px; color:var(--hint); }
+.batch-wrap { margin-top:14px; display:none; }
+.batch-wrap.show { display:block; }
+.batch-progress { width:100%; height:10px; border-radius:6px; accent-color:var(--blue); }
+.batch-status-row { display:flex; justify-content:space-between; gap:10px; margin-top:8px; font-size:12.5px; color:var(--muted); }
+.batch-summary { font-size:12.5px; color:var(--muted); margin-top:6px; }
 
 #status { min-height:1.4em; color:var(--muted); font-size:13px; margin:14px 0; }
-#status.err { color:#b3261e; }
+#status.err { color:#f87171; }
 
 .result-wrap { margin-top:10px; }
 .result-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .result-head h2 { font-size:14px; color:var(--blue); }
+.btn-group { display:flex; gap:8px; }
 .copy-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:6px 14px; font-size:12.5px; cursor:pointer; color:var(--muted); }
-textarea#result { width:100%; min-height:260px; padding:14px 16px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; background:var(--surface); resize:vertical; font-family:inherit; white-space:pre-wrap; }
+textarea#result { width:100%; min-height:280px; padding:14px 16px; border:1.5px solid var(--border); border-radius:10px; font-size:13.5px; background:var(--surface); color:var(--text); resize:vertical; font-family:inherit; white-space:pre-wrap; }
+
+.rcp-fields { display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; font-size:13px; margin-top:10px; }
+.rcp-fields dt { color:var(--muted); }
+.rcp-fields dd { font-weight:600; }
+.rcp-table-wrap { margin-top:10px; overflow-x:auto; }
+table.rcp-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+table.rcp-table th, table.rcp-table td { border:1px solid var(--border); padding:6px 8px; text-align:left; white-space:nowrap; }
+table.rcp-table th { background:var(--blue-bg); color:var(--blue); font-weight:600; }
+table.rcp-table td.num { text-align:right; }
+.rcp-warn { color:var(--amber); font-size:11px; margin-top:6px; }
 
 .disclaim { font-size:11.5px; color:var(--hint); margin-top:26px; border-top:1px solid var(--border); padding-top:12px; }
 </style>
@@ -71,18 +114,72 @@ textarea#result { width:100%; min-height:260px; padding:14px 16px; border:1.5px 
   <div class="hdr-icon">🔎</div>
   <div class="hdr-info">
     <div class="hdr-title" id="hdr-title">OCR 텍스트 추출</div>
-    <div class="hdr-sub" id="hdr-sub">이미지·PDF에서 텍스트를 추출합니다</div>
+    <div class="hdr-sub" id="hdr-sub">이미지·PDF·영수증을 텍스트/마크다운/엑셀/문서로 변환합니다</div>
   </div>
 </header>
 
 <div class="page">
-  <div class="intro" id="intro">PNG·JPG 이미지 또는 PDF 파일을 올리면 텍스트를 추출합니다. PDF는 페이지별로 처리되며 페이지 수만큼 사용 횟수를 소모합니다.</div>
+  <div class="intro" id="intro">파일을 올리면 선택한 출력 형식(텍스트·마크다운·CSV/엑셀·문서)으로 변환합니다. 다건 모드에서는 폴더/여러 파일을 한 번에 처리하고 예상 소요 시간을 함께 보여줍니다.</div>
 
-  <div class="drop" id="drop">
-    <label class="sr" for="fileInput" id="pick-label">파일 선택</label>
-    <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" style="display:none">
-    <button class="pick-btn" type="button" id="pickBtn">파일 선택</button>
-    <div class="drop-hint" id="drop-hint">또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)</div>
+  <div class="mode-tabs">
+    <button class="mode-tab active" type="button" id="tabSingle" onclick="switchMode('single')">단건 처리</button>
+    <button class="mode-tab" type="button" id="tabBulk" onclick="switchMode('bulk')">다건 처리</button>
+  </div>
+
+  <!-- 단건 -->
+  <div id="modeSingle">
+    <div class="drop" id="dropSingle">
+      <label class="sr" for="fileInput" id="pick-label">파일 선택</label>
+      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" style="display:none">
+      <button class="pick-btn" type="button" id="pickBtn">파일 선택</button>
+      <div class="drop-hint" id="drop-hint">또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)</div>
+    </div>
+  </div>
+
+  <!-- 다건 -->
+  <div id="modeBulk" style="display:none;">
+    <div class="drop" id="dropBulk">
+      <label class="sr" for="folderInput" id="pick-folder-label">폴더 선택</label>
+      <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none">
+      <label class="sr" for="filesInput" id="pick-files-label">여러 파일 선택</label>
+      <input type="file" id="filesInput" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" multiple style="display:none">
+      <div class="pick-row">
+        <button class="pick-btn" type="button" id="pickFolderBtn">📁 폴더 선택</button>
+        <button class="pick-btn secondary" type="button" id="pickFilesBtn">여러 파일 선택</button>
+      </div>
+      <div class="drop-hint" id="drop-hint-bulk">또는 이 영역에 여러 파일을 끌어다 놓으세요</div>
+    </div>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <button class="settings-toggle" type="button" id="settingsToggle" onclick="toggleSettings()">
+      <span id="settings-label">⚙ 설정</span>
+      <span class="chev">▸</span>
+    </button>
+    <div class="settings-body">
+      <div class="setting-row">
+        <label for="fmtSelect"><span id="lbl-fmt">출력 형식</span></label>
+        <select id="fmtSelect" onchange="onFormatChange()">
+          <option value="text" id="opt-text">텍스트 (.txt) — 손글씨·일반 문서 추천</option>
+          <option value="markdown" id="opt-md">마크다운 (.md) — PDF·긴 문서 추천</option>
+          <option value="excel" id="opt-excel">CSV/엑셀 (.xlsx) — 영수증 추천</option>
+          <option value="doc" id="opt-doc">문서 (.doc) — 워드에서 바로 열기</option>
+        </select>
+        <div class="setting-hint" id="fmt-hint"></div>
+      </div>
+      <div class="setting-row">
+        <label for="contrastRange"><span id="lbl-contrast">대비(콘트라스트)</span><span id="contrastVal">+15%</span></label>
+        <input type="range" id="contrastRange" min="-20" max="50" value="15" step="5">
+      </div>
+      <div class="setting-row">
+        <label for="sharpenRange"><span id="lbl-sharpen">샤프니스</span><span id="sharpenVal">25%</span></label>
+        <input type="range" id="sharpenRange" min="0" max="100" value="25" step="5">
+      </div>
+      <div class="setting-check" id="includeRawRow">
+        <input type="checkbox" id="includeRaw" checked>
+        <label for="includeRaw" id="include-raw-label">원본 인식 텍스트도 함께 저장(검증용, 엑셀 출력 시)</label>
+      </div>
+    </div>
   </div>
 
   <div class="ask-row">
@@ -106,68 +203,152 @@ textarea#result { width:100%; min-height:260px; padding:14px 16px; border:1.5px 
     </div>
   </div>
 
+  <div class="batch-wrap" id="batchWrap">
+    <progress class="batch-progress" id="batchProgress" value="0" max="100"></progress>
+    <div class="batch-status-row">
+      <span id="batchStatusText"></span>
+      <span id="batchEtaText"></span>
+    </div>
+    <div class="batch-summary" id="batchSummary" aria-live="polite"></div>
+  </div>
+
   <div id="status" role="status" aria-live="polite"></div>
 
   <div class="result-wrap" id="resultWrap" style="display:none;">
     <div class="result-head">
       <h2 id="result-h">추출된 텍스트</h2>
-      <button class="copy-btn" type="button" id="copyBtn">복사</button>
+      <div class="btn-group">
+        <button class="copy-btn" type="button" id="copyBtn">복사</button>
+        <button class="copy-btn" type="button" id="downloadBtn">다운로드</button>
+      </div>
     </div>
     <textarea id="result" readonly aria-labelledby="result-h"></textarea>
+  </div>
+
+  <div class="result-wrap" id="rcpResultWrap" style="display:none;">
+    <div class="result-head">
+      <h2 id="rcp-result-h">인식 결과</h2>
+      <button class="copy-btn" type="button" id="downloadXlsxBtn">엑셀 다운로드</button>
+    </div>
+    <dl class="rcp-fields" id="rcpFields"></dl>
+    <div class="rcp-table-wrap"><table class="rcp-table" id="rcpItemsTable"></table></div>
+    <div class="rcp-warn" id="rcpWarn"></div>
   </div>
 
   <div class="disclaim" id="disclaim">
     ※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다.
     추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요.
+    문서(.doc) 출력은 표·이미지 배치를 그대로 복원하지 않는 기본 구조 변환입니다.
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 /* ───────── i18n ───────── */
 const I18N = {
   ko: {
-    hdr_title:"OCR 텍스트 추출", hdr_sub:"이미지·PDF에서 텍스트를 추출합니다",
-    intro:"PNG·JPG 이미지 또는 PDF 파일을 올리면 텍스트를 추출합니다. PDF는 페이지별로 처리되며 페이지 수만큼 사용 횟수를 소모합니다.",
+    hdr_title:"OCR 텍스트 추출", hdr_sub:"이미지·PDF·영수증을 텍스트/마크다운/엑셀/문서로 변환합니다",
+    intro:"파일을 올리면 선택한 출력 형식(텍스트·마크다운·CSV/엑셀·문서)으로 변환합니다. 다건 모드에서는 폴더/여러 파일을 한 번에 처리하고 예상 소요 시간을 함께 보여줍니다.",
+    tab_single:"단건 처리", tab_bulk:"다건 처리",
     pick_label:"파일 선택", pick_btn:"파일 선택",
     drop_hint:"또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)",
+    pick_folder_label:"폴더 선택", pick_folder_btn:"📁 폴더 선택",
+    pick_files_label:"여러 파일 선택", pick_files_btn:"여러 파일 선택",
+    drop_hint_bulk:"또는 이 영역에 여러 파일을 끌어다 놓으세요",
+    settings_label:"⚙ 설정",
+    lbl_fmt:"출력 형식",
+    opt_text:"텍스트 (.txt) — 손글씨·일반 문서 추천",
+    opt_md:"마크다운 (.md) — PDF·긴 문서 추천",
+    opt_excel:"CSV/엑셀 (.xlsx) — 영수증 추천",
+    opt_doc:"문서 (.doc) — 워드에서 바로 열기",
+    fmt_hint_text:"인식된 텍스트를 그대로 .txt로 저장합니다.",
+    fmt_hint_markdown:"인식된 텍스트를 .md 파일로 저장합니다(구조 자동 변환은 아직 지원하지 않음).",
+    fmt_hint_excel:"상호명·품목·금액 등을 표로 인식해 엑셀로 저장합니다 — 영수증류에 적합합니다.",
+    fmt_hint_doc:"인식된 텍스트를 워드에서 바로 열리는 기본 문서(.doc)로 저장합니다. 표·이미지 배치를 그대로 복원하진 않습니다.",
+    lbl_contrast:"대비(콘트라스트)", lbl_sharpen:"샤프니스",
+    include_raw_label:"원본 인식 텍스트도 함께 저장(검증용, 엑셀 출력 시)",
     remaining:n=>`오늘 남은 처리 ${n}회`, remaining_unlimited:"오늘 처리 횟수 무제한 (관리자)",
-    processing:"처리 중...", processing_page:(i,n)=>`처리 중... (${i}/${n} 페이지)`,
-    result_h:"추출된 텍스트", copy_btn:"복사", copied:"복사됨",
+    result_h:"추출된 텍스트", rcp_result_h:"인식 결과", copy_btn:"복사", copied:"복사됨", download_btn:"다운로드", download_xlsx_btn:"엑셀 다운로드",
     login_required:"로그인 후 이용 가능한 기능입니다.",
     rate_limited:"오늘 사용 가능한 횟수를 모두 사용했습니다. 내일 다시 시도해 주세요.",
     pc_offline:"로컬 AI 서버가 오프라인입니다. 잠시 후 다시 시도해 주세요.",
-    error:"텍스트 추출에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    error:"처리에 실패했습니다. 잠시 후 다시 시도해 주세요.",
     unsupported:"지원하지 않는 파일 형식입니다 (PNG, JPG, PDF만 가능).",
     too_large:"파일이 너무 큽니다.",
     preview_pdf:n=>`PDF 미리보기 (1/${n} 페이지)`,
     rotate_btn:"🔄 회전 후 다시 인식",
     zoom_out:"축소", zoom_in:"확대", zoom_fit:"원래 크기",
+    processing:"처리 중...", processing_page:(i,n)=>`처리 중... (${i}/${n} 페이지)`,
     low_confidence_tip:"⚠ 원본이 흐릿하거나 구겨져 있어 인식이 불안정할 수 있습니다. 최대한 평평하게 펴서 밝은 곳에서 다시 촬영하거나, 회전 버튼으로 다시 시도해 보세요.",
-    disclaim:"※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다. 추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요."
+    rcp_structure_failed:"구조화에 실패했습니다 — 텍스트 형식으로 다시 시도해 보세요.",
+    rcp_field_store:"상호명", rcp_field_biz:"사업자등록번호", rcp_field_date:"거래일시", rcp_field_phone:"전화번호",
+    rcp_field_subtotal:"공급가액", rcp_field_tax:"부가세", rcp_field_total:"합계금액",
+    rcp_item_name:"품명", rcp_item_qty:"수량", rcp_item_price:"금액",
+    rcp_warn_total:"⚠ 인식된 합계금액이 원본 텍스트의 숫자와 달라 다시 확인이 필요할 수 있습니다.",
+    batch_empty:"선택한 폴더/파일 중 처리 가능한 파일이 없습니다.",
+    batch_analyzing:"폴더 분석 중...",
+    batch_eta_calculating:"남은 시간 계산 중...",
+    batch_eta:s=>`예상 남은 시간: ${s}`,
+    batch_skipped:n=>`${n}개 파일은 지원하지 않는 형식이거나 20MB를 초과해 제외됐습니다.`,
+    batch_done:(ok,fail,total)=>`완료: 총 ${total}건 중 ${ok}건 성공${fail?`, ${fail}건 실패`:""}`,
+    batch_stopped_rate:"일일 처리 한도에 도달해 배치를 중단했습니다. 지금까지 처리된 결과만 표시합니다.",
+    batch_stopped_offline:"로컬 AI 서버가 오프라인이 되어 배치를 중단했습니다. 지금까지 처리된 결과만 표시합니다.",
+    unit_sec:s=>`${s}초`, unit_min_sec:(m,s)=>`${m}분 ${s}초`,
+    disclaim:"※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다. 추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요. 문서(.doc) 출력은 표·이미지 배치를 그대로 복원하지 않는 기본 구조 변환입니다."
   },
   en: {
-    hdr_title:"OCR Text Extraction", hdr_sub:"Extract text from images and PDFs",
-    intro:"Upload a PNG/JPG image or a PDF to extract text. PDFs are processed page by page, consuming one use per page.",
+    hdr_title:"OCR Text Extraction", hdr_sub:"Convert images, PDFs, and receipts to text/markdown/excel/doc",
+    intro:"Upload a file to convert it to the selected output format (text, markdown, CSV/Excel, or doc). Batch mode processes a folder or multiple files with an estimated time remaining.",
+    tab_single:"Single", tab_bulk:"Batch",
     pick_label:"Choose file", pick_btn:"Choose file",
     drop_hint:"or drag and drop a file here (PNG, JPG, PDF)",
+    pick_folder_label:"Choose folder", pick_folder_btn:"📁 Choose folder",
+    pick_files_label:"Choose multiple files", pick_files_btn:"Choose multiple files",
+    drop_hint_bulk:"or drag and drop multiple files here",
+    settings_label:"⚙ Settings",
+    lbl_fmt:"Output format",
+    opt_text:"Text (.txt) — best for handwriting/general docs",
+    opt_md:"Markdown (.md) — best for PDFs/long docs",
+    opt_excel:"CSV/Excel (.xlsx) — best for receipts",
+    opt_doc:"Doc (.doc) — opens directly in Word",
+    fmt_hint_text:"Saves the recognized text as-is to .txt.",
+    fmt_hint_markdown:"Saves the recognized text to a .md file (no automatic structuring yet).",
+    fmt_hint_excel:"Recognizes store name/items/amounts as a table and saves to Excel — best for receipts.",
+    fmt_hint_doc:"Saves the recognized text as a basic .doc file that opens directly in Word. Table/image layout is not reproduced.",
+    lbl_contrast:"Contrast", lbl_sharpen:"Sharpness",
+    include_raw_label:"Also save the raw recognized text (for verification, Excel output only)",
     remaining:n=>`${n} uses left today`, remaining_unlimited:"Unlimited today (admin)",
-    processing:"Processing...", processing_page:(i,n)=>`Processing... (page ${i}/${n})`,
-    result_h:"Extracted text", copy_btn:"Copy", copied:"Copied",
+    result_h:"Extracted text", rcp_result_h:"Result", copy_btn:"Copy", copied:"Copied", download_btn:"Download", download_xlsx_btn:"Download Excel",
     login_required:"Sign in to use this feature.",
     rate_limited:"You've used all your uses for today. Please try again tomorrow.",
     pc_offline:"The local AI server is offline. Please try again shortly.",
-    error:"Failed to extract text. Please try again shortly.",
+    error:"Processing failed. Please try again shortly.",
     unsupported:"Unsupported file type (PNG, JPG, PDF only).",
     too_large:"File is too large.",
     preview_pdf:n=>`PDF preview (page 1/${n})`,
     rotate_btn:"🔄 Rotate & retry",
     zoom_out:"Zoom out", zoom_in:"Zoom in", zoom_fit:"Reset zoom",
+    processing:"Processing...", processing_page:(i,n)=>`Processing... (page ${i}/${n})`,
     low_confidence_tip:"⚠ The source may be blurry or creased, so results could be unreliable. Try flattening it and retaking the photo in good light, or use the rotate button to retry.",
-    disclaim:"※ This feature only works while the local PC server is on. If it's offline, a notice is shown. Extraction accuracy depends on the source image/font quality — always check the original for important documents."
+    rcp_structure_failed:"Structuring failed — try the Text format instead.",
+    rcp_field_store:"Store name", rcp_field_biz:"Business reg. no.", rcp_field_date:"Date", rcp_field_phone:"Phone",
+    rcp_field_subtotal:"Subtotal", rcp_field_tax:"Tax", rcp_field_total:"Total",
+    rcp_item_name:"Item", rcp_item_qty:"Qty", rcp_item_price:"Price",
+    rcp_warn_total:"⚠ The recognized total doesn't match a number found in the raw text — please double-check.",
+    batch_empty:"No supported files found in the selected folder/files.",
+    batch_analyzing:"Analyzing folder...",
+    batch_eta_calculating:"Estimating time left...",
+    batch_eta:s=>`Estimated time left: ${s}`,
+    batch_skipped:n=>`${n} file(s) were skipped (unsupported type or over 20MB).`,
+    batch_done:(ok,fail,total)=>`Done: ${ok}/${total} succeeded${fail?`, ${fail} failed`:""}`,
+    batch_stopped_rate:"Daily limit reached — batch stopped. Showing results processed so far.",
+    batch_stopped_offline:"The local AI server went offline — batch stopped. Showing results processed so far.",
+    unit_sec:s=>`${s}s`, unit_min_sec:(m,s)=>`${m}m ${s}s`,
+    disclaim:"※ This feature only works while the local PC server is on. If it's offline, a notice is shown. Extraction accuracy depends on the source image/font quality — always check the original for important documents. Doc (.doc) output is a basic structural conversion, not a pixel-perfect layout reproduction."
   }
 };
 // 언어 토글은 이 페이지에 두지 않는다 — 허브 사이드바 상단의 공용 KO/EN 토글이
@@ -175,26 +356,43 @@ const I18N = {
 let lang = localStorage.getItem("wf_lang") || "ko";
 const t = k => I18N[lang][k];
 
-let _lastStatusKey = null; // 마지막으로 표시한 동적 상태 메시지 키 — 언어 전환 시 재번역용
+let _lastStatusKey = null;
 function applyLang() {
   document.documentElement.lang = lang;
   document.getElementById("hdr-title").textContent = t("hdr_title");
   document.getElementById("hdr-sub").textContent = t("hdr_sub");
   document.getElementById("intro").textContent = t("intro");
+  document.getElementById("tabSingle").textContent = t("tab_single");
+  document.getElementById("tabBulk").textContent = t("tab_bulk");
   document.getElementById("pick-label").textContent = t("pick_label");
   document.getElementById("pickBtn").textContent = t("pick_btn");
   document.getElementById("drop-hint").textContent = t("drop_hint");
+  document.getElementById("pick-folder-label").textContent = t("pick_folder_label");
+  document.getElementById("pickFolderBtn").textContent = t("pick_folder_btn");
+  document.getElementById("pick-files-label").textContent = t("pick_files_label");
+  document.getElementById("pickFilesBtn").textContent = t("pick_files_btn");
+  document.getElementById("drop-hint-bulk").textContent = t("drop_hint_bulk");
+  document.getElementById("settings-label").textContent = t("settings_label");
+  document.getElementById("lbl-fmt").textContent = t("lbl_fmt");
+  document.getElementById("opt-text").textContent = t("opt_text");
+  document.getElementById("opt-md").textContent = t("opt_md");
+  document.getElementById("opt-excel").textContent = t("opt_excel");
+  document.getElementById("opt-doc").textContent = t("opt_doc");
+  document.getElementById("lbl-contrast").textContent = t("lbl_contrast");
+  document.getElementById("lbl-sharpen").textContent = t("lbl_sharpen");
+  document.getElementById("include-raw-label").textContent = t("include_raw_label");
   document.getElementById("result-h").textContent = t("result_h");
+  document.getElementById("rcp-result-h").textContent = t("rcp_result_h");
   document.getElementById("copyBtn").textContent = t("copy_btn");
+  document.getElementById("downloadBtn").textContent = t("download_btn");
+  document.getElementById("downloadXlsxBtn").textContent = t("download_xlsx_btn");
   document.getElementById("rotateBtn").textContent = t("rotate_btn");
   document.getElementById("zoomOutBtn").setAttribute("aria-label", t("zoom_out"));
   document.getElementById("zoomInBtn").setAttribute("aria-label", t("zoom_in"));
   document.getElementById("zoomFitBtn").textContent = t("zoom_fit");
   document.getElementById("disclaim").textContent = t("disclaim");
-  if (_lastStatusKey) {
-    const status = document.getElementById("status");
-    status.textContent = t(_lastStatusKey);
-  }
+  updateFormatHint();
+  if (_lastStatusKey) document.getElementById("status").textContent = t(_lastStatusKey);
 }
 function setStatus(status, key, isErr) {
   _lastStatusKey = key;
@@ -208,8 +406,33 @@ window.addEventListener("message", (e) => {
   }
 });
 
+/* ───────── 단건/다건 탭 ───────── */
+function switchMode(mode) {
+  document.getElementById("tabSingle").classList.toggle("active", mode === "single");
+  document.getElementById("tabBulk").classList.toggle("active", mode === "bulk");
+  document.getElementById("modeSingle").style.display = mode === "single" ? "block" : "none";
+  document.getElementById("modeBulk").style.display = mode === "bulk" ? "block" : "none";
+  // 사용자 요청: 단건은 설정 기본 숨김(빠르게 결과만 보고 싶은 경우가 많음),
+  // 다건은 기본 표시(잘못된 설정으로 여러 건을 다시 처리하는 낭비를 막기 위해 미리 확인).
+  document.getElementById("settingsPanel").classList.toggle("open", mode === "bulk");
+  document.getElementById("previewWrap").classList.remove("show");
+  document.getElementById("resultWrap").style.display = "none";
+  document.getElementById("rcpResultWrap").style.display = "none";
+  document.getElementById("batchWrap").classList.remove("show");
+  setStatus(document.getElementById("status"), null, false);
+}
+function toggleSettings() {
+  document.getElementById("settingsPanel").classList.toggle("open");
+}
+function updateFormatHint() {
+  const fmt = document.getElementById("fmtSelect").value;
+  document.getElementById("fmt-hint").textContent = t(`fmt_hint_${fmt}`);
+  document.getElementById("includeRawRow").style.display = fmt === "excel" ? "flex" : "none";
+}
+function onFormatChange() { updateFormatHint(); }
+
 /* ───────── Supabase ───────── */
-const OCR_WORKER_URL = "https://ocr-service.worksfree.workers.dev/ocr";
+const OCR_BASE_URL = "https://ocr-service.worksfree.workers.dev";
 let sbClient = null;
 try {
   if (window.supabase) {
@@ -221,10 +444,12 @@ try {
   }
 } catch (e) {}
 
+const MAX_FILE_BYTES = 20 * 1024 * 1024;
+const MAX_OCR_DIM = 1800; // 워커 num_ctx(6144)에 맞춘 값
+
 function canvasToBase64(canvas) {
   return canvas.toDataURL("image/png").split(",")[1];
 }
-
 function loadImageElement(file) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -235,81 +460,107 @@ function loadImageElement(file) {
   });
 }
 
-// 긴 변 상한(px) — 스마트폰 원본 사진(4000x3000 등)을 그대로 보내면 OCR 모델의 컨텍스트
-// 예산을 넘겨 응답이 몇 글자만에 끊기는 현상이 실측으로 확인됨(회전 문제로 오인하기 쉬움).
-// 워커 쪽 num_ctx(6144)에 맞춘 값 — 워커의 OCR_MODEL을 바꾸면 이 값도 함께 재검토할 것.
-const MAX_OCR_DIM = 1800;
+/* ───────── 샤프니스(언샵 마스크 3x3 컨볼루션) ─────────
+   CSS filter로는 흉내낼 수 없어 픽셀 단위로 직접 계산한다. amount 0~1로
+   원본과 샤픈 커널 결과를 블렌딩 — 0이면 원본 그대로, 1이면 커널 그대로. */
+function sharpenCanvas(canvas, amount) {
+  if (amount <= 0) return;
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  const src = ctx.getImageData(0, 0, w, h);
+  const s = src.data;
+  const out = new Uint8ClampedArray(s.length);
+  const k = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const pi = (y * w + x) * 4;
+      for (let c = 0; c < 3; c++) {
+        let sum = 0, ki = 0;
+        for (let ky = -1; ky <= 1; ky++) {
+          const yy = Math.min(h - 1, Math.max(0, y + ky));
+          for (let kx = -1; kx <= 1; kx++) {
+            const xx = Math.min(w - 1, Math.max(0, x + kx));
+            sum += s[(yy * w + xx) * 4 + c] * k[ki++];
+          }
+        }
+        out[pi + c] = s[pi + c] * (1 - amount) + sum * amount;
+      }
+      out[pi + 3] = s[pi + 3];
+    }
+  }
+  ctx.putImageData(new ImageData(out, w, h), 0, 0);
+}
 
-// 90도 단위 회전 — swap=true(90/270)면 캔버스 가로/세로를 바꿔서 잘림 없이 재구성하고,
-// 긴 변이 MAX_OCR_DIM을 넘으면 같은 비율로 축소해서 그린다.
-function rotateImageToBase64(img, degrees) {
-  const rad = (degrees % 360) * Math.PI / 180;
-  const swap = degrees % 180 !== 0;
-  const srcW = img.naturalWidth || img.width, srcH = img.naturalHeight || img.height;
+function currentContrastPct() { return parseInt(document.getElementById("contrastRange").value, 10); }
+function currentSharpenPct() { return parseInt(document.getElementById("sharpenRange").value, 10); }
+
+// 회전 + 다운스케일 + 대비 + 샤프니스를 한 번에 적용 — 미리보기와 실제 전송 데이터가
+// 항상 같은 파이프라인을 거치도록 통일(미리보기 따로/전송 따로일 때 생기는 불일치 방지).
+function buildProcessedCanvas(imgEl, rotationDeg, contrastPct, sharpenPct) {
+  const rad = (rotationDeg % 360) * Math.PI / 180;
+  const swap = rotationDeg % 180 !== 0;
+  const srcW = imgEl.naturalWidth || imgEl.width, srcH = imgEl.naturalHeight || imgEl.height;
   let drawW = srcW, drawH = srcH;
   let canvasW = swap ? srcH : srcW, canvasH = swap ? srcW : srcH;
   const maxDim = Math.max(canvasW, canvasH);
   if (maxDim > MAX_OCR_DIM) {
     const scale = MAX_OCR_DIM / maxDim;
-    drawW *= scale; drawH *= scale;
-    canvasW *= scale; canvasH *= scale;
+    drawW *= scale; drawH *= scale; canvasW *= scale; canvasH *= scale;
   }
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(canvasW);
   canvas.height = Math.round(canvasH);
   const ctx = canvas.getContext("2d");
-  // 가벼운 대비 보정 — 실측(olmOCR-2 + 자동차등록증/영수증/손글씨)으로 부작용 없이
-  // 영수증류에서만 오차율이 소폭 개선됨을 확인(0.5~1%p, 정상 문서는 변화 없음).
-  ctx.filter = "contrast(1.15)";
+  ctx.filter = `contrast(${1 + contrastPct / 100})`;
   ctx.translate(canvas.width / 2, canvas.height / 2);
   ctx.rotate(rad);
-  ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+  ctx.drawImage(imgEl, -drawW / 2, -drawH / 2, drawW, drawH);
+  sharpenCanvas(canvas, sharpenPct / 100);
+  return canvas;
+}
+
+async function renderPdfPageToBase64(pdfDoc, pageNum, contrastPct) {
+  const page = await pdfDoc.getPage(pageNum);
+  const viewport = page.getViewport({ scale: 2.0, rotation: 0 });
+  const canvas = document.createElement("canvas");
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  const ctx = canvas.getContext("2d");
+  ctx.filter = `contrast(${1 + contrastPct / 100})`;
+  await page.render({ canvasContext: ctx, viewport }).promise;
   return canvasToBase64(canvas);
 }
 
-async function pdfToPageImages(file, rotation, onFirstPage) {
-  const buf = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-  const images = [];
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const viewport = page.getViewport({ scale: 2.0, rotation }); // OCR 정확도를 위해 2배 렌더링 + 사용자 지정 회전
-    const canvas = document.createElement("canvas");
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    const ctx = canvas.getContext("2d");
-    ctx.filter = "contrast(1.15)"; // 이미지 경로와 동일한 가벼운 대비 보정 (rotateImageToBase64 참고)
-    await page.render({ canvasContext: ctx, viewport }).promise;
-    const b64 = canvasToBase64(canvas);
-    images.push(b64);
-    if (i === 1 && onFirstPage) onFirstPage(b64, pdf.numPages);
-  }
-  return images;
+/* ───────── OCR 호출 ───────── */
+async function callOcr(session, imageBase64) {
+  const resp = await fetch(`${OCR_BASE_URL}/ocr`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ access_token: session.access_token, image_base64: imageBase64 }),
+  });
+  let data = {}; try { data = await resp.json(); } catch {}
+  return { resp, data };
+}
+async function callReceipt(session, imageBase64) {
+  const resp = await fetch(`${OCR_BASE_URL}/receipt`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ access_token: session.access_token, image_base64: imageBase64 }),
+  });
+  let data = {}; try { data = await resp.json(); } catch {}
+  return { resp, data };
+}
+function applyErrorStatus(status, resp, data) {
+  if (resp.status === 401 || data.error === "unauthenticated" || data.error === "invalid_session") setStatus(status, "login_required", true);
+  else if (resp.status === 429 || data.error === "rate_limited") setStatus(status, "rate_limited", true);
+  else if (resp.status === 503 || data.error === "pc_offline") setStatus(status, "pc_offline", true);
+  else setStatus(status, "error", true);
+}
+function formatDuration(totalSec) {
+  const sec = Math.max(0, Math.round(totalSec));
+  if (sec < 60) return t("unit_sec")(sec);
+  return t("unit_min_sec")(Math.floor(sec / 60), sec % 60);
 }
 
-// _previewUrl은 "현재 화면에 떠 있는 blob URL"만 추적한다 — 호출부가 미리 만들어 넘긴 새 URL을
-// 이전 URL로 착각해 즉시 revoke해버리는 실수(이미지가 뜨기도 전에 무효화됨)를 피하기 위해
-// revoke 판단은 반드시 이 함수 내부에서, 새 src를 저장하기 "직전"에만 한다.
-let _previewUrl = null;
-function showPreview(src, caption) {
-  if (_previewUrl && _previewUrl !== src && _previewUrl.startsWith("blob:")) {
-    URL.revokeObjectURL(_previewUrl);
-  }
-  _previewUrl = src.startsWith("blob:") ? src : null;
-  document.getElementById("previewImg").src = src;
-  document.getElementById("previewCap").textContent = caption || "";
-  document.getElementById("previewWrap").classList.add("show");
-  resetZoom();
-}
-function hidePreview() {
-  if (_previewUrl && _previewUrl.startsWith("blob:")) { URL.revokeObjectURL(_previewUrl); }
-  _previewUrl = null;
-  document.getElementById("previewWrap").classList.remove("show");
-}
-
-/* ───────── 미리보기 확대/축소 ─────────
-   현장에서 원본과 OCR 결과를 대조할 수 있도록 확대/축소 + 스크롤 팬 지원.
-   실제 OCR에 전송되는 이미지 데이터와는 무관 — 화면 표시 크기만 조절한다. */
+/* ───────── 미리보기 확대/축소 ───────── */
 const ZOOM_MIN = 50, ZOOM_MAX = 300, ZOOM_STEP = 25;
 let _zoomPct = 100;
 function applyZoom() {
@@ -319,124 +570,176 @@ function applyZoom() {
   document.getElementById("zoomInBtn").disabled = _zoomPct >= ZOOM_MAX;
 }
 function resetZoom() {
-  _zoomPct = 100;
-  applyZoom();
+  _zoomPct = 100; applyZoom();
   const scroll = document.getElementById("previewScroll");
-  scroll.scrollTop = 0;
-  scroll.scrollLeft = 0;
+  scroll.scrollTop = 0; scroll.scrollLeft = 0;
+}
+let _previewUrl = null;
+function showPreview(src, caption) {
+  if (_previewUrl && _previewUrl !== src && _previewUrl.startsWith("blob:")) URL.revokeObjectURL(_previewUrl);
+  _previewUrl = src.startsWith("blob:") ? src : null;
+  document.getElementById("previewImg").src = src;
+  document.getElementById("previewCap").textContent = caption || "";
+  document.getElementById("previewWrap").classList.add("show");
+  resetZoom();
+}
+function hidePreview() {
+  if (_previewUrl && _previewUrl.startsWith("blob:")) URL.revokeObjectURL(_previewUrl);
+  _previewUrl = null;
+  document.getElementById("previewWrap").classList.remove("show");
 }
 
-/* ───────── OCR 호출 ───────── */
-async function callOcr(session, imageBase64) {
-  const resp = await fetch(OCR_WORKER_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ access_token: session.access_token, image_base64: imageBase64 }),
-  });
-  let data = {};
-  try { data = await resp.json(); } catch {}
-  return { resp, data };
+/* ───────── 다운로드 헬퍼 ───────── */
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
 }
+function escHtml(s) { const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML; }
+function tsNow() { return new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19); }
 
-function applyErrorStatus(status, resp, data) {
-  if (resp.status === 401 || data.error === "unauthenticated" || data.error === "invalid_session") {
-    setStatus(status, "login_required", true);
-  } else if (resp.status === 429 || data.error === "rate_limited") {
-    setStatus(status, "rate_limited", true);
-  } else if (resp.status === 503 || data.error === "pc_offline") {
-    setStatus(status, "pc_offline", true);
-  } else {
-    setStatus(status, "error", true);
+function downloadAsText(text, base) { triggerDownload(new Blob([text], { type: "text/plain;charset=utf-8" }), `${base}.txt`); }
+function downloadAsMarkdown(text, base) { triggerDownload(new Blob([text], { type: "text/markdown;charset=utf-8" }), `${base}.md`); }
+// 표·이미지 배치를 픽셀 단위로 복원하는 게 아니라, 워드가 열 수 있는 최소 구조(문단)로만
+// 감싸는 방식이다 — PP-StructureV3(진짜 레이아웃 보존 docx 생성) 경로는 이 PC의
+// PaddlePaddle CPU 실행기 내부 버그로 막혀 있어(2026-07-23 실측 확인) 당장은 이 정도가 현실적인 선.
+function downloadAsDoc(text, base) {
+  const paragraphs = text.split("\n").map(line => `<p>${escHtml(line) || "&nbsp;"}</p>`).join("\n");
+  const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'></head><body>${paragraphs}</body></html>`;
+  triggerDownload(new Blob(["﻿", html], { type: "application/msword" }), `${base}.doc`);
+}
+function fmtNum(n) { return typeof n === "number" ? n.toLocaleString() : "-"; }
+function setIntegerFormat(ws) {
+  if (!ws["!ref"]) return;
+  const range = XLSX.utils.decode_range(ws["!ref"]);
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+      if (cell && cell.t === "n") cell.z = "#,##0";
+    }
   }
 }
 
-// 현재 로드된 파일의 회전 가능한 상태 — 회전 버튼이 파일을 다시 고를 필요 없이
-// 같은 파일을 재렌더링(PDF는 viewport rotation, 이미지는 canvas 회전)해서 재인식할 수 있도록 유지한다.
-let _currentFile = null;
-let _currentIsPdf = false;
-let _currentImgEl = null;
-let _rotationDeg = 0;
-let _rotateBusy = false;
+/* ═══════════════ 단건 처리 ═══════════════ */
 
-async function buildRotatedImages(rotationDeg, onFirstPage) {
+let _currentFile = null, _currentIsPdf = false, _currentImgEl = null, _rotationDeg = 0, _rotateBusy = false;
+let _rcpSingleData = null;
+
+async function buildSingleImages(rotationDeg, onFirstPage) {
+  const contrastPct = currentContrastPct(), sharpenPct = currentSharpenPct();
   if (_currentIsPdf) {
-    return await pdfToPageImages(_currentFile, rotationDeg, onFirstPage);
+    const buf = await _currentFile.arrayBuffer();
+    if (!_currentFile._pdfDoc) _currentFile._pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
+    const pdfDoc = _currentFile._pdfDoc;
+    const images = [];
+    for (let i = 1; i <= pdfDoc.numPages; i++) {
+      const b64 = await renderPdfPageToBase64(pdfDoc, i, contrastPct);
+      images.push(b64);
+      if (i === 1 && onFirstPage) onFirstPage(b64, pdfDoc.numPages);
+    }
+    return images;
   }
-  const b64 = rotateImageToBase64(_currentImgEl, rotationDeg);
+  const canvas = buildProcessedCanvas(_currentImgEl, rotationDeg, contrastPct, sharpenPct);
+  const b64 = canvasToBase64(canvas);
   if (onFirstPage) onFirstPage(b64);
   return [b64];
 }
 
-async function runOcrPipeline(images, session) {
+function renderRcpFields(structured) {
+  const rows = [
+    [t("rcp_field_store"), structured?.store_name || "-"],
+    [t("rcp_field_biz"), structured?.business_reg_no || "-"],
+    [t("rcp_field_date"), structured?.date || "-"],
+    [t("rcp_field_phone"), structured?.phone || "-"],
+    [t("rcp_field_subtotal"), fmtNum(structured?.subtotal)],
+    [t("rcp_field_tax"), fmtNum(structured?.tax)],
+    [t("rcp_field_total"), fmtNum(structured?.total)],
+  ];
+  document.getElementById("rcpFields").innerHTML = rows.map(([k, v]) => `<dt>${escHtml(k)}</dt><dd>${escHtml(String(v))}</dd>`).join("");
+}
+function renderRcpItemsTable(items) {
+  const table = document.getElementById("rcpItemsTable");
+  if (!items || !items.length) { table.innerHTML = ""; return; }
+  const head = `<tr><th>${escHtml(t("rcp_item_name"))}</th><th>${escHtml(t("rcp_item_qty"))}</th><th>${escHtml(t("rcp_item_price"))}</th></tr>`;
+  const body = items.map(it => `<tr><td>${escHtml(it.name || "")}</td><td class="num">${escHtml(String(it.qty ?? ""))}</td><td class="num">${fmtNum(it.price)}</td></tr>`).join("");
+  table.innerHTML = head + body;
+}
+
+async function runSinglePipeline(images, session, fmt) {
   const status = document.getElementById("status");
   const resultWrap = document.getElementById("resultWrap");
-  const resultEl = document.getElementById("result");
+  const rcpWrap = document.getElementById("rcpResultWrap");
+  resultWrap.style.display = "none";
+  rcpWrap.style.display = "none";
+
+  if (fmt === "excel") {
+    // 영수증류 — 이미지 1장만 지원(다중 페이지 PDF는 첫 페이지만 구조화)
+    setStatus(status, "processing", false);
+    const { resp, data } = await callReceipt(session, images[0]);
+    if (!resp.ok || !data.ok) { applyErrorStatus(status, resp, data); return; }
+    if (data.unlimited) document.getElementById("remaining").textContent = t("remaining_unlimited");
+    else if (typeof data.remaining_today === "number") document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
+
+    _rcpSingleData = { rawText: data.text, structured: data.structured, regexCheck: data.regex_check };
+    if (!data.structured) {
+      setStatus(status, "rcp_structure_failed", true);
+      document.getElementById("rcpFields").innerHTML = "";
+      document.getElementById("rcpItemsTable").innerHTML = "";
+    } else {
+      setStatus(status, data.low_confidence ? "low_confidence_tip" : null, false);
+      renderRcpFields(data.structured);
+      renderRcpItemsTable(data.structured.items);
+      const rc = data.regex_check;
+      document.getElementById("rcpWarn").textContent =
+        (rc && rc.total != null && data.structured.total != null && rc.total !== data.structured.total) ? t("rcp_warn_total") : "";
+    }
+    rcpWrap.style.display = "block";
+    return;
+  }
 
   const texts = [];
   let lowConfidence = false;
   for (let i = 0; i < images.length; i++) {
-    if (images.length > 1) {
-      _lastStatusKey = null; // 페이지 진행 문구는 함수형이라 재번역 캐시 대상에서 제외
-      status.className = ""; status.textContent = t("processing_page")(i + 1, images.length);
-    }
+    if (images.length > 1) { _lastStatusKey = null; status.className = ""; status.textContent = t("processing_page")(i + 1, images.length); }
+    else setStatus(status, "processing", false);
     const { resp, data } = await callOcr(session, images[i]);
-    console.log("[ocr] response:", resp.status, data);
     if (!resp.ok || !data.ok) {
       applyErrorStatus(status, resp, data);
-      if (texts.length === 0) return; // 첫 페이지부터 실패면 결과 없이 종료
-      break; // 일부 페이지까지는 성공 — 여기까지 결과 표시
+      if (texts.length === 0) return;
+      break;
     }
     if (data.low_confidence) lowConfidence = true;
     texts.push(images.length > 1 ? `--- Page ${i + 1} ---\n${data.text}` : data.text);
-    if (data.unlimited) {
-      document.getElementById("remaining").textContent = t("remaining_unlimited");
-    } else if (typeof data.remaining_today === "number") {
-      document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
-    }
+    if (data.unlimited) document.getElementById("remaining").textContent = t("remaining_unlimited");
+    else if (typeof data.remaining_today === "number") document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
   }
-
   if (texts.length) {
-    // low_confidence: 워커가 반복 폭주를 감지해 재시도까지 했던 페이지가 있었다는 뜻 —
-    // 결과는 그대로 보여주되(막지 않음), 원본 상태를 개선해 재시도해볼 것을 안내한다.
     setStatus(status, lowConfidence ? "low_confidence_tip" : null, false);
-    resultEl.value = texts.join("\n\n");
+    document.getElementById("result").value = texts.join("\n\n");
     resultWrap.style.display = "block";
   }
 }
 
 async function handleFile(file) {
   const status = document.getElementById("status");
-  const resultWrap = document.getElementById("resultWrap");
   setStatus(status, null, false);
-  resultWrap.style.display = "none";
+  document.getElementById("resultWrap").style.display = "none";
+  document.getElementById("rcpResultWrap").style.display = "none";
   hidePreview();
   document.getElementById("fileName").textContent = file.name;
-  console.log("[ocr] handleFile:", file.name, file.type, file.size, "bytes");
 
   const isImage = /^image\/(png|jpe?g)$/.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
   const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
-  if (!isImage && !isPdf) {
-    setStatus(status, "unsupported", true);
-    return;
-  }
-  if (file.size > 20 * 1024 * 1024) {
-    setStatus(status, "too_large", true);
-    return;
-  }
+  if (!isImage && !isPdf) { setStatus(status, "unsupported", true); return; }
+  if (file.size > MAX_FILE_BYTES) { setStatus(status, "too_large", true); return; }
 
-  _currentFile = file;
-  _currentIsPdf = isPdf;
-  _rotationDeg = 0;
-  _currentImgEl = null;
+  _currentFile = file; _currentIsPdf = isPdf; _rotationDeg = 0; _currentImgEl = null;
 
   if (isImage) {
-    try {
-      _currentImgEl = await loadImageElement(file);
-      showPreview(URL.createObjectURL(file), "");
-      console.log("[ocr] preview shown:", _previewUrl);
-    } catch (e) {
-      console.error("[ocr] preview failed:", e);
-    }
+    try { _currentImgEl = await loadImageElement(file); showPreview(URL.createObjectURL(file), ""); }
+    catch (e) { console.error("[ocr] preview failed:", e); }
   }
 
   if (!sbClient) { setStatus(status, "login_required", true); return; }
@@ -444,12 +747,12 @@ async function handleFile(file) {
   if (!session) { setStatus(status, "login_required", true); return; }
 
   setStatus(status, "processing", false);
-
   try {
-    const images = await buildRotatedImages(_rotationDeg, isPdf
+    const fmt = document.getElementById("fmtSelect").value;
+    const images = await buildSingleImages(_rotationDeg, isPdf
       ? (b64, numPages) => showPreview("data:image/png;base64," + b64, t("preview_pdf")(numPages))
       : null);
-    await runOcrPipeline(images, session);
+    await runSinglePipeline(images, session, fmt);
   } catch (err) {
     console.error("[ocr] exception:", err);
     setStatus(status, "error", true);
@@ -463,60 +766,266 @@ async function handleRotate() {
   rotateBtn.disabled = true;
   const status = document.getElementById("status");
   document.getElementById("resultWrap").style.display = "none";
-
+  document.getElementById("rcpResultWrap").style.display = "none";
   try {
     if (!sbClient) { setStatus(status, "login_required", true); return; }
     const { data: { session } } = await sbClient.auth.getSession();
     if (!session) { setStatus(status, "login_required", true); return; }
-
     _rotationDeg = (_rotationDeg + 90) % 360;
     setStatus(status, "processing", false);
-    const images = await buildRotatedImages(_rotationDeg, _currentIsPdf
+    const fmt = document.getElementById("fmtSelect").value;
+    const images = await buildSingleImages(_rotationDeg, _currentIsPdf
       ? (b64, numPages) => showPreview("data:image/png;base64," + b64, t("preview_pdf")(numPages))
       : (b64) => showPreview("data:image/png;base64," + b64, ""));
-    await runOcrPipeline(images, session);
+    await runSinglePipeline(images, session, fmt);
   } catch (err) {
     console.error("[ocr] rotate exception:", err);
     setStatus(status, "error", true);
   } finally {
-    _rotateBusy = false;
-    rotateBtn.disabled = false;
+    _rotateBusy = false; rotateBtn.disabled = false;
   }
 }
 
 document.getElementById("pickBtn").addEventListener("click", () => document.getElementById("fileInput").click());
-document.getElementById("fileInput").addEventListener("change", (e) => {
-  if (e.target.files[0]) handleFile(e.target.files[0]);
-});
+document.getElementById("fileInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
 document.getElementById("rotateBtn").addEventListener("click", handleRotate);
-
-document.getElementById("zoomInBtn").addEventListener("click", () => {
-  _zoomPct = Math.min(ZOOM_MAX, _zoomPct + ZOOM_STEP);
-  applyZoom();
-});
-document.getElementById("zoomOutBtn").addEventListener("click", () => {
-  _zoomPct = Math.max(ZOOM_MIN, _zoomPct - ZOOM_STEP);
-  applyZoom();
-});
+document.getElementById("zoomInBtn").addEventListener("click", () => { _zoomPct = Math.min(ZOOM_MAX, _zoomPct + ZOOM_STEP); applyZoom(); });
+document.getElementById("zoomOutBtn").addEventListener("click", () => { _zoomPct = Math.max(ZOOM_MIN, _zoomPct - ZOOM_STEP); applyZoom(); });
 document.getElementById("zoomFitBtn").addEventListener("click", resetZoom);
 
-const dropEl = document.getElementById("drop");
-["dragenter", "dragover"].forEach(ev => dropEl.addEventListener(ev, (e) => { e.preventDefault(); dropEl.classList.add("drag"); }));
-["dragleave", "drop"].forEach(ev => dropEl.addEventListener(ev, (e) => { e.preventDefault(); dropEl.classList.remove("drag"); }));
-dropEl.addEventListener("drop", (e) => {
-  const file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
-});
+const dropSingleEl = document.getElementById("dropSingle");
+["dragenter", "dragover"].forEach(ev => dropSingleEl.addEventListener(ev, (e) => { e.preventDefault(); dropSingleEl.classList.add("drag"); }));
+["dragleave", "drop"].forEach(ev => dropSingleEl.addEventListener(ev, (e) => { e.preventDefault(); dropSingleEl.classList.remove("drag"); }));
+dropSingleEl.addEventListener("drop", (e) => { const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
 
 document.getElementById("copyBtn").addEventListener("click", async () => {
-  const resultEl = document.getElementById("result");
   try {
-    await navigator.clipboard.writeText(resultEl.value);
-    const btn = document.getElementById("copyBtn");
-    const orig = btn.textContent;
-    btn.textContent = t("copied");
-    setTimeout(() => { btn.textContent = orig; }, 1500);
+    await navigator.clipboard.writeText(document.getElementById("result").value);
+    const btn = document.getElementById("copyBtn"); const orig = btn.textContent;
+    btn.textContent = t("copied"); setTimeout(() => { btn.textContent = orig; }, 1500);
   } catch (e) {}
+});
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const text = document.getElementById("result").value;
+  if (!text) return;
+  const fmt = document.getElementById("fmtSelect").value;
+  const base = `ocr_${tsNow()}`;
+  if (fmt === "markdown") downloadAsMarkdown(text, base);
+  else if (fmt === "doc") downloadAsDoc(text, base);
+  else downloadAsText(text, base);
+});
+document.getElementById("downloadXlsxBtn").addEventListener("click", () => {
+  if (!_rcpSingleData) return;
+  const includeRaw = document.getElementById("includeRaw").checked;
+  const s = _rcpSingleData.structured || {};
+  const aoa = [
+    [t("rcp_field_store"), s.store_name || ""], [t("rcp_field_biz"), s.business_reg_no || ""],
+    [t("rcp_field_date"), s.date || ""], [t("rcp_field_phone"), s.phone || ""],
+    [t("rcp_field_subtotal"), s.subtotal ?? ""], [t("rcp_field_tax"), s.tax ?? ""], [t("rcp_field_total"), s.total ?? ""],
+    [], [t("rcp_item_name"), t("rcp_item_qty"), t("rcp_item_price")],
+    ...(s.items || []).map(it => [it.name || "", it.qty ?? "", it.price ?? ""]),
+  ];
+  if (includeRaw) { aoa.push([]); aoa.push(["OCR Raw Text"]); aoa.push([_rcpSingleData.rawText || ""]); }
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  setIntegerFormat(ws);
+  XLSX.utils.book_append_sheet(wb, ws, "Receipt");
+  XLSX.writeFile(wb, `영수증_${(s.store_name || "receipt").replace(/[\\/:*?"<>|]/g, "")}.xlsx`);
+});
+
+/* ═══════════════ 다건 처리 ═══════════════ */
+
+async function collectBatchUnits(files) {
+  const units = [];
+  for (const file of files) {
+    const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+    if (isPdf) {
+      try {
+        const buf = await file.arrayBuffer();
+        const pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
+        for (let p = 1; p <= pdfDoc.numPages; p++) units.push({ file, isPdf: true, pageNum: p, totalPages: pdfDoc.numPages, pdfDoc });
+      } catch (e) {
+        console.error("[ocr] pdf parse failed:", file.name, e);
+        units.push({ file, isPdf: true, pageNum: 1, totalPages: 1, parseError: true });
+      }
+    } else {
+      units.push({ file, isPdf: false });
+    }
+  }
+  return units;
+}
+function updateProgressEls(els, completed, total, durations, done) {
+  const pct = total ? Math.round((completed / total) * 100) : 0;
+  els.progress.value = pct;
+  if (done) { els.eta.textContent = ""; return; }
+  if (durations.length >= 1) {
+    const avg = durations.reduce((a, b) => a + b, 0) / durations.length;
+    els.eta.textContent = t("batch_eta")(formatDuration(avg * Math.max(0, total - completed)));
+  } else {
+    els.eta.textContent = t("batch_eta_calculating");
+  }
+}
+
+async function handleBatch(fileList) {
+  const status = document.getElementById("status");
+  const batchWrap = document.getElementById("batchWrap");
+  const els = {
+    progress: document.getElementById("batchProgress"), statusText: document.getElementById("batchStatusText"),
+    eta: document.getElementById("batchEtaText"), summary: document.getElementById("batchSummary"),
+  };
+  setStatus(status, null, false);
+  document.getElementById("resultWrap").style.display = "none";
+  document.getElementById("rcpResultWrap").style.display = "none";
+  els.summary.textContent = ""; els.eta.textContent = ""; els.progress.value = 0;
+  batchWrap.classList.add("show");
+
+  const allFiles = Array.from(fileList);
+  const supported = allFiles.filter(f => {
+    const isImage = /^image\/(png|jpe?g)$/.test(f.type) || /\.(png|jpe?g)$/i.test(f.name);
+    const isPdf = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+    return (isImage || isPdf) && f.size <= MAX_FILE_BYTES;
+  });
+  const skipped = allFiles.length - supported.length;
+  if (!supported.length) { batchWrap.classList.remove("show"); setStatus(status, "batch_empty", true); return; }
+
+  if (!sbClient) { batchWrap.classList.remove("show"); setStatus(status, "login_required", true); return; }
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (!session) { batchWrap.classList.remove("show"); setStatus(status, "login_required", true); return; }
+
+  const fmt = document.getElementById("fmtSelect").value;
+  const contrastPct = currentContrastPct(), sharpenPct = currentSharpenPct();
+
+  els.statusText.textContent = t("batch_analyzing");
+  const units = fmt === "excel" ? supported.map(file => ({ file, isPdf: false })) : await collectBatchUnits(supported);
+  const total = units.length;
+  if (!total) { batchWrap.classList.remove("show"); setStatus(status, "batch_empty", true); return; }
+
+  const durations = [];
+  const fileResults = new Map();
+  const rcpRows = [];
+  let lowConfidence = false, failCount = 0, stoppedReason = null;
+
+  for (let i = 0; i < total; i++) {
+    const unit = units[i];
+    const label = unit.isPdf ? `${unit.file.name} (${unit.pageNum}/${unit.totalPages})` : unit.file.name;
+    els.statusText.textContent = `${label} — ${i + 1}/${total}`;
+    updateProgressEls(els, i, total, durations);
+
+    const t0 = performance.now();
+    try {
+      if (unit.parseError) throw new Error("pdf_parse_failed");
+      const b64 = unit.isPdf
+        ? await renderPdfPageToBase64(unit.pdfDoc, unit.pageNum, contrastPct)
+        : canvasToBase64(buildProcessedCanvas(await loadImageElement(unit.file), 0, contrastPct, sharpenPct));
+
+      if (fmt === "excel") {
+        const { resp, data } = await callReceipt(session, b64);
+        if (!resp.ok || !data.ok) {
+          if (resp.status === 429 || data.error === "rate_limited") { stoppedReason = "rate_limited"; durations.push((performance.now() - t0) / 1000); break; }
+          if (resp.status === 503 || data.error === "pc_offline") { stoppedReason = "pc_offline"; durations.push((performance.now() - t0) / 1000); break; }
+          failCount++; rcpRows.push({ fileName: unit.file.name, ok: false });
+        } else {
+          rcpRows.push({ fileName: unit.file.name, ok: true, rawText: data.text, structured: data.structured });
+          if (data.unlimited) document.getElementById("remaining").textContent = t("remaining_unlimited");
+          else if (typeof data.remaining_today === "number") document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
+        }
+      } else {
+        const { resp, data } = await callOcr(session, b64);
+        if (!resp.ok || !data.ok) {
+          if (resp.status === 429 || data.error === "rate_limited") { stoppedReason = "rate_limited"; durations.push((performance.now() - t0) / 1000); break; }
+          if (resp.status === 503 || data.error === "pc_offline") { stoppedReason = "pc_offline"; durations.push((performance.now() - t0) / 1000); break; }
+          failCount++;
+          if (!fileResults.has(unit.file)) fileResults.set(unit.file, []);
+          fileResults.get(unit.file).push({ pageNum: unit.isPdf ? unit.pageNum : null, text: "[처리 실패]" });
+        } else {
+          if (data.low_confidence) lowConfidence = true;
+          if (!fileResults.has(unit.file)) fileResults.set(unit.file, []);
+          fileResults.get(unit.file).push({ pageNum: unit.isPdf ? unit.pageNum : null, text: data.text });
+          if (data.unlimited) document.getElementById("remaining").textContent = t("remaining_unlimited");
+          else if (typeof data.remaining_today === "number") document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
+        }
+      }
+    } catch (e) {
+      console.error("[ocr] batch unit failed:", label, e);
+      failCount++;
+      if (fmt === "excel") rcpRows.push({ fileName: unit.file.name, ok: false });
+      else { if (!fileResults.has(unit.file)) fileResults.set(unit.file, []); fileResults.get(unit.file).push({ pageNum: unit.isPdf ? unit.pageNum : null, text: "[처리 실패]" }); }
+    }
+    durations.push((performance.now() - t0) / 1000);
+  }
+
+  const processedCount = durations.length;
+  updateProgressEls(els, processedCount, total, durations, true);
+
+  if (stoppedReason === "rate_limited") setStatus(status, "batch_stopped_rate", true);
+  else if (stoppedReason === "pc_offline") setStatus(status, "batch_stopped_offline", true);
+  else setStatus(status, lowConfidence ? "low_confidence_tip" : null, false);
+
+  let summaryMsg = t("batch_done")(processedCount - failCount, failCount, total);
+  if (skipped > 0) summaryMsg += " " + t("batch_skipped")(skipped);
+  els.summary.textContent = summaryMsg;
+
+  if (fmt === "excel") {
+    _rcpBulkData = rcpRows;
+    downloadBulkExcel(); // 다건은 결과가 많아 화면 표 대신 바로 다운로드
+  } else {
+    const parts = [];
+    for (const [file, pages] of fileResults.entries()) {
+      const header = `=== ${file.name} ===`;
+      parts.push(pages.length > 1 ? `${header}\n${pages.map(p => `--- Page ${p.pageNum} ---\n${p.text}`).join("\n\n")}` : `${header}\n${pages[0].text}`);
+    }
+    const combined = parts.join("\n\n\n");
+    if (combined.trim()) {
+      document.getElementById("result").value = combined;
+      document.getElementById("resultWrap").style.display = "block";
+      const base = `ocr_배치_${tsNow()}`;
+      if (fmt === "markdown") downloadAsMarkdown(combined, base);
+      else if (fmt === "doc") downloadAsDoc(combined, base);
+      // text는 자동 다운로드하지 않음 — 복사/다운로드 버튼으로 선택
+    }
+  }
+}
+
+let _rcpBulkData = [];
+function downloadBulkExcel() {
+  if (!_rcpBulkData.length) return;
+  const includeRaw = document.getElementById("includeRaw").checked;
+  const wb = XLSX.utils.book_new();
+  const summaryAoa = [["파일", t("rcp_field_store"), t("rcp_field_biz"), t("rcp_field_date"), t("rcp_field_subtotal"), t("rcp_field_tax"), t("rcp_field_total")]];
+  for (const r of _rcpBulkData) { const s = r.structured || {}; summaryAoa.push([r.fileName, s.store_name || "", s.business_reg_no || "", s.date || "", s.subtotal ?? "", s.tax ?? "", s.total ?? ""]); }
+  const wsSummary = XLSX.utils.aoa_to_sheet(summaryAoa); setIntegerFormat(wsSummary);
+  XLSX.utils.book_append_sheet(wb, wsSummary, "요약");
+
+  const detailAoa = [["파일", t("rcp_field_store"), t("rcp_field_date"), t("rcp_item_name"), t("rcp_item_qty"), t("rcp_item_price")]];
+  for (const r of _rcpBulkData) { const s = r.structured; if (!s || !s.items) continue; for (const it of s.items) detailAoa.push([r.fileName, s.store_name || "", s.date || "", it.name || "", it.qty ?? "", it.price ?? ""]); }
+  const wsDetail = XLSX.utils.aoa_to_sheet(detailAoa); setIntegerFormat(wsDetail);
+  XLSX.utils.book_append_sheet(wb, wsDetail, "품목상세");
+
+  if (includeRaw) {
+    const rawAoa = [["파일", "OCR Raw Text"]];
+    for (const r of _rcpBulkData) rawAoa.push([r.fileName, r.rawText || ""]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rawAoa), "Raw Text");
+  }
+  XLSX.writeFile(wb, `영수증_일괄_${tsNow()}.xlsx`);
+}
+
+document.getElementById("pickFolderBtn").addEventListener("click", () => document.getElementById("folderInput").click());
+document.getElementById("folderInput").addEventListener("change", (e) => { if (e.target.files && e.target.files.length) handleBatch(e.target.files); e.target.value = ""; });
+document.getElementById("pickFilesBtn").addEventListener("click", () => document.getElementById("filesInput").click());
+document.getElementById("filesInput").addEventListener("change", (e) => { if (e.target.files && e.target.files.length) handleBatch(e.target.files); e.target.value = ""; });
+
+const dropBulkEl = document.getElementById("dropBulk");
+["dragenter", "dragover"].forEach(ev => dropBulkEl.addEventListener(ev, (e) => { e.preventDefault(); dropBulkEl.classList.add("drag"); }));
+["dragleave", "drop"].forEach(ev => dropBulkEl.addEventListener(ev, (e) => { e.preventDefault(); dropBulkEl.classList.remove("drag"); }));
+dropBulkEl.addEventListener("drop", (e) => { if (e.dataTransfer.files && e.dataTransfer.files.length) handleBatch(e.dataTransfer.files); });
+
+/* ───────── 설정 슬라이더 표시값 갱신 ───────── */
+document.getElementById("contrastRange").addEventListener("input", (e) => {
+  const v = parseInt(e.target.value, 10);
+  document.getElementById("contrastVal").textContent = (v >= 0 ? "+" : "") + v + "%";
+});
+document.getElementById("sharpenRange").addEventListener("input", (e) => {
+  document.getElementById("sharpenVal").textContent = e.target.value + "%";
 });
 
 applyLang();
