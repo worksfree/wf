@@ -36,11 +36,25 @@ async function lifeartSignUp(name, phone, email, password, msgEl) {
   msgEl.textContent = '가입 처리 중...'; msgEl.className = 'form-msg';
   const { data, error } = await sb.auth.signUp({
     email, password,
-    options: { data: { name, phone, tenant: 'lifeart' } },
+    options: {
+      data: { name, phone, tenant: 'lifeart' },
+      // 공유 Supabase 프로젝트의 기본 Site URL 이 lifeart 도메인이 아닐 수 있어
+      // 명시 지정 — 안 하면 확인 메일 링크가 다른 테넌트로 튈 수 있다.
+      // (운영자가 이 도메인들을 Auth 허용목록(Redirect URLs)에 등록해야 실제로 동작함)
+      emailRedirectTo: location.origin + '/auth/login/',
+    },
   });
   if (error) {
     msgEl.textContent = error.message.includes('already registered')
       ? '이미 가입된 이메일입니다.' : '가입에 실패했습니다: ' + error.message;
+    msgEl.className = 'form-msg error';
+    return;
+  }
+  // 이미 가입(인증완료)된 이메일로 다시 signUp 하면 에러 없이 "성공처럼" 응답이 오되
+  // identities 가 빈 배열로 온다(열거 공격 방지를 위한 Supabase 의도된 동작).
+  // 이 신호를 놓치면 신규가입도 아닌데 "인증 메일 확인하세요" 라고 잘못 안내하게 된다.
+  if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    msgEl.textContent = '이미 가입된 이메일입니다. 로그인해주세요.';
     msgEl.className = 'form-msg error';
     return;
   }
@@ -54,10 +68,34 @@ async function lifeartSignUp(name, phone, email, password, msgEl) {
       msgEl.textContent = e.message; msgEl.className = 'form-msg error'; return;
     }
     location.href = '/mypage/';
-  } else {
-    msgEl.textContent = '가입 완료! 인증 메일을 확인하신 뒤 로그인해주세요.';
-    msgEl.className = 'form-msg success';
+    return;
   }
+
+  // 세션 없음 = 이메일 확인 대기 상태. Auth SMTP 미설정 기간엔 Worker(service_role)가
+  // 즉시 확인 처리해줄 수 있어 시도해본다 — Worker 가 비활성화(SKIP_EMAIL_CONFIRM 미설정)
+  // 상태면 그대로 실패하므로 아래 기본 안내 문구로 자연스럽게 폴백된다.
+  // ★ SMTP 설정 완료 후에는 이 블록을 건드릴 필요 없음 — Worker 시크릿만 끄면 원상복귀.
+  if (data.user) {
+    try {
+      const res = await fetch(TOSS_VERIFY_URL + '/confirm-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: data.user.id }),
+      });
+      if (res.ok) {
+        const { error: loginErr } = await sb.auth.signInWithPassword({ email, password });
+        if (!loginErr) {
+          const { data: { session } } = await sb.auth.getSession();
+          if (session?.user) await ensureProfile(session.user, { name, phone });
+          location.href = '/mypage/';
+          return;
+        }
+      }
+    } catch (_) { /* Worker 미응답 등 → 아래 기본 안내로 폴백 */ }
+  }
+
+  msgEl.textContent = '가입 완료! 인증 메일을 확인하신 뒤 로그인해주세요.';
+  msgEl.className = 'form-msg success';
 }
 
 async function lifeartLogin(email, password, msgEl) {

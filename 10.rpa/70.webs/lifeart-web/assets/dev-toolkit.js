@@ -22,7 +22,7 @@
   // 테스트 계정 (throwaway — pre-test 환경 전용, 실계정 아님)
   var DEV_ACCOUNTS = [
     { label: '테스트 회원', email: 'lifeart.tester@worksfree.kr',       password: 'LifeArt!test2026' },
-    { label: '테스트 관리자', email: 'lifeart.admin.test@worksfree.kr', password: 'LifeArt!admin2026' },
+    { label: '테스트 관리자', email: 'lifeart.admin.tester@worksfree.kr', password: 'LifeArt!admin2026' },
   ];
 
   // 로그인 페이지면: 프리필 요청이 있으면 폼 채우고 포커스

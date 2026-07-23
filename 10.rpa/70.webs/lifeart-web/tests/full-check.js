@@ -5,7 +5,7 @@
 // ============================================================
 const { chromium } = require('playwright');
 const B = 'https://pre-test-lifeart.lifeart.ai.kr';
-const ADMIN = { email: 'lifeart.admin.test@worksfree.kr', password: 'LifeArt!admin2026' };
+const ADMIN = { email: 'lifeart.admin.tester@worksfree.kr', password: 'LifeArt!admin2026' };
 const nc = () => '?nc=' + Date.now() + Math.random().toString(36).slice(2);
 
 const PAGES = [

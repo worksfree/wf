@@ -1,7 +1,7 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 const MEMBER = { email: 'lifeart.tester@worksfree.kr', password: 'LifeArt!test2026' };
-const ADMIN  = { email: 'lifeart.admin.test@worksfree.kr', password: 'LifeArt!admin2026' };
+const ADMIN  = { email: 'lifeart.admin.tester@worksfree.kr', password: 'LifeArt!admin2026' };
 
 async function login(page, acct) {
   await page.goto('/auth/login/');

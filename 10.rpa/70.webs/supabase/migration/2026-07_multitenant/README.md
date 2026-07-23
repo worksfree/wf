@@ -18,6 +18,8 @@ Supabase Dashboard → SQL Editor 에서 **번호 순서대로** 실행하세요
 | 07 | `07_email_tenant.sql` | 이메일/캠페인 tenant_id 추가 | 낮음 | 컬럼 drop |
 | 08 | `08_lifeart_tables.sql` | LifeArt 전용 4테이블 | 낮음(신규) | DROP TABLE |
 | 09 | `09_lifeart_seed.sql` | 액자 44종 시딩 | 없음 | DELETE |
+| 21 | `21_lifeart_products_addons.sql` | lifeart_products.is_addon + 액자 옵션상품 4종 시딩 | 낮음(신규 컬럼) | 컬럼 drop |
+| 22 | `22_lifeart_admin_orders_options.sql` | 주문 관리 RPC에 options(addon 내역) 반환 추가 | 낮음(RPC만) | 15 재실행으로 원복 |
 
 ## 중요
 
@@ -42,6 +44,7 @@ pre-test-lifeart 경유 실측(가입·테넌트 스코핑·관리자 RPC·시�
 | 05 | 자산(ETF) 테넌트 격리 RLS | ✅ 적용됨 (2026-07-18) | 4테이블 신규 정책 확인: portfolios_own_tenant · daily_own_tenant · div_own_tenant · snap_read/snap_write (구 정책 잔존 없음) |
 | 06·07 | 경매 북마크 · 이메일/캠페인 tenant_id 컬럼 | ✅ 적용됨 (2026-07-18 스키마 조회) | auction_bookmarks + email/campaign 6종에 tenant_id 존재. `gov_contacts`만 테이블 미존재로 스킵(무해) |
 | **19** | **허브 노드 일관성**(esg_reports·jobkorea_*·page_views tenant_id+RLS) | ⏳ **미적용 — 실행 필요** | 실측으로 tenant_id 누락 확인된 3계열 정비. `19_hub_node_tenant_consistency.sql` SQL Editor 실행 → 검증 (a)(b) 결과 공유 |
+| **21·22** | **옵션상품(is_addon) + 주문 옵션 내역 RPC** | ⏳ **미적용 — 실행 필요** | 상품 상세/구매 페이지 옵션상품 기능(2026-07-23 추가) 반영 위해 순서대로 실행 |
 
 ### 🔒 캠페인 RPC 익명 잠금 — 해소 완료 (2026-07-18)
 

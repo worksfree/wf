@@ -140,7 +140,8 @@ header {
 /* aspect-ratio 로 로딩 전에도 높이를 확보 → 이미지 로드 시 레이아웃 튐(CLS) 방지 */
 .guide-figure img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
 .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 26px 0; }
-.guide-grid img { width: 100%; border-radius: 12px; display: block; aspect-ratio: 4/3; object-fit: cover; }
+.guide-grid img { width: 100%; border-radius: 12px; display: block; aspect-ratio: 4/3; object-fit: cover; transition: transform .3s; }
+.guide-grid img:hover { transform: scale(1.06); position: relative; z-index: 1; }
 .guide-steps { counter-reset: gs; max-width: 760px; margin: 26px auto; }
 .guide-step { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--border); }
 .guide-step::before { counter-increment: gs; content: counter(gs); flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--deep-charcoal); color: var(--muted-gold); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
@@ -375,13 +376,15 @@ header {
 .product-card {
   background: white; border: 1px solid var(--border); border-radius: 10px;
   overflow: hidden; text-decoration: none; color: inherit;
-  transition: box-shadow .2s, transform .2s;
+  transition: box-shadow .2s;
 }
-.product-card:hover { box-shadow: 0 10px 24px rgba(0,0,0,.08); transform: translateY(-2px); }
+.product-card:hover { box-shadow: 0 10px 24px rgba(0,0,0,.08); }
 .product-card .thumb {
   height: 160px; background: var(--soft-gray) center/cover no-repeat;
   display: flex; align-items: center; justify-content: center; font-size: 34px;
+  transition: transform .3s;
 }
+.product-card:hover .thumb { transform: scale(1.06); }
 .product-card .body { padding: 18px 20px; }
 .product-card h3 { font-size: 16px; margin-bottom: 6px; color: var(--deep-charcoal); }
 .product-card p { font-size: 13px; color: var(--text-mid); }
@@ -566,7 +569,7 @@ footer { background: var(--deep-charcoal); color: #888; padding: 32px; font-size
   background: var(--soft-gray); cursor: pointer;
 }
 .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; display: block; }
-.gallery-item:hover img { transform: scale(1.05); }
+.gallery-item:hover img { transform: scale(1.06); }
 .gallery-item .cap {
   position: absolute; left: 0; right: 0; bottom: 0; padding: 20px 12px 10px;
   background: linear-gradient(transparent, rgba(0,0,0,.6)); color: #fff; font-size: 13px;
@@ -593,3 +596,79 @@ footer { background: var(--deep-charcoal); color: #888; padding: 32px; font-size
 /* 미릴리스 메뉴 표기는 포토북과 동일하게 .wip("개발 예정") 패턴을 사용한다.
    최상위 <li>는 .has-sub::after(▾ 화살표)가 이미 ::after를 점유하므로,
    라벨을 <span class="wip">로 감싸 툴팁을 부여한다(header/footer 소스 참조). */
+
+/* ── 상품 상세 · 구매 페이지 (fomex.co.kr 참고: 갤러리 좌 / 구매박스 우 + 하단 탭) ── */
+.pd-wrap {
+  display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 44px; max-width: 1080px; margin: 0 auto 48px; align-items: flex-start;
+}
+@media (max-width: 860px) { .pd-wrap { grid-template-columns: 1fr; gap: 28px; } }
+
+.pd-gallery-main {
+  aspect-ratio: 4/3; border-radius: 14px; overflow: hidden; background: var(--soft-gray);
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+.pd-gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pd-gallery-thumbs { display: flex; gap: 10px; margin-top: 12px; }
+.pd-gallery-thumbs button {
+  padding: 0; border: 2px solid transparent; border-radius: 8px; overflow: hidden;
+  width: 76px; height: 58px; cursor: pointer; background: var(--soft-gray); flex: none;
+}
+.pd-gallery-thumbs button img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pd-gallery-thumbs button.active, .pd-gallery-thumbs button:hover { border-color: var(--accent); }
+
+.pd-info { position: sticky; top: 88px; }
+.pd-kicker { font-size: 12px; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+.pd-title { font-size: 24px; font-weight: 700; color: var(--deep-charcoal); letter-spacing: -.4px; margin-bottom: 14px; }
+.pd-unit-price { font-size: 14px; color: var(--text-mid); margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.pd-unit-price strong { color: var(--text-dark); font-size: 17px; font-variant-numeric: tabular-nums; }
+
+.pd-qty-row { display: flex; align-items: center; gap: 10px; }
+.pd-stepper {
+  display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+}
+.pd-stepper button {
+  width: 32px; height: 34px; border: none; background: var(--soft-gray); color: var(--text-dark);
+  font-size: 16px; cursor: pointer; line-height: 1;
+}
+.pd-stepper button:hover { background: var(--border); }
+.pd-stepper input {
+  width: 48px; height: 34px; border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+  text-align: center; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--text-dark); background: white;
+}
+
+.pd-addons { margin-top: 22px; }
+.pd-addons-label { font-size: 13px; font-weight: 600; color: var(--text-mid); margin-bottom: 10px; }
+.pd-addon-row {
+  display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.pd-addon-row:last-child { border-bottom: none; }
+.pd-addon-row input[type="checkbox"] { width: 17px; height: 17px; flex: none; accent-color: var(--accent); }
+.pd-addon-row label { flex: 1; font-size: 13.5px; color: var(--text-dark); cursor: pointer; }
+.pd-addon-row .pd-addon-price { font-size: 13px; color: var(--text-mid); font-variant-numeric: tabular-nums; flex: none; }
+.pd-addon-row .pd-stepper { transform: scale(.9); transform-origin: right center; opacity: .5; pointer-events: none; }
+.pd-addon-row input[type="checkbox"]:checked ~ .pd-stepper { opacity: 1; pointer-events: auto; }
+
+.pd-total-box {
+  background: var(--soft-gray); border-radius: 10px; padding: 16px 18px; margin: 22px 0 18px; font-size: 13px;
+}
+.pd-total-line { display: flex; justify-content: space-between; padding: 4px 0; color: var(--text-mid); }
+.pd-total-line.grand {
+  border-top: 1px solid var(--border); margin-top: 8px; padding-top: 10px;
+  font-size: 17px; font-weight: 700; color: var(--text-dark);
+}
+.pd-total-line.grand span:last-child { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+.pd-detail-tabs { max-width: 1080px; margin: 0 auto; }
+.pd-detail-tabs .content-section { max-width: none; padding: 0; }
+
+/* 사이즈별 단가표 (액자 등 SKU 나열형 상품 공통 — 상품 상세 탭에서도 재사용) */
+.price-table { width: 100%; border-collapse: collapse; margin-bottom: 32px; font-size: 13.5px; }
+.price-table th { background: var(--deep-charcoal); color: var(--muted-gold); padding: 10px 14px; text-align: left; font-weight: 500; }
+.price-table td { padding: 8px 14px; border-bottom: 1px solid var(--border); color: var(--text-mid); font-variant-numeric: tabular-nums; }
+.price-table td.price { text-align: right; color: var(--text-dark); font-weight: 600; }
+.price-table tr:nth-child(even) td { background: var(--soft-gray); }
+
+@media (max-width: 640px) {
+  .pd-info { position: static; }
+}

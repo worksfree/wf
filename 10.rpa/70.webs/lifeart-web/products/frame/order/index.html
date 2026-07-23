@@ -20,27 +20,78 @@
   <a href="/auth/login/" class="btn-primary" style="display:inline-block; padding:11px 24px;">로그인하러 가기</a>
 </div>
 
-<div class="content-section" id="order-body" style="display:none; display:flex; justify-content:center;">
-  <form class="form-box" id="order-form" style="max-width:480px; width:100%;">
-    <div class="form-row">
-      <label>상품 선택</label>
-      <select name="product_id" id="product-select" required></select>
+<div id="order-body" style="display:none;">
+  <div class="content-section" style="padding-top:40px; padding-bottom:24px;">
+    <div class="pd-wrap">
+      <div class="pd-gallery">
+        <div class="pd-gallery-main"><img id="pd-main-img" src="/assets/img/frames/frame-crystal-01.jpg" alt="슬림 크리스탈 액자"></div>
+        <div class="pd-gallery-thumbs" id="pd-thumbs">
+          <button type="button" data-series="슬림 크리스탈" class="active"><img src="/assets/img/frames/frame-crystal-01.jpg" alt="슬림 크리스탈"></button>
+          <button type="button" data-series="티크목"><img src="/assets/img/frames/frame-teak-01.jpg" alt="티크목"></button>
+          <button type="button" data-series="삼각 소 다크"><img src="/assets/img/frames/frame-samgak-01.jpg" alt="삼각 소 다크"></button>
+        </div>
+      </div>
+
+      <div class="pd-info">
+        <div class="pd-kicker">Products · 액자</div>
+        <h1 class="pd-title">프리미엄 맞춤 액자</h1>
+
+        <form id="order-form">
+          <div class="form-row">
+            <label for="series-select">시리즈</label>
+            <select id="series-select"></select>
+          </div>
+          <div class="form-row">
+            <label for="product-select">사이즈 · 마감</label>
+            <select name="product_id" id="product-select" required></select>
+          </div>
+
+          <div class="pd-unit-price">개당 <strong id="pd-unit-price-val">0원</strong></div>
+
+          <div class="form-row">
+            <label for="qty-input">수량</label>
+            <div class="pd-stepper">
+              <button type="button" data-step="-1" aria-label="수량 감소">−</button>
+              <input type="number" id="qty-input" value="1" min="1">
+              <button type="button" data-step="1" aria-label="수량 증가">+</button>
+            </div>
+          </div>
+
+          <div class="pd-addons" id="pd-addons-wrap" style="display:none;">
+            <div class="pd-addons-label">추가구성상품 <span style="font-weight:400; color:var(--text-light);">(선택)</span></div>
+            <div id="pd-addons-list"></div>
+          </div>
+
+          <div class="pd-total-box" id="pd-total-box"></div>
+
+          <div class="form-row">
+            <label for="shipping-address">배송지</label>
+            <textarea name="shipping_address" id="shipping-address" required placeholder="받으실 주소를 입력해주세요"></textarea>
+          </div>
+
+          <button type="submit" class="form-submit">주문하고 결제하기</button>
+          <div class="form-msg" id="order-msg"></div>
+        </form>
+      </div>
     </div>
-    <div class="form-row">
-      <label>수량</label>
-      <input type="number" name="quantity" id="qty-input" value="1" min="1" required>
+  </div>
+
+  <div class="pd-detail-tabs content-section">
+    <div class="tab-row">
+      <button class="tab-btn active" data-tab="pd-detail">상세정보</button>
+      <button class="tab-btn" data-tab="pd-guide">구매 · 배송 안내</button>
     </div>
-    <div class="form-row">
-      <label>배송지</label>
-      <textarea name="shipping_address" required placeholder="받으실 주소를 입력해주세요"></textarea>
+    <div class="tab-panel active" id="tab-pd-detail">
+      <p style="color:var(--text-mid); font-size:14px;">불러오는 중...</p>
     </div>
-    <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; margin:16px 0; color:var(--text-dark);">
-      <span>결제 예정 금액</span>
-      <span id="order-amount">0원</span>
+    <div class="tab-panel" id="tab-pd-guide">
+      <table class="info-table">
+        <tr><th>배송 방법</th><td>택배 (또는 현장 수령·직접 납품)</td></tr>
+        <tr><th>제작·배송 기간</th><td>주문 후 통상 3~7영업일 (수량·마감에 따라 상이)</td></tr>
+        <tr><th>교환·반품</th><td>수령일로부터 7일 이내 가능 (맞춤 제작 상품 제외 — <a href="/shipping/" style="color:var(--accent);">상세 정책 보기</a>)</td></tr>
+      </table>
     </div>
-    <button type="submit" class="form-submit">주문하고 결제하기</button>
-    <div class="form-msg" id="order-msg"></div>
-  </form>
+  </div>
 </div>
 
 <div id="site-footer"></div>
@@ -52,7 +103,16 @@
 <script>
 document.addEventListener('layout:ready', initOrderPage);
 
-let PRODUCTS = [];
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+let ALL_PRODUCTS = [];
+let ADDONS = [];
+const SERIES_IMG = {
+  '슬림 크리스탈': '/assets/img/frames/frame-crystal-01.jpg',
+  '티크목': '/assets/img/frames/frame-teak-01.jpg',
+  '삼각 소 다크': '/assets/img/frames/frame-samgak-01.jpg',
+};
+const SERIES_ORDER = Object.keys(SERIES_IMG);
 
 async function initOrderPage() {
   const { data: { session } } = await sb.auth.getSession();
@@ -60,53 +120,182 @@ async function initOrderPage() {
     document.getElementById('order-gate').style.display = 'block';
     return;
   }
-  document.getElementById('order-body').style.display = 'flex';
+  document.getElementById('order-body').style.display = 'block';
 
-  const { data } = await sb.from('lifeart_products').select('*').eq('category', 'frame').order('price');
-  PRODUCTS = data || [];
-  const sel = document.getElementById('product-select');
-  sel.innerHTML = PRODUCTS.map(p => `<option value="${p.id}">${p.name} — ${p.price.toLocaleString()}원</option>`).join('');
-  updateAmount();
+  const [{ data: products }, { data: addons }] = await Promise.all([
+    sb.from('lifeart_products').select('*').eq('category', 'frame').eq('is_addon', false).eq('is_active', true).order('price'),
+    sb.from('lifeart_products').select('*').eq('category', 'frame').eq('is_addon', true).eq('is_active', true).order('price'),
+  ]);
+  ALL_PRODUCTS = products || [];
+  ADDONS = addons || [];
 
-  sel.addEventListener('change', updateAmount);
-  document.getElementById('qty-input').addEventListener('input', updateAmount);
+  renderSeriesOptions();
+  renderSizeOptions();
+  renderAddons();
+  renderDetailTable();
 
-  document.getElementById('order-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const msgEl = document.getElementById('order-msg');
-    const product = PRODUCTS.find(p => p.id === sel.value);
-    const qty = parseInt(document.getElementById('qty-input').value, 10);
-    const amount = product.price * qty;
-    const address = e.target.shipping_address.value.trim();
-    if (!address) { msgEl.textContent = '배송지를 입력해주세요.'; msgEl.className = 'form-msg error'; return; }
+  document.getElementById('series-select').addEventListener('change', () => { renderSizeOptions(); updateAll(); });
+  document.getElementById('product-select').addEventListener('change', updateAll);
+  document.getElementById('qty-input').addEventListener('input', updateAll);
+  document.querySelectorAll('.pd-info .pd-stepper button[data-step]').forEach(btn => {
+    btn.addEventListener('click', () => stepQty(btn));
+  });
+  document.querySelectorAll('#pd-thumbs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('series-select').value = btn.dataset.series;
+      renderSizeOptions(); updateAll();
+    });
+  });
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
 
-    msgEl.textContent = '주문 생성 중...'; msgEl.className = 'form-msg';
-    const { data: order, error } = await sb.from('lifeart_orders').insert({
-      tenant_id: TENANT_UUID,
-      user_id: session.user.id,
-      product_id: product.id,
-      quantity: qty,
-      amount,
-      shipping_address: address,
-      status: 'pending',
-      env: getEnv(),
-    }).select().single();
+  updateAll();
+  document.getElementById('order-form').addEventListener('submit', onSubmit);
+}
 
-    if (error) {
-      msgEl.textContent = '주문 생성에 실패했습니다.';
-      msgEl.className = 'form-msg error';
-      console.error(error);
-      return;
-    }
-    location.href = '/checkout/?order=' + order.id;
+function renderSeriesOptions() {
+  const seriesSet = new Set(ALL_PRODUCTS.map(p => p.options?.series).filter(Boolean));
+  // 정찰가 오름차순 정렬로 가져온 목록이라 그대로 쓰면 최저가 시리즈가 우연히 기본
+  // 선택되므로, 마케팅 페이지(products/frame/)와 동일한 순서를 고정으로 앞세운다.
+  const known = SERIES_ORDER.filter(s => seriesSet.has(s));
+  const extra = [...seriesSet].filter(s => !SERIES_ORDER.includes(s));
+  const seriesList = [...known, ...extra];
+  document.getElementById('series-select').innerHTML =
+    seriesList.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+}
+
+function renderSizeOptions() {
+  const series = document.getElementById('series-select').value;
+  const items = ALL_PRODUCTS.filter(p => p.options?.series === series);
+  document.getElementById('product-select').innerHTML = items.map(p => {
+    const label = [p.options?.size, p.options?.finish].filter(Boolean).join(' · ') || p.name;
+    return `<option value="${p.id}">${esc(label)} — ${p.price.toLocaleString()}원</option>`;
+  }).join('');
+  updateGalleryImage(series);
+}
+
+function updateGalleryImage(series) {
+  const img = SERIES_IMG[series] || SERIES_IMG['슬림 크리스탈'];
+  document.getElementById('pd-main-img').src = img;
+  document.getElementById('pd-main-img').alt = series + ' 액자';
+  document.querySelectorAll('#pd-thumbs button').forEach(b => b.classList.toggle('active', b.dataset.series === series));
+}
+
+function renderAddons() {
+  const wrap = document.getElementById('pd-addons-wrap');
+  const list = document.getElementById('pd-addons-list');
+  if (!ADDONS.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = ADDONS.map(a => `
+    <div class="pd-addon-row">
+      <input type="checkbox" class="pd-addon-check" id="addon-${a.id}" data-id="${a.id}">
+      <label for="addon-${a.id}">${esc(a.name)}</label>
+      <span class="pd-addon-price">+${a.price.toLocaleString()}원</span>
+      <div class="pd-stepper">
+        <button type="button" data-addon-step="-1" data-target="addon-qty-${a.id}" aria-label="${esc(a.name)} 수량 감소">−</button>
+        <input type="number" id="addon-qty-${a.id}" value="1" min="1">
+        <button type="button" data-addon-step="1" data-target="addon-qty-${a.id}" aria-label="${esc(a.name)} 수량 증가">+</button>
+      </div>
+    </div>`).join('');
+  list.querySelectorAll('.pd-addon-check').forEach(chk => chk.addEventListener('change', updateAll));
+  list.querySelectorAll('input[type="number"]').forEach(inp => inp.addEventListener('input', updateAll));
+  list.querySelectorAll('button[data-addon-step]').forEach(btn => btn.addEventListener('click', () => {
+    const target = document.getElementById(btn.dataset.target);
+    target.value = Math.max(1, (parseInt(target.value, 10) || 1) + parseInt(btn.dataset.addonStep, 10));
+    updateAll();
+  }));
+}
+
+function renderDetailTable() {
+  const bySeries = {};
+  ALL_PRODUCTS.forEach(p => {
+    const s = p.options?.series || '기타';
+    (bySeries[s] = bySeries[s] || []).push(p);
+  });
+  const html = Object.entries(bySeries).map(([series, items]) => `
+    <h2>${esc(series)}</h2>
+    <div style="overflow-x:auto;">
+    <table class="price-table">
+      <thead><tr><th>사이즈 · 마감</th><th style="text-align:right;">판매가</th></tr></thead>
+      <tbody>${items.map(p => `<tr><td>${esc([p.options?.size, p.options?.finish].filter(Boolean).join(' · '))}</td><td class="price">${p.price.toLocaleString()}원</td></tr>`).join('')}</tbody>
+    </table>
+    </div>`).join('');
+  document.getElementById('tab-pd-detail').innerHTML = html || '<p style="color:var(--text-light);">등록된 상품이 없습니다.</p>';
+}
+
+function stepQty(btn) {
+  const input = document.getElementById('qty-input');
+  input.value = Math.max(1, (parseInt(input.value, 10) || 1) + parseInt(btn.dataset.step, 10));
+  updateAll();
+}
+
+function getSelectedProduct() {
+  return ALL_PRODUCTS.find(p => p.id === document.getElementById('product-select').value);
+}
+
+function getCheckedAddons() {
+  return [...document.querySelectorAll('.pd-addon-check:checked')].map(chk => {
+    const a = ADDONS.find(x => x.id === chk.dataset.id);
+    const qty = parseInt(document.getElementById('addon-qty-' + a.id).value, 10) || 1;
+    return { id: a.id, name: a.name, price: a.price, qty };
   });
 }
 
-function updateAmount() {
-  const sel = document.getElementById('product-select');
-  const product = PRODUCTS.find(p => p.id === sel.value);
+function updateAll() {
+  const product = getSelectedProduct();
   const qty = parseInt(document.getElementById('qty-input').value, 10) || 1;
-  document.getElementById('order-amount').textContent = product ? (product.price * qty).toLocaleString() + '원' : '0원';
+  document.getElementById('pd-unit-price-val').textContent = product ? product.price.toLocaleString() + '원' : '0원';
+
+  const addons = getCheckedAddons();
+  const productTotal = product ? product.price * qty : 0;
+  const addonsTotal = addons.reduce((sum, a) => sum + a.price * a.qty, 0);
+  const grand = productTotal + addonsTotal;
+
+  const lines = [`<div class="pd-total-line"><span>${product ? esc(product.name) : '상품'} × ${qty}</span><span>${productTotal.toLocaleString()}원</span></div>`];
+  addons.forEach(a => lines.push(`<div class="pd-total-line"><span>${esc(a.name)} × ${a.qty}</span><span>${(a.price * a.qty).toLocaleString()}원</span></div>`));
+  lines.push(`<div class="pd-total-line grand"><span>결제 예정 금액</span><span id="order-amount">${grand.toLocaleString()}원</span></div>`);
+  document.getElementById('pd-total-box').innerHTML = lines.join('');
+}
+
+async function onSubmit(e) {
+  e.preventDefault();
+  const msgEl = document.getElementById('order-msg');
+  const product = getSelectedProduct();
+  const qty = parseInt(document.getElementById('qty-input').value, 10) || 1;
+  const addons = getCheckedAddons();
+  const address = document.getElementById('shipping-address').value.trim();
+  if (!product) { msgEl.textContent = '상품을 선택해주세요.'; msgEl.className = 'form-msg error'; return; }
+  if (!address) { msgEl.textContent = '배송지를 입력해주세요.'; msgEl.className = 'form-msg error'; return; }
+
+  const amount = product.price * qty + addons.reduce((sum, a) => sum + a.price * a.qty, 0);
+  msgEl.textContent = '주문 생성 중...'; msgEl.className = 'form-msg';
+
+  const { data: { session } } = await sb.auth.getSession();
+  const { data: order, error } = await sb.from('lifeart_orders').insert({
+    tenant_id: TENANT_UUID,
+    user_id: session.user.id,
+    product_id: product.id,
+    quantity: qty,
+    amount,
+    options: { series: product.options?.series || null, size: product.options?.size || null, addons },
+    shipping_address: address,
+    status: 'pending',
+    env: getEnv(),
+  }).select().single();
+
+  if (error) {
+    msgEl.textContent = '주문 생성에 실패했습니다.';
+    msgEl.className = 'form-msg error';
+    console.error(error);
+    return;
+  }
+  location.href = '/checkout/?order=' + order.id;
 }
 </script>
 </body>

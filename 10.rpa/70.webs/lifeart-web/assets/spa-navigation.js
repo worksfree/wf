@@ -1,5 +1,10 @@
 
 document.addEventListener('DOMContentLoaded', () => {
+  // 프래그먼트 전용 이동(popstate) 판별용 — 경로+쿼리가 안 바뀌면 "진짜 페이지 이동"이 아니다.
+  // (href="#" 앵커 클릭도 브라우저가 popstate 를 쏘는데, 그때마다 body 를 통째로
+  //  fetch·교체하면 인라인 스크립트가 재실행되어 최상위 let/const 재선언 에러로 죽는다.)
+  let lastPath = location.pathname + location.search;
+
   // Turn all internal links into SPA-style navigation
   document.body.addEventListener('click', async (e) => {
     const link = e.target.closest('a');
@@ -35,7 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Update URL
       history.pushState({}, '', url.href);
-      
+      lastPath = url.pathname + url.search;
+
       // Re-run scripts. This is a simplified approach.
       // We need to re-evaluate the scripts in the new body.
       // 외부(src) 스크립트는 이미 로드·실행되어 전역(const sb 등)이 존재하므로 재실행 금지
@@ -65,6 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle back/forward navigation
   window.addEventListener('popstate', async (e) => {
     const url = new URL(location.href);
+
+    // 경로·쿼리가 그대로면 해시(#)만 바뀐 프래그먼트 이동 — 진짜 페이지 전환이 아니므로
+    // body 를 다시 fetch·교체하지 않는다(안 그러면 인라인 스크립트가 재실행되어 깨진다).
+    const newPath = url.pathname + url.search;
+    if (newPath === lastPath) return;
+    lastPath = newPath;
+
     try {
       const response = await fetch(url.href);
       if (!response.ok) {

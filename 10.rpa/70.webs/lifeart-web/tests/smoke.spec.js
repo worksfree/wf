@@ -7,7 +7,7 @@
 const { test, expect } = require('@playwright/test');
 
 const MEMBER = { email: 'lifeart.tester@worksfree.kr', password: 'LifeArt!test2026' };
-const ADMIN  = { email: 'lifeart.admin.test@worksfree.kr', password: 'LifeArt!admin2026' };
+const ADMIN  = { email: 'lifeart.admin.tester@worksfree.kr', password: 'LifeArt!admin2026' };
 
 // 무해한(무시 가능한) 콘솔 오류 패턴 — O&M 테이블 미생성 404, 파비콘 등
 const IGNORABLE = [
@@ -92,6 +92,20 @@ test('상품 조회 + 주문 페이지 상품 로드', async ({ page }) => {
   await expect(page.locator('#product-select option')).not.toHaveCount(0);
   const amount = await page.locator('#order-amount').textContent();
   expect(amount).toMatch(/원/);
+});
+
+test('액자 주문 페이지 — 옵션상품(추가구성상품) 선택 시 총액 반영', async ({ page }) => {
+  await page.goto('/auth/login/');
+  await page.fill('input[name="email"]', MEMBER.email);
+  await page.fill('input[name="password"]', MEMBER.password);
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/mypage/**');
+  await page.goto('/products/frame/order/');
+  await expect(page.locator('.pd-addon-row').first()).toBeVisible();
+  const before = await page.locator('#order-amount').textContent();
+  await page.locator('.pd-addon-row input[type="checkbox"]').first().check();
+  const after = await page.locator('#order-amount').textContent();
+  expect(after).not.toEqual(before);
 });
 
 test('관리자 로그인 → O&M 4탭 로드(테이블 미생성이어도 graceful)', async ({ page }) => {

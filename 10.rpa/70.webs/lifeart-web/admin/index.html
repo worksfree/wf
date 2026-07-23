@@ -83,6 +83,7 @@
   <div class="tab-row">
     <button class="tab-btn active" data-tab="dashboard">매출 현황</button>
     <button class="tab-btn" data-tab="orders">주문 관리</button>
+    <button class="tab-btn" data-tab="products">상품 관리</button>
     <button class="tab-btn" data-tab="users">회원 관리</button>
     <button class="tab-btn" data-tab="inquiries">문의 관리</button>
     <button class="tab-btn" data-tab="notices">공지사항</button>
@@ -112,9 +113,59 @@
   <!-- 주문 -->
   <div class="tab-panel" id="tab-orders" style="overflow-x:auto;">
     <table class="admin-table" id="orders-table">
-      <thead><tr><th>주문일</th><th>주문자</th><th>상품</th><th>수량</th><th>금액</th><th>주문상태</th><th>결제</th><th>배송상태</th><th></th></tr></thead>
-      <tbody><tr><td colspan="9">불러오는 중...</td></tr></tbody>
+      <thead><tr><th>주문일</th><th>주문자</th><th>상품</th><th>옵션</th><th>수량</th><th>금액</th><th>주문상태</th><th>결제</th><th>배송상태</th><th></th></tr></thead>
+      <tbody><tr><td colspan="10">불러오는 중...</td></tr></tbody>
     </table>
+  </div>
+
+  <!-- 상품 관리 (액자 44종 + 옵션상품 등) -->
+  <div class="tab-panel" id="tab-products">
+    <div class="adm-toolbar" style="justify-content:space-between; align-items:center;">
+      <select id="prod-filter" class="adm-btn">
+        <option value="">전체 카테고리</option>
+        <option value="frame">액자</option>
+        <option value="instant-album">삽입식 기념앨범</option>
+        <option value="vip-album">VIP 앨범</option>
+      </select>
+      <button class="adm-btn primary" onclick="openProductEditor()">+ 상품 등록</button>
+    </div>
+    <div class="adm-editor" id="product-editor">
+      <input type="hidden" id="prod-id">
+      <div class="row">
+        <div style="flex:1;">
+          <label>카테고리</label>
+          <select id="prod-category" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; background:white;">
+            <option value="frame">액자</option>
+            <option value="instant-album">삽입식 기념앨범</option>
+            <option value="vip-album">VIP 앨범</option>
+          </select>
+        </div>
+        <label><input type="checkbox" id="prod-is-addon"> 옵션상품(추가구성상품)으로 등록</label>
+      </div>
+      <label>상품명</label><input type="text" id="prod-name" placeholder="예: 슬림 크리스탈 8x10 또는 선물 포장">
+      <div class="row">
+        <div style="flex:1;"><label>판매가(원)</label><input type="number" id="prod-price" value="0" min="0"></div>
+        <div style="flex:1;"><label>사용여부</label>
+          <label style="display:block; margin-top:8px;"><input type="checkbox" id="prod-active" checked> 판매중</label>
+        </div>
+      </div>
+      <div class="row">
+        <div style="flex:1;"><label>시리즈 (선택)</label><input type="text" id="prod-series" placeholder="예: 슬림 크리스탈"></div>
+        <div style="flex:1;"><label>사이즈 (선택)</label><input type="text" id="prod-size" placeholder="예: 8x10"></div>
+        <div style="flex:1;"><label>마감 (선택)</label><input type="text" id="prod-finish" placeholder="예: 아크릴"></div>
+      </div>
+      <label>메모 (선택)</label><input type="text" id="prod-note" placeholder="상담형 안내문 등 자유 메모">
+      <div class="adm-toolbar" style="margin:0;">
+        <button class="adm-btn" onclick="closeProductEditor()">취소</button>
+        <button class="adm-btn primary" onclick="saveProduct()">저장</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table" id="product-table">
+        <thead><tr><th>카테고리</th><th>상품명</th><th>시리즈·사이즈</th><th>가격</th><th>구분</th><th>사용</th><th></th></tr></thead>
+        <tbody><tr><td colspan="7">불러오는 중...</td></tr></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- 문의 (1:1 / 견적 / 제휴 통합) -->
@@ -307,12 +358,14 @@ async function initAdmin() {
     });
   });
   document.getElementById('inq-filter').addEventListener('change', loadInquiries);
+  document.getElementById('prod-filter').addEventListener('change', loadProducts);
 
   // 로컬 무세션 미리보기(게이트 우회)에서는 데이터 로드를 생략 — RLS 400 콘솔 오류 방지
   if (!session) return;
 
   await loadDashboard();
   await loadOrders();
+  await loadProducts();
   await loadInquiries();
   await loadNotices();
   await loadFaqs();
@@ -351,16 +404,22 @@ async function loadDashboard() {
 
 /* ── 주문 관리 (회원·결제·배송 통합) ── */
 const ORDER_STATUS = { pending:'결제대기', paid:'결제완료', shipping:'배송중', done:'완료', cancelled:'취소' };
+function addonSummary(options) {
+  const addons = options?.addons || [];
+  if (!addons.length) return '<span style="color:var(--text-light);">—</span>';
+  return addons.map(a => `${esc(a.name)}${a.qty > 1 ? ' ×' + a.qty : ''}`).join('<br>');
+}
 async function loadOrders() {
   const { data: orders, error } = await sb.rpc('lifeart_admin_get_orders');
   const tb = document.querySelector('#orders-table tbody');
-  if (error) { tb.innerHTML = `<tr><td colspan="9">주문 목록 오류: ${esc(error.message||'')} [${esc(error.code||'')}]</td></tr>`; return; }
-  if (!orders?.length) { tb.innerHTML = '<tr><td colspan="9">주문이 없습니다.</td></tr>'; return; }
+  if (error) { tb.innerHTML = `<tr><td colspan="10">주문 목록 오류: ${esc(error.message||'')} [${esc(error.code||'')}]</td></tr>`; return; }
+  if (!orders?.length) { tb.innerHTML = '<tr><td colspan="10">주문이 없습니다.</td></tr>'; return; }
   tb.innerHTML = orders.map(o => `
     <tr>
       <td>${new Date(o.created_at).toLocaleDateString('ko-KR')}</td>
       <td>${esc(o.member_name)||esc(o.member_email)||'비회원'}<br><span style="font-size:11px;color:var(--text-light);">${esc(o.member_email)||''}</span></td>
       <td>${esc(o.product_name) || '-'}</td>
+      <td style="font-size:12px;">${addonSummary(o.options)}</td>
       <td>${o.quantity}</td>
       <td>${won(o.amount)}</td>
       <td>${ORDER_STATUS[o.status]||o.status}</td>
@@ -374,6 +433,87 @@ async function loadOrders() {
     </tr>`).join('');
 }
 async function updateShipping(id, status) { await sb.from('lifeart_orders').update({ shipping_status: status }).eq('id', id); loadDashboard(); }
+
+/* ── 상품 관리 (액자 SKU + 옵션상품) ── */
+const CATEGORY_LABEL = { frame:'액자', 'instant-album':'삽입식 기념앨범', 'vip-album':'VIP 앨범' };
+async function loadProducts() {
+  const filter = document.getElementById('prod-filter').value;
+  let q = sb.from('lifeart_products').select('*').order('category').order('is_addon').order('price');
+  if (filter) q = q.eq('category', filter);
+  const { data, error } = await q;
+  const tb = document.querySelector('#product-table tbody');
+  if (error) { tb.innerHTML = `<tr><td colspan="7">상품 목록 오류: ${esc(error.message||'')}</td></tr>`; return; }
+  if (!data?.length) { tb.innerHTML = '<tr><td colspan="7">등록된 상품이 없습니다.</td></tr>'; return; }
+  tb.innerHTML = data.map(p => `
+    <tr>
+      <td>${CATEGORY_LABEL[p.category]||esc(p.category)}</td>
+      <td>${esc(p.name)}</td>
+      <td style="font-size:12px;color:var(--text-light);">${esc([p.options?.series, p.options?.size, p.options?.finish].filter(Boolean).join(' · '))||'—'}</td>
+      <td>${won(p.price)}</td>
+      <td>${p.is_addon?'<span class="badge">옵션상품</span>':'기본상품'}</td>
+      <td>${p.is_active?'✔':'—'}</td>
+      <td><button class="adm-btn" onclick='editProduct(${JSON.stringify(p)})'>수정</button>
+          <button class="adm-btn danger" onclick="delProduct('${p.id}')">삭제</button></td>
+    </tr>`).join('');
+}
+function openProductEditor() { document.getElementById('product-editor').classList.add('open'); }
+function closeProductEditor() {
+  document.getElementById('product-editor').classList.remove('open');
+  document.getElementById('prod-id').value = '';
+  ['prod-name','prod-series','prod-size','prod-finish','prod-note'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('prod-price').value = '0';
+  document.getElementById('prod-category').value = 'frame';
+  document.getElementById('prod-is-addon').checked = false;
+  document.getElementById('prod-active').checked = true;
+}
+function editProduct(p) {
+  document.getElementById('prod-id').value = p.id;
+  document.getElementById('prod-category').value = p.category;
+  document.getElementById('prod-name').value = p.name;
+  document.getElementById('prod-price').value = p.price;
+  document.getElementById('prod-is-addon').checked = !!p.is_addon;
+  document.getElementById('prod-active').checked = p.is_active !== false;
+  document.getElementById('prod-series').value = p.options?.series || '';
+  document.getElementById('prod-size').value = p.options?.size || '';
+  document.getElementById('prod-finish').value = p.options?.finish || '';
+  document.getElementById('prod-note').value = p.options?.note || '';
+  openProductEditor();
+}
+async function saveProduct() {
+  const id = document.getElementById('prod-id').value;
+  const name = document.getElementById('prod-name').value.trim();
+  if (!name) { alert('상품명을 입력하세요'); return; }
+  const options = {};
+  const series = document.getElementById('prod-series').value.trim();
+  const size = document.getElementById('prod-size').value.trim();
+  const finish = document.getElementById('prod-finish').value.trim();
+  const note = document.getElementById('prod-note').value.trim();
+  if (series) options.series = series;
+  if (size) options.size = size;
+  if (finish) options.finish = finish;
+  if (note) options.note = note;
+  const payload = {
+    category: document.getElementById('prod-category').value,
+    name,
+    price: parseInt(document.getElementById('prod-price').value, 10) || 0,
+    is_addon: document.getElementById('prod-is-addon').checked,
+    is_active: document.getElementById('prod-active').checked,
+    options,
+    tenant_id: TENANT_UUID,
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = id
+    ? await sb.from('lifeart_products').update(payload).eq('id', id)
+    : await sb.from('lifeart_products').insert(payload);
+  if (error) { alert('저장 실패: ' + error.message); return; }
+  closeProductEditor(); loadProducts();
+}
+async function delProduct(id) {
+  if (!confirm('이 상품을 삭제하시겠습니까?')) return;
+  const { error } = await sb.from('lifeart_products').delete().eq('id', id);
+  if (error) { alert('삭제 실패: ' + error.message + ' (주문 이력이 있는 상품은 "사용여부"를 끄는 판매중지를 이용하세요)'); return; }
+  loadProducts();
+}
 
 /* ── 문의 (1:1/견적/제휴 통합) ── */
 const TYPE_LABEL = { qna:'1:1문의', estimate:'견적', partnership:'제휴' };

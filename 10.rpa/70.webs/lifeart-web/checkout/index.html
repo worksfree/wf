@@ -31,6 +31,8 @@
 <script>
 document.addEventListener('layout:ready', initCheckout);
 
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
 async function initCheckout() {
   const box = document.getElementById('checkout-box');
   const { data: { session } } = await sb.auth.getSession();
@@ -63,10 +65,17 @@ async function initCheckout() {
     : `<button class="form-submit" disabled style="opacity:.55; cursor:not-allowed;">온라인 결제 준비중</button>
        <p style="font-size:12px; color:var(--text-light); text-align:center; margin-top:12px;">온라인 결제는 곧 오픈됩니다. 그 전까지는 견적·상담 문의로 진행해 주세요.</p>`;
 
+  const addons = order.options?.addons || [];
+  const addonRows = addons.map(a => `
+    <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-mid); padding:4px 0;">
+      <span>+ ${esc(a.name)} × ${a.qty}</span><span>${(a.price * a.qty).toLocaleString()}원</span>
+    </div>`).join('');
+
   box.innerHTML = `
     <div style="margin-bottom:20px;">
       <div style="font-size:13px; color:var(--text-mid); margin-bottom:4px;">주문 상품</div>
       <div style="font-size:16px; font-weight:700; color:var(--text-dark);">${order.lifeart_products?.name || '상품'} × ${order.quantity}</div>
+      ${addonRows ? `<div style="margin-top:8px; padding-top:8px; border-top:1px dashed var(--border);">${addonRows}</div>` : ''}
     </div>
     <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700; padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:20px;">
       <span>결제 금액</span><span style="color:var(--accent);">${order.amount.toLocaleString()}원</span>
