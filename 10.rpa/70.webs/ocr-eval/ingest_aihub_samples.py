@@ -14,6 +14,15 @@ AIHub_샘플_다운로드_가이드.md 참고. 그 승인이 끝나고 파일을
 """
 import glob, json, os, sys, time
 
+# stdout이 파일로 리다이렉트되면 Windows에서 cp949로 인코딩을 시도해 em-dash(—) 등에서
+# UnicodeEncodeError로 죽는다(2026-07-23 야간 sweep_contrast_sharpen.py 실행에서 실제로
+# 발생 — 1단계 294건 완료 후 2단계 진입 로그에서 크래시). UTF-8을 명시적으로 강제한다.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 BASE = os.path.dirname(__file__)
 sys.path.insert(0, BASE)
 import ocr_eval_lib as lib
