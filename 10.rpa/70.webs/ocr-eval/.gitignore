@@ -1,0 +1,10 @@
+# 실제 이미지/결과 데이터는 용량이 커서 git에 올리지 않는다 — collect_test_corpus.py로 재현
+test_corpus/
+aihub_samples/*/*.jpg
+aihub_samples/*/*.jpeg
+aihub_samples/*/*.png
+aihub_samples/*/*.tif
+aihub_samples/*/*.tiff
+aihub_samples/*/*.bmp
+aihub_sweep_results.jsonl
+aihub_sweep_progress.log
