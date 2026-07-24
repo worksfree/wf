@@ -155,6 +155,17 @@ table.rcp-table td.num { text-align:right; }
           <div class="setting-hint" id="fmt-hint"></div>
         </div>
         <div class="setting-row">
+          <label for="docTypePreset"><span id="lbl-doctype">문서 유형(권장값 자동 채움)</span></label>
+          <select id="docTypePreset" onchange="onDocTypePresetChange()">
+            <option value="manual" id="opt-dt-manual">수동 조정</option>
+            <option value="photo_receipt" id="opt-dt-photo-receipt">📱 촬영 — 영수증/전표</option>
+            <option value="photo_handwriting" id="opt-dt-photo-hw">📱 촬영 — 손글씨/메모</option>
+            <option value="digital" id="opt-dt-digital">💻 전자문서/PDF</option>
+            <option value="scan" id="opt-dt-scan">🖨 스캔 문서 (추정값·미검증)</option>
+          </select>
+          <div class="setting-hint" id="doctype-hint"></div>
+        </div>
+        <div class="setting-row">
           <label for="contrastRange"><span id="lbl-contrast">대비(콘트라스트)</span><span id="contrastVal">+15%</span></label>
           <input type="range" id="contrastRange" min="-20" max="50" value="15" step="5">
         </div>
@@ -310,6 +321,17 @@ const I18N = {
     drop_hint_bulk:"또는 이 영역에 여러 파일을 끌어다 놓으세요",
     settings_label:"⚙ 설정",
     settings_shared_hint:"이 설정은 단건·다건 처리에 공통 적용됩니다. 단건에서 파일 하나로 미리 결과를 확인한 뒤 다건으로 넘어가면 같은 설정으로 처리됩니다.",
+    lbl_doctype:"문서 유형(권장값 자동 채움)",
+    opt_dt_manual:"수동 조정",
+    opt_dt_photo_receipt:"📱 촬영 — 영수증/전표",
+    opt_dt_photo_hw:"📱 촬영 — 손글씨/메모",
+    opt_dt_digital:"💻 전자문서/PDF",
+    opt_dt_scan:"🖨 스캔 문서 (추정값·미검증)",
+    doctype_hint_manual:"아래 슬라이더를 직접 조정합니다.",
+    doctype_hint_photo_receipt:"실측 기반(콘트라스트 −20% · 샤프니스 8%) — 로컬 영수증 표본 최적값.",
+    doctype_hint_photo_hw:"실측 기반(콘트라스트 −20% · 샤프니스 73%) — 로컬 손글씨 표본 최적값.",
+    doctype_hint_digital:"실측 기반(콘트라스트 −10% · 샤프니스 0%) — 이미 벡터 렌더링된 문서라 샤프닝하면 오히려 아티팩트가 생깁니다.",
+    doctype_hint_scan:"⚠ 실측 표본이 없어 추정한 값입니다(콘트라스트 0% · 샤프니스 20%) — 결과가 안 좋으면 수동 조정을 권장합니다.",
     lbl_fmt:"출력 형식",
     opt_text:"텍스트 (.txt) — 손글씨·일반 문서 추천",
     opt_md:"마크다운 (.md) — PDF·긴 문서 추천",
@@ -371,6 +393,17 @@ const I18N = {
     drop_hint_bulk:"or drag and drop multiple files here",
     settings_label:"⚙ Settings",
     settings_shared_hint:"These settings apply to both single and batch processing. Preview a sample in single mode first, then switch to batch — it'll use the same settings.",
+    lbl_doctype:"Document type (auto-fills recommended values)",
+    opt_dt_manual:"Manual",
+    opt_dt_photo_receipt:"📱 Photo — receipt/invoice",
+    opt_dt_photo_hw:"📱 Photo — handwriting/notes",
+    opt_dt_digital:"💻 Digital doc/PDF",
+    opt_dt_scan:"🖨 Scanned document (estimated, unverified)",
+    doctype_hint_manual:"Adjust the sliders below directly.",
+    doctype_hint_photo_receipt:"Based on measurement (contrast −20% · sharpness 8%) — optimal for the local receipt sample.",
+    doctype_hint_photo_hw:"Based on measurement (contrast −20% · sharpness 73%) — optimal for the local handwriting sample.",
+    doctype_hint_digital:"Based on measurement (contrast −10% · sharpness 0%) — already vector-rendered, so sharpening tends to introduce artifacts.",
+    doctype_hint_scan:"⚠ Estimated — no measured sample for this category (contrast 0% · sharpness 20%). If results are poor, try manual adjustment.",
     lbl_fmt:"Output format",
     opt_text:"Text (.txt) — best for handwriting/general docs",
     opt_md:"Markdown (.md) — best for PDFs/long docs",
@@ -451,6 +484,13 @@ function applyLang() {
   document.getElementById("opt-md").textContent = t("opt_md");
   document.getElementById("opt-excel").textContent = t("opt_excel");
   document.getElementById("opt-doc").textContent = t("opt_doc");
+  document.getElementById("lbl-doctype").textContent = t("lbl_doctype");
+  document.getElementById("opt-dt-manual").textContent = t("opt_dt_manual");
+  document.getElementById("opt-dt-photo-receipt").textContent = t("opt_dt_photo_receipt");
+  document.getElementById("opt-dt-photo-hw").textContent = t("opt_dt_photo_hw");
+  document.getElementById("opt-dt-digital").textContent = t("opt_dt_digital");
+  document.getElementById("opt-dt-scan").textContent = t("opt_dt_scan");
+  updateDocTypeHint();
   document.getElementById("lbl-contrast").textContent = t("lbl_contrast");
   document.getElementById("lbl-sharpen").textContent = t("lbl_sharpen");
   document.getElementById("include-raw-label").textContent = t("include_raw_label");
@@ -497,6 +537,30 @@ function updateFormatHint() {
   document.getElementById("includeRawRow").style.display = fmt === "excel" ? "flex" : "none";
 }
 function onFormatChange() { updateFormatHint(); }
+
+/* ───────── 문서 유형 프리셋 — 콘트라스트/샤프니스 권장값 자동 채움 ─────────
+   2026-07-24 로컬 표본 스윕 실측값(scratchpad/ocr_lab/sweep_report.md) 기반.
+   "scan"만 실측 표본이 없어 촬영/전자문서 중간값으로 추정한 것 — UI에도 명시. */
+const DOC_TYPE_PRESETS = {
+  photo_receipt:     { contrast: -20, sharpen: 8 },
+  photo_handwriting: { contrast: -20, sharpen: 73 },
+  digital:           { contrast: -10, sharpen: 0 },
+  scan:              { contrast: 0,   sharpen: 20 },
+};
+function updateDocTypeHint() {
+  const val = document.getElementById("docTypePreset").value;
+  document.getElementById("doctype-hint").textContent = t(`doctype_hint_${val}`);
+}
+function onDocTypePresetChange() {
+  const val = document.getElementById("docTypePreset").value;
+  updateDocTypeHint();
+  const preset = DOC_TYPE_PRESETS[val];
+  if (!preset) return; // "manual" — 슬라이더 값 그대로 둠
+  document.getElementById("contrastRange").value = preset.contrast;
+  document.getElementById("sharpenRange").value = preset.sharpen;
+  document.getElementById("contrastVal").textContent = (preset.contrast >= 0 ? "+" : "") + preset.contrast + "%";
+  document.getElementById("sharpenVal").textContent = preset.sharpen + "%";
+}
 
 /* ───────── Supabase ───────── */
 const OCR_BASE_URL = "https://ocr-service.worksfree.workers.dev";
@@ -1185,9 +1249,13 @@ dropBulkEl.addEventListener("drop", (e) => { if (e.dataTransfer.files && e.dataT
 document.getElementById("contrastRange").addEventListener("input", (e) => {
   const v = parseInt(e.target.value, 10);
   document.getElementById("contrastVal").textContent = (v >= 0 ? "+" : "") + v + "%";
+  document.getElementById("docTypePreset").value = "manual"; // 직접 조정 시 프리셋 표시와 실제 값 불일치 방지
+  updateDocTypeHint();
 });
 document.getElementById("sharpenRange").addEventListener("input", (e) => {
   document.getElementById("sharpenVal").textContent = e.target.value + "%";
+  document.getElementById("docTypePreset").value = "manual";
+  updateDocTypeHint();
 });
 
 applyLang();
