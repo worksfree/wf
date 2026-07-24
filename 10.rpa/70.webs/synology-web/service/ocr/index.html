@@ -107,6 +107,19 @@ table.rcp-table td.num { text-align:right; }
 .rcp-warn { color:var(--amber); font-size:11px; margin-top:6px; }
 
 .disclaim { font-size:11.5px; color:var(--hint); margin-top:26px; border-top:1px solid var(--border); padding-top:12px; }
+
+/* 카메라 모달 — 페이지 안에서 촬영(getUserMedia). 네이티브 카메라 앱으로 나갔다가
+   모바일이 탭을 강제종료하고 복귀 시 새로고침되면서 촬영한 사진이 유실되는 문제를
+   근본적으로 피하기 위해 앱 전환 없이 페이지 안에서 촬영을 끝낸다. */
+.camera-modal { display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,.9); align-items:center; justify-content:center; flex-direction:column; padding:16px; }
+.camera-modal.open { display:flex; }
+.camera-video-wrap { position:relative; width:100%; max-width:520px; border-radius:12px; overflow:hidden; background:#000; }
+.camera-video-wrap video { width:100%; display:block; max-height:70vh; object-fit:contain; }
+.camera-modal-actions { display:flex; gap:14px; align-items:center; justify-content:center; margin-top:18px; }
+.camera-shutter-btn { width:64px; height:64px; border-radius:50%; background:#fff; border:4px solid var(--blue); cursor:pointer; }
+.camera-shutter-btn:active { background:var(--blue-bg); }
+.camera-close-btn { background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:20px; padding:10px 18px; font-size:13px; cursor:pointer; }
+.camera-modal-hint { color:var(--hint); font-size:12px; margin-top:10px; text-align:center; }
 </style>
 </head>
 <body>
@@ -252,6 +265,21 @@ table.rcp-table td.num { text-align:right; }
   </div>
 </div>
 
+<!-- 카메라 모달 — 네이티브 앱으로 나가지 않고 페이지 안에서 촬영(getUserMedia) -->
+<div class="camera-modal" id="cameraModal" role="dialog" aria-modal="true" aria-label="카메라 촬영" aria-labelledby="camera-modal-label">
+  <label class="sr" id="camera-modal-label">카메라 촬영</label>
+  <div class="camera-video-wrap">
+    <video id="cameraVideo" autoplay playsinline muted></video>
+  </div>
+  <div class="camera-modal-actions">
+    <button class="camera-close-btn" type="button" id="cameraCancelBtn">✕ <span id="camera-cancel-label">취소</span></button>
+    <button class="camera-shutter-btn" type="button" id="cameraShutterBtn" aria-label="촬영"></button>
+    <span style="width:70px;"></span>
+  </div>
+  <div class="camera-modal-hint" id="camera-modal-hint">가운데 흰 버튼을 눌러 촬영하세요</div>
+</div>
+<canvas id="cameraCanvas" style="display:none;"></canvas>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -267,6 +295,10 @@ const I18N = {
     pick_label:"파일 선택", pick_btn:"🖼 파일 선택",
     pick_camera_label:"사진 촬영", pick_camera_btn:"📷 사진 촬영",
     no_camera_alert:"이 기기에서 카메라를 찾을 수 없습니다.",
+    camera_permission_denied_alert:"카메라 권한이 거부되었습니다. 브라우저 설정에서 카메라 접근을 허용해주세요.",
+    camera_error_alert:"카메라를 시작할 수 없습니다. 잠시 후 다시 시도해주세요.",
+    camera_modal_label:"카메라 촬영", camera_cancel_label:"취소", camera_shutter_label:"촬영",
+    camera_modal_hint:"가운데 흰 버튼을 눌러 촬영하세요",
     drop_hint:"또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)",
     pick_folder_label:"폴더 선택", pick_folder_btn:"📁 폴더 선택",
     pick_files_label:"여러 파일 선택", pick_files_btn:"여러 파일 선택",
@@ -320,6 +352,10 @@ const I18N = {
     pick_label:"Choose file", pick_btn:"🖼 Choose file",
     pick_camera_label:"Take photo", pick_camera_btn:"📷 Take photo",
     no_camera_alert:"No camera was found on this device.",
+    camera_permission_denied_alert:"Camera permission was denied. Please allow camera access in your browser settings.",
+    camera_error_alert:"Couldn't start the camera. Please try again shortly.",
+    camera_modal_label:"Take a photo", camera_cancel_label:"Cancel", camera_shutter_label:"Capture",
+    camera_modal_hint:"Tap the white button to take the photo",
     drop_hint:"or drag and drop a file here (PNG, JPG, PDF)",
     pick_folder_label:"Choose folder", pick_folder_btn:"📁 Choose folder",
     pick_files_label:"Choose multiple files", pick_files_btn:"Choose multiple files",
@@ -384,6 +420,11 @@ function applyLang() {
   document.getElementById("pickBtn").textContent = t("pick_btn");
   document.getElementById("pick-camera-label").textContent = t("pick_camera_label");
   document.getElementById("pickCameraBtn").textContent = t("pick_camera_btn");
+  document.getElementById("cameraModal").setAttribute("aria-label", t("camera_modal_label"));
+  document.getElementById("camera-modal-label").textContent = t("camera_modal_label");
+  document.getElementById("camera-cancel-label").textContent = t("camera_cancel_label");
+  document.getElementById("cameraShutterBtn").setAttribute("aria-label", t("camera_shutter_label"));
+  document.getElementById("camera-modal-hint").textContent = t("camera_modal_hint");
   document.getElementById("drop-hint").textContent = t("drop_hint");
   document.getElementById("pick-folder-label").textContent = t("pick_folder_label");
   document.getElementById("pickFolderBtn").textContent = t("pick_folder_btn");
@@ -810,10 +851,76 @@ async function hasCameraDevice() {
     return devices.some(d => d.kind === "videoinput");
   } catch (e) { return true; }
 }
-document.getElementById("pickCameraBtn").addEventListener("click", async () => {
-  if (!(await hasCameraDevice())) { alert(t("no_camera_alert")); return; }
-  document.getElementById("cameraInput").click();
-});
+
+/* ── 카메라 촬영: 네이티브 앱으로 나가지 않고 getUserMedia로 페이지 안에서 촬영 ──
+   <input capture> 방식은 네이티브 카메라 앱으로 전환되는데, 모바일에서 그동안
+   브라우저가 메모리 확보를 위해 탭을 강제 종료했다가 복귀 시 페이지를 통째로
+   새로고침하는 경우가 실측으로 확인됐다(2026-07-24) — 이러면 촬영한 사진이 옛
+   페이지 컨텍스트로 전달되도록 돼 있어 새 페이지의 새 input엔 도달하지 못하고
+   유실된다. getUserMedia로 페이지를 벗어나지 않고 그 자리에서 촬영하면 애초에
+   탭 전환이 없어 이 문제 자체가 발생하지 않는다. getUserMedia를 지원하지 않는
+   구형 환경만 <input capture>로 폴백한다. */
+let _cameraStream = null;
+let _cameraReturnFocusEl = null;
+
+async function openCameraModal() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    // getUserMedia 미지원 — 구형 브라우저 폴백
+    if (!(await hasCameraDevice())) { alert(t("no_camera_alert")); return; }
+    document.getElementById("cameraInput").click();
+    return;
+  }
+  try {
+    _cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+  } catch (e) {
+    if (e && (e.name === "NotFoundError" || e.name === "OverconstrainedError")) {
+      alert(t("no_camera_alert"));
+    } else if (e && e.name === "NotAllowedError") {
+      alert(t("camera_permission_denied_alert"));
+    } else {
+      alert(t("camera_error_alert"));
+    }
+    return;
+  }
+  _cameraReturnFocusEl = document.activeElement;
+  const modal = document.getElementById("cameraModal");
+  const video = document.getElementById("cameraVideo");
+  video.srcObject = _cameraStream;
+  modal.classList.add("open");
+  document.getElementById("cameraShutterBtn").focus();
+  document.addEventListener("keydown", onCameraModalKeydown);
+}
+
+function closeCameraModal() {
+  const modal = document.getElementById("cameraModal");
+  modal.classList.remove("open");
+  document.removeEventListener("keydown", onCameraModalKeydown);
+  if (_cameraStream) { _cameraStream.getTracks().forEach(t => t.stop()); _cameraStream = null; }
+  document.getElementById("cameraVideo").srcObject = null;
+  if (_cameraReturnFocusEl && _cameraReturnFocusEl.focus) _cameraReturnFocusEl.focus();
+}
+
+function onCameraModalKeydown(e) {
+  if (e.key === "Escape") closeCameraModal();
+}
+
+function captureCameraPhoto() {
+  const video = document.getElementById("cameraVideo");
+  const canvas = document.getElementById("cameraCanvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const file = new File([blob], `camera_${Date.now()}.jpg`, { type: "image/jpeg" });
+    closeCameraModal();
+    handleFile(file);
+  }, "image/jpeg", 0.92);
+}
+
+document.getElementById("pickCameraBtn").addEventListener("click", openCameraModal);
+document.getElementById("cameraShutterBtn").addEventListener("click", captureCameraPhoto);
+document.getElementById("cameraCancelBtn").addEventListener("click", closeCameraModal);
 document.getElementById("cameraInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
 document.getElementById("rotateBtn").addEventListener("click", handleRotate);
 document.getElementById("zoomInBtn").addEventListener("click", () => { _zoomPct = Math.min(ZOOM_MAX, _zoomPct + ZOOM_STEP); applyZoom(); });
