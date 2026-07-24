@@ -308,7 +308,7 @@ const RECEIPT_STRUCTURE_PROMPT_HEAD =
   "텍스트에 없는 값은 빈 문자열이나 0으로 두고 지어내지 마세요. " +
   "항목마다 텍스트 전체를 다시 확인하세요 — 값이 실제로 있는데 비워두는 실수를 하지 마세요.\n" +
   "- store_name: 상호명\n" +
-  "- business_reg_no: 사업자등록번호\n" +
+  "- business_reg_no: 사업자등록번호(사업자번호로만 표기된 경우도 동일한 값)\n" +
   "- date: 거래일시\n" +
   "- phone: 전화번호\n" +
   "- address: 사업장 주소(있으면)\n" +
@@ -454,13 +454,19 @@ async function runReceiptExtraction(env, imageBase64) {
 
   // LLM 구조화가 JSON 파싱은 성공했지만 필드를 골고루 못 채우는 경우(실측 확인,
   // 2026-07-24) — 라벨이 뚜렷해 정규식으로도 뽑히는 필드는 LLM이 비워둔 자리를
-  // 정규식 결과로 메운다. business_reg_no/total은 기존처럼 대조용(regex_check)으로만
-  // 두고 자동 교체하지 않음 — 숫자 필드는 오탐 시 사용자가 직접 알아채기 쉽고, 잘못
-  // 채우면 금액 신뢰도에 영향이 커서 더 보수적으로 접근한다.
+  // 정규식 결과로 메운다. total은 기존처럼 대조용(regex_check)으로만 두고 자동
+  // 교체하지 않음 — 금액 필드는 잘못 채우면 신뢰도에 영향이 커서 보수적으로 접근한다.
+  //
+  // business_reg_no는 2026-07-24 실측(엑셀 출력에서 빈칸)으로 여기 포함시킴 — 영수증에
+  // "사업자등록번호" 대신 "사업자번호"로만 표기된 경우 LLM이 프롬프트 설명(사업자등록번호)
+  // 문구에 매여 못 찾는 사례 확인. regexFallback의 라벨 정규식은 "(등록)?"을 옵셔널로 두어
+  // 두 표기를 모두 잡고, 값 형식도 3-2-5 자리 숫자로 고정돼 있어 total 같은 자유 숫자 필드
+  // 보다 오탐 위험이 낮다 — 그래서 total과 달리 자동 백필 대상에 포함한다.
   if (structured) {
     if (!structured.phone && regexCheck.phone) structured.phone = regexCheck.phone;
     if (!structured.date && regexCheck.date) structured.date = regexCheck.date;
     if (!structured.address && regexCheck.address) structured.address = regexCheck.address;
+    if (!structured.business_reg_no && regexCheck.business_reg_no) structured.business_reg_no = regexCheck.business_reg_no;
   }
 
   let addressCheck = null;
