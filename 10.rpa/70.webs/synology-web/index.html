@@ -2077,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.8.14';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.8.16';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2116,9 +2116,9 @@ const TREE = [
       { label:{ko:'변환 결과 검증',   en:'Conversion Verifier'}, icon:'✦', iframe:'service/conversion-verifier/index.html' },
       { label:{ko:'앱 요청 게시판',   en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
       { label:{ko:'전자책 미리보기',   en:'eBook Preview'},       icon:'📖', iframe:'service/ebook/index.html' },
-      { label:{ko:'OCR 텍스트 추출',   en:'OCR Text Extraction'}, icon:'🔎', iframe:'service/ocr/index.html' },
-      { label:{ko:'DWG 표제란/BOM 추출', en:'DWG Title Block/BOM Extraction'}, icon:'📐', iframe:'service/dwg-extract/index.html' },
-      { label:{ko:'그룹웨어 자동 데모', en:'Groupware Auto Demo'}, icon:'🎬', iframe:'groupware/demo/index.html' },
+      { label:{ko:'OCR 텍스트 추출',   en:'OCR Text Extraction'}, icon:'🔎', iframe:'service/ocr/index.html', statusTag:{ko:'알파', en:'Alpha'} },
+      { label:{ko:'DWG 표제란/BOM 추출', en:'DWG Title Block/BOM Extraction'}, icon:'📐', iframe:'service/dwg-extract/index.html', statusTag:{ko:'개발 50%', en:'50% Built'} },
+      { label:{ko:'그룹웨어 자동 데모', en:'Groupware Auto Demo'}, icon:'🎬', iframe:'groupware/demo/index.html', statusTag:{ko:'개발예정', en:'Planned'} },
     ]
   },
   {
@@ -2589,6 +2589,15 @@ function buildTree(nodes, depth=0, path=[]) {
         const tag = document.createElement('span');
         tag.style.cssText = 'font-size:12px;background:#0f1e0f;color:#4ade80;border:1px solid #166534;border-radius:10px;padding:1px 7px;flex-shrink:0;';
         tag.textContent = t('dev_tag');
+        labelEl.appendChild(tag);
+      }
+      // 노드별 커스텀 진행상태 태그(예: "개발 50%", "알파") — coming/dev처럼
+      // 고정 문구가 아니라 노드마다 다른 문구가 필요해 자유 텍스트로 둠.
+      // label과 동일하게 {ko,en} 객체를 getLabel()로 읽는다.
+      if (node.statusTag) {
+        const tag = document.createElement('span');
+        tag.style.cssText = 'font-size:12px;background:#2a1e0a;color:#fbbf24;border:1px solid #92400e;border-radius:10px;padding:1px 7px;flex-shrink:0;';
+        tag.textContent = getLabel(node.statusTag);
         labelEl.appendChild(tag);
       }
       // 리프 노드: memberOnly는 클릭 차단용으로만 사용, 시각 태그 제거
