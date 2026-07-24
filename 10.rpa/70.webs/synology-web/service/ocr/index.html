@@ -105,6 +105,10 @@ table.rcp-table th, table.rcp-table td { border:1px solid var(--border); padding
 table.rcp-table th { background:var(--blue-bg); color:var(--blue); font-weight:600; }
 table.rcp-table td.num { text-align:right; }
 .rcp-warn { color:var(--amber); font-size:11px; margin-top:6px; }
+.rcp-addr-note { font-size:11px; margin-top:2px; }
+.rcp-addr-note.ok { color:var(--green); }
+.rcp-addr-note.low { color:var(--amber); }
+.rcp-addr-note.fail { color:var(--hint); }
 
 .disclaim { font-size:11.5px; color:var(--hint); margin-top:26px; border-top:1px solid var(--border); padding-top:12px; }
 
@@ -252,6 +256,7 @@ table.rcp-table td.num { text-align:right; }
           <button class="copy-btn" type="button" id="downloadXlsxBtn">엑셀 다운로드</button>
         </div>
         <dl class="rcp-fields" id="rcpFields"></dl>
+        <div class="rcp-addr-note" id="rcpAddrNote"></div>
         <div class="rcp-table-wrap"><table class="rcp-table" id="rcpItemsTable"></table></div>
         <div class="rcp-warn" id="rcpWarn"></div>
       </div>
@@ -331,9 +336,13 @@ const I18N = {
     low_confidence_tip:"⚠ 원본이 흐릿하거나 구겨져 있어 인식이 불안정할 수 있습니다. 최대한 평평하게 펴서 밝은 곳에서 다시 촬영하거나, 회전 버튼으로 다시 시도해 보세요.",
     rcp_structure_failed:"구조화에 실패했습니다 — 텍스트 형식으로 다시 시도해 보세요.",
     rcp_field_store:"상호명", rcp_field_biz:"사업자등록번호", rcp_field_date:"거래일시", rcp_field_phone:"전화번호",
-    rcp_field_subtotal:"공급가액", rcp_field_tax:"부가세", rcp_field_total:"합계금액",
+    rcp_field_address:"주소", rcp_field_subtotal:"공급가액", rcp_field_tax:"부가세", rcp_field_total:"합계금액",
     rcp_item_name:"품명", rcp_item_qty:"수량", rcp_item_price:"금액",
     rcp_warn_total:"⚠ 인식된 합계금액이 원본 텍스트의 숫자와 달라 다시 확인이 필요할 수 있습니다.",
+    rcp_addr_corrected_high:"✓ 주소 자동 보정됨(공식 주소와 대조)",
+    rcp_addr_corrected_low:"⚠ 주소를 추정 보정했습니다 — 정확도가 낮을 수 있으니 확인해 주세요",
+    rcp_addr_verified:"✓ 공식 주소와 일치 확인됨",
+    rcp_addr_unverified:"주소 자동 검증 실패 — 원본 인식 그대로 표시 중",
     batch_empty:"선택한 폴더/파일 중 처리 가능한 파일이 없습니다.",
     batch_analyzing:"폴더 분석 중...",
     batch_eta_calculating:"남은 시간 계산 중...",
@@ -388,9 +397,13 @@ const I18N = {
     low_confidence_tip:"⚠ The source may be blurry or creased, so results could be unreliable. Try flattening it and retaking the photo in good light, or use the rotate button to retry.",
     rcp_structure_failed:"Structuring failed — try the Text format instead.",
     rcp_field_store:"Store name", rcp_field_biz:"Business reg. no.", rcp_field_date:"Date", rcp_field_phone:"Phone",
-    rcp_field_subtotal:"Subtotal", rcp_field_tax:"Tax", rcp_field_total:"Total",
+    rcp_field_address:"Address", rcp_field_subtotal:"Subtotal", rcp_field_tax:"Tax", rcp_field_total:"Total",
     rcp_item_name:"Item", rcp_item_qty:"Qty", rcp_item_price:"Price",
     rcp_warn_total:"⚠ The recognized total doesn't match a number found in the raw text — please double-check.",
+    rcp_addr_corrected_high:"✓ Address auto-corrected (matched against official address DB)",
+    rcp_addr_corrected_low:"⚠ Address corrected by estimation — may be less reliable, please verify",
+    rcp_addr_verified:"✓ Matches an official address",
+    rcp_addr_unverified:"Address auto-verification failed — showing raw recognition as-is",
     batch_empty:"No supported files found in the selected folder/files.",
     batch_analyzing:"Analyzing folder...",
     batch_eta_calculating:"Estimating time left...",
@@ -701,17 +714,31 @@ async function buildSingleImages(rotationDeg, onFirstPage) {
   return [b64];
 }
 
-function renderRcpFields(structured) {
+function renderRcpFields(structured, addressCheck) {
   const rows = [
     [t("rcp_field_store"), structured?.store_name || "-"],
     [t("rcp_field_biz"), structured?.business_reg_no || "-"],
     [t("rcp_field_date"), structured?.date || "-"],
     [t("rcp_field_phone"), structured?.phone || "-"],
+    [t("rcp_field_address"), structured?.address || "-"],
     [t("rcp_field_subtotal"), fmtNum(structured?.subtotal)],
     [t("rcp_field_tax"), fmtNum(structured?.tax)],
     [t("rcp_field_total"), fmtNum(structured?.total)],
   ];
   document.getElementById("rcpFields").innerHTML = rows.map(([k, v]) => `<dt>${escHtml(k)}</dt><dd>${escHtml(String(v))}</dd>`).join("");
+
+  const noteEl = document.getElementById("rcpAddrNote");
+  if (!structured?.address || !addressCheck) { noteEl.textContent = ""; noteEl.className = "rcp-addr-note"; return; }
+  if (addressCheck.corrected) {
+    noteEl.textContent = t(addressCheck.confidence === "high" ? "rcp_addr_corrected_high" : "rcp_addr_corrected_low");
+    noteEl.className = "rcp-addr-note " + (addressCheck.confidence === "high" ? "ok" : "low");
+  } else if (addressCheck.verified) {
+    noteEl.textContent = t("rcp_addr_verified");
+    noteEl.className = "rcp-addr-note ok";
+  } else {
+    noteEl.textContent = t("rcp_addr_unverified");
+    noteEl.className = "rcp-addr-note fail";
+  }
 }
 function renderRcpItemsTable(items) {
   const table = document.getElementById("rcpItemsTable");
@@ -736,14 +763,14 @@ async function runSinglePipeline(images, session, fmt) {
     if (data.unlimited) document.getElementById("remaining").textContent = t("remaining_unlimited");
     else if (typeof data.remaining_today === "number") document.getElementById("remaining").textContent = t("remaining")(data.remaining_today);
 
-    _rcpSingleData = { rawText: data.text, structured: data.structured, regexCheck: data.regex_check };
+    _rcpSingleData = { rawText: data.text, structured: data.structured, regexCheck: data.regex_check, addressCheck: data.address_check };
     if (!data.structured) {
       setStatus(status, "rcp_structure_failed", true);
       document.getElementById("rcpFields").innerHTML = "";
       document.getElementById("rcpItemsTable").innerHTML = "";
     } else {
       setStatus(status, data.low_confidence ? "low_confidence_tip" : null, false);
-      renderRcpFields(data.structured);
+      renderRcpFields(data.structured, data.address_check);
       renderRcpItemsTable(data.structured.items);
       const rc = data.regex_check;
       document.getElementById("rcpWarn").textContent =
@@ -955,6 +982,7 @@ document.getElementById("downloadXlsxBtn").addEventListener("click", () => {
   const aoa = [
     [t("rcp_field_store"), s.store_name || ""], [t("rcp_field_biz"), s.business_reg_no || ""],
     [t("rcp_field_date"), s.date || ""], [t("rcp_field_phone"), s.phone || ""],
+    [t("rcp_field_address"), s.address || ""],
     [t("rcp_field_subtotal"), s.subtotal ?? ""], [t("rcp_field_tax"), s.tax ?? ""], [t("rcp_field_total"), s.total ?? ""],
     [], [t("rcp_item_name"), t("rcp_item_qty"), t("rcp_item_price")],
     ...(s.items || []).map(it => [it.name || "", it.qty ?? "", it.price ?? ""]),
@@ -1125,8 +1153,8 @@ function downloadBulkExcel() {
   if (!_rcpBulkData.length) return;
   const includeRaw = document.getElementById("includeRaw").checked;
   const wb = XLSX.utils.book_new();
-  const summaryAoa = [["파일", t("rcp_field_store"), t("rcp_field_biz"), t("rcp_field_date"), t("rcp_field_subtotal"), t("rcp_field_tax"), t("rcp_field_total")]];
-  for (const r of _rcpBulkData) { const s = r.structured || {}; summaryAoa.push([r.fileName, s.store_name || "", s.business_reg_no || "", s.date || "", s.subtotal ?? "", s.tax ?? "", s.total ?? ""]); }
+  const summaryAoa = [["파일", t("rcp_field_store"), t("rcp_field_biz"), t("rcp_field_date"), t("rcp_field_address"), t("rcp_field_subtotal"), t("rcp_field_tax"), t("rcp_field_total")]];
+  for (const r of _rcpBulkData) { const s = r.structured || {}; summaryAoa.push([r.fileName, s.store_name || "", s.business_reg_no || "", s.date || "", s.address || "", s.subtotal ?? "", s.tax ?? "", s.total ?? ""]); }
   const wsSummary = XLSX.utils.aoa_to_sheet(summaryAoa); setIntegerFormat(wsSummary);
   XLSX.utils.book_append_sheet(wb, wsSummary, "요약");
 

@@ -273,6 +273,7 @@ const RECEIPT_SCHEMA = {
     business_reg_no: { type: "string" },
     date: { type: "string" },
     phone: { type: "string" },
+    address: { type: "string" },
     items: {
       type: "array",
       items: {
@@ -298,6 +299,7 @@ const RECEIPT_STRUCTURE_PROMPT_HEAD =
   "- business_reg_no: 사업자등록번호\n" +
   "- date: 거래일시\n" +
   "- phone: 전화번호\n" +
+  "- address: 사업장 주소(있으면)\n" +
   "- items: 품목 배열, 각 항목은 name(품명)/qty(수량)/price(금액)\n" +
   "- subtotal: 공급가액\n- tax: 부가세\n- total: 합계금액\n\n[영수증 텍스트]\n";
 
@@ -345,6 +347,59 @@ function regexFallback(rawText) {
   };
 }
 
+// ── 주소 검증/보정 (행안부 도로명주소 검색API) ──
+// 영수증 주소는 OCR이 시각적으로 비슷한 글자를 혼동하기 쉬운 필드다(실측: "효원로"→
+// "요원로", "팔달구"→"발달구" 등). 공식 주소 DB와 대조해 없는 주소면 근접한 실제
+// 주소로 보정한다. 사용자가 제안한 방식 그대로 구현: 전체 주소로 검색 → 결과 없으면
+// 뒤(가장 세부적인 토큰, 대개 도로명·번지)부터 한 단어씩 줄여가며 재검색 → 처음
+// 결과가 나온 단계의 주소를 채택한다. 토큰을 줄여야 했다면(=상위 행정구역만으로
+// 찾음) confidence를 "low"로 표시해 사용자가 한 번 더 보게 한다 — 잘못된 도시로
+// 확신 없이 자동 치환하는 걸 피하기 위함(신뢰도 표시 없이 조용히 틀린 주소로
+// 바꾸는 게 OCR 오류보다 더 나쁠 수 있어서).
+// JUSO_API_KEY가 없으면 이 기능 전체가 조용히 no-op(원문 그대로 반환)한다 — 발급
+// 전에도 영수증 처리 자체는 그대로 동작해야 하므로.
+const JUSO_ENDPOINT = "https://business.juso.go.kr/addrlink/addrLinkApi.do";
+
+async function searchJuso(env, keyword) {
+  const url =
+    `${JUSO_ENDPOINT}?confmKey=${env.JUSO_API_KEY}&currentPage=1&countPerPage=5` +
+    `&keyword=${encodeURIComponent(keyword)}&resultType=json`;
+  const r = await fetchWithTimeout(url, {}, 5000);
+  const data = await r.json();
+  // 문서/응답 버전에 따라 최상위 경로가 다르게 보고되는 사례가 있어 둘 다 대응
+  return data?.results?.juso || data?.data?.result || [];
+}
+
+async function correctAddress(env, ocrAddress) {
+  if (!env.JUSO_API_KEY || !ocrAddress || !ocrAddress.trim()) {
+    return { address: ocrAddress || "", verified: false, corrected: false };
+  }
+  const norm = (s) => (s || "").replace(/\s+/g, "");
+  const tokens = ocrAddress.trim().split(/\s+/);
+  for (let dropFromEnd = 0; dropFromEnd < tokens.length; dropFromEnd++) {
+    const query = tokens.slice(0, tokens.length - dropFromEnd).join(" ");
+    if (!query) break;
+    try {
+      const results = await searchJuso(env, query);
+      if (results && results.length > 0) {
+        const best = results[0];
+        const correctedAddr = best.roadAddr || best.jibunAddr || ocrAddress;
+        return {
+          address: correctedAddr,
+          original: ocrAddress,
+          corrected: norm(correctedAddr) !== norm(ocrAddress),
+          verified: true,
+          confidence: dropFromEnd === 0 ? "high" : "low",
+        };
+      }
+    } catch (e) {
+      console.error(`juso search failed (query="${query}"): ${e}`);
+      // 이 단계 실패는 다음(더 짧은) 단계로 계속 폴백
+    }
+  }
+  return { address: ocrAddress, original: ocrAddress, verified: false, corrected: false };
+}
+
 async function runReceiptExtraction(env, imageBase64) {
   const ocrResult = await runOcr(env, imageBase64); // 1단계: 기존 검증된 OCR 그대로 재사용
   let structured;
@@ -366,11 +421,21 @@ async function runReceiptExtraction(env, imageBase64) {
       structured = null;
     }
   }
+  let addressCheck = null;
+  if (structured?.address) {
+    try {
+      addressCheck = await correctAddress(env, structured.address);
+      if (addressCheck.corrected) structured.address = addressCheck.address;
+    } catch (e) {
+      console.error(`address correction failed: ${e}`);
+    }
+  }
   return {
     rawText: ocrResult.text,
     lowConfidence: ocrResult.lowConfidence || !structured,
     structured,
     regexCheck: regexFallback(ocrResult.text),
+    addressCheck,
   };
 }
 
@@ -431,6 +496,7 @@ export default {
           text: result.rawText,
           structured: result.structured,
           regex_check: result.regexCheck,
+          address_check: result.addressCheck,
           low_confidence: result.lowConfidence,
           remaining_today: rate.remaining,
           unlimited: !!rate.unlimited,
