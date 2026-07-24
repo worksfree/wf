@@ -40,6 +40,12 @@ const server = http.createServer((req, res) => {
   req.pipe(proxyReq);
 });
 
-server.listen(LISTEN_PORT, "127.0.0.1", () => {
-  console.log(`[proxy] listening on 127.0.0.1:${LISTEN_PORT} -> ${TARGET_HOST}:${TARGET_PORT} (Host header rewritten)`);
+// "0.0.0.0"(전체 인터페이스) 바인딩 — 원래는 127.0.0.1(로컬 전용)이었는데, pc-ai.worksfree.kr의
+// Cloudflare Tunnel 라우트가 이 PC 자신이 커넥터인 터널(lifeart_ai)에서 NAS가 커넥터인
+// 터널(worksfree)로 옮겨가면서(2026-07-25) NAS가 LAN IP(192.168.100.36:8765)로 이 프록시에
+// 접근해야 하게 됐다 — 127.0.0.1 바인딩으로는 같은 PC 안에서만 접근 가능해서 NAS발 요청이
+// 전부 응답 없이 타임아웃났다. 인증 자체는 없지만(detect_server.py와 동일 패턴), Cloudflare
+// Access가 터널 앞단에서 막아주므로 로컬 서버는 신뢰된 요청만 받는다고 가정한다.
+server.listen(LISTEN_PORT, "0.0.0.0", () => {
+  console.log(`[proxy] listening on 0.0.0.0:${LISTEN_PORT} -> ${TARGET_HOST}:${TARGET_PORT} (Host header rewritten)`);
 });
