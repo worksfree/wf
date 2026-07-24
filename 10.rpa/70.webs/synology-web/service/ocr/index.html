@@ -395,16 +395,14 @@ const I18N = {
     detect_mode_label:"🔬 정밀 교정 모드(베타) — 인식 위치를 이미지 위에 표시",
     detect_mode_hint:"단건 처리에서만 동작합니다. 인식이 끝나면 이미지 위에 글자 위치를 박스로 표시하고, 박스를 클릭하면 그 부분만 다시 확인할 수 있습니다. 지금은 테스트 기능입니다.",
     detect_overlay_h:"🔍 인식 위치 확인",
-    overlay_hint:"박스를 클릭하면 본문에서 해당 위치를 찾아 선택해 줍니다 — 못 찾아도 본문을 직접 수정할 수 있습니다",
+    overlay_hint:"박스를 클릭하면 본문에서 예상 위치를 선택해 줍니다 — 본문은 언제든 직접 수정할 수 있습니다",
     detect_loading:"위치 감지 중...",
     detect_done:(n)=>`${n}개 위치 감지됨 — 박스를 클릭해 보세요`,
     detect_failed:"위치 감지에 실패했습니다.",
     detect_offline:"감지 서버가 꺼져 있습니다. PC에서 감지 서버를 켜주세요.",
     detect_plan_required:"이 기능은 준비 중입니다.",
     overlay_apply_no_target:"텍스트 결과가 없습니다(CSV/엑셀 출력은 아래 표를 직접 수정해 주세요).",
-    overlay_apply_not_found:"본문에서 이 위치에 해당하는 문구를 자동으로 찾지 못했습니다 — 아래 본문에서 직접 찾아 수정해 주세요.",
-    overlay_hint_debug:(hint, conf)=>`(감지된 참고 텍스트: "${hint}"${conf===null?"":`, 신뢰도 ${conf}%`})`,
-    overlay_match_found:"✓ 본문에서 해당 위치를 찾아 선택했습니다 — 그대로 타이핑해 수정하세요.",
+    overlay_match_found:"✓ 예상 위치를 선택했습니다 — 인식 순서 기반 추정이라 다를 수 있으니 확인 후 수정하세요.",
     rcp_edit_hint:"아래 값과 품목을 직접 수정할 수 있습니다 — 수정한 내용이 엑셀 다운로드에 반영됩니다.",
     lbl_doctype:"문서 유형(권장값 자동 채움)",
     opt_dt_manual:"수동 조정",
@@ -481,16 +479,14 @@ const I18N = {
     detect_mode_label:"🔬 Precision review mode (beta) — show recognized text positions on the image",
     detect_mode_hint:"Only works in single mode. After recognition finishes, text positions are shown as boxes on the image — click a box to re-check just that spot. This is a test feature for now.",
     detect_overlay_h:"🔍 Review recognized positions",
-    overlay_hint:"Click a box to find and select that spot in the text below — if it's not found, you can still edit the text directly",
+    overlay_hint:"Click a box to select its estimated spot in the text below — you can always edit the text directly",
     detect_loading:"Detecting positions...",
     detect_done:(n)=>`${n} position(s) detected — click a box`,
     detect_failed:"Position detection failed.",
     detect_offline:"The detection server is offline. Please start it on the PC.",
     detect_plan_required:"This feature is coming soon.",
     overlay_apply_no_target:"No text result yet (for CSV/Excel output, edit the table below directly).",
-    overlay_apply_not_found:"Couldn't automatically find text matching this position — please find and edit it in the text below manually.",
-    overlay_hint_debug:(hint, conf)=>`(detected hint text: "${hint}"${conf===null?"":`, confidence ${conf}%`})`,
-    overlay_match_found:"✓ Found and selected the matching spot in the text — type to edit it.",
+    overlay_match_found:"✓ Selected the estimated spot — this is based on recognition order, so double-check before editing.",
     rcp_edit_hint:"You can edit the values and items below — changes are reflected in the Excel download.",
     lbl_doctype:"Document type (auto-fills recommended values)",
     opt_dt_manual:"Manual",
@@ -1030,24 +1026,25 @@ async function runSinglePipeline(images, session, fmt) {
    잘라 보내면 같은 모델이라도 인식 품질이 전체 이미지보다 훨씬 나빠지는 사례가 나왔다
    (2026-07-25, 사용자 실기기 보고 — 손글씨 메모 한 단어 크롭이 엉뚱한 텍스트로 재인식됨).
 
-   그래서 크롭 재인식을 버리고, hint_text를 "글자 그대로는 못 믿어도 위치 힌트로는 쓸모
-   있다"는 용도로 바꿔 쓴다 — 편집 거리(레벤슈타인) 기반 근사 매칭(fuzzyFitMatch)으로 이미
-   신뢰도가 검증된 전체 본문 텍스트(올mOCR-2 결과) 안에서 그 박스에 해당하는 구간을 찾는다.
+   1차 구현(같은 날)은 hint_text를 검색 키로 삼아 본문 안에서 편집거리 기반 근사 매칭으로
+   구간을 "찾으려" 했는데, 이건 논리적으로 모순이었다(2026-07-25, 사용자 지적) — 박스를
+   클릭하는 이유 자체가 "그 자리 인식이 틀렸으니 고치려는 것"인데, 내용이 일치해야 찾아진다는
+   조건은 정확히 고쳐야 할 사례에서 가장 먼저 깨진다("다녀오기"를 "대기하기"로 오인식한
+   경우 4글자 중 3글자가 달라 어떤 임계값을 잡아도 매칭 실패). 게다가 당시엔 매칭 실패 시
+   편집 자체가 완전히 막히는 별도 버그까지 있었다.
 
-   1차 구현(같은 날)은 찾은 구간을 별도 편집 필드에 복사해 "본문에 반영" 버튼으로 옮기는
-   2단계 방식이었는데, 매칭이 실패하면(EasyOCR 힌트가 아예 엉뚱하거나 그 자리의 본문 자체가
-   오인식된 경우 — 정확히 이 기능이 고쳐야 할 사례에서 오히려 실패하기 쉬움) 편집이 완전히
-   막혀버리는 문제가 실기기 테스트로 확인됨(2026-07-25). 그래서 본문(#result)을 아예
-   직접 편집 가능하게 바꾸고, 박스 클릭은 "본문에서 해당 구간을 찾아 선택해 주는 내비게이션
-   보조" 역할로 축소했다 — 매칭에 실패해도 사용자가 본문을 스크롤해 직접 고치는 경로가 항상
-   열려 있어 막히지 않는다. 매칭 실패 시에는 hint_text와 신뢰도를 상태 메시지에 그대로
-   노출해 "왜 못 찾았는지"를 바로 진단할 수 있게 했다.
+   그래서 "내용이 맞는지" 대신 "박스가 몇 번째이고 몇 글자인지"만으로 위치를 계산하도록
+   바꿨다 — 검출된 모든 박스를 읽기 순서(세로→가로)로 정렬하고, 각 박스의 hint_text 길이를
+   누적합해 "이 박스는 본문의 N~M번째 글자"라는 오프셋을 직접 계산한다(assignBoxOffsets).
+   내용 비교가 전혀 없으므로 그 자리 인식이 얼마나 틀렸든 실패하지 않는다. 전체 박스
+   글자수 합과 본문 실제 길이가 다를 수 있어(둘 다 저마다 인식 오차가 있으므로) 비율로
+   스케일 보정한다 — 한쪽이 전체적으로 조금 더 많이/적게 인식했어도 상대적 위치는 유지된다.
 
-   오탐 방지를 위해 먼저 박스의 세로 위치 비율로 본문 안 예상 구간(단일 컬럼 문서 가정)만
-   느슨한 기준으로 훑고, 못 찾으면 전체 본문을 더 엄격한 기준으로 재시도한다. 짧은 한글
-   단어(2~4음절)는 EasyOCR 오류 한두 글자만으로도 편집거리 비율이 쉽게 30~50%를 넘는 걸
-   실측으로 확인해 임계값을 다소 넉넉히 잡았다(0.6/0.45) — 그래도 실패하는 경우가 있을 수
-   있는데, 그건 위 폴백(본문 직접 편집)으로 커버된다.
+   남은 한계: 이 방식도 완벽하진 않다 — EasyOCR가 박스 하나에서 글자를 실제보다 더 많이
+   지어내거나(삽입) 빠뜨리면(삭제) 그 박스 이후 모든 박스의 위치가 그만큼씩 밀린다(스케일
+   보정은 전체 합만 맞출 뿐 개별 오차까지는 못 잡는다). 그래서 "선택"만 하고 자동으로
+   덮어쓰지 않는다 — 확인 후 필요하면 선택 범위를 직접 조정해서 고치면 된다. 본문(#result)은
+   항상 직접 편집 가능해서(readonly 없음) 위치가 살짝 어긋나도 막히지 않는다.
 
    PDF는 페이지가 여러 장이라 미지원(_lastProcessedCanvas가 이미지 단건일 때만 채워짐).
    박스는 별도 이미지가 아니라 기존 미리보기(previewImgWrap) 위에 그린다 — 확대/축소·
@@ -1096,6 +1093,13 @@ async function runDetectOverlay(session) {
 
   statusEl.textContent = t("detect_done")(data.boxes.length);
   const natW = _lastProcessedCanvas.width, natH = _lastProcessedCanvas.height;
+
+  // 박스별 본문 오프셋을 미리 계산해 각 box 객체에 붙여 둔다(_offStart/_offEnd) — 그리는
+  // 순서(data.boxes)와 읽는 순서(orderBoxesForReadingOrder)가 다를 수 있어 분리했다.
+  const bodyShown = document.getElementById("resultWrap").style.display !== "none";
+  const bodyStrippedLen = bodyShown ? stripWithIndexMap(document.getElementById("result").value).stripped.length : 0;
+  assignBoxOffsets(orderBoxesForReadingOrder(data.boxes), bodyStrippedLen);
+
   data.boxes.forEach((box) => {
     const div = document.createElement("div");
     div.className = "overlay-box";
@@ -1105,13 +1109,13 @@ async function runDetectOverlay(session) {
     div.style.height = Math.max(0.5, (box.y1 - box.y0) / natH * 100) + "%";
     div.setAttribute("role", "button");
     div.setAttribute("tabindex", "0");
-    div.addEventListener("click", () => onOverlayBoxClick(box, natH, div));
-    div.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOverlayBoxClick(box, natH, div); } });
+    div.addEventListener("click", () => onOverlayBoxClick(box, div));
+    div.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOverlayBoxClick(box, div); } });
     wrapEl.appendChild(div);
   });
 }
 
-function onOverlayBoxClick(box, natH, boxEl) {
+function onOverlayBoxClick(box, boxEl) {
   document.querySelectorAll(".overlay-box.active").forEach(b => b.classList.remove("active"));
   boxEl.classList.add("active");
 
@@ -1139,21 +1143,17 @@ function onOverlayBoxClick(box, natH, boxEl) {
     statusEl.className = "overlay-apply-status fail";
     return;
   }
-  const match = findBoxMatchInBody(resultEl.value, box, natH);
-  if (!match) {
-    // 실패 원인을 바로 진단할 수 있게 hint_text/신뢰도를 그대로 노출한다(2026-07-25,
-    // 사용자 요청 — "에러 메시지 기반으로 확인해줘").
-    const hint = (box.hint_text || "").trim();
-    const conf = typeof box.hint_confidence === "number" ? Math.round(box.hint_confidence * 100) : null;
-    statusEl.textContent = t("overlay_apply_not_found") + " " + t("overlay_hint_debug")(hint || "—", conf);
+  const span = mapOffsetsToBody(resultEl.value, box._offStart, box._offEnd);
+  if (!span) {
+    statusEl.textContent = t("overlay_apply_no_target");
     statusEl.className = "overlay-apply-status fail";
     return;
   }
-  // 찾은 구간을 본문에서 직접 선택해 보여준다 — 사용자가 그 자리를 바로 타이핑해 고칠 수
-  // 있다(2026-07-25부터 #result가 readonly가 아님). 매칭이 완벽하지 않을 수 있어 그대로
-  // 덮어쓰지 않고 "선택"만 해서 최종 판단은 사용자가 하게 둔다.
+  // 내용을 비교해서 "찾는" 게 아니라 순서·글자수 계산으로 바로 선택한다 — 그 자리 인식이
+  // 얼마나 틀렸든 실패하지 않는다(2026-07-25, 사용자 지적으로 설계 전환). 스케일 보정만
+  // 거친 추정치라 자동으로 덮어쓰지 않고 "선택"만 해서 최종 확인은 사용자가 하게 둔다.
   resultEl.focus();
-  resultEl.setSelectionRange(match.start, match.end);
+  resultEl.setSelectionRange(span.start, span.end);
   statusEl.textContent = t("overlay_match_found");
   statusEl.className = "overlay-apply-status ok";
 }
@@ -1168,79 +1168,59 @@ function stripWithIndexMap(s) {
   return { stripped: chars.join(""), origIndex };
 }
 
-// needle이 haystack 어딘가에 "끼워 맞춰지는(fitting)" 최적 구간을 편집 거리(레벤슈타인)
-// 기준으로 찾는다 — 표준 "free-start 근사 문자열 매칭" DP(1행을 0으로 초기화해 haystack
-// 어디서 시작해도 비용 0으로 취급). O(n·m)이라 본문 길이가 수천자 수준인 이 용도엔 충분히
-// 빠르다. EasyOCR hint_text는 글자 단위로는 자주 틀리지만(2026-07-24 실측 confidence
-// 0.1~0.3대), "이 언저리에 이 정도 길이의 텍스트가 있다"는 신호로는 편집 거리로 충분히
-// 걸러낼 수 있어 정확 일치 대신 이 방식을 쓴다.
-function fuzzyFitMatch(haystack, needle) {
-  const n = haystack.length, m = needle.length;
-  if (!m || !n) return null;
-  let prevCost = new Array(n + 1).fill(0);
-  let prevStart = Array.from({ length: n + 1 }, (_, i) => i);
-  for (let j = 1; j <= m; j++) {
-    const curCost = new Array(n + 1);
-    const curStart = new Array(n + 1);
-    curCost[0] = j;
-    curStart[0] = 0;
-    for (let i = 1; i <= n; i++) {
-      let best = prevCost[i - 1] + (needle[j - 1] === haystack[i - 1] ? 0 : 1); // 치환(또는 일치)
-      let bestStart = prevStart[i - 1];
-      const del = prevCost[i] + 1; // needle 글자 하나를 haystack 소비 없이 건너뜀
-      if (del < best) { best = del; bestStart = prevStart[i]; }
-      const ins = curCost[i - 1] + 1; // haystack 글자 하나를 needle 소비 없이 건너뜀
-      if (ins < best) { best = ins; bestStart = curStart[i - 1]; }
-      curCost[i] = best;
-      curStart[i] = bestStart;
+// 박스를 읽는 순서(세로로 줄을 나누고, 같은 줄 안에서는 가로 순서)로 정렬한다. "같은 줄"
+// 판정은 두 박스의 세로 중심 차이가 두 박스 평균 높이의 절반보다 작은지로 느슨하게 본다 —
+// 완벽한 레이아웃 분석은 아니지만 영수증·메모 같은 단순 문서엔 충분하다.
+function orderBoxesForReadingOrder(boxes) {
+  const items = boxes.map(b => ({ box: b, cy: (b.y0 + b.y1) / 2, h: Math.max(1, b.y1 - b.y0) }));
+  items.sort((a, b) => a.cy - b.cy);
+  const rows = [];
+  for (const item of items) {
+    const row = rows[rows.length - 1];
+    if (row && Math.abs(item.cy - row.avgCy) < (row.avgH + item.h) / 4) {
+      row.items.push(item);
+      row.avgCy = row.items.reduce((s, it) => s + it.cy, 0) / row.items.length;
+      row.avgH = row.items.reduce((s, it) => s + it.h, 0) / row.items.length;
+    } else {
+      rows.push({ items: [item], avgCy: item.cy, avgH: item.h });
     }
-    prevCost = curCost;
-    prevStart = curStart;
   }
-  // 동일 최소 비용을 내는 끝점이 여러 개면 가장 뒤쪽(<=)을 택한다 — 그래야 needle 마지막
-  // 글자가 haystack과 어긋날 때 "삭제"쪽으로 몰려 매칭 구간이 한 글자 짧게 잘리는 경계
-  // 오차를 피할 수 있다(실측 재현: needle 끝 1글자만 틀린 경우 <였다면 '기'가 잘려나갔음).
-  let bestEnd = -1, bestCost = Infinity;
-  for (let i = 1; i <= n; i++) {
-    if (prevCost[i] <= bestCost) { bestCost = prevCost[i]; bestEnd = i; }
+  const ordered = [];
+  for (const row of rows) {
+    row.items.sort((a, b) => a.box.x0 - b.box.x0);
+    for (const it of row.items) ordered.push(it.box);
   }
-  if (bestEnd === -1) return null;
-  return { start: prevStart[bestEnd], end: bestEnd, cost: bestCost };
+  return ordered;
 }
 
-// 박스 세로 중심의 이미지 내 비율로 본문 안 예상 위치를 추정한다 — 영수증·메모처럼 위→아래로
-// 읽는 단일 컬럼 문서를 가정한 휴리스틱. 다단 레이아웃·회전된 이미지에서는 어긋날 수 있어
-// findBoxMatchInBody가 이 창에서 못 찾으면 전체 본문으로 폴백한다.
-function estimateBodyWindow(box, natHeight, strippedLen) {
-  const cy = (box.y0 + box.y1) / 2;
-  const frac = natHeight > 0 ? Math.min(1, Math.max(0, cy / natHeight)) : 0.5;
-  const center = Math.round(frac * strippedLen);
-  const half = Math.max(80, Math.round(strippedLen * 0.25));
-  return { from: Math.max(0, center - half), to: Math.min(strippedLen, center + half) };
+// 읽기 순서대로 정렬된 박스들에 본문(공백 제거 기준) 오프셋을 매긴다 — 각 박스의 hint_text
+// 길이(EasyOCR, 내용은 못 믿어도 길이는 대략적인 신호가 됨)를 누적합해서 계산한다. 박스
+// 전체 글자수 합과 본문 실제 길이가 다를 수 있어(둘 다 독립적으로 인식 오차가 있으므로)
+// bodyStrippedLen에 맞춰 비율로 스케일 보정한다 — 전체적으로 더 많이/적게 인식됐어도 상대
+// 위치는 유지된다. box 객체에 직접 _offStart/_offEnd를 붙인다(참조 공유라 원본에도 반영됨).
+function assignBoxOffsets(orderedBoxes, bodyStrippedLen) {
+  const lens = orderedBoxes.map(b => Math.max(1, (b.hint_text || "").replace(/\s+/g, "").length));
+  const total = lens.reduce((a, c) => a + c, 0);
+  const scale = total > 0 && bodyStrippedLen > 0 ? bodyStrippedLen / total : 1;
+  let cursor = 0;
+  orderedBoxes.forEach((box, i) => {
+    box._offStart = Math.round(cursor * scale);
+    cursor += lens[i];
+    box._offEnd = Math.round(cursor * scale);
+  });
 }
 
-// 박스 하나에 해당하는 본문 구간을 찾는다 — hint_text(EasyOCR, 저신뢰도)를 검색 키로 쓰되
-// 정확 일치가 아니라 편집 거리 근사 매칭을 쓴다. 오탐 방지를 위해 먼저 박스 위치 근처만
-// 느슨한 기준(60% 이내)으로 훑고, 못 찾으면 전체 본문을 더 엄격한 기준(45% 이내)으로 재시도.
-// 짧은 한글 단어는 EasyOCR 오류 한두 글자만으로 비율이 쉽게 30~50%를 넘어(실측 확인) 예전
-// 임계값(0.5/0.3)에서는 정상적인 경우도 자주 실패했다.
-function findBoxMatchInBody(bodyText, box, natHeight) {
-  const needle = (box.hint_text || "").trim().replace(/\s+/g, "");
-  if (needle.length < 2) return null; // 1글자 이하는 아무 데나 우연히 맞아떨어지기 쉬워 매칭 자체를 시도하지 않음
-  const { stripped: hs, origIndex } = stripWithIndexMap(bodyText);
-  if (!hs.length) return null;
-
-  const tryMatch = (from, to, maxRatio) => {
-    if (to - from < needle.length) return null;
-    const m = fuzzyFitMatch(hs.slice(from, to), needle);
-    if (!m || m.end <= m.start) return null;
-    const ratio = m.cost / needle.length;
-    if (ratio > maxRatio) return null;
-    return { start: origIndex[from + m.start], end: origIndex[from + m.end - 1] + 1 };
-  };
-
-  const win = estimateBodyWindow(box, natHeight, hs.length);
-  return tryMatch(win.from, win.to, 0.6) || tryMatch(0, hs.length, 0.45);
+// box._offStart/_offEnd(공백 제거 기준 오프셋)를 본문 원본 문자열의 실제 인덱스로 변환한다.
+function mapOffsetsToBody(bodyText, offStart, offEnd) {
+  if (typeof offStart !== "number" || typeof offEnd !== "number") return null;
+  const { stripped, origIndex } = stripWithIndexMap(bodyText);
+  const n = stripped.length;
+  if (n === 0) return null;
+  const s = Math.max(0, Math.min(offStart, n));
+  const e = Math.max(s, Math.min(Math.max(offEnd, s + 1), n));
+  const start = origIndex[Math.min(s, n - 1)];
+  const end = origIndex[e - 1] + 1;
+  return { start, end: Math.max(end, start + 1) };
 }
 
 async function maybeRunDetectOverlay(session) {
