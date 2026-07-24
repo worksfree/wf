@@ -130,8 +130,7 @@ table.rcp-table td input:hover { background:var(--surface); }
 .overlay-crop-thumb-wrap { flex-shrink:0; width:110px; }
 .overlay-crop-thumb-wrap img { width:100%; display:block; border-radius:6px; border:1px solid var(--border); }
 .overlay-crop-result { flex:1; min-width:0; }
-.overlay-crop-result textarea { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--surface2); color:var(--text); font-family:inherit; font-size:13px; resize:vertical; margin-bottom:8px; }
-.overlay-apply-status { font-size:11.5px; margin-top:6px; min-height:1.2em; }
+.overlay-apply-status { font-size:11.5px; margin-bottom:8px; min-height:1.2em; }
 .overlay-apply-status.ok { color:var(--green); }
 .overlay-apply-status.fail { color:var(--amber); }
 .rcp-addr-note { font-size:11px; margin-top:2px; }
@@ -316,21 +315,17 @@ table.rcp-table td input:hover { background:var(--surface); }
             <button class="copy-btn" type="button" id="downloadBtn">다운로드</button>
           </div>
         </div>
-        <textarea id="result" readonly aria-labelledby="result-h"></textarea>
+        <textarea id="result" aria-labelledby="result-h"></textarea>
       </div>
 
       <div class="detect-overlay-wrap" id="detectOverlayWrap" style="display:none;">
         <div class="overlay-crop-panel" id="overlayCropPanel" style="display:none;">
           <div class="overlay-crop-thumb-wrap"><img id="overlayCropThumb" alt=""></div>
           <div class="overlay-crop-result">
-            <label class="sr" for="overlayCropText" id="overlay-crop-text-label">재인식 결과(수정 가능)</label>
-            <textarea id="overlayCropText" rows="2"></textarea>
+            <div class="overlay-apply-status" id="overlayApplyStatus" aria-live="polite"></div>
             <div class="btn-group">
-              <button class="copy-btn" type="button" id="overlayApplyBtn">본문에 반영</button>
-              <button class="copy-btn" type="button" id="overlayCropCopyBtn">복사</button>
               <button class="copy-btn" type="button" id="overlayCropCloseBtn">닫기</button>
             </div>
-            <div class="overlay-apply-status" id="overlayApplyStatus" aria-live="polite"></div>
           </div>
         </div>
       </div>
@@ -400,17 +395,16 @@ const I18N = {
     detect_mode_label:"🔬 정밀 교정 모드(베타) — 인식 위치를 이미지 위에 표시",
     detect_mode_hint:"단건 처리에서만 동작합니다. 인식이 끝나면 이미지 위에 글자 위치를 박스로 표시하고, 박스를 클릭하면 그 부분만 다시 확인할 수 있습니다. 지금은 테스트 기능입니다.",
     detect_overlay_h:"🔍 인식 위치 확인",
-    overlay_hint:"박스를 클릭하면 본문에서 해당 위치를 찾아 보여줍니다",
-    overlay_crop_text_label:"매칭된 텍스트(수정 가능)",
+    overlay_hint:"박스를 클릭하면 본문에서 해당 위치를 찾아 선택해 줍니다 — 못 찾아도 본문을 직접 수정할 수 있습니다",
     detect_loading:"위치 감지 중...",
     detect_done:(n)=>`${n}개 위치 감지됨 — 박스를 클릭해 보세요`,
     detect_failed:"위치 감지에 실패했습니다.",
     detect_offline:"감지 서버가 꺼져 있습니다. PC에서 감지 서버를 켜주세요.",
     detect_plan_required:"이 기능은 준비 중입니다.",
-    overlay_apply_btn:"본문에 반영",
-    overlay_apply_no_target:"텍스트 결과가 없어 반영할 수 없습니다(CSV/엑셀 출력은 아래 표를 직접 수정해 주세요).",
-    overlay_apply_not_found:"본문에서 이 위치에 해당하는 문구를 찾지 못했습니다 — 직접 본문에서 찾아 수정해 주세요.",
-    overlay_apply_done:"✓ 본문에 반영했습니다.",
+    overlay_apply_no_target:"텍스트 결과가 없습니다(CSV/엑셀 출력은 아래 표를 직접 수정해 주세요).",
+    overlay_apply_not_found:"본문에서 이 위치에 해당하는 문구를 자동으로 찾지 못했습니다 — 아래 본문에서 직접 찾아 수정해 주세요.",
+    overlay_hint_debug:(hint, conf)=>`(감지된 참고 텍스트: "${hint}"${conf===null?"":`, 신뢰도 ${conf}%`})`,
+    overlay_match_found:"✓ 본문에서 해당 위치를 찾아 선택했습니다 — 그대로 타이핑해 수정하세요.",
     rcp_edit_hint:"아래 값과 품목을 직접 수정할 수 있습니다 — 수정한 내용이 엑셀 다운로드에 반영됩니다.",
     lbl_doctype:"문서 유형(권장값 자동 채움)",
     opt_dt_manual:"수동 조정",
@@ -487,17 +481,16 @@ const I18N = {
     detect_mode_label:"🔬 Precision review mode (beta) — show recognized text positions on the image",
     detect_mode_hint:"Only works in single mode. After recognition finishes, text positions are shown as boxes on the image — click a box to re-check just that spot. This is a test feature for now.",
     detect_overlay_h:"🔍 Review recognized positions",
-    overlay_hint:"Click a box to find that spot in the text below",
-    overlay_crop_text_label:"Matched text (editable)",
+    overlay_hint:"Click a box to find and select that spot in the text below — if it's not found, you can still edit the text directly",
     detect_loading:"Detecting positions...",
     detect_done:(n)=>`${n} position(s) detected — click a box`,
     detect_failed:"Position detection failed.",
     detect_offline:"The detection server is offline. Please start it on the PC.",
     detect_plan_required:"This feature is coming soon.",
-    overlay_apply_btn:"Apply to text",
-    overlay_apply_no_target:"No text result to apply to (for CSV/Excel output, edit the table below directly).",
-    overlay_apply_not_found:"Couldn't find text matching this position — please find and edit it in the text manually.",
-    overlay_apply_done:"✓ Applied to the text.",
+    overlay_apply_no_target:"No text result yet (for CSV/Excel output, edit the table below directly).",
+    overlay_apply_not_found:"Couldn't automatically find text matching this position — please find and edit it in the text below manually.",
+    overlay_hint_debug:(hint, conf)=>`(detected hint text: "${hint}"${conf===null?"":`, confidence ${conf}%`})`,
+    overlay_match_found:"✓ Found and selected the matching spot in the text — type to edit it.",
     rcp_edit_hint:"You can edit the values and items below — changes are reflected in the Excel download.",
     lbl_doctype:"Document type (auto-fills recommended values)",
     opt_dt_manual:"Manual",
@@ -590,8 +583,6 @@ function applyLang() {
   document.getElementById("settings-shared-hint").textContent = t("settings_shared_hint");
   document.getElementById("detect-mode-label").textContent = t("detect_mode_label");
   document.getElementById("detect-mode-hint").textContent = t("detect_mode_hint");
-  document.getElementById("overlay-crop-text-label").textContent = t("overlay_crop_text_label");
-  document.getElementById("overlayApplyBtn").textContent = t("overlay_apply_btn");
   document.getElementById("rcp-edit-hint").textContent = t("rcp_edit_hint");
   document.getElementById("lbl-fmt").textContent = t("lbl_fmt");
   document.getElementById("opt-text").textContent = t("opt_text");
@@ -1042,18 +1033,27 @@ async function runSinglePipeline(images, session, fmt) {
    그래서 크롭 재인식을 버리고, hint_text를 "글자 그대로는 못 믿어도 위치 힌트로는 쓸모
    있다"는 용도로 바꿔 쓴다 — 편집 거리(레벤슈타인) 기반 근사 매칭(fuzzyFitMatch)으로 이미
    신뢰도가 검증된 전체 본문 텍스트(올mOCR-2 결과) 안에서 그 박스에 해당하는 구간을 찾는다.
-   이러면 (1) 크롭을 다시 인식할 필요가 없어 응답이 즉시 오고 모델 품질 저하 위험도 없으며,
-   (2) 박스↔본문 구간이 인덱스 단위로 정확히 매칭되어 편집 필드에서 고친 내용을 바로 그
-   구간에 반영할 수 있다(문자열 재검색 불필요 — 같은 문구가 본문에 여러 번 나와도 안전).
+
+   1차 구현(같은 날)은 찾은 구간을 별도 편집 필드에 복사해 "본문에 반영" 버튼으로 옮기는
+   2단계 방식이었는데, 매칭이 실패하면(EasyOCR 힌트가 아예 엉뚱하거나 그 자리의 본문 자체가
+   오인식된 경우 — 정확히 이 기능이 고쳐야 할 사례에서 오히려 실패하기 쉬움) 편집이 완전히
+   막혀버리는 문제가 실기기 테스트로 확인됨(2026-07-25). 그래서 본문(#result)을 아예
+   직접 편집 가능하게 바꾸고, 박스 클릭은 "본문에서 해당 구간을 찾아 선택해 주는 내비게이션
+   보조" 역할로 축소했다 — 매칭에 실패해도 사용자가 본문을 스크롤해 직접 고치는 경로가 항상
+   열려 있어 막히지 않는다. 매칭 실패 시에는 hint_text와 신뢰도를 상태 메시지에 그대로
+   노출해 "왜 못 찾았는지"를 바로 진단할 수 있게 했다.
+
    오탐 방지를 위해 먼저 박스의 세로 위치 비율로 본문 안 예상 구간(단일 컬럼 문서 가정)만
-   느슨한 기준으로 훑고, 못 찾으면 전체 본문을 더 엄격한 기준으로 재시도한다.
+   느슨한 기준으로 훑고, 못 찾으면 전체 본문을 더 엄격한 기준으로 재시도한다. 짧은 한글
+   단어(2~4음절)는 EasyOCR 오류 한두 글자만으로도 편집거리 비율이 쉽게 30~50%를 넘는 걸
+   실측으로 확인해 임계값을 다소 넉넉히 잡았다(0.6/0.45) — 그래도 실패하는 경우가 있을 수
+   있는데, 그건 위 폴백(본문 직접 편집)으로 커버된다.
 
    PDF는 페이지가 여러 장이라 미지원(_lastProcessedCanvas가 이미지 단건일 때만 채워짐).
    박스는 별도 이미지가 아니라 기존 미리보기(previewImgWrap) 위에 그린다 — 확대/축소·
    회전과 항상 같은 이미지를 보게 하기 위함(사용자 요청, 2026-07-24). 미리보기 자체도
    이제 원본이 아니라 "실제로 인식에 들어간" 처리된 이미지를 보여주도록 handleFile에서
    맞춰 놨다 — 그래야 박스 좌표(처리된 이미지 기준)와 화면에 보이는 이미지가 일치한다. */
-let _lastMatchSpan = null; // 클릭한 박스가 본문에서 찾은 구간 {start,end} — "본문에 반영" 시 이 위치를 그대로 치환
 
 function clearOverlayBoxes() {
   document.getElementById("previewImgWrap").querySelectorAll(".overlay-box").forEach(b => b.remove());
@@ -1063,7 +1063,6 @@ function hideDetectOverlay() {
   document.getElementById("detectOverlayWrap").style.display = "none";
   document.getElementById("overlayCropPanel").style.display = "none";
   document.getElementById("detectOverlayStatus").textContent = "";
-  _lastMatchSpan = null;
   clearOverlayBoxes();
 }
 
@@ -1118,11 +1117,10 @@ function onOverlayBoxClick(box, natH, boxEl) {
 
   const panel = document.getElementById("overlayCropPanel");
   const thumb = document.getElementById("overlayCropThumb");
-  const textEl = document.getElementById("overlayCropText");
   const statusEl = document.getElementById("overlayApplyStatus");
   statusEl.textContent = "";
+  statusEl.className = "overlay-apply-status";
   panel.style.display = "flex";
-  _lastMatchSpan = null;
 
   const pad = 6; // 박스 경계에 글자가 살짝 걸리는 걸 방지하는 여유 패딩(시각적 확인용 썸네일)
   const x0 = Math.max(0, box.x0 - pad), y0 = Math.max(0, box.y0 - pad);
@@ -1137,20 +1135,27 @@ function onOverlayBoxClick(box, natH, boxEl) {
 
   const resultEl = document.getElementById("result");
   if (document.getElementById("resultWrap").style.display === "none") {
-    textEl.value = "";
     statusEl.textContent = t("overlay_apply_no_target");
     statusEl.className = "overlay-apply-status fail";
     return;
   }
   const match = findBoxMatchInBody(resultEl.value, box, natH);
   if (!match) {
-    textEl.value = "";
-    statusEl.textContent = t("overlay_apply_not_found");
+    // 실패 원인을 바로 진단할 수 있게 hint_text/신뢰도를 그대로 노출한다(2026-07-25,
+    // 사용자 요청 — "에러 메시지 기반으로 확인해줘").
+    const hint = (box.hint_text || "").trim();
+    const conf = typeof box.hint_confidence === "number" ? Math.round(box.hint_confidence * 100) : null;
+    statusEl.textContent = t("overlay_apply_not_found") + " " + t("overlay_hint_debug")(hint || "—", conf);
     statusEl.className = "overlay-apply-status fail";
     return;
   }
-  _lastMatchSpan = match;
-  textEl.value = resultEl.value.slice(match.start, match.end);
+  // 찾은 구간을 본문에서 직접 선택해 보여준다 — 사용자가 그 자리를 바로 타이핑해 고칠 수
+  // 있다(2026-07-25부터 #result가 readonly가 아님). 매칭이 완벽하지 않을 수 있어 그대로
+  // 덮어쓰지 않고 "선택"만 해서 최종 판단은 사용자가 하게 둔다.
+  resultEl.focus();
+  resultEl.setSelectionRange(match.start, match.end);
+  statusEl.textContent = t("overlay_match_found");
+  statusEl.className = "overlay-apply-status ok";
 }
 
 // 공백을 제거한 문자열과, 그 각 글자가 원본에서 몇 번째 인덱스였는지의 매핑을 함께 만든다.
@@ -1216,10 +1221,12 @@ function estimateBodyWindow(box, natHeight, strippedLen) {
 
 // 박스 하나에 해당하는 본문 구간을 찾는다 — hint_text(EasyOCR, 저신뢰도)를 검색 키로 쓰되
 // 정확 일치가 아니라 편집 거리 근사 매칭을 쓴다. 오탐 방지를 위해 먼저 박스 위치 근처만
-// 느슨한 기준(50% 이내)으로 훑고, 못 찾으면 전체 본문을 더 엄격한 기준(30% 이내)으로 재시도.
+// 느슨한 기준(60% 이내)으로 훑고, 못 찾으면 전체 본문을 더 엄격한 기준(45% 이내)으로 재시도.
+// 짧은 한글 단어는 EasyOCR 오류 한두 글자만으로 비율이 쉽게 30~50%를 넘어(실측 확인) 예전
+// 임계값(0.5/0.3)에서는 정상적인 경우도 자주 실패했다.
 function findBoxMatchInBody(bodyText, box, natHeight) {
   const needle = (box.hint_text || "").trim().replace(/\s+/g, "");
-  if (!needle) return null;
+  if (needle.length < 2) return null; // 1글자 이하는 아무 데나 우연히 맞아떨어지기 쉬워 매칭 자체를 시도하지 않음
   const { stripped: hs, origIndex } = stripWithIndexMap(bodyText);
   if (!hs.length) return null;
 
@@ -1233,28 +1240,7 @@ function findBoxMatchInBody(bodyText, box, natHeight) {
   };
 
   const win = estimateBodyWindow(box, natHeight, hs.length);
-  return tryMatch(win.from, win.to, 0.5) || tryMatch(0, hs.length, 0.3);
-}
-
-// 편집 필드 내용을 클릭 시점에 찾아 둔 본문 구간(_lastMatchSpan)에 그대로 치환한다 — 문자열을
-// 다시 검색하지 않으므로 같은 문구가 본문에 여러 번 나와도 엉뚱한 곳을 바꿀 위험이 없다.
-// CSV/엑셀(구조화된 필드)은 이 방식이 안 맞아 대상에서 제외 — 그쪽은 rcpFields를 직접
-// 편집하는 방식으로 별도 처리.
-function applyOverlayEditToResult() {
-  const statusEl = document.getElementById("overlayApplyStatus");
-  const editedText = document.getElementById("overlayCropText").value;
-  const resultEl = document.getElementById("result");
-
-  if (!_lastMatchSpan) {
-    statusEl.textContent = t("overlay_apply_not_found");
-    statusEl.className = "overlay-apply-status fail";
-    return;
-  }
-  const { start, end } = _lastMatchSpan;
-  resultEl.value = resultEl.value.slice(0, start) + editedText + resultEl.value.slice(end);
-  _lastMatchSpan = { start, end: start + editedText.length }; // 같은 박스를 연속으로 반영해도 위치 유지
-  statusEl.textContent = t("overlay_apply_done");
-  statusEl.className = "overlay-apply-status ok";
+  return tryMatch(win.from, win.to, 0.6) || tryMatch(0, hs.length, 0.45);
 }
 
 async function maybeRunDetectOverlay(session) {
@@ -1696,10 +1682,6 @@ document.getElementById("sharpenRange").addEventListener("input", (e) => {
   updateDocTypeHint();
 });
 
-document.getElementById("overlayApplyBtn").addEventListener("click", applyOverlayEditToResult);
-document.getElementById("overlayCropCopyBtn").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(document.getElementById("overlayCropText").value); } catch (e) {}
-});
 document.getElementById("overlayCropCloseBtn").addEventListener("click", () => {
   document.getElementById("overlayCropPanel").style.display = "none";
   document.querySelectorAll(".overlay-box.active").forEach(b => b.classList.remove("active"));
