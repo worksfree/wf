@@ -2077,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.8.4';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.8.5';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -3681,9 +3681,15 @@ function onAuthComplete() {
   updateAuthUI();
 
   // ── 계정 전환 감지 ────────────────────────────────────────────────────
-  // 다른 사용자로 로그인하면 이전 고권한 콘텐츠를 즉시 차단하고 홈으로 귀환
+  // 다른 사용자로 로그인하면 이전 고권한 콘텐츠를 즉시 차단하고 홈으로 귀환.
+  // 단, 스크립트가 막 로드된 뒤의 "첫" onAuthComplete()는 전환으로 치지 않는다 —
+  // _prevAuthUserId는 매 새로고침마다 null로 초기화되므로, 로그인 상태가 그대로
+  // 복원된 경우에도 null≠실제ID라 "전환됨"으로 오판해 방금 sessionStorage로
+  // 복원한 페이지를 홈으로 덮어써 버리는 버그가 있었다(모바일에서 카메라 촬영 후
+  // 탭이 재로드되며 이 경로를 타 OCR→홈으로 튕기는 것으로 실측 확인, 2026-07-24).
+  const _isFirstAuthComplete = !_initialNavDone;
   const _curUserId = authUser?.id ?? null;
-  const _userChanged = _prevAuthUserId !== _curUserId;
+  const _userChanged = !_isFirstAuthComplete && _prevAuthUserId !== _curUserId;
   _prevAuthUserId = _curUserId;
 
   refreshTreeAndCards();
