@@ -105,6 +105,19 @@ table.rcp-table th, table.rcp-table td { border:1px solid var(--border); padding
 table.rcp-table th { background:var(--blue-bg); color:var(--blue); font-weight:600; }
 table.rcp-table td.num { text-align:right; }
 .rcp-warn { color:var(--amber); font-size:11px; margin-top:6px; }
+
+/* 정밀 교정(베타) — 인식 위치 오버레이 */
+.detect-overlay-wrap { margin-top:14px; }
+.overlay-img-container { position:relative; display:inline-block; width:100%; border-radius:10px; overflow:hidden; border:1px solid var(--border); background:var(--surface); }
+.overlay-img-container img { display:block; width:100%; height:auto; }
+.overlay-box { position:absolute; border:2px solid rgba(59,130,246,.85); background:rgba(59,130,246,.10); cursor:pointer; }
+.overlay-box:hover, .overlay-box.active { background:rgba(59,130,246,.32); border-color:#93c5fd; }
+.overlay-hint { font-size:11.5px; color:var(--hint); margin-top:6px; }
+.overlay-crop-panel { display:flex; gap:12px; margin-top:12px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--surface); align-items:flex-start; }
+.overlay-crop-thumb-wrap { flex-shrink:0; width:110px; }
+.overlay-crop-thumb-wrap img { width:100%; display:block; border-radius:6px; border:1px solid var(--border); }
+.overlay-crop-result { flex:1; min-width:0; }
+.overlay-crop-result textarea { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--surface2); color:var(--text); font-family:inherit; font-size:13px; resize:vertical; margin-bottom:8px; }
 .rcp-addr-note { font-size:11px; margin-top:2px; }
 .rcp-addr-note.ok { color:var(--green); }
 .rcp-addr-note.low { color:var(--amber); }
@@ -177,6 +190,11 @@ table.rcp-table td.num { text-align:right; }
           <input type="checkbox" id="includeRaw" checked>
           <label for="includeRaw" id="include-raw-label">원본 인식 텍스트도 함께 저장(검증용, 엑셀 출력 시)</label>
         </div>
+        <div class="setting-check" id="detectModeRow">
+          <input type="checkbox" id="detectModeToggle">
+          <label for="detectModeToggle" id="detect-mode-label">🔬 정밀 교정 모드(베타) — 인식 위치를 이미지 위에 표시</label>
+        </div>
+        <div class="setting-hint" id="detect-mode-hint"></div>
         <div class="settings-shared-hint" id="settings-shared-hint">이 설정은 단건·다건 처리에 공통 적용됩니다. 단건에서 파일 하나로 미리 결과를 확인한 뒤 다건으로 넘어가면 같은 설정으로 처리됩니다.</div>
       </div>
     </div>
@@ -262,6 +280,28 @@ table.rcp-table td.num { text-align:right; }
         <textarea id="result" readonly aria-labelledby="result-h"></textarea>
       </div>
 
+      <div class="detect-overlay-wrap" id="detectOverlayWrap" style="display:none;">
+        <div class="result-head">
+          <h2 id="detect-overlay-h">🔍 인식 위치 확인</h2>
+          <span id="detectOverlayStatus" style="font-size:12px;color:var(--hint);" aria-live="polite"></span>
+        </div>
+        <div class="overlay-img-container" id="overlayImgContainer">
+          <img id="overlayImg" alt="">
+        </div>
+        <div class="overlay-hint" id="overlay-hint">박스를 클릭하면 그 부분만 다시 확인합니다</div>
+        <div class="overlay-crop-panel" id="overlayCropPanel" style="display:none;">
+          <div class="overlay-crop-thumb-wrap"><img id="overlayCropThumb" alt=""></div>
+          <div class="overlay-crop-result">
+            <label class="sr" for="overlayCropText" id="overlay-crop-text-label">재인식 결과(수정 가능)</label>
+            <textarea id="overlayCropText" rows="2"></textarea>
+            <div class="btn-group">
+              <button class="copy-btn" type="button" id="overlayCropCopyBtn">복사</button>
+              <button class="copy-btn" type="button" id="overlayCropCloseBtn">닫기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="result-wrap" id="rcpResultWrap" style="display:none;">
         <div class="result-head">
           <h2 id="rcp-result-h">인식 결과</h2>
@@ -322,6 +362,18 @@ const I18N = {
     drop_hint_bulk:"또는 이 영역에 여러 파일을 끌어다 놓으세요",
     settings_label:"⚙ 설정",
     settings_shared_hint:"이 설정은 단건·다건 처리에 공통 적용됩니다. 단건에서 파일 하나로 미리 결과를 확인한 뒤 다건으로 넘어가면 같은 설정으로 처리됩니다.",
+    detect_mode_label:"🔬 정밀 교정 모드(베타) — 인식 위치를 이미지 위에 표시",
+    detect_mode_hint:"단건 처리에서만 동작합니다. 인식이 끝나면 이미지 위에 글자 위치를 박스로 표시하고, 박스를 클릭하면 그 부분만 다시 확인할 수 있습니다. 지금은 테스트 기능입니다.",
+    detect_overlay_h:"🔍 인식 위치 확인",
+    overlay_hint:"박스를 클릭하면 그 부분만 다시 확인합니다",
+    overlay_crop_text_label:"재인식 결과(수정 가능)",
+    detect_loading:"위치 감지 중...",
+    detect_done:(n)=>`${n}개 위치 감지됨 — 박스를 클릭해 보세요`,
+    detect_failed:"위치 감지에 실패했습니다.",
+    detect_offline:"감지 서버가 꺼져 있습니다. PC에서 감지 서버를 켜주세요.",
+    detect_plan_required:"이 기능은 준비 중입니다.",
+    detect_recognizing:"재인식 중...",
+    detect_recognize_failed:"재인식에 실패했습니다.",
     lbl_doctype:"문서 유형(권장값 자동 채움)",
     opt_dt_manual:"수동 조정",
     opt_dt_photo_receipt:"📱 촬영 — 영수증/전표",
@@ -394,6 +446,18 @@ const I18N = {
     drop_hint_bulk:"or drag and drop multiple files here",
     settings_label:"⚙ Settings",
     settings_shared_hint:"These settings apply to both single and batch processing. Preview a sample in single mode first, then switch to batch — it'll use the same settings.",
+    detect_mode_label:"🔬 Precision review mode (beta) — show recognized text positions on the image",
+    detect_mode_hint:"Only works in single mode. After recognition finishes, text positions are shown as boxes on the image — click a box to re-check just that spot. This is a test feature for now.",
+    detect_overlay_h:"🔍 Review recognized positions",
+    overlay_hint:"Click a box to re-check just that spot",
+    overlay_crop_text_label:"Re-recognition result (editable)",
+    detect_loading:"Detecting positions...",
+    detect_done:(n)=>`${n} position(s) detected — click a box`,
+    detect_failed:"Position detection failed.",
+    detect_offline:"The detection server is offline. Please start it on the PC.",
+    detect_plan_required:"This feature is coming soon.",
+    detect_recognizing:"Re-recognizing...",
+    detect_recognize_failed:"Re-recognition failed.",
     lbl_doctype:"Document type (auto-fills recommended values)",
     opt_dt_manual:"Manual",
     opt_dt_photo_receipt:"📱 Photo — receipt/invoice",
@@ -480,6 +544,11 @@ function applyLang() {
   document.getElementById("drop-hint-bulk").textContent = t("drop_hint_bulk");
   document.getElementById("settings-label").textContent = t("settings_label");
   document.getElementById("settings-shared-hint").textContent = t("settings_shared_hint");
+  document.getElementById("detect-mode-label").textContent = t("detect_mode_label");
+  document.getElementById("detect-mode-hint").textContent = t("detect_mode_hint");
+  document.getElementById("detect-overlay-h").textContent = t("detect_overlay_h");
+  document.getElementById("overlay-hint").textContent = t("overlay_hint");
+  document.getElementById("overlay-crop-text-label").textContent = t("overlay_crop_text_label");
   document.getElementById("lbl-fmt").textContent = t("lbl_fmt");
   document.getElementById("opt-text").textContent = t("opt_text");
   document.getElementById("opt-md").textContent = t("opt_md");
@@ -531,6 +600,7 @@ function switchMode(mode) {
   document.getElementById("resultWrap").style.display = "none";
   document.getElementById("rcpResultWrap").style.display = "none";
   document.getElementById("batchWrap").classList.remove("show");
+  hideDetectOverlay();
   setStatus(document.getElementById("status"), null, false);
 }
 function updateFormatHint() {
@@ -681,6 +751,14 @@ async function callReceipt(session, imageBase64) {
   let data = {}; try { data = await resp.json(); } catch {}
   return { resp, data };
 }
+async function callDetect(session, imageBase64) {
+  const resp = await fetch(`${OCR_BASE_URL}/detect`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ access_token: session.access_token, image_base64: imageBase64 }),
+  });
+  let data = {}; try { data = await resp.json(); } catch {}
+  return { resp, data };
+}
 function applyErrorStatus(status, resp, data) {
   if (resp.status === 401 || data.error === "unauthenticated" || data.error === "invalid_session") setStatus(status, "login_required", true);
   else if (resp.status === 429 || data.error === "rate_limited") setStatus(status, "rate_limited", true);
@@ -772,10 +850,12 @@ function setIntegerFormat(ws) {
 
 let _currentFile = null, _currentIsPdf = false, _currentImgEl = null, _rotationDeg = 0, _rotateBusy = false;
 let _rcpSingleData = null;
+let _lastProcessedCanvas = null; // 정밀 교정(베타) 오버레이/크롭용 — PDF는 페이지가 여러 장이라 미지원
 
 async function buildSingleImages(rotationDeg, onFirstPage) {
   const contrastPct = currentContrastPct(), sharpenPct = currentSharpenPct();
   if (_currentIsPdf) {
+    _lastProcessedCanvas = null;
     const buf = await _currentFile.arrayBuffer();
     if (!_currentFile._pdfDoc) _currentFile._pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
     const pdfDoc = _currentFile._pdfDoc;
@@ -788,6 +868,7 @@ async function buildSingleImages(rotationDeg, onFirstPage) {
     return images;
   }
   const canvas = buildProcessedCanvas(_currentImgEl, rotationDeg, contrastPct, sharpenPct);
+  _lastProcessedCanvas = canvas;
   const b64 = canvasToBase64(canvas);
   if (onFirstPage) onFirstPage(b64);
   return [b64];
@@ -882,12 +963,108 @@ async function runSinglePipeline(images, session, fmt) {
   }
 }
 
+/* ───────── 정밀 교정(베타) — 인식 위치 오버레이 ─────────
+   위치 탐지는 PC 로컬 EasyOCR 감지 서버(workers/ocr-detect-pc)가 맡고, 거기서 나온
+   텍스트는 신뢰도가 낮아 쓰지 않는다(2026-07-24 실측 확인) — 박스 좌표만 쓰고, 박스를
+   클릭하면 그 영역만 크롭해 이미 검증된 /ocr(올mOCR-2)로 다시 인식한다. PDF는 페이지가
+   여러 장이라 미지원(_lastProcessedCanvas가 이미지 단건일 때만 채워짐). */
+function hideDetectOverlay() {
+  document.getElementById("detectOverlayWrap").style.display = "none";
+  document.getElementById("overlayCropPanel").style.display = "none";
+  document.getElementById("overlayImgContainer").querySelectorAll(".overlay-box").forEach(b => b.remove());
+}
+
+async function runDetectOverlay(session) {
+  if (!_lastProcessedCanvas) { hideDetectOverlay(); return; }
+  const wrap = document.getElementById("detectOverlayWrap");
+  const statusEl = document.getElementById("detectOverlayStatus");
+  const img = document.getElementById("overlayImg");
+  const container = document.getElementById("overlayImgContainer");
+
+  wrap.style.display = "block";
+  container.querySelectorAll(".overlay-box").forEach(b => b.remove());
+  document.getElementById("overlayCropPanel").style.display = "none";
+  statusEl.textContent = t("detect_loading");
+
+  const b64 = canvasToBase64(_lastProcessedCanvas);
+  img.src = "data:image/png;base64," + b64;
+
+  let resp, data;
+  try {
+    ({ resp, data } = await callDetect(session, b64));
+  } catch (e) {
+    console.error("[ocr] detect exception:", e);
+    statusEl.textContent = t("detect_failed");
+    return;
+  }
+  if (!resp.ok || !data.ok) {
+    if (resp.status === 503 || data.error === "pc_offline") statusEl.textContent = t("detect_offline");
+    else if (resp.status === 403 || data.error === "plan_required") statusEl.textContent = t("detect_plan_required");
+    else statusEl.textContent = t("detect_failed");
+    return;
+  }
+
+  statusEl.textContent = t("detect_done")(data.boxes.length);
+  const natW = _lastProcessedCanvas.width, natH = _lastProcessedCanvas.height;
+  data.boxes.forEach((box) => {
+    const div = document.createElement("div");
+    div.className = "overlay-box";
+    div.style.left = (box.x0 / natW * 100) + "%";
+    div.style.top = (box.y0 / natH * 100) + "%";
+    div.style.width = Math.max(0.5, (box.x1 - box.x0) / natW * 100) + "%";
+    div.style.height = Math.max(0.5, (box.y1 - box.y0) / natH * 100) + "%";
+    div.setAttribute("role", "button");
+    div.setAttribute("tabindex", "0");
+    div.addEventListener("click", () => onOverlayBoxClick(box, session, div));
+    div.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOverlayBoxClick(box, session, div); } });
+    container.appendChild(div);
+  });
+}
+
+async function onOverlayBoxClick(box, session, boxEl) {
+  document.querySelectorAll(".overlay-box.active").forEach(b => b.classList.remove("active"));
+  boxEl.classList.add("active");
+
+  const panel = document.getElementById("overlayCropPanel");
+  const thumb = document.getElementById("overlayCropThumb");
+  const textEl = document.getElementById("overlayCropText");
+  panel.style.display = "flex";
+  textEl.value = t("detect_recognizing");
+
+  const pad = 6; // 박스 경계에 글자가 살짝 걸리는 걸 방지하는 여유 패딩
+  const x0 = Math.max(0, box.x0 - pad), y0 = Math.max(0, box.y0 - pad);
+  const x1 = Math.min(_lastProcessedCanvas.width, box.x1 + pad);
+  const y1 = Math.min(_lastProcessedCanvas.height, box.y1 + pad);
+  const w = Math.max(1, Math.round(x1 - x0)), h = Math.max(1, Math.round(y1 - y0));
+
+  const cropCanvas = document.createElement("canvas");
+  cropCanvas.width = w; cropCanvas.height = h;
+  cropCanvas.getContext("2d").drawImage(_lastProcessedCanvas, x0, y0, w, h, 0, 0, w, h);
+  const cropB64 = canvasToBase64(cropCanvas);
+  thumb.src = "data:image/png;base64," + cropB64;
+
+  try {
+    const { resp, data } = await callOcr(session, cropB64);
+    if (!resp.ok || !data.ok) { textEl.value = t("detect_recognize_failed"); return; }
+    textEl.value = data.text.trim();
+  } catch (e) {
+    console.error("[ocr] crop re-recognize exception:", e);
+    textEl.value = t("detect_recognize_failed");
+  }
+}
+
+async function maybeRunDetectOverlay(session) {
+  if (!document.getElementById("detectModeToggle").checked || _currentIsPdf) { hideDetectOverlay(); return; }
+  await runDetectOverlay(session);
+}
+
 async function handleFile(file) {
   const status = document.getElementById("status");
   setStatus(status, null, false);
   document.getElementById("resultWrap").style.display = "none";
   document.getElementById("rcpResultWrap").style.display = "none";
   hidePreview();
+  hideDetectOverlay();
   document.getElementById("fileName").textContent = file.name;
 
   const isImage = /^image\/(png|jpe?g)$/.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
@@ -913,6 +1090,7 @@ async function handleFile(file) {
       ? (b64, numPages) => showPreview("data:image/png;base64," + b64, t("preview_pdf")(numPages))
       : null);
     await runSinglePipeline(images, session, fmt);
+    await maybeRunDetectOverlay(session);
   } catch (err) {
     console.error("[ocr] exception:", err);
     setStatus(status, "error", true);
@@ -931,6 +1109,7 @@ async function handleReprocess(rotate) {
   const status = document.getElementById("status");
   document.getElementById("resultWrap").style.display = "none";
   document.getElementById("rcpResultWrap").style.display = "none";
+  hideDetectOverlay();
   try {
     if (!sbClient) { setStatus(status, "login_required", true); return; }
     const { data: { session } } = await sbClient.auth.getSession();
@@ -942,6 +1121,7 @@ async function handleReprocess(rotate) {
       ? (b64, numPages) => showPreview("data:image/png;base64," + b64, t("preview_pdf")(numPages))
       : (b64) => showPreview("data:image/png;base64," + b64, ""));
     await runSinglePipeline(images, session, fmt);
+    await maybeRunDetectOverlay(session);
   } catch (err) {
     console.error("[ocr] reprocess exception:", err);
     setStatus(status, "error", true);
@@ -1276,6 +1456,14 @@ document.getElementById("sharpenRange").addEventListener("input", (e) => {
   document.getElementById("sharpenVal").textContent = e.target.value + "%";
   document.getElementById("docTypePreset").value = "manual";
   updateDocTypeHint();
+});
+
+document.getElementById("overlayCropCopyBtn").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(document.getElementById("overlayCropText").value); } catch (e) {}
+});
+document.getElementById("overlayCropCloseBtn").addEventListener("click", () => {
+  document.getElementById("overlayCropPanel").style.display = "none";
+  document.querySelectorAll(".overlay-box.active").forEach(b => b.classList.remove("active"));
 });
 
 applyLang();

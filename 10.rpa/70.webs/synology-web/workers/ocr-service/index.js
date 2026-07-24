@@ -39,9 +39,20 @@
  * 동일한 runOcr()을 그대로 재사용하고, 2단계로 그 텍스트만(이미지 없이) 다시 한 번 호출해
  * Ollama format(JSON Schema)로 구조화한다 — structureReceipt() 주석 참고.
  *
+ * POST /detect — "정밀 교정(베타)" 모드용 텍스트 위치(바운딩 박스) 감지(service/ocr/index.html).
+ * PC의 EasyOCR 감지 전용 로컬 서버(workers/ocr-detect-pc/detect_server.py, Ollama와는 별개
+ * 프로세스)에 이미지를 보내 박스 좌표만 받아온다. 텍스트 인식은 이 라우트가 하지 않는다 —
+ * 클라이언트가 박스를 클릭하면 그 영역만 잘라 /ocr로 다시 호출해 이미 검증된 올mOCR-2로
+ * 재인식한다(EasyOCR 자체 인식 텍스트는 신뢰도가 낮아 위치 참고용으로만 사용, 2026-07-24
+ * 실측 확인 — detect_server.py 상단 주석 참고). 지금은 로그인 사용자 전원에게 열려 있는
+ * 테스트 단계 기능이고, 유료 등급 전용으로 제한할 계획이라 canUseDetectFeature()에 게이트를
+ * 분리해 뒀다 — 나중에 실제 결제 등급 체크만 그 함수 안에 추가하면 된다.
+ *
  * 시크릿(전부 `wrangler secret put`으로만 설정, 평문 기재 금지):
  *   CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET — biz-rag와 동일 Service Token 재사용 가능
- *   PC_AI_URL          — 예: https://pc-ai.worksfree.kr
+ *   PC_AI_URL          — 예: https://pc-ai.worksfree.kr (Ollama, /ocr·/receipt용)
+ *   PC_DETECT_URL      — 예: https://detect.worksfree.kr (EasyOCR 감지 서버, /detect용).
+ *                        Access 앱은 PC_AI_URL과 별개로 만들었지만 Service Token은 동일한 것 재사용.
  */
 
 const SUPABASE_URL = "https://rkycwfpkzorfpcxfvaqt.supabase.co";
@@ -470,6 +481,38 @@ async function runReceiptExtraction(env, imageBase64) {
   };
 }
 
+// 지금은 로그인만 되어 있으면 전원 사용 가능(테스트 단계) — 나중에 유료 등급 전용으로
+// 제한할 계획이라 게이트를 이 함수 하나로 분리해 뒀다. 실제 결제 등급 체크(예:
+// profiles.plan === 'pro' 같은 컬럼 조회)를 추가할 때 이 함수 안만 고치면 된다.
+async function canUseDetectFeature(env, accessToken, userId) {
+  return true;
+}
+
+// EasyOCR 감지 전용 로컬 서버 호출 — Ollama(PC_AI_URL)와는 별개 프로세스/포트.
+// 텍스트는 신뢰하지 않고 박스 좌표만 쓴다(detect_server.py 주석 참고).
+async function runDetect(env, imageBase64) {
+  const r = await fetchWithTimeout(
+    `${env.PC_DETECT_URL}/detect`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "CF-Access-Client-Id": env.CF_ACCESS_CLIENT_ID,
+        "CF-Access-Client-Secret": env.CF_ACCESS_CLIENT_SECRET,
+      },
+      body: JSON.stringify({ image_base64: imageBase64 }),
+    },
+    OCR_TIMEOUT_MS
+  );
+  if (!r.ok) {
+    const detail = await r.text().catch(() => "");
+    console.error(`detect failed: status=${r.status} body=${detail.slice(0, 500)}`);
+    throw new Error(`detect failed: ${r.status}`);
+  }
+  const data = await r.json();
+  return data.boxes || [];
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -478,7 +521,8 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
-    if (request.method !== "POST" || (url.pathname !== "/ocr" && url.pathname !== "/receipt")) {
+    const KNOWN_PATHS = new Set(["/ocr", "/receipt", "/detect"]);
+    if (request.method !== "POST" || !KNOWN_PATHS.has(url.pathname)) {
       return json({ error: "not_found" }, 404, origin);
     }
 
@@ -502,6 +546,22 @@ export default {
 
     const user = await verifyUser(access_token);
     if (!user) return json({ error: "invalid_session" }, 401, origin);
+
+    // /detect는 별도 로컬 서버(PC_DETECT_URL)를 쓰고 GPU/Ollama 비용이 없어 일일 횟수
+    // 제한 대상이 아니다 — 대신 canUseDetectFeature()로 별도 게이트(지금은 로그인만 요구).
+    if (url.pathname === "/detect") {
+      const allowed = await canUseDetectFeature(env, access_token, user.id);
+      if (!allowed) return json({ error: "plan_required" }, 403, origin);
+      if (!env.PC_DETECT_URL || !env.CF_ACCESS_CLIENT_ID || !env.CF_ACCESS_CLIENT_SECRET) {
+        return json({ error: "server_misconfigured" }, 500, origin);
+      }
+      try {
+        const boxes = await runDetect(env, image_base64);
+        return json({ ok: true, boxes }, 200, origin);
+      } catch (e) {
+        return json({ error: "pc_offline", detail: String(e) }, 503, origin);
+      }
+    }
 
     const admin = await isAdmin(access_token, user.id);
     let rate = { ok: true, remaining: null, unlimited: true };

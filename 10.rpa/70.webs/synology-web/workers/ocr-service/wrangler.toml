@@ -1,0 +1,19 @@
+name               = "ocr-service"
+main               = "index.js"
+compatibility_date = "2025-01-01"
+
+# KV 네임스페이스 생성 (최초 1회, 이 폴더에서 실행):
+#   npx wrangler kv namespace create OCR_RATE_LIMIT
+# 출력된 id 값을 아래에 채워 넣는다.
+[[kv_namespaces]]
+binding = "OCR_RATE_LIMIT"
+id      = "a30f9fea36f8430f8cb9b66fccf18179"
+
+# 아래는 전부 시크릿으로만 설정한다 (여기 평문 기재 금지):
+#   npx wrangler secret put CF_ACCESS_CLIENT_ID       (biz-rag와 동일 Service Token 값 재사용 가능 —
+#                                                       같은 Service Token을 pc-ai/detect 두 Access
+#                                                       앱 정책에 모두 등록해 재사용 중)
+#   npx wrangler secret put CF_ACCESS_CLIENT_SECRET
+#   npx wrangler secret put PC_AI_URL                  (예: https://pc-ai.worksfree.kr — Ollama)
+#   npx wrangler secret put PC_DETECT_URL              (예: https://detect.worksfree.kr — EasyOCR
+#                                                       감지 서버, workers/ocr-detect-pc 참고)
