@@ -901,6 +901,15 @@ NAS scp 배포 전에 반드시 아래 순서를 따른다:
 > `deploy.ps1`을 사용하면 버전 증가·index.html 동기화·scp·캐시 퍼지가 자동으로 처리된다.  
 > 개별 파일만 빠르게 배포할 때도 위 1·2번은 수동으로 반드시 처리한다.
 
+### 6. `workers/` 폴더는 NAS 배포 대상에서 항상 제외 (반복 버그 — NAS 전송 지연 원인)
+
+**문제**: `deploy.ps1`의 NAS 전송 제외 목록은 `.gitignore`와 완전히 별개다. `workers/` 안의 Python venv(`ocr-detect-pc/venv/`, 1.1GB)나 PC 로컬 서버 바이너리(`dwg-extract-pc/bin/`, 33MB)는 git에는 안 잡혀도(`.gitignore`), tar는 `.gitignore`를 전혀 신경 쓰지 않아서 매번 통째로 압축해 NAS로 전송하고 있었다 — "NAS 전송이 언제부턴가 오래 걸린다"는 증상의 실제 원인이었음(2026-07-25 확인, 실측 1058.9MB → 5.6MB로 개선).
+
+**규칙**:
+- `workers/`(Cloudflare Worker 소스 + PC 로컬 서버 코드)는 NAS가 전혀 쓰지 않는다 — Worker는 `wrangler deploy`로, PC 로컬 서버는 PC에서 직접 실행한다. `deploy.ps1`의 `$EXCLUDE`(화면 표시용)와 `$excludeFlags`(실제 tar 명령) **양쪽 모두**에 `workers`가 포함돼 있어야 한다 — 하나만 있으면 실제 전송엔 반영되지 않는다.
+- `workers/` 아래 새 PC 로컬 서비스(venv, 바이너리 등)를 추가할 때는 이미 `workers` 통째로 제외돼 있으니 `deploy.ps1` 쪽은 별도 조치 불필요 — 다만 이 제외 규칙 자체를 실수로 지우지 않도록 주의.
+- `workers/` 밖에 새로운 대용량 폴더(venv, node_modules류, 캐시 등)를 만들 때는 `.gitignore`뿐 아니라 `deploy.ps1`의 `$excludeFlags`도 함께 점검한다 — 둘은 서로 다른 시스템이라 하나만 챙기면 안 된다.
+
 ---
 
 ## 구축가이드 문서 하드링크 규칙
