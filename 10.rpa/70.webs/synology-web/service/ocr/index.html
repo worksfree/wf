@@ -171,7 +171,6 @@ table.rcp-table td input:hover { background:var(--surface); }
             <option value="text" id="opt-text">텍스트 (.txt) — 손글씨·일반 문서 추천</option>
             <option value="markdown" id="opt-md">마크다운 (.md) — PDF·긴 문서 추천</option>
             <option value="excel" id="opt-excel">CSV/엑셀 (.xlsx) — 영수증 추천</option>
-            <option value="doc" id="opt-doc">문서 (.doc) — 워드에서 바로 열기</option>
           </select>
           <div class="setting-hint" id="fmt-hint"></div>
         </div>
@@ -324,7 +323,6 @@ table.rcp-table td input:hover { background:var(--surface); }
   <div class="disclaim" id="disclaim">
     ※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다.
     추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요.
-    문서(.doc) 출력은 표·이미지 배치를 그대로 복원하지 않는 기본 구조 변환입니다.
   </div>
 </div>
 
@@ -352,8 +350,8 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs
 /* ───────── i18n ───────── */
 const I18N = {
   ko: {
-    hdr_title:"OCR 텍스트 추출", hdr_sub:"이미지·PDF·영수증을 텍스트/마크다운/엑셀/문서로 변환합니다",
-    intro:"파일을 올리면 선택한 출력 형식(텍스트·마크다운·CSV/엑셀·문서)으로 변환합니다. 다건 모드에서는 폴더/여러 파일을 한 번에 처리하고 예상 소요 시간을 함께 보여줍니다.",
+    hdr_title:"OCR 텍스트 추출", hdr_sub:"이미지·PDF·영수증을 텍스트/마크다운/엑셀로 변환합니다",
+    intro:"파일을 올리면 선택한 출력 형식(텍스트·마크다운·CSV/엑셀)으로 변환합니다. 다건 모드에서는 폴더/여러 파일을 한 번에 처리하고 예상 소요 시간을 함께 보여줍니다.",
     tab_single:"단건 처리", tab_bulk:"다건 처리",
     pick_label:"파일 선택", pick_btn:"🖼 파일 선택",
     pick_camera_label:"사진 촬영", pick_camera_btn:"📷 사진 촬영",
@@ -400,11 +398,9 @@ const I18N = {
     opt_text:"텍스트 (.txt) — 손글씨·일반 문서 추천",
     opt_md:"마크다운 (.md) — PDF·긴 문서 추천",
     opt_excel:"CSV/엑셀 (.xlsx) — 영수증 추천",
-    opt_doc:"문서 (.doc) — 워드에서 바로 열기",
     fmt_hint_text:"인식된 텍스트를 그대로 .txt로 저장합니다.",
     fmt_hint_markdown:"인식된 텍스트를 .md 파일로 저장합니다(구조 자동 변환은 아직 지원하지 않음).",
     fmt_hint_excel:"상호명·품목·금액 등을 표로 인식해 엑셀로 저장합니다 — 영수증류에 적합합니다.",
-    fmt_hint_doc:"인식된 텍스트를 워드에서 바로 열리는 기본 문서(.doc)로 저장합니다. 표·이미지 배치를 그대로 복원하진 않습니다.",
     lbl_contrast:"대비(콘트라스트)", lbl_sharpen:"샤프니스",
     include_raw_label:"원본 인식 텍스트도 함께 저장(검증용, 엑셀 출력 시)",
     remaining:n=>`오늘 남은 처리 ${n}회`, remaining_unlimited:"오늘 처리 횟수 무제한 (관리자)",
@@ -438,11 +434,11 @@ const I18N = {
     batch_stopped_rate:"일일 처리 한도에 도달해 배치를 중단했습니다. 지금까지 처리된 결과만 표시합니다.",
     batch_stopped_offline:"로컬 AI 서버가 오프라인이 되어 배치를 중단했습니다. 지금까지 처리된 결과만 표시합니다.",
     unit_sec:s=>`${s}초`, unit_min_sec:(m,s)=>`${m}분 ${s}초`,
-    disclaim:"※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다. 추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요. 문서(.doc) 출력은 표·이미지 배치를 그대로 복원하지 않는 기본 구조 변환입니다."
+    disclaim:"※ 이 기능은 이 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다. 추출 정확도는 원본 화질·글꼴에 따라 달라질 수 있으니 중요 문서는 원본을 함께 확인하세요."
   },
   en: {
-    hdr_title:"OCR Text Extraction", hdr_sub:"Convert images, PDFs, and receipts to text/markdown/excel/doc",
-    intro:"Upload a file to convert it to the selected output format (text, markdown, CSV/Excel, or doc). Batch mode processes a folder or multiple files with an estimated time remaining.",
+    hdr_title:"OCR Text Extraction", hdr_sub:"Convert images, PDFs, and receipts to text/markdown/excel",
+    intro:"Upload a file to convert it to the selected output format (text, markdown, or CSV/Excel). Batch mode processes a folder or multiple files with an estimated time remaining.",
     tab_single:"Single", tab_bulk:"Batch",
     pick_label:"Choose file", pick_btn:"🖼 Choose file",
     pick_camera_label:"Take photo", pick_camera_btn:"📷 Take photo",
@@ -489,11 +485,9 @@ const I18N = {
     opt_text:"Text (.txt) — best for handwriting/general docs",
     opt_md:"Markdown (.md) — best for PDFs/long docs",
     opt_excel:"CSV/Excel (.xlsx) — best for receipts",
-    opt_doc:"Doc (.doc) — opens directly in Word",
     fmt_hint_text:"Saves the recognized text as-is to .txt.",
     fmt_hint_markdown:"Saves the recognized text to a .md file (no automatic structuring yet).",
     fmt_hint_excel:"Recognizes store name/items/amounts as a table and saves to Excel — best for receipts.",
-    fmt_hint_doc:"Saves the recognized text as a basic .doc file that opens directly in Word. Table/image layout is not reproduced.",
     lbl_contrast:"Contrast", lbl_sharpen:"Sharpness",
     include_raw_label:"Also save the raw recognized text (for verification, Excel output only)",
     remaining:n=>`${n} uses left today`, remaining_unlimited:"Unlimited today (admin)",
@@ -527,7 +521,7 @@ const I18N = {
     batch_stopped_rate:"Daily limit reached — batch stopped. Showing results processed so far.",
     batch_stopped_offline:"The local AI server went offline — batch stopped. Showing results processed so far.",
     unit_sec:s=>`${s}s`, unit_min_sec:(m,s)=>`${m}m ${s}s`,
-    disclaim:"※ This feature only works while the local PC server is on. If it's offline, a notice is shown. Extraction accuracy depends on the source image/font quality — always check the original for important documents. Doc (.doc) output is a basic structural conversion, not a pixel-perfect layout reproduction."
+    disclaim:"※ This feature only works while the local PC server is on. If it's offline, a notice is shown. Extraction accuracy depends on the source image/font quality — always check the original for important documents."
   }
 };
 // 언어 토글은 이 페이지에 두지 않는다 — 허브 사이드바 상단의 공용 KO/EN 토글이
@@ -569,7 +563,6 @@ function applyLang() {
   document.getElementById("opt-text").textContent = t("opt_text");
   document.getElementById("opt-md").textContent = t("opt_md");
   document.getElementById("opt-excel").textContent = t("opt_excel");
-  document.getElementById("opt-doc").textContent = t("opt_doc");
   document.getElementById("lbl-doctype").textContent = t("lbl_doctype");
   document.getElementById("opt-dt-manual").textContent = t("opt_dt_manual");
   document.getElementById("opt-dt-photo-receipt").textContent = t("opt_dt_photo_receipt");
@@ -845,14 +838,6 @@ function tsNow() { return new Date().toISOString().replace(/[:.]/g, "-").slice(0
 
 function downloadAsText(text, base) { triggerDownload(new Blob([text], { type: "text/plain;charset=utf-8" }), `${base}.txt`); }
 function downloadAsMarkdown(text, base) { triggerDownload(new Blob([text], { type: "text/markdown;charset=utf-8" }), `${base}.md`); }
-// 표·이미지 배치를 픽셀 단위로 복원하는 게 아니라, 워드가 열 수 있는 최소 구조(문단)로만
-// 감싸는 방식이다 — PP-StructureV3(진짜 레이아웃 보존 docx 생성) 경로는 이 PC의
-// PaddlePaddle CPU 실행기 내부 버그로 막혀 있어(2026-07-23 실측 확인) 당장은 이 정도가 현실적인 선.
-function downloadAsDoc(text, base) {
-  const paragraphs = text.split("\n").map(line => `<p>${escHtml(line) || "&nbsp;"}</p>`).join("\n");
-  const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'></head><body>${paragraphs}</body></html>`;
-  triggerDownload(new Blob(["﻿", html], { type: "application/msword" }), `${base}.doc`);
-}
 function setIntegerFormat(ws) {
   if (!ws["!ref"]) return;
   const range = XLSX.utils.decode_range(ws["!ref"]);
@@ -1360,7 +1345,6 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   const fmt = document.getElementById("fmtSelect").value;
   const base = `ocr_${tsNow()}`;
   if (fmt === "markdown") downloadAsMarkdown(text, base);
-  else if (fmt === "doc") downloadAsDoc(text, base);
   else downloadAsText(text, base);
 });
 document.getElementById("downloadXlsxBtn").addEventListener("click", () => {
@@ -1530,7 +1514,6 @@ async function handleBatch(fileList) {
       document.getElementById("resultWrap").style.display = "block";
       const base = `ocr_배치_${tsNow()}`;
       if (fmt === "markdown") downloadAsMarkdown(combined, base);
-      else if (fmt === "doc") downloadAsDoc(combined, base);
       // text는 자동 다운로드하지 않음 — 복사/다운로드 버튼으로 선택
     }
   }
