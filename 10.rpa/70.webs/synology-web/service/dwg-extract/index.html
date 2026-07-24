@@ -37,6 +37,15 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid #
 .drop-hint { font-size:12px; color:var(--hint); margin-top:10px; }
 .file-name { font-size:13px; color:var(--muted); margin-top:12px; word-break:break-all; }
 
+.sample-gallery { margin-top:14px; }
+.sample-gallery-label { font-size:12px; color:var(--muted); margin-bottom:8px; }
+.sample-gallery-row { display:flex; gap:10px; flex-wrap:wrap; }
+.sample-card { display:flex; flex-direction:column; align-items:center; gap:3px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; cursor:pointer; min-width:110px; }
+.sample-card:hover { border-color:var(--blue); }
+.sample-card-icon { font-size:22px; }
+.sample-card-title { font-size:12.5px; color:var(--text); font-weight:600; }
+.sample-card-sub { font-size:11px; color:var(--hint); }
+
 #status { font-size:13px; margin-top:14px; min-height:1.4em; }
 #status.err { color:#f87171; }
 #status.ok { color:var(--green); }
@@ -85,6 +94,27 @@ table.bom tr:hover td { background:var(--surface2); }
     <input type="file" id="fileInput" accept=".dwg" style="display:none">
   </div>
 
+  <div class="sample-gallery" id="sampleGallery">
+    <div class="sample-gallery-label" id="sample-gallery-label">📎 파일이 없다면 샘플로 바로 테스트해보세요</div>
+    <div class="sample-gallery-row">
+      <button class="sample-card" type="button" data-sample="samples/sample_singlepart.DWG" data-name="샘플_단품도면.DWG">
+        <span class="sample-card-icon">📐</span>
+        <span class="sample-card-title" id="sample-title-1">단품 도면</span>
+        <span class="sample-card-sub" id="sample-sub-1">BOM 없음</span>
+      </button>
+      <button class="sample-card" type="button" data-sample="samples/sample_assembly_bom.DWG" data-name="샘플_조립도.DWG">
+        <span class="sample-card-icon">📐</span>
+        <span class="sample-card-title" id="sample-title-2">조립도</span>
+        <span class="sample-card-sub" id="sample-sub-2">BOM 24행</span>
+      </button>
+      <button class="sample-card" type="button" data-sample="samples/sample_top_assembly.DWG" data-name="샘플_최상위조립도.DWG">
+        <span class="sample-card-icon">📐</span>
+        <span class="sample-card-title" id="sample-title-3">최상위 조립도</span>
+        <span class="sample-card-sub" id="sample-sub-3">BOM 1행</span>
+      </button>
+    </div>
+  </div>
+
   <div id="status"></div>
 
   <div class="section" id="titleBlockSection">
@@ -121,6 +151,10 @@ const I18N = {
     hdr_title:"DWG 표제란/BOM 추출", hdr_sub:"AutoCAD 도면에서 설계정보와 부품표를 그대로 뽑아냅니다",
     intro:"DWG 파일을 올리면 표제란(설계자·일자·승인 등)과 BOM(부품표)을 이미지 변환 없이 도면 안 벡터 텍스트에서 직접 읽어 엑셀로 저장합니다.",
     pick_btn:"📁 파일 선택", drop_hint:"또는 이 영역에 .dwg 파일을 끌어다 놓으세요",
+    sample_gallery_label:"📎 파일이 없다면 샘플로 바로 테스트해보세요",
+    sample_title_1:"단품 도면", sample_sub_1:"BOM 없음",
+    sample_title_2:"조립도", sample_sub_2:"BOM 24행",
+    sample_title_3:"최상위 조립도", sample_sub_3:"BOM 1행",
     tb_title:"📋 표제란", bom_title:"🧾 BOM (부품표)",
     bom_count:(n)=>`${n}개 품목`, bom_not_found:"이 도면에서 BOM을 찾지 못했습니다 — 단품 상세도이거나, 이 도면 양식에 부품표가 없을 수 있습니다.",
     download_xlsx_btn:"엑셀 다운로드",
@@ -135,6 +169,10 @@ const I18N = {
     hdr_title:"DWG Title Block / BOM Extraction", hdr_sub:"Pull design info and parts lists straight out of AutoCAD drawings",
     intro:"Upload a DWG file to read its title block (designer/date/approval, etc.) and BOM (parts list) directly from the drawing's vector text — no image conversion — and save as Excel.",
     pick_btn:"📁 Choose file", drop_hint:"or drag a .dwg file here",
+    sample_gallery_label:"📎 No file handy? Try a sample instantly",
+    sample_title_1:"Single part", sample_sub_1:"No BOM",
+    sample_title_2:"Assembly", sample_sub_2:"24-row BOM",
+    sample_title_3:"Top assembly", sample_sub_3:"1-row BOM",
     tb_title:"📋 Title Block", bom_title:"🧾 BOM (Parts List)",
     bom_count:(n)=>`${n} items`, bom_not_found:"No BOM found in this drawing — it may be a single-part detail drawing, or this drawing format has no parts list.",
     download_xlsx_btn:"Download Excel",
@@ -156,6 +194,13 @@ function applyLang() {
   document.getElementById("intro").textContent = t("intro");
   document.getElementById("pickBtn").textContent = t("pick_btn");
   document.getElementById("drop-hint").textContent = t("drop_hint");
+  document.getElementById("sample-gallery-label").textContent = t("sample_gallery_label");
+  document.getElementById("sample-title-1").textContent = t("sample_title_1");
+  document.getElementById("sample-sub-1").textContent = t("sample_sub_1");
+  document.getElementById("sample-title-2").textContent = t("sample_title_2");
+  document.getElementById("sample-sub-2").textContent = t("sample_sub_2");
+  document.getElementById("sample-title-3").textContent = t("sample_title_3");
+  document.getElementById("sample-sub-3").textContent = t("sample_sub_3");
   document.getElementById("tb-title").textContent = t("tb_title");
   document.getElementById("bom-title").textContent = t("bom_title");
   document.getElementById("downloadXlsxBtn").textContent = t("download_xlsx_btn");
@@ -290,6 +335,28 @@ const dropZone = document.getElementById("dropZone");
 ["dragenter", "dragover"].forEach(evt => dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.add("drag"); }));
 ["dragleave", "drop"].forEach(evt => dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.remove("drag"); }));
 dropZone.addEventListener("drop", (e) => { const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+
+// 샘플 갤러리 — 서버에 미리 올려둔 샘플 DWG를 fetch로 받아 File 객체로 감싸서
+// 기존 handleFile() 파이프라인에 그대로 태운다(업로드 경로와 동일 코드).
+document.querySelectorAll(".sample-card").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    try {
+      const url = btn.dataset.sample;
+      const name = btn.dataset.name;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`sample fetch failed: ${resp.status}`);
+      const blob = await resp.blob();
+      const file = new File([blob], name, { type: "application/octet-stream" });
+      await handleFile(file);
+    } catch (e) {
+      console.error("[dwg-extract] sample load failed:", e);
+      setStatus("error", true);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+});
 
 /* ───────── 엑셀 다운로드 ───────── */
 document.getElementById("downloadXlsxBtn").addEventListener("click", () => {

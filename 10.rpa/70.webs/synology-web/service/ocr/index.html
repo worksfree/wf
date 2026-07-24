@@ -50,6 +50,14 @@ label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(
 .pick-btn:disabled { opacity:.5; cursor:not-allowed; }
 .drop-hint { font-size:12px; color:var(--hint); margin-top:10px; }
 
+.sample-gallery { margin-top:14px; }
+.sample-gallery-label { font-size:12px; color:var(--muted); margin-bottom:8px; }
+.sample-gallery-row { display:flex; gap:10px; flex-wrap:wrap; }
+.sample-thumb { display:flex; flex-direction:column; align-items:center; gap:5px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:6px; cursor:pointer; width:84px; }
+.sample-thumb:hover { border-color:var(--blue); }
+.sample-thumb img { width:72px; height:72px; object-fit:cover; border-radius:6px; background:#000; }
+.sample-thumb span { font-size:11px; color:var(--muted); }
+
 .ask-row { display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
 .remaining { font-size:12px; color:var(--hint); }
 
@@ -226,6 +234,27 @@ table.rcp-table td input:hover { background:var(--surface); }
           </div>
           <div class="drop-hint" id="drop-hint">또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)</div>
         </div>
+        <div class="sample-gallery" id="sampleGallery">
+          <div class="sample-gallery-label" id="sample-gallery-label">📎 파일이 없다면 샘플로 바로 테스트해보세요</div>
+          <div class="sample-gallery-row">
+            <button class="sample-thumb" type="button" data-sample="samples/sample_receipt1.jpg" data-name="샘플_영수증1.jpg">
+              <img src="samples/sample_receipt1.jpg" alt="" loading="lazy">
+              <span id="sample-label-receipt1">영수증</span>
+            </button>
+            <button class="sample-thumb" type="button" data-sample="samples/sample_receipt2.jpg" data-name="샘플_영수증2.jpg">
+              <img src="samples/sample_receipt2.jpg" alt="" loading="lazy">
+              <span id="sample-label-receipt2">영수증</span>
+            </button>
+            <button class="sample-thumb" type="button" data-sample="samples/sample_handwriting1.jpg" data-name="샘플_손글씨1.jpg">
+              <img src="samples/sample_handwriting1.jpg" alt="" loading="lazy">
+              <span id="sample-label-hw1">손글씨</span>
+            </button>
+            <button class="sample-thumb" type="button" data-sample="samples/sample_handwriting2.jpg" data-name="샘플_손글씨2.jpg">
+              <img src="samples/sample_handwriting2.jpg" alt="" loading="lazy">
+              <span id="sample-label-hw2">손글씨</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- 다건 -->
@@ -361,6 +390,8 @@ const I18N = {
     camera_modal_label:"카메라 촬영", camera_cancel_label:"취소", camera_shutter_label:"촬영",
     camera_modal_hint:"가운데 흰 버튼을 눌러 촬영하세요",
     drop_hint:"또는 이 영역에 파일을 끌어다 놓으세요 (PNG, JPG, PDF)",
+    sample_gallery_label:"📎 파일이 없다면 샘플로 바로 테스트해보세요",
+    sample_label_receipt:"영수증", sample_label_handwriting:"손글씨",
     pick_folder_label:"폴더 선택", pick_folder_btn:"📁 폴더 선택",
     pick_files_label:"여러 파일 선택", pick_files_btn:"여러 파일 선택",
     drop_hint_bulk:"또는 이 영역에 여러 파일을 끌어다 놓으세요",
@@ -448,6 +479,8 @@ const I18N = {
     camera_modal_label:"Take a photo", camera_cancel_label:"Cancel", camera_shutter_label:"Capture",
     camera_modal_hint:"Tap the white button to take the photo",
     drop_hint:"or drag and drop a file here (PNG, JPG, PDF)",
+    sample_gallery_label:"📎 No file handy? Try a sample instantly",
+    sample_label_receipt:"Receipt", sample_label_handwriting:"Handwriting",
     pick_folder_label:"Choose folder", pick_folder_btn:"📁 Choose folder",
     pick_files_label:"Choose multiple files", pick_files_btn:"Choose multiple files",
     drop_hint_bulk:"or drag and drop multiple files here",
@@ -547,6 +580,11 @@ function applyLang() {
   document.getElementById("cameraShutterBtn").setAttribute("aria-label", t("camera_shutter_label"));
   document.getElementById("camera-modal-hint").textContent = t("camera_modal_hint");
   document.getElementById("drop-hint").textContent = t("drop_hint");
+  document.getElementById("sample-gallery-label").textContent = t("sample_gallery_label");
+  document.getElementById("sample-label-receipt1").textContent = t("sample_label_receipt");
+  document.getElementById("sample-label-receipt2").textContent = t("sample_label_receipt");
+  document.getElementById("sample-label-hw1").textContent = t("sample_label_handwriting");
+  document.getElementById("sample-label-hw2").textContent = t("sample_label_handwriting");
   document.getElementById("pick-folder-label").textContent = t("pick_folder_label");
   document.getElementById("pickFolderBtn").textContent = t("pick_folder_btn");
   document.getElementById("pick-files-label").textContent = t("pick_files_label");
@@ -1241,6 +1279,27 @@ async function handleReprocess() {
 
 document.getElementById("pickBtn").addEventListener("click", () => document.getElementById("fileInput").click());
 document.getElementById("fileInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
+
+// 샘플 갤러리 — 파일 업로드 없이 바로 테스트해볼 수 있게, 서버에 미리 올려둔
+// 샘플 이미지를 fetch로 받아 File 객체로 감싸서 기존 handleFile() 파이프라인에
+// 그대로 태운다(업로드 경로와 동일한 코드로 처리 — 별도 분기 불필요).
+document.querySelectorAll(".sample-thumb").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    try {
+      const url = btn.dataset.sample;
+      const name = btn.dataset.name;
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const file = new File([blob], name, { type: blob.type || "image/jpeg" });
+      await handleFile(file);
+    } catch (e) {
+      console.error("[ocr] sample load failed:", e);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+});
 // enumerateDevices는 권한 승인 전에도 kind(videoinput 여부)는 조회 가능 — 라벨만 비어 있음.
 // API 자체가 없거나 조회에 실패하면 판단 불가로 보고 기존 동작(그냥 시도)을 유지한다(오탐 방지).
 async function hasCameraDevice() {
