@@ -2077,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.8.16';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.8.22';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2206,6 +2206,7 @@ const TREE = [
       { label:{ko:'마케팅 자료',  en:'Marketing Materials'}, icon:'📢', iframe:'consulting/marketing/index.html', adminOnly:true },
       { label:{ko:'B2B 이메일 DB', en:'B2B Email DB'},   icon:'🗄', iframe:'consulting/bizdb/index.html',         adminOnly:true },
       { label:{ko:'파일 스토리지', en:'File Storage'},   icon:'📦', iframe:'admin/storage/index.html',              adminOnly:true },
+      { label:{ko:'DWG 샘플 관리', en:'DWG Samples'},   icon:'📐', iframe:'admin/dwg-samples/index.html',          adminOnly:true },
     ]
   },
 ];
@@ -2396,6 +2397,10 @@ const DASH_CARDS = [
     title:{ko:'파일 스토리지', en:'File Storage'},
     desc: {ko:'NAS 파일 저장 · Supabase DB 메타데이터 관리 · 업로드 · 다운로드', en:'NAS file storage · Supabase DB metadata · upload · download'},
     iframe:'admin/storage/index.html', adminOnly:true },
+  { section:'admin', icon:'📐',
+    title:{ko:'DWG 샘플 관리', en:'DWG Samples'},
+    desc: {ko:'DWG 추출 샘플 갤러리 파일·캡션 교체 · 결과 블러 강도 설정', en:'Replace DWG extraction sample files/captions · set result blur intensity'},
+    iframe:'admin/dwg-samples/index.html', adminOnly:true },
 ];
 
 /* ════════════════════════════════════════════

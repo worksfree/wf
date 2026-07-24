@@ -42,9 +42,15 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid #
 .sample-gallery-row { display:flex; gap:10px; flex-wrap:wrap; }
 .sample-card { display:flex; flex-direction:column; align-items:center; gap:3px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; cursor:pointer; min-width:110px; }
 .sample-card:hover { border-color:var(--blue); }
-.sample-card-icon { font-size:22px; }
+.sample-card-thumb { width:64px; height:64px; object-fit:contain; border-radius:6px; background:#1c2333; }
 .sample-card-title { font-size:12.5px; color:var(--text); font-weight:600; }
 .sample-card-sub { font-size:11px; color:var(--hint); }
+.sample-privacy-note { font-size:11px; color:var(--hint); margin-top:6px; }
+
+/* 샘플 결과의 part name/description은 실제 회사 도면 데이터라 블러 처리한다
+   (2026-07-26 요청) — CSS 필터라 DOM/엑셀 원문에는 영향 없으므로, 이 값이 실제로
+   노출되는 경로(엑셀 다운로드)는 샘플일 때 버튼 자체를 숨겨서 별도로 막는다. */
+.blurred { filter: blur(var(--dwg-blur-px, 6px)); user-select: none; }
 
 #status { font-size:13px; margin-top:14px; min-height:1.4em; }
 #status.err { color:#f87171; }
@@ -97,37 +103,38 @@ table.bom tr:hover td { background:var(--surface2); }
   <div class="sample-gallery" id="sampleGallery">
     <div class="sample-gallery-label" id="sample-gallery-label">📎 파일이 없다면 샘플로 바로 테스트해보세요</div>
     <div class="sample-gallery-row">
-      <button class="sample-card" type="button" data-sample="samples/sample_singlepart1.DWG" data-name="샘플_단품도면1.DWG">
-        <span class="sample-card-icon">📐</span>
+      <button class="sample-card" type="button" data-slot="slot1" data-sample="samples/sample_singlepart1.DWG" data-name="샘플_단품도면1.DWG">
+        <img class="sample-card-thumb" id="sample-thumb-1" src="samples/sample_singlepart1.svg" alt="">
         <span class="sample-card-title" id="sample-title-1">단품 도면 1</span>
         <span class="sample-card-sub" id="sample-sub-1">BOM 없음</span>
       </button>
-      <button class="sample-card" type="button" data-sample="samples/sample_singlepart2.DWG" data-name="샘플_단품도면2.DWG">
-        <span class="sample-card-icon">📐</span>
+      <button class="sample-card" type="button" data-slot="slot2" data-sample="samples/sample_singlepart2.DWG" data-name="샘플_단품도면2.DWG">
+        <img class="sample-card-thumb" id="sample-thumb-2" src="samples/sample_singlepart2.svg" alt="">
         <span class="sample-card-title" id="sample-title-2">단품 도면 2</span>
         <span class="sample-card-sub" id="sample-sub-2">BOM 없음(홀 치수표 포함)</span>
       </button>
-      <button class="sample-card" type="button" data-sample="samples/sample_assembly_bom1.DWG" data-name="샘플_조립도1.DWG">
-        <span class="sample-card-icon">📐</span>
+      <button class="sample-card" type="button" data-slot="slot3" data-sample="samples/sample_assembly_bom1.DWG" data-name="샘플_조립도1.DWG">
+        <img class="sample-card-thumb" id="sample-thumb-3" src="samples/sample_assembly_bom1.svg" alt="">
         <span class="sample-card-title" id="sample-title-3">조립도 1</span>
         <span class="sample-card-sub" id="sample-sub-3">BOM 24행</span>
       </button>
-      <button class="sample-card" type="button" data-sample="samples/sample_assembly_bom2.DWG" data-name="샘플_조립도2.DWG">
-        <span class="sample-card-icon">📐</span>
+      <button class="sample-card" type="button" data-slot="slot4" data-sample="samples/sample_assembly_bom2.DWG" data-name="샘플_조립도2.DWG">
+        <img class="sample-card-thumb" id="sample-thumb-4" src="samples/sample_assembly_bom2.svg" alt="">
         <span class="sample-card-title" id="sample-title-4">조립도 2</span>
         <span class="sample-card-sub" id="sample-sub-4">BOM 31행</span>
       </button>
-      <button class="sample-card" type="button" data-sample="samples/sample_assembly_bom3.DWG" data-name="샘플_조립도3.DWG">
-        <span class="sample-card-icon">📐</span>
+      <button class="sample-card" type="button" data-slot="slot5" data-sample="samples/sample_assembly_bom3.DWG" data-name="샘플_조립도3.DWG">
+        <img class="sample-card-thumb" id="sample-thumb-5" src="samples/sample_assembly_bom3.svg" alt="">
         <span class="sample-card-title" id="sample-title-5">조립도 3</span>
         <span class="sample-card-sub" id="sample-sub-5">BOM 14행</span>
       </button>
-      <button class="sample-card" type="button" data-sample="samples/sample_top_assembly.DWG" data-name="샘플_최상위조립도.DWG">
-        <span class="sample-card-icon">📐</span>
+      <button class="sample-card" type="button" data-slot="slot6" data-sample="samples/sample_top_assembly.DWG" data-name="샘플_최상위조립도.DWG">
+        <img class="sample-card-thumb" id="sample-thumb-6" src="samples/sample_top_assembly.svg" alt="">
         <span class="sample-card-title" id="sample-title-6">최상위 조립도</span>
         <span class="sample-card-sub" id="sample-sub-6">BOM 1행</span>
       </button>
     </div>
+    <div class="sample-privacy-note" id="sample-privacy-note">🔒 샘플은 실제 고객사 도면입니다 — 결과의 품명/설명 항목은 블러 처리되고, 엑셀 다운로드는 제공되지 않습니다.</div>
   </div>
 
   <div id="status"></div>
@@ -173,6 +180,7 @@ const I18N = {
     sample_title_4:"조립도 2", sample_sub_4:"BOM 31행",
     sample_title_5:"조립도 3", sample_sub_5:"BOM 14행",
     sample_title_6:"최상위 조립도", sample_sub_6:"BOM 1행",
+    sample_privacy_note:"🔒 샘플은 실제 고객사 도면입니다 — 결과의 품명/설명 항목은 블러 처리되고, 엑셀 다운로드는 제공되지 않습니다.",
     tb_title:"📋 표제란", bom_title:"🧾 BOM (부품표)",
     bom_count:(n)=>`${n}개 품목`, bom_not_found:"이 도면에서 BOM을 찾지 못했습니다 — 단품 상세도이거나, 이 도면 양식에 부품표가 없을 수 있습니다.",
     download_xlsx_btn:"엑셀 다운로드",
@@ -194,6 +202,7 @@ const I18N = {
     sample_title_4:"Assembly 2", sample_sub_4:"31-row BOM",
     sample_title_5:"Assembly 3", sample_sub_5:"14-row BOM",
     sample_title_6:"Top assembly", sample_sub_6:"1-row BOM",
+    sample_privacy_note:"🔒 Samples are real customer drawings — the part name/description fields in results are blurred, and Excel download isn't offered for them.",
     tb_title:"📋 Title Block", bom_title:"🧾 BOM (Parts List)",
     bom_count:(n)=>`${n} items`, bom_not_found:"No BOM found in this drawing — it may be a single-part detail drawing, or this drawing format has no parts list.",
     download_xlsx_btn:"Download Excel",
@@ -208,6 +217,11 @@ const I18N = {
 let lang = localStorage.getItem("wf_lang") || "ko";
 function t(key) { const v = I18N[lang][key]; return v !== undefined ? v : I18N.ko[key]; }
 
+// O&M(admin/dwg-samples)에서 슬롯별 캡션을 바꿨으면 slotId -> manifest entry로 채워짐.
+// 파일 자체(DWG/SVG)는 이미 로드 시점에 각 버튼의 data-sample/썸네일 src를 직접 덮어써서
+// 반영하므로(아래 IIFE), 여기서는 캡션 텍스트만 참고한다.
+let _sampleOverrides = {};
+
 function applyLang() {
   document.documentElement.lang = lang;
   document.getElementById("hdr-title").textContent = t("hdr_title");
@@ -217,9 +231,13 @@ function applyLang() {
   document.getElementById("drop-hint").textContent = t("drop_hint");
   document.getElementById("sample-gallery-label").textContent = t("sample_gallery_label");
   for (let i = 1; i <= 6; i++) {
-    document.getElementById(`sample-title-${i}`).textContent = t(`sample_title_${i}`);
-    document.getElementById(`sample-sub-${i}`).textContent = t(`sample_sub_${i}`);
+    const ov = _sampleOverrides[`slot${i}`]; // O&M(admin/dwg-samples)에서 캡션을 바꾼 경우 우선
+    document.getElementById(`sample-title-${i}`).textContent =
+      (ov && (lang === "en" ? ov.title_en : ov.title_ko)) || t(`sample_title_${i}`);
+    document.getElementById(`sample-sub-${i}`).textContent =
+      (ov && (lang === "en" ? ov.sub_en : ov.sub_ko)) || t(`sample_sub_${i}`);
   }
+  document.getElementById("sample-privacy-note").textContent = t("sample_privacy_note");
   document.getElementById("tb-title").textContent = t("tb_title");
   document.getElementById("bom-title").textContent = t("bom_title");
   document.getElementById("downloadXlsxBtn").textContent = t("download_xlsx_btn");
@@ -236,16 +254,59 @@ window.addEventListener("message", (e) => {
 
 /* ───────── Supabase ───────── */
 const EXTRACT_BASE_URL = "https://dwg-extract.worksfree.workers.dev";
+const SUPABASE_URL = "https://rkycwfpkzorfpcxfvaqt.supabase.co";
+const SUPABASE_ANON =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs";
 let sbClient = null;
 try {
   if (window.supabase) {
     sbClient = window.supabase.createClient(
-      "https://rkycwfpkzorfpcxfvaqt.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs",
+      SUPABASE_URL, SUPABASE_ANON,
       { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } }
     );
   }
 } catch (e) {}
+
+// 샘플 결과 블러 강도(px) — O&M(admin/dwg-samples)에서 site_config.dwg_sample_blur_px로
+// 조정 가능. 공개 읽기 정책(site_config select_all)이라 익명 조회로 충분하다.
+(async () => {
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/site_config?key=eq.dwg_sample_blur_px&select=value`,
+      { headers: { apikey: SUPABASE_ANON } }
+    );
+    const rows = r.ok ? await r.json() : [];
+    const px = typeof rows[0]?.value === "number" ? rows[0].value : 6;
+    document.documentElement.style.setProperty("--dwg-blur-px", px + "px");
+  } catch (e) {}
+})();
+
+// 샘플 슬롯 매니페스트 — O&M(admin/dwg-samples)에서 파일을 교체하면 여기서 캡션과
+// 파일 경로(Supabase Storage, wf-assets 버킷 public 읽기)를 실제 값으로 덮어쓴다.
+// site_config에 항목이 없는 슬롯은 그대로 기본(로컬 samples/ 정적 파일) 유지 —
+// 즉 배포된 6개 기본 샘플과 O&M 교체 샘플이 슬롯 단위로 자연스럽게 섞여 동작한다.
+const SAMPLE_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/wf-assets/dwg-samples`;
+(async () => {
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/site_config?key=eq.dwg_sample_manifest&select=value`,
+      { headers: { apikey: SUPABASE_ANON } }
+    );
+    const rows = r.ok ? await r.json() : [];
+    const manifest = Array.isArray(rows[0]?.value) ? rows[0].value : [];
+    for (const entry of manifest) {
+      if (!entry?.id) continue;
+      const btn = document.querySelector(`.sample-card[data-slot="${entry.id}"]`);
+      if (!btn) continue;
+      btn.dataset.sample = `${SAMPLE_STORAGE_BASE}/${entry.id}.dwg`;
+      btn.dataset.name = `${entry.title_ko || entry.id}.dwg`;
+      const thumb = btn.querySelector("img");
+      if (thumb) thumb.src = `${SAMPLE_STORAGE_BASE}/${entry.id}.svg`;
+      _sampleOverrides[entry.id] = entry;
+    }
+    if (manifest.length) applyLang();
+  } catch (e) {}
+})();
 
 const MAX_FILE_BYTES = 20 * 1024 * 1024;
 
@@ -274,6 +335,15 @@ function fileToBase64(file) {
   });
 }
 
+// part name/description 열·필드만 블러 대상으로 매칭 — dwg_extract.py의
+// BOM_HEADER_KEYWORDS 중 이름/설명에 해당하는 어휘만 좁혀서 재사용(재질·제조사
+// 등은 블러 대상 아님, 2026-07-26 요청 범위).
+const BLUR_LABEL_KEYWORDS = ["part name", "partname", "품명", "description"];
+function _isBlurLabel(label) {
+  const l = (label || "").toLowerCase();
+  return BLUR_LABEL_KEYWORDS.some(kw => l.includes(kw));
+}
+
 /* ───────── 결과 렌더링 ───────── */
 function renderResult(result) {
   const tbSection = document.getElementById("titleBlockSection");
@@ -284,6 +354,7 @@ function renderResult(result) {
     for (const [k, v] of entries) {
       const dt = document.createElement("dt"); dt.textContent = k;
       const dd = document.createElement("dd"); dd.textContent = v;
+      if (_isSampleResult && _isBlurLabel(k)) dd.classList.add("blurred");
       tbList.appendChild(dt); tbList.appendChild(dd);
     }
     tbSection.classList.add("show");
@@ -296,8 +367,9 @@ function renderResult(result) {
   const bomTable = document.getElementById("bomTable");
   const bomBadge = document.getElementById("bom-count-badge");
   if (result.bom_found && (result.bom_rows || []).length) {
+    const blurCols = new Set(result.bom_headers.map((h, i) => (_isSampleResult && _isBlurLabel(h)) ? i : -1).filter(i => i >= 0));
     const headRow = "<tr>" + result.bom_headers.map(h => `<th>${escHtml(h)}</th>`).join("") + "</tr>";
-    const bodyRows = result.bom_rows.map(row => "<tr>" + row.map(c => `<td>${escHtml(c)}</td>`).join("") + "</tr>").join("");
+    const bodyRows = result.bom_rows.map(row => "<tr>" + row.map((c, i) => `<td${blurCols.has(i) ? ' class="blurred"' : ""}>${escHtml(c)}</td>`).join("") + "</tr>").join("");
     bomTable.innerHTML = headRow + bodyRows;
     bomBadge.textContent = t("bom_count")(result.bom_rows.length);
     bomBadge.style.display = "";
@@ -308,12 +380,20 @@ function renderResult(result) {
     bomSection.classList.add("show");
   }
 
-  document.getElementById("actionsWrap").style.display = entries.length || (result.bom_rows||[]).length ? "flex" : "none";
+  // 화면 블러는 CSS 효과라 엑셀 다운로드 파일엔 원문이 그대로 담긴다 — 샘플(실제
+  // 고객사 도면)일 때는 그 유출 경로 자체를 막기 위해 다운로드 버튼을 숨긴다
+  // (2026-07-26 요청, "다운로드 버튼 숨김" 방식으로 확정).
+  const hasContent = entries.length || (result.bom_rows || []).length;
+  document.getElementById("actionsWrap").style.display = hasContent && !_isSampleResult ? "flex" : "none";
 }
 
 function escHtml(s) { const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML; }
 
 /* ───────── 업로드/호출 ───────── */
+// 샘플 카드로 트리거된 결과인지 여부 — renderResult()의 블러/다운로드버튼 노출 판단에 씀.
+// handleFile 자체는 업로드·샘플 공용 파이프라인이라, 호출부에서 미리 세팅해 둔다.
+let _isSampleResult = false;
+
 async function handleFile(file) {
   document.getElementById("fileName").textContent = file.name;
   document.getElementById("titleBlockSection").classList.remove("show");
@@ -348,12 +428,12 @@ async function handleFile(file) {
 }
 
 document.getElementById("pickBtn").addEventListener("click", () => document.getElementById("fileInput").click());
-document.getElementById("fileInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
+document.getElementById("fileInput").addEventListener("change", (e) => { if (e.target.files[0]) { _isSampleResult = false; handleFile(e.target.files[0]); } e.target.value = ""; });
 
 const dropZone = document.getElementById("dropZone");
 ["dragenter", "dragover"].forEach(evt => dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.add("drag"); }));
 ["dragleave", "drop"].forEach(evt => dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.remove("drag"); }));
-dropZone.addEventListener("drop", (e) => { const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+dropZone.addEventListener("drop", (e) => { const f = e.dataTransfer.files[0]; if (f) { _isSampleResult = false; handleFile(f); } });
 
 // 샘플 갤러리 — 서버에 미리 올려둔 샘플 DWG를 fetch로 받아 File 객체로 감싸서
 // 기존 handleFile() 파이프라인에 그대로 태운다(업로드 경로와 동일 코드).
@@ -367,6 +447,7 @@ document.querySelectorAll(".sample-card").forEach((btn) => {
       if (!resp.ok) throw new Error(`sample fetch failed: ${resp.status}`);
       const blob = await resp.blob();
       const file = new File([blob], name, { type: "application/octet-stream" });
+      _isSampleResult = true;
       await handleFile(file);
     } catch (e) {
       console.error("[dwg-extract] sample load failed:", e);

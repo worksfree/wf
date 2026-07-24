@@ -16,6 +16,12 @@
  * 서버 쪽(workers/dwg-extract-pc/dwg_extract.py)에 있다 — 이 워커는 인증과
  * 프록시 역할만 한다.
  *
+ * POST /thumbnail — 텍스트 없는 도형 와이어프레임 SVG 생성(dwg_thumbnail.py).
+ * O&M(admin/dwg-samples)에서 샘플 DWG를 교체할 때 썸네일을 재생성하는 용도로만
+ * 쓰이며, /extract와 동일하게 로그인만 요구한다(관리자 전용 강제는 admin 페이지
+ * 쪽에서 이미 이중 게이트로 처리 — 이 워커는 그 페이지가 호출하는 프록시일 뿐).
+ *
+
  * 시크릿(전부 `wrangler secret put`으로만 설정, 평문 기재 금지):
  *   CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET — ocr-service와 동일 Service Token 재사용 가능
  *   PC_EXTRACT_URL      — 예: https://dwg-extract.worksfree.kr (workers/dwg-extract-pc)
@@ -89,6 +95,28 @@ async function runExtract(env, dwgBase64) {
   return r.json();
 }
 
+async function runThumbnail(env, dwgBase64) {
+  const r = await fetchWithTimeout(
+    `${env.PC_EXTRACT_URL}/thumbnail`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "CF-Access-Client-Id": env.CF_ACCESS_CLIENT_ID,
+        "CF-Access-Client-Secret": env.CF_ACCESS_CLIENT_SECRET,
+      },
+      body: JSON.stringify({ dwg_base64: dwgBase64 }),
+    },
+    EXTRACT_TIMEOUT_MS
+  );
+  if (!r.ok) {
+    const detail = await r.text().catch(() => "");
+    console.error(`thumbnail failed: status=${r.status} body=${detail.slice(0, 500)}`);
+    throw new Error(`thumbnail failed: ${r.status}`);
+  }
+  return r.json();
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -97,7 +125,8 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
-    if (request.method !== "POST" || url.pathname !== "/extract") {
+    const KNOWN_PATHS = new Set(["/extract", "/thumbnail"]);
+    if (request.method !== "POST" || !KNOWN_PATHS.has(url.pathname)) {
       return json({ error: "not_found" }, 404, origin);
     }
 
@@ -127,6 +156,10 @@ export default {
     }
 
     try {
+      if (url.pathname === "/thumbnail") {
+        const result = await runThumbnail(env, dwg_base64);
+        return json({ ok: true, svg: result.svg || "" }, 200, origin);
+      }
       const result = await runExtract(env, dwg_base64);
       return json(
         {

@@ -31,6 +31,7 @@ for _stream in (sys.stdout, sys.stderr):
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dwg_extract import extract_dwg
+from dwg_thumbnail import build_thumbnail_svg
 
 PORT = 8767
 BASE_DIR = Path(__file__).resolve().parent
@@ -54,7 +55,7 @@ class ExtractHandler(BaseHTTPRequestHandler):
             self._send_json({"error": "not_found"}, 404)
 
     def do_POST(self):
-        if self.path != "/extract":
+        if self.path not in ("/extract", "/thumbnail"):
             self._send_json({"error": "not_found"}, 404)
             return
 
@@ -79,10 +80,14 @@ class ExtractHandler(BaseHTTPRequestHandler):
             with tempfile.NamedTemporaryFile(suffix=".dwg", delete=False) as tmp:
                 tmp.write(dwg_bytes)
                 tmp_path = tmp.name
-            result = extract_dwg(tmp_path, DWGREAD_EXE)
-            self._send_json({"ok": True, **result})
+            if self.path == "/extract":
+                result = extract_dwg(tmp_path, DWGREAD_EXE)
+                self._send_json({"ok": True, **result})
+            else:  # /thumbnail — O&M에서 샘플 DWG를 교체할 때 와이어프레임 SVG 재생성용
+                svg = build_thumbnail_svg(tmp_path, DWGREAD_EXE)
+                self._send_json({"ok": True, "svg": svg})
         except Exception as e:
-            print(f"[dwg_extract_server] 추출 실패: {e}", flush=True)
+            print(f"[dwg_extract_server] {self.path} 실패: {e}", flush=True)
             self._send_json({"error": "extract_failed", "detail": str(e)}, 500)
         finally:
             if tmp_path:

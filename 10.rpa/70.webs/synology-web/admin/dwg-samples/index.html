@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DWG 샘플 관리 — WorksFree O&M</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#222536;--border:#2d3047;
+  --text:#e2e8f0;--muted:#94a3b8;--hint:#64748b;
+  --blue:#3b82f6;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
+
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.hdr-icon{font-size:22px}.hdr-title{font-size:16px;font-weight:600;flex:1}
+.admin-badge{font-size:10px;font-weight:700;background:#3b0f0f;color:#fca5a5;border:1px solid rgba(220,38,38,.4);border-radius:10px;padding:2px 9px}
+
+.page{max-width:1000px;margin:0 auto;padding:24px 16px 60px}
+.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.info-card{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:14px 16px;margin-bottom:24px;font-size:12px;color:var(--muted);line-height:1.7}
+
+.btn{padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:12.5px;font-weight:500;font-family:inherit;transition:.15s}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn-primary:hover{opacity:.85;color:#fff}
+.btn-danger:hover{border-color:var(--red);color:var(--red)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── 블러 강도 ── */
+.blur-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:32px}
+.blur-card-desc{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6}
+.blur-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.blur-label{font-size:11px;color:var(--hint);white-space:nowrap}
+#blur-slider{flex:1;min-width:160px;accent-color:var(--yellow)}
+.blur-val{font-weight:700;color:var(--yellow);font-size:15px;min-width:40px}
+#blur-msg.ok{color:var(--green)} #blur-msg.err{color:var(--red)}
+
+/* ── 슬롯 카드 ── */
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.slot-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
+.slot-card.overridden{border-color:rgba(16,185,129,.4)}
+.slot-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.slot-thumb{width:56px;height:56px;object-fit:contain;background:#1c2333;border-radius:6px;border:1px solid var(--border);flex-shrink:0}
+.slot-id{font-size:10px;color:var(--hint);font-family:monospace}
+.slot-badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:8px;background:var(--surface2);color:var(--hint);border:1px solid var(--border)}
+.slot-badge.on{color:var(--green);border-color:rgba(16,185,129,.4)}
+.slot-field{margin-bottom:7px}
+.slot-field label{display:block;font-size:10.5px;color:var(--hint);margin-bottom:2px}
+.slot-field input[type=text]{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:12px;font-family:inherit}
+.slot-file-row{display:flex;align-items:center;gap:8px;margin-top:8px;margin-bottom:8px}
+.slot-file-row input[type=file]{font-size:11px;color:var(--muted);max-width:170px}
+.slot-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.slot-msg{font-size:11px;min-height:16px;width:100%}
+.slot-msg.ok{color:var(--green)} .slot-msg.err{color:var(--red)}
+
+#admin-gate{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center}
+#admin-gate.visible{display:flex}
+</style>
+</head>
+<body>
+
+<div id="admin-gate">
+  <div style="font-size:48px">🔒</div>
+  <div style="font-size:18px;font-weight:600">관리자 전용 페이지</div>
+  <div style="font-size:13px;color:var(--muted)">이 페이지는 관리자 계정으로만 접근할 수 있습니다.</div>
+</div>
+
+<div id="main-content" style="display:none">
+
+<header>
+  <div class="hdr-icon">📐</div>
+  <div class="hdr-title">DWG 샘플 관리 · DWG Samples</div>
+  <span class="admin-badge">🔒 ADMIN</span>
+</header>
+
+<div class="page">
+
+  <div class="info-card">
+    <strong style="color:var(--text)">이 페이지가 하는 일</strong><br>
+    DWG 표제란/BOM 추출(<code>service/dwg-extract</code>) 샘플 갤러리는 실제 고객사 도면 6건을 쓰고 있습니다.
+    여기서 슬롯별로 다른 DWG 파일로 교체하거나, 표시되는 제목/부제를 바꿀 수 있습니다 — 코드 배포 없이 즉시 반영됩니다.
+    파일을 교체하지 않은 슬롯은 기존 기본 샘플이 그대로 표시됩니다.<br><br>
+    교체한 파일은 <strong>Supabase Storage(wf-assets 버킷)</strong>에 저장되고, 썸네일(도형만 있는 와이어프레임 SVG,
+    텍스트 없음)은 업로드 시점에 PC 로컬 서버가 자동으로 다시 생성합니다 — <strong>PC가 켜져 있어야</strong> 업로드가 됩니다.
+  </div>
+
+  <!-- ── 블러 강도 ── -->
+  <div class="section-title">샘플 결과 블러 강도</div>
+  <div class="blur-card">
+    <div class="blur-card-desc">
+      샘플로 추출한 결과 중 품명(part name)/설명(description) 항목을 흐리게 표시하는 강도입니다.
+      실제 업로드한 파일의 결과에는 적용되지 않습니다 — 샘플에만 적용됩니다. (기본값: 6px)
+    </div>
+    <div class="blur-row">
+      <span class="blur-label">약하게 (1px)</span>
+      <input type="range" id="blur-slider" min="1" max="20" step="1" value="6" oninput="onBlurInput(this.value)">
+      <span class="blur-label">강하게 (20px)</span>
+      <span class="blur-val" id="blur-val">6px</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+      <button class="btn btn-primary" id="btn-blur-save" onclick="saveBlur()">💾 블러 강도 저장</button>
+      <span id="blur-msg"></span>
+    </div>
+  </div>
+
+  <!-- ── 슬롯 카드 ── -->
+  <div class="section-title">샘플 슬롯 (6개)</div>
+  <div class="slot-grid" id="slotGrid"></div>
+
+</div>
+</div><!-- /main-content -->
+
+<script>
+const SUPABASE_URL  = 'https://rkycwfpkzorfpcxfvaqt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs';
+const SB_SESSION_KEY = 'sb-rkycwfpkzorfpcxfvaqt-auth-token';
+const EXTRACT_BASE_URL = 'https://dwg-extract.worksfree.workers.dev';
+const BUCKET = 'wf-assets';
+const STORAGE_PREFIX = 'dwg-samples';
+
+const _noopStore = { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} };
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storage:_noopStore }
+});
+
+// service/dwg-extract/index.html에 실제 배포된 기본 6슬롯 — 여기 캡션/썸네일이 곧 "교체 전
+// 기본값"이다(양쪽 문서를 따로 관리하지 않도록 이 목록이 정본). 슬롯을 새로 추가하려면
+// 이 배열과 service/dwg-extract/index.html의 카드 6개를 함께 맞춰야 한다.
+const DEFAULT_SLOTS = [
+  { id:'slot1', title_ko:'단품 도면 1', title_en:'Single part 1', sub_ko:'BOM 없음', sub_en:'No BOM', defaultSvg:'../../service/dwg-extract/samples/sample_singlepart1.svg' },
+  { id:'slot2', title_ko:'단품 도면 2', title_en:'Single part 2', sub_ko:'BOM 없음(홀 치수표 포함)', sub_en:'No BOM (hole callout table)', defaultSvg:'../../service/dwg-extract/samples/sample_singlepart2.svg' },
+  { id:'slot3', title_ko:'조립도 1', title_en:'Assembly 1', sub_ko:'BOM 24행', sub_en:'24-row BOM', defaultSvg:'../../service/dwg-extract/samples/sample_assembly_bom1.svg' },
+  { id:'slot4', title_ko:'조립도 2', title_en:'Assembly 2', sub_ko:'BOM 31행', sub_en:'31-row BOM', defaultSvg:'../../service/dwg-extract/samples/sample_assembly_bom2.svg' },
+  { id:'slot5', title_ko:'조립도 3', title_en:'Assembly 3', sub_ko:'BOM 14행', sub_en:'14-row BOM', defaultSvg:'../../service/dwg-extract/samples/sample_assembly_bom3.svg' },
+  { id:'slot6', title_ko:'최상위 조립도', title_en:'Top assembly', sub_ko:'BOM 1행', sub_en:'1-row BOM', defaultSvg:'../../service/dwg-extract/samples/sample_top_assembly.svg' },
+];
+
+async function _getJWT() {
+  try {
+    if (window !== window.top && window.parent._SB) {
+      const { data } = await window.parent._SB.auth.getSession();
+      if (data?.session?.access_token) return data.session.access_token;
+    }
+  } catch(e) {}
+  try {
+    const raw = localStorage.getItem(SB_SESSION_KEY) ||
+      Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i))
+        .filter(k => k?.startsWith('sb-') && k?.endsWith('-auth-token'))
+        .map(k => localStorage.getItem(k))
+        .find(v => v?.includes('"access_token"'));
+    if (raw) {
+      const tok = JSON.parse(raw)?.access_token;
+      if (tok) return tok;
+    }
+  } catch(e) {}
+  return null;
+}
+async function _scUpsert(jwt, key, value) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/site_config`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${jwt}`,
+      'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'
+    },
+    body: JSON.stringify([{ key, value, updated_at: new Date().toISOString() }])
+  });
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    throw new Error(e.message || e.hint || e.code || `HTTP ${r.status}`);
+  }
+}
+async function _injectSession() {
+  try {
+    let raw = localStorage.getItem(SB_SESSION_KEY);
+    if (!raw) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
+          const v = localStorage.getItem(k);
+          if (v && v.includes('"access_token"')) { raw = v; break; }
+        }
+      }
+    }
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    const token = stored?.access_token; const uid = stored?.user?.id;
+    if (!token || !uid) return null;
+    const exp = stored?.expires_at ?? 0;
+    if (exp && (Date.now()/1000) > exp) return null;
+    try { await sb.auth.setSession({ access_token: token, refresh_token: stored?.refresh_token||'' }); } catch(e) {}
+    return { user: stored.user, access_token: token };
+  } catch(e) { return null; }
+}
+
+// ── 어드민 게이트 ────────────────────────────────────────────────────
+(async () => {
+  if (window !== window.top) {
+    document.getElementById('admin-gate').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    await _injectSession(); boot(); return;
+  }
+  const bypass = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (bypass) {
+    document.getElementById('admin-gate').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    await _injectSession(); boot(); return;
+  }
+  const session = await _injectSession();
+  if (session) {
+    try {
+      const r = await fetch(
+        `${SUPABASE_URL}/rest/v1/profiles?id=eq.${session.user.id}&select=role&limit=1`,
+        { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` } }
+      );
+      const rows = r.ok ? await r.json() : [];
+      if (rows[0]?.role === 'admin') {
+        document.getElementById('admin-gate').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        boot(); return;
+      }
+    } catch(e) {}
+  }
+  document.getElementById('admin-gate').classList.add('visible');
+})();
+
+// ── 상태 ──
+let manifestArr = [];          // site_config.dwg_sample_manifest — 슬롯 override만 담김
+const pendingFiles = {};       // slotId -> 새로 선택한 File(아직 업로드 전)
+
+function manifestEntry(slotId) { return manifestArr.find(e => e.id === slotId); }
+
+async function loadManifest() {
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/site_config?key=eq.dwg_sample_manifest&select=value`,
+    { headers: { apikey: SUPABASE_ANON } }
+  );
+  const rows = r.ok ? await r.json() : [];
+  manifestArr = Array.isArray(rows[0]?.value) ? rows[0].value : [];
+}
+
+async function loadBlur() {
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/site_config?key=eq.dwg_sample_blur_px&select=value`,
+    { headers: { apikey: SUPABASE_ANON } }
+  );
+  const rows = r.ok ? await r.json() : [];
+  const px = typeof rows[0]?.value === 'number' ? rows[0].value : 6;
+  document.getElementById('blur-slider').value = px;
+  document.getElementById('blur-val').textContent = px + 'px';
+}
+
+function onBlurInput(v) { document.getElementById('blur-val').textContent = v + 'px'; }
+
+async function saveBlur() {
+  const msg = document.getElementById('blur-msg');
+  const btn = document.getElementById('btn-blur-save');
+  btn.disabled = true; msg.textContent = '저장 중...'; msg.className = '';
+  try {
+    const jwt = await _getJWT();
+    if (!jwt) throw new Error('로그인 세션을 찾지 못했습니다');
+    await _scUpsert(jwt, 'dwg_sample_blur_px', parseInt(document.getElementById('blur-slider').value, 10));
+    msg.textContent = '✓ 저장했습니다'; msg.className = 'ok';
+  } catch (e) {
+    msg.textContent = '❌ ' + e.message; msg.className = 'err';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+
+function renderSlots() {
+  const grid = document.getElementById('slotGrid');
+  grid.innerHTML = DEFAULT_SLOTS.map(def => {
+    const ov = manifestEntry(def.id);
+    const thumbSrc = ov ? `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${STORAGE_PREFIX}/${def.id}.svg?t=${Date.now()}` : def.defaultSvg;
+    return `
+    <div class="slot-card${ov ? ' overridden' : ''}" id="card-${def.id}">
+      <div class="slot-head">
+        <img class="slot-thumb" id="thumb-${def.id}" src="${thumbSrc}" alt="">
+        <div>
+          <div class="slot-id">${def.id}</div>
+          <span class="slot-badge${ov ? ' on' : ''}" id="badge-${def.id}">${ov ? '교체됨' : '기본값'}</span>
+        </div>
+      </div>
+      <div class="slot-field"><label>제목(KO)</label><input type="text" id="tk-${def.id}" value="${escHtml(ov?.title_ko ?? def.title_ko)}"></div>
+      <div class="slot-field"><label>제목(EN)</label><input type="text" id="te-${def.id}" value="${escHtml(ov?.title_en ?? def.title_en)}"></div>
+      <div class="slot-field"><label>부제(KO)</label><input type="text" id="sk-${def.id}" value="${escHtml(ov?.sub_ko ?? def.sub_ko)}"></div>
+      <div class="slot-field"><label>부제(EN)</label><input type="text" id="se-${def.id}" value="${escHtml(ov?.sub_en ?? def.sub_en)}"></div>
+      <div class="slot-file-row">
+        <input type="file" id="file-${def.id}" accept=".dwg" onchange="onSlotFileChange('${def.id}')">
+      </div>
+      <div class="slot-actions">
+        <button class="btn btn-primary" onclick="saveSlot('${def.id}')">💾 저장</button>
+        <button class="btn btn-danger" onclick="resetSlot('${def.id}')" ${ov ? '' : 'disabled'}>↺ 기본값으로</button>
+      </div>
+      <div class="slot-msg" id="msg-${def.id}"></div>
+    </div>`;
+  }).join('');
+}
+
+function onSlotFileChange(slotId) {
+  const input = document.getElementById(`file-${slotId}`);
+  const f = input.files[0];
+  const msg = document.getElementById(`msg-${slotId}`);
+  if (!f) { delete pendingFiles[slotId]; return; }
+  if (!/\.dwg$/i.test(f.name)) {
+    msg.textContent = '❌ .dwg 파일만 가능합니다'; msg.className = 'slot-msg err';
+    input.value = ''; delete pendingFiles[slotId]; return;
+  }
+  if (f.size > 20 * 1024 * 1024) {
+    msg.textContent = '❌ 20MB를 초과합니다'; msg.className = 'slot-msg err';
+    input.value = ''; delete pendingFiles[slotId]; return;
+  }
+  pendingFiles[slotId] = f;
+  msg.textContent = `"${f.name}" 선택됨 — 저장을 눌러야 반영됩니다`; msg.className = 'slot-msg';
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadToStorage(jwt, path, blob, contentType) {
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + jwt, 'apikey': SUPABASE_ANON,
+      'Content-Type': contentType, 'x-upsert': 'true'
+    },
+    body: blob
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(`[${r.status}] ${j.message || j.error || JSON.stringify(j)}`);
+}
+
+async function saveSlot(slotId) {
+  const msg = document.getElementById(`msg-${slotId}`);
+  const card = document.getElementById(`card-${slotId}`);
+  const buttons = card.querySelectorAll('button');
+  buttons.forEach(b => b.disabled = true);
+  msg.textContent = '저장 중...'; msg.className = 'slot-msg';
+
+  try {
+    const jwt = await _getJWT();
+    if (!jwt) throw new Error('로그인 세션을 찾지 못했습니다');
+
+    const pendingFile = pendingFiles[slotId];
+    const hadOverride = !!manifestEntry(slotId);
+    if (!pendingFile && !hadOverride) {
+      throw new Error('아직 교체된 파일이 없는 슬롯입니다 — 먼저 DWG 파일을 선택하세요');
+    }
+
+    if (pendingFile) {
+      msg.textContent = 'DWG 업로드 중...';
+      await uploadToStorage(jwt, `${STORAGE_PREFIX}/${slotId}.dwg`, pendingFile, 'application/octet-stream');
+
+      msg.textContent = '썸네일 생성 중... (PC가 켜져 있어야 합니다)';
+      const dwgB64 = await fileToBase64(pendingFile);
+      const resp = await fetch(`${EXTRACT_BASE_URL}/thumbnail`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ access_token: jwt, dwg_base64: dwgB64 }),
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok || !data.ok) {
+        throw new Error(data.error === 'pc_offline' ? 'PC 로컬 서버가 꺼져 있어 썸네일을 만들 수 없습니다 — DWG는 업로드됐지만 썸네일은 이전 것이 유지됩니다' : `썸네일 생성 실패: ${data.error || resp.status}`);
+      }
+      msg.textContent = '썸네일 업로드 중...';
+      await uploadToStorage(jwt, `${STORAGE_PREFIX}/${slotId}.svg`, new Blob([data.svg], { type: 'image/svg+xml' }), 'image/svg+xml');
+    }
+
+    msg.textContent = '캡션 저장 중...';
+    const entry = {
+      id: slotId,
+      title_ko: document.getElementById(`tk-${slotId}`).value.trim(),
+      title_en: document.getElementById(`te-${slotId}`).value.trim(),
+      sub_ko: document.getElementById(`sk-${slotId}`).value.trim(),
+      sub_en: document.getElementById(`se-${slotId}`).value.trim(),
+    };
+    manifestArr = [...manifestArr.filter(e => e.id !== slotId), entry];
+    await _scUpsert(jwt, 'dwg_sample_manifest', manifestArr);
+
+    delete pendingFiles[slotId];
+    document.getElementById(`file-${slotId}`).value = '';
+    msg.textContent = '✓ 저장 완료 — DWG 추출 페이지에 즉시 반영됩니다'; msg.className = 'slot-msg ok';
+    renderSlots();
+  } catch (e) {
+    msg.textContent = '❌ ' + e.message; msg.className = 'slot-msg err';
+  } finally {
+    buttons.forEach(b => b.disabled = false);
+  }
+}
+
+async function resetSlot(slotId) {
+  if (!manifestEntry(slotId)) return;
+  if (!confirm(`${slotId}을 기본 샘플로 되돌릴까요? (업로드했던 파일은 Storage에서도 삭제됩니다)`)) return;
+  const msg = document.getElementById(`msg-${slotId}`);
+  msg.textContent = '되돌리는 중...'; msg.className = 'slot-msg';
+  try {
+    const jwt = await _getJWT();
+    if (!jwt) throw new Error('로그인 세션을 찾지 못했습니다');
+    manifestArr = manifestArr.filter(e => e.id !== slotId);
+    await _scUpsert(jwt, 'dwg_sample_manifest', manifestArr);
+    // Storage 파일 삭제는 실패해도(이미 없음 등) 무시 — 매니페스트에서 빠진 것만으로 충분히 "기본값 복귀"됨.
+    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + jwt, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prefixes: [`${STORAGE_PREFIX}/${slotId}.dwg`, `${STORAGE_PREFIX}/${slotId}.svg`] }),
+    }).catch(() => {});
+    delete pendingFiles[slotId];
+    renderSlots();
+  } catch (e) {
+    msg.textContent = '❌ ' + e.message; msg.className = 'slot-msg err';
+  }
+}
+
+async function boot() {
+  await Promise.all([loadManifest(), loadBlur()]);
+  renderSlots();
+}
+</script>
+</body>
+</html>
