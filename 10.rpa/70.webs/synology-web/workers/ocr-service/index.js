@@ -294,13 +294,16 @@ const RECEIPT_SCHEMA = {
 
 const RECEIPT_STRUCTURE_PROMPT_HEAD =
   "다음은 영수증에서 추출한 텍스트입니다. 아래 항목을 이 텍스트에서만 찾아 JSON으로 정리하세요. " +
-  "텍스트에 없는 값은 빈 문자열이나 0으로 두고 지어내지 마세요.\n" +
+  "텍스트에 없는 값은 빈 문자열이나 0으로 두고 지어내지 마세요. " +
+  "항목마다 텍스트 전체를 다시 확인하세요 — 값이 실제로 있는데 비워두는 실수를 하지 마세요.\n" +
   "- store_name: 상호명\n" +
   "- business_reg_no: 사업자등록번호\n" +
   "- date: 거래일시\n" +
   "- phone: 전화번호\n" +
   "- address: 사업장 주소(있으면)\n" +
-  "- items: 품목 배열, 각 항목은 name(품명)/qty(수량)/price(금액)\n" +
+  "- items: 품목 배열, 각 항목은 name(품명)/qty(수량)/price(금액). 카드 결제 전표(매출표)처럼 " +
+  "실제 구매 품목 목록이 없는 영수증이면 빈 배열로 두세요 — [일시불]/[할부] 같은 결제 방식 " +
+  "표시는 품목이 아니니 items에 넣지 마세요.\n" +
   "- subtotal: 공급가액\n- tax: 부가세\n- total: 합계금액\n\n[영수증 텍스트]\n";
 
 // JSON Schema를 Ollama의 format 파라미터로 넘기면 문법(GBNF) 제약으로 구조는 보장되지만,
@@ -338,12 +341,26 @@ async function structureReceipt(env, rawText, options) {
 // 사업자등록번호·합계금액처럼 형식이 고정적인 고신뢰 필드는 모델 출력만 믿지 않고
 // 이미 정확도가 검증된 원본 텍스트에서 정규식으로도 뽑아 대조용으로 함께 반환한다
 // (연구 결과 권장 패턴 — 모델이 숫자 서식을 바꾸거나 누락하는 경우의 안전망).
+//
+// 2026-07-24 실측: 텍스트 출력에서는 "주소:", "TEL:", "거래일시:", "사업자번호:"처럼
+// 라벨이 명확히 붙어 다 읽히는데, 엑셀(구조화) 출력에서는 상호명·합계 같은 눈에 띄는
+// 필드만 채워지고 나머지는 비어서 나오는 문제 발견 — structureReceipt()가 JSON
+// 파싱 자체는 성공(에러 없음)하지만 필드별로 골고루 채우지 못해서, 지금까지는 이걸
+// 잡아내는 재시도 로직이 없었다. 라벨이 뚜렷한 필드는 LLM 구조화 결과를 기다리지 않고
+// 정규식으로 직접 뽑아, LLM이 비워둔 자리를 메우는 용도로 쓴다(runReceiptExtraction 참고).
 function regexFallback(rawText) {
-  const bizNoMatch = rawText.match(/\d{3}[-\s]?\d{2}[-\s]?\d{5}/);
+  const bizNoLabeled = rawText.match(/사업자(?:등록)?번호\s*[:：]?\s*(\d{3}[-\s]?\d{2}[-\s]?\d{5})/);
+  const bizNoLoose = rawText.match(/\d{3}[-\s]?\d{2}[-\s]?\d{5}/);
   const totalMatch = rawText.match(/(?:합\s*계|총\s*액|총\s*합\s*계)[^\d₩]{0,10}([\d,]{3,})/);
+  const phoneMatch = rawText.match(/(?:TEL|전화(?:번호)?)\s*[:：]?\s*([\d\-]{9,13})/i);
+  const dateMatch = rawText.match(/거래일시\s*[:：]?\s*([\d]{2,4}[./\-][\d]{1,2}[./\-][\d]{1,2}[^\n]{0,15})/);
+  const addrMatch = rawText.match(/주소\s*[:：]?\s*([^\n]+)/);
   return {
-    business_reg_no: bizNoMatch ? bizNoMatch[0].replace(/\s/g, "") : null,
+    business_reg_no: (bizNoLabeled?.[1] || bizNoLoose?.[0] || "").replace(/\s/g, "") || null,
     total: totalMatch ? parseInt(totalMatch[1].replace(/,/g, ""), 10) : null,
+    phone: phoneMatch ? phoneMatch[1].trim() : null,
+    date: dateMatch ? dateMatch[1].trim() : null,
+    address: addrMatch ? addrMatch[1].trim() : null,
   };
 }
 
@@ -421,6 +438,20 @@ async function runReceiptExtraction(env, imageBase64) {
       structured = null;
     }
   }
+
+  const regexCheck = regexFallback(ocrResult.text);
+
+  // LLM 구조화가 JSON 파싱은 성공했지만 필드를 골고루 못 채우는 경우(실측 확인,
+  // 2026-07-24) — 라벨이 뚜렷해 정규식으로도 뽑히는 필드는 LLM이 비워둔 자리를
+  // 정규식 결과로 메운다. business_reg_no/total은 기존처럼 대조용(regex_check)으로만
+  // 두고 자동 교체하지 않음 — 숫자 필드는 오탐 시 사용자가 직접 알아채기 쉽고, 잘못
+  // 채우면 금액 신뢰도에 영향이 커서 더 보수적으로 접근한다.
+  if (structured) {
+    if (!structured.phone && regexCheck.phone) structured.phone = regexCheck.phone;
+    if (!structured.date && regexCheck.date) structured.date = regexCheck.date;
+    if (!structured.address && regexCheck.address) structured.address = regexCheck.address;
+  }
+
   let addressCheck = null;
   if (structured?.address) {
     try {
@@ -434,7 +465,7 @@ async function runReceiptExtraction(env, imageBase64) {
     rawText: ocrResult.text,
     lowConfidence: ocrResult.lowConfidence || !structured,
     structured,
-    regexCheck: regexFallback(ocrResult.text),
+    regexCheck,
     addressCheck,
   };
 }
