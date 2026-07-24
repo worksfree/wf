@@ -2077,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.8.5';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.8.14';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2117,6 +2117,7 @@ const TREE = [
       { label:{ko:'앱 요청 게시판',   en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
       { label:{ko:'전자책 미리보기',   en:'eBook Preview'},       icon:'📖', iframe:'service/ebook/index.html' },
       { label:{ko:'OCR 텍스트 추출',   en:'OCR Text Extraction'}, icon:'🔎', iframe:'service/ocr/index.html' },
+      { label:{ko:'DWG 표제란/BOM 추출', en:'DWG Title Block/BOM Extraction'}, icon:'📐', iframe:'service/dwg-extract/index.html' },
       { label:{ko:'그룹웨어 자동 데모', en:'Groupware Auto Demo'}, icon:'🎬', iframe:'groupware/demo/index.html' },
     ]
   },

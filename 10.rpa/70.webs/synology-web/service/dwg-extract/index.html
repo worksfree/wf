@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- iframe hide 스크립트 없음 — 추가 금지 (허브 iframe 로드 시 헤더 유지) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DWG 표제란/BOM 추출 — WorksFree</title>
+<style>
+/* service/ocr과 동일한 허브 다크 테마 팔레트(HUB_THEMES.claude) */
+:root {
+  --bg:#0f1117; --surface:#1c2333; --surface2:#222536; --border:#2a3347;
+  --text:#e2e8f0; --muted:#7e9ab5; --hint:#64748b;
+  --blue:#3b82f6; --blue-bg:#0c1a30; --amber:#f59e0b; --green:#10b981;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'IBM Plex Sans KR','Segoe UI','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+header {
+  position:sticky; top:0; z-index:100;
+  min-height:72px; padding:14px 24px;
+  display:flex; align-items:center; gap:14px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+}
+.hdr-icon  { font-size:26px; flex-shrink:0; }
+.hdr-info  { flex:1; }
+.hdr-title { font-size:17px; font-weight:600; letter-spacing:-.2px; }
+.hdr-sub   { font-size:13px; color:var(--muted); margin-top:2px; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
+
+.page { max-width:920px; margin:0 auto; padding:22px 18px 72px; }
+.intro { font-size:13px; color:var(--muted); margin-bottom:16px; }
+
+.drop { border:2px dashed var(--border); border-radius:12px; padding:32px 20px; text-align:center; background:var(--surface); }
+.drop.drag { border-color:var(--blue); background:var(--blue-bg); }
+.drop-btn { padding:10px 22px; font-size:14px; font-weight:600; color:#fff; background:var(--blue); border:none; border-radius:8px; cursor:pointer; }
+.drop-btn:hover { filter:brightness(1.1); }
+.drop-hint { font-size:12px; color:var(--hint); margin-top:10px; }
+.file-name { font-size:13px; color:var(--muted); margin-top:12px; word-break:break-all; }
+
+#status { font-size:13px; margin-top:14px; min-height:1.4em; }
+#status.err { color:#f87171; }
+#status.ok { color:var(--green); }
+
+.section { margin-top:24px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; display:none; }
+.section.show { display:block; }
+.section-title { font-size:14px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.badge { font-size:11px; font-weight:600; padding:2px 9px; border-radius:20px; background:var(--surface2); color:var(--muted); border:1px solid var(--border); }
+.badge.ok { color:#6ee7b7; background:rgba(16,185,129,.12); border-color:rgba(16,185,129,.3); }
+
+dl.kv { display:grid; grid-template-columns:auto 1fr; gap:8px 16px; font-size:13px; }
+dl.kv dt { color:var(--hint); white-space:nowrap; }
+dl.kv dd { color:var(--text); word-break:break-all; }
+
+.table-wrap { overflow-x:auto; }
+table.bom { width:100%; border-collapse:collapse; font-size:12.5px; white-space:nowrap; }
+table.bom th, table.bom td { padding:6px 10px; border-bottom:1px solid var(--border); text-align:left; }
+table.bom th { color:var(--muted); font-weight:600; background:var(--surface2); position:sticky; top:0; }
+table.bom td { color:var(--text); }
+table.bom tr:hover td { background:var(--surface2); }
+
+.actions { margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; }
+.copy-btn { padding:8px 16px; font-size:13px; font-weight:600; color:var(--text); background:var(--surface2); border:1px solid var(--border); border-radius:8px; cursor:pointer; }
+.copy-btn:hover { filter:brightness(1.15); }
+
+.disclaim { font-size:11.5px; color:var(--hint); margin-top:28px; padding-top:14px; border-top:1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">📐</div>
+  <div class="hdr-info">
+    <div class="hdr-title" id="hdr-title">DWG 표제란/BOM 추출</div>
+    <div class="hdr-sub" id="hdr-sub">AutoCAD 도면에서 설계정보와 부품표를 그대로 뽑아냅니다</div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="intro" id="intro">DWG 파일을 올리면 표제란(설계자·일자·승인 등)과 BOM(부품표)을 이미지 변환 없이 도면 안 벡터 텍스트에서 직접 읽어 엑셀로 저장합니다.</div>
+
+  <div class="drop" id="dropZone">
+    <button class="drop-btn" type="button" id="pickBtn">📁 파일 선택</button>
+    <div class="drop-hint" id="drop-hint">또는 이 영역에 .dwg 파일을 끌어다 놓으세요</div>
+    <div class="file-name" id="fileName"></div>
+    <input type="file" id="fileInput" accept=".dwg" style="display:none">
+  </div>
+
+  <div id="status"></div>
+
+  <div class="section" id="titleBlockSection">
+    <div class="section-title">
+      <span id="tb-title">📋 표제란</span>
+    </div>
+    <dl class="kv" id="titleBlockList"></dl>
+  </div>
+
+  <div class="section" id="bomSection">
+    <div class="section-title">
+      <span id="bom-title">🧾 BOM (부품표)</span>
+      <span class="badge ok" id="bom-count-badge"></span>
+    </div>
+    <div class="table-wrap"><table class="bom" id="bomTable"></table></div>
+  </div>
+
+  <div class="actions" id="actionsWrap" style="display:none">
+    <button class="copy-btn" type="button" id="downloadXlsxBtn">엑셀 다운로드</button>
+  </div>
+
+  <div class="disclaim" id="disclaim">
+    ※ 이 기능은 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다.
+    표제란 라벨 인식은 실측 검증된 회사 표준 도면 양식 기준이며, 도면 양식에 따라 일부 필드가 다르게 나올 수 있습니다.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script>
+/* ───────── i18n ───────── */
+const I18N = {
+  ko: {
+    hdr_title:"DWG 표제란/BOM 추출", hdr_sub:"AutoCAD 도면에서 설계정보와 부품표를 그대로 뽑아냅니다",
+    intro:"DWG 파일을 올리면 표제란(설계자·일자·승인 등)과 BOM(부품표)을 이미지 변환 없이 도면 안 벡터 텍스트에서 직접 읽어 엑셀로 저장합니다.",
+    pick_btn:"📁 파일 선택", drop_hint:"또는 이 영역에 .dwg 파일을 끌어다 놓으세요",
+    tb_title:"📋 표제란", bom_title:"🧾 BOM (부품표)",
+    bom_count:(n)=>`${n}개 품목`, bom_not_found:"이 도면에서 BOM을 찾지 못했습니다 — 단품 상세도이거나, 이 도면 양식에 부품표가 없을 수 있습니다.",
+    download_xlsx_btn:"엑셀 다운로드",
+    status_processing:"추출 중...", status_done:"추출 완료",
+    unsupported:"DWG 파일만 지원합니다(.dwg).", too_large:"파일이 너무 큽니다(최대 20MB).",
+    login_required:"로그인 후 이용 가능한 기능입니다.", error:"처리 중 오류가 발생했습니다.",
+    pc_offline:"로컬 추출 서버가 오프라인입니다. 잠시 후 다시 시도해 주세요.",
+    no_title_block:"표제란 필드를 찾지 못했습니다.",
+    disclaim:"※ 이 기능은 PC(로컬 서버)가 켜져 있을 때만 동작합니다. PC가 오프라인이면 안내 메시지가 표시됩니다. 표제란 라벨 인식은 실측 검증된 회사 표준 도면 양식 기준이며, 도면 양식에 따라 일부 필드가 다르게 나올 수 있습니다.",
+  },
+  en: {
+    hdr_title:"DWG Title Block / BOM Extraction", hdr_sub:"Pull design info and parts lists straight out of AutoCAD drawings",
+    intro:"Upload a DWG file to read its title block (designer/date/approval, etc.) and BOM (parts list) directly from the drawing's vector text — no image conversion — and save as Excel.",
+    pick_btn:"📁 Choose file", drop_hint:"or drag a .dwg file here",
+    tb_title:"📋 Title Block", bom_title:"🧾 BOM (Parts List)",
+    bom_count:(n)=>`${n} items`, bom_not_found:"No BOM found in this drawing — it may be a single-part detail drawing, or this drawing format has no parts list.",
+    download_xlsx_btn:"Download Excel",
+    status_processing:"Extracting...", status_done:"Done",
+    unsupported:"Only .dwg files are supported.", too_large:"File is too large (max 20MB).",
+    login_required:"Sign in to use this feature.", error:"An error occurred while processing.",
+    pc_offline:"The local extraction server is offline. Please try again shortly.",
+    no_title_block:"No title block fields found.",
+    disclaim:"※ This feature only works while the local PC server is on. If it's offline, a notice is shown. Title block label recognition is calibrated against a validated company drawing template — some fields may vary by drawing format.",
+  }
+};
+let lang = localStorage.getItem("wf_lang") || "ko";
+function t(key) { const v = I18N[lang][key]; return v !== undefined ? v : I18N.ko[key]; }
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.getElementById("hdr-title").textContent = t("hdr_title");
+  document.getElementById("hdr-sub").textContent = t("hdr_sub");
+  document.getElementById("intro").textContent = t("intro");
+  document.getElementById("pickBtn").textContent = t("pick_btn");
+  document.getElementById("drop-hint").textContent = t("drop_hint");
+  document.getElementById("tb-title").textContent = t("tb_title");
+  document.getElementById("bom-title").textContent = t("bom_title");
+  document.getElementById("downloadXlsxBtn").textContent = t("download_xlsx_btn");
+  document.getElementById("disclaim").textContent = t("disclaim");
+  if (_lastStatusKey) setStatus(_lastStatusKey, _lastStatusErr);
+  if (_lastResult) renderResult(_lastResult);
+}
+window.addEventListener("message", (e) => {
+  if (e.data && e.data.type === "wf_lang" && I18N[e.data.lang]) {
+    lang = e.data.lang;
+    applyLang();
+  }
+});
+
+/* ───────── Supabase ───────── */
+const EXTRACT_BASE_URL = "https://dwg-extract.worksfree.workers.dev";
+let sbClient = null;
+try {
+  if (window.supabase) {
+    sbClient = window.supabase.createClient(
+      "https://rkycwfpkzorfpcxfvaqt.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreWN3ZnBrem9yZnBjeGZ2YXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDk4OTQsImV4cCI6MjA5Mzg4NTg5NH0.u1HC0KiArbdqFAPpkRWsfZmMYqfZ-euRTHeNtUr2NBs",
+      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } }
+    );
+  }
+} catch (e) {}
+
+const MAX_FILE_BYTES = 20 * 1024 * 1024;
+
+/* ───────── 상태 표시 ───────── */
+let _lastStatusKey = null, _lastStatusErr = false;
+let _lastResult = null;
+function setStatus(key, isErr) {
+  _lastStatusKey = key; _lastStatusErr = !!isErr;
+  const el = document.getElementById("status");
+  el.className = isErr ? "err" : (key === "status_done" ? "ok" : "");
+  el.textContent = key ? t(key) : "";
+}
+function applyErrorStatus(resp, data) {
+  if (resp.status === 401 || data.error === "unauthenticated" || data.error === "invalid_session") setStatus("login_required", true);
+  else if (resp.status === 503 || data.error === "pc_offline") setStatus("pc_offline", true);
+  else setStatus("error", true);
+}
+
+/* ───────── 파일 읽기 ───────── */
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ───────── 결과 렌더링 ───────── */
+function renderResult(result) {
+  const tbSection = document.getElementById("titleBlockSection");
+  const tbList = document.getElementById("titleBlockList");
+  const entries = Object.entries(result.title_block || {});
+  tbList.innerHTML = "";
+  if (entries.length) {
+    for (const [k, v] of entries) {
+      const dt = document.createElement("dt"); dt.textContent = k;
+      const dd = document.createElement("dd"); dd.textContent = v;
+      tbList.appendChild(dt); tbList.appendChild(dd);
+    }
+    tbSection.classList.add("show");
+  } else {
+    tbList.innerHTML = `<dt></dt><dd>${escHtml(t("no_title_block"))}</dd>`;
+    tbSection.classList.add("show");
+  }
+
+  const bomSection = document.getElementById("bomSection");
+  const bomTable = document.getElementById("bomTable");
+  const bomBadge = document.getElementById("bom-count-badge");
+  if (result.bom_found && (result.bom_rows || []).length) {
+    const headRow = "<tr>" + result.bom_headers.map(h => `<th>${escHtml(h)}</th>`).join("") + "</tr>";
+    const bodyRows = result.bom_rows.map(row => "<tr>" + row.map(c => `<td>${escHtml(c)}</td>`).join("") + "</tr>").join("");
+    bomTable.innerHTML = headRow + bodyRows;
+    bomBadge.textContent = t("bom_count")(result.bom_rows.length);
+    bomBadge.style.display = "";
+    bomSection.classList.add("show");
+  } else {
+    bomBadge.style.display = "none";
+    bomTable.innerHTML = `<tr><td>${escHtml(t("bom_not_found"))}</td></tr>`;
+    bomSection.classList.add("show");
+  }
+
+  document.getElementById("actionsWrap").style.display = entries.length || (result.bom_rows||[]).length ? "flex" : "none";
+}
+
+function escHtml(s) { const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML; }
+
+/* ───────── 업로드/호출 ───────── */
+async function handleFile(file) {
+  document.getElementById("fileName").textContent = file.name;
+  document.getElementById("titleBlockSection").classList.remove("show");
+  document.getElementById("bomSection").classList.remove("show");
+  document.getElementById("actionsWrap").style.display = "none";
+  _lastResult = null;
+
+  if (!/\.dwg$/i.test(file.name)) { setStatus("unsupported", true); return; }
+  if (file.size > MAX_FILE_BYTES) { setStatus("too_large", true); return; }
+
+  if (!sbClient) { setStatus("login_required", true); return; }
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (!session) { setStatus("login_required", true); return; }
+
+  setStatus("status_processing", false);
+  try {
+    const dwgBase64 = await fileToBase64(file);
+    const resp = await fetch(`${EXTRACT_BASE_URL}/extract`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ access_token: session.access_token, dwg_base64: dwgBase64 }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.ok) { applyErrorStatus(resp, data); return; }
+    _lastResult = data;
+    renderResult(data);
+    setStatus("status_done", false);
+  } catch (e) {
+    console.error("[dwg-extract] exception:", e);
+    setStatus("error", true);
+  }
+}
+
+document.getElementById("pickBtn").addEventListener("click", () => document.getElementById("fileInput").click());
+document.getElementById("fileInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
+
+const dropZone = document.getElementById("dropZone");
+["dragenter", "dragover"].forEach(evt => dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.add("drag"); }));
+["dragleave", "drop"].forEach(evt => dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.remove("drag"); }));
+dropZone.addEventListener("drop", (e) => { const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+
+/* ───────── 엑셀 다운로드 ───────── */
+document.getElementById("downloadXlsxBtn").addEventListener("click", () => {
+  if (!_lastResult) return;
+  const wb = XLSX.utils.book_new();
+
+  const tbAoa = Object.entries(_lastResult.title_block || {}).map(([k, v]) => [k, v]);
+  const wsTitle = XLSX.utils.aoa_to_sheet(tbAoa.length ? tbAoa : [[""]]);
+  XLSX.utils.book_append_sheet(wb, wsTitle, "표제란");
+
+  if (_lastResult.bom_found && (_lastResult.bom_rows || []).length) {
+    const bomAoa = [_lastResult.bom_headers, ...(_lastResult.bom_rows || [])];
+    const wsBom = XLSX.utils.aoa_to_sheet(bomAoa);
+    XLSX.utils.book_append_sheet(wb, wsBom, "BOM");
+  }
+
+  const base = document.getElementById("fileName").textContent.replace(/\.dwg$/i, "") || "dwg_extract";
+  XLSX.writeFile(wb, `${base.replace(/[\\/:*?"<>|]/g, "")}_추출결과.xlsx`);
+});
+
+applyLang();
+</script>
+</body>
+</html>

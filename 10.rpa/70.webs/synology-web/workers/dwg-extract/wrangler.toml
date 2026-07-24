@@ -1,0 +1,11 @@
+name               = "dwg-extract"
+main               = "index.js"
+compatibility_date = "2025-01-01"
+
+# 아래는 전부 시크릿으로만 설정한다 (여기 평문 기재 금지):
+#   npx wrangler secret put CF_ACCESS_CLIENT_ID       (biz-rag/ocr-service와 동일 Service
+#                                                       Token 값 재사용 — pc-ai/detect와
+#                                                       같은 앱 정책에 등록해 재사용 중)
+#   npx wrangler secret put CF_ACCESS_CLIENT_SECRET
+#   npx wrangler secret put PC_EXTRACT_URL             (예: https://dwg-extract.worksfree.kr
+#                                                       — workers/dwg-extract-pc 참고)

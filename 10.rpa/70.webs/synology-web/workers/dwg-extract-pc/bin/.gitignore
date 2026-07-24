@@ -1,0 +1,4 @@
+# 10.rpa/.gitignore의 전역 *.exe 규칙에서 이 폴더의 런타임 의존 바이너리만 예외 처리.
+# 빌드 산출물이 아니라 dwg_extract_server.py가 그대로 서브프로세스로 실행하는
+# 필수 번들 파일(GNU LibreDWG, GPL 오픈소스)이라 커밋 대상이다.
+!dwgread.exe
