@@ -158,9 +158,24 @@ def extract_title_block(objs, labels=None) -> dict:
     return result
 
 
+# BOM 헤더에 흔히 쓰이는 단어들 — find_bom_block이 고른 "가장 큰 블록"이
+# 진짜 부품표인지 확인하는 용도. 실측(2026-07-25) 확인: 단품 도면에
+# BOM은 없어도 이보다 더 큰 홀/가공 치수표(헤더: "태그"/"크기"/"수량")가
+# 있으면 그게 잘못 선택되는 사례가 나왔다 — 개수만으로는 표 종류를
+# 구분할 수 없어서 헤더 어휘로 한 번 더 검증한다.
+# "수량"/"qty"는 일부러 뺐다 — 홀 치수표에도 흔히 쓰여서 구분력이 없다는 게
+# 바로 이 실측 사례로 확인됨. 구매/가공 부품에만 의미 있는 단어(제조사·
+# 재질·표면처리 등)로 좁혀야 홀 치수표 같은 다른 표와 구분된다.
+BOM_HEADER_KEYWORDS = [
+    "part name", "partname", "품명", "품번", "부품", "material", "재질",
+    "maker", "제조사", "표면처리", "열처리", "description",
+]
+
+
 def find_bom_block(objs, min_children: int = 10):
-    """MTEXT 자식이 가장 많은 "블록"(owner handle)을 BOM 테이블로 간주하고
-    (owner_handle, [(x, y, text), ...]) 반환. 없으면 (None, []).
+    """MTEXT 자식이 많은 "블록"(owner handle) 중, 헤더 어휘가 BOM처럼 보이는
+    첫 번째 것을 BOM 테이블로 간주해 (owner_handle, [(x, y, text), ...]) 반환.
+    없으면 (None, []).
 
     owner=None(= modelspace 직속, 블록 소속 아님)은 후보에서 반드시 제외한다 —
     표제란·테두리 구역참조 격자·공차표·주기 등이 전부 modelspace 직속 MTEXT라
@@ -174,6 +189,11 @@ def find_bom_block(objs, min_children: int = 10):
     min_children도 20 → 10으로 낮췄다 — 실측된 가장 작은 진짜 BOM(9열×2행=18개)
     보다는 작고, BOM이 없는 도면에서 관찰된 가장 큰 "가짜" 블록(7개, 실측)보다는
     커서 둘 다 안전하게 걸러진다.
+
+    "가장 큰 블록 = BOM"이라는 가정만으로는 부족하다는 것도 실측으로 확인됨
+    (2026-07-25) — 단품 도면 중 하나가 BOM 대신 더 큰 홀 가공 치수표
+    (태그/크기/수량 헤더)를 갖고 있어서 그게 잘못 선택됐다. 그래서 큰 블록
+    순서대로 훑으면서 BOM_HEADER_KEYWORDS와 매칭되는 첫 번째만 채택한다.
     """
     mtexts = list(_iter_entities(objs, "MTEXT"))
     by_owner = defaultdict(list)
@@ -184,12 +204,14 @@ def find_bom_block(objs, min_children: int = 10):
         x, y, _ = m.get("ins_pt", [0, 0, 0])
         by_owner[owner].append((x, y, fix_kr(m.get("text", ""))))
 
-    if not by_owner:
-        return None, []
-    best_owner = max(by_owner, key=lambda o: len(by_owner[o]))
-    if len(by_owner[best_owner]) < min_children:
-        return None, []
-    return best_owner, by_owner[best_owner]
+    candidates = sorted(by_owner.items(), key=lambda kv: -len(kv[1]))
+    for owner, items in candidates:
+        if len(items) < min_children:
+            break  # 크기순 정렬이라 이후 후보는 전부 더 작음 — 더 볼 필요 없음
+        joined = " ".join(t.lower() for _, _, t in items)
+        if any(kw in joined for kw in BOM_HEADER_KEYWORDS):
+            return owner, items
+    return None, []
 
 
 def reconstruct_table(cells, row_gap_ratio: float = 0.5):
@@ -256,15 +278,41 @@ def reconstruct_table(cells, row_gap_ratio: float = 0.5):
             del groups[merge_at + 1]
         return groups
 
+    # 1차: 모든 데이터 행의 그룹 계산(줄바꿈 병합까지) — 이 시점엔 아직
+    # 열을 배정하지 않는다. 실측(2026-07-25) 확인: 일부 행은 특정 열의
+    # MTEXT가 아예 없다(빈 문자열 자리조차 없음) — 예를 들어 MATERIAL·
+    # 표면처리·열처리 3칸이 통째로 빠져서 그 행의 실제 셀 개수가 6개뿐인
+    # 경우가 있었다. 이런 행에 순서대로(왼쪽부터) 배정하면 MAKER 값이
+    # MATERIAL 칸으로 밀려 들어가는 오배정이 생긴다.
+    row_groups = {idx: group_row_cells(rows[idx]) for idx in row_order[1:]}
+
+    # 2차: "완전한" 행(그룹 수가 정확히 n_cols인 행)들의 열별 X좌표 중앙값을
+    # 뽑아 열 기준 위치(reference_x)로 삼는다. 헤더 X 대신 이걸 쓰는 이유는
+    # 위 주석에서 설명한 대로 헤더 라벨 위치가 데이터 위치와 어긋나기 때문.
+    complete_rows = [g for g in row_groups.values() if len(g) == n_cols]
+
+    def group_x(g):
+        return sum(c[0] for c in g) / len(g)
+
+    if complete_rows:
+        col_xs_samples = [[group_x(row[col]) for row in complete_rows] for col in range(n_cols)]
+        reference_x = [sorted(s)[len(s) // 2] for s in col_xs_samples]  # 열별 중앙값
+    else:
+        # "완전한" 행이 하나도 없는 극단적인 경우엔 헤더 X로 대체(최선의 대안).
+        reference_x = [x for x, _ in header_cells]
+
+    def assign_col(x):
+        return min(range(n_cols), key=lambda i: abs(reference_x[i] - x))
+
     data_rows = []
     for idx in row_order[1:]:
-        groups = group_row_cells(rows[idx])
+        groups = row_groups[idx]
         row_out = ["" for _ in range(n_cols)]
-        # 셀이 헤더보다 적은 행(정말 일부 칸이 통째로 빠진 경우)은 왼쪽부터
-        # 채운다 — 흔치 않은 경우라 완벽하진 않지만 안전한 기본 동작.
-        for i, g in enumerate(groups[:n_cols]):
+        for g in groups:
+            col = assign_col(group_x(g))
             texts = [t for _, t in g if t]
-            row_out[i] = " ".join(texts).strip()
+            merged = " ".join(texts).strip()
+            row_out[col] = (row_out[col] + " " + merged).strip() if row_out[col] else merged
         data_rows.append(row_out)
 
     return header_texts, data_rows
