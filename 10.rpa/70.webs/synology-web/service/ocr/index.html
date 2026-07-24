@@ -67,16 +67,16 @@ label.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(
 
 .preview-wrap { margin-top:14px; display:none; }
 .preview-wrap.show { display:block; }
-.preview-scroll { max-height:420px; overflow:auto; border:1px solid var(--border); border-radius:10px; background:var(--surface); }
+.preview-scroll { max-height:420px; overflow:auto; border:1px solid var(--border); border-radius:10px; background:var(--surface); display:flex; }
 .preview-scroll:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
-.preview-wrap img { display:block; width:100%; border-radius:10px; }
+.preview-wrap img { display:block; width:100%; border-radius:10px; margin:auto; }
 .preview-cap { font-size:11.5px; color:var(--hint); margin-top:6px; text-align:center; }
 .zoom-row { display:flex; justify-content:center; align-items:center; gap:8px; margin-top:8px; }
 .zoom-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; width:30px; height:30px; font-size:15px; line-height:1; cursor:pointer; color:var(--muted); }
 .zoom-btn:disabled { opacity:.4; cursor:not-allowed; }
 .zoom-pct { font-size:12px; color:var(--hint); min-width:38px; text-align:center; }
 .zoom-fit-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; color:var(--muted); }
-.rotate-row { display:flex; justify-content:center; margin-top:8px; }
+.rotate-row { display:flex; justify-content:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
 .rotate-btn { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:6px 14px; font-size:12.5px; cursor:pointer; color:var(--muted); }
 .rotate-btn:disabled { opacity:.5; cursor:not-allowed; }
 
@@ -232,9 +232,10 @@ table.rcp-table td.num { text-align:right; }
           <button class="zoom-btn" type="button" id="zoomOutBtn">−</button>
           <span class="zoom-pct" id="zoomPct" aria-live="polite">100%</span>
           <button class="zoom-btn" type="button" id="zoomInBtn">+</button>
-          <button class="zoom-fit-btn" type="button" id="zoomFitBtn">원래 크기</button>
+          <button class="zoom-fit-btn" type="button" id="zoomFitBtn">전체 보기</button>
         </div>
         <div class="rotate-row">
+          <button class="rotate-btn" type="button" id="reprocessBtn">⟳ 현재 설정으로 다시 인식</button>
           <button class="rotate-btn" type="button" id="rotateBtn">🔄 회전 후 다시 인식</button>
         </div>
       </div>
@@ -352,8 +353,8 @@ const I18N = {
     unsupported:"지원하지 않는 파일 형식입니다 (PNG, JPG, PDF만 가능).",
     too_large:"파일이 너무 큽니다.",
     preview_pdf:n=>`PDF 미리보기 (1/${n} 페이지)`,
-    rotate_btn:"🔄 회전 후 다시 인식",
-    zoom_out:"축소", zoom_in:"확대", zoom_fit:"원래 크기",
+    rotate_btn:"🔄 회전 후 다시 인식", reprocess_btn:"⟳ 현재 설정으로 다시 인식",
+    zoom_out:"축소", zoom_in:"확대", zoom_fit:"전체 보기",
     processing:"처리 중...", processing_page:(i,n)=>`처리 중... (${i}/${n} 페이지)`,
     low_confidence_tip:"⚠ 원본이 흐릿하거나 구겨져 있어 인식이 불안정할 수 있습니다. 최대한 평평하게 펴서 밝은 곳에서 다시 촬영하거나, 회전 버튼으로 다시 시도해 보세요.",
     rcp_structure_failed:"구조화에 실패했습니다 — 텍스트 형식으로 다시 시도해 보세요.",
@@ -424,8 +425,8 @@ const I18N = {
     unsupported:"Unsupported file type (PNG, JPG, PDF only).",
     too_large:"File is too large.",
     preview_pdf:n=>`PDF preview (page 1/${n})`,
-    rotate_btn:"🔄 Rotate & retry",
-    zoom_out:"Zoom out", zoom_in:"Zoom in", zoom_fit:"Reset zoom",
+    rotate_btn:"🔄 Rotate & retry", reprocess_btn:"⟳ Re-run with current settings",
+    zoom_out:"Zoom out", zoom_in:"Zoom in", zoom_fit:"Fit to view",
     processing:"Processing...", processing_page:(i,n)=>`Processing... (page ${i}/${n})`,
     low_confidence_tip:"⚠ The source may be blurry or creased, so results could be unreliable. Try flattening it and retaking the photo in good light, or use the rotate button to retry.",
     rcp_structure_failed:"Structuring failed — try the Text format instead.",
@@ -500,6 +501,7 @@ function applyLang() {
   document.getElementById("downloadBtn").textContent = t("download_btn");
   document.getElementById("downloadXlsxBtn").textContent = t("download_xlsx_btn");
   document.getElementById("rotateBtn").textContent = t("rotate_btn");
+  document.getElementById("reprocessBtn").textContent = t("reprocess_btn");
   document.getElementById("zoomOutBtn").setAttribute("aria-label", t("zoom_out"));
   document.getElementById("zoomInBtn").setAttribute("aria-label", t("zoom_in"));
   document.getElementById("zoomFitBtn").textContent = t("zoom_fit");
@@ -692,16 +694,28 @@ function formatDuration(totalSec) {
 }
 
 /* ───────── 미리보기 확대/축소 ───────── */
-const ZOOM_MIN = 50, ZOOM_MAX = 300, ZOOM_STEP = 25;
+const ZOOM_MIN = 10, ZOOM_MAX = 300, ZOOM_STEP = 25;
 let _zoomPct = 100;
 function applyZoom() {
   document.getElementById("previewImg").style.width = _zoomPct + "%";
-  document.getElementById("zoomPct").textContent = _zoomPct + "%";
+  document.getElementById("zoomPct").textContent = Math.round(_zoomPct) + "%";
   document.getElementById("zoomOutBtn").disabled = _zoomPct <= ZOOM_MIN;
   document.getElementById("zoomInBtn").disabled = _zoomPct >= ZOOM_MAX;
 }
+// 이미지 전체가 미리보기 창 안에 다 들어오는 배율 계산(가로·세로 둘 다 넘치지 않게) —
+// width를 컨테이너 대비 %로 주는 방식이라, 세로가 max-height를 넘지 않는 상한을 구하면 됨.
+function computeFitZoom() {
+  const img = document.getElementById("previewImg");
+  const scroll = document.getElementById("previewScroll");
+  if (!img.naturalWidth || !img.naturalHeight) return 100;
+  const containerW = scroll.clientWidth || 1;
+  const maxH = parseFloat(getComputedStyle(scroll).maxHeight) || 420;
+  const pctByHeight = (maxH * img.naturalWidth) / (containerW * img.naturalHeight) * 100;
+  return Math.max(ZOOM_MIN, Math.min(100, pctByHeight));
+}
 function resetZoom() {
-  _zoomPct = 100; applyZoom();
+  _zoomPct = computeFitZoom();
+  applyZoom();
   const scroll = document.getElementById("previewScroll");
   scroll.scrollTop = 0; scroll.scrollLeft = 0;
 }
@@ -709,10 +723,11 @@ let _previewUrl = null;
 function showPreview(src, caption) {
   if (_previewUrl && _previewUrl !== src && _previewUrl.startsWith("blob:")) URL.revokeObjectURL(_previewUrl);
   _previewUrl = src.startsWith("blob:") ? src : null;
-  document.getElementById("previewImg").src = src;
+  const img = document.getElementById("previewImg");
   document.getElementById("previewCap").textContent = caption || "";
   document.getElementById("previewWrap").classList.add("show");
-  resetZoom();
+  img.onload = () => resetZoom(); // naturalWidth/Height는 로드 완료 후에만 유효 — 그 전엔 fit 계산 불가
+  img.src = src;
 }
 function hidePreview() {
   if (_previewUrl && _previewUrl.startsWith("blob:")) URL.revokeObjectURL(_previewUrl);
@@ -904,11 +919,15 @@ async function handleFile(file) {
   }
 }
 
-async function handleRotate() {
+// rotate=true: 회전각을 90도 더 돌리고 재인식(회전 버튼). rotate=false: 회전은
+// 그대로 두고 현재 설정(대비·샤프니스·출력형식 등)만 반영해서 재인식(재인식 버튼) —
+// 설정 슬라이더를 조정한 뒤 같은 이미지로 바로 다시 시도하고 싶다는 요청으로 추가.
+async function handleReprocess(rotate) {
   if (_rotateBusy || !_currentFile) return;
   _rotateBusy = true;
   const rotateBtn = document.getElementById("rotateBtn");
-  rotateBtn.disabled = true;
+  const reprocessBtn = document.getElementById("reprocessBtn");
+  rotateBtn.disabled = true; reprocessBtn.disabled = true;
   const status = document.getElementById("status");
   document.getElementById("resultWrap").style.display = "none";
   document.getElementById("rcpResultWrap").style.display = "none";
@@ -916,7 +935,7 @@ async function handleRotate() {
     if (!sbClient) { setStatus(status, "login_required", true); return; }
     const { data: { session } } = await sbClient.auth.getSession();
     if (!session) { setStatus(status, "login_required", true); return; }
-    _rotationDeg = (_rotationDeg + 90) % 360;
+    if (rotate) _rotationDeg = (_rotationDeg + 90) % 360;
     setStatus(status, "processing", false);
     const fmt = document.getElementById("fmtSelect").value;
     const images = await buildSingleImages(_rotationDeg, _currentIsPdf
@@ -924,10 +943,10 @@ async function handleRotate() {
       : (b64) => showPreview("data:image/png;base64," + b64, ""));
     await runSinglePipeline(images, session, fmt);
   } catch (err) {
-    console.error("[ocr] rotate exception:", err);
+    console.error("[ocr] reprocess exception:", err);
     setStatus(status, "error", true);
   } finally {
-    _rotateBusy = false; rotateBtn.disabled = false;
+    _rotateBusy = false; rotateBtn.disabled = false; reprocessBtn.disabled = false;
   }
 }
 
@@ -1013,7 +1032,8 @@ document.getElementById("pickCameraBtn").addEventListener("click", openCameraMod
 document.getElementById("cameraShutterBtn").addEventListener("click", captureCameraPhoto);
 document.getElementById("cameraCancelBtn").addEventListener("click", closeCameraModal);
 document.getElementById("cameraInput").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ""; });
-document.getElementById("rotateBtn").addEventListener("click", handleRotate);
+document.getElementById("rotateBtn").addEventListener("click", () => handleReprocess(true));
+document.getElementById("reprocessBtn").addEventListener("click", () => handleReprocess(false));
 document.getElementById("zoomInBtn").addEventListener("click", () => { _zoomPct = Math.min(ZOOM_MAX, _zoomPct + ZOOM_STEP); applyZoom(); });
 document.getElementById("zoomOutBtn").addEventListener("click", () => { _zoomPct = Math.max(ZOOM_MIN, _zoomPct - ZOOM_STEP); applyZoom(); });
 document.getElementById("zoomFitBtn").addEventListener("click", resetZoom);
