@@ -158,13 +158,29 @@ def extract_title_block(objs, labels=None) -> dict:
     return result
 
 
-def find_bom_block(objs, min_children: int = 20):
-    """MTEXT 자식이 가장 많은 블록(owner handle)을 BOM 테이블로 간주하고
-    (owner_handle, [(x, y, text), ...]) 반환. 없으면 (None, [])."""
+def find_bom_block(objs, min_children: int = 10):
+    """MTEXT 자식이 가장 많은 "블록"(owner handle)을 BOM 테이블로 간주하고
+    (owner_handle, [(x, y, text), ...]) 반환. 없으면 (None, []).
+
+    owner=None(= modelspace 직속, 블록 소속 아님)은 후보에서 반드시 제외한다 —
+    표제란·테두리 구역참조 격자·공차표·주기 등이 전부 modelspace 직속 MTEXT라
+    개수가 많으면(실측 86개) 진짜 BOM 블록(실측 18개)보다 커져서, 제외하지
+    않으면 이 잡동사니 뭉치를 BOM으로 잘못 고르는 사례가 실측 확인됨
+    (2026-07-25, 부품 1개짜리 최상위 조립도). 우연히 owner 값이 파이썬 None과
+    겹쳐 "못 찾음" 판정으로 흡수되긴 했지만, 그건 결과가 맞았을 뿐 원인은
+    잘못된 로직이었다 — modelspace 직속에 우연히 20개 미만 텍스트만 있는
+    도면이었다면 쓰레기 표가 그대로 나갔을 것.
+
+    min_children도 20 → 10으로 낮췄다 — 실측된 가장 작은 진짜 BOM(9열×2행=18개)
+    보다는 작고, BOM이 없는 도면에서 관찰된 가장 큰 "가짜" 블록(7개, 실측)보다는
+    커서 둘 다 안전하게 걸러진다.
+    """
     mtexts = list(_iter_entities(objs, "MTEXT"))
     by_owner = defaultdict(list)
     for m in mtexts:
         owner = _handle(m.get("ownerhandle"))
+        if owner is None:
+            continue  # modelspace 직속 — 블록이 아니므로 BOM 후보에서 제외
         x, y, _ = m.get("ins_pt", [0, 0, 0])
         by_owner[owner].append((x, y, fix_kr(m.get("text", ""))))
 

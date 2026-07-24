@@ -24,7 +24,7 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.8.8.2"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.8.8.15"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
 $AUC_VER  = "0.7.0.4"           # 경매지도 버전 (auction 배포 시 4번째↑)
 
 # 배포 대상 환경
@@ -39,7 +39,7 @@ $TARGETS = @{
 }
 
 # 배포 제외 목록
-$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log","*.bak",".git","node_modules","*.sh",".claude","test-results","playwright-report")
+$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log","*.bak",".git","node_modules","*.sh",".claude","test-results","playwright-report","workers")
 # ────────────────────────────────────────────────────────────────
 
 # 배포 환경 선택 후 증가하므로, 여기서는 현재값 저장만
@@ -351,7 +351,8 @@ if (Test-Path $gitBash) {
         "--exclude='deploy.ps1' --exclude='deploy.bat' " +
         "--exclude='*.log' --exclude='*.sh' " +
         "--exclude='.git' --exclude='node_modules' --exclude='.vscode' " +
-        "--exclude='.claude' --exclude='test-results' --exclude='playwright-report' "
+        "--exclude='.claude' --exclude='test-results' --exclude='playwright-report' " +
+        "--exclude='workers' "
     }
     # set -o pipefail: local tar 실패(클라우드 파일 읽기 오류 등)를 exit code로 전파
     # echo TAR_EXIT:$?: remote tar 결과를 명시적으로 출력 (exit 0 마스킹 제거)
