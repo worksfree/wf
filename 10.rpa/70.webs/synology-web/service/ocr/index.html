@@ -177,15 +177,6 @@ table.rcp-table td input:hover { background:var(--surface); }
       <div class="settings-panel" id="settingsPanel">
         <div class="settings-label" id="settings-label">⚙ 설정</div>
         <div class="setting-row">
-          <label for="fmtSelect"><span id="lbl-fmt">출력 형식</span></label>
-          <select id="fmtSelect" onchange="onFormatChange()">
-            <option value="text" id="opt-text">텍스트 (.txt) — 손글씨·일반 문서 추천</option>
-            <option value="markdown" id="opt-md">마크다운 (.md) — PDF·긴 문서 추천</option>
-            <option value="excel" id="opt-excel">CSV/엑셀 (.xlsx) — 영수증 추천</option>
-          </select>
-          <div class="setting-hint" id="fmt-hint"></div>
-        </div>
-        <div class="setting-row">
           <label for="docTypePreset"><span id="lbl-doctype">문서 유형(권장값 자동 채움)</span></label>
           <select id="docTypePreset" onchange="onDocTypePresetChange()">
             <option value="manual" id="opt-dt-manual">수동 조정</option>
@@ -213,6 +204,15 @@ table.rcp-table td input:hover { background:var(--surface); }
           <label for="detectModeToggle" id="detect-mode-label">🔬 정밀 교정 모드(베타) — 인식 위치를 이미지 위에 표시</label>
         </div>
         <div class="setting-hint" id="detect-mode-hint"></div>
+        <div class="setting-row">
+          <label for="fmtSelect"><span id="lbl-fmt">출력 형식</span></label>
+          <select id="fmtSelect" onchange="onFormatChange()">
+            <option value="text" id="opt-text">텍스트 (.txt) — 손글씨·일반 문서 추천</option>
+            <option value="markdown" id="opt-md">마크다운 (.md) — PDF·긴 문서 추천</option>
+            <option value="excel" id="opt-excel">CSV/엑셀 (.xlsx) — 영수증 추천</option>
+          </select>
+          <div class="setting-hint" id="fmt-hint"></div>
+        </div>
         <div class="settings-shared-hint" id="settings-shared-hint">이 설정은 단건·다건 처리에 공통 적용됩니다. 단건에서 파일 하나로 미리 결과를 확인한 뒤 다건으로 넘어가면 같은 설정으로 처리됩니다.</div>
       </div>
     </div>
