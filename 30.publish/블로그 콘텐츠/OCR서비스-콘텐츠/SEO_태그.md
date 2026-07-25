@@ -101,7 +101,14 @@ EasyOCR PaddleOCR Tesseractjs 하이브리드AI 모델조합 텍스트위치탐�
 바운딩박스 오버레이UI AI아키텍처설계
 ```
 
-**EP13: 클릭 한 번으로 테스트하기 — 샘플 갤러리와 라이선스 다시 점검하기(완결편)**
+**EP13: "고치려고 클릭했는데 못 찾는다"는 모순 — 내용 대신 순서를 믿기로 했다**
+```
+로컬LLM Ollama OCR오픈소스 VLM CloudflareWorker CloudflareTunnel 온디바이스AI RTX5090 GPU서버 worksfree
+알고리즘설계 편집거리 레벤슈타인 순환논리 소프트웨어재설계 사용자피드백
+버그헌팅 프론트엔드디버깅 UX개선
+```
+
+**EP14: 클릭 한 번으로 테스트하기 — 샘플 갤러리와 라이선스 다시 점검하기(완결편)**
 ```
 로컬LLM Ollama OCR오픈소스 VLM CloudflareWorker CloudflareTunnel 온디바이스AI RTX5090 GPU서버 worksfree
 데이터라이선스 CCBY 오픈데이터 웹개발 샘플갤러리 UX개선

@@ -4,7 +4,7 @@
 네이버 블로그 발행 시 이 문서의 태그를 그대로 복사해 사용.
 
 > ⚠ 이 시리즈는 아직 `_auto/posting_schedule.md`의 발행 일정표에 편입되지 않았다.
-> OCR 서비스구축 시리즈(13편)와 마찬가지로 별도 슬롯 확인 필요.
+> OCR 서비스구축 시리즈(14편)와 마찬가지로 별도 슬롯 확인 필요.
 
 ---
 
@@ -58,4 +58,11 @@ DWG CAD도면 AutoCAD LibreDWG 오픈소스 BOM부품표 표제란 CAD자동화 
 DWG CAD도면 AutoCAD LibreDWG 오픈소스 BOM부품표 표제란 CAD자동화 기구설계 worksfree
 GroundTruth 소프트웨어테스트 회귀테스트 품질검증 버그헌팅 자동화테스트
 데이터대조검증 QA엔지니어링 소프트웨어품질
+```
+
+**EP07: 지울 수 없다면 안 보이게 — 도형만 남긴 썸네일로 임시 조치를 풀었다**
+```
+DWG CAD도면 AutoCAD LibreDWG 오픈소스 BOM부품표 표제란 CAD자동화 기구설계 worksfree
+SVG와이어프레임 데이터프라이버시 CSS블러 O&M운영 데이터거버넌스 SupabaseStorage
+소프트웨어설계 관리자도구 개발일지
 ```
