@@ -335,10 +335,11 @@ function fileToBase64(file) {
   });
 }
 
-// part name/description 열·필드만 블러 대상으로 매칭 — dwg_extract.py의
-// BOM_HEADER_KEYWORDS 중 이름/설명에 해당하는 어휘만 좁혀서 재사용(재질·제조사
-// 등은 블러 대상 아님, 2026-07-26 요청 범위).
-const BLUR_LABEL_KEYWORDS = ["part name", "partname", "품명", "description"];
+// 블러 대상 필드/컬럼 — BOM의 part name/description(dwg_extract.py의
+// BOM_HEADER_KEYWORDS 중 이름/설명 어휘만 좁혀서 재사용)에 더해, 표제란의
+// 담당자(DESIGN/CHECK/APPROVE)와 도면번호(DWG NO.)도 블러 대상에 포함
+// (2026-07-26 요청 확장 — 재질·표면처리 등은 여전히 블러 대상 아님).
+const BLUR_LABEL_KEYWORDS = ["part name", "partname", "품명", "description", "design", "check", "approve", "dwg no"];
 function _isBlurLabel(label) {
   const l = (label || "").toLowerCase();
   return BLUR_LABEL_KEYWORDS.some(kw => l.includes(kw));
