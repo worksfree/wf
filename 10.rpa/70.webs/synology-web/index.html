@@ -2077,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.8.22';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.8.24';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2117,7 +2117,7 @@ const TREE = [
       { label:{ko:'앱 요청 게시판',   en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
       { label:{ko:'전자책 미리보기',   en:'eBook Preview'},       icon:'📖', iframe:'service/ebook/index.html' },
       { label:{ko:'OCR 텍스트 추출',   en:'OCR Text Extraction'}, icon:'🔎', iframe:'service/ocr/index.html', statusTag:{ko:'알파', en:'Alpha'} },
-      { label:{ko:'DWG 표제란/BOM 추출', en:'DWG Title Block/BOM Extraction'}, icon:'📐', iframe:'service/dwg-extract/index.html', statusTag:{ko:'개발 50%', en:'50% Built'} },
+      { label:{ko:'DWG 표제란/BOM 추출', en:'DWG Title Block/BOM Extraction'}, icon:'📐', iframe:'service/dwg-extract/index.html', statusTag:{ko:'알파', en:'Alpha'} },
       { label:{ko:'그룹웨어 자동 데모', en:'Groupware Auto Demo'}, icon:'🎬', iframe:'groupware/demo/index.html', statusTag:{ko:'개발예정', en:'Planned'} },
     ]
   },
@@ -2142,11 +2142,11 @@ const TREE = [
   {
     slug:'finance',
     label:{ko:'재무관리', en:'Finance'}, icon:'💰', consultantTag:true, children:[
-      { label:{ko:'자산 통합 관리', en:'Asset Portfolio'}, icon:'📊', iframe:'consulting/asset/index.html', consultantOnly:true },
+      { label:{ko:'자산 통합 관리', en:'Asset Portfolio'}, icon:'📊', iframe:'consulting/asset/index.html', consultantOnly:true, statusTag:{ko:'알파', en:'Alpha'} },
       {
-        label:{ko:'연금 시뮬레이터', en:'Pension Simulator'}, icon:'💰', consultantOnly:true, children:[
-          { label:{ko:'v1 절세 시뮬레이터', en:'v1 Tax Simulator'},     icon:'✦', iframe:'consulting/pension/index.html',    consultantOnly:true },
-          { label:{ko:'v2 최적 인출 전략', en:'v2 Optimal Withdrawal'}, icon:'✦', iframe:'consulting/pension/v2/index.html', consultantOnly:true },
+        label:{ko:'연금 시뮬레이터', en:'Pension Simulator'}, icon:'💰', consultantOnly:true, statusTag:{ko:'알파', en:'Alpha'}, children:[
+          { label:{ko:'v1 절세 시뮬레이터', en:'v1 Tax Simulator'},     icon:'✦', iframe:'consulting/pension/index.html',    consultantOnly:true, statusTag:{ko:'알파', en:'Alpha'} },
+          { label:{ko:'v2 최적 인출 전략', en:'v2 Optimal Withdrawal'}, icon:'✦', iframe:'consulting/pension/v2/index.html', consultantOnly:true, statusTag:{ko:'알파', en:'Alpha'} },
         ]
       },
     ]

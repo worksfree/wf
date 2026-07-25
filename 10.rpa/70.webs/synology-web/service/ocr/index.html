@@ -10,8 +10,11 @@
    기존 컨설팅/서비스 페이지들과 통일. 허브가 iframe에 테마를 자동 주입해주지
    않아서(기본 테마일 때는 각 페이지가 자체 CSS로 맞춰야 함) 직접 맞춘다. */
 :root {
+  /* muted/hint 원본값(#7e9ab5/#64748b)이 실측 대비 3.2~3.3:1로 WCAG AA 본문
+     기준(4.5:1) 미달이라(2026-07-26, service/dwg-extract와 동일 팔레트라 같이
+     수정) 두 값 모두 밝게 재조정 — 계층(hint < muted < text)은 그대로 유지. */
   --bg:#0f1117; --surface:#1c2333; --surface2:#222536; --border:#2a3347;
-  --text:#e2e8f0; --muted:#7e9ab5; --hint:#64748b;
+  --text:#e2e8f0; --muted:#a8bdd1; --hint:#8fa3ba;
   --blue:#3b82f6; --blue-bg:#0c1a30; --amber:#f59e0b; --green:#10b981;
 }
 * { box-sizing:border-box; margin:0; padding:0; }

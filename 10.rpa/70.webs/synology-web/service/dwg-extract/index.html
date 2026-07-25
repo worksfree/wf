@@ -6,10 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DWG 표제란/BOM 추출 — WorksFree</title>
 <style>
-/* service/ocr과 동일한 허브 다크 테마 팔레트(HUB_THEMES.claude) */
+/* service/ocr과 동일한 허브 다크 테마 팔레트(HUB_THEMES.claude) 기반이지만,
+   muted/hint 원본값(#7e9ab5/#64748b)이 실측 대비 3.2~3.3:1로 WCAG AA 본문
+   기준(4.5:1) 미달이라(2026-07-26 사용자 지적) 두 값 모두 밝게 재조정했다 —
+   hint는 hub index.html의 --muted 값(주석에 5.2:1로 남아있음)보다도 더
+   밝혀서 hint > 기존 hint, muted > 기존 muted 순서(계층)는 그대로 유지. */
 :root {
   --bg:#0f1117; --surface:#1c2333; --surface2:#222536; --border:#2a3347;
-  --text:#e2e8f0; --muted:#7e9ab5; --hint:#64748b;
+  --text:#e2e8f0; --muted:#a8bdd1; --hint:#8fa3ba;
   --blue:#3b82f6; --blue-bg:#0c1a30; --amber:#f59e0b; --green:#10b981;
 }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -24,28 +28,28 @@ header {
 .hdr-icon  { font-size:26px; flex-shrink:0; }
 .hdr-info  { flex:1; }
 .hdr-title { font-size:17px; font-weight:600; letter-spacing:-.2px; }
-.hdr-sub   { font-size:13px; color:var(--muted); margin-top:2px; }
+.hdr-sub   { font-size:13.5px; color:var(--muted); margin-top:2px; }
 button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
 
 .page { max-width:920px; margin:0 auto; padding:22px 18px 72px; }
-.intro { font-size:13px; color:var(--muted); margin-bottom:16px; }
+.intro { font-size:13.5px; color:var(--muted); margin-bottom:16px; }
 
 .drop { border:2px dashed var(--border); border-radius:12px; padding:32px 20px; text-align:center; background:var(--surface); }
 .drop.drag { border-color:var(--blue); background:var(--blue-bg); }
 .drop-btn { padding:10px 22px; font-size:14px; font-weight:600; color:#fff; background:var(--blue); border:none; border-radius:8px; cursor:pointer; }
 .drop-btn:hover { filter:brightness(1.1); }
-.drop-hint { font-size:12px; color:var(--hint); margin-top:10px; }
+.drop-hint { font-size:12.5px; color:var(--hint); margin-top:10px; }
 .file-name { font-size:13px; color:var(--muted); margin-top:12px; word-break:break-all; }
 
 .sample-gallery { margin-top:14px; }
-.sample-gallery-label { font-size:12px; color:var(--muted); margin-bottom:8px; }
+.sample-gallery-label { font-size:12.5px; color:var(--muted); margin-bottom:8px; }
 .sample-gallery-row { display:flex; gap:10px; flex-wrap:wrap; }
 .sample-card { display:flex; flex-direction:column; align-items:center; gap:3px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; cursor:pointer; min-width:110px; }
 .sample-card:hover { border-color:var(--blue); }
 .sample-card-thumb { width:64px; height:64px; object-fit:contain; border-radius:6px; background:#1c2333; }
 .sample-card-title { font-size:12.5px; color:var(--text); font-weight:600; }
-.sample-card-sub { font-size:11px; color:var(--hint); }
-.sample-privacy-note { font-size:11px; color:var(--hint); margin-top:6px; }
+.sample-card-sub { font-size:12px; color:var(--hint); }
+.sample-privacy-note { font-size:12px; color:var(--hint); margin-top:6px; }
 
 /* 샘플 결과의 part name/description은 실제 회사 도면 데이터라 블러 처리한다
    (2026-07-26 요청) — CSS 필터라 DOM/엑셀 원문에는 영향 없으므로, 이 값이 실제로
@@ -77,7 +81,7 @@ table.bom tr:hover td { background:var(--surface2); }
 .copy-btn { padding:8px 16px; font-size:13px; font-weight:600; color:var(--text); background:var(--surface2); border:1px solid var(--border); border-radius:8px; cursor:pointer; }
 .copy-btn:hover { filter:brightness(1.15); }
 
-.disclaim { font-size:11.5px; color:var(--hint); margin-top:28px; padding-top:14px; border-top:1px solid var(--border); }
+.disclaim { font-size:12px; color:var(--hint); margin-top:28px; padding-top:14px; border-top:1px solid var(--border); }
 </style>
 </head>
 <body>
