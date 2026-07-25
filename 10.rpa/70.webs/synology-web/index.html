@@ -273,7 +273,7 @@
   .tree-caret { font-size:12px; color:var(--muted); margin-left:auto; flex-shrink:0; transition:transform .2s; }
   .tree-caret.open { transform:rotate(90deg); }
   /* 관리자 전용 URL 복사 버튼 */
-  .tree-url-btn { font-size:10px; opacity:0; padding:1px 4px; cursor:pointer; transition:opacity .15s; flex-shrink:0; color:var(--muted); }
+  .tree-url-btn { font-size:12px; opacity:0; padding:1px 4px; cursor:pointer; transition:opacity .15s; flex-shrink:0; color:var(--muted); }
   .tree-label:hover .tree-url-btn { opacity:.55; }
   .tree-url-btn:hover { opacity:1 !important; color:var(--blue); }
   .tree-section-hdr { display:flex; align-items:center; gap:8px; padding:14px 16px 10px; font-size:19px; font-weight:700; letter-spacing:.02em; color:#94a3b8; border-bottom:1px solid var(--border); margin-bottom:6px; }
@@ -511,7 +511,7 @@
     gap:5px;
   }
   .lock-icon  { font-size:22px; line-height:1; }
-  .lock-label { font-size:11px; color:var(--muted); font-weight:500; letter-spacing:.04em; }
+  .lock-label { font-size:12px; color:var(--muted); font-weight:500; letter-spacing:.04em; }
   /* 다건 유료 칩 */
   .card-pro {
     position:absolute; top:10px; right:10px;
@@ -595,7 +595,7 @@
     border-radius:4px; padding:1px 4px;
     flex-shrink:0;
   }
-  .user-caret { font-size:10px; color:var(--muted); }
+  .user-caret { font-size:12px; color:var(--muted); }
 
   .user-dropdown {
     position:absolute; top:calc(100% + 4px); left:0;
@@ -605,7 +605,7 @@
     box-shadow:0 8px 24px rgba(0,0,0,.4);
   }
   .user-dropdown-email {
-    font-size:11px; color:var(--muted);
+    font-size:12px; color:var(--muted);
     padding:8px 12px; border-bottom:1px solid var(--border);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
@@ -849,7 +849,7 @@
   .req-mark  { background:#0c1a30; color:#60a5fa; border:1px solid #1e40af; }
   .opt-mark  { background:#1c2333; color:#64748b; border:1px solid #334155; }
   .consent-section-title { font-size:13px; font-weight:600; }
-  .consent-toggle { font-size:11px; color:var(--muted); }
+  .consent-toggle { font-size:12px; color:var(--muted); }
 
   .consent-detail {
     display:none; padding:12px 14px;
@@ -1007,8 +1007,8 @@
   .ch-icon { font-size:16px; flex-shrink:0; }
   .ch-info { flex:1; min-width:0; }
   .ch-reason { font-weight:600; font-size:12px; }
-  .ch-note { color:var(--muted); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .ch-date { color:var(--muted); font-size:11px; }
+  .ch-note { color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ch-date { color:var(--muted); font-size:12px; }
   .ch-delta { font-weight:700; font-size:14px; flex-shrink:0; text-align:right; }
   .ch-delta.plus  { color:#34d399; }
   .ch-delta.minus { color:#f87171; }
@@ -1053,9 +1053,9 @@
     padding:2px 9px; border-radius:10px; white-space:nowrap;
   }
   .credit-pkg-amount { font-size:24px; font-weight:800; color:var(--accent); }
-  .credit-pkg-unit   { font-size:11px; color:var(--muted); margin-bottom:8px; }
+  .credit-pkg-unit   { font-size:12px; color:var(--muted); margin-bottom:8px; }
   .credit-pkg-kr     { font-size:14px; font-weight:600; }
-  .credit-pkg-usd    { font-size:11px; color:var(--muted); margin-top:2px; }
+  .credit-pkg-usd    { font-size:12px; color:var(--muted); margin-top:2px; }
   .credit-pay-btns   { display:flex; flex-direction:column; gap:10px; }
   .credit-pay-btn {
     width:100%; padding:12px; border-radius:8px; border:none;
@@ -1073,7 +1073,7 @@
   .credit-result.ok  { background:rgba(16,185,129,.12); color:#10b981; display:block; }
   .credit-result.err { background:rgba(239,68,68,.1);  color:#ef4444;  display:block; }
   .credit-note {
-    font-size:11px; color:var(--muted); margin-top:14px; line-height:1.6;
+    font-size:12px; color:var(--muted); margin-top:14px; line-height:1.6;
   }
   /* ── 테스트 결제 모드 배너 ─────────────────── */
   .credit-test-banner {
@@ -1118,7 +1118,7 @@
   }
   .sub-pkg-name  { font-size:14px; font-weight:700; margin-bottom:8px; }
   .sub-pkg-price { font-size:20px; font-weight:800; color:var(--accent); }
-  .sub-pkg-desc  { font-size:11px; color:var(--muted); margin-top:6px; line-height:1.5; }
+  .sub-pkg-desc  { font-size:12px; color:var(--muted); margin-top:6px; line-height:1.5; }
   /* ── 토스트 알림 ─────────────────────── */
   #wf-toast {
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
@@ -2077,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.8.26';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.8.27';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);

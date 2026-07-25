@@ -25,16 +25,16 @@ header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14p
 
 .page{max-width:860px;margin:0 auto;padding:28px 20px 80px}
 .section{margin-bottom:28px}
-.section-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
 
 /* stats */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
 .stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px}
 .stat-card.highlight{border-color:var(--blue)}
-.sc-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.sc-label{font-size:12px;color:var(--muted);margin-bottom:6px}
 .sc-val{font-size:28px;font-weight:700;line-height:1}
-.sc-sub{font-size:11px;color:var(--hint);margin-top:4px}
+.sc-sub{font-size:12px;color:var(--hint);margin-top:4px}
 
 /* today bar */
 .today-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:28px}
@@ -135,7 +135,7 @@ header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14p
 .db-close-btn:hover{color:var(--text);background:var(--border)}
 .db-body{flex:1;overflow-y:auto;overflow-x:auto}
 .db-table{border-collapse:collapse;font-size:13px;min-width:900px;width:100%}
-.db-table th{position:sticky;top:0;background:var(--surface2);color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.05em;padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.db-table th{position:sticky;top:0;background:var(--surface2);color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.05em;padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
 .db-table td{padding:8px 12px;border-bottom:1px solid rgba(42,51,71,.5);vertical-align:middle;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .db-table tr:hover td{background:rgba(59,130,246,.04)}
 .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
@@ -191,7 +191,7 @@ header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14p
 .prev-dev-btn.active{background:var(--surface2);color:var(--text)}
 .prev-close{font-size:17px;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1;flex-shrink:0}
 .prev-close:hover{color:var(--text);background:var(--border)}
-.prev-meta{font-size:11px;color:var(--hint);padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:16px;flex-wrap:wrap;line-height:1.7}
+.prev-meta{font-size:12px;color:var(--hint);padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:16px;flex-wrap:wrap;line-height:1.7}
 .prev-meta b{color:var(--muted)}
 .prev-body{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;background:#1a1d2e}
 .prev-frame-wrap{transition:max-width .2s;width:100%;max-width:100%}
@@ -209,7 +209,7 @@ header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14p
 .prev-test-msg.ok{color:#6ee7b7}
 .prev-test-msg.err{color:#fca5a5}
 .prev-test-msg.loading{color:var(--muted)}
-.prev-quota-note{font-size:11px;color:var(--hint);padding:0 18px 8px;flex-shrink:0;background:var(--surface)}
+.prev-quota-note{font-size:12px;color:var(--hint);padding:0 18px 8px;flex-shrink:0;background:var(--surface)}
 
 /* ── 캠페인 관리 ── */
 .camp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
@@ -220,7 +220,7 @@ header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14p
 .camp-card-top{display:flex;align-items:flex-start;gap:8px}
 .camp-card-info{flex:1;min-width:0}
 .camp-card-name{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.camp-card-sub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.camp-card-sub{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .camp-progress-row{display:flex;align-items:center;gap:10px}
 .camp-progress-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
 .camp-progress-fill{height:100%;border-radius:2px;background:var(--green);transition:width .3s}
@@ -255,7 +255,7 @@ header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14p
 .modal-btn-cancel{background:var(--border);color:var(--text)}
 .modal-btn:disabled{opacity:.35;cursor:not-allowed}
 .runs-table{border-collapse:collapse;width:100%;font-size:13px}
-.runs-table th{background:var(--surface2);color:var(--muted);font-size:11px;font-weight:700;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.runs-table th{background:var(--surface2);color:var(--muted);font-size:12px;font-weight:700;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
 .runs-table td{padding:8px 12px;border-bottom:1px solid rgba(42,51,71,.5)}
 </style>
 </head>

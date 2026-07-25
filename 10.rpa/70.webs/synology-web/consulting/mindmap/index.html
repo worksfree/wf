@@ -38,7 +38,7 @@ header{position:fixed;top:0;left:0;right:0;height:52px;background:var(--panel);b
 .logo{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
 .logo-dot{width:7px;height:7px;background:var(--gold);border-radius:50%}
 .hdr-r{display:flex;align-items:center;gap:8px}
-.hdr-hint{font-size:11px;color:var(--muted)}
+.hdr-hint{font-size:12px;color:var(--muted)}
 .hdr-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
 .hdr-btn:hover{border-color:var(--blue);color:var(--blue)}
 .hdr-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
@@ -88,7 +88,7 @@ body.edit-mode .node-box:hover{outline:2px dashed var(--blue);outline-offset:3px
 body.edit-mode .node.selected .node-box{outline:2px solid #fff;outline-offset:3px}
 .node-edit-btn{position:absolute;top:-10px;right:-10px;width:20px;height:20px;border-radius:50%;border:none;font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;font-weight:700;line-height:1}
 .node-del-btn{background:#ef4444;color:#fff}
-.node-edit-label{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);white-space:nowrap;display:none}
+.node-edit-label{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--muted);white-space:nowrap;display:none}
 body.edit-mode .node-edit-btn{display:flex}
 body.edit-mode .node-edit-label{display:block}
 
@@ -122,7 +122,7 @@ body.connect-mode-active .node-box{outline:1px dashed var(--amber)!important;out
 .detail-sub{font-size:12.5px;color:var(--muted);line-height:1.6}
 .detail-body{padding:16px 20px;flex:1}
 .detail-section{margin-bottom:18px}
-.ds-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.ds-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
 .ds-edit-btn{font-size:10px;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;display:none}
 body.edit-mode .ds-edit-btn{display:inline}
 .check-list{display:flex;flex-direction:column;gap:5px}
@@ -138,8 +138,8 @@ body.edit-mode .ds-edit-btn{display:inline}
 
 /* ── LEGEND ── */
 #legend{position:fixed;bottom:16px;left:16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 14px;z-index:150}
-.leg-title{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;text-transform:uppercase}
-.leg-row{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);margin-bottom:4px}
+.leg-title{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;text-transform:uppercase}
+.leg-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:4px}
 .leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
 /* ── ZOOM ── */
@@ -153,7 +153,7 @@ body.edit-mode .ds-edit-btn{display:inline}
 
 /* ── OVERVIEW ── */
 #overview{position:fixed;left:16px;top:68px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 14px;z-index:150;max-width:200px}
-.ov-title{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:7px;text-transform:uppercase}
+.ov-title{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:7px;text-transform:uppercase}
 .ov-item{display:flex;align-items:center;gap:7px;padding:3px 0;cursor:pointer;transition:opacity .12s}
 .ov-item:hover{opacity:.7}
 .ov-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -166,7 +166,7 @@ body.edit-mode .ds-edit-btn{display:inline}
 .modal-title{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
 .modal-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer}
 .modal-field{margin-bottom:12px}
-.modal-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px;display:block}
+.modal-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:4px;display:block}
 .modal-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;font-family:inherit}
 .modal-input:focus{border-color:var(--blue)}
 .modal-textarea{min-height:80px;resize:vertical}
@@ -184,7 +184,7 @@ body.edit-mode .ds-edit-btn{display:inline}
   display:flex;align-items:center;gap:6px;
   transition:right .3s cubic-bezier(.4,0,.2,1);
 }
-#edit-ctrl #hdr-hint{font-size:11px;color:var(--muted);display:none}
+#edit-ctrl #hdr-hint{font-size:12px;color:var(--muted);display:none}
 /* 상세 패널이 열리면 패널 왼쪽 경계에 붙음 (360px + 8px) */
 #detail.open ~ #edit-ctrl{right:368px}
 </style>
