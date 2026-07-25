@@ -85,7 +85,7 @@
     --success: #10b981;
     --warn:    #f59e0b;
     --text:    #e2e8f0;
-    --muted:   #7e9ab5;  /* #64748b → 3.25:1 on panel → #7e9ab5 → 5.2:1 (WCAG AA) */
+    --muted:   #a8bdd1;  /* 2026-07-26: 서비스 페이지들과 동일 값으로 재통일(7.8~9.8:1) — 예전 #7e9ab5(5.2:1)도 AA는 통과했으나 페이지마다 값이 제각각이라 하나로 맞춤 */
     --hover:   #243049;
     --active:  #1e3a5f;
     --radius:  8px;
@@ -2077,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.8.24';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.8.26';             // deploy.ps1이 자동 증가
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -3260,7 +3260,7 @@ const HUB_THEMES = {
   claude: {
     name: '클로드 기본',
     preview: ['#0f1117','#1c2333','#3b82f6'],
-    css: ':root{--bg:#0f1117;--sidebar:#161b27;--panel:#1c2333;--border:#2a3347;--accent:#3b82f6;--accent2:#06b6d4;--success:#10b981;--warn:#f59e0b;--text:#e2e8f0;--muted:#64748b;--hover:#243049;--active:#1e3a5f;--surface:#1a1d27;--surface2:#222536;--blue:#3b82f6;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--orange:#f97316;--hint:#64748b;}'
+    css: ':root{--bg:#0f1117;--sidebar:#161b27;--panel:#1c2333;--border:#2a3347;--accent:#3b82f6;--accent2:#06b6d4;--success:#10b981;--warn:#f59e0b;--text:#e2e8f0;--muted:#a8bdd1;--hover:#243049;--active:#1e3a5f;--surface:#1a1d27;--surface2:#222536;--blue:#3b82f6;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--orange:#f97316;--hint:#8fa3ba;}'
   },
   sunset: {
     name: '선셋 다크',
