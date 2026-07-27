@@ -1,6 +1,6 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
-require('dotenv').config({ path: '.env.test' });
+require('dotenv').config({ path: '_secrets/.env.test' });
 
 const BASE_URL = process.env.DEPLOY_TARGET || 'http://localhost:3001';
 

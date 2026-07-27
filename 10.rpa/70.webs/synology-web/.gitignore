@@ -2,9 +2,9 @@ node_modules/
 playwright-report/
 test-results/
 .playwright/
-.env.test
 **/.claude/worktrees/
-secrets.ps1
-Client ID.txt
 auction/crawler/data/*.db
 **/.wrangler/
+
+# 시크릿·고객데이터 — 폴더째 제외(개별 파일명 나열 방식은 하나 놓치면 새는 게 이번 사고 원인이었음)
+_secrets/

@@ -41,8 +41,10 @@ $TARGETS = @{
 # 배포 제외 목록
 # ⚠️ 2026-07-28: secrets.ps1/Client ID.txt/.env.test가 이 목록에 없어서 test·staging·portal
 # 전부에 실제 Cloudflare·Google OAuth·Supabase service_role 키가 배포된 사고 발생 — 즉시 삭제 후
-# .gitignore와 동일한 항목을 여기에도 반영(두 목록은 서로 다른 시스템이라 하나만 고치면 재발함).
-$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log","*.bak",".git","node_modules","*.sh",".claude","test-results","playwright-report","workers","secrets.ps1","Client ID.txt",".env.test",".env.test.example",".wrangler","백업_20260513.json","현장클리닉_원본DB.txt")
+# 모든 시크릿·고객데이터 파일을 _secrets/ 폴더 하나로 모으고 그 폴더째 제외하도록 변경.
+# (개별 파일명 나열은 새 시크릿 파일이 추가될 때 빠뜨리기 쉬워 이번 사고의 근본 원인이었음 —
+# 폴더째 제외하면 _secrets/ 안에 뭘 새로 넣어도 항상 안전함. .gitignore도 동일하게 폴더 단위로 맞춤.)
+$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log","*.bak",".git","node_modules","*.sh",".claude","test-results","playwright-report","workers","_secrets",".wrangler")
 # ────────────────────────────────────────────────────────────────
 
 # 배포 환경 선택 후 증가하므로, 여기서는 현재값 저장만
@@ -362,10 +364,7 @@ if (Test-Path $gitBash) {
         "--exclude='*.log' --exclude='*.sh' " +
         "--exclude='.git' --exclude='node_modules' --exclude='.vscode' " +
         "--exclude='.claude' --exclude='test-results' --exclude='playwright-report' " +
-        "--exclude='workers' " +
-        "--exclude='secrets.ps1' --exclude='Client ID.txt' " +
-        "--exclude='.env.test' --exclude='.env.test.example' --exclude='.wrangler' " +
-        "--exclude='백업_20260513.json' --exclude='현장클리닉_원본DB.txt' "
+        "--exclude='workers' --exclude='_secrets' --exclude='.wrangler' "
     }
     # set -o pipefail: local tar 실패(클라우드 파일 읽기 오류 등)를 exit code로 전파
     # echo TAR_EXIT:$?: remote tar 결과를 명시적으로 출력 (exit 0 마스킹 제거)
@@ -498,7 +497,7 @@ if ($allOk -and ($choice -eq "2" -or $choice -eq "3")) {
 # ── Cloudflare 캐시 퍼지 (전체 배포 완료 후 1회) ────────────────
 if ($allOk) {
     $CF_ZONE_ID   = "b5e82c46532b06a2cd456cc5ff3b9234"
-    $secretsFile  = Join-Path $PSScriptRoot "secrets.ps1"
+    $secretsFile  = Join-Path $PSScriptRoot "_secrets\secrets.ps1"
     if (Test-Path $secretsFile) { . $secretsFile }
     $CF_API_TOKEN = $env:CF_CACHE_PURGE_TOKEN
     Write-Host ""
