@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- iframe hide 스크립트 없음 — 추가 금지 (허브 iframe 로드 시 헤더 유지) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB 설계검증 — WorksFree</title>
+<style>
+:root {
+  --bg:#0f1117; --surface:#1c2333; --surface2:#222536; --border:#2a3347;
+  --text:#e2e8f0; --muted:#a8bdd1; --hint:#8fa3ba;
+  --blue:#3b82f6; --blue-bg:#0c1a30; --amber:#f59e0b; --green:#10b981; --red:#f87171;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'IBM Plex Sans KR','Segoe UI','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+header {
+  position:sticky; top:0; z-index:100;
+  min-height:72px; padding:14px 24px;
+  display:flex; align-items:center; gap:14px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+}
+.hdr-icon  { font-size:26px; flex-shrink:0; }
+.hdr-info  { flex:1; }
+.hdr-title { font-size:17px; font-weight:600; letter-spacing:-.2px; }
+.hdr-sub   { font-size:13.5px; color:var(--muted); margin-top:2px; }
+.hdr-badge { font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; background:rgba(245,158,11,.12); color:#fcd34d; border:1px solid rgba(245,158,11,.3); flex-shrink:0; white-space:nowrap; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid #ff9b3d; outline-offset:2px; }
+
+.page { max-width:1000px; margin:0 auto; padding:22px 18px 72px; }
+.intro { font-size:13.5px; color:var(--muted); margin-bottom:18px; }
+
+.card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:16px; }
+.card-title { font-size:14px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+
+/* ── 업로드 2행 + 샘플 버튼 ── */
+.upload-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:640px) { .upload-grid { grid-template-columns:1fr; } }
+.upload-row-title { font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px; }
+.drop { border:2px dashed var(--border); border-radius:10px; padding:16px 12px; text-align:center; background:var(--surface2); }
+.drop.drag { border-color:var(--blue); background:var(--blue-bg); }
+.drop-btn { padding:8px 16px; font-size:13px; font-weight:600; color:#fff; background:var(--blue); border:none; border-radius:8px; cursor:pointer; }
+.drop-btn:hover { filter:brightness(1.1); }
+.drop-hint { font-size:11.5px; color:var(--hint); margin-top:6px; }
+.file-name { font-size:12px; color:var(--green); margin-top:8px; word-break:break-all; }
+
+.sample-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+.sample-text { font-size:12.5px; color:var(--hint); }
+.sample-btn { padding:8px 16px; font-size:13px; font-weight:600; color:var(--text); background:var(--surface2); border:1px solid var(--border); border-radius:8px; cursor:pointer; white-space:nowrap; }
+.sample-btn:hover { border-color:var(--blue); color:#fff; }
+
+.tol-row { display:flex; align-items:center; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); flex-wrap:wrap; }
+.tol-row label { font-size:12.5px; color:var(--muted); font-weight:600; }
+.tol-row input[type="number"] { width:80px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:6px 9px; font-size:13px; font-family:inherit; }
+.tol-hint { font-size:12px; color:var(--hint); }
+
+#status { font-size:13px; margin-top:10px; min-height:1.4em; }
+#status.err { color:#f87171; }
+#status.ok  { color:var(--green); }
+
+/* ── 결과 요약 ── */
+.summary-row { display:flex; gap:12px; flex-wrap:wrap; }
+.summary-stat { flex:1; min-width:110px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center; }
+.summary-stat .num { font-size:22px; font-weight:700; }
+.summary-stat .lbl { font-size:11.5px; color:var(--hint); margin-top:2px; }
+.summary-stat.pass .num { color:var(--green); }
+.summary-stat.fail .num { color:var(--red); }
+
+/* ── 결과 표 ── */
+.tbl-wrap { overflow-x:auto; margin-top:14px; }
+table.rtbl { width:100%; border-collapse:collapse; font-size:12.5px; }
+table.rtbl th, table.rtbl td { padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
+table.rtbl th { color:var(--hint); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; }
+table.rtbl td.reason { white-space:normal; color:var(--muted); }
+.badge { font-size:11px; font-weight:700; padding:2px 9px; border-radius:20px; display:inline-block; }
+.badge.pass { color:#6ee7b7; background:rgba(16,185,129,.12); border:1px solid rgba(16,185,129,.3); }
+.badge.fail { color:#fca5a5; background:rgba(248,113,113,.12); border:1px solid rgba(248,113,113,.3); }
+tr.fail-row { background:rgba(248,113,113,.05); }
+
+.orphan-box { margin-top:14px; padding:10px 14px; background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.3); border-radius:10px; font-size:12.5px; color:#fcd34d; }
+.orphan-box code { font-family:'IBM Plex Mono',monospace; background:rgba(0,0,0,.2); padding:1px 5px; border-radius:4px; }
+
+/* ── SVG 뷰어 ── */
+.viewer-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.viewer-toolbar button { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:5px 11px; cursor:pointer; font-size:13px; }
+.viewer-toolbar button:hover { border-color:var(--blue); }
+.viewer-toolbar .zoom-pct { font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--muted); min-width:52px; text-align:center; }
+.viewer-wrap { overflow:auto; max-height:520px; border:1px solid var(--border); border-radius:10px; background:#fff; }
+.viewer-wrap svg { display:block; }
+.viewer-legend { display:flex; gap:16px; flex-wrap:wrap; margin-top:10px; font-size:12px; color:var(--hint); }
+.viewer-legend span { display:inline-flex; align-items:center; gap:6px; }
+.legend-dot { width:10px; height:10px; border-radius:2px; display:inline-block; }
+
+.export-btn { padding:10px 18px; font-size:13.5px; font-weight:700; color:#fff; background:var(--blue); border:none; border-radius:8px; cursor:pointer; margin-top:14px; }
+.export-btn:hover { filter:brightness(1.1); }
+.export-btn:disabled { background:var(--surface2); color:var(--hint); cursor:not-allowed; }
+
+.notice-box { margin-top:6px; padding:12px 14px; background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.3); border-radius:10px; font-size:12.5px; color:#fcd34d; line-height:1.7; }
+.disclaim { font-size:12px; color:var(--hint); margin-top:24px; padding-top:14px; border-top:1px solid var(--border); }
+.hidden { display:none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">🔌</div>
+  <div class="hdr-info">
+    <div class="hdr-title" id="hdr-title">PCB 설계검증</div>
+    <div class="hdr-sub" id="hdr-sub">스펙 파일과 도면(DXF)의 핀 연결을 좌표 기반으로 자동 대조합니다</div>
+  </div>
+  <div class="hdr-badge" id="hdr-badge">🧪 알파 · 방식 A 전용</div>
+</header>
+
+<div class="page">
+  <div class="intro" id="intro">스펙 파일(엑셀, From_Pin/To_Pin)과 도면(DXF)을 올리면, 도면 안의 핀 라벨 텍스트와 배선(LINE) 끝점의 좌표 근접도만으로 연결 여부를 판정합니다 — 회로 데이터 없이 도면 좌표만으로 1차 검증합니다. 처리는 전부 이 브라우저 안에서만 일어나며 서버로 전송되지 않습니다.</div>
+
+  <div class="card">
+    <div class="card-title" id="upload-title">① 파일 업로드</div>
+    <div class="upload-grid">
+      <div>
+        <div class="upload-row-title" id="lbl-row-spec">스펙 파일 (.xlsx)</div>
+        <div class="drop" id="dropSpec">
+          <button class="drop-btn" type="button" id="pickSpecBtn">📁 파일 선택</button>
+          <div class="drop-hint" id="drop-hint-spec">또는 이 영역에 끌어다 놓으세요 — 열: From_Pin, To_Pin</div>
+          <div class="file-name" id="specFileName"></div>
+          <input type="file" id="specInput" accept=".xlsx,.xls" style="display:none">
+        </div>
+      </div>
+      <div>
+        <div class="upload-row-title" id="lbl-row-dxf">설계 도면 (.dxf)</div>
+        <div class="drop" id="dropDxf">
+          <button class="drop-btn" type="button" id="pickDxfBtn">📁 파일 선택</button>
+          <div class="drop-hint" id="drop-hint-dxf">또는 이 영역에 끌어다 놓으세요 — ASCII DXF</div>
+          <div class="file-name" id="dxfFileName"></div>
+          <input type="file" id="dxfInput" accept=".dxf" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <div class="sample-row">
+      <div class="sample-text" id="sample-text">파일이 없으신가요? IC 8개(QFP32, 0.75mm 핀피치)·배선 84건(결함 5건 포함)짜리 실전급 샘플로 확인해 볼 수 있습니다 — 확대해야 배선이 분리되어 보이는 밀도입니다.</div>
+      <button class="sample-btn" type="button" id="loadSampleBtn">🧪 <span id="sample-btn-label">샘플로 테스트</span></button>
+    </div>
+
+    <div class="tol-row">
+      <label for="tolInput" id="lbl-tol">좌표 오차범위(tolerance, mm)</label>
+      <input type="number" id="tolInput" min="0.001" step="0.01" value="0.05">
+      <span class="tol-hint" id="tol-hint">정밀 좌표로 생성된 샘플은 0.05mm면 충분합니다. 실제 스캔·내보내기 DXF는 도면 단위에 맞춰 0.3~1mm 정도로 넓혀야 할 수 있습니다 — 너무 좁히면 정상 연결도 놓치고, 너무 넓히면 다른 핀과 혼동합니다.</span>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+  <div class="card hidden" id="resultsCard">
+    <div class="card-title" id="results-title">② 검증 결과</div>
+    <div class="summary-row">
+      <div class="summary-stat"><div class="num" id="sum-total">0</div><div class="lbl" id="sum-total-lbl">전체</div></div>
+      <div class="summary-stat pass"><div class="num" id="sum-pass">0</div><div class="lbl" id="sum-pass-lbl">PASS</div></div>
+      <div class="summary-stat fail"><div class="num" id="sum-fail">0</div><div class="lbl" id="sum-fail-lbl">FAIL</div></div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="rtbl" id="resultTable">
+        <thead>
+          <tr>
+            <th id="th-from">스펙 출발핀</th>
+            <th id="th-to">스펙 도착핀</th>
+            <th id="th-status">검증결과</th>
+            <th id="th-reason">상세사유</th>
+          </tr>
+        </thead>
+        <tbody id="resultTbody"></tbody>
+      </table>
+    </div>
+
+    <div class="orphan-box hidden" id="orphanBox"></div>
+
+    <button class="export-btn" id="exportBtn" type="button">📥 <span id="export-btn-label">결과 엑셀 다운로드</span></button>
+  </div>
+
+  <div class="card hidden" id="viewerCard">
+    <div class="card-title" id="viewer-title">③ 도면 뷰어 (LINE·TEXT만 표시)</div>
+    <div class="viewer-toolbar">
+      <button type="button" id="zoomOutBtn" aria-label="축소">−</button>
+      <span class="zoom-pct" id="zoomPctLabel">100%</span>
+      <button type="button" id="zoomInBtn" aria-label="확대">+</button>
+      <button type="button" id="zoom10xBtn">🔍 <span id="zoom10x-label">10배로 보기</span></button>
+      <button type="button" id="zoomResetBtn"><span id="zoom-reset-label">100%로 리셋</span></button>
+    </div>
+    <div class="viewer-wrap" id="viewerWrap"></div>
+    <div class="viewer-legend">
+      <span><span class="legend-dot" style="background:#334155"></span><span id="legend-normal">정상 배선/라벨</span></span>
+      <span><span class="legend-dot" style="background:#dc2626"></span><span id="legend-problem">FAIL 관련 라벨</span></span>
+      <span><span class="legend-dot" style="background:#d97706"></span><span id="legend-orphan">스펙에 없는 라벨(추가 발견)</span></span>
+    </div>
+  </div>
+
+  <div class="notice-box" id="notice-box">
+    ⚠ <span id="notice-text">이 도구는 "방식 A"(핀 라벨 텍스트가 배선 끝점과 좌표상 가까움)로 그려진 도면에만 적용됩니다. 여러 세그먼트로 꺾인 배선(버스 라우팅 등)은 연결성 추적으로 하나의 net으로 인식하지만, LINE·TEXT·MTEXT 엔티티만 인식하며 블록(INSERT) 속성 방식(방식 B)·POLYLINE 배선·구버전 DXF(R12 이하)의 한글 인코딩은 아직 지원하지 않습니다. 실제 발주 전 최종 판단은 반드시 사람이 함께 확인하세요.</span>
+  </div>
+
+  <div class="disclaim" id="disclaim">
+    ※ 업로드한 파일은 이 브라우저 메모리 안에서만 처리되고 어디로도 전송되지 않습니다. 방식·한계에 대한 배경은 블로그 시리즈 "PCB 설계검증 자동화 서비스구축" EP01을 참고하세요.
+  </div>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script>
+/* ───────── i18n ───────── */
+const I18N = {
+  ko: {
+    hdr_title:"PCB 설계검증", hdr_sub:"스펙 파일과 도면(DXF)의 핀 연결을 좌표 기반으로 자동 대조합니다", hdr_badge:"🧪 알파 · 방식 A 전용",
+    intro:"스펙 파일(엑셀, From_Pin/To_Pin)과 도면(DXF)을 올리면, 도면 안의 핀 라벨 텍스트와 배선(LINE) 끝점의 좌표 근접도만으로 연결 여부를 판정합니다 — 회로 데이터 없이 도면 좌표만으로 1차 검증합니다. 처리는 전부 이 브라우저 안에서만 일어나며 서버로 전송되지 않습니다.",
+    upload_title:"① 파일 업로드",
+    lbl_row_spec:"스펙 파일 (.xlsx)", drop_hint_spec:"또는 이 영역에 끌어다 놓으세요 — 열: From_Pin, To_Pin",
+    lbl_row_dxf:"설계 도면 (.dxf)", drop_hint_dxf:"또는 이 영역에 끌어다 놓으세요 — ASCII DXF",
+    pick_btn:"📁 파일 선택",
+    sample_text:"파일이 없으신가요? IC 8개(QFP32, 0.75mm 핀피치)·배선 84건(결함 5건 포함)짜리 실전급 샘플로 확인해 볼 수 있습니다 — 확대해야 배선이 분리되어 보이는 밀도입니다.",
+    sample_btn_label:"샘플로 테스트",
+    lbl_tol:"좌표 오차범위(tolerance, mm)",
+    tol_hint:"정밀 좌표로 생성된 샘플은 0.05mm면 충분합니다. 실제 스캔·내보내기 DXF는 도면 단위에 맞춰 0.3~1mm 정도로 넓혀야 할 수 있습니다 — 너무 좁히면 정상 연결도 놓치고, 너무 넓히면 다른 핀과 혼동합니다.",
+    results_title:"② 검증 결과",
+    sum_total_lbl:"전체", sum_pass_lbl:"PASS", sum_fail_lbl:"FAIL",
+    th_from:"스펙 출발핀", th_to:"스펙 도착핀", th_status:"검증결과", th_reason:"상세사유",
+    export_btn_label:"결과 엑셀 다운로드",
+    viewer_title:"③ 도면 뷰어 (LINE·TEXT만 표시)",
+    zoom10x_label:"10배로 보기", zoom_reset_label:"100%로 리셋",
+    legend_normal:"정상 배선/라벨", legend_problem:"FAIL 관련 라벨", legend_orphan:"스펙에 없는 라벨(추가 발견)",
+    notice_text:"이 도구는 \"방식 A\"(핀 라벨 텍스트가 배선 끝점과 좌표상 가까움)로 그려진 도면에만 적용됩니다. 여러 세그먼트로 꺾인 배선(버스 라우팅 등)은 연결성 추적으로 하나의 net으로 인식하지만, LINE·TEXT·MTEXT 엔티티만 인식하며 블록(INSERT) 속성 방식(방식 B)·POLYLINE 배선·구버전 DXF(R12 이하)의 한글 인코딩은 아직 지원하지 않습니다. 실제 발주 전 최종 판단은 반드시 사람이 함께 확인하세요.",
+    disclaim:"※ 업로드한 파일은 이 브라우저 메모리 안에서만 처리되고 어디로도 전송되지 않습니다. 방식·한계에 대한 배경은 블로그 시리즈 \"PCB 설계검증 자동화 서비스구축\" EP01을 참고하세요.",
+    status_parsing_spec:"스펙 파일 읽는 중...", status_parsing_dxf:"도면 읽는 중...", status_verifying:"검증 중...",
+    status_done:"검증 완료", status_sample_loading:"샘플 불러오는 중...",
+    err_spec_read:"스펙 파일을 읽지 못했습니다. .xlsx 파일인지 확인하세요.",
+    err_dxf_read:"도면 파일을 읽지 못했습니다. ASCII DXF 형식인지 확인하세요.",
+    err_spec_cols:"From_Pin/To_Pin 열을 찾지 못해 첫 두 열을 각각 출발핀/도착핀으로 사용합니다.",
+    err_no_lines_or_texts:"도면에서 LINE 또는 TEXT/MTEXT 엔티티를 찾지 못했습니다.",
+    reason_pass:"정상 연결",
+    reason_from_missing:"도면에 {pin} 라벨이 없음",
+    reason_to_missing:"도면에 {pin} 라벨이 없음 (오연결 유력)",
+    reason_no_line:"두 핀을 잇는 배선이 도면에 없음 (미연결)",
+    orphan_prefix:"스펙에 없는 라벨이 도면에서 추가로 발견됨(오연결·오탈자 의심): ",
+  },
+  en: {
+    hdr_title:"PCB Design Verification", hdr_sub:"Cross-check pin connections between a spec file and a DXF drawing, by coordinates", hdr_badge:"🧪 Alpha · Method A only",
+    intro:"Upload a spec file (Excel, From_Pin/To_Pin) and a drawing (DXF) — connections are judged purely by how close pin-label text sits to line (LINE) endpoints, with no schematic/netlist data needed. Everything runs in this browser only; nothing is uploaded to a server.",
+    upload_title:"① Upload files",
+    lbl_row_spec:"Spec file (.xlsx)", drop_hint_spec:"or drag it here — columns: From_Pin, To_Pin",
+    lbl_row_dxf:"Design drawing (.dxf)", drop_hint_dxf:"or drag it here — ASCII DXF",
+    pick_btn:"📁 Choose file",
+    sample_text:"No files handy? Try an industrial-scale sample — 8 ICs (QFP32, 0.75mm pin pitch), 84 nets (5 seeded defects) — dense enough that you'll need to zoom in before individual traces separate.",
+    sample_btn_label:"Try the sample",
+    lbl_tol:"Coordinate tolerance (mm)",
+    tol_hint:"0.05mm is plenty for a precisely-generated sample. Real scanned/exported DXF may need 0.3-1mm depending on the drawing's units — too tight and valid connections get missed, too loose and pins get confused with neighbors.",
+    results_title:"② Verification results",
+    sum_total_lbl:"Total", sum_pass_lbl:"PASS", sum_fail_lbl:"FAIL",
+    th_from:"Spec From_Pin", th_to:"Spec To_Pin", th_status:"Result", th_reason:"Reason",
+    export_btn_label:"Download result as Excel",
+    viewer_title:"③ Drawing viewer (LINE/TEXT only)",
+    zoom10x_label:"View at 10x", zoom_reset_label:"Reset to 100%",
+    legend_normal:"Normal trace/label", legend_problem:"FAIL-related label", legend_orphan:"Label not in spec (extra found)",
+    notice_text:"This tool only works on drawings using \"Method A\" (pin-label text placed near trace endpoints). Traces bent across multiple segments (bus routing, etc.) are tracked as a single net via connectivity, but it only recognizes LINE, TEXT, and MTEXT entities — block/attribute-based labeling (Method B), POLYLINE traces, and older DXF (R12 and earlier) Korean-text encoding aren't supported yet. Always have a person confirm before placing a real order.",
+    disclaim:"※ Uploaded files are processed only in this browser's memory and never sent anywhere. For background on the method and its limits, see EP01 of the \"PCB Design Verification Automation\" blog series.",
+    status_parsing_spec:"Reading spec file...", status_parsing_dxf:"Reading drawing...", status_verifying:"Verifying...",
+    status_done:"Verification complete", status_sample_loading:"Loading sample...",
+    err_spec_read:"Couldn't read the spec file. Make sure it's a valid .xlsx.",
+    err_dxf_read:"Couldn't read the drawing. Make sure it's an ASCII DXF file.",
+    err_spec_cols:"Couldn't find From_Pin/To_Pin columns — using the first two columns as From/To instead.",
+    err_no_lines_or_texts:"No LINE or TEXT/MTEXT entities found in the drawing.",
+    reason_pass:"Connected correctly",
+    reason_from_missing:"No {pin} label found in the drawing",
+    reason_to_missing:"No {pin} label found in the drawing (likely miswired)",
+    reason_no_line:"No trace found linking the two pins (open connection)",
+    orphan_prefix:"Labels found in the drawing that aren't in the spec (possible miswire/typo): ",
+  }
+};
+let lang = localStorage.getItem("wf_lang") || "ko";
+function t(key) { const v = I18N[lang][key]; return v !== undefined ? v : I18N.ko[key]; }
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.getElementById("hdr-title").textContent = t("hdr_title");
+  document.getElementById("hdr-sub").textContent = t("hdr_sub");
+  document.getElementById("hdr-badge").textContent = t("hdr_badge");
+  document.getElementById("intro").textContent = t("intro");
+  document.getElementById("upload-title").textContent = t("upload_title");
+  document.getElementById("lbl-row-spec").textContent = t("lbl_row_spec");
+  document.getElementById("drop-hint-spec").textContent = t("drop_hint_spec");
+  document.getElementById("lbl-row-dxf").textContent = t("lbl_row_dxf");
+  document.getElementById("drop-hint-dxf").textContent = t("drop_hint_dxf");
+  document.getElementById("pickSpecBtn").textContent = t("pick_btn");
+  document.getElementById("pickDxfBtn").textContent = t("pick_btn");
+  document.getElementById("sample-text").textContent = t("sample_text");
+  document.getElementById("sample-btn-label").textContent = t("sample_btn_label");
+  document.getElementById("lbl-tol").textContent = t("lbl_tol");
+  document.getElementById("tol-hint").textContent = t("tol_hint");
+  document.getElementById("results-title").textContent = t("results_title");
+  document.getElementById("sum-total-lbl").textContent = t("sum_total_lbl");
+  document.getElementById("sum-pass-lbl").textContent = t("sum_pass_lbl");
+  document.getElementById("sum-fail-lbl").textContent = t("sum_fail_lbl");
+  document.getElementById("th-from").textContent = t("th_from");
+  document.getElementById("th-to").textContent = t("th_to");
+  document.getElementById("th-status").textContent = t("th_status");
+  document.getElementById("th-reason").textContent = t("th_reason");
+  document.getElementById("export-btn-label").textContent = t("export_btn_label");
+  document.getElementById("viewer-title").textContent = t("viewer_title");
+  document.getElementById("zoom10x-label").textContent = t("zoom10x_label");
+  document.getElementById("zoom-reset-label").textContent = t("zoom_reset_label");
+  document.getElementById("legend-normal").textContent = t("legend_normal");
+  document.getElementById("legend-problem").textContent = t("legend_problem");
+  document.getElementById("legend-orphan").textContent = t("legend_orphan");
+  document.getElementById("notice-text").textContent = t("notice_text");
+  document.getElementById("disclaim").textContent = t("disclaim");
+  if (lastResults) renderResults();
+}
+window.addEventListener("message", (e) => {
+  if (e.data && e.data.type === "wf_lang" && I18N[e.data.lang]) {
+    lang = e.data.lang;
+    applyLang();
+  }
+});
+
+/* ───────── 상태 ───────── */
+let specRows = null;      // [{From_Pin, To_Pin}]
+let dxfData = null;       // {lines:[{x1,y1,x2,y2}], texts:[{text,x,y}]}
+let lastResults = null;   // {results, summary, orphanLabels, problemPinNames}
+
+function setStatus(msg, cls) {
+  const el = document.getElementById('status');
+  el.textContent = msg || '';
+  el.className = cls || '';
+}
+
+/* ───────── DXF 최소 파서 — ENTITIES 섹션의 LINE/TEXT/MTEXT만 추출 ─────────
+   DXF는 "그룹코드\n값\n" 쌍이 반복되는 ASCII 포맷이다. 회로 의미 정보가 없는
+   순수 기하 도면이므로, 여기서는 좌표 근접 매칭에 필요한 최소 엔티티만 뽑는다. */
+function parseDXF(text) {
+  const rawLines = text.split(/\r\n|\r|\n/);
+  const lines = [];
+  const texts = [];
+  let i = 0;
+  let cur = null;       // 현재 파싱 중인 엔티티
+  let curSection = null;
+
+  function finalizeCurrent() {
+    if (cur && curSection === 'ENTITIES') {
+      if (cur.type === 'LINE' && cur.x1 !== undefined && cur.y1 !== undefined && cur.x2 !== undefined && cur.y2 !== undefined) {
+        lines.push({ x1:cur.x1, y1:cur.y1, x2:cur.x2, y2:cur.y2 });
+      } else if ((cur.type === 'TEXT' || cur.type === 'MTEXT') && cur.x1 !== undefined && cur.y1 !== undefined && cur.textParts.length) {
+        const raw = cur.textParts.join('')
+          .replace(/\\P/g, ' ')
+          .replace(/\\[A-Za-z][^;]*;/g, '')
+          .replace(/[{}]/g, '')
+          .trim();
+        if (raw) texts.push({ text:raw, x:cur.x1, y:cur.y1 });
+      }
+    }
+    cur = null;
+  }
+
+  while (i + 1 < rawLines.length) {
+    const code = parseInt(rawLines[i], 10);
+    const value = (rawLines[i+1] || '').trim();
+    i += 2;
+    if (Number.isNaN(code)) continue;
+
+    if (code === 0) {
+      finalizeCurrent();
+      if (value === 'SECTION') { curSection = null; continue; }
+      if (value === 'ENDSEC')  { curSection = null; continue; }
+      if (value === 'EOF')     { break; }
+      cur = { type:value, textParts:[] };
+      continue;
+    }
+    if (code === 2 && cur === null) { curSection = value; continue; }
+    if (!cur) continue;
+
+    switch (code) {
+      case 10: cur.x1 = parseFloat(value); break;
+      case 20: cur.y1 = parseFloat(value); break;
+      case 11: cur.x2 = parseFloat(value); break;
+      case 21: cur.y2 = parseFloat(value); break;
+      case 1:
+      case 3:  cur.textParts.push(value); break;
+      default: break;
+    }
+  }
+  finalizeCurrent();
+  return { lines, texts };
+}
+
+/* ───────── 검증 로직 — Union-Find 연결성 매칭 ─────────
+   여러 LINE 세그먼트가 꺾여 이어진 배선(버스 라우팅 등)도 하나의 net으로
+   취급하기 위해, 모든 LINE 끝점을 점으로 모아 오차범위 이내로 가까운
+   점들을 union-find로 묶는다. 텍스트 라벨은 가장 가까운 점의 클러스터에
+   귀속시키고, 스펙의 From/To 핀이 같은 클러스터에 속하면 PASS로 판정한다. */
+function dist(x1,y1,x2,y2) { return Math.hypot(x1-x2, y1-y2); }
+
+function buildConnectivity(dxfData, tolerance) {
+  const points = [];
+  const lineEndpointIdx = [];
+  dxfData.lines.forEach(l => {
+    const i1 = points.length; points.push({ x:l.x1, y:l.y1 });
+    const i2 = points.length; points.push({ x:l.x2, y:l.y2 });
+    lineEndpointIdx.push([i1, i2]);
+  });
+
+  const n = points.length;
+  const parent = Array.from({ length:n }, (_, idx) => idx);
+  function find(a) { while (parent[a] !== a) { parent[a] = parent[parent[a]]; a = parent[a]; } return a; }
+  function union(a, b) { const ra = find(a), rb = find(b); if (ra !== rb) parent[ra] = rb; }
+
+  lineEndpointIdx.forEach(([i1, i2]) => union(i1, i2));           // 같은 LINE의 양 끝은 항상 연결
+  for (let i = 0; i < n; i++) {                                    // 서로 다른 LINE끼리도 접점이면 연결(꺾인 배선)
+    for (let j = i + 1; j < n; j++) {
+      if (dist(points[i].x, points[i].y, points[j].x, points[j].y) <= tolerance) union(i, j);
+    }
+  }
+
+  const textToRoots = new Map(); // 텍스트 문자열 -> 소속 클러스터 root 집합
+  dxfData.texts.forEach(tx => {
+    let bestIdx = -1, bestD = Infinity;
+    for (let i = 0; i < n; i++) {
+      const d = dist(tx.x, tx.y, points[i].x, points[i].y);
+      if (d <= tolerance && d < bestD) { bestD = d; bestIdx = i; }
+    }
+    if (bestIdx >= 0) {
+      const root = find(bestIdx);
+      if (!textToRoots.has(tx.text)) textToRoots.set(tx.text, new Set());
+      textToRoots.get(tx.text).add(root);
+    }
+  });
+  return textToRoots;
+}
+
+function runVerification() {
+  if (!specRows || !dxfData) return;
+  const tolerance = parseFloat(document.getElementById('tolInput').value) || 0.05;
+
+  if (!dxfData.lines.length && !dxfData.texts.length) {
+    setStatus(t('err_no_lines_or_texts'), 'err');
+    return;
+  }
+
+  const textToRoots = buildConnectivity(dxfData, tolerance);
+  const specPinNames = new Set();
+  specRows.forEach(r => { specPinNames.add(r.From_Pin); specPinNames.add(r.To_Pin); });
+
+  const results = specRows.map(row => {
+    const fromRoots = textToRoots.get(row.From_Pin);
+    const toRoots   = textToRoots.get(row.To_Pin);
+    if (!fromRoots) {
+      return { from:row.From_Pin, to:row.To_Pin, status:'FAIL', reason:t('reason_from_missing').replace('{pin}', row.From_Pin) };
+    }
+    if (!toRoots) {
+      return { from:row.From_Pin, to:row.To_Pin, status:'FAIL', reason:t('reason_to_missing').replace('{pin}', row.To_Pin) };
+    }
+    const connected = [...fromRoots].some(r => toRoots.has(r));
+    if (connected) return { from:row.From_Pin, to:row.To_Pin, status:'PASS', reason:t('reason_pass') };
+    return { from:row.From_Pin, to:row.To_Pin, status:'FAIL', reason:t('reason_no_line') };
+  });
+
+  const orphanLabels = [...textToRoots.keys()].filter(n => !specPinNames.has(n));
+  const problemPinNames = new Set();
+  results.forEach(r => { if (r.status !== 'PASS') { problemPinNames.add(r.from); problemPinNames.add(r.to); } });
+
+  const summary = {
+    total: results.length,
+    pass: results.filter(r => r.status === 'PASS').length,
+    fail: results.filter(r => r.status === 'FAIL').length,
+  };
+
+  lastResults = { results, summary, orphanLabels, problemPinNames };
+  setStatus(t('status_done'), 'ok');
+  renderResults();
+  renderViewer();
+}
+
+/* ───────── 결과 렌더링 ───────── */
+function renderResults() {
+  if (!lastResults) return;
+  const { results, summary, orphanLabels } = lastResults;
+
+  document.getElementById('resultsCard').classList.remove('hidden');
+  document.getElementById('sum-total').textContent = summary.total;
+  document.getElementById('sum-pass').textContent = summary.pass;
+  document.getElementById('sum-fail').textContent = summary.fail;
+
+  const tbody = document.getElementById('resultTbody');
+  tbody.innerHTML = '';
+  results.forEach(r => {
+    const tr = document.createElement('tr');
+    if (r.status === 'FAIL') tr.className = 'fail-row';
+    tr.innerHTML = `<td>${escapeHtml(r.from)}</td><td>${escapeHtml(r.to)}</td>` +
+      `<td><span class="badge ${r.status === 'PASS' ? 'pass' : 'fail'}">${r.status}</span></td>` +
+      `<td class="reason">${escapeHtml(r.reason)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  const orphanBox = document.getElementById('orphanBox');
+  if (orphanLabels.length) {
+    orphanBox.classList.remove('hidden');
+    orphanBox.innerHTML = escapeHtml(t('orphan_prefix')) + orphanLabels.map(l => `<code>${escapeHtml(l)}</code>`).join(' ');
+  } else {
+    orphanBox.classList.add('hidden');
+    orphanBox.innerHTML = '';
+  }
+
+  document.getElementById('exportBtn').disabled = false;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ───────── SVG 뷰어 (확대/축소 지원) ───────── */
+let viewerNativeW = 0, viewerNativeH = 0;
+let zoomPct = 100;
+const ZOOM_STEPS = [50, 75, 100, 150, 200, 300, 400, 600, 800, 1000, 1500, 2000];
+
+function renderViewer() {
+  if (!dxfData || !lastResults) return;
+  const { problemPinNames, orphanLabels } = lastResults;
+  const orphanSet = new Set(orphanLabels);
+
+  const allX = [], allY = [];
+  dxfData.lines.forEach(l => { allX.push(l.x1, l.x2); allY.push(l.y1, l.y2); });
+  dxfData.texts.forEach(tx => { allX.push(tx.x); allY.push(tx.y); });
+  if (!allX.length) return;
+
+  const pad = 2;
+  const minX = Math.min(...allX) - pad, maxX = Math.max(...allX) + pad;
+  const minY = Math.min(...allY) - pad, maxY = Math.max(...allY) + pad;
+  const w = maxX - minX, h = maxY - minY;
+  const scale = 6; // 1 도면 단위(mm) = 6px 기준 — 확대는 아래 zoomPct로 별도 적용
+
+  function sx(x) { return (x - minX) * scale; }
+  function sy(y) { return (maxY - y) * scale; } // DXF는 Y-up, SVG는 Y-down이라 반전
+
+  viewerNativeW = w * scale;
+  viewerNativeH = h * scale;
+
+  let svg = `<svg viewBox="0 0 ${viewerNativeW} ${viewerNativeH}" xmlns="http://www.w3.org/2000/svg">`;
+  dxfData.lines.forEach(l => {
+    svg += `<line x1="${sx(l.x1)}" y1="${sy(l.y1)}" x2="${sx(l.x2)}" y2="${sy(l.y2)}" stroke="#334155" stroke-width="0.6"/>`;
+  });
+  dxfData.texts.forEach(tx => {
+    let color = '#334155';
+    if (orphanSet.has(tx.text)) color = '#d97706';
+    else if (problemPinNames.has(tx.text)) color = '#dc2626';
+    svg += `<text x="${sx(tx.x)}" y="${sy(tx.y)}" font-size="4" font-family="monospace" fill="${color}">${escapeHtml(tx.text)}</text>`;
+  });
+  svg += `</svg>`;
+
+  document.getElementById('viewerCard').classList.remove('hidden');
+  document.getElementById('viewerWrap').innerHTML = svg;
+  zoomPct = 100;
+  applyZoom();
+}
+
+function applyZoom() {
+  const svg = document.querySelector('#viewerWrap svg');
+  if (!svg || !viewerNativeW) return;
+  svg.setAttribute('width', Math.round(viewerNativeW * zoomPct / 100));
+  svg.setAttribute('height', Math.round(viewerNativeH * zoomPct / 100));
+  document.getElementById('zoomPctLabel').textContent = zoomPct + '%';
+  document.getElementById('zoomOutBtn').disabled = zoomPct <= ZOOM_STEPS[0];
+  document.getElementById('zoomInBtn').disabled = zoomPct >= ZOOM_STEPS[ZOOM_STEPS.length - 1];
+}
+
+function stepZoom(dir) {
+  const idx = ZOOM_STEPS.indexOf(zoomPct);
+  let nextIdx;
+  if (idx === -1) {
+    // 임의값이면 가장 가까운 스텝에서 이동
+    nextIdx = ZOOM_STEPS.findIndex(s => s >= zoomPct);
+    if (dir < 0) nextIdx = Math.max(0, nextIdx - 1);
+  } else {
+    nextIdx = idx + dir;
+  }
+  nextIdx = Math.max(0, Math.min(ZOOM_STEPS.length - 1, nextIdx));
+  zoomPct = ZOOM_STEPS[nextIdx];
+  applyZoom();
+}
+
+document.getElementById('zoomOutBtn').addEventListener('click', () => stepZoom(-1));
+document.getElementById('zoomInBtn').addEventListener('click', () => stepZoom(1));
+document.getElementById('zoomResetBtn').addEventListener('click', () => { zoomPct = 100; applyZoom(); });
+document.getElementById('zoom10xBtn').addEventListener('click', () => { zoomPct = 1000; applyZoom(); });
+
+/* ───────── 스펙 엑셀 파싱 ───────── */
+const SPEC_COL_ALIASES = [
+  ['From_Pin', 'To_Pin'], ['from_pin', 'to_pin'], ['From', 'To'],
+  ['Pin_A', 'Pin_B'], ['출발핀', '도착핀'], ['시작핀', '끝핀'],
+];
+
+function parseSpecWorkbook(arrayBuffer) {
+  const wb = XLSX.read(arrayBuffer, { type:'array' });
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
+  if (!rows.length) return [];
+
+  const headerKeys = Object.keys(rows[0]);
+  let fromKey = null, toKey = null;
+  for (const [a, b] of SPEC_COL_ALIASES) {
+    if (headerKeys.includes(a) && headerKeys.includes(b)) { fromKey = a; toKey = b; break; }
+  }
+  if (!fromKey) {
+    fromKey = headerKeys[0]; toKey = headerKeys[1];
+    setStatus(t('err_spec_cols'), '');
+  }
+  return rows
+    .map(r => ({ From_Pin:String(r[fromKey] ?? '').trim(), To_Pin:String(r[toKey] ?? '').trim() }))
+    .filter(r => r.From_Pin && r.To_Pin);
+}
+
+/* ───────── 파일 업로드 처리 ───────── */
+async function handleSpecFile(file) {
+  document.getElementById('specFileName').textContent = file.name;
+  setStatus(t('status_parsing_spec'), '');
+  try {
+    const buf = await file.arrayBuffer();
+    specRows = parseSpecWorkbook(buf);
+    if (dxfData) runVerification();
+  } catch (e) {
+    setStatus(t('err_spec_read'), 'err');
+    specRows = null;
+  }
+}
+
+async function handleDxfFile(file) {
+  document.getElementById('dxfFileName').textContent = file.name;
+  setStatus(t('status_parsing_dxf'), '');
+  try {
+    const text = await file.text();
+    dxfData = parseDXF(text);
+    if (specRows) runVerification();
+  } catch (e) {
+    setStatus(t('err_dxf_read'), 'err');
+    dxfData = null;
+  }
+}
+
+document.getElementById('pickSpecBtn').addEventListener('click', () => document.getElementById('specInput').click());
+document.getElementById('specInput').addEventListener('change', e => { if (e.target.files[0]) handleSpecFile(e.target.files[0]); });
+document.getElementById('pickDxfBtn').addEventListener('click', () => document.getElementById('dxfInput').click());
+document.getElementById('dxfInput').addEventListener('change', e => { if (e.target.files[0]) handleDxfFile(e.target.files[0]); });
+
+[['dropSpec', handleSpecFile], ['dropDxf', handleDxfFile]].forEach(([id, handler]) => {
+  const zone = document.getElementById(id);
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag');
+    const f = e.dataTransfer.files[0]; if (f) handler(f);
+  });
+});
+
+document.getElementById('tolInput').addEventListener('input', () => { if (specRows && dxfData) runVerification(); });
+
+document.getElementById('loadSampleBtn').addEventListener('click', async () => {
+  setStatus(t('status_sample_loading'), '');
+  try {
+    const [specBuf, dxfText] = await Promise.all([
+      fetch('samples/spec_complex.xlsx').then(r => r.arrayBuffer()),
+      fetch('samples/board_complex.dxf').then(r => r.text()),
+    ]);
+    specRows = parseSpecWorkbook(specBuf);
+    dxfData = parseDXF(dxfText);
+    document.getElementById('specFileName').textContent = 'spec_complex.xlsx';
+    document.getElementById('dxfFileName').textContent = 'board_complex.dxf';
+    runVerification();
+  } catch (e) {
+    setStatus(t('err_dxf_read'), 'err');
+  }
+});
+
+/* ───────── 결과 엑셀 다운로드 ───────── */
+document.getElementById('exportBtn').addEventListener('click', () => {
+  if (!lastResults) return;
+  const aoa = [[t('th_from'), t('th_to'), t('th_status'), t('th_reason')]];
+  lastResults.results.forEach(r => aoa.push([r.from, r.to, r.status, r.reason]));
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'PCB_검증결과');
+  XLSX.writeFile(wb, 'PCB_설계검증_결과.xlsx');
+});
+
+applyLang();
+</script>
+</body>
+</html>

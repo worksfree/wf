@@ -18,8 +18,8 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.worksfree.kr">
-<meta property="og:title" content="WorksFree Hub — 경영지도사·파트너 통합 컨설팅 플랫폼">
-<meta property="og:description" content="ESG·상속세·비상장주식·CEO리스크·연금 등 실무 컨설팅 도구 통합 플랫폼. 경영지도사·파트너 전용 서비스.">
+<meta property="og:title" content="WorksFree Hub — 경영지도사·컨설턴트 통합 컨설팅 플랫폼">
+<meta property="og:description" content="ESG·상속세·비상장주식·CEO리스크·연금 등 실무 컨설팅 도구 통합 플랫폼. 경영지도사·컨설턴트 전용 서비스.">
 <meta property="og:image" content="https://www.worksfree.kr/assets/logo-481KB.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -392,7 +392,7 @@
     flex-direction:column; align-items:center; justify-content:center;
     pointer-events:none;
   }
-  #access-overlay.active { display:flex; }
+  #access-overlay.active { display:flex; pointer-events:auto; }
   /* blur 모드 — iframe 흐릿 + 중앙 카드 */
   #frame-container.access-blur iframe { filter:blur(var(--blur-px, 5px)); pointer-events:none; }
   #frame-container.access-blur #access-overlay { pointer-events:auto; }
@@ -1152,7 +1152,7 @@
   <div class="denied-box">
     <div class="denied-icon">🔒</div>
     <div class="denied-title" id="denied-title">접근 권한 없음</div>
-    <div class="denied-desc"  id="denied-desc">이 메뉴는 파트너 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.</div>
+    <div class="denied-desc"  id="denied-desc">이 메뉴는 컨설턴트 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.</div>
   </div>
 </div>
 
@@ -1466,8 +1466,8 @@
     <div class="dev-status" id="dev-status">비로그인</div>
     <div id="dev-track-status" style="font-size:10px;color:#475569;margin-bottom:6px;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.04)">📊 페이지뷰 추적: —</div>
     <button class="dev-btn" id="dev-btn-member"    onclick="devLogin('member')">▶ 일반회원</button>
-    <button class="dev-btn" id="dev-btn-consultant" onclick="devLogin('consultant')" style="border-color:#0ea5e9;color:#7dd3fc" title="경영지도사 — 비보험 콘텐츠">▶ 컨설턴트</button>
-    <button class="dev-btn" id="dev-btn-partner"        onclick="devLogin('partner')"        style="border-color:#7c3aed;color:#c4b5fd" title="전문 컨설턴트 — 전문 콘텐츠 포함">▶ 파트너 (🔒)</button>
+    <button class="dev-btn" id="dev-btn-consultant" onclick="devLogin('consultant')" style="border-color:#0ea5e9;color:#7dd3fc" title="파트너 — 비보험 콘텐츠">▶ 파트너</button>
+    <button class="dev-btn" id="dev-btn-partner"        onclick="devLogin('partner')"        style="border-color:#7c3aed;color:#c4b5fd" title="컨설턴트 — 전문 콘텐츠 포함">▶ 컨설턴트 (🔒)</button>
     <button class="dev-btn" id="dev-btn-admin"      onclick="devLogin('admin')"      style="border-color:#dc2626;color:#fca5a5">▶ 관리자 (🔒)</button>
     <button class="dev-btn" onclick="devShowConsent()">📋 동의 모달 보기</button>
     <button class="dev-btn danger" onclick="devResetConsent()">↺ 동의 초기화</button>
@@ -1566,15 +1566,15 @@
       <div class="ao-card">
         <button class="ao-close" onclick="document.getElementById('access-overlay').classList.remove('active')" title="닫기">✕</button>
         <div class="ao-icon">🔐</div>
-        <div class="ao-title" id="ao-title">파트너 전용 기능</div>
-        <div class="ao-desc" id="ao-desc">이 기능은 파트너 계정에서만 사용할 수 있습니다.<br>파트너 가입 또는 권한 승인이 필요합니다.</div>
+        <div class="ao-title" id="ao-title">컨설턴트 전용 기능</div>
+        <div class="ao-desc" id="ao-desc">이 기능은 컨설턴트 계정에서만 사용할 수 있습니다.<br>컨설턴트 가입 또는 권한 승인이 필요합니다.</div>
         <button class="ao-btn" onclick="showHome()">홈으로 돌아가기</button>
       </div>
     </div>
     <!-- 읽기 전용 배너 -->
     <div id="access-readonly-banner">
       <span>👁</span>
-      <span id="ao-readonly-msg">읽기 전용 — 이 페이지는 파트너 계정에서만 직접 사용할 수 있습니다.</span>
+      <span id="ao-readonly-msg">읽기 전용 — 이 페이지는 컨설턴트 계정에서만 직접 사용할 수 있습니다.</span>
     </div>
     <div id="preview-overlay">
       <div class="preview-card">
@@ -1642,30 +1642,30 @@ let lang = localStorage.getItem('wf_lang') || 'ko';
 const HUB_I18N = {
   ko: {
     home:          '홈',
-    badge_gfc:     '파트너 전용 접속',
+    badge_gfc:     '컨설턴트 전용 접속',
     badge_open:    '일반 접속',
     denied_title:  '접근 권한 없음',
-    denied_desc:   '이 메뉴는 파트너 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.',
+    denied_desc:   '이 메뉴는 컨설턴트 전용입니다.<br>올바른 링크로 접속하거나<br>담당자에게 문의해 주세요.',
     dashboard:     '대시보드',
-    home_desc_gfc: '파트너 전용 도구 포함 전체 메뉴에 접근 가능합니다.',
-    home_desc_consultant: '컨설팅 도구 전체 메뉴에 접근 가능합니다.',
+    home_desc_gfc: '컨설턴트 전용 도구 포함 전체 메뉴에 접근 가능합니다.',
+    home_desc_consultant: '파트너 전용 메뉴에 접근 가능합니다.',
     home_desc_open:'공용 도구에 접근 가능합니다. 컨설팅 콘텐츠는 제공되지 않습니다.',
-    tooltip_gfc:   '파트너 전용 메뉴입니다',
+    tooltip_gfc:   '컨설턴트 전용 메뉴입니다',
     tooltip_coming:'준비 중인 메뉴입니다',
     coming_tag:    '준비중',
     dev_tag:       '개발 중',
-    card_lock:       '파트너 전용',
+    card_lock:       '컨설턴트 전용',
     card_locked:     '접근 제한',
     card_coming:     '개발 예정',
     login_req:       '로그인 필요',
     pro_tag:         '다건 유료',
     member_tag:      '회원전용',
-    consultant_tag:  '컨설턴트 전용',
-    tooltip_consultant: '경영지도사 / 파트너 전용 서비스입니다',
-    denied_consultant_title: '컨설팅 서비스 전용',
-    denied_consultant_desc:  '이 서비스는 경영지도사 및 파트너 전용입니다.<br>WorksFree에 문의하시면 컨설팅 서비스를 이용하실 수 있습니다.',
-    denied_partner_title:    '파트너 전용 서비스',
-    denied_partner_desc:     '이 서비스는 파트너 이상의 권한이 필요합니다.<br>WorksFree에 문의하시면 파트너 서비스를 이용하실 수 있습니다.',
+    consultant_tag:  '파트너 전용',
+    tooltip_consultant: '파트너 전용 서비스입니다',
+    denied_consultant_title: '파트너 전용 서비스',
+    denied_consultant_desc:  '이 서비스는 WorksFree 파트너 전용입니다.<br>파트너 등록을 원하시면 WorksFree에 문의해 주세요.',
+    denied_partner_title:    '컨설턴트 전용 서비스',
+    denied_partner_desc:     '이 서비스는 WorksFree 컨설턴트 전용입니다.',
     denied_admin_title:      'O&M 관리자 전용',
     denied_admin_desc:       '이 기능은 관리자 계정에서만 사용할 수 있습니다.<br>담당자에게 문의해 주세요.',
     denied_staff_title:      '사내 직원 전용',
@@ -1778,27 +1778,27 @@ const HUB_I18N = {
     badge_gfc:     'Partner Access',
     badge_open:    'General Access',
     denied_title:  'Access Denied',
-    denied_desc:   'This menu is for partners only.<br>Please use the correct link or<br>contact your account manager.',
+    denied_desc:   'This menu is for consultants only.<br>Please use the correct link or<br>contact your account manager.',
     dashboard:     'Dashboard',
-    home_desc_gfc: 'You have access to all menus including partner-exclusive tools.',
-    home_desc_consultant: 'You have access to all consulting tools.',
+    home_desc_gfc: 'You have access to all menus including consultant-exclusive tools.',
+    home_desc_consultant: 'You have access to all partner menus.',
     home_desc_open:'You have access to public tools. Consulting content is not available.',
-    tooltip_gfc:   'Partner exclusive menu',
+    tooltip_gfc:   'Consultant exclusive menu',
     tooltip_coming:'This menu is coming soon',
     coming_tag:    'Coming Soon',
     dev_tag:       'Dev',
-    card_lock:       'Partner Only',
+    card_lock:       'Consultant Only',
     card_locked:     'Restricted',
     card_coming:     'Coming Soon',
     login_req:       'Login Required',
     pro_tag:         'Bulk Paid',
     member_tag:      'Member Only',
-    consultant_tag:  'Consultant Only',
-    tooltip_consultant: 'For Consultants / Partners only',
-    denied_consultant_title: 'Consultant Service',
-    denied_consultant_desc:  'This service is for consultants and partners only.<br>Contact WorksFree to learn about consulting services.',
-    denied_partner_title:    'Partner Service',
-    denied_partner_desc:     'This service requires partner-level access or above.<br>Contact WorksFree to learn about partner services.',
+    consultant_tag:  'Partner Only',
+    tooltip_consultant: 'For Partners only',
+    denied_consultant_title: 'Partner Service Only',
+    denied_consultant_desc:  'This service is available to WorksFree partners only.<br>Contact WorksFree to register as a partner.',
+    denied_partner_title:    'Consultant Service Only',
+    denied_partner_desc:     'This service is available to WorksFree consultants only.',
     denied_admin_title:      'O&M Admin Only',
     denied_admin_desc:       'This feature requires an administrator account.<br>Please contact your account manager.',
     denied_staff_title:      'Staff Only',
@@ -2077,7 +2077,7 @@ function applyHubLang() {
   }
 }
 
-const HUB_VERSION = '0.8.8.27';             // deploy.ps1이 자동 증가
+const HUB_VERSION = '0.8.13.0003';         // deploy.ps1이 자동 증가 (MAJOR.MINOR.PP.BBBB)
 const GFC_TOKEN   = 'gfc-2025-samsung-wf'; // ← 파트너 전용 토큰
 
 const params   = new URLSearchParams(location.search);
@@ -2117,7 +2117,9 @@ const TREE = [
       { label:{ko:'앱 요청 게시판',   en:'App Request Board'},   icon:'✦', iframe:'board/index.html' },
       { label:{ko:'전자책 미리보기',   en:'eBook Preview'},       icon:'📖', iframe:'service/ebook/index.html' },
       { label:{ko:'OCR 텍스트 추출',   en:'OCR Text Extraction'}, icon:'🔎', iframe:'service/ocr/index.html', statusTag:{ko:'알파', en:'Alpha'} },
+      { label:{ko:'PCB 설계검증',   en:'PCB Design Verification'}, icon:'🔌', iframe:'service/pcb-verify/index.html', statusTag:{ko:'알파', en:'Alpha'} },
       { label:{ko:'DWG 표제란/BOM 추출', en:'DWG Title Block/BOM Extraction'}, icon:'📐', iframe:'service/dwg-extract/index.html', statusTag:{ko:'알파', en:'Alpha'} },
+      { label:{ko:'PDF 전자서명', en:'PDF E-Signature'}, icon:'🔏', iframe:'service/pdf-sign/index.html', statusTag:{ko:'개발예정', en:'Planned'} },
       { label:{ko:'그룹웨어 자동 데모', en:'Groupware Auto Demo'}, icon:'🎬', iframe:'groupware/demo/index.html', statusTag:{ko:'개발예정', en:'Planned'} },
     ]
   },
@@ -2127,9 +2129,9 @@ const TREE = [
       { label:{ko:'ESG 자가진단',          en:'ESG Assessment'},       icon:'🏢', iframe:'consulting/esg/index.html',         consultantOnly:true },
       { label:{ko:'중대재해처벌법',         en:'Serious Accident Act'}, icon:'⚖', iframe:'consulting/jdh/index.html',         consultantOnly:true },
       { label:{ko:'소상공인·자영업자 지원', en:'Govt Support: SOHO'},   icon:'🏪', iframe:'consulting/soho/index.html',        consultantOnly:true },
-      { label:{ko:'지원제도 내비게이터',    en:'Support Navigator'},    icon:'🎯', iframe:'consulting/support/index.html',     consultantOnly:true },
-      { label:{ko:'AI 상담사',             en:'AI Assistant'},         icon:'🤖', iframe:'consulting/ai-helper/index.html',   consultantOnly:true },
-      { label:{ko:'현장클리닉 관리',        en:'Field Clinic'},         icon:'🏥', iframe:'consulting/g1/index.html',          consultantOnly:true },
+      { label:{ko:'지원제도 내비게이터',    en:'Support Navigator'},    icon:'🎯', iframe:'consulting/support/index.html',     consultantOnly:true, dev:true },
+      { label:{ko:'AI 상담사',             en:'AI Assistant'},         icon:'🤖', iframe:'consulting/ai-helper/index.html',   consultantOnly:true, dev:true },
+      { label:{ko:'현장클리닉 관리',        en:'Field Clinic'},         icon:'🏥', iframe:'consulting/g1/index.html',          consultantOnly:true, dev:true },
       { label:{ko:'예비창업패키지',         en:'Pre-Startup Package'},  icon:'🚀', iframe:'consulting/prebiz/index.html',      consultantOnly:true },
       { label:{ko:'컨설팅 마인드맵',        en:'Consulting Mindmap'},   icon:MINDMAP_ICON, iframe:'consulting/mindmap/index.html', consultantOnly:true },
       // { label:{ko:'ISO 자가진단',        en:'ISO Self-Check'},       icon:'📋', iframe:'consulting/iso/index.html',         consultantOnly:true },
@@ -2161,7 +2163,7 @@ const TREE = [
           { label:{ko:'v3', en:'v3'}, icon:'✦', iframe:'consulting/tacomanager/v3/index.html' },
         ]
       },
-      { label:{ko:'Naver Blog Commenter', en:'Naver Blog Commenter'}, icon:'💬', iframe:'app-store/web/naver-blog-commenter/index.html' },
+      { label:{ko:'네이버 댓글 응답기', en:'Naver Blog Commenter'}, icon:'💬', iframe:'app-store/web/naver-blog-commenter/index.html', dev:true },
       { label:{ko:'경매 정보', en:'Auction Info'}, icon:'🏛', iframe:'auction/index.html', dev:true },
     ]
   },
@@ -2183,7 +2185,7 @@ const TREE = [
   },
   {
     slug:'groupware',
-    label:{ko:'그룹웨어', en:'Groupware'}, icon:'🏢', staffOnly:true, children:[
+    label:{ko:'그룹웨어', en:'Groupware'}, icon:'🏢', adminOnly:true, children:[
       { label:{ko:'전자결재', en:'Approval'},  icon:'📝', iframe:'groupware/approval/index.html', staffOnly:true },
       { label:{ko:'게시판',   en:'Board'},     icon:'📢', iframe:'groupware/board/index.html',    staffOnly:true },
       { label:{ko:'주소록/조직도', en:'Directory'}, icon:'👥', iframe:'groupware/directory/index.html', staffOnly:true },
@@ -2235,6 +2237,10 @@ const DASH_CARDS = [
     title:{ko:'전자책 미리보기',       en:'eBook Preview'},
     desc: {ko:'NAS 풀스택 가이드 20% 무료 미리보기',  en:'20% free preview of NAS Full-Stack Guide'},
     iframe:'service/ebook/index.html' },
+  { section:'service', icon:'🔏',
+    title:{ko:'PDF 전자서명',          en:'PDF E-Signature'},
+    desc: {ko:'PDF에 암호화 전자서명(PKI) 추가 — 개발 중', en:'Add PKI digital signatures to PDFs — in development'},
+    iframe:'service/pdf-sign/index.html' },
   { section:'service', icon:'🎬',
     title:{ko:'그룹웨어 자동 데모',     en:'Groupware Auto Demo'},
     desc: {ko:'연차 신청서가 팀원→팀장→임원→대표로 흐르는 과정을 자동 재생', en:'Auto-plays a leave request flowing through the approval chain'},
@@ -2506,7 +2512,8 @@ function buildTree(nodes, depth=0, path=[]) {
   const wrap = document.createElement('div');
 
   nodes.forEach(node => {
-    // 사이드바에 항상 전체 표시 — 권한 없는 항목은 잠금 아이콘으로 표시
+    // 관리자 전용 최상위 섹션(그룹웨어·O&M) — 비관리자에게 완전 숨김
+    if (depth === 0 && node.adminOnly && userRole !== 'admin') return;
 
     // partner-item 클래스: IS_PARTNER 일 때만 (= 접근 가능한 파트너 항목 강조)
     const nodeEl = document.createElement('div');
@@ -2654,23 +2661,22 @@ function buildTree(nodes, depth=0, path=[]) {
       labelEl.addEventListener('click', () => {
         if (node.coming) return;
         if (node.action) { node.action(); setActive(labelEl); return; }
-        // DB 규칙이 명시적으로 있으면 노드 플래그(adminOnly 등) 무시
-        // → loadIframe() 내부에서 getAccessLevel()로 올바른 overlay 적용
+        // partner·consultant teaser는 DB 규칙 유무와 무관하게 TREE 플래그 우선
+        if (node.partnerOnly && !IS_PARTNER) {
+          setActive(labelEl); _loadIframeBlurred('partner', node.iframe, path, node.label); return;
+        }
+        if (node.consultantOnly && !canConsult()) {
+          setActive(labelEl); _loadIframeBlurred('consultant', node.iframe, path, node.label); return;
+        }
+        // admin·staff는 DB 규칙 없을 때만 TREE 플래그로 처리
         const _hasDbRule = node.iframe && Object.prototype.hasOwnProperty.call(
           pageAccessRules, node.iframe.split('?')[0]);
         if (!_hasDbRule) {
-          if (node.partnerOnly && !IS_PARTNER) {
-            // 보안: loadIframe() 없이 overlay만 표시 — iframe 콘텐츠 미로드
-            setActive(labelEl); showAccessBlur('partner'); return;
-          }
           if (node.adminOnly && userRole !== 'admin') {
             setActive(labelEl); showAccessBlur('admin'); return;
           }
           if (node.staffOnly && !IS_STAFF) {
             setActive(labelEl); showAccessBlur('staff'); return;
-          }
-          if (node.consultantOnly && !canConsult()) {
-            setActive(labelEl); showAccessBlur('consultant'); return;
           }
         }
         if (node.memberOnly && !authUser) {
@@ -2721,6 +2727,8 @@ function renderHomeSections() {
   if (titleEl) titleEl.textContent = t('dashboard');
   TREE.forEach(node => {
     if (!node.slug) return;
+    // 관리자 전용 섹션 — 비관리자에게 홈 타일도 숨김
+    if (node.adminOnly && userRole !== 'admin') return;
     // TREE 기반으로 리프 노드 수집 — TREE에 노드 추가 시 자동 반영
     const count = _collectSectionLeaves(node).filter(leaf =>
       !(leaf.iframe && getAccessLevel(leaf.iframe.split('?')[0]) === 'hidden')
@@ -2767,8 +2775,11 @@ function renderDashCards(sectionFilter=null) {
     const cleanSrc = node.iframe?.split('?')[0];
     if (!cleanSrc) return;
 
-    // 페이지 접근 규칙: hidden → 대시보드에서 완전 숨김
-    if (getAccessLevel(cleanSrc) === 'hidden') return;
+    // partner·consultant 테이저 여부 먼저 판단 (DB hidden이어도 잠금 카드로 표시)
+    const _isPartnerTeaser    = node.partnerOnly    && !IS_PARTNER;
+    const _isConsultantTeaser = node.consultantOnly && !canConsult();
+    // 페이지 접근 규칙: hidden → 대시보드에서 숨김 (단, teaser 대상은 잠금 카드로 유지)
+    if (getAccessLevel(cleanSrc) === 'hidden' && !_isPartnerTeaser && !_isConsultantTeaser) return;
 
     // DASH_CARDS 메타데이터 보조맵 — desc·풍부한 제목·태그 제공 (없으면 TREE 기본값)
     const meta = cardMeta[cleanSrc] || {};
@@ -2776,18 +2787,15 @@ function renderDashCards(sectionFilter=null) {
     const titleStr = meta.title ? getLabel(meta.title) : getLabel(node.label);
     const descStr  = meta.desc  ? getLabel(meta.desc)  : '';
 
-    // DB 규칙이 있으면 hidden은 위에서 걸렀으므로 잠금 없음, 없으면 TREE 노드 플래그 사용
+    // partner·consultant 테이저는 DB 규칙 무관하게 항상 잠금, 나머지는 DB 규칙 우선
     const _hasCardRule = Object.prototype.hasOwnProperty.call(pageAccessRules, cleanSrc);
-    const isLocked = _hasCardRule
-      ? false
-      : (
-          (node.adminOnly      && userRole !== 'admin')                           ||
-          (node.staffOnly      && !IS_STAFF)                                      ||
-          (node.consultantOnly && !canConsult())                                  ||
-          (node.partnerOnly    && !IS_PARTNER)                                    ||
-          (node.roleOnly       && userRole !== 'admin' && userRole !== node.roleOnly) ||
-          (node.memberOnly     && !authUser)
-        );
+    const isLocked = _isPartnerTeaser || _isConsultantTeaser ||
+      (!_hasCardRule && (
+        (node.adminOnly  && userRole !== 'admin') ||
+        (node.staffOnly  && !IS_STAFF)            ||
+        (node.roleOnly   && userRole !== 'admin' && userRole !== node.roleOnly) ||
+        (node.memberOnly && !authUser)
+      ));
 
     const el = document.createElement('div');
 
@@ -2798,11 +2806,13 @@ function renderDashCards(sectionFilter=null) {
         ? t('denied_admin_title')
         : node.staffOnly
           ? t('denied_staff_title')
+          : node.partnerOnly
+          ? t('card_lock')       // 컨설턴트 전용 (IS_PARTNER 미만)
           : node.consultantOnly
-          ? t('card_locked')    // 접근 제한 — 컨설턴트 전용
+          ? t('consultant_tag')  // 파트너 전용 (canConsult() 미만)
           : node.memberOnly
-            ? t('login_req')    // 로그인 필요 — 앱스토어
-            : t('card_coming'); // 개발 예정 — 파트너 전용
+            ? t('login_req')
+            : t('card_coming');
       el.innerHTML = `
         <div class="card-title">${titleStr}</div>
         <div class="card-locked-body">
@@ -2815,11 +2825,10 @@ function renderDashCards(sectionFilter=null) {
         </div>
       `;
       el.onclick = () => {
-        // 보안: 대시보드 잠금 카드도 loadIframe() 없이 overlay만 — 콘텐츠 미로드
-        if (node.adminOnly)      { showAccessBlur('admin');      return; }
-        if (node.staffOnly)      { showAccessBlur('staff');      return; }
-        if (node.consultantOnly) { showAccessBlur('consultant'); return; }
-        if (node.partnerOnly)    { showAccessBlur('partner');    return; }
+        if (node.adminOnly)      { showAccessBlur('admin'); return; }
+        if (node.staffOnly)      { showAccessBlur('staff'); return; }
+        if (node.consultantOnly) { _loadIframeBlurred('consultant', node.iframe, [], node.label); return; }
+        if (node.partnerOnly)    { _loadIframeBlurred('partner',    node.iframe, [], node.label); return; }
         showDenied('denied_title', 'denied_desc');
       };
     } else {
@@ -2830,11 +2839,13 @@ function renderDashCards(sectionFilter=null) {
       el.className = `dash-card${gfcTag ? ' gfc-card' : ''}`;
       const chipHtml = node.memberOnly
         ? `<div class="card-member">${t('member_tag')}</div>`
-        : node.consultantOnly
-          ? `<div class="card-consultant">${t('consultant_tag')}</div>`
-          : gfcTag
-            ? `<div class="card-lock">${t('card_lock')}</div>`
-            : proTag
+        : node.partnerOnly
+          ? `<div class="card-lock">${t('card_lock')}</div>`
+          : node.consultantOnly
+            ? `<div class="card-consultant">${t('consultant_tag')}</div>`
+            : gfcTag
+              ? `<div class="card-lock">${t('card_lock')}</div>`
+              : proTag
               ? `<div class="card-pro">${t('pro_tag')}</div>`
               : dev
                 ? `<div class="card-dev">${t('dev_tag')}</div>`
@@ -2982,7 +2993,8 @@ function loadIframe(src, path=[], label='') {
   _navStackPush();
   _loadIframeImpl(src, path, label, true);
 }
-function _loadIframeImpl(src, path=[], label='', _pushHist=false) {
+// _forceLoad=true: hidden 레벨 체크 건너뜀 — partner·consultant teaser 로드 시 사용
+function _loadIframeImpl(src, path=[], label='', _pushHist=false, _forceLoad=false) {
   src = normalizeIframeSrc(src);
   currentSrc = src;
   _activateSectionForIframe(src);
@@ -2993,9 +3005,9 @@ function _loadIframeImpl(src, path=[], label='', _pushHist=false) {
   sessionStorage.setItem('wf_last_page', JSON.stringify({ src, path, label }));
 
   // ── 페이지 접근 레벨 확인 ────────────────────────────────────────
-  const accessLevel = getAccessLevel(src);
+  const accessLevel = _forceLoad ? 'full' : getAccessLevel(src);
   if (accessLevel === 'hidden') {
-    showDenied();
+    _showHomeImpl();
     return;
   }
 
@@ -3097,6 +3109,8 @@ function showSectionDash(node, keepFullSidebar=false) {
   _showSectionDashImpl(node, keepFullSidebar, true);
 }
 function _showSectionDashImpl(node, keepFullSidebar=false, _pushHist=false) {
+  // 관리자 전용 섹션 — 비관리자 직접 접근 차단
+  if (node.adminOnly && userRole !== 'admin') { _showHomeImpl(); return; }
   previewBaseSrc = null;
   hidePreviewOverlay();
   sessionStorage.removeItem('wf_last_page');
@@ -3414,9 +3428,14 @@ function _reapplyCurrentPageAccess() {
   const hasDbRule = Object.prototype.hasOwnProperty.call(pageAccessRules, clean);
 
   if (hasDbRule) {
-    // DB 규칙이 있으면 최우선 — adminOnly 등 노드 플래그보다 우선
+    // DB 규칙이 있으면 최우선 — 단 partner·consultant teaser는 TREE 플래그 우선
     const level = getAccessLevel(src);
-    if (level === 'hidden') { showDenied(); _showHomeImpl(); return; }
+    if (level === 'hidden') {
+      const _n = _findNodeByIframe(TREE, src);
+      if (_n?.partnerOnly    && !IS_PARTNER)   { showAccessBlur('partner');    return; }
+      if (_n?.consultantOnly && !canConsult())  { showAccessBlur('consultant'); return; }
+      _showHomeImpl(); return;
+    }
     if (level !== 'full') {
       // 접근 제한 → iframe 콘텐츠 제거 후 overlay (showAccessBlur가 담당)
       const _iframe = document.getElementById('contentFrame');
@@ -3442,6 +3461,22 @@ function _reapplyCurrentPageAccess() {
   }
 }
 
+/* 콘텐츠 로드 후 blur 오버레이 — partner·consultant teaser UX
+   _loadIframeImpl 호출 후 즉시 blur를 적용하므로, 콘텐츠가 로드되는 동안에도 흐릿하게 표시됨 */
+function _loadIframeBlurred(type, src, path, label) {
+  const aoTitle = document.getElementById('ao-title');
+  const aoDesc  = document.getElementById('ao-desc');
+  if (aoTitle) aoTitle.textContent = type === 'partner' ? t('denied_partner_title') : t('denied_consultant_title');
+  if (aoDesc)  aoDesc.innerHTML    = type === 'partner' ? t('denied_partner_desc')  : t('denied_consultant_desc');
+  // DB hidden 규칙을 우회하고 실제 콘텐츠 로드 (_forceLoad=true)
+  _loadIframeImpl(src, path, label, true, true);
+  // 로드와 동시에 blur+overlay 적용 (콘텐츠는 흐릿하게 배경에 깔림)
+  const fc      = document.getElementById('frame-container');
+  const overlay = document.getElementById('access-overlay');
+  if (fc)      fc.classList.add('access-blur');
+  if (overlay) overlay.classList.add('active');
+}
+
 function showAccessBlur(type) {
   const fc      = document.getElementById('frame-container');
   const overlay = document.getElementById('access-overlay');
@@ -3455,9 +3490,11 @@ function showAccessBlur(type) {
                                    : type === 'staff'   ? t('denied_staff_desc')
                                    : type === 'partner' ? t('denied_partner_desc')
                                    :                      t('denied_consultant_desc');
-  // 보안: iframe 콘텐츠 완전 제거 (pointer-events:none만으로는 키보드·포커스 접근 차단 불충분)
-  const iframe = document.getElementById('contentFrame');
-  if (iframe) iframe.src = 'about:blank';
+  // 보안: admin·staff만 iframe 완전 제거 — partner·consultant는 기존 콘텐츠 보존 (blur teaser)
+  if (type === 'admin' || type === 'staff') {
+    const iframe = document.getElementById('contentFrame');
+    if (iframe) iframe.src = 'about:blank';
+  }
   // overlay 카드를 표시하기 위해 frame-container 활성화
   const hs = document.getElementById('home-screen');
   if (hs) hs.style.display = 'none';
@@ -4322,7 +4359,7 @@ function devToggleCollapse() {
 
 let _devPwResolve = null;
 function devPromptPw(role) {
-  const titles = { gfc: '🔐 파트너 비밀번호', admin: '🔐 관리자 비밀번호' };
+  const titles = { partner: '🔐 컨설턴트 비밀번호', admin: '🔐 관리자 비밀번호' };
   const titleEl = document.getElementById('dev-pw-title');
   if (titleEl) titleEl.textContent = titles[role] || '🔐 비밀번호 확인';
   // 원래 함수 로직은 아래에서 이어짐 (이름 변경 후 즉시 return)

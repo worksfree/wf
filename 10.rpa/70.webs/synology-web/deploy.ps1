@@ -24,7 +24,7 @@ $fromBat = try {
 # ── ✏️  여기만 수정하면 됩니다 ──────────────────────────────────
 $NAS_USER = "wfadmin"             # NAS SSH 계정
 $NAS_IP   = "192.168.100.38"      # NAS 로컬 IP (공유기에서 고정 권장)
-$VERSION  = "0.8.8.15"            # 현재 배포 버전 (test=4번째↑, staging=3번째↑, portal=2번째↑)
+$VERSION  = "0.8.13.0003"         # 현재 배포 버전 (test=BUILD↑, staging=PATCH↑+BUILD리셋, portal=MINOR↑)
 $AUC_VER  = "0.7.0.4"           # 경매지도 버전 (auction 배포 시 4번째↑)
 
 # 배포 대상 환경
@@ -39,7 +39,10 @@ $TARGETS = @{
 }
 
 # 배포 제외 목록
-$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log","*.bak",".git","node_modules","*.sh",".claude","test-results","playwright-report","workers")
+# ⚠️ 2026-07-28: secrets.ps1/Client ID.txt/.env.test가 이 목록에 없어서 test·staging·portal
+# 전부에 실제 Cloudflare·Google OAuth·Supabase service_role 키가 배포된 사고 발생 — 즉시 삭제 후
+# .gitignore와 동일한 항목을 여기에도 반영(두 목록은 서로 다른 시스템이라 하나만 고치면 재발함).
+$EXCLUDE = @("deploy.ps1","deploy.bat","deploy.log",".vscode","*.log","*.bak",".git","node_modules","*.sh",".claude","test-results","playwright-report","workers","secrets.ps1","Client ID.txt",".env.test",".env.test.example",".wrangler","백업_20260513.json","현장클리닉_원본DB.txt")
 # ────────────────────────────────────────────────────────────────
 
 # 배포 환경 선택 후 증가하므로, 여기서는 현재값 저장만
@@ -230,7 +233,8 @@ if ($choice -eq "8") {
 }
 
 # ── 버전 자동 증가 (확인 통과 후 실행) ──────────────────────────
-# 규칙: test·g1=4번째 자연 증가, staging=3번째↑+4번째 리셋, portal=2번째↑+3·4번째 리셋
+# 형식: MAJOR.MINOR.PP.BBBB  (PATCH 2자리 00-99, BUILD 4자리 0000-9999, 제로패딩)
+# 규칙: test·g1 = BUILD++ (9999→PATCH↑), staging = PATCH++(99→MINOR↑)+BUILD 리셋, portal = MINOR++
 # auction(8): $AUC_VER 별도 증가 (hub $VERSION은 변경 없음)
 
 if ($choice -eq "8") {
@@ -253,19 +257,25 @@ if ($choice -eq "8") {
 } elseif ($scriptContent -match '\$VERSION\s*=\s*"(\d+)\.(\d+)\.(\d+)\.(\d+)"') {
     $p = @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4])
     switch ($choice) {
-        "2" {        # staging: 3번째↑, 4번째 리셋, 자릿수 올림
+        "2" {        # staging: PATCH(2자리)↑ + BUILD 리셋, PATCH 99→MINOR 올림
             $p[2]++; $p[3] = 0
-            for ($i = 2; $i -gt 0; $i--) { if ($p[$i] -ge 10) { $p[$i] = 0; $p[$i-1]++ } }
+            if ($p[2] -ge 100) { $p[2] = 0; $p[1]++ }
+            if ($p[1] -ge 10)  { $p[1] = 0; $p[0]++ }
         }
-        "3" {        # portal: 2번째↑, 3·4번째 리셋
+        "3" {        # portal(www): MINOR↑, PATCH·BUILD 리셋
             $p[1]++; $p[2] = 0; $p[3] = 0
             if ($p[1] -ge 10) { $p[1] = 0; $p[0]++ }
         }
-        default {    # test(1) · g1consulting(4): 4번째 자연 증가 (상한 없음)
+        default {    # test(1) · g1consulting(4): BUILD(4자리)↑, 9999→PATCH 올림
             $p[3]++
+            if ($p[3] -ge 10000) { $p[3] = 0; $p[2]++
+                if ($p[2] -ge 100) { $p[2] = 0; $p[1]++
+                    if ($p[1] -ge 10) { $p[1] = 0; $p[0]++ }
+                }
+            }
         }
     }
-    $newVer  = "$($p[0]).$($p[1]).$($p[2]).$($p[3])"
+    $newVer  = "$($p[0]).$($p[1]).$("{0:D2}" -f $p[2]).$("{0:D4}" -f $p[3])"
     $updated = $scriptContent -replace '(\$VERSION\s*=\s*")[\d.]+"', ('${1}' + $newVer + '"')
     [System.IO.File]::WriteAllText($PSCommandPath, $updated, [System.Text.Encoding]::UTF8)
     $VERSION = $newVer
@@ -352,7 +362,10 @@ if (Test-Path $gitBash) {
         "--exclude='*.log' --exclude='*.sh' " +
         "--exclude='.git' --exclude='node_modules' --exclude='.vscode' " +
         "--exclude='.claude' --exclude='test-results' --exclude='playwright-report' " +
-        "--exclude='workers' "
+        "--exclude='workers' " +
+        "--exclude='secrets.ps1' --exclude='Client ID.txt' " +
+        "--exclude='.env.test' --exclude='.env.test.example' --exclude='.wrangler' " +
+        "--exclude='백업_20260513.json' --exclude='현장클리닉_원본DB.txt' "
     }
     # set -o pipefail: local tar 실패(클라우드 파일 읽기 오류 등)를 exit code로 전파
     # echo TAR_EXIT:$?: remote tar 결과를 명시적으로 출력 (exit 0 마스킹 제거)
@@ -368,6 +381,7 @@ if (Test-Path $gitBash) {
     # PS 쪽에서 필터링 (bash 쪽 grep "..." 사용 시 PS→bash 인자 전달 quoting 파괴됨)
     $meaningfulLines = $result | Where-Object { $_ -notmatch 'Cannot change mode|Exiting with failure' }
     $hasTarErrors    = ($meaningfulLines | Where-Object { $_ -match '^tar:' }).Count -gt 0
+    # TAR_EXIT:2 = "Cannot change mode" (NAS 권한 경고, 무해) → hasTarErrors=false이면 benign
     $ok = ($LASTEXITCODE -eq 0) -and ($resultStr -match 'TAR_EXIT:[012]') -and -not $hasTarErrors
 } else {
     Write-Host "  ⚠ Git Bash 미설치 — Windows scp 사용 (클라우드 파일 누락 위험)" -ForegroundColor DarkYellow
@@ -376,8 +390,12 @@ if (Test-Path $gitBash) {
     $ok      = ($LASTEXITCODE -eq 0)
 }
 
-# ── 로그 기록 ───────────────────────────────────────────────────
-"[$TIMESTAMP] v$VERSION → $($T.Name) : $(if ($ok){'SUCCESS'}else{'FAILED'})" | Add-Content $LOG_FILE
+# ── 로그 기록 (Google Drive 싱크 락 충돌 대비 재시도) ─────────────
+$logLine = "[$TIMESTAMP] v$VERSION → $($T.Name) : $(if ($ok){'SUCCESS'}else{'FAILED'})"
+for ($i = 0; $i -lt 5; $i++) {
+    try { $logLine | Add-Content $LOG_FILE -ErrorAction Stop; break }
+    catch { if ($i -lt 4) { Start-Sleep -Milliseconds 400 } }
+}
 
 # ── 결과 출력 ───────────────────────────────────────────────────
 Write-Host ""
@@ -465,7 +483,7 @@ if ($allOk -and ($choice -eq "2" -or $choice -eq "3")) {
     Write-Host ""
     Write-Host "  ▶ PDF 에셋 동기화 (test → $($syncEnv.Name))..." -ForegroundColor Gray
     $syncCmd = "if [ -d $srcPath ]; then mkdir -p $dstPath && cp -r $srcPath/. $dstPath/ 2>/dev/null && echo SYNC_OK; else echo SYNC_SKIP; fi"
-    $syncResult = & $gitBash -c "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} `"$syncCmd`"" 2>&1
+    $syncResult = & $gitBash -c "ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${NAS_USER}@${NAS_IP} '$syncCmd'" 2>&1
     $syncStr = ($syncResult -join ' ')
     if ($syncStr -match 'SYNC_OK') {
         Write-Host "    ✅ PDF 에셋 동기화 완료" -ForegroundColor Green
